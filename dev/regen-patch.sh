@@ -63,6 +63,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0034-mos-legalize-prefetch.patch"
   "$PATCHES/0036-mos-zero-page-indexed-globals.patch"
   "$PATCHES/0038-mos-return-frame-address.patch"
+  "$PATCHES/0042-mos-scavenger-p-undef-a16-test.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only

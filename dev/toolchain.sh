@@ -109,6 +109,11 @@ if [ ! -d "$SRC/.git" ]; then
   }
   apply_patch 0001-320-far-addrspace
   apply_patch 0002-321-accum16
+  # +mos-a16 regression for the 0011 scavenger-live-$p fix (downstream-only test; 0011's
+  # actual code fix is folded into 0002 directly, not applied standalone). Its own file
+  # was sitting loose in vendor/ with nothing recreating it on a fresh bootstrap; captured
+  # here so dev/regen-patch.sh's TESTRELS cp step has something to find on any vendor/.
+  apply_patch 0042-mos-scavenger-p-undef-a16-test
   # Upstream PR #578 (MOSCopyOpt loop live-in fixed point + its two lit tests).
   # Stock-llvm-mos defect, so it stays a standalone artifact applied after 0002
   # and listed in dev/regen-patch.sh's STANDALONE_MOSDIR. Drop on upstream merge.

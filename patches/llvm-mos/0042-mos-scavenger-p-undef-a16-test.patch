@@ -1,0 +1,76 @@
+diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef.mir b/llvm/test/CodeGen/MOS/scavenger-p-undef.mir
+new file mode 100644
+index 000000000000..a35569246d42
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/scavenger-p-undef.mir
+@@ -0,0 +1,70 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs -o - %s | FileCheck %s
++#
++# DOWNSTREAM-ONLY: this case needs the 16-bit accumulator feature (+mos-a16,
++# $a16) of the llvm-mos-65816 tree and is not part of the upstream submission;
++# the stock-6502 regression for the same fix is scavenger-p-undef-6502.ll.
++# (This vendor tree is LLVM 23, whose PEI pass is still spelled `prologepilog`;
++# the patch carries the current upstream spelling `prolog-epilog`.)
++
++# The register scavenger must borrow $p to hold a frame-index carry. $p is a
++# composite status register whose sub-registers ($c, $nz, $v) are what codegen
++# actually defines, so the PHP it emits can read a $p that holds no value at all
++# — and the machine verifier rejects that unless the operand is flagged undef.
++#
++# The predicate that decides this has to match the verifier's own notion of
++# "defined", which is a FORWARD availability set (block live-ins, plus defs,
++# minus kills/dead defs), accepting the use when *any* sub-register is in it. A
++# reaching-definition scan is not the same thing: the `dead $c` produced by the
++# ASL below IS a modifier of $p above the scavenge point, yet leaves nothing
++# available there.
++#
++# This function pins both directions in one block:
++#   * the first spill follows `dead renamable $c = ASL`  -> nothing available
++#                                                        -> PH undef $p
++#   * the second follows `renamable $c = LDImm1 0`       -> $c available
++#                                                        -> PH $p (no undef)
++# An over-eager undef would let a live flag def move or die, so the second case
++# is as load-bearing as the first.
++
++--- |
++  target triple = "mos"
++  define void @scavenge_p_no_available_flag() { unreachable }
++...
++---
++name: scavenge_p_no_available_flag
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++  - { id: 1, type: spill-slot, size: 8, alignment: 1 }
++body: |
++  ; The prologue lands in bb.0 so that its own scavenged $p save does not leave
++  ; $p defined on entry to the block under test.
++  bb.0:
++    successors: %bb.1
++    liveins: $a16, $y
++
++    BRA %bb.1
++
++  bb.1:
++    successors: %bb.2
++    liveins: $a16, $y
++
++    ; CHECK-LABEL: name: scavenge_p_no_available_flag
++    ; CHECK: bb.1:
++    ; CHECK: renamable $a, dead renamable $c = ASL killed renamable $a
++    ; CHECK-NEXT: PH $a
++    ; CHECK-NEXT: PH undef $p
++    ; CHECK: renamable $c = LDImm1 0
++    ; CHECK-NEXT: PH $p
++    ; CHECK-NOT: PH undef $p
++    renamable $a = COPY killed renamable $y
++    renamable $a, dead renamable $c = ASL killed renamable $a
++    dead early-clobber renamable $rs3 = STStk killed renamable $a16, %stack.0, 0
++    renamable $c = LDImm1 0
++    renamable $a16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    renamable $a, dead renamable $c, dead renamable $v = ADCImm killed renamable $a, 0, killed renamable $c
++    BRA %bb.2
++
++  bb.2:
++    RTS
++...

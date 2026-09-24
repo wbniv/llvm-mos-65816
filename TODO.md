@@ -1113,7 +1113,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   SelectionDAG does. Tests on MOS and AArch64; corpus differential 10 repaired / 0 changed.
   [PR draft](docs/upstream-gisel-inline-asm-indirect-output-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0037-validation.md). Aimed at llvm/llvm-project.
-  Remaining: publish (user-triggered).
+  [Independent audit complete](docs/pr-preparations/2026-09-23/0037-review-audit.md):
+  915 standalone suite passes, one unsupported; 12/12 focused corpus cases pass.
+  Generic/AArch64 submission variant prepared. Remaining: check and validate against
+  current llvm/llvm-project, prepare the branch, then publish (user-triggered).
 - [T5] **`__builtin_return_address` / `__builtin_frame_address` on MOS (patch 0038).** Both
   intrinsics were unlegalized (15 c-torture compilations). Frame address = the incoming soft stack
   pointer (fixed frame object at offset 0, no frame pointer forced); return address = the word
@@ -1171,15 +1174,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [ ] **`dev/regen-patch.sh` cannot round-trip against a reproducible `vendor/`.** Its `TESTRELS`
-  allow-list names `llvm/test/CodeGen/MOS/scavenger-p-undef.mir` and `insert-rep-sep-cloned-kills.mir`,
-  but no patch in `dev/toolchain.sh`'s apply list creates either file — they exist only in the shared,
-  hand-augmented `vendor/` (from drafted-but-unposted `0011`/`0002` work). A clean bootstrap (from the
-  `[toolchain-bootstrap-variants]` proof, 2026‑09‑24) therefore fails at
-  `cp: cannot stat '.../scavenger-p-undef.mir'`. Either land the patches that create those files, or
-  drop them from `TESTRELS` and regenerate 0002 without them. Found 2026‑09‑24 during the pin-bootstrap
-  work; unranked — added by Sonnet, this session's rank-requires-fable guard blocks a non-Fable model
-  from assigning the tier, so it needs a Fable pass to rank.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 153 tests, 147 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
@@ -1200,7 +1194,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [Audit](docs/pr-preparations/2026-09-23/0033-review-audit.md) confirmed the crash fix and found
   the rollback statistic decremented per instruction; revised 2026-09-23 (per-group `NumHoisted`,
   added to `NumSpills` only when the group is kept) and revalidated. The audit's provenance
-  finding was a container mount alias, not an unpatched compiler (see the validation record).
+  finding was a container mount alias, not an unpatched compiler: the follow-up audit
+  verified the original invocation and withdrew that finding. The current test comment
+  obeys AGENTS.md; a fresh revised-0033-only MOS suite passes 130 tests, one unsupported.
   Remaining: publish (user-triggered).
 - [T5] **Zero-page indexed globals: patch 0036 prepared and installed.** The compact
   form is intended under the existing whole-object zero-page contract. Classify explicit
@@ -1210,7 +1206,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   unsupported; 36 local width-mode compilations verify and round-trip cleanly.
   [PR draft](docs/upstream-zero-page-indexed-globals-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0036-validation.md).
-  [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md); ready to post. Remaining: publication (user-triggered).
+  [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md) and
+  [review audited](docs/pr-preparations/2026-09-23/0036-review-audit.md). No code revision
+  requested. Remaining: submission preparation and publication (user-triggered).
 - [T4] **Explicit `mos16(constant)` can select a zero-page opcode and truncate the address.**
   Pristine `llvm-mc` emits `B5 F0` for `lda mos16(240),x` and `B5 34` for
   `lda mos16(4660),x`, instead of absolute,X encodings `BD F0 00` / `BD 34 12`.
@@ -1361,10 +1359,21 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [scavenger-p-undef-capture] Corrected an over-broad finding (only one of the two
+  named `.mir` files was actually orphaned — `insert-rep-sep-cloned-kills.mir` was already inside
+  `0002`) and captured the real one, `scavenger-p-undef.mir` (a downstream-only `+mos-a16` regression
+  for the 0011 scavenger fix; 0011's actual code fix already lives inside `0002`), into a new
+  standalone patch `0042-mos-scavenger-p-undef-a16-test`, applied by `dev/toolchain.sh` and listed in
+  `dev/regen-patch.sh`'s `STANDALONE_MOSDIR` so a future 0002 regen won't duplicate it. Validated: the
+  patch reproduces the file byte-for-byte against a scratch tree. Not validated: a live end-to-end
+  `dev/regen-patch.sh` round trip against the shared `vendor/`, deliberately skipped — it would also
+  regenerate `0002` from the tree's *other* uncommitted, unrelated `MOSRegisterInfo.*` edits, which
+  aren't this session's to fold in.
 - ✅ 2026-09-24 — [toolchain-bootstrap-variants] `dev/toolchain.sh` bootstraps from the pin again: `-vendor` twins added for `0035`/`0037`/`0041` (+ the missing `0028` line), all 26 patches apply to a fresh `8be0546` checkout, `clang-23` built and assembly-equivalent to the shared build. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
 - ✅ 2026-09-24 — [toolchain-pin-bootstrap] Proved end to end: fetch+checkout hits the pin exactly, but the tracked patch stack does NOT apply cleanly — `0035-clang-prefetch-int16-operands` fails at patch 11/25, no artifact was produced. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
 - ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
 - ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
+- ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
 - ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
 - ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
@@ -2354,8 +2363,4 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
        of the same defect; it is fixed alongside it, not separately.
      - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
        return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
-<!-- triaged 2026-09-24: the plan now carries the eight numbered verification steps with raw
-     output and PASS under "## Verification" (it had only linked the validation record, which is
-     what the audit flagged). All eight pass; the curated M2 item for patch 0040 records the
-     same numbers, so nothing is separately open. -->
 <!-- END auto-captured-deferrals -->
