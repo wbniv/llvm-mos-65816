@@ -65,6 +65,7 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0036-mos-zero-page-indexed-globals.patch"
   "$PATCHES/0038-mos-return-frame-address.patch"
   "$PATCHES/0042-mos-scavenger-p-undef-a16-test.patch"
+  "$PATCHES/0043-mos-inline-asm-physreg-width.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
@@ -72,6 +73,7 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"
   "llvm/test/MC/MOS/motorola-integers-default.s"
+  "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll"  # created by 0043; cp'd in so 0043 reverses cleanly
   "llvm/test/MC/MOS/modifier-width.s"                  # created by 0039; cp'd in so 0039 reverses cleanly
   "llvm/test/MC/MOS/modifier-width-65816.s"            # created by 0039
   "llvm/test/MC/MOS/modifier-width-errors.s"           # created by 0039

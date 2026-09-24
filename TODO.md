@@ -1236,13 +1236,11 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   registers to allocate!`** (`asm("" : "=a"(long))` on MOS: `getRegistersForValue`'s physreg walk runs
   off the end of the 3-register `GPR` class when asked for 4; generic `InlineAsmLowering`, identical
   before and after 0041). Emit a clean diagnostic instead. Reason for T2: small and self-contained
-  once the wording is chosen (found in the 0041 work).
-- [wip T3] <!-- agent:a72e86f51e00fec65 --> **`MOSTargetLowering::getNumRegistersForInlineAsm` disagrees with `getRegForInlineAsmConstraint`
-  for non-`"r"` classes**: `"a"(int)` yields one 8-bit `GPR` for a 16-bit value, so the value is
-  silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
-  inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
-  test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 153 tests, 147 pass,
+  once the wording is chosen (found in the 0041 work). **Needs a new reproducer:** patch `0043`
+  makes MOS reject a physreg constraint whose operand is too wide, so `asm("" : "=a"(long))` now
+  stops at that check and never reaches the generic walk. The generic defect is untouched and
+  still reachable from other targets/constraints.
+- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
   (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
@@ -1439,6 +1437,9 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [inline-asm-physreg-width] MOS inline-asm constraints `a`/`x`/`y`/`R`/`d` now reject an
+  operand wider than their 8-bit register instead of truncating it (patch `0043`, AVR precedent).
+  See [plan](docs/plans/2026-09-24-inline-asm-num-registers.md).
 - ✅ 2026-07-13 — [dp-arg-cc] DP-pointer-arg CC crash fixed upstream (issue #561 closed, PR #563 merged
   `8be054612`); fork patch 0008 retired. TODO was stale by ~2 months (caught by the 2026-09-24 #320 audit).
   See [plan](docs/plans/2026-06-22-320-far-value-residuals.md).

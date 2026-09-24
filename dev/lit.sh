@@ -3,7 +3,7 @@
 # against the MOS lit suites (or the given paths).
 #
 # dev/toolchain.sh's "distribution" target installs clang+lld only — llc, opt,
-# llvm-mc, llvm-objdump, llvm-readobj, FileCheck, not are NOT part of it, so a
+# llvm-mc, llvm-objdump, llvm-readobj, split-file, FileCheck, not are NOT part of it, so a
 # green toolchain rebuild can leave them stale and a lit run silently reads
 # months-old codegen (see docs/agent-handoff.md SECOND GOTCHA; it produced a
 # false 13-vs-9 failure count during the 0040 work). This target rebuilds
@@ -20,7 +20,7 @@ set -euo pipefail
 usage() {
   cat <<'USAGE'
 Usage: dev/run.sh lit [PATHS...]
-  Refresh llc/opt/llvm-mc/llvm-objdump/llvm-readobj/FileCheck/not in
+  Refresh llc/opt/llvm-mc/llvm-objdump/llvm-readobj/split-file/FileCheck/not in
   build/llvm-mos, then run build/llvm-mos/bin/llvm-lit -s against PATHS.
   PATHS are under the repo root (/work inside the container); default:
     vendor/llvm-mos/llvm/test/CodeGen/MOS
@@ -51,7 +51,7 @@ LIT="$BUILDDIR/bin/llvm-lit"
 # generated at configure time (a python script templated with the build's own
 # paths), not a ninja target, so it needs no rebuild here.
 echo "==> refresh the lit tool set in $BUILDDIR (-j$JOBS)"
-cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj FileCheck not --parallel "$JOBS"
+cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj split-file FileCheck not --parallel "$JOBS"
 
 paths=()
 if [ $# -gt 0 ]; then

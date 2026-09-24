@@ -16,7 +16,7 @@ set -euo pipefail
 
 usage() {
   echo "Usage: dev/run.sh toolchain   # build llvm-mos clang/lld from source -> build/llvm-mos-install"
-  echo "  also refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/llvm-readobj/FileCheck/not)"
+  echo "  also refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/llvm-readobj/split-file/FileCheck/not)"
   echo "  in build/llvm-mos; run lit itself with: dev/run.sh lit [PATHS...]"
   echo "Env: BUILD_JOBS (compile parallelism, default 6 — lower if the 14 GiB host swaps)"
   echo "     LLVM_MOS_PIN (upstream SHA a FRESH vendor/ is checked out at; an existing"
@@ -198,6 +198,11 @@ if [ ! -d "$SRC/.git" ]; then
   # Generated against pristine upstream; four of its registration hunks sit next
   # to 0002's REP/SEP lines, hence the reduced context (-C1). Same in regen-patch.sh.
   apply_patch 0038-mos-return-frame-address -C1
+  # Inline-asm constraints naming an 8-bit data register (a/x/y/R/d) refuse an
+  # operand too wide for it instead of dropping its high bits. Stock-llvm-mos
+  # defect independent of +mos-a16, so it stays a standalone artifact applied
+  # after 0002 and reverse-applied out of every 0002 regeneration.
+  apply_patch 0043-mos-inline-asm-physreg-width
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and
@@ -249,7 +254,7 @@ cmake --build "$BUILDDIR" --target install-distribution
 # The "distribution" component list above is clang+lld only (see the trim step),
 # so it never rebuilds the tools llvm/test/CodeGen/MOS + llvm/test/MC/MOS lit
 # suites actually invoke in their RUN lines: llc, opt, llvm-mc, llvm-objdump,
-# llvm-readobj, FileCheck, not (checked by grepping the RUN lines — not guessed;
+# llvm-readobj, split-file, FileCheck, not (checked by grepping the RUN lines — not guessed;
 # llvm-lit itself is a configure-time-generated script, not a build target, so
 # it needs no rebuild here). A green toolchain build could leave $BUILDDIR/bin/llc
 # months stale while clang/lld moved on, producing a false lit reading (it did,
@@ -257,7 +262,7 @@ cmake --build "$BUILDDIR" --target install-distribution
 # invocation, so this stays incremental (ccache-warm, ninja no-ops anything
 # already current) — see docs/agent-handoff.md SECOND GOTCHA / dev/run.sh lit.
 echo "==> refresh the lit tool set in $BUILDDIR (-j$JOBS)"
-cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj FileCheck not --parallel "$JOBS"
+cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj split-file FileCheck not --parallel "$JOBS"
 
 echo "==> done in $((SECONDS/60))m $((SECONDS%60))s: $("$INSTALL/bin/mos-clang" --version | head -1)"
 echo "    use it: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build && ... corpus"

@@ -1,0 +1,167 @@
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+index 3271f98..ca6f5c7 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+@@ -129,11 +129,27 @@ unsigned MOSTargetLowering::getNumRegistersForInlineAsm(LLVMContext &Context,
+                                                         EVT VT) const {
+   // 16-bit inputs and outputs must be passed in Imag16 registers to allow using
+   // pointer values in inline assembly.
++  //
++  // This hook is given only a value type, never the constraint being lowered,
++  // so the answer has to hold for every constraint that can accept the type.
++  // It holds because getRegForInlineAsmConstraint() refuses any constraint
++  // whose register is narrower than the value: the classes it can still return
++  // for a 16-bit value hold all 16 bits in one register.
+   if (VT == MVT::i16)
+     return 1;
+   return TargetLowering::getNumRegistersForInlineAsm(Context, VT);
+ }
+
++// True when VT is a concrete, sized type wider than Bits. Types with no
++// meaningful width of their own (MVT::Other for an operand with no value type,
++// the abstract iPTR) are never wider than anything.
++static bool isWiderThan(MVT VT, unsigned Bits) {
++  if (!VT.isValid() || VT == MVT::iPTR ||
++      !(VT.isInteger() || VT.isFloatingPoint()))
++    return false;
++  return VT.getSizeInBits().getKnownMinValue() > Bits;
++}
++
+ TargetLowering::ConstraintType
+ MOSTargetLowering::getConstraintType(StringRef Constraint) const {
+   if (Constraint.size() == 1) {
+@@ -166,16 +182,36 @@ MOSTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
+       if (VT == MVT::i16)
+         return std::make_pair(0U, &MOS::Imag16RegClass);
+       return std::make_pair(0U, &MOS::Imag8RegClass);
++    // The data registers A, X and Y are 8 bits wide and are not pairable: there
++    // is no ordering in which any two of them form a wider value, so a
++    // constraint naming one of them cannot accept an operand that does not fit
++    // in it. Reject such an operand by falling through to the generic
++    // implementation, which reports the constraint as unsatisfiable; accepting
++    // it would drop the operand's high bits. Clang states the same rule for C
++    // sources in MOSTargetInfo::validateOperandSize().
+     case 'R':
++      if (isWiderThan(VT, 8))
++        break;
+       return std::make_pair(0U, &MOS::GPRRegClass);
+     case 'a':
++      if (isWiderThan(VT, 8))
++        break;
+       return std::make_pair(MOS::A, &MOS::GPRRegClass);
+     case 'x':
++      if (isWiderThan(VT, 8))
++        break;
+       return std::make_pair(MOS::X, &MOS::GPRRegClass);
+     case 'y':
++      if (isWiderThan(VT, 8))
++        break;
+       return std::make_pair(MOS::Y, &MOS::GPRRegClass);
+     case 'd':
++      if (isWiderThan(VT, 8))
++        break;
+       return std::make_pair(0U, &MOS::XYRegClass);
++    // The flag registers are one bit wide, and widening that bit to the
++    // operand's type is what "c" and "v" are for, so they take any width clang
++    // admits rather than only i1.
+     case 'c':
+       return std::make_pair(MOS::C, &MOS::FlagRegClass);
+     case 'v':
+diff --git a/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
+new file mode 100644
+index 0000000..336d6ad
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
+@@ -0,0 +1,92 @@
++; RUN: split-file %s %t
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs %t/ok.ll -o - | FileCheck %s
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-A
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-X
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-Y
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_R.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-R
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_d.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-D
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_in.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-IN
++
++; "a", "x", "y" name one of the 8-bit data registers and "R"/"d" name a class of
++; them. None of those registers pair into a wider value, so an operand that does
++; not fit in eight bits cannot be placed in one and the constraint is rejected.
++; Clang applies the same rule to C sources, so these cases are reachable only
++; from IR. The check matters because the alternative is silent: the number of
++; registers an inline-asm operand needs is reported from the value type alone,
++; without the constraint, so a 16-bit operand is reported as fitting in one
++; register and its high byte would be dropped on the way into an 8-bit one.
++
++;--- ok.ll
++
++; An 8-bit operand fits the register the constraint names.
++define i8 @narrow_a() {
++; CHECK-LABEL: narrow_a:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i8 asm "lda #42", "=a"()
++  ret i8 %v
++}
++
++; "r" is the constraint that does accept a 16-bit value: it selects Imag16, a
++; class whose registers hold all sixteen bits, which is what lets inline asm
++; take a pointer.
++define i16 @wide_r() {
++; CHECK-LABEL: wide_r:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i16 asm "", "=r"()
++  ret i16 %v
++}
++
++; The flag constraints are unaffected: their registers are one bit wide and
++; extending that bit to the operand's type is the point of "c" and "v".
++define i8 @carry_to_byte() {
++; CHECK-LABEL: carry_to_byte:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i8 asm "sec", "=c"()
++  ret i8 %v
++}
++
++;--- wide_a.ll
++define i16 @wide_a() {
++; REJECT-A: LLVM ERROR: unable to translate instruction: call{{.*}}wide_a
++  %v = call i16 asm "", "=a"()
++  ret i16 %v
++}
++
++;--- wide_x.ll
++define i16 @wide_x() {
++; REJECT-X: LLVM ERROR: unable to translate instruction: call{{.*}}wide_x
++  %v = call i16 asm "", "=x"()
++  ret i16 %v
++}
++
++;--- wide_y.ll
++define i16 @wide_y() {
++; REJECT-Y: LLVM ERROR: unable to translate instruction: call{{.*}}wide_y
++  %v = call i16 asm "", "=y"()
++  ret i16 %v
++}
++
++;--- wide_R.ll
++define i16 @wide_R() {
++; REJECT-R: LLVM ERROR: unable to translate instruction: call{{.*}}wide_R
++  %v = call i16 asm "", "=R"()
++  ret i16 %v
++}
++
++;--- wide_d.ll
++define i16 @wide_d() {
++; REJECT-D: LLVM ERROR: unable to translate instruction: call{{.*}}wide_d
++  %v = call i16 asm "", "=d"()
++  ret i16 %v
++}
++
++;--- wide_in.ll
++; The input direction is rejected for the same reason as the output direction.
++define void @wide_in(i16 %x) {
++; REJECT-IN: LLVM ERROR: unable to translate instruction: call{{.*}}wide_in
++  call void asm "", "a"(i16 %x)
++  ret void
++}

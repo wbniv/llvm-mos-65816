@@ -104,7 +104,7 @@ Targets:
   toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
              (for M1 codegen; long first build — see dev/toolchain.sh). Also
              refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/
-             llvm-readobj/FileCheck/not) in build/llvm-mos, so a green rebuild
+             llvm-readobj/split-file/FileCheck/not) in build/llvm-mos, so a green rebuild
              never leaves `lit` reading a stale llc (see `lit` below).
   lit        refresh that same lit tool set in build/llvm-mos, then run
              build/llvm-mos/bin/llvm-lit -s against llvm/test/CodeGen/MOS +
