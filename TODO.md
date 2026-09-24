@@ -1240,6 +1240,13 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   makes MOS reject a physreg constraint whose operand is too wide, so `asm("" : "=a"(long))` now
   stops at that check and never reaches the generic walk. The generic defect is untouched and
   still reachable from other targets/constraints.
+- [T2] **Draft the `0043` upstream PR** (inline-asm physreg constraints reject a too-wide operand; landed
+  `84d87260`, [plan](docs/plans/2026-09-24-inline-asm-num-registers.md)). Upstream-shaped already — MOS dir
+  + one MOS lit test, no `+mos-a16` dependency, AVR precedent (`AVRISelLowering.cpp` guards each class on
+  its VT) — but has no PR body, no validation record against the pinned base, and no
+  `docs/upstream-contribution-status.md` entry. Also owes a live `dev/regen-patch.sh` round trip (blocked
+  at fix time by another worker's dirty `0002`). Reason for T2: the 0033/0036 docs are the template;
+  no design. Posting stays user-triggered.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
