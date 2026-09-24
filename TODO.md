@@ -1177,11 +1177,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
   defect; decide per test, fix or re-baseline with a reason, and get the suite to 0 fail so the lit
   target is a usable gate. Reason for T3: four independent judgements, no design.
-- [T2] **Prove the toolchain pin with one clean bootstrap.** `dev/toolchain.sh` now fetches
-  `LLVM_MOS_PIN` (`8be0546`), justified by reading `dev/regen-patch.sh`, not by a fresh clone: run
-  `dev/run.sh toolchain` against an EMPTY scratch `vendor/` (never the shared one) and confirm every
-  patch applies and the installed `clang-23` matches the current build's sha256. Reason for T2: a
-  bounded run with a yes/no answer; the shallow-fetch fallback is the one untested branch.
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
@@ -1357,6 +1352,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [toolchain-pin-bootstrap] Proved end to end: fetch+checkout hits the pin exactly, but the tracked patch stack does NOT apply cleanly — `0035-clang-prefetch-int16-operands` fails at patch 11/25, no artifact was produced. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
 - ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
 - ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
 - ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
