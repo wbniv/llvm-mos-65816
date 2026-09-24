@@ -78,7 +78,7 @@ Project toolchain: `build/llvm-mos-install/bin/clang-23`, sha256
 | MOS CodeGen + MC, `llc-0041` | 145 tests: 144 pass, 1 unsupported, 0 fail |
 | X86 + ARM + AArch64 CodeGen suites, `llc-0041` | 11,461 tests: 11,438 pass, 23 expectedly fail, **0 fail** |
 | `dev/run.sh torture --tests 20030222-1.c pr52286.c` (four-way runtime gate) | 2 PASS, 0 FAIL, 0 SKIP, 0 XFAIL |
-| `dev/run.sh corpus-a16` after the project toolchain rebuild | **in flight at the time of writing**: 12 of 79 programs reported, 12 PASS, 0 FAIL, 0 XFAIL (`corpus-a16-0041.log`) |
+| `dev/run.sh corpus-a16` after the project toolchain rebuild | `79/79 passed, 0 xfail` — 79 verdict rows, 0 FAIL, 0 XFAIL (host == default == `+mos-a16` == `+mos-xy16` on MAME and bsnes-jg) |
 
 `20030222-1.c` is the asymmetric case and the reason the runtime gate matters: it feeds a
 `long long` through an eight-register tied group and reads the result back as the low `int`, and its
@@ -86,9 +86,35 @@ own `main` aborts if it gets the wrong half. A reversed piece order cancels out 
 not here. Both files now `PASS all variants PASS (0x600D)` — host == default@MAME ==
 `+mos-a16`@MAME == `+mos-xy16`@MAME == `+mos-a16`@bsnes-jg — so they move from
 `examples/65816/torture/unsupported.tsv` (bucketed `link-other` with the assertion's crash banner)
-into `inscope.tsv`. The two rows are moved by hand rather than by re-running
-`tools/torture_filter.py`, which would rewrite every row of two files other workers have just
-touched.
+into `inscope.tsv`.
+
+**The generator confirms the two moved rows.** They were first moved by hand, on the incorrect
+assumption that re-running the filter would rewrite unrelated rows; it does not — it is idempotent.
+`tools/torture_filter.py --opt=-Os` was therefore re-run over all 1,779 tests and diffed against the
+committed manifests (`regen-tsv-0041.log`):
+
+- `inscope.tsv`: **byte-identical** — 1,299 rows, including `20030222-1.c`, `pr52286.c` and the
+  `ashrdi-1.c` row patch 0040 added.
+- `unsupported.tsv`: identical 480 test names in identical order with identical buckets
+  (`builtins-multifile` 55, `compile-error` 170, `dg-require-unsupported` 58, `link-other` 15,
+  `region-overflow` 1, `undefined-symbol` 181), and both `link-other` rows for the two repaired
+  tests correctly absent.
+
+The committed files are kept rather than replaced, because the regenerated `unsupported.tsv` differs
+in the **diagnostic column only**, on 136 rows, and only as an artifact of where it was run:
+`_first()` truncates the raw diagnostic line with `ls[:200]` *before* `sanitize()` strips the repo
+root, so the surviving text is `200 - len(FUZZ_ROOT) - …` characters. This run used a scratch root
+104 characters long instead of the canonical 25, and 174 (the longest committed diagnostic) − 79 (the
+root-length delta) = 95, which is exactly the length every differing regenerated row has. **This is
+a real if minor reproducibility wart in the tool** — the third column of a committed manifest depends
+on the absolute checkout path, which is what `sanitize()`'s own docstring ("so the committed manifest
+is portable + deterministic") sets out to prevent. Not fixed here; flagged for whoever owns the
+filter. It does not affect the scope decision, which is the column that matters and which matched
+exactly.
+
+The filter was run rooted at a scratch `FUZZ_ROOT` (symlinks to the shared `vendor/` and `build/`,
+a copy of `_shim.c`) rather than in the shared checkout, so no tracked file outside this worktree
+was written.
 
 Piece order was checked directly rather than inferred. On AArch64, where `$0` in the asm template
 names an operand's **first** register:

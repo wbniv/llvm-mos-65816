@@ -388,14 +388,13 @@ Rebuild took (`clang-23` mtime advanced 03:22 → 04:34, size 124 828 136 → 12
 `buildSplitToAsmRegs`/`buildMergeFromAsmRegs` are present in the binary).
 
 ```text
+==> corpus-a16: expected.tsv  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg; settle=1000)
   arith      PASS   corpus_result=0xA9E9  8/16/32-bit integer ALU
-  … 12 of 79 programs reported, 12 PASS, 0 FAIL, 0 XFAIL …
-  maze_sim   PASS   corpus_result=0x0749  Maze recursive-division generate + A* indexed-heap solve
+  …
+==> corpus-a16: 79/79 passed, 0 xfail
 ```
 
-**INCOMPLETE** — the gate was still running when this record was written (it takes about two hours
-for 79 programs, and running a build alongside it flakes MAME's settle window). No failure so far.
-The remaining programs must be checked before this row can be called a PASS.
+79 verdict rows, 0 FAIL, 0 XFAIL. **PASS.**
 
 **9. `dev/run.sh torture` over the two repaired files (runtime differential).**
 
