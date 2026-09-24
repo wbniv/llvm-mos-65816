@@ -1177,13 +1177,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [T2] **`tools/torture_filter.py` truncates the diagnostic before it strips the checkout path**, so
-  the committed manifest's third column depends on the absolute `FUZZ_ROOT`: `_first()` cuts the raw
-  line at 200 characters and `sanitize()` removes the root afterwards, leaving `200 − len(root)`
-  characters (regenerating from a 104-character root shortened 136 `unsupported.tsv` rows to
-  exactly 95 characters; the committed rows span 97–174). Sanitize first, then truncate, and
-  regenerate the manifests once from the canonical root. Reason for T2: one function, the order
-  is the fix (found in the 0041 work).
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
@@ -1359,6 +1352,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
 - ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
 - ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
