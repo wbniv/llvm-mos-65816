@@ -270,7 +270,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [ ] **Phase 2 — select `[dp],Y` (`b7`/`97`) behind a conservative gate.** Phase 1 measured **GO**
+- [T4] **Phase 2 — select `[dp],Y` (`b7`/`97`) behind a conservative gate.** Phase 1 measured **GO**
   ([investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md)): folding the index is
   −47 % bytes / −44 % cycles on a single 8‑bit‑indexed far access, and 68 → 10 loop‑body bytes
   (~5.6× cycles) on a realistic 64‑iteration far→WRAM blit; with the add hoisted on *both* sides the
@@ -281,7 +281,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   byte offset, unsigned; require Y free or already index‑resident; a misclassification must only ever
   miss a win. Recommended first increment is the zero‑proof `Y ∈ {0,1,2,3}` sub‑case (multi‑byte access
   off an existing far pointer), which needs no range analysis at all. **Not** covered by the GO verdict:
-  `9f` (`sta long,X`) and the long‑form arithmetic — they need their own measurement.
+  `9f` (`sta long,X`) and the long‑form arithmetic — they need their own measurement. Reason for T4:
+  instruction-selection design plus a gate whose misclassification would regress shipped codegen;
+  the zero-proof sub-case first, the range-gated general case only once that is differential-green.
 ### M2 — Optimizing Payoff
 
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
@@ -907,7 +909,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T2] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
+- [wip T2] <!-- agent:ac42f66260ff4c60c --> **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
   independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
   one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
   (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
