@@ -1,0 +1,153 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+@@ -109,6 +109,48 @@ void MOSInstPrinter::printAddr24Operand(const MCInst *MI, unsigned OpNo,
+   OS << ')';
+ }
+
++// A 16-bit immediate prints its width explicitly whenever the bare text could
++// be re-parsed as an 8-bit one. The assembler has no notion of the M/X flags,
++// so `adc #66` always matches the narrowest candidate and reassembles to two
++// bytes; with M=0 the processor then consumes the following opcode as the
++// immediate's high byte and the whole instruction stream desynchronises.
++// Values above 255 are unambiguous already, which is why only small constants
++// are affected -- and why this went unnoticed.
++//
++// This is the same rule MOSDisassembler::getInstruction applies when it
++// re-wraps a decoded 16-bit immediate, one layer over: here it covers every
++// MCInst that reaches the printer, including the ones built by codegen, which
++// is the only producer of a plain (unwrapped) small 16-bit immediate.
++void MOSInstPrinter::printImm16Operand(const MCInst *MI, unsigned OpNo,
++                                       raw_ostream &OS) {
++  const MCOperand &Op = MI->getOperand(OpNo);
++
++  // An expression that already carries a MOS modifier prints that modifier
++  // itself; wrapping it again would yield mos16(mos16(x)).
++  if (Op.isExpr())
++    if (const auto *MME = dyn_cast<MOSMCExpr>(Op.getExpr()))
++      if (MME->getKind() != MOSMCExpr::VK_NONE)
++        return printOperand(MI, OpNo, OS);
++
++  // A constant that cannot fit an 8-bit immediate already states its own
++  // width, so ordinary disassembly does not grow a wrapper. Anything else --
++  // a small constant, an out-of-range one (whose bare text matches no operand
++  // at all), or a symbolic expression (which always matches the narrowest
++  // candidate) -- has to say how wide it is.
++  int64_t Value;
++  bool IsConstant = Op.isImm();
++  if (IsConstant)
++    Value = Op.getImm();
++  else if (Op.isExpr())
++    IsConstant = Op.getExpr()->evaluateAsAbsolute(Value);
++  if (IsConstant && Value > 0xFF && Value <= 0xFFFF)
++    return printOperand(MI, OpNo, OS);
++
++  OS << "mos16(";
++  printOperand(MI, OpNo, OS);
++  OS << ')';
++}
++
+ void MOSInstPrinter::printBranchOperand(const MCInst *MI, uint64_t Address,
+                                         unsigned OpNo, raw_ostream &OS) {
+   const MCOperand &Op = MI->getOperand(OpNo);
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+@@ -41,6 +41,7 @@ public:
+   void printBranchOperand(const MCInst *MI, uint64_t Address, unsigned OpNo,
+                           raw_ostream &OS);
+   void printAddr24Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
++  void printImm16Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+                                unsigned OpIdx, unsigned PrintMethodIdx,
+                                raw_ostream &OS);
+diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+--- a/llvm/lib/Target/MOS/MOSInstrFormats.td
++++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
+@@ -225,7 +225,15 @@ class imm16at<int offset> : Operand<i32> {
+   let OperandNamespace = "MOSOp";
+   let Type = i16;
+ }
+-def imm16 : imm16at<1>;
++// The 16-bit immediate of an Immediate16 instruction must be printed with an
++// explicit mos16() width whenever it would fit an 8-bit one, or the assembly
++// does not round-trip: the assembler has no M/X state, so a bare `adc #66`
++// re-parses as the two-byte form and, with M=0, desynchronises the instruction
++// stream from that point on. imm16at5 (the HuC6280 tii/tdd block length) does
++// not share this: its operand slot has no narrower sibling to collapse into.
++def imm16 : imm16at<1> {
++  let PrintMethod = "printImm16Operand";
++}
+ def imm16at5 : imm16at<5>;
+
+ /// An 8-bit pc-relative reference, for branch instructions.
+diff --git a/llvm/test/CodeGen/MOS/a16-immediate-width.ll b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
+@@ -0,0 +1,65 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++
++; Under +mos-a16 the accumulator is 16 bits, so these immediates are three-byte
++; Immediate16 forms. The assembler has no notion of the M flag, so a bare
++; `adc #66` re-parses as the two-byte 8-bit form -- and with M=0 the processor
++; then eats the next opcode as the immediate's high byte, desynchronising the
++; instruction stream. Anything that could fit an 8-bit immediate therefore has
++; to be printed with an explicit mos16() width.
++;
++; This has to be checked here rather than in an MC round-trip test: the
++; assembler cannot build an Immediate16 MCInst holding a plain small immediate
++; (its text always matches Imm8 first), and the disassembler wraps the operand
++; itself, so codegen is the only producer of the unmarked form.
++
++@g16 = global i16 48879
++
++define void @add_small(ptr %p) {
++; CHECK-LABEL: add_small:
++; CHECK:      rep #32
++; CHECK:      adc #mos16(66)
++; CHECK:      sep #32
++  %v = load i16, ptr @g16
++  %r = add i16 %v, 66
++  store i16 %r, ptr %p
++  ret void
++}
++
++; A value that cannot fit an 8-bit immediate already states its own width, so
++; it stays bare and ordinary 16-bit assembly does not grow a wrapper.
++define void @add_wide(ptr %p) {
++; CHECK-LABEL: add_wide:
++; CHECK:      adc #43981
++; CHECK-NOT:  mos16
++  %v = load i16, ptr @g16
++  %r = add i16 %v, 43981
++  store i16 %r, ptr %p
++  ret void
++}
++
++; The boundary: 255 is the largest value an 8-bit immediate can hold, so it is
++; still ambiguous and still has to be marked.
++define void @eor_boundary(ptr %p) {
++; CHECK-LABEL: eor_boundary:
++; CHECK:      eor #mos16(255)
++  %v = load i16, ptr @g16
++  %r = xor i16 %v, 255
++  store i16 %r, ptr %p
++  ret void
++}
++
++; A 16-bit compare is the same shape; and the 8-bit immediates the same
++; function emits once M is back to 1 must NOT be marked -- they are genuine
++; two-byte operands, not narrowed 16-bit ones.
++define i8 @cmp_small() {
++; CHECK-LABEL: cmp_small:
++; CHECK:      cmp #mos16(5)
++; CHECK:      sep #32
++; CHECK-NEXT: lda #0
++; CHECK:      sep #32
++; CHECK-NEXT: lda #1
++  %v = load i16, ptr @g16
++  %c = icmp ult i16 %v, 5
++  %r = zext i1 %c to i8
++  ret i8 %r
++}

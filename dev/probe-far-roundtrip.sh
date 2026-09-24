@@ -19,15 +19,31 @@ set -euo pipefail
 usage() {
   cat <<'EOF'
 Usage: dev/probe-far-roundtrip.sh [--cc PATH] [--mc PATH] [--objdump PATH]
-                                  [--cpu CPU] [--flags "..."] [-v] [FIXTURE...]
+                                  [--cpu CPU] [--flags "..."] [--all] [-v]
+                                  [FIXTURE...]
 
   --cc      mos-clang to compile with   (default: build/llvm-mos-install/bin/mos-clang)
   --mc      llvm-mc to reassemble with  (default: build/llvm-mos-install/bin/llvm-mc)
   --objdump llvm-objdump               (default: alongside --cc)
   --cpu     -mcpu value                 (default: mosw65816)
   --flags   extra clang flags           (default: "-Os")
+  --all     widen the default corpus from the far/packed24 fixtures to EVERY
+            examples/65816 fixture (117). The far set alone does not reach the
+            16-bit-immediate class of printer defect (patch 0045): only two of
+            its fixtures carried a small a16 immediate, against 32 over the
+            whole corpus. Slower (~3x), and the right setting for a release
+            check or after any InstPrinter/AsmParser change.
   -v        print the diverging bytes for each mismatch
   FIXTURE   .c/.s paths; default = examples/65816/far*.c + packed24 fixtures
+
+Both printer gaps this probe was written for are closed, so the expected
+result is 0 divergent in every mode:
+
+  A16="-Xclang -target-feature -Xclang +mos-a16"
+  XY16="-Xclang -target-feature -Xclang +mos-xy16"
+  dev/probe-far-roundtrip.sh --all                              #  8-bit default
+  dev/probe-far-roundtrip.sh --all --flags "-Os $A16"           # +mos-a16
+  dev/probe-far-roundtrip.sh --all --flags "-Os $A16 $XY16"     # +mos-a16 +mos-xy16
 
 Exit 0 when every fixture round-trips byte-identically, 1 otherwise.
 EOF
@@ -41,6 +57,7 @@ OBJDUMP=""
 CPU="mosw65816"
 FLAGS="-Os"
 VERBOSE=0
+ALL=0
 FIXTURES=()
 
 while [ $# -gt 0 ]; do
@@ -51,6 +68,7 @@ while [ $# -gt 0 ]; do
     --objdump) OBJDUMP="$2"; shift 2 ;;
     --cpu) CPU="$2"; shift 2 ;;
     --flags) FLAGS="$2"; shift 2 ;;
+    --all) ALL=1; shift ;;
     -v) VERBOSE=1; shift ;;
     *) FIXTURES+=("$1"); shift ;;
   esac
@@ -65,9 +83,16 @@ for t in "$CC" "$MC" "$OBJDUMP"; do
 done
 
 if [ ${#FIXTURES[@]} -eq 0 ]; then
+  # `[ … ] && glob=(…)` would be an AND-list whose failure `set -e` exempts only
+  # by a subtlety of the shell's rules; spell it out.
+  if [ "$ALL" = 1 ]; then
+    glob=("$ROOT"/examples/65816/*.c)
+  else
+    glob=("$ROOT"/examples/65816/far*.c)
+  fi
   while IFS= read -r f; do FIXTURES+=("$f"); done < <(
     # shellcheck disable=SC2012  # fixture names are plain ASCII
-    ls "$ROOT"/examples/65816/far*.c "$ROOT"/examples/65816/packed24/*.c 2>/dev/null | sort -u
+    ls "${glob[@]}" "$ROOT"/examples/65816/packed24/*.c 2>/dev/null | sort -u
   )
 fi
 

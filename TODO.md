@@ -270,22 +270,13 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [wip T4] <!-- agent:a40ebadf2d32b1054 --> **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the long-address gap
-  above.** A 16-bit immediate ≤ 255 prints as a bare `#N` and reassembles to 2 bytes instead of 3; under
-  M=0 (`+mos-a16`'s whole point) that **desyncs the instruction stream** — the next opcode's first byte is
-  consumed as the immediate's high byte. Reachable the same way (`-save-temps`). Measured: 36/112
-  `examples/65816/*.c` fixtures diverge on round-trip (97 lost `imm16` lines); values ≥ 256 are safe by
-  accident, which is why it went unnoticed. `llvm-mc` already handles `#mos16(27)` → `49 1b 00` on both
-  binaries, so this is purely printer-side. Follows the shape decided by the long-address item above;
-  fork-only (`+mos-a16` is downstream), so a separate patch. Reason for T4: same design blast radius;
-  if the shape is already settled by the time this is picked up, re-rank to T3.
-  [audit §6.3](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#63-the-second-instance--16-bit-immediates-under-mos-a16).
 - [T2] **Promote `dev/probe-far-roundtrip.sh` to a committed round-trip gate** (`dev/run.sh roundtrip`)
   over the 65816 corpus in all three modes — compile `-c` vs `-S`+`llvm-mc`, diff `.text` — so the two
-  AsmPrinter gaps above can never regress silently again. No round-trip gate existed before the
-  2026-09-24 #320 audit that wrote the script. Either land after the two gaps (clean baseline) or now with
-  the current 36 divergences recorded as a known set that must shrink, never grow. Reason for T2: the
-  script exists and works; wiring + an expected-set file is bounded.
+  AsmPrinter gaps (Done: [asmprinter-long-address], [asmprinter-a16-immediate]) can never regress silently
+  again. No round-trip gate existed before the 2026-09-24 #320 audit that wrote the script. **The baseline
+  is now clean**: `0045` added a `--all` flag (whole 117-fixture corpus, not just the far set) and all three
+  modes are 0 divergent, so no expected-failure set is needed — this is wiring plus a decision about what a
+  gate run may cost (`--all` is ~3× the far-set default). Reason for T2: the script exists and works.
   [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
 - [T1] **`MOSFixupKinds.cpp` `Infos[]` has 14 initialisers for 15 fixup kinds — add the `AddrAsciz`
   row.** Harmless today (`TargetSize == 0` = never relax, correct for a data directive; `MC/MOS/addr-asciz.s`
@@ -1418,6 +1409,10 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [asmprinter-a16-immediate] 16-bit immediates now print an explicit `mos16(...)` width when
+  the value would fit 8 bits, so a `+mos-a16` `adc #66` cannot reassemble to 2 bytes and desync the M=0
+  instruction stream (patch `0045`, downstream-only — no upstream target). Round-trip 32 → 0 divergent over
+  all 117 `examples/65816` fixtures, in all three modes. See [plan](docs/plans/2026-09-24-asmprinter-a16-immediate.md).
 - ✅ 2026-09-24 — [asmprinter-long-address] 24-bit operands now print an explicit `mos24(...)` width, so far
   load/store and the `$5C` long jump survive a `-S`-then-reassemble round trip instead of silently collapsing to
   their DBR-relative / bank-local 16-bit siblings (patch `0044`, printer-side; `0039` was the parser half). No
@@ -2459,4 +2454,9 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
 <!-- triaged 2026-09-24: the 0044 upstream PR draft is genuine open work — PROMOTED to the
      Upstream / Contribution section as a [T2] item beside its 0043 twin. fp:aae009e400ac4fcc -->
+- [ ] **(triage)** **`dev/probe-far-roundtrip.sh` gained `--all`.** The far/packed24 default corpus reaches only 2 of the 32 fixtures this defect touched, so it was a weak guard for this class. `--all` widens the default set to every `examples/65816` fixture (117) and the usage text now records the three expected-clean invocations. The default is unchanged (the far set is ~3× faster), so the `[T2]` "promote the probe to a committed gate" item still owns the decision about what a gate run costs — this just gives it a ready-made switch and a clean baseline in all three modes. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:9965ffa7ff2cd4bf -->
+- [ ] **(triage)** **No upstream follow-up.** See §6: downstream-only, so `docs/upstream-contribution-status.md` is untouched and no PR-draft item follows. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:a50f1d12729199d4 -->
+- [ ] **(triage)** **Residual, not reachable in the corpus:** a *narrower* width modifier (`mos16lo`/`mos16hi`) sitting on an `Immediate16` operand would be left unmarked by rule 1 and would still re-parse as 8-bit. The census in §1 found none — every such immediate in the corpus is a genuine `imm8` operand — and one would be a lowering bug rather than a printing one. Recorded so it is not rediscovered as a printer gap. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:5a80b2e34469dc4a -->
+- [ ] **(triage)** **The X-side has no codegen test, because codegen does not reach it.** `LDX_Immediate16` / `CPX_Immediate16` share the same `imm16` operand and the same rule, but under `+mos-a16 +mos-xy16` the compiler still emits only two-byte index immediates (`a2 00`, the `mos16lo`/`mos16hi` pairs) — measured over all 117 fixtures and re-checked on a synthetic indexed-load IR, where the only marked immediate is the accumulator's `adc #mos16(3)`. The printer covers the X forms; they become testable if a later change folds a constant into an index immediate. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:428a53e4a874f6ad -->
+- [ ] **(triage)** **The disassembler's own wrapper (`MOSDisassembler.cpp:326-333`) is now redundant** but deliberately left in place (§2). If it is ever removed, the printer keeps `llvm-objdump` correct. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:9ca54b424914620f -->
 <!-- END auto-captured-deferrals -->

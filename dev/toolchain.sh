@@ -210,6 +210,13 @@ if [ ! -d "$SRC/.git" ]; then
   # parser half is 0039), so it stays a standalone artifact applied after 0002
   # and reverse-applied out of every 0002 regeneration.
   apply_patch 0044-mos-asm-print-long-address
+  # The same printer gap one width down: a 16-bit immediate that would fit an
+  # 8-bit one prints an explicit mos16() width, so `adc #66` under M=0 cannot
+  # re-parse as the two-byte form and desynchronise the instruction stream.
+  # Unlike 0044 this is DOWNSTREAM-ONLY — upstream nothing builds an
+  # Immediate16 MCInst holding a plain small immediate — so it has no upstream
+  # target; it is standalone only to keep it reviewable apart from 0002.
+  apply_patch 0045-mos-asm-print-a16-immediate
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and
