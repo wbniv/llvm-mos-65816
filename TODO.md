@@ -1910,6 +1910,29 @@ revisit) rather than active work._
 _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
 
 <!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+<!-- triaged 2026-09-24: all five captured deferrals from
+     2026-09-24-asmprinter-a16-immediate.md are non-work — §8 is an "also changed /
+     recorded so it is not rediscovered" section, not a deferral list.
+     • "probe gained --all" -> shipped in this same commit; the follow-on decision
+       (what a gate run may cost) is already the curated [T2] "Promote
+       dev/probe-far-roundtrip.sh to a committed round-trip gate" item, which now
+       records the clean three-mode baseline.
+     • "No upstream follow-up" -> a statement that nothing is queued: 0045 is
+       downstream-only (+mos-a16 does not exist upstream), so there is deliberately
+       no docs/upstream-contribution-status.md entry and no PR-draft item. The
+       absence is the disposition.
+     • "narrower width modifier on an Immediate16 operand" -> measured absent across
+       all 117 fixtures in both a16 modes, and would be a LOWERING bug rather than a
+       printer gap if it ever appeared. Recorded in the plan so it is not
+       rediscovered; nothing to build.
+     • "X-side has no codegen test" -> codegen never selects LDX/CPX_Immediate16
+       today (every index immediate is the two-byte form, measured); the printer
+       already covers the X forms. Becomes testable only if a later change folds a
+       constant into an index immediate — no item until then.
+     • "the disassembler's own wrapper is now redundant" -> a deliberate
+       leave-in-place (plan §2), not a cleanup owed. Deleting stock llvm-mos code to
+       save nothing is churn.
+     Nothing open here. -->
 <!-- triaged 2026-09-15: all three captured deferrals from
      2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md are non-work.
      • "Publishing #118 (or #116/#117) to biohack.net" -> the curated M2 Cluster G block
@@ -2454,9 +2477,4 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
 <!-- triaged 2026-09-24: the 0044 upstream PR draft is genuine open work — PROMOTED to the
      Upstream / Contribution section as a [T2] item beside its 0043 twin. fp:aae009e400ac4fcc -->
-- [ ] **(triage)** **`dev/probe-far-roundtrip.sh` gained `--all`.** The far/packed24 default corpus reaches only 2 of the 32 fixtures this defect touched, so it was a weak guard for this class. `--all` widens the default set to every `examples/65816` fixture (117) and the usage text now records the three expected-clean invocations. The default is unchanged (the far set is ~3× faster), so the `[T2]` "promote the probe to a committed gate" item still owns the decision about what a gate run costs — this just gives it a ready-made switch and a clean baseline in all three modes. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:9965ffa7ff2cd4bf -->
-- [ ] **(triage)** **No upstream follow-up.** See §6: downstream-only, so `docs/upstream-contribution-status.md` is untouched and no PR-draft item follows. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:a50f1d12729199d4 -->
-- [ ] **(triage)** **Residual, not reachable in the corpus:** a *narrower* width modifier (`mos16lo`/`mos16hi`) sitting on an `Immediate16` operand would be left unmarked by rule 1 and would still re-parse as 8-bit. The census in §1 found none — every such immediate in the corpus is a genuine `imm8` operand — and one would be a lowering bug rather than a printing one. Recorded so it is not rediscovered as a printer gap. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:5a80b2e34469dc4a -->
-- [ ] **(triage)** **The X-side has no codegen test, because codegen does not reach it.** `LDX_Immediate16` / `CPX_Immediate16` share the same `imm16` operand and the same rule, but under `+mos-a16 +mos-xy16` the compiler still emits only two-byte index immediates (`a2 00`, the `mos16lo`/`mos16hi` pairs) — measured over all 117 fixtures and re-checked on a synthetic indexed-load IR, where the only marked immediate is the accumulator's `adc #mos16(3)`. The printer covers the X forms; they become testable if a later change folds a constant into an index immediate. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:428a53e4a874f6ad -->
-- [ ] **(triage)** **The disassembler's own wrapper (`MOSDisassembler.cpp:326-333`) is now redundant** but deliberately left in place (§2). If it is ever removed, the printer keeps `llvm-objdump` correct. — _from [2026-09-24-asmprinter-a16-immediate.md](docs/plans/2026-09-24-asmprinter-a16-immediate.md)_  <!-- fp:9ca54b424914620f -->
 <!-- END auto-captured-deferrals -->
