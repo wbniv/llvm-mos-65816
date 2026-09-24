@@ -1,0 +1,109 @@
+diff --git a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
+index 8fd6ff4e439c..78b15447b37e 100644
+--- a/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
++++ b/llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp
+@@ -26,6 +26,7 @@
+ #include "MCTargetDesc/MOSTargetStreamer.h"
+ #include "MOS.h"
+ #include "llvm/ADT/SmallSet.h"
++#include "llvm/ADT/SmallString.h"
+ #include "llvm/ADT/StringExtras.h"
+ #include "llvm/ADT/StringSwitch.h"
+ #include "llvm/MC/MCAsmInfo.h"
+@@ -40,6 +41,7 @@
+ #include "llvm/MC/MCSymbol.h"
+ #include "llvm/MC/TargetRegistry.h"
+ #include "llvm/Support/Debug.h"
++#include "llvm/Support/raw_ostream.h"
+ 
+ #define DEBUG_TYPE "mos-asm-parser"
+ 
+@@ -590,8 +592,28 @@ public:
+       getStreamer().emitBytes(Str);
+       getStreamer().emitBytes(
+           StringRef("\0\0\0\0\0\0\0\0\0", CharCount - Str.size() + 1));
++    } else if (getStreamer().hasRawTextSupport()) {
++      // Symbol, plain-text streamer (e.g. `llvm-mc -show-encoding` without
++      // `--filetype=obj`): the generic MCStreamer::emitValue can only emit a
++      // not-yet-resolved symbolic value by falling back to
++      // evaluateAsAbsolute, which fails for an unresolved symbol, and
++      // CharCount+1 is deliberately not restricted to a power-of-two byte
++      // count (the range check above allows [1,8], i.e. sizes [2,9]), so
++      // that fallback crashes with "Don't know how to emit this value." for
++      // most widths before a MOSTargetStreamer ever gets a say. There is no
++      // generic way to print "N raw bytes of an unresolved value" as text,
++      // so round-trip the original directive source instead of going
++      // through MOSMCExpr/emitValue at all. Object-file emission (below) is
++      // unaffected: hasRawTextSupport() is false there, and still routes
++      // through MOSMCELFStreamer::emitMosAddrAsciz via a dedicated fixup.
++      SmallString<64> Text;
++      raw_svector_ostream SS(Text);
++      SS << "\t.mos_addr_asciz\t";
++      getContext().getAsmInfo()->printExpr(SS, *AddrExpr);
++      SS << ", " << CharCount;
++      getStreamer().emitRawText(SS.str());
+     } else {
+-      // Symbol: emit as relocatable expression
++      // Symbol, object-file streamer: emit as relocatable expression.
+       const MCExpr *Expr = MOSMCExpr::create(MOSMCExpr::VK_ADDR_ASCIZ, AddrExpr,
+                                              /*Negated=*/false, getContext());
+       getStreamer().emitValue(Expr, CharCount + 1, Loc);
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCExpr.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCExpr.cpp
+index f13bfd2..aaecb5e 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCExpr.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCExpr.cpp
+@@ -102,7 +102,12 @@ int64_t MOSMCExpr::evaluateAsInt64(int64_t Value) const {
+     break;
+ 
+   case MOSMCExpr::VK_ADDR_ASCIZ:
+-    llvm_unreachable("Unable to evaluate VK_ADDR_ASCIZ as int64.");
++    // VK_ADDR_ASCIZ has no masked/shifted width like the address- and
++    // immediate-width variants above: its per-instance width lives in the
++    // MOS::AddrAsciz fixup (see MOSMCELFStreamer::emitMosAddrAsciz), not in
++    // this transform. An absolute constant is the value to be stringified
++    // as-is; there is nothing to mask or shift.
++    break;
+ 
+   case MOSMCExpr::VK_NONE:
+     llvm_unreachable("Uninitialized expression.");
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSModifierNames.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSModifierNames.cpp
+index 970340fee617..f9983777bc50 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSModifierNames.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSModifierNames.cpp
+@@ -26,6 +26,14 @@ static const struct ModifierEntry ModifierNames[] = {
+     {"mos24segmentlo", MOSMCExpr::VK_ADDR24_SEGMENT_LO, false},
+     {"mos24segmenthi", MOSMCExpr::VK_ADDR24_SEGMENT_HI, false},
+     {"mos13", MOSMCExpr::VK_ADDR13, false},
++    // VK_ADDR_ASCIZ is never spelled directly in source (it is produced only
++    // by the `.mos_addr_asciz <symbol>, N` directive, not by wrapping a
++    // general operand), but it still needs a name here so
++    // MOSMCExpr::printImpl/getName() have something real to print instead of
++    // silently emitting an empty modifier name (getName() returning nullptr
++    // is treated as "" by StringRef, not a crash, but the printed text was
++    // wrong: `(sym)` instead of a reparseable form).
++    {"addrasciz", MOSMCExpr::VK_ADDR_ASCIZ, false},
+ };
+ 
+ llvm::ArrayRef<ModifierEntry> modifierNames() { return ModifierNames; }
+diff --git a/llvm/test/MC/MOS/addr-asciz.s b/llvm/test/MC/MOS/addr-asciz.s
+index db3b4d3..8b9c2ef 100644
+--- a/llvm/test/MC/MOS/addr-asciz.s
++++ b/llvm/test/MC/MOS/addr-asciz.s
+@@ -1,6 +1,11 @@
+ ; RUN: llvm-mc -triple mos -motorola-integers --filetype=obj -o=%t.obj %s
+ ; RUN: llvm-readelf --relocs -x .header %t.obj | FileCheck %s
+ 
++; A symbolic .mos_addr_asciz operand must round-trip as plain text under the
++; non-object-file (-show-encoding) streamer, including when its value is not
++; yet resolvable at parse time.
++; RUN: llvm-mc -triple mos -motorola-integers -show-encoding %s | FileCheck %s --check-prefix=ASM
++
+ .section .header,"a",@progbits
+   .mos_addr_asciz _start, 5
+   .mos_addr_asciz 42, 5
+@@ -11,3 +16,5 @@
+ # CHECK-LABEL: section '.header':
+ # CHECK-NEXT: 0x00000000 30000000 00003432 00000000 39393939 0.....42....9999
+ # CHECK-NEXT: 0x00000010 39393939 00                         9999.
++
++# ASM: .mos_addr_asciz _start, 5

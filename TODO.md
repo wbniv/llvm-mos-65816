@@ -270,12 +270,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [wip T2] <!-- agent:a997e50cfdce30851 --> **`llvm-mc -show-encoding` crashes on a symbolic `.mos_addr_asciz`** (`LLVM ERROR: Don't know how
-  to emit this value.` — `VK_ADDR_ASCIZ` has no textual form and `evaluateAsInt64` is
-  `llvm_unreachable`). `MC/MOS/addr-asciz.s` only exercises `--filetype=obj`, so nothing catches it. Not
-  24-bit-specific; found incidentally by the 2026-09-24 #320 audit. Needs a textual form plus a
-  `-show-encoding` RUN line; upstream-postable. Reason for T2: one MCExpr printer case + a test.
-  [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
 - [T3] **`[dp],Y` (`b7`/`97`) indirect-long-indexed is never selected — MEASURE first.** A far pointer
   plus a runtime index always materialises a 32-bit pointer add then `lda [dp]`; `farindex.c`, a
   *dedicated* far-array-subscript fixture, emits 34× `lda [dp]` and zero `lda [dp],y`. Also unselected:
@@ -1402,6 +1396,11 @@ revisit) rather than active work._
   `p2↔s32` and `p3↔3×s8` legalizer bridges and the `G_PHI(p2)` legalisation. `dev/run.sh lit`: 163
   discovered (was 159), 157 pass, the same 4 known-failing baseline.
   See [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
+- ✅ 2026-09-24 — [mc-addr-asciz-symbolic-crash] `llvm-mc -show-encoding` no longer crashes on a symbolic
+  `.mos_addr_asciz`: the parser now round-trips the directive as raw text when the streamer can't
+  represent an unresolved symbolic value, `VK_ADDR_ASCIZ` got a real modifier spelling, and
+  `evaluateAsInt64`'s unreachable case became a correct identity pass-through (patch `0047`,
+  pristine-upstream). See [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md).
 - ✅ 2026-09-24 — [roundtrip-gate] Wired `dev/probe-far-roundtrip.sh` into `dev/run.sh roundtrip` (all 3
   modes, `--all` 117-fixture default; `--far-only` opts into the fast far/packed24 subset) — confirmed
   the 0-divergent baseline and the FAIL/exit-code path. See
