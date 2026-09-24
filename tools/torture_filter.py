@@ -24,6 +24,11 @@ fast, parallel, emulator-free path). Run on the host:
 
   FUZZ_ROOT=$PWD MOS_TOOLCHAIN=$PWD/build/llvm-mos-install python3 tools/torture_filter.py
 
+Ordering rule: sanitize() (strip the root/tempdir) BEFORE truncating a diagnostic to the
+200-char cap, so the retained text is the same regardless of FUZZ_ROOT's length — never
+cap raw text that still contains a machine-specific path. Covered by
+tests/test_torture_filter.py.
+
 See docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md.
 """
 import argparse
@@ -100,11 +105,17 @@ def classify(stderr):
 
 
 def _first(text, needles):
+    """Return the first line containing any needle: sanitize()d, THEN capped at 200 chars.
+
+    sanitize() must run before the cap — otherwise a long FUZZ_ROOT/tempdir prefix eats
+    into the 200-char budget before it's stripped, so the retained real content would
+    depend on the absolute root path's length (see the module docstring's ordering rule).
+    """
     for line in text.splitlines():
         ls = line.strip()
         for n in needles:
             if n in ls:
-                return ls[:200]
+                return sanitize(ls)[:200]
     return ""
 
 
@@ -148,6 +159,10 @@ def build_one(cfile, opt, timeout, shim_obj):
         if p.returncode == 0 and rom.exists():
             return name, "inscope", ""
         reason, diag = classify(p.stderr or p.stdout)
+        # _first() already sanitized+capped whatever it returned; this sanitize() is for
+        # the branches above that build `diag` directly (the undefined-symbol summary,
+        # "(no diagnostic)") rather than through _first — harmless no-op on text that's
+        # already portable.
         return name, reason, sanitize(diag)
 
 

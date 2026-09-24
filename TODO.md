@@ -1177,13 +1177,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
-- [T2] **`tools/torture_filter.py` truncates the diagnostic before it strips the checkout path**, so
-  the committed manifest's third column depends on the absolute `FUZZ_ROOT`: `_first()` cuts the raw
-  line at 200 characters and `sanitize()` removes the root afterwards, leaving `200 − len(root)`
-  characters (regenerating from a 104-character root shortened 136 `unsupported.tsv` rows to
-  exactly 95 characters; the committed rows span 97–174). Sanitize first, then truncate, and
-  regenerate the manifests once from the canonical root. Reason for T2: one function, the order
-  is the fix (found in the 0041 work).
 - [T3] **`dev/toolchain.sh` clones llvm-mos `main` unpinned** while `vendor/` sits at `8be0546`
   (2026‑07‑13) and the validation stack at `742d554`; a fresh bootstrap gets whatever `main` is that
   day, against the reproducibility rule, and every patch must keep applying to a moving base. Pin
@@ -1364,6 +1357,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
 - ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
 - ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
 - ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
