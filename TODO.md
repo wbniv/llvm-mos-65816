@@ -1171,6 +1171,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
+- [ ] **`dev/regen-patch.sh` cannot round-trip against a reproducible `vendor/`.** Its `TESTRELS`
+  allow-list names `llvm/test/CodeGen/MOS/scavenger-p-undef.mir` and `insert-rep-sep-cloned-kills.mir`,
+  but no patch in `dev/toolchain.sh`'s apply list creates either file — they exist only in the shared,
+  hand-augmented `vendor/` (from drafted-but-unposted `0011`/`0002` work). A clean bootstrap (from the
+  `[toolchain-bootstrap-variants]` proof, 2026‑09‑24) therefore fails at
+  `cp: cannot stat '.../scavenger-p-undef.mir'`. Either land the patches that create those files, or
+  drop them from `TESTRELS` and regenerate 0002 without them. Found 2026‑09‑24 during the pin-bootstrap
+  work; unranked — added by Sonnet, this session's rank-requires-fable guard blocks a non-Fable model
+  from assigning the tier, so it needs a Fable pass to rank.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 153 tests, 147 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
