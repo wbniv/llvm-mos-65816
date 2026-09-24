@@ -1167,7 +1167,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   yet), and fixing it needs a parse-time notion of a symbol's addressing width — a design question, not
   width arithmetic. Verified `0039` neither fixes nor worsens it (byte-identical failure output
   before/after). [diagnosis §2.3](docs/plans/2026-09-24-mos16-constant-truncation.md#23-scope-boundary--what-this-does-not-fix) ·
-  [validation](docs/pr-preparations/2026-09-24/0039-validation.md).
+  [validation](docs/pr-preparations/2026-09-24/0039-validation.md). **Low severity in isolation** per the
+  2026-09-24 #320 audit (relaxation covers the defined-symbol case) — fixing the AsmPrinter long-address
+  gap below removes the practical need for this one; see
+  [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
@@ -1229,18 +1232,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   **`0012` RETIRED — DO NOT POST (user decision 2026-08-05):** the direct MIR test manufactured
   `LDCImm 1`; no current upstream producer emits it, and `0027` (`357fe37`) corrected the former
   downstream a16 producer to canonical `-1`. Its patch and draft remain historical evidence only.
-- [wip T2] **DP-pointer-argument calling-convention crash — reported + FIXED upstream** — ✅ **issue
-  [#561](https://github.com/llvm-mos/llvm-mos/issues/561) (2026-06-22) + fix [PR #563](https://github.com/llvm-mos/llvm-mos/pull/563)
-  (2026-06-23, `Fixes #561` → auto-closes on merge).** Passing an `addrspace(1)` (8-bit direct-page) pointer
-  **argument** crashed the MOS backend: the CC materialized it into a 16-bit `RS` reg → illegal `(p1)=COPY
-  $rs`. **Pure upstream** — reproduces on plain `mos6502`; **breaking commit = `e618537e7d5e`** ("Use address
-  space 1 for ZP pointers", 2022-07-25). **Fix** (spike GO, `wt/dp-arg-cc`): a `CCIfPtrAddrSpace<1,
-  CCAssignToReg<[A, X, RC2..RC15]>>` rule giving the DP pointer an 8-bit slot (mirrors the far rules + i8
-  pool) + `llvm/test/CodeGen/MOS/dp-pointer-arg.ll`; validated (crash gone 5 shapes mos6502+mosw65816,
-  correct `lda 0,x`/`sta 0,x`, corpus 7/7, test crashes pre-fix/passes post). Carried as **fork patch `0008`**
-  (`e0e8bd4`); drop on merge + bump the vendor pin. **Awaiting upstream review.**
-  [plan](docs/plans/2026-06-22-320-far-value-residuals.md) (Part A) · issue body
-  `docs/320-upstream-dp-arg-cc-issue.md` · PR body `docs/320-upstream-dp-arg-cc-pr.md`.
 - [T5] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
   `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
   [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
@@ -1358,6 +1349,9 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-07-13 — [dp-arg-cc] DP-pointer-arg CC crash fixed upstream (issue #561 closed, PR #563 merged
+  `8be054612`); fork patch 0008 retired. TODO was stale by ~2 months (caught by the 2026-09-24 #320 audit).
+  See [plan](docs/plans/2026-06-22-320-far-value-residuals.md).
 - ✅ 2026-09-24 — [vacuous-verify-sweep] Last 2 of 23 demo gate scripts (`blossom.sh`, `mandel-oop.sh`) got the real
   `-fno-lto -c` verify leg. The `a16-rc-undef-ra-pure-virtual` blocker is fixed by patch `0028`, so no XFAIL wiring was
   needed; both gates GREEN (MAME + bsnes-jg). See [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
