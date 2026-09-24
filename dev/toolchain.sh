@@ -16,6 +16,8 @@ set -euo pipefail
 
 usage() {
   echo "Usage: dev/run.sh toolchain   # build llvm-mos clang/lld from source -> build/llvm-mos-install"
+  echo "  also refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/llvm-readobj/FileCheck/not)"
+  echo "  in build/llvm-mos; run lit itself with: dev/run.sh lit [PATHS...]"
   echo "Env: BUILD_JOBS (compile parallelism, default 6 — lower if the 14 GiB host swaps)"
   echo "     LLVM_MOS_PIN (upstream SHA a FRESH vendor/ is checked out at; an existing"
   echo "                   vendor/ is never reset, only warned about when it has drifted)"
@@ -224,5 +226,19 @@ cmake --build "$BUILDDIR" --target distribution --parallel "$JOBS"
 echo "==> install-distribution -> $INSTALL"
 cmake --build "$BUILDDIR" --target install-distribution
 
+# The "distribution" component list above is clang+lld only (see the trim step),
+# so it never rebuilds the tools llvm/test/CodeGen/MOS + llvm/test/MC/MOS lit
+# suites actually invoke in their RUN lines: llc, opt, llvm-mc, llvm-objdump,
+# llvm-readobj, FileCheck, not (checked by grepping the RUN lines — not guessed;
+# llvm-lit itself is a configure-time-generated script, not a build target, so
+# it needs no rebuild here). A green toolchain build could leave $BUILDDIR/bin/llc
+# months stale while clang/lld moved on, producing a false lit reading (it did,
+# during the 0040 work: 13-vs-9). Same in-tree build dir, same container
+# invocation, so this stays incremental (ccache-warm, ninja no-ops anything
+# already current) — see docs/agent-handoff.md SECOND GOTCHA / dev/run.sh lit.
+echo "==> refresh the lit tool set in $BUILDDIR (-j$JOBS)"
+cmake --build "$BUILDDIR" --target llc opt llvm-mc llvm-objdump llvm-readobj FileCheck not --parallel "$JOBS"
+
 echo "==> done in $((SECONDS/60))m $((SECONDS%60))s: $("$INSTALL/bin/mos-clang" --version | head -1)"
 echo "    use it: MOS_TOOLCHAIN=/work/build/llvm-mos-install dev/run.sh build && ... corpus"
+echo "    lit: dev/run.sh lit [PATHS...]   (runs llvm-lit -s against the MOS suites; refreshes these tools first)"

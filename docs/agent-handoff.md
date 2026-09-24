@@ -79,13 +79,15 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   `build/llvm-mos-install/bin/clang` is a symlink with a *stale mtime*; the real binary is **`clang-23`**.
   Confirm a rebuild took by checking `clang-23`'s mtime advanced (or `nm` it for a new symbol) — a stale
   build silently serving old codegen has burned this project before.
-  **SECOND GOTCHA (2026-07-31):** `dev/run.sh toolchain` does **not** rebuild `build/llvm-mos/bin/llc`
-  (it is not in the installed distribution component list), so a green toolchain build can still leave
-  `llc` months stale — it reproduced an already-fixed nondeterminism bug and failed the new lit test
-  after the fix had built fine. Any verification that drives `llc` directly (`dev/measure-gallery-repro.sh`,
-  MIR/lit work) must refresh it explicitly:
-  `docker run --rm -v $ROOT:/work --user $(id -u):$(id -g) -e HOME=/work/build llvm-mos-65816-dev
-  cmake --build /work/build/llvm-mos --target llc --parallel 8`.
+  **SECOND GOTCHA (2026-07-31, fixed 2026-09-24):** `dev/run.sh toolchain` used to install only the
+  clang+lld distribution, leaving `build/llvm-mos/bin/llc` (and `opt`/`llvm-mc`/`llvm-objdump`/
+  `llvm-readobj`/`FileCheck`/`not`) to go months stale after a green rebuild — it reproduced an
+  already-fixed nondeterminism bug and produced a false 13-vs-9 lit reading during the 0040 work.
+  `dev/toolchain.sh` now rebuilds that exact tool set (the ones `llvm/test/CodeGen/MOS` +
+  `llvm/test/MC/MOS` RUN lines actually invoke) right after `install-distribution`, in the same
+  container invocation, so a toolchain rebuild can no longer leave `llc` behind clang. Run lit itself
+  with `dev/run.sh lit [PATHS...]` (refreshes the same tools first, then `llvm-lit -s` against the two
+  MOS suites, or the given paths, under `/work`); see `dev/lit.sh`.
 - **The upstream-shape validation build (`build/newton-postra-build`, assertions on) is a copy of
   `build/0029-cross-target-build`** and is driven in the container with its source mounted at the
   cached path: `dev/container.sh -v "$PWD/build/newton-postra-src:/work/build/register-exhaustion-src"

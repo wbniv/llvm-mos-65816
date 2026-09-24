@@ -1142,12 +1142,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
      register" item added with 0038 was a re-discovery of patch 0003 (open upstream PR #584,
      Done 2026-08-01 below). It only reproduced on the isolated 0038 validation stack, which
      omits 0003; the project toolchain has the fix. Nothing to do. -->
-- [T2] **`dev/run.sh toolchain` leaves `build/llvm-mos/bin/llc` stale.** It builds and installs the
-  clang distribution targets only, so a green toolchain rebuild can leave `llc` (and any lit run on
-  it) months behind — it produced a false 13-vs-9 lit reading during the 0040 work and the same
-  trap is recorded in `docs/agent-handoff.md` (2026‑07‑31). Fix: add `llc` (and `llvm-lit`'s other
-  tool deps) to the build targets in `dev/toolchain.sh`, or add a `dev/run.sh lit` target that
-  rebuilds first. Reason for T2: one script, the target list is known.
 - [T5] **Upstream Windows CI red on `llvm-mos/main`: `CodeGen/AMDGPU/si-pre-allocate-wwm-regs-preserve-rci.mir`**
   (an MSVC comma-space CHECK mismatch), proven pre-existing on
   [main run 34793262107](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107) (2026‑09‑14),
@@ -1177,6 +1171,17 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   silently truncated (0041 made the truncation explicit, as SelectionDAG does; the MOS-side
   inconsistency is older). Decide the contract (reject, or widen to the register count) and add a
   test. Reason for T3: one target hook pair, but the intended semantics need settling.
+- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 153 tests, 147 pass,
+  2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
+  `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
+  (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
+  defect; decide per test, fix or re-baseline with a reason, and get the suite to 0 fail so the lit
+  target is a usable gate. Reason for T3: four independent judgements, no design.
+- [T2] **Prove the toolchain pin with one clean bootstrap.** `dev/toolchain.sh` now fetches
+  `LLVM_MOS_PIN` (`8be0546`), justified by reading `dev/regen-patch.sh`, not by a fresh clone: run
+  `dev/run.sh toolchain` against an EMPTY scratch `vendor/` (never the shared one) and confirm every
+  patch applies and the installed `clang-23` matches the current build's sha256. Reason for T2: a
+  bounded run with a yes/no answer; the shallow-fetch fallback is the one untested branch.
 - [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
   compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
@@ -1352,6 +1357,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
 - ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
 - ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
 - ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
