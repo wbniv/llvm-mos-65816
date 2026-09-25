@@ -270,8 +270,36 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
+- [T4] **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index.** Increment 1
+  (Done 2026-09-25) folds only a compile-time-constant displacement in `[1,3]`. The
+  investigation's main target is still unselected: a *runtime* index provably within the Y width.
+  Gate on the **scaled** byte offset (`index × sizeof(elem)`, unsigned) — `0..255` under
+  `+mos-a16`, `0..65535` only under `+mos-xy16` (Y's width is governed by **X**, not M) — with Y
+  free or already index-resident, and the same may-fold discipline: failing the range proof must
+  fall back, never regress. Its customer is the blit shape (`dev/dpy-shapes/loop.c`), measured
+  −50 % loop bytes / −31 % cycles in
+  [Phase 1 §4](docs/investigations/2026-09-24-dpy-indexed-measurement.md) and **unchanged (86 B)**
+  by increment 1. Entry point: `MOSLegalizerInfo::tryFarIndirectIndexedAddressing`, which already
+  emits the opcode — increment 2 only widens what it accepts as the index. Reason for T4: a range
+  proof plus a gate whose misclassification would regress shipped codegen; land the scheduler item
+  below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
+  [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
 ### M2 — Optimizing Payoff
 
+- [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
+  measuring `[dp],Y` increment 1. When a 32-bit index-scaling shift feeds a 32-bit pointer add, the pre-RA
+  scheduler sinks each `rol` next to its `adc` consumer, so both carries are live at once; there
+  is only one `P.C`, so the second is materialised as `ldy #1 / bcs +2 / ldy #0` (5 B) and
+  restored with `cpy #1` (2 B) — twelve times in a three-access function. Reproducer and numbers
+  in [the plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md#the-three-access-cliff--a-separate-reproducible-defect):
+  a 3-access far shape is **397 → 410 B** at `-Os`, but **369 → 290 B** with
+  `-mllvm -enable-misched=false` — i.e. the scheduler costs ~80 B on that shape and is **already**
+  costing the unmodified compiler 28 B on it today. `-enable-post-misched=false` changes nothing,
+  so it is the pre-RA scheduler. This is the only reason increment 1 shows +8 B on `farindex`
+  instead of a win. No local instruction-selection predicate can see it; the fix belongs in
+  `MOSMachineScheduler`'s pressure model. Reason for T4: scheduler heuristics with an unknown blast
+  radius — measure across the whole corpus (governing lesson 2) before and after; a fix that helps
+  this shape and hurts others is not a fix.
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
@@ -895,7 +923,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T2] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
+- [T4] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
   independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
   one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
   (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
@@ -918,8 +946,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   CGRAM entries 0-223 of 256 — entries 224-255 stay at whatever (randomized) CGRAM already held, a
   possible second, unrelated contributor. Reproducible standalone battery-build scripts left in the
   escalating agent's scratchpad (not committed — described in its handback, not re-derived here).
-  **Needs a T3/T4 re-rank** (a Fable session — this session couldn't write one); T2's "no design" premise
-  no longer holds.
+  **Re-ranked T2→T4 2026-09-25:** an unknown root cause behind two different symptoms, to be found by
+  tracing emulator state (HDMA channels 1-2, `REG_BGMODE`/`REG_TM`, CGRAM 224-255) across entropy-0 vs
+  entropy-1 runs — debugging, not a recipe; the T2 "no design" premise no longer holds.
 - [T2] **`rdiff`'s title card dominates both gate captures and the Gray-Scott field is never
   visible.** Measured 2026-09-15 on `main` (gate PASS, `corpus_result=0x5555`, so invisible to the
   differential): frames 500/2000/2600/3500 all show the title; frame 6000 is entirely black — title torn
@@ -1913,35 +1942,9 @@ revisit) rather than active work._
 
 _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
 
-<!-- filed 2026-09-25 by the [dpy-indexed-phase2] dispatch; unranked on purpose — ranking is T5 -->
-
-- **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index.** Increment 1
-  (Done 2026-09-25) folds only a compile-time-constant displacement in `[1,3]`. The
-  investigation's main target is still unselected: a *runtime* index provably within the Y width.
-  Gate on the **scaled** byte offset (`index × sizeof(elem)`, unsigned) — `0..255` under
-  `+mos-a16`, `0..65535` only under `+mos-xy16` (Y's width is governed by **X**, not M) — with Y
-  free or already index-resident, and the same may-fold discipline: failing the range proof must
-  fall back, never regress. Its customer is the blit shape (`dev/dpy-shapes/loop.c`), measured
-  −50 % loop bytes / −31 % cycles in
-  [Phase 1 §4](docs/investigations/2026-09-24-dpy-indexed-measurement.md) and **unchanged (86 B)**
-  by increment 1. Entry point: `MOSLegalizerInfo::tryFarIndirectIndexedAddressing`, which already
-  emits the opcode — increment 2 only widens what it accepts as the index.
-  *Suggested tier: T4* (a range proof plus a gate whose misclassification would regress shipped
-  codegen).
-
-- **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
-  measuring the above. When a 32-bit index-scaling shift feeds a 32-bit pointer add, the pre-RA
-  scheduler sinks each `rol` next to its `adc` consumer, so both carries are live at once; there
-  is only one `P.C`, so the second is materialised as `ldy #1 / bcs +2 / ldy #0` (5 B) and
-  restored with `cpy #1` (2 B) — twelve times in a three-access function. Reproducer and numbers
-  in [the plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md#the-three-access-cliff--a-separate-reproducible-defect):
-  a 3-access far shape is **397 → 410 B** at `-Os`, but **369 → 290 B** with
-  `-mllvm -enable-misched=false` — i.e. the scheduler costs ~80 B on that shape and is **already**
-  costing the unmodified compiler 28 B on it today. `-enable-post-misched=false` changes nothing,
-  so it is the pre-RA scheduler. This is the only reason increment 1 shows +8 B on `farindex`
-  instead of a win. No local instruction-selection predicate can see it; the fix belongs in
-  `MOSMachineScheduler`'s pressure model.
-  *Suggested tier: T4* (scheduler heuristics, unknown blast radius, needs its own measurement).
+<!-- triaged 2026-09-25: both items filed by the [dpy-indexed-phase2] dispatch were genuine open
+     work with no owner — PROMOTED as [T4]: increment 2 (range-gated runtime index) at the end of
+     M1, the pre-RA scheduler carry-pressure cliff at the top of M2. -->
 
 <!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
 <!-- triaged 2026-09-24: all five captured deferrals from
