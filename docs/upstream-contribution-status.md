@@ -1,12 +1,15 @@
 # Upstream contribution status — PR progress and submission queue
 
-**GitHub status last verified:** 2026-09-23, live `gh pr view` / `gh issue view` of every PR and
-issue referenced in this document. Scope: PRs/issues authored by `wbniv` in `llvm-mos/llvm-mos`,
-plus authored PRs in `llvm-mos/llvm-mos-sdk`.
+**GitHub status last verified:** 2026-09-25, live `gh pr view` / `gh issue view` / `gh pr checks` of
+every PR and issue referenced in this document. Scope: PRs/issues authored by `wbniv` in
+`llvm-mos/llvm-mos`, plus authored PRs in `llvm-mos/llvm-mos-sdk`.
 **13 compiler PRs: 7 merged (#562, #563, #577, #579, #587, #590, #591), 6 open (#578, #584, #586,
 #588, #589, #604). Both authored issues (#561 and #576) are closed.** (#549, #575 and #585 are other
-authors' PRs and were listed here by mistake until 2026‑09‑24; verified with `gh pr view`.)
-**SDK: one authored PR, #450, open.** No state change since the September 21 snapshot.
+authors' PRs and were listed here by mistake until 2026‑09‑24; verified with `gh pr view`.) No PR or
+issue state changed between the 2026-09-23 and 2026-09-25 checks; CI rollups, review decisions, and
+comment counts on the six open PRs are unchanged.
+**SDK: one authored PR, #450, open.** No state change since the September 20 posting (reconfirmed
+2026-09-25: 0 comments, 0 reviews, `reviewDecision` empty).
 
 **Prepared submissions (posting is user-triggered; review evidence is linked below):**
 [0029](upstream-twoaddr-physreg-reschedule-pr.md) register exhaustion ·
@@ -71,6 +74,21 @@ fix is now prepared as [0039](upstream-asm-modifier-width-pr.md). Review, corpus
 patch's record. See the [pending-work tracker](upstream-pending-work.md) for
 submission steps and the remaining defects.
 
+**Landed, PR draft not yet started (September 24):** four more pristine-upstream fixes landed in the
+patch stack, each the same upstream-postable shape as `0033`/`0036`, but none yet has a PR body or a
+`pr-preparations` validation record. `TODO.md` carries the draft-PR follow-up for three of them:
+[`0043`](plans/2026-09-24-inline-asm-num-registers.md) (inline-asm physreg constraints reject an
+operand wider than the register, `84d87260`) · [`0044`](plans/2026-09-24-asmprinter-long-address.md)
+(AsmPrinter marks 24-bit address operands with an explicit `mos24()` width, `5ea5006c`) ·
+[`0046`](plans/2026-09-24-fixupkinds-addrasciz-row.md) (`MOSFixupKinds.cpp` gains its missing
+`AddrAsciz` row, `fe54d1b7`).
+[`0047`](plans/2026-09-24-mc-addr-asciz-symbolic-crash.md) (fixes an `llvm-mc -show-encoding` crash
+on a symbolic `.mos_addr_asciz`, `6eced8e4`) is the same upstream-postable shape, but has **no
+queued TODO item** for its PR draft — its own plan (§Upstream) deliberately left it unranked because
+ranking is reserved to the Fable orchestrator, not a T2 dispatch; it still needs one. `0045`
+(AsmPrinter `mos16()` immediate marking under `+mos-a16`) is fork-only by design — its plan states no
+upstream destination — and is intentionally absent from this queue.
+
 ## Current PR progress
 
 | Open PR | Current head | Review / next step | Latest GitHub CI (Ubuntu / Windows / macOS) |
@@ -102,6 +120,14 @@ identify who or what initiated cancellation. Record this as an incomplete build,
 result; the Node warning alone does not establish the cancellation cause.
 Local revision validation is recorded separately in the
 [September 13 bundle](pr-revisions/2026-09-13/validation.md).
+
+**#604 Windows CI checked 2026-09-25:** the failing job is
+`CodeGen/AMDGPU/si-pre-allocate-wwm-regs-preserve-rci.mir` (an MSVC comma-space `CHECK` mismatch),
+confirmed pre-existing and unrelated to the MVN/MVP change — the same test fails on a plain
+`llvm-mos/main` run ([`34793262107`](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107),
+2026-09-14) that predates #604. `TODO.md` carries the prepared reply for if a maintainer queries the
+red check; posting it is user-triggered. `gh pr view 604` shows zero comments and zero reviews as of
+this refresh — no review activity yet.
 
 | Merged PR | Contribution | Merged (UTC) |
 |---|---|---|
