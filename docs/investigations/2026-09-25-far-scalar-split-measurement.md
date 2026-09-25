@@ -252,8 +252,10 @@ common C shapes. It is filed separately in TODO.
    `adc long` buys 4 B in `tick` (22 → 18 B). They need `ADC/…AbsLong16` pseudos, and they must keep the
    `noStoreBetween` + single-use clamp of the near fold helpers.
 6. **No bank-crossing special case** (§6).
-7. **Validate on the `-c` path.** The AsmPrinter long-address text gap (audit §6) means a `-save-temps`
-   round trip can silently narrow `mos24(...)`.
+7. **Validate on `-c` and on `-S`.** The AsmPrinter long-address text gap that the `long,X` doc warns
+   about is closed by `0044` (`5ea5006c`, an explicit `mos24()` on 24-bit operands). The `-S` round trip
+   here reproduced the compiled bytes exactly (§4.2). Keep checking both paths on a toolchain that predates
+   it.
 
 ## 6. Bank crossing — does one `M=0` access at `$xxFFFF` wrap like two byte accesses? **Yes, identically.**
 
@@ -301,3 +303,192 @@ Phase 2 carries **no bank-seam constraint**, and no alignment or "not at `$xxFFF
 - **Durable artifacts merged to `main`:** this document, `dev/measure-far-scalar-split.sh`, and
   `dev/far-scalar-split/`, which holds the fixtures, the census and relocation analysers, the hand-built
   `m0/*.s`, and the bank-seam probe. The worktree is disposable.
+
+## 8. Raw output (verification record)
+
+The record is `GENDIR=/home/will/llvm-mos-65816/build BANKCROSS=1 dev/measure-far-scalar-split.sh`, run
+in the worktree against the toolchain named above, exit 0. The hand-built rows (step 4b) are the
+`dev/far-scalar-split/m0/*.s` files merged with this document.
+
+| step | what it checks | result |
+|---|---|---|
+| 1 | the split happens in the Legalizer | **PASS**: `G_LOAD (s16) p2` becomes 2× `G_LOAD_FAR_ABS (s8)` |
+| 2a/2b | census, exact IR and object shapes | **PASS**: 11 `i16` loads + 2 stores, 16 byte-split sites, `+mos-a16` == `+mos-xy16` |
+| 3/4 | current against `M=0`, 4 modes | **PASS**: the numbers in §4 |
+| 5 | hazard forms | **PASS**: `stz`/`ldx`/`ldy`/`stx abs` found (§5.2) |
+| 6 | bank seam | **PASS**: 3/3 bsnes-jg, 3/3 MAME, carry semantics |
+
+```
+toolchain: <worktree>/build/llvm-mos-install/bin/clang-23  sha256 d06097b58e71b708
+==> 1) root cause: MIR for xe() after IRTranslator and after Legalizer (+mos-a16)
+    # *** IR Dump After IRTranslator (irtranslator) ***:
+      %0:_(s16) = G_MERGE_VALUES %1:_(s8), %2:_(s8)
+      %3:_(s16) = G_LOAD %4:_(p2) :: (dereferenceable invariant load (s16) from @fg, align 1, !tbaa !2, addrspace 2)
+    # *** IR Dump After Legalizer (legalizer) ***:
+      %0:_(s16) = G_MERGE_VALUES %1:_(s8), %2:_(s8)
+      %8:_(s8) = G_LOAD_FAR_ABS @fg :: (dereferenceable invariant load (s8) from @fg, !tbaa !2, addrspace 2)
+      %11:_(s8) = G_LOAD_FAR_ABS @fg + 1 :: (dereferenceable invariant load (s8) from @fg + 1, !tbaa !2, addrspace 2)
+      %3:_(s16) = G_MERGE_VALUES %8:_(s8), %11:_(s8)
+==> 2a) exact census: far (addrspace 2) i16/i32 loads+stores in optimized IR (+mos-a16)
+    translation units: 426 compiled, 0 failed to compile (skipped)
+    all far accesses (op width base):
+        11  load i16 runtime-ptr
+         2  load i32 runtime-ptr
+         3  load i8 global
+       102  load i8 runtime-ptr
+         2  store i16 runtime-ptr
+         4  store i8 global
+        25  store i8 runtime-ptr
+    i16/i32 far accesses by translation unit:
+         2  ex_farbank load i32 runtime-ptr
+         3  ex_farindex load i16 runtime-ptr
+         1  snes_dblbridge load i16 runtime-ptr
+         6  snes_lzss-gallery load i16 runtime-ptr
+         2  snes_lzss-gallery store i16 runtime-ptr
+         1  snes_mandel-double load i16 runtime-ptr
+==> 2b) shape census: byte-split far pairs in objects (dev/far-scalar-split/census.py)
+    a16: 16 byte-split sites
+      1        ex:farbank main indlong-ld dp
+      1        ex:farbank main indlong-ld reg
+      2        ex:farindex main indlong-ld dp
+      1        ex:farindex main indlong-ld reg
+      1        snes:dblbridge _title_reserve indlong-ld imag16
+      1        snes:lsystem main indlong-st -
+      1        snes:lzss-gallery compress_far indlong-ld imag16
+      1        snes:lzss-gallery compress_far indlong-ld reg
+      3        snes:lzss-gallery compress_far indlong-st -
+      1        snes:lzss-gallery main indlong-ld dp
+      1        snes:lzss-gallery main indlong-ld imag16
+      1        snes:lzss-gallery vram_words_far indlong-ld reg
+      1        snes:mandel-double main indlong-ld dp
+    xy16: 16 byte-split sites
+      1        ex:farbank main indlong-ld dp
+      1        ex:farbank main indlong-ld reg
+      2        ex:farindex main indlong-ld dp
+      1        ex:farindex main indlong-ld reg
+      1        snes:dblbridge _title_reserve indlong-ld imag16
+      1        snes:lsystem main indlong-st -
+      1        snes:lzss-gallery compress_far indlong-ld imag16
+      1        snes:lzss-gallery compress_far indlong-ld reg
+      3        snes:lzss-gallery compress_far indlong-st -
+      1        snes:lzss-gallery main indlong-ld dp
+      1        snes:lzss-gallery main indlong-ld imag16
+      1        snes:lzss-gallery vram_words_far indlong-ld reg
+      1        snes:mandel-double main indlong-ld dp
+==> 3/4a) current far codegen vs NEAR analog (= M=0 far-global target), -Os
+  -- a16   (current far)
+  xe                 31 B     52 cy (fall-through path)
+  tick               48 B     74 cy (fall-through path)
+  mixv               41 B   loop body  38 B    60 cy/iter
+  mixh               45 B   loop body  21 B    36 cy/iter
+  sump               89 B   loop body  67 B   113 cy/iter
+  fillp              89 B   loop body  53 B    87 cy/iter
+  ldr                12 B     22 cy (fall-through path)
+  vramup             53 B   loop body  46 B    74 cy/iter
+  str                10 B     18 cy (fall-through path)
+  -- a16   (near analog; only the global-scalar rows xe/tick/mixv/mixh/ldr/str are the far M=0 target)
+  xe                 21 B     38 cy (fall-through path)
+  tick               18 B     32 cy (fall-through path)
+  mixv               27 B   loop body  24 B    40 cy/iter
+  mixh               37 B   loop body  21 B    36 cy/iter
+  ldr                 8 B     15 cy (fall-through path)
+  str                15 B     28 cy (fall-through path)
+  -- xy16   (current far)
+  xe                 31 B     54 cy (fall-through path)
+  tick               48 B     74 cy (fall-through path)
+  mixv               41 B   loop body  38 B    62 cy/iter
+  mixh               45 B   loop body  21 B    38 cy/iter
+  sump               89 B   loop body  67 B   121 cy/iter
+  fillp              89 B   loop body  53 B    95 cy/iter
+  ldr                12 B     22 cy (fall-through path)
+  vramup             53 B   loop body  46 B    74 cy/iter
+  str                10 B     18 cy (fall-through path)
+  -- xy16   (near analog; only the global-scalar rows xe/tick/mixv/mixh/ldr/str are the far M=0 target)
+  xe                 21 B     40 cy (fall-through path)
+  tick               18 B     32 cy (fall-through path)
+  mixv               27 B   loop body  24 B    42 cy/iter
+  mixh               37 B   loop body  21 B    38 cy/iter
+  ldr                 8 B     16 cy (fall-through path)
+  str                15 B     29 cy (fall-through path)
+  -- a16-nm   (current far)
+  xe                 31 B     52 cy (fall-through path)
+  tick               48 B     74 cy (fall-through path)
+  mixv               41 B   loop body  38 B    60 cy/iter
+  mixh               45 B   loop body  21 B    36 cy/iter
+  sump              112 B   loop body  74 B   122 cy/iter
+  fillp              89 B   loop body  53 B    87 cy/iter
+  ldr                12 B     22 cy (fall-through path)
+  vramup             89 B   loop body  67 B   107 cy/iter
+  str                10 B     18 cy (fall-through path)
+  -- a16-nm   (near analog; only the global-scalar rows xe/tick/mixv/mixh/ldr/str are the far M=0 target)
+  xe                 21 B     38 cy (fall-through path)
+  tick               18 B     32 cy (fall-through path)
+  mixv               27 B   loop body  24 B    40 cy/iter
+  mixh               37 B   loop body  21 B    36 cy/iter
+  ldr                 8 B     15 cy (fall-through path)
+  str                15 B     28 cy (fall-through path)
+  -- xy16-nm   (current far)
+  xe                 31 B     54 cy (fall-through path)
+  tick               48 B     74 cy (fall-through path)
+  mixv               41 B   loop body  38 B    62 cy/iter
+  mixh               45 B   loop body  21 B    38 cy/iter
+  sump              112 B   loop body  74 B   135 cy/iter
+  fillp              89 B   loop body  53 B    95 cy/iter
+  ldr                12 B     22 cy (fall-through path)
+  vramup             89 B   loop body  67 B   115 cy/iter
+  str                10 B     18 cy (fall-through path)
+  -- xy16-nm   (near analog; only the global-scalar rows xe/tick/mixv/mixh/ldr/str are the far M=0 target)
+  xe                 21 B     40 cy (fall-through path)
+  tick               18 B     32 cy (fall-through path)
+  mixv               27 B   loop body  24 B    42 cy/iter
+  mixh               37 B   loop body  21 B    38 cy/iter
+  ldr                 8 B     16 cy (fall-through path)
+  str                15 B     29 cy (fall-through path)
+==> 4b) hand-built M=0 shapes (dev/far-scalar-split/m0/*.s)
+  -- X=8
+  fillp_m0           89 B   loop body  53 B    86 cy/iter
+  ldr_naive          15 B     28 cy (fall-through path)
+  sump_m0_nm         98 B   loop body  60 B    94 cy/iter
+  sump_m0            75 B   loop body  53 B    85 cy/iter
+  tick_nofold        22 B     40 cy (fall-through path)
+  vramup_m0_nmr      81 B   loop body  59 B    92 cy/iter
+  vramup_m0_nm       89 B   loop body  67 B   106 cy/iter
+  vramup_m0          45 B   loop body  38 B    59 cy/iter
+  -- --x16
+  fillp_m0           89 B   loop body  53 B    94 cy/iter
+  ldr_naive          15 B     29 cy (fall-through path)
+  sump_m0_nm         98 B   loop body  60 B   103 cy/iter
+  sump_m0            75 B   loop body  53 B    89 cy/iter
+  tick_nofold        22 B     40 cy (fall-through path)
+  vramup_m0_nmr      81 B   loop body  59 B   100 cy/iter
+  vramup_m0_nm       89 B   loop body  67 B   114 cy/iter
+  vramup_m0          45 B   loop body  38 B    59 cy/iter
+==> 5) native s16 forms with a 16-bit (DBR-relative) operand, near analog (hazard.c, FAR empty)
+  -- a16: R_MOS_ADDR16 operands on hc/hn
+    h_zero 9c stz R_MOS_ADDR16 hc
+    h_cnt ae ldx R_MOS_ADDR16 hn
+    h_cnt ac ldy R_MOS_ADDR16 hn+0x1
+    h_cpy ae ldx R_MOS_ADDR16 hn
+    h_cpy 8e stx R_MOS_ADDR16 hc
+    h_cpy ae ldx R_MOS_ADDR16 hn+0x1
+    h_cpy 8e stx R_MOS_ADDR16 hc+0x1
+  -- xy16: R_MOS_ADDR16 operands on hc/hn
+    h_zero 9c stz R_MOS_ADDR16 hc
+    h_cnt ae ldx R_MOS_ADDR16 hn
+    h_cnt ac ldy R_MOS_ADDR16 hn+0x1
+    h_cpy ae ldx R_MOS_ADDR16 hn
+    h_cpy 8e stx R_MOS_ADDR16 hc
+    h_cpy ae ldx R_MOS_ADDR16 hn+0x1
+    h_cpy 8e stx R_MOS_ADDR16 hc+0x1
+==> 6) bank seam ($7EFFFF|$7F0000) on bsnes-jg + MAME
+==> bsnes-jg (host)
+SMOKE: PASS off=0x200 len=4 got=0x5AA55AA5 (ran 60 frames, bsnes-jg)
+SMOKE: PASS off=0x204 len=4 got=0xC3125AA5 (ran 60 frames, bsnes-jg)
+SMOKE: PASS off=0x208 len=4 got=0x5AA5C367 (ran 60 frames, bsnes-jg)
+==> MAME (container)
+SMOKE: PASS addr=0x7E0200 len=4 got=0x5AA55AA5 (ran 60 ticks)
+SMOKE: PASS addr=0x7E0204 len=4 got=0xC3125AA5 (ran 60 ticks)
+SMOKE: PASS addr=0x7E0208 len=4 got=0x5AA5C367 (ran 60 ticks)
+RESULT: PASS -- M=0 far 16-bit accesses carry into the next bank (== byte-split)
+==> done. Interpretation: docs/investigations/2026-09-25-far-scalar-split-measurement.md
+```
