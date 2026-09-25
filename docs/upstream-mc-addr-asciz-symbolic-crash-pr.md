@@ -38,5 +38,6 @@ This compiler fix is independent of the SNES platform submission.
 
 Assisted-by: Claude Fable 5.1, credited in `6eced8e4`, for the initial fix;
 Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high` reasoning
-effort) for pinned-base validation and the initial PR draft; OpenAI Codex for
+effort) for pinned-base validation and the initial PR draft; OpenAI Codex CLI
+0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning effort, for
 independent review, narrowing the patch, expanded tests, and this revision.

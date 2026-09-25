@@ -89,6 +89,7 @@ Assisted-by: Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high`
 reasoning effort) for investigation, patch validation against the pinned
 upstream base, and PR drafting.
 
-Assisted-by: OpenAI Codex for independent review, the compile-time table-length
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh`
+reasoning effort, for independent review, the compile-time table-length
 check, and documentation updates. Claude’s original implementation and validation
 credit above is retained.

@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/6065ebec) | fix(mos): finish defect review, near-store fixes, and evidence enforcement |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b2) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
 | [2026-06-23](https://github.com/wbniv/llvm-mos-65816/commit/0aa1110b) | #321 worktree-teardown: handle throwaway/<slug> via the blessed wrapper |
 | [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/392030ab) | #321 docs: add the feature-worktree howto (target of the agent-handoff + CLAUDE.md pointers) |
@@ -8,6 +9,11 @@
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/00833780) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+6065ebec	author	Will Norris
+6065ebec	added	16
+6065ebec	deleted	0
+6065ebec	files	1
+6065ebec	body	Extend the inline-asm physical-register width guard to named registers,\ncheck the fixup-table length at compile time, and keep symbolic addr-asciz\nhandling scoped to directive text output. Refresh all required lit tools\nand make missing rcundef witnesses fail with useful diagnostics.\n\nKeep byte-built absolute argument stores and narrowly gated plain indirect\nA:X stores on their profitable byte paths. Preserve atomic word stores,\nnative consumers, and call-preserved contexts. Add lit/runtime regressions,\nbefore/after corpus measurements, plans, and reproduction scripts. Setters\nshrink 14 to 7 bytes absolute and 13 to 8 bytes indirect, with no measured\ncorpus growth. Regenerate and round-trip-check patch 0002.\n\nRecheck the three older reports without claiming unsupported closure.\nNarrow-count shifts and inline-bitboard register pressure remain not\nreproduced with historical baseline gaps; reentrant remains a contract\nclarification. Retain current-build observations, original attributions,\nand follow-up work. Require structured defect records and immutable\nbaseline evidence through agent instructions and the staged commit hook.\nDocument how to activate the repository hooks in each clone.\n\nValidation: 132 older-report verifier compiles and runtime differentials\npass; both store regressions and native-copy controls pass on MAME and\nbsnes-jg. Final MOS lit: 162 pass, 2 unsupported, the same 4 existing\nfailures. Evidence checker: 12 tests pass. Comment-history, staged evidence,\nSNES display-quality, and whitespace checks pass.\n\nOpenAI Codex performed the independent review, follow-up implementations,\nreproduction audit, evidence enforcement, and documentation reconciliation.\nInclude Claude Sonnet 5's initial PR drafts and pinned-base validation with\ntheir original credits and explicit limits for the revised artifacts.\nPreserve the original Claude implementation credits in the review record.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nCo-Authored-By: OpenAI Codex <noreply@openai.com>
 da5409b2	author	Will Norris
 da5409b2	added	3
 da5409b2	deleted	3

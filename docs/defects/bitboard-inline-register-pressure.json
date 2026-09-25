@@ -3,7 +3,7 @@
   "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
   "attribution": [
     "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
-    "OpenAI Codex: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+    "OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra), xhigh reasoning effort: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
   ],
   "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
   "id": "bitboard-inline-register-pressure",

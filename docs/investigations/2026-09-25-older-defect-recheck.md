@@ -148,7 +148,8 @@ Runtime logs are `/tmp/older-defect-{shift,bitboard}-runtime.log`.
 
 ## Attribution
 
-OpenAI Codex: fresh reproduction, restored narrow-count/inline-pressure inputs,
+OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
+effort: fresh reproduction, restored narrow-count/inline-pressure inputs,
 compile and runtime validation, reproducible check script, and documentation
 reconciliation. Existing Claude discovery, demo, and compiler-patch attribution
 is retained. This work confirms the current compiler state; it does not claim

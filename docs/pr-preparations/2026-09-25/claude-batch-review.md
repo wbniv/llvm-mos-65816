@@ -150,6 +150,12 @@ trail rather than attributing the whole batch to this review:
   Claude Sonnet 5 for rdiff.
 
 These commits link the [Claude session](https://claude.ai/code/session_017sAprvTwtKFJHKgQmr1qgr).
-OpenAI Codex performed this independent review, the revisions listed above,
+OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
+effort, performed this independent review, the revisions listed above,
 local validation, and documentation reconciliation. Earlier upstream author
 and demo credits are retained.
+
+Attribution metadata was verified from session
+`01a0d69b-5f24-7f10-be74-98413c05de4c`: its session header records CLI version
+`0.155.1`, and its turn contexts record `gpt-6-astra` with `xhigh` effort.
+These details also qualify the abbreviated Codex credit in commit `6065ebec`.

@@ -142,6 +142,7 @@ the [indirect-store record](2026-09-25-near-indirect-s16-store-residency.md).
 ## Attribution
 
 Claude: original discovery and size/cycle measurements in the far-scalar study.
-OpenAI Codex: MIR diagnosis, store-use and call-preservation predicate,
+OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
+effort: MIR diagnosis, store-use and call-preservation predicate,
 implementation, regression tests, context counterexamples, validation, and this
 follow-up documentation. Earlier Claude and Codex patch-stack credits are retained.

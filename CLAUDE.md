@@ -83,7 +83,11 @@ bypass it. Its checks do not replace reviewing the trigger or replaying evidence
   **triage them** (delete a bullet already covered by a curated TODO item with a short
   `<!-- triaged YYYY-MM-DD: … -->` note; a fingerprint ledger keeps deleted items from returning), then
   re-commit `TODO.md`.
-- End commit messages with: `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
+- Follow [AGENTS.md's AI attribution rule](AGENTS.md#ai-attribution) in every commit
+  and authored record: include the actual agent/tool version, exact model name/ID
+  and version, and reasoning effort, verified from the relevant session metadata.
+  Use the actual contributor in `Co-Authored-By`; never reuse a hard-coded model
+  credit. Record unavailable historical details as unknown and retain original credits.
 - **Push only when asked / coordinate.** `main` may carry other workers' commits not yet pushed (some route
   via fork PR branches deliberately); don't `git push origin main` without checking.
 - **Upstream contributions are queued in [`docs/upstream-contribution-status.md`](docs/upstream-contribution-status.md)** —

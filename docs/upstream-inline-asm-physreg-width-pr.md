@@ -49,5 +49,6 @@ This is independent of native 65816 features and SNES platform submission.
 Assisted-by: Claude Opus 5 (1M context), credited in `84d87260`, for the initial
 implementation; Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high`
 reasoning effort) for pinned-base validation and the initial PR draft; OpenAI
-Codex for independent review, the named-register extension, regression coverage,
+Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning effort,
+for independent review, the named-register extension, regression coverage,
 and this revision.

@@ -2,7 +2,8 @@
 
 Adopted during the 2026-09-25 older-report recheck, following the user's challenge
 that failure to reproduce is not evidence of a fix. Workflow and documentation:
-OpenAI Codex. [Motivating investigation](investigations/2026-09-25-older-defect-recheck.md).
+OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
+effort. [Motivating investigation](investigations/2026-09-25-older-defect-recheck.md).
 
 ## Capture a failing baseline before changing anything
 

@@ -185,7 +185,8 @@ Final `0002` SHA-256:
 
 ## Attribution and submission scope
 
-OpenAI Codex: indirect-store reproduction, diagnosis, implementation plan,
+OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
+effort: indirect-store reproduction, diagnosis, implementation plan,
 implementation, atomic-store correction, tests, validation, and documentation.
 Claude: the original broader A:X store-cost finding in the [far-scalar study](../investigations/2026-09-25-far-scalar-split-measurement.md).
 Preserve both attributions and the preceding absolute-store evidence.
