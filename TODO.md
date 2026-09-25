@@ -284,6 +284,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   proof plus a gate whose misclassification would regress shipped codegen; land the scheduler item
   below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
   [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
+  **Correctness flag (2026-09-25, [hoist investigation §5](docs/investigations/2026-09-25-farptr-hoist-measurement.md#5-the-dpy-interaction--flagged)):** `loop.c`'s `tab[o + j]` is `tab + zext(add i16 o, j)` with **no `nuw`** — it wraps at 16 bits, so folding it as `[tab+o],Y` with `Y=j` is a miscompile for `o ≥ 0xFFC1`; never reassociate a non-`nuw` narrow add. Legal fixtures: `tab[(uint32_t)o + j]` / `p = tab + base; p[j]` (72 B today → 32 B hand-built).
 - [T3] **`long,X` (`bf`/`9f`) for a global far base plus a runtime index — MEASURE first.** The
   `[dp],Y` work covers a far *pointer* held in a DP quad; when the base is a far **global** (`tbl[i]`
   with `tbl` at a known 24-bit address) the natural form is absolute-long indexed, `lda`/`sta long,X`
@@ -297,19 +298,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   same census-and-measure pass since they share the operand shape. Phase 2 only on GO, re-ranked **T4**.
   [audit §2](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#2-codegen--instruction-selection--done-for-correctness-measured-gaps-in-coverage) ·
   [Phase 1 §6](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
-- [T3] **The 32-bit far-pointer add is never hoisted out of a loop — find out why, then MEASURE.** Phase 1
-  §4 hand-built two halves of the blit win separately: hoisting the pointer add alone took the 64-iteration
-  loop from 86 to 42 bytes (26 → 18 cyc/iter is the `[dp],Y` half on top of that). Today the full 32-bit add
-  is recomputed inside the body every iteration — no LICM, no strength reduction — and `[dp],Y` increment 2
-  leaves that half untouched by design. Phase 1 (this rank, T3, throwaway worktree): establish *why* it is
-  not hoisted (the add is a post-legalization MOS shape — is IR LICM already past, does `MachineLICM` refuse
-  the multi-instruction carry chain, or does the address-mode selection re-materialise it per access?),
-  then measure the hoist on the real blit shape and on `farindex.c` with and without `-enable-misched=false`
-  so the scheduler cliff cannot mask the number; record GO/NO-GO and *where* the hoist belongs. Phase 2 on
-  GO, re-ranked **T4** — a wrong hoist point is a cross-cutting change. Reason for T3: bounded investigation
-  with a measured target; the design decision waits for the number.
-  [Phase 1 §4](docs/investigations/2026-09-24-dpy-indexed-measurement.md) ·
-  [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
+  **Customer (2026-09-25, [hoist investigation §4](docs/investigations/2026-09-25-farptr-hoist-measurement.md#4-where-the-motivating-shapes-win-actually-is)):** `dev/dpy-shapes/loop.c` (`tab[o + j]`, 16-bit-wrapping index) is legal only as `lda tab,X` with a 16-bit X = `o+j` under `+mos-xy16` — it is not a `[dp],Y` customer. Today 86 B.
 ### M2 — Optimizing Payoff
 
 - [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
@@ -1447,6 +1436,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-25 — [farptr-hoist-measure] NO-GO: `loop.c` hoist illegal (16-bit wrap); legal shapes already hoist, win is `[dp],Y` inc 2. See [investigation](docs/investigations/2026-09-25-farptr-hoist-measurement.md).
 - ✅ 2026-09-25 — [dpy-indexed-phase2] `[dp],Y` Phase 2 inc 1: a compile-time-constant far
   displacement in `[1,3]` now folds to `lda/sta [dp],y` (`b7`/`97`) off the same Imag32 quad instead of a
   32-bit pointer add — far `uint32_t` read 311→143 B (−54%), far `uint16_t` 107→75 B; new
