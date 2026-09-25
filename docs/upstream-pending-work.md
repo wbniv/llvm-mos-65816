@@ -1,15 +1,15 @@
 # Pending upstream work and dependencies
 
-**Local preparation updated 2026-09-23.** Patch 0036's zero-page indexed-global
-fix is implemented, validated, installed, and independently reviewed; the
-review audit is complete. Patch 0037 also has a completed independent audit.
-Patches 0034 and 0035 address separate backend and frontend prefetch defects.
-The new `mos16(constant)` parser-width defect is diagnosed but not fixed.
-Earlier patches retain their dated validation and review records below.
+**Local preparation updated 2026-09-25.** Independent reviews and validation
+for 0032–0037 remain linked below. The `mos16(constant)` parser-width defect is
+fixed in 0039. The [September 25 batch review](pr-preparations/2026-09-25/claude-batch-review.md)
+revises 0043, 0046, and 0047 and updates their PR drafts; integrated tests and
+pinned-base applicability are checked, with isolated revision validation and
+submission branches still to prepare. Patch 0044 still needs its PR draft/bundle.
 The [contribution tracker](upstream-contribution-status.md#current-pr-progress)
-holds the September 23 GitHub snapshot; this local-readiness update does not
-reverify remote PR or CI state. Status describes the work, not whether its
-GitHub container is called an issue or a pull request.
+retains its dated GitHub snapshot; this local review does not reverify remote
+PR or CI state. Status describes the work, not whether its GitHub container is
+called an issue or a pull request.
 
 Use the [saved unpatched upstream reference](upstream-reference-build.md) for new
 reproduction checks; keep candidate patches in separate builds.

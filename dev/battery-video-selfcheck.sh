@@ -1,15 +1,9 @@
 #!/usr/bin/env bash
 # dev/battery-video-selfcheck.sh — do the example battery's two VIDEO ROMs actually play?
 #
-# WHY THIS EXISTS
-# ---------------
-# dev/build.sh's battery links apollo-reel and snes-video-reel, but for months neither ROM carried its
-# packed SVX2 stream: the post-link pack step lived only in their own gate scripts. Both linked cleanly
-# and both were garbage at run time — the decoder was fed zeros (apollo) or open bus (reel), ran its
-# output pointer off the framebuffer and swept bank $00's WRAM mirror and I/O registers. What that sweep
-# hit depended on power-on state, so it surfaced as a bogus "entropy-sensitive after the title" defect
-# (docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md). The fix is the `battery-post:` marker;
-# this is the guard that keeps it fixed.
+# The battery-post markers pack each decoder's SVX2 stream into the ROM after
+# linking. Playback requires those bytes at the bank named by the asset header.
+# Check their presence separately from the title and playback entropy checks.
 #
 # WHAT IT ASSERTS, per ROM (host-side):
 #   1. stream present — the ROM's bytes at the stream's HiROM file offset (derived from the header's
@@ -25,7 +19,7 @@
 #   --no-entropy   stream leg only
 set -euo pipefail
 
-usage() { sed -n '2,25p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,/^set -euo pipefail/{ /^#/s/^# \{0,1\}//p; }' "$0"; }
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
 BUILD="$ROOT/build"

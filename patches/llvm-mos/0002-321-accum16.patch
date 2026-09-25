@@ -4166,7 +4166,7 @@ index d13429a713db..0e357b030d97 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa58723c..9f42b43af1c2 100644
+index 6356fa58723c..e7784a169a6c 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,6 +25,7 @@
@@ -4883,7 +4883,7 @@ index 6356fa58723c..9f42b43af1c2 100644
    auto Tmp = Builder.buildPtrToInt(SrcTypeS, SrcReg);
 
    if (DestTypeS.getSizeInBits() < SrcTypeS.getSizeInBits()) {
-@@ -1615,14 +2076,181 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+@@ -1615,14 +2076,252 @@ bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
  // Memory Operations
  //===----------------------------------------------------------------------===//
 
@@ -4964,14 +4964,9 @@ index 6356fa58723c..9f42b43af1c2 100644
 +  return true;
 +}
 +
-+// #321 native s16 indirect memory: route an s16 G_LOAD/G_STORE through a
-+// non-absolute 16-bit pointer to a single native 16-bit indirect op
-+// (G_LOAD16_INDIR/G_STORE16_INDIR -> lda (zp)/sta (zp) in M=0). The whole pointer
-+// (incl. any G_PTR_ADD for a[i]) is materialized into the zero-page Imag16 pair, so
-+// the plain-indirect form is always correct — just occasionally less optimal than
-+// (zp),y, which (with absolute/abs-indexed s16 access) stays on the byte-pair path
-+// as a follow-up. Absolute addresses (globals) narrow here so they keep their
-+// byte-wise lowering for now.
++// Native s16 accesses use absolute, indexed, or indirect addressing when their
++// operands can benefit from the 16-bit register path. Other accesses narrow to
++// two byte operations.
 +bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
 +                                           MachineRegisterInfo &MRI,
 +                                           GLoadStore &MI) const {
@@ -4979,6 +4974,78 @@ index 6356fa58723c..9f42b43af1c2 100644
 +  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
 +  Register Ptr = MI.getPointerReg();
 +  const bool IsLoad = isa<GLoad>(MI);
++
++  // A byte-built value used only by absolute stores or byte consumers does not
++  // need an Imag16 pair. Keeping these stores byte-wise lets the register allocator
++  // store each byte directly without an accumulator-width transition. Calls,
++  // inline assembly, and cross-block uses can require the bytes to be spilled;
++  // keep those values on the native path, where a single wide reload is cheaper.
++  auto isByteBuiltStoreValue = [&](Register Value) {
++    const MachineInstr *Def = MRI.getVRegDef(Value);
++    if (!Def || Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
++        Def->getNumOperands() != 3 ||
++        MRI.getType(Def->getOperand(1).getReg()) != LLT::scalar(8))
++      return false;
++    return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
++      if (Use.getParent() != Def->getParent())
++        return false;
++      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
++        if (I->isCall() || I->isInlineAsm())
++          return false;
++      switch (Use.getOpcode()) {
++      case TargetOpcode::G_UNMERGE_VALUES:
++        return true;
++      case MOS::G_STORE16_ABS:
++        return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
++          return MMO->isAtomic();
++        });
++      case TargetOpcode::G_STORE: {
++        const auto &Store = cast<GStore>(Use);
++        return !Store.isAtomic() &&
++               matchAbsoluteAddressing(MRI, Store.getPointerReg()).has_value();
++      }
++      default:
++        return false;
++      }
++    });
++  };
++
++  // A single plain indirect store can consume an A:X value directly. Imaginary
++  // argument pairs and values shared with other stores can favor one wide load.
++  // Allow only copies and byte splits between the merge and its consumers: other
++  // work can clobber A:X or establish a native-width context with cheaper stores.
++  auto isByteIndirectStore = [&]() {
++    // Atomic stores must remain a single memory operation.
++    if (IsLoad || MI.isAtomic())
++      return false;
++    const MachineInstr *PtrDef = getDefIgnoringCopies(Ptr, MRI);
++    if (!PtrDef || !PtrDef->isCopy() ||
++        !MOS::Imag16RegClass.contains(PtrDef->getOperand(1).getReg()))
++      return false;
++    Register Value = cast<GStore>(MI).getValueReg();
++    const MachineInstr *Def = MRI.getVRegDef(Value);
++    if (!Def || Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
++        Def->getNumOperands() != 3)
++      return false;
++    auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
++      const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
++      return ByteDef && ByteDef->isCopy() &&
++             ByteDef->getOperand(1).getReg() == PhysReg;
++    };
++    if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
++        !isABIByte(Def->getOperand(2).getReg(), MOS::X))
++      return false;
++    return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
++      if (Use.getParent() != Def->getParent() ||
++          (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES))
++        return false;
++      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
++        if (&*I != &MI && !I->isCopy() && !I->isDebugInstr() &&
++            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES)
++          return false;
++      return true;
++    });
++  };
 +
 +  // Don't take a constant-valued store native: materializing the constant into an
 +  // Imag16 pair just to `lda zp; sta` is worse than the byte path — a store of zero
@@ -4994,8 +5061,7 @@ index 6356fa58723c..9f42b43af1c2 100644
 +  // `b = (a == c)`) should keep its byte-wise lowering. Forming the native 16-bit
 +  // `lda abs -> A16; sta imag16` here only for the consumer to read the bytes straight
 +  // back is a wasteful round-trip (worse than the default byte loads). Narrow it
-+  // instead. (Stores always take the native form; the indirect-load-then-unmerge case
-+  // is a separate follow-up — see TODO.)
++  // instead. Indirect loads retain the native form.
 +  const bool AllUsesUnmerge =
 +      IsLoad && !MRI.use_nodbg_empty(MI.getOperand(0).getReg()) &&
 +      all_of(MRI.use_nodbg_instructions(MI.getOperand(0).getReg()),
@@ -5006,7 +5072,9 @@ index 6356fa58723c..9f42b43af1c2 100644
 +  if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 16) {
 +    // Absolute address (global/static/const) -> native 16-bit `lda abs`/`sta abs`.
 +    if (auto AbsOp = matchAbsoluteAddressing(MRI, Ptr)) {
-+      if (!AllUsesUnmerge) {
++      const bool ByteStore =
++          !IsLoad && isByteBuiltStoreValue(cast<GStore>(MI).getValueReg());
++      if (!AllUsesUnmerge && !ByteStore) {
 +        Register Dst = MI.getOperand(0).getReg();
 +        Builder
 +            .buildInstr(IsLoad ? MOS::G_LOAD16_ABS : MOS::G_STORE16_ABS)
@@ -5025,11 +5093,14 @@ index 6356fa58723c..9f42b43af1c2 100644
 +        MI.eraseFromParent();
 +        return true;
 +      }
-+      // else: all-uses-unmerge load -> fall through to the byte-wise narrowing below.
++      // Byte-only loads and byte-built stores use the narrowing below.
 +    } else if (tryIndexedAddressing16(Helper, MRI, MI)) {
 +      // abs,x or (zp),y indexed 16-bit load/store (#321 Increment 1e).
 +      return true;
 +    } else if (STI.has65C02()) {
++      if (isByteIndirectStore())
++        return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
++               LegalizerHelper::Legalized;
 +      // Runtime 16-bit pointer -> native 16-bit `lda (zp)`/`sta (zp)`.
 +      Builder.buildInstr(IsLoad ? MOS::G_LOAD16_INDIR : MOS::G_STORE16_INDIR)
 +          .add(MI.getOperand(0))
@@ -5066,7 +5137,7 @@ index 6356fa58723c..9f42b43af1c2 100644
 
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
-@@ -1652,6 +2280,51 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+@@ -1652,6 +2351,51 @@ bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5118,7 +5189,7 @@ index 6356fa58723c..9f42b43af1c2 100644
  // Converts pointer to integer before store, allowing the store to later be
  // narrowed to 8 bits.
  bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
-@@ -1659,6 +2332,17 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+@@ -1659,6 +2403,17 @@ bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
                                       GStore &MI) const {
    if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
      return selectAddressingMode(Helper, MRI, MI);
@@ -5136,7 +5207,7 @@ index 6356fa58723c..9f42b43af1c2 100644
 
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1685,6 +2369,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1685,6 +2440,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
 
@@ -5287,7 +5358,7 @@ index 6356fa58723c..9f42b43af1c2 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1709,6 +2537,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+@@ -1709,6 +2608,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
      // long (`lda [dp]`) through a ZP Imag32 quad.
      if (tryFarAbsoluteAddressing(Helper, MRI, MI))
        return true;
@@ -5298,40 +5369,17 @@ index 6356fa58723c..9f42b43af1c2 100644
      return tryFarIndirectAddressing(Helper, MRI, MI);
    }
    default:
-@@ -1823,6 +2655,83 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
+@@ -1823,6 +2726,60 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
-+// #321 Phase 2 inc 1: fold a small COMPILE-TIME-CONSTANT byte displacement off a
-+// runtime far pointer into 65816 indirect-long *indexed* addressing —
-+// `lda [dp],y` (b7) / `sta [dp],y` (97) — instead of materialising a 32-bit
-+// pointer add (an inc/bne carry chain plus a whole second Imag32 quad) to reach
-+// the adjacent byte. This is the "zero-proof" slice of
-+// docs/investigations/2026-09-24-dpy-indexed-measurement.md §6 constraint 3: a
-+// constant displacement needs no range analysis whatsoever.
-+//
-+// GATE — every predicate below is a *may-fold* check. Failing any one returns
-+// false and the caller falls through to tryFarIndirectAddressing, i.e. today's
-+// already-correct add + `lda [dp]`. A misclassification can only ever miss a
-+// win, never cause a regression (§6 constraint 5).
-+//
-+//   (a) Every peeled G_PTR_ADD offset is a compile-time constant. A variable
-+//       index is the general range-gated case and is NOT handled here — it
-+//       needs the scaled-offset range proof of §6 constraints 1-2.
-+//   (b) The accumulated displacement is in [1, kMaxFarIndirIdxDisp]. 0 is
-+//       excluded because plain `lda [dp]` already encodes it in fewer bytes with
-+//       no Y at all; negatives are excluded by the lower bound.
-+//   (c) The residual base is a runtime far pointer. Guaranteed: the caller runs
-+//       tryFarAbsoluteAddressing first, and matchAbsoluteAddressing peels
-+//       constant G_PTR_ADDs itself, so a constant/global/frame-index base would
-+//       already have been taken by absolute-long addressing (which is smaller).
-+//
-+// A displacement of at most kMaxFarIndirIdxDisp always fits an 8-bit Y (§6
-+// constraint 1: Y's width is governed by X, and 0..3 is inside 0..255 at either
-+// width), so this emits an s8 index in all three modes — exactly as the near
-+// `(zp),y` path does for a constant displacement. Y residency is left to
-+// register allocation, as it is for that path: the worst case it can produce is
-+// a phy/ply pair (~6 B) against the >= 22 B this removes (§5).
++// Fold a byte displacement of 1..3 from a runtime far pointer into the
++// 65816's [dp],Y addressing mode. Y contains an s8 constant, and the effective
++// address carries into the bank byte. The base remains in an Imag32 ZP quad.
++// Zero displacement needs no index; a link-time base uses absolute-long
++// addressing. Runtime offsets remain part of the materialized base pointer.
++// The small window targets adjacent bytes of scalar loads and stores without
++// requiring range analysis or widening the index register.
 +static constexpr int64_t kMaxFarIndirIdxDisp = 3;
 +
 +bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
@@ -5382,7 +5430,7 @@ index 6356fa58723c..9f42b43af1c2 100644
  bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                                                      MachineRegisterInfo &MRI,
                                                      GLoadStore &MI,
-@@ -1913,7 +2822,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1913,7 +2870,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -5459,7 +5507,7 @@ index 6356fa58723c..9f42b43af1c2 100644
          continue;
        }
      }
-@@ -1996,6 +2973,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1996,6 +3021,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -5471,7 +5519,7 @@ index 6356fa58723c..9f42b43af1c2 100644
      }
    }
 
-@@ -2020,6 +3002,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2020,6 +3050,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5578,7 +5626,7 @@ index 6356fa58723c..9f42b43af1c2 100644
  bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
                                       MachineRegisterInfo &MRI, MachineInstr &MI,
                                       LostDebugLocObserver &LocObserver) const {
-@@ -2065,6 +3147,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+@@ -2065,6 +3195,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
      return true;
    }
 
@@ -6550,35 +6598,382 @@ index 2fb9967160e5..cdb29e3bc941 100644
      // If the CSR is used as a 16-bit pointer, then the two halves cannot be
      // assigned independently. Thus, instead of two size-1 candidates, one
      // size-2 candidate is used.
+diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+new file mode 100644
+index 000000000000..d9c2a64528c6
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+@@ -0,0 +1,161 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++
++@g = global i16 0, align 1
++@h = global i16 0, align 1
++
++declare i16 @produce()
++
++; The ABI supplies an i16 argument in A:X. Absolute byte stores can consume
++; those registers directly when no native-width consumer needs the value.
++define void @store_arg(i16 %value) {
++; BYTE-LABEL: store_arg:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  store i16 %value, ptr @g, align 1
++  ret void
++}
++
++define i16 @store_return(i16 %value) {
++; BYTE-LABEL: store_return:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr @g, align 1
++  ret i16 %value
++}
++
++define void @store_twice(i16 %value) {
++; BYTE-LABEL: store_twice:
++; BYTE-NOT: rep
++; BYTE-NOT: __rc
++; BYTE-DAG: sta g
++; BYTE-DAG: stx g+1
++; BYTE-DAG: sta h
++; BYTE-DAG: stx h+1
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr @g, align 1
++  store volatile i16 %value, ptr @h, align 1
++  ret void
++}
++
++; Call results use the same byte-register ABI as arguments.
++define void @store_call() {
++; BYTE-LABEL: store_call:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: jsr produce
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  %value = call i16 @produce()
++  store i16 %value, ptr @g, align 1
++  ret void
++}
++
++; Native producers retain a native store so the value stays in the wide path.
++define void @store_add(i16 %value) {
++; NATIVE-LABEL: store_add:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE-NEXT: rts
++; DEFAULT-LABEL: store_add:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %sum = add i16 %value, 42
++  store i16 %sum, ptr @g, align 1
++  ret void
++}
++
++define void @store_copy() {
++; NATIVE-LABEL: store_copy:
++; NATIVE: rep #[[WIDTH:(16|32)]]
++; NATIVE-NEXT: ld{{[axy]}} h
++; NATIVE-NEXT: st{{[axy]}} g
++; NATIVE-NEXT: sep #[[WIDTH]]
++; NATIVE-NEXT: rts
++; DEFAULT-LABEL: store_copy:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %value = load volatile i16, ptr @h, align 1
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; A byte-built argument with a native arithmetic use already needs Imag16.
++define i16 @store_mixed(i16 %value) {
++; NATIVE-LABEL: store_mixed:
++; NATIVE: rep #32
++; NATIVE: sta g
++; NATIVE: inc
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_mixed:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr @g, align 1
++  %sum = add i16 %value, 1
++  ret i16 %sum
++}
++
++; A value live across a call needs preserved storage. One native reload and store
++; can consume that pair without two separate byte reloads.
++declare void @opaque()
++define void @store_across_call(i16 %value) {
++; NATIVE-LABEL: store_across_call:
++; NATIVE: jsr opaque
++; NATIVE-NEXT: rep #32
++; NATIVE-NEXT: lda __rc20
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_across_call:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void @opaque()
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; The argument can cross a call along one predecessor of the store block.
++define void @store_cross_block(i16 %value, i1 %condition) {
++; NATIVE-LABEL: store_cross_block:
++; NATIVE: jsr opaque
++; NATIVE: rep #32
++; NATIVE-NEXT: lda __rc20
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_cross_block:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  br i1 %condition, label %call, label %store
++call:
++  call void @opaque()
++  br label %store
++store:
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; Clobbering inline assembly can require the same preservation as a call.
++define void @store_across_asm(i16 %value) {
++; NATIVE-LABEL: store_across_asm:
++; NATIVE: ;APP
++; NATIVE: ;NO_APP
++; NATIVE: rep #32
++; NATIVE: sta g
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_across_asm:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void asm sideeffect "", "~{a},~{x},~{y}"()
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
+new file mode 100644
+index 000000000000..9f22e668b55f
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
+@@ -0,0 +1,187 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++
++@g = global i16 0, align 2
++@h = global i16 0, align 1
++declare void @opaque()
++
++; The pointer already occupies an imaginary pair, while the value arrives in A:X.
++; A single indirect store can use those bytes directly in the ambient M8/X8 mode.
++define void @store_indirect(ptr %p, i16 %value) {
++; BYTE-LABEL: store_indirect:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: txa
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; Volatile stores preserve both bytes and their low-to-high order.
++define void @store_volatile(ptr %p, i16 %value) {
++; BYTE-LABEL: store_volatile:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: txa
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr %p, align 1
++  ret void
++}
++
++; The byte-valued return also consumes the original low byte after the stores.
++define i16 @store_and_return(ptr %p, i16 %value) {
++; BYTE-LABEL: store_and_return:
++; BYTE-NOT: rep
++; BYTE: sta (__rc2)
++; BYTE: sta (__rc2),y
++; BYTE: lda __rc4
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr %p, align 1
++  ret i16 %value
++}
++
++; Sharing the value across stores changes its register and reload costs.
++define void @store_twice(ptr %p, ptr %q, i16 %value) {
++; NATIVE-LABEL: store_twice:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sta (__rc4)
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_twice:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store volatile i16 %value, ptr %p, align 1
++  store volatile i16 %value, ptr %q, align 1
++  ret void
++}
++
++define void @store_absolute_and_indirect(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_absolute_and_indirect:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sta g
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_absolute_and_indirect:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr %p, align 1
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; Indexed addressing retains its native-width store.
++define void @store_offset(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_offset:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2),y
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_offset:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %q = getelementptr i16, ptr %p, i16 1
++  store i16 %value, ptr %q, align 1
++  ret void
++}
++
++; A native producer can feed the wide store without splitting its result.
++define void @store_computed(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_computed:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE-NEXT: sta (__rc2)
++; NATIVE-NEXT: sep #32
++; DEFAULT-LABEL: store_computed:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %sum = add i16 %value, 42
++  store i16 %sum, ptr %p, align 1
++  ret void
++}
++
++; Intervening arithmetic changes both A:X residency and the current width.
++define void @store_native_context(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_native_context:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE: sta (__rc2)
++; NATIVE-NEXT: sep #32
++; DEFAULT-LABEL: store_native_context:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %old = load volatile i16, ptr @h, align 1
++  %sum = add i16 %old, 42
++  store volatile i16 %sum, ptr @h, align 1
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; A call requires the argument to survive in preserved storage.
++define void @store_across_call(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_across_call:
++; NATIVE: jsr opaque
++; NATIVE: rep #32
++; NATIVE: sta (__rc{{[0-9]+}})
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_across_call:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void @opaque()
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; Later arguments already reside in imaginary registers and favor a wide load.
++define void @store_later_argument(ptr %p, i16 %first, i16 %value) {
++; NATIVE-LABEL: store_later_argument:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_later_argument:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr %p, align 1
++  store volatile i16 %first, ptr @g, align 1
++  ret void
++}
++
++; Atomic word stores require the native single-instruction memory access. The
++; function attribute enables that path even in the default-feature RUN above.
++define void @store_atomic(ptr %p, i16 %value) #0 {
++; BYTE-LABEL: store_atomic:
++; BYTE: rep #32
++; BYTE: sta (__rc2)
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr %p unordered, align 2
++  ret void
++}
++
++; The same atomic contract applies to absolute stores and shared values.
++define void @store_atomic_absolute(i16 %value) #0 {
++; BYTE-LABEL: store_atomic_absolute:
++; BYTE: rep #32
++; BYTE: sta g
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr @g unordered, align 2
++  ret void
++}
++
++define void @store_atomic_shared(i16 %value) #0 {
++; BYTE-LABEL: store_atomic_shared:
++; BYTE: rep #32
++; BYTE: sta g
++; BYTE: sta h
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr @g unordered, align 2
++  store volatile i16 %value, ptr @h, align 1
++  ret void
++}
++
++attributes #0 = { "target-features"="+mos-a16" }
 diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 new file mode 100644
-index 000000000000..b6172ca9cd50
+index 000000000000..6462de8970e1
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
-@@ -0,0 +1,161 @@
+@@ -0,0 +1,148 @@
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
 +; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
 +
-+; #321 Phase 2 increment 1 — 65816 indirect-long INDEXED addressing,
-+; `lda [dp],y` ($b7) / `sta [dp],y` ($97), for a runtime far (addrspace 2)
-+; pointer plus a SMALL COMPILE-TIME-CONSTANT displacement.
-+;
-+; Before this, reaching the adjacent byte of a far object meant materialising a
-+; 32-bit pointer add (an inc/bne carry chain plus a second Imag32 ZP quad) and a
-+; second plain `lda [dp]`. Measurement + verdict:
-+; docs/investigations/2026-09-24-dpy-indexed-measurement.md (GO).
-+; Design + gate: docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md.
-+;
-+; The gate is deliberately narrow — displacement must be a compile-time constant
-+; in [1,3] (kMaxFarIndirIdxDisp in MOSLegalizerInfo.cpp). BOTH directions are
-+; pinned here: a gate whose whole point is "never regress" is only as good as its
-+; negative tests, so every non-matching shape below must still select the old,
-+; already-correct $a7/$87 + add path.
-+;
-+; dev/run.sh farindex is the matching runtime/differential gate; this test pins
-+; the SELECTED OPCODE BYTE, which the emulator gates cannot.
++; A runtime far pointer plus a constant byte displacement in [1,3] selects
++; indirect-long indexed addressing: lda [dp],y ($b7) / sta [dp],y ($97).
++; Zero, larger, and runtime offsets keep plain indirect-long addressing; a
++; link-time base uses absolute-long addressing. Assembly and object checks
++; pin the selected forms under both accumulator and index feature modes.
 +
 +target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
 +
@@ -6607,7 +7002,7 @@ index 000000000000..b6172ca9cd50
 +; element. The pointer is G_PTR_ADD(G_PTR_ADD(@tbl, i), 1) for the high byte:
 +; the constant peel must STOP at the variable offset and use the inner node as
 +; the base, not give up. This is the farindex.c shape and the single most common
-+; customer; an earlier revision failed exactly here.
++; customer because each multi-byte array element uses adjacent byte accesses.
 +define i16 @far_load_subscript_u16(i32 %i) {
 +; CHECK-LABEL: far_load_subscript_u16:
 +; CHECK: lda [__rc{{[0-9]+}}]
@@ -6662,7 +7057,7 @@ index 000000000000..b6172ca9cd50
 +  ret void
 +}
 +
-+;=== NEGATIVE — must still take the old path ================================
++;=== NEGATIVE — use unindexed or absolute-long addressing ===================
 +
 +; Displacement 0 is NOT folded: plain `lda [dp]` already encodes it in fewer
 +; bytes with no Y at all.

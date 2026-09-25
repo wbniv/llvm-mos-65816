@@ -1,5 +1,12 @@
 # Inline-asm physreg constraints must refuse operands wider than their register
 
+> **Reviewed September 25:** [independent review and revisions](../pr-preparations/2026-09-25/claude-batch-review.md)
+> supersede this initial implementation record where they differ. In particular,
+> 0043 also guards explicit register names reachable from C; 0046 checks the table
+> length at compile time; 0047 changes only directive text emission and tests,
+> without exposing an `addrasciz()` modifier or changing integer evaluation.
+
+
 **TODO item:** `MOSTargetLowering::getNumRegistersForInlineAsm` disagrees with
 `getRegForInlineAsmConstraint` for non-`"r"` classes.
 **File:** `vendor/llvm-mos/llvm/lib/Target/MOS/MOSISelLowering.cpp`

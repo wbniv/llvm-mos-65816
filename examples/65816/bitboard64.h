@@ -1,4 +1,4 @@
-// Bitboard Knight Tour (#120) — s64 popcount/clz/ctz libcall coverage.
+// Bitboard Knight Tour (#120) — s64 popcount/clz/ctz operation coverage.
 #ifndef BITBOARD64_H
 #define BITBOARD64_H
 

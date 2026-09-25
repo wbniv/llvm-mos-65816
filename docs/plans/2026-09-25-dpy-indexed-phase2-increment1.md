@@ -115,13 +115,15 @@ falls through to `tryFarIndirectAddressing`, i.e. today's already-correct add + 
    constant `(zp),y` displacement under **all three** modes including `+mos-xy16`
    (`selectIndirectAddressing` takes its constant-offset branch with `Use16BitIdx == false`
    whenever the offset is constant), so no new XY-width question is introduced.
-6. Constraint 4, "`Y` free or already index-resident": handled by register allocation exactly as
-   for the near-pointer constant-offset `(zp),y` form. Worst case RA inserts `phy`/`ply`
-   (≈ 6 B / 11 cy, Phase 1 §5) against the ≥ 22 B this removes, so the worst case is still a win —
-   no separate predicate is needed, and adding one could only cost wins.
+6. Y is allocated like the near-pointer constant-offset `(zp),y` form. The local
+   instruction saving does **not** bound the final function size: scheduling and
+   register allocation can add spills elsewhere. The measured three-access
+   cases below regress by 13 and 8 bytes with the default scheduler.
 
-Constraint 5 ("misclassification must only ever miss a win") is structural here: the function is a
-pure `bool try…` that either rewrites the load/store or returns without touching it.
+A failed predicate leaves the instruction unchanged. That establishes a safe
+fallback, not a profitability proof for successful matches. The implementation
+preserves runtime behavior in the recorded gates, but the original “never regress”
+size requirement is not met for every measured shape.
 
 ### 3.3 Correctness of the addressing mode itself
 
@@ -323,16 +325,17 @@ Disabling only that scheduler isolates it exactly:
 (-enable-post-misched=false changes nothing: it is the PRE-RA scheduler.)
 ```
 
-So the fold is worth **−79 / −86 bytes** on exactly the shapes that appear to regress, and the
-scheduler is eating that and 80-odd bytes more. It is **pre-existing**, not created here: at
-`-Os` the scheduler already costs the unmodified compiler 28 bytes on the same 3-access shape
-(397 with misched vs 369 without). This change raises the pressure enough to cross its cliff.
+With scheduling disabled the fold saves **79 / 86 bytes**. Under the shipped
+scheduler it causes real **13 / 8 byte regressions** on those same inputs.
+The scheduler already has a pressure weakness (397 versus 369 bytes before
+this change), but that does not make the new before/after regression unrelated.
 
-**Disposition:** land the fold (it is correct, differential-green, and strictly removes
-instructions and ZP bytes), and track the scheduler's carry-pressure behaviour as its own item.
-Narrowing the gate cannot address it — no local, compile-time-visible predicate correlates with
-"the scheduler will interleave two carry chains", and a fires-only-when-there-are-fewer-than-three
-heuristic would be arbitrary and unmaintainable.
+**Current disposition:** the fold is landed and its runtime checks pass. The
+scheduler follow-up remains open and must include these exact before/after
+size cases. No reliable profitability predicate has been demonstrated; do not
+claim that none can exist, or that the current gate guarantees a size win.
+A scheduler repair or a measured conservative gate must resolve the regression
+before describing the optimization as meeting the no-regression requirement.
 
 **8a. Default-build isolation** (agent-handoff "Gating discipline — the fuzzer guards the DEFAULT
 build too"). Every `examples/65816/*.c` recompiled `-c -Os` with **no** `+mos-a16`, old vs new

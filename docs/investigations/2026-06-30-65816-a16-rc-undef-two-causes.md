@@ -1,5 +1,14 @@
 # Finding — the `a16-*-rc-undef` "undefined physical register" verifier failure is TWO distinct defects
 
+**Current reproduction note (2026-09-25, OpenAI Codex):** the current patched
+compiler verifies the nine pressure witnesses in the [fresh recheck](2026-09-25-older-defect-recheck.md),
+and a reconstructed fully inlined bitboard fixture passes compile/runtime checks.
+The historical analysis below predates the integrated undef-lane/copy-liveness
+fixes; their separately validated status is recorded in the
+[upstream report](../upstream-rc-undef-ra-pure-virtual-issue.md).
+The bitboard report itself remains **not reproduced**, not causally closed.
+
+
 **Status:** **ROOT-CAUSED** (both). **Cause #1 — FIXED + SHIPPED + upstream-PR-ready** (register
 coalescer). **Cause #2 — root-caused, three fix attempts, DEFERRED to upstream** (a generic-LLVM RA
 sub-register-`undef`-liveness feature). The code was already **correct** under both causes — the symptom is

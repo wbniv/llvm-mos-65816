@@ -74,20 +74,30 @@ fix is now prepared as [0039](upstream-asm-modifier-width-pr.md). Review, corpus
 patch's record. See the [pending-work tracker](upstream-pending-work.md) for
 submission steps and the remaining defects.
 
-**Landed, PR draft not yet started (September 24):** four more pristine-upstream fixes landed in the
-patch stack, each the same upstream-postable shape as `0033`/`0036`, but none yet has a PR body or a
-`pr-preparations` validation record. `TODO.md` carries the draft-PR follow-up for three of them:
-[`0043`](plans/2026-09-24-inline-asm-num-registers.md) (inline-asm physreg constraints reject an
-operand wider than the register, `84d87260`) · [`0044`](plans/2026-09-24-asmprinter-long-address.md)
-(AsmPrinter marks 24-bit address operands with an explicit `mos24()` width, `5ea5006c`) ·
-[`0046`](plans/2026-09-24-fixupkinds-addrasciz-row.md) (`MOSFixupKinds.cpp` gains its missing
-`AddrAsciz` row, `fe54d1b7`).
-[`0047`](plans/2026-09-24-mc-addr-asciz-symbolic-crash.md) (fixes an `llvm-mc -show-encoding` crash
-on a symbolic `.mos_addr_asciz`, `6eced8e4`) is the same upstream-postable shape, but has **no
-queued TODO item** for its PR draft — its own plan (§Upstream) deliberately left it unranked because
-ranking is reserved to the Fable orchestrator, not a T2 dispatch; it still needs one. `0045`
-(AsmPrinter `mos16()` immediate marking under `+mos-a16`) is fork-only by design — its plan states no
-upstream destination — and is intentionally absent from this queue.
+**September 25 local review update:** [0043](upstream-inline-asm-physreg-width-pr.md),
+[0046](upstream-fixupkinds-addrasciz-row-pr.md), and
+[0047](upstream-mc-addr-asciz-symbolic-crash-pr.md) have PR drafts and initial
+pinned-base validation records. The [independent review](pr-preparations/2026-09-25/claude-batch-review.md)
+extends 0043 to explicit register names reachable from C, adds a compile-time
+fixup-table count check to 0046, and removes the unintended `addrasciz()` language
+extension from 0047. The revised artifacts apply to the pin and pass their
+integrated tests; refresh their isolated validation and prepare submission
+branches before posting. Earlier binary hashes apply only to earlier revisions.
+
+[0044](plans/2026-09-24-asmprinter-long-address.md), the 24-bit address printer,
+still needs its standalone PR body and pinned-base validation bundle. `0045`
+(native-width immediates) and `0048` (far-codegen tests) remain fork-specific.
+Independent compiler submissions do not wait for SNES platform merge; the
+platform/runtime prerequisites remain in the [separate tracker](upstream-pending-work.md#snes--separate-platform-track).
+
+When the revised branches and standalone checks are ready, the posting commands
+are (posting remains user-triggered):
+
+```sh
+gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Reject inline-asm operands wider than a named data register" --body-file docs/upstream-inline-asm-physreg-width-pr.md
+gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Complete and check the fixup information table" --body-file docs/upstream-fixupkinds-addrasciz-row-pr.md
+gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Preserve symbolic .mos_addr_asciz directives in text output" --body-file docs/upstream-mc-addr-asciz-symbolic-crash-pr.md
+```
 
 ## Current PR progress
 
@@ -361,7 +371,7 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 | # | Item | Type | What it does | Drafted at | Branch |
 |---|------|------|--------------|-----------|--------|
 | 1 | ✅ **MERGED 2026-07-25 (discovered)** — **F4** — `mos-late-opt` TYX/TXY dead-flag fix | **PR** | Clears dead/kill flags when rewriting `LDImm`→TYX/TXY (verifier reject on reentrant `+mos-a16`). Merged upstream as commit `9142aebae`; fork patch `0003-late-opt-txy-dead-flag.patch` **retired** (deleted) — see [rebase plan](plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md). | [`docs/321-upstream-late-opt-txy-pr.md`](321-upstream-late-opt-txy-pr.md) | [**PR #562**](https://github.com/llvm-mos/llvm-mos/pull/562) (opened 2026-06-22, **merged**) |
-| 2 | **Reentrant attribute semantics** | decision + possible fix/docs | Current clang suppresses the global nonreentrant default but emits no positive marker; backend inference can re-add nonreentrant. No ordinary-C miscompile established. Agree the intended contract before selecting a fix. | [Focused report](upstream-reentrant-soft-stack-issue.md) | unposted semantics report; no validated fix |
+| 2 | **Reentrant attribute semantics** | decision + possible fix/docs | Current clang suppresses the global nonreentrant default but emits no positive marker; backend inference can re-add nonreentrant. No ordinary-C miscompile established. Agree the intended contract before selecting a fix. | [Focused report](upstream-reentrant-soft-stack-issue.md) | unposted semantics report; no validated fix; [local reproduction refreshed 2026-09-25](investigations/2026-09-25-older-defect-recheck.md) |
 | 3 | **#320** — far-pointer design note | **note** | Opens the five-address-space ABI-blessing discussion (a Discord/#320 post, not a code change). **Updated 2026-06-21** with the Phase 0/3 corrections: retracts the pow2-pointer-size premise (real reason = MVT has no i24), the C1 single-datalayout finding (`0=far-default` foreclosed → a clang flag), and the packed-24 representable-but-deferred position. Posting-ready (user-triggered). | [`docs/320-upstream-far-pointer-note.md`](320-upstream-far-pointer-note.md) | n/a (note) |
 | 4 | ✅ **FIXED** — **scavenger live-`$p`** — `saveScavengerRegister` can't preserve a live `$p` across an unbalanced stack range | **fix PR** | Upstream crash (was an issue-with-no-fix): a `+mos-a16`/`+mos-xy16` compare keeps N/Z live across a frame-carry spill, forcing the whole `$p` preserved across an *unbalanced* range, but `$p` has no GPR home → illegal `STImag8 $p` + undefined-`$p` `PH $p`. **Fix** = route `$p` hard-stack-neutrally through a dead index reg into `RC17` + drop the stale `assertNZDeadAt`; carried as fork patch `0011` (`a16scavnz.c` now a `0x22A6` positive gate, both emulators, asserts-clean). | [PR body](upstream-scavenger-live-p-pr.md) · patch `patches/llvm-mos/0011-mos-scavenger-live-p-save.patch` | not yet pushed (`wbniv:mos-scavenger-live-p-save` to mint) |
 | 5 | ✅ **POSTED 2026-07-26** — **DWARF step 6** — 65816 DWARF lit test + `<output>.elf` doc note | **PR** | ROADMAP step 6: pins verified DWARF shapes + documents the undocumented debug-companion `.elf` | [lit](../dev/lit/DebugInfo/MOS/dwarf-65816.ll) · [note](321-upstream-dwarf-output-elf-companion.md) | [**PR #579**](https://github.com/llvm-mos/llvm-mos/pull/579) (`wbniv:mos-dwarf-65816-test-docs` @ `be45bd41c300` — a16-dependent test dropped in review prep; body cleaned 2026-07-31, venue-flex line added) |
@@ -407,7 +417,7 @@ correct). File it:
 
 ```
 gh issue create --repo llvm-mos/llvm-mos \
-  --title "[MOS] __attribute__((reentrant)) is a no-op for non-recursive functions — cannot force the soft stack" \
+  --title "[MOS] Clarify whether __attribute__((reentrant)) must prevent inferred nonreentrant allocation" \
   --body-file docs/upstream-reentrant-soft-stack-issue.md
 ```
 

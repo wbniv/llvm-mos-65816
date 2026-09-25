@@ -26,12 +26,11 @@
 #define GS_F    150   /* 0.0366 * 4096 (feed rate) */
 #define GS_K    254   /* 0.062 * 4096  (kill rate; the kill term uses F+k) */
 
-/* Demo grid (used by rdiff.c; 32*8=256 px wide, 20*8=160 px tall). 20 rows, not the original 24:
+/* Demo grid (used by rdiff.c; 32*8=256 px wide, 20*8=160 px tall). The
  * rdiff.c's static footprint (the four 16-bit double-buffers + gate scratch + title card) shares
  * the 7680 B low-WRAM region with the SOFT STACK, which grows down from $2000 into the same
- * region (see link.ld) — 24 rows left only ~110 B of stack headroom, the thinnest margin of any
- * demo in this repo, and the soft stack silently overran into gs_u/the title struct under
- * gs_step()'s call depth. 20 rows restores ~1262 B of headroom without touching corpus_result
+ * region (see link.ld). Twenty rows leave approximately 1262 B of stack headroom for
+ * gs_step() and display dispatch. Grid sizing does not affect corpus_result
  * (computed on the separate GS_GATE_W×GS_GATE_H sub-grid below). See rdiff.c's header comment. */
 #define GS_W               32
 #define GS_H               20

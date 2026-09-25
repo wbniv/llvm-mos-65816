@@ -1,0 +1,17 @@
+cpu	assume_nonreentrant	stage	function	nonreentrant
+mos6502	False	frontend	force_frame	False
+mos6502	False	frontend	ordinary_frame	False
+mos6502	False	after-pass	force_frame	True
+mos6502	False	after-pass	ordinary_frame	True
+mos6502	True	frontend	force_frame	False
+mos6502	True	frontend	ordinary_frame	True
+mos6502	True	after-pass	force_frame	True
+mos6502	True	after-pass	ordinary_frame	True
+mosw65816	False	frontend	force_frame	False
+mosw65816	False	frontend	ordinary_frame	False
+mosw65816	False	after-pass	force_frame	True
+mosw65816	False	after-pass	ordinary_frame	True
+mosw65816	True	frontend	force_frame	False
+mosw65816	True	frontend	ordinary_frame	True
+mosw65816	True	after-pass	force_frame	True
+mosw65816	True	after-pass	ordinary_frame	True

@@ -1,0 +1,3 @@
+==> bitboard-inline-recheck: differential default vs +mos-a16  (expected 0xC074; bsnes=yes)
+  [PASS] bitboard-inline-recheck  0xC074 (all agree)
+RESULT: PASS — bitboard-inline-recheck: default == +mos-a16 == host on both emulators

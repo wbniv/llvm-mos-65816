@@ -224,7 +224,19 @@ here.
 native form" rule (`legalizeLoadStore16`, anchor `Stores always take the native form`, :2195) makes a
 plain **near setter** `void set(uint16_t v){ g = v; }` cost **14 B / 27 cy under `+mos-a16`**, against
 **7 B / 14 cy** by default (`sta abs; stx abs`). That is a live lesson-2 regression on one of the most
-common C shapes. It is filed separately in TODO.
+common C shapes.
+
+**Follow-up (2026-09-25, OpenAI Codex):** the absolute setter now takes the byte
+path when its value is built from bytes and has only local byte/absolute-store
+uses without an intervening call or inline assembly. It measures **7 B / 14 cy**
+in both a16 and xy16. Native producers and values kept across calls retain native
+stores; a producer-only rule lost one byte for a call-preserved argument.
+See the [implementation and validation record](../plans/2026-09-25-near-s16-store-residency.md).
+The [next Codex follow-up](../plans/2026-09-25-near-indirect-s16-store-residency.md)
+also takes a plain indirect A:X setter from 13→8 B (store-and-return 15→12 B),
+with no losses in the measured controls or corpus. It excludes atomic stores
+and corrects the same omission in the absolute predicate. Shared native-use,
+broader indirect contexts, and far-store profitability remain separate TODO items.
 
 ## 5. Constraints a Phase 2 must gate on (recorded so they are not rediscovered)
 

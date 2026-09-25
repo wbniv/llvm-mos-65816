@@ -14,6 +14,7 @@ if [[ -n "$shared_hooks" ]]; then
 fi
 
 python3 "$repo_root/dev/check-comment-history.py"
+python3 "$repo_root/dev/check-defect-evidence.py" --staged
 
 # --staged: judge the staged blobs and HEAD, not concurrent unstaged work.
 # Register a reviewed display access site with

@@ -1,17 +1,16 @@
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-index 3271f98..ca6f5c7 100644
+index 3271f98..b176cab 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-@@ -129,11 +129,27 @@ unsigned MOSTargetLowering::getNumRegistersForInlineAsm(LLVMContext &Context,
+@@ -129,11 +129,26 @@ unsigned MOSTargetLowering::getNumRegistersForInlineAsm(LLVMContext &Context,
                                                          EVT VT) const {
    // 16-bit inputs and outputs must be passed in Imag16 registers to allow using
    // pointer values in inline assembly.
 +  //
 +  // This hook is given only a value type, never the constraint being lowered,
 +  // so the answer has to hold for every constraint that can accept the type.
-+  // It holds because getRegForInlineAsmConstraint() refuses any constraint
-+  // whose register is narrower than the value: the classes it can still return
-+  // for a 16-bit value hold all 16 bits in one register.
++  // Data-register constraints must therefore hold the whole value in one
++  // register. Flag outputs instead extend their single condition bit.
    if (VT == MVT::i16)
      return 1;
    return TargetLowering::getNumRegistersForInlineAsm(Context, VT);
@@ -30,7 +29,7 @@ index 3271f98..ca6f5c7 100644
  TargetLowering::ConstraintType
  MOSTargetLowering::getConstraintType(StringRef Constraint) const {
    if (Constraint.size() == 1) {
-@@ -166,16 +182,36 @@ MOSTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
+@@ -166,26 +181,56 @@ MOSTargetLowering::getRegForInlineAsmConstraint(const TargetRegisterInfo *TRI,
        if (VT == MVT::i16)
          return std::make_pair(0U, &MOS::Imag16RegClass);
        return std::make_pair(0U, &MOS::Imag8RegClass);
@@ -67,12 +66,34 @@ index 3271f98..ca6f5c7 100644
      case 'c':
        return std::make_pair(MOS::C, &MOS::FlagRegClass);
      case 'v':
+       return std::make_pair(MOS::V, &MOS::FlagRegClass);
+     }
+   }
+-  if (Constraint == "{cc}")
++  if (Constraint == "{cc}" && !isWiderThan(VT, 8))
+     return std::make_pair(MOS::P, &MOS::PcRegClass);
+
+-  return TargetLowering::getRegForInlineAsmConstraint(TRI, Constraint, VT);
++  auto Result =
++      TargetLowering::getRegForInlineAsmConstraint(TRI, Constraint, VT);
++  // Explicit names such as {a} and {rc0} designate a single register too.
++  // Clang emits these for register variables even when the source constraint
++  // is "r". Preserve the condition-bit extension contract for {c}/{v}; an
++  // untyped clobber has no value width to check.
++  if (Result.first && Result.second && Result.first != MOS::C &&
++      Result.first != MOS::V &&
++      isWiderThan(VT, TRI->getRegSizeInBits(*Result.second).getFixedValue()))
++    return std::make_pair(0U, nullptr);
++  return Result;
+ }
+
+ bool is8BitIndex(Type *Ty) {
 diff --git a/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
 new file mode 100644
-index 0000000..336d6ad
+index 0000000..f9b7702
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
-@@ -0,0 +1,92 @@
+@@ -0,0 +1,165 @@
 +; RUN: split-file %s %t
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs %t/ok.ll -o - | FileCheck %s
 +; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-A
@@ -81,12 +102,18 @@ index 0000000..336d6ad
 +; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_R.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-R
 +; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_d.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-D
 +; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/wide_in.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-IN
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_a.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-A
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-X
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_y.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-Y
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_rc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RC
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_rs.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-RS
++; RUN: not --crash llc -mtriple=mos -mcpu=mos6502 %t/named_cc.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=REJECT-NAMED-CC
 +
 +; "a", "x", "y" name one of the 8-bit data registers and "R"/"d" name a class of
 +; them. None of those registers pair into a wider value, so an operand that does
 +; not fit in eight bits cannot be placed in one and the constraint is rejected.
-+; Clang applies the same rule to C sources, so these cases are reachable only
-+; from IR. The check matters because the alternative is silent: the number of
++; Explicit register names also arise from C register variables using "r".
++; The check matters because the number of
 +; registers an inline-asm operand needs is reported from the value type alone,
 +; without the constraint, so a 16-bit operand is reported as fitting in one
 +; register and its high byte would be dropped on the way into an 8-bit one.
@@ -113,13 +140,38 @@ index 0000000..336d6ad
 +  ret i16 %v
 +}
 +
-+; The flag constraints are unaffected: their registers are one bit wide and
++; The flag constraints allow extension: their registers are one bit wide and
 +; extending that bit to the operand's type is the point of "c" and "v".
 +define i8 @carry_to_byte() {
 +; CHECK-LABEL: carry_to_byte:
 +; CHECK: ;APP
 +; CHECK: ;NO_APP
 +  %v = call i8 asm "sec", "=c"()
++  ret i8 %v
++}
++
++; A named byte, named pair, and untyped clobbers each satisfy their contract.
++define i8 @named_byte() {
++; CHECK-LABEL: named_byte:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i8 asm "", "={rc0},~{a},~{x},~{y},~{cc}"()
++  ret i8 %v
++}
++
++define i16 @named_pair() {
++; CHECK-LABEL: named_pair:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i16 asm "", "={rs0}"()
++  ret i16 %v
++}
++
++define i8 @named_carry() {
++; CHECK-LABEL: named_carry:
++; CHECK: ;APP
++; CHECK: ;NO_APP
++  %v = call i8 asm "sec", "={c}"()
 +  ret i8 %v
 +}
 +
@@ -164,4 +216,46 @@ index 0000000..336d6ad
 +; REJECT-IN: LLVM ERROR: unable to translate instruction: call{{.*}}wide_in
 +  call void asm "", "a"(i16 %x)
 +  ret void
++}
++
++;--- named_a.ll
++define i16 @named_a() {
++; REJECT-NAMED-A: LLVM ERROR: unable to translate instruction: call{{.*}}named_a
++  %v = call i16 asm "", "={a}"()
++  ret i16 %v
++}
++
++;--- named_x.ll
++define i16 @named_x() {
++; REJECT-NAMED-X: LLVM ERROR: unable to translate instruction: call{{.*}}named_x
++  %v = call i16 asm "", "={x}"()
++  ret i16 %v
++}
++
++;--- named_y.ll
++define i16 @named_y() {
++; REJECT-NAMED-Y: LLVM ERROR: unable to translate instruction: call{{.*}}named_y
++  %v = call i16 asm "", "={y}"()
++  ret i16 %v
++}
++
++;--- named_rc.ll
++define i16 @named_rc() {
++; REJECT-NAMED-RC: LLVM ERROR: unable to translate instruction: call{{.*}}named_rc
++  %v = call i16 asm "", "={rc0}"()
++  ret i16 %v
++}
++
++;--- named_rs.ll
++define i32 @named_rs() {
++; REJECT-NAMED-RS: LLVM ERROR: unable to translate instruction: call{{.*}}named_rs
++  %v = call i32 asm "", "={rs0}"()
++  ret i32 %v
++}
++
++;--- named_cc.ll
++define i16 @named_cc() {
++; REJECT-NAMED-CC: LLVM ERROR: unable to translate instruction: call{{.*}}named_cc
++  %v = call i16 asm "", "={cc}"()
++  ret i16 %v
 +}

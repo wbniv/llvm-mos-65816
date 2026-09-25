@@ -1,5 +1,12 @@
 # `MOSFixupKinds.cpp` `Infos[]` missing the `AddrAsciz` row
 
+> **Reviewed September 25:** [independent review and revisions](../pr-preparations/2026-09-25/claude-batch-review.md)
+> supersede this initial implementation record where they differ. In particular,
+> 0043 also guards explicit register names reachable from C; 0046 checks the table
+> length at compile time; 0047 changes only directive text emission and tests,
+> without exposing an `addrasciz()` modifier or changing integer evaluation.
+
+
 **Date:** 2026-09-24 · **TODO:** M2 item "`MOSFixupKinds.cpp` `Infos[]` has 14 initialisers for
 15 fixup kinds — add the `AddrAsciz` row." · **Branch:** `main` (one-line pristine-upstream fix,
 not an investigation/spike; no worktree needed).

@@ -1,35 +1,41 @@
 | Date | Change |
 |------|--------|
-| [2026-06-23](https://github.com/wbniv/llvm-mos-65816/commit/0aa1110) | #321 worktree-teardown: handle throwaway/<slug> via the blessed wrapper |
-| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/392030a) | #321 docs: add the feature-worktree howto (target of the agent-handoff + CLAUDE.md pointers) |
-| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9148a7b) | docs: investigations go on throwaway worktrees, not main (standing convention) |
-| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f1) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
-| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/0083378) | #321 docs: add project CLAUDE.md + agent-handoff guide |
+| [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b2) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
+| [2026-06-23](https://github.com/wbniv/llvm-mos-65816/commit/0aa1110b) | #321 worktree-teardown: handle throwaway/<slug> via the blessed wrapper |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/392030ab) | #321 docs: add the feature-worktree howto (target of the agent-handoff + CLAUDE.md pointers) |
+| [2026-06-18](https://github.com/wbniv/llvm-mos-65816/commit/9148a7b7) | docs: investigations go on throwaway worktrees, not main (standing convention) |
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/6fff2f14) | #321 docs: wire awareness of the upstream-contribution-status queue into CLAUDE.md + TODO |
+| [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/00833780) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
-0aa1110	author	Will Norris
-0aa1110	added	3
-0aa1110	deleted	1
-0aa1110	files	1
-0aa1110	body	Closes the gap found while tearing down the M1-verify measurement worktree:\nthe wrapper blindly prepended wt/ (so throwaway/<slug> resolved to a nonexistent\nwt/throwaway/<slug>), while raw teardown is guard-blocked outright -- leaving\ndisposable investigation/measurement worktrees with no blessed path.\n\n- Resolve a bare slug -> wt/<slug> (feature, unchanged); an explicit branch\n  (wt/<slug>, throwaway/<slug>, ...) is used verbatim.\n- throwaway/<slug> is disposable: the unmerged-commit + tracked-content gates\n  downgrade from hard-ABORT to a --yes-gated WARN, and the retain-until-upstream\n  policy gate is skipped (teardown still needs --yes -- it is irreversible).\n- usage() now prints just the leading comment block (no trailing code in -h).\n- Tests +3 (guard passthrough for a throwaway branch delete; resolution of\n  throwaway/<slug> verbatim vs bare-slug default to wt/) -> 18/18. Verified\n  end-to-end on a real throwaway worktree (dry-run + --yes teardown).\n- CLAUDE.md dead-end teardown guidance now points at the wrapper.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-392030a	author	Will Norris
-392030a	added	3
-392030a	deleted	1
-392030a	files	1
-392030a	body	docs/howto-feature-worktree.md: the cp -al hardlink procedure to run dev/run.sh from a\nworktree without a 30-90 min toolchain rebuild (the CLAUDE.md env-override trick is\nhost-side only — it dangles inside dev/run.sh's single-root Docker mount). The pointer\nfrom agent-handoff.md landed via concurrent commit d26a5e6; this adds the file it and the\nCLAUDE.md caveat reference, plus the CLAUDE.md caveat itself.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-9148a7b	author	Will Norris
-9148a7b	added	8
-9148a7b	deleted	0
-9148a7b	files	1
-9148a7b	body	Per a standing user principle (2026-06-18): exploratory/measurement work\n(measurements, spikes, probes) runs on a throwaway/<slug> branch in its own\nworktree, never on main's working copy — a dead-end stays disposable and, on\nthis hot shared tree (concurrent agents leave vendor/, 0002, TODO.md dirty),\nthe worktree gives a clean checkout + clean commits. Keep -> merge durable\nartifacts back; dead-end -> worktree remove + branch -D.\n\nAdded to the project commit-discipline section; the cross-project rule + rationale\nis in ~/SRC/CLAUDE.md "Worktree-based feature workflow" (extended to investigations),\nand an auto-memory (investigations-on-throwaway-branches) mirrors it.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-6fff2f1	author	Will Norris
-6fff2f1	added	4
-6fff2f1	deleted	0
-6fff2f1	files	1
-6fff2f1	body	So the pending-to-post queue (docs/upstream-contribution-status.md) is kept current:\n\n- CLAUDE.md (auto-loaded every session) §Commit discipline: a standing rule — upstream\n  PRs/issues/notes are queued in that doc; posting is user-triggered; keep it current in\n  the same commit when you draft an artifact, push a PR branch, or post one.\n- TODO.md §Upstream / Contribution: a back-pointer to the doc as the live queue + exact\n  post commands, to keep in sync (drafted → ready-to-post → posted).\n\nThe status doc already points back to the TODO section, so discoverability is bidirectional.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
-0083378	author	Will Norris
-0083378	added	60
-0083378	deleted	0
-0083378	files	1
-0083378	body	No project-level CLAUDE.md existed (only the shared ~/SRC/CLAUDE.md cascaded down). Add a\nproject guide that auto-loads every session as the standing handoff preface, plus a\nreferenced docs/agent-handoff.md for the verbose mechanics -- so each task is just this\ngeneral context + a per-task docs/plans/ supplement.\n\nCLAUDE.md (lean, auto-loaded): what the project is; the gitignored vendor/ + patches/0002\n"edit in place, regen the patch" model and the shared-tree "only commit your files" rule;\nthe differential correctness bar; the three governing lessons (measure-don't-assume;\na native 16-bit op isn't automatically smaller -> gate conservatively where it wins;\nmodest gains are worth doing); and project commit discipline.\n\ndocs/agent-handoff.md (referenced): exact build/compile/disasm/emulator/fuzz commands plus\nthe clang-23 stale-symlink and quiet-box gotchas; the micro-test pattern; the\nnative-a16-vs-8-bit-a16 same-shape, 16-bit-ambient measurement methodology; and backend\nnavigation (grep anchors, key files, register classes).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+da5409b2	author	Will Norris
+da5409b2	added	3
+da5409b2	deleted	3
+da5409b2	files	1
+da5409b2	body	The ~/SRC/<name> → ~/<name> flattening completed 2026-07-19; ~/SRC no\nlonger exists and there is no compat symlink, so every surviving\n~/SRC/... reference was dead.\n\nFunctional (verified against the filesystem):\n- dev/publish-web-roms.sh — the live default was\n  SITE="${HOME}/SRC/biohack.net", i.e. every invocation without --site\n  aborted with "no roms dir". Now ${HOME}/biohack.net;\n  ~/biohack.net/public/play/roms confirmed present.\n- dev/land-far-integration.sh — hardcoded /home/will/SRC/... for the\n  main checkout and for two SIBLING worktrees. ROOT now derives from\n  the script's own location and the siblings derive from ROOT\n  ("$ROOT-far-followups", "$ROOT-far-cc"), matching the\n  "$MAIN-$SLUG" convention in docs/howto-feature-worktree.md, so the\n  repo can live anywhere. Header notes that both worktrees must be\n  restored to re-run — neither is present on this machine (nor is the\n  gitignored vendor/llvm-mos), which is pre-existing and unrelated.\n- .claude/skills/{snes-demo,snes-rom-page}/SKILL.md — --site\n  ~/biohack.net; the per-site sections now cite ~/indri.studio and\n  ~/biohack.net. Both directories confirmed present.\n\nDocs (living, not dated snapshots):\n- CLAUDE.md, docs/howto-feature-worktree.md — ~/CLAUDE.md; the\n  relative link targets were already correct under the flat layout\n  since the parent of this repo is now ~.\n- docs/agent-handoff.md — the worktree registry's 16 sibling paths\n  repointed to /home/will/llvm-mos-65816-<slug>.\n- docs/howto-bulk-rebuild-republish-web-roms.md,\n  docs/snes-demo-cookbook.md — ~/biohack.net.\n- docs/investigations/snes-emulator-in-browser.md — ~/bsnes-jg-wasm\n  (present).\n- docs/ROADMAP.md — the M1 build-glue workspace is ~/llvm-mos-snes;\n  note it is not checked out on this machine.\n\nNot the vendored upstream: ~/llvm-mos is a separate checkout that this\nrepo never consumes — dev/toolchain.sh clones vendor/llvm-mos from\ngithub.com/llvm-mos/llvm-mos — so nothing was repointed at it, and its\nown LLVM_SRC_ROOT-style identifiers are not migration debt.\n\nLeft alone: dated point-in-time records under docs/plans/,\ndocs/handoffs/, docs/transcripts/ and .history/ sidecars; and SRC-in-\nanother-sense identifiers ($SRC in dev/*.sh, PLAYER_SRC, SUBSRC,\ntruchet.c's SRC table).\n\nVerified: bash -n clean on both edited scripts plus scaffold.sh;\ndev/publish-web-roms.sh -h exits 0; dev/test-worktree-teardown.sh\n26 passed / 0 failed; re-run of the SRC search leaves only dated\nrecords and the (pre-existing dirty, already-correct)\n.claude/memory/MEMORY.md.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_015uDBhrHoJFYhNJkNLhve4E
+0aa1110b	author	Will Norris
+0aa1110b	added	3
+0aa1110b	deleted	1
+0aa1110b	files	1
+0aa1110b	body	Closes the gap found while tearing down the M1-verify measurement worktree:\nthe wrapper blindly prepended wt/ (so throwaway/<slug> resolved to a nonexistent\nwt/throwaway/<slug>), while raw teardown is guard-blocked outright -- leaving\ndisposable investigation/measurement worktrees with no blessed path.\n\n- Resolve a bare slug -> wt/<slug> (feature, unchanged); an explicit branch\n  (wt/<slug>, throwaway/<slug>, ...) is used verbatim.\n- throwaway/<slug> is disposable: the unmerged-commit + tracked-content gates\n  downgrade from hard-ABORT to a --yes-gated WARN, and the retain-until-upstream\n  policy gate is skipped (teardown still needs --yes -- it is irreversible).\n- usage() now prints just the leading comment block (no trailing code in -h).\n- Tests +3 (guard passthrough for a throwaway branch delete; resolution of\n  throwaway/<slug> verbatim vs bare-slug default to wt/) -> 18/18. Verified\n  end-to-end on a real throwaway worktree (dry-run + --yes teardown).\n- CLAUDE.md dead-end teardown guidance now points at the wrapper.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+392030ab	author	Will Norris
+392030ab	added	3
+392030ab	deleted	1
+392030ab	files	1
+392030ab	body	docs/howto-feature-worktree.md: the cp -al hardlink procedure to run dev/run.sh from a\nworktree without a 30-90 min toolchain rebuild (the CLAUDE.md env-override trick is\nhost-side only — it dangles inside dev/run.sh's single-root Docker mount). The pointer\nfrom agent-handoff.md landed via concurrent commit d26a5e6; this adds the file it and the\nCLAUDE.md caveat reference, plus the CLAUDE.md caveat itself.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+9148a7b7	author	Will Norris
+9148a7b7	added	8
+9148a7b7	deleted	0
+9148a7b7	files	1
+9148a7b7	body	Per a standing user principle (2026-06-18): exploratory/measurement work\n(measurements, spikes, probes) runs on a throwaway/<slug> branch in its own\nworktree, never on main's working copy — a dead-end stays disposable and, on\nthis hot shared tree (concurrent agents leave vendor/, 0002, TODO.md dirty),\nthe worktree gives a clean checkout + clean commits. Keep -> merge durable\nartifacts back; dead-end -> worktree remove + branch -D.\n\nAdded to the project commit-discipline section; the cross-project rule + rationale\nis in ~/SRC/CLAUDE.md "Worktree-based feature workflow" (extended to investigations),\nand an auto-memory (investigations-on-throwaway-branches) mirrors it.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+6fff2f14	author	Will Norris
+6fff2f14	added	4
+6fff2f14	deleted	0
+6fff2f14	files	1
+6fff2f14	body	So the pending-to-post queue (docs/upstream-contribution-status.md) is kept current:\n\n- CLAUDE.md (auto-loaded every session) §Commit discipline: a standing rule — upstream\n  PRs/issues/notes are queued in that doc; posting is user-triggered; keep it current in\n  the same commit when you draft an artifact, push a PR branch, or post one.\n- TODO.md §Upstream / Contribution: a back-pointer to the doc as the live queue + exact\n  post commands, to keep in sync (drafted → ready-to-post → posted).\n\nThe status doc already points back to the TODO section, so discoverability is bidirectional.\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+00833780	author	Will Norris
+00833780	added	60
+00833780	deleted	0
+00833780	files	1
+00833780	body	No project-level CLAUDE.md existed (only the shared ~/SRC/CLAUDE.md cascaded down). Add a\nproject guide that auto-loads every session as the standing handoff preface, plus a\nreferenced docs/agent-handoff.md for the verbose mechanics -- so each task is just this\ngeneral context + a per-task docs/plans/ supplement.\n\nCLAUDE.md (lean, auto-loaded): what the project is; the gitignored vendor/ + patches/0002\n"edit in place, regen the patch" model and the shared-tree "only commit your files" rule;\nthe differential correctness bar; the three governing lessons (measure-don't-assume;\na native 16-bit op isn't automatically smaller -> gate conservatively where it wins;\nmodest gains are worth doing); and project commit discipline.\n\ndocs/agent-handoff.md (referenced): exact build/compile/disasm/emulator/fuzz commands plus\nthe clang-23 stale-symlink and quiet-box gotchas; the micro-test pattern; the\nnative-a16-vs-8-bit-a16 same-shape, 16-bit-ambient measurement methodology; and backend\nnavigation (grep anchors, key files, register classes).\n\nCo-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
 -->

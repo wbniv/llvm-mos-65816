@@ -1,0 +1,3 @@
+==> shift64-narrow-recheck: differential default vs +mos-a16  (expected 0x6A2B; bsnes=yes)
+  [PASS] shift64-narrow-recheck  0x6A2B (all agree)
+RESULT: PASS — shift64-narrow-recheck: default == +mos-a16 == host on both emulators

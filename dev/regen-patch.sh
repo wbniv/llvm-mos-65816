@@ -72,6 +72,8 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0047-mos-mc-addr-asciz-symbolic-crash.patch"  # -show-encoding crash; pristine-upstream
 )
 TESTRELS=(
+  "llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll"
+  "llvm/test/CodeGen/MOS/a16-byte-store.ll"
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
   "llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir"
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"

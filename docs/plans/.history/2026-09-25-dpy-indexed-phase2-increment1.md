@@ -1,9 +1,15 @@
 | Date | Change |
 |------|--------|
+| [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/e1a4adad) | docs(321): record the last three verification legs in the [dp],Y plan |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/dbb84e16) | test(321): farbank gate — [dp],y (b7) across a bank boundary |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/2689b74d) | feat(321): select [dp],Y (b7/97) for a small constant far displacement |
 
 <!--history-meta v1
+e1a4adad	author	Will Norris
+e1a4adad	added	23
+e1a4adad	deleted	5
+e1a4adad	files	1
+e1a4adad	body	roundtrip re-run after examples/65816/farbank.c joined that suite (117 -> 118\nfixtures, still 0 divergent in all three modes), the differential fuzzer\n(45/50 PASS, 0 mismatch/crash/error — the documented seeds 1-50 baseline), and a\nresidual risk: neither tryFarIndirectIndexedAddressing nor the\ntryFarIndirectAddressing it fronts asserts an 8-bit mem-op, so if a wider far\naccess ever reaches selectAddressingMode's case 32: BOTH need the guard.\n\nCo-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_017sAprvTwtKFJHKgQmr1qgr
 dbb84e16	author	Will Norris
 dbb84e16	added	74
 dbb84e16	deleted	1

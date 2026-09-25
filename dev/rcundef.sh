@@ -46,7 +46,7 @@ declare -A OPTS=(
 rc=0
 for src in "$ROOT/examples/65816/rcundef.c" \
            "$ROOT/examples/snes/corpus/newton_sim.c"; do
-  [ -f "$src" ] || { echo "    SKIP (missing) $(basename "$src")"; continue; }
+  [ -f "$src" ] || { echo "    FAIL (missing) $(basename "$src")"; rc=1; continue; }
   for spec in "a16:-Xclang -target-feature -Xclang +mos-a16" \
               "xy16:-Xclang -target-feature -Xclang +mos-xy16"; do
     name="${spec%%:*}"; feat="${spec#*:}"
@@ -57,7 +57,7 @@ for src in "$ROOT/examples/65816/rcundef.c" \
         echo "    $(basename "$src") $name $opt  -verify clean"
       else
         echo "    $(basename "$src") $name $opt  -verify FAIL"
-        echo "$log" | grep -iE 'Bad machine code|undefined physical|instruction:' | sed 's/^/        /' | head -3
+        echo "$log" | sed -n '1,12s/^/        /p'
         rc=1
       fi
     done

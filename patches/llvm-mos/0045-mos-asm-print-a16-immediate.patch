@@ -1,4 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+index ecfe05d..ee02dbf 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
 @@ -109,6 +109,48 @@ void MOSInstPrinter::printAddr24Operand(const MCInst *MI, unsigned OpNo,
@@ -11,7 +12,7 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Targ
 +// bytes; with M=0 the processor then consumes the following opcode as the
 +// immediate's high byte and the whole instruction stream desynchronises.
 +// Values above 255 are unambiguous already, which is why only small constants
-+// are affected -- and why this went unnoticed.
++// need an explicit width.
 +//
 +// This is the same rule MOSDisassembler::getInstruction applies when it
 +// re-wraps a decoded 16-bit immediate, one layer over: here it covers every
@@ -51,6 +52,7 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Targ
                                          unsigned OpNo, raw_ostream &OS) {
    const MCOperand &Op = MI->getOperand(OpNo);
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+index 8c61f60..c6795eb 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
 @@ -41,6 +41,7 @@ public:
@@ -62,6 +64,7 @@ diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target
                                 unsigned OpIdx, unsigned PrintMethodIdx,
                                 raw_ostream &OS);
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+index ad9c595..e48d582 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -225,7 +225,15 @@ class imm16at<int offset> : Operand<i32> {
@@ -83,6 +86,7 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSIns
  /// An 8-bit pc-relative reference, for branch instructions.
 diff --git a/llvm/test/CodeGen/MOS/a16-immediate-width.ll b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
 new file mode 100644
+index 0000000..6edf135
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-immediate-width.ll
 @@ -0,0 +1,65 @@

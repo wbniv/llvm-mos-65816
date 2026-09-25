@@ -1,0 +1,25 @@
+{
+  "schema": 1,
+  "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+  "attribution": [
+    "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
+    "OpenAI Codex: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+  ],
+  "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
+  "id": "bitboard-inline-register-pressure",
+  "title": "Undefined registers in inline bitboard operations",
+  "status": "not_reproduced",
+  "reproducer_origin": "reconstructed",
+  "summary": "Forced-inline bit-count probes, the full demo, and nine additional pressure witnesses verify on the current compiler. This reconstructed input does not establish closure of the original bitboard report.",
+  "unknowns": "The exact historical failing bitboard translation unit and compiler were not recovered. The cause has not been bisected to a fix.",
+  "observations": [
+    {
+      "path": "docs/investigations/2026-09-25-older-defect-recheck.tsv",
+      "sha256": "71a459a9e4ffb98fc337e48061372c5b5274b240159ec301e26a686702824d2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-bitboard-runtime.log",
+      "sha256": "a087b2cdeb137e83f82b08d1bc04834f106efddfbd9bd1352d6249acb8ec126f"
+    }
+  ]
+}

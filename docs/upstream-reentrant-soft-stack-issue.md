@@ -1,6 +1,6 @@
 # Reentrant attribute: opt-out or a forced reentrant frame?
 
-**Assessment updated 2026-09-22. Not posted; no fix proposed until the contract is agreed.**
+**Assessment updated 2026-09-25. Not posted; no fix proposed until the contract is agreed.**
 Target: `llvm-mos/llvm-mos` (clang attribute lowering and MOSNonReentrant).
 
 ## Proposed issue title
@@ -15,7 +15,7 @@ when it proves the function does not recurse and does not classify it as interru
 reachable. Thus the attribute does not force a soft-stack frame for an otherwise
 provably non-reentrant function.
 
-Current upstream source confirms both steps:
+The saved upstream source inspected on 2026-09-22 confirms both steps:
 
 - [CodeGenModule.cpp](https://github.com/llvm-mos/llvm-mos/blob/742d554bf08042b8df93d791c335260fadd16643/clang/lib/CodeGen/CodeGenModule.cpp):
   `ReentrantAttr` suppresses `AssumeNonReentrant`; there is no positive marker.
@@ -49,6 +49,17 @@ No IR editing or downstream frontend is needed for this result. The reference
 build has assertions disabled; the `verify` pass checks the resulting IR.
 The emitted IR is saved in `build/upstream-ready-2026-09-22/reentrant.ll` and
 `reentrant-after.ll`.
+
+## Current local reproduction (2026-09-25, OpenAI Codex)
+
+The rebuilt project compiler reproduces the same behavior for mos6502 and
+mosw65816, with and without `-fnonreentrant`. The frontend opt-out is effective;
+`mos-nonreentrant` subsequently marks both leaf functions nonreentrant. An
+end-to-end mos6502 assembly check gives them the same four-byte static frame.
+This refreshes the local behavior evidence, not the intended semantic contract.
+[Full evidence](investigations/2026-09-25-older-defect-recheck.md) ·
+[structured status](defects/reentrant-attribute-contract.json).
+No issue was posted. Earlier investigation attribution is retained.
 
 ## What this does and does not establish
 

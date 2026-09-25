@@ -1,0 +1,29 @@
+{
+  "schema": 1,
+  "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+  "attribution": [
+    "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
+    "OpenAI Codex: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+  ],
+  "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
+  "id": "shift64-narrow-count",
+  "title": "Narrow-count 64-bit shift legalization",
+  "status": "not_reproduced",
+  "reproducer_origin": "original",
+  "summary": "The retained C input and additional byte-count probes pass on the identified current compiler. The historical failure is not disproved or causally fixed by this recheck.",
+  "unknowns": "The original failing compiler/toolchain and a discriminating red baseline were not recovered. No fixing change has been identified.",
+  "observations": [
+    {
+      "path": "docs/investigations/2026-09-25-older-defect-recheck.tsv",
+      "sha256": "71a459a9e4ffb98fc337e48061372c5b5274b240159ec301e26a686702824d2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-runtime.log",
+      "sha256": "3103328c10403195b83dc1792b6a489ad2dfc6aa7654b30f1843069835af59e5"
+    },
+    {
+      "path": "examples/65816/shift64seam-narrow.c",
+      "sha256": "4ef2a8e93d7f9727ca738bd2255c461f5a6beda834ad1af72237d2a94f90c817"
+    }
+  ]
+}

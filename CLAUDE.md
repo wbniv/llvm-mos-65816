@@ -31,6 +31,22 @@ Correctness = the **differential**: host-computed == default(non-`+mos-a16`)@MAM
 `+mos-a16`@bsnes-jg, plus `-verify-machineinstrs` clean. Any disagreement or crash is a real defect, not a
 glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
 
+## Defect evidence and closure — mandatory for every agent
+
+Follow [the defect evidence workflow](docs/howto-defect-evidence.md) and the
+closure rules in [AGENTS.md](AGENTS.md). Every new compiler defect or status
+change needs a structured `docs/defects/*.json` record. Capture the exact input,
+failing toolchain/configuration, diagnostics, and relevant IR/MIR before changing
+the compiler; keep that baseline immutable. Preserve original attribution.
+
+A current passing probe establishes **not reproduced on this build**, not fixed
+or invalid. Label reconstructed inputs, retain historical evidence, and keep
+missing baseline information explicit. Close as fixed only with a causal change
+and a same-input regression that fails on the preserved baseline and passes with
+the fix. Do not retire an XFAIL merely because a replacement fixture passes.
+The pre-commit evidence check enforces structured closure requirements; do not
+bypass it. Its checks do not replace reviewing the trigger or replaying evidence.
+
 ## Three governing lessons (hard-won)
 
 1. **Measure, don't assume.** Predicted codegen is often wrong here — build the real shape, diff the bytes,

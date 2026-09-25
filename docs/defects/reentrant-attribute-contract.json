@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+  "attribution": [
+    "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
+    "OpenAI Codex: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+  ],
+  "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
+  "id": "reentrant-attribute-contract",
+  "title": "Reentrant attribute versus inferred static frames",
+  "status": "contract_clarification",
+  "reproducer_origin": "original",
+  "summary": "The frontend opt-out works; backend analysis can infer nonreentrant again. This confirms that the attribute does not force soft-stack frames, without establishing a supported-program miscompile.",
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-reentrant.tsv",
+      "sha256": "15b197c2b85ec87570ffd557c5c286798c680309ce94370c958090ea58678f37"
+    },
+    {
+      "path": "docs/investigations/repro/upstream-issues-2026-09-20/reentrant.c",
+      "sha256": "3629f7c4019e6a9ea5a7da4b439dfcff851e89e68fab3aa660f5b9ba5cacf771"
+    }
+  ]
+}

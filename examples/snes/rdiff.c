@@ -14,15 +14,9 @@
  *   grows DOWN into this SAME region (link.ld: "soft stack grows down from $2000; bss/heap up"),
  *   so headroom here is stack headroom, not spare BSS.
  *
- *   The grid was 32×24 (≈7570 B used, only ~110 B of stack headroom — the thinnest margin of
- *   any demo in this repo, per __bss_end in the linker map) until 2026-09-25: that margin was too thin
- *   for gs_step()'s nested __mulsi3 calls + Display's virtual dispatch, so the soft stack
- *   silently overran into gs_u/main.title. The corruption was invisible to the corpus gate
- *   (corpus_result is computed on the separate `gstate` sub-grid before display_init even runs)
- *   but visibly reactivated the (still VRAM-resident) title card's TitleLayer.active flag at
- *   random, so the title dominated screenshots for thousands of frames instead of tearing down
- *   once around frame 600 — see docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md
- *   (deferred section) and TODO.md's [rdiff-title-card-dominates] entry.
+ *   gs_step()'s nested multiplication calls and Display's virtual dispatch need that
+ *   stack space. The corpus gate checks a separate small grid before display_init();
+ *   the rendered demo also needs a post-title emulator check to exercise this footprint.
  *
  * corpus_result = rdiff_gate_crc() on an 8×8 sub-grid (8 steps) — a fixed-size gate_state
  * independent of GS_W/GS_H, set once at startup.

@@ -67,6 +67,37 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
 | `main` | `/home/will/llvm-mos-65816` | seed-42 regression: `legalizeICmp` EQ-swap leaked into non-a16 path | ~~DONE~~ `51a5bae` |
 | `main` | `/home/will/llvm-mos-65816` | indir-dst copy fold (`*p = gg`): corpus trigger check | ~~CLOSED WON'T-DO~~ — 0/6 progs, 0 B, `f52d5b8` |
 
+**2026-09-25 near-store follow-up:** OpenAI Codex’s absolute s16 argument-store
+fix is integrated into the main working tree and installed compiler, with validation
+complete. `.scratch/near-store` (`wt/321-near-store`) retains the independent
+source/build and must be preserved. The [record](plans/2026-09-25-near-s16-store-residency.md)
+contains measurements, reproduction commands, and Claude/Codex attribution.
+`dev/run.sh a16storebytes` runs its host/default/a16/xy16 runtime differential.
+The [indirect-store follow-up](plans/2026-09-25-near-indirect-s16-store-residency.md)
+is also complete and integrated: plain setter 13→8 B, return case
+15→12 B, plus atomic-store safeguards including a correction to the absolute fix.
+Main and worktree compilers match; `a16indirectstore`, `a16storebytes`, and `a16abs`
+pass. Census: no larger objects or new failures; full MOS lit retains its four
+existing failures (162 pass, 2 unsupported). The pre-indirect compiler is preserved
+in `build/indirect-store-review/baseline-install`; the worktree now contains the
+combined fixes. See the focused record for hashes, exclusions, and attribution.
+
+## Defect reproduction and closure
+
+Follow [the evidence workflow](howto-defect-evidence.md) and the mandatory rules
+in `AGENTS.md`. New compiler reports/status changes require a `docs/defects/*.json`
+record. The active pre-commit hook validates staged evidence and rejects unsupported
+fixed claims or changes to captured baselines. Passing current inputs means only
+**not reproduced on this build** unless a causal red/green repair is established.
+
+The [2026-09-25 older-report recheck](investigations/2026-09-25-older-defect-recheck.md)
+records 132 successful compiles and narrow-shift/inline-bitboard runtime checks.
+Both historical failure reports remain not reproduced, with missing baseline
+information explicit; reentrant remains a contract clarification. OpenAI Codex
+performed the recheck and enforcement work; original credits are preserved.
+`.scratch/older-defect-recheck` holds the isolated inputs/artifacts; main's
+`build/older-defect-recheck` retains a copy. Compiler sources were not changed.
+
 ## Build / compile / disasm / test — the exact commands
 
 - **Rebuild the toolchain after a `vendor/` edit** (Docker container; incremental): `dev/run.sh toolchain`.
@@ -81,7 +112,7 @@ licensing rule (datasheets are third-party copyrighted; the release tarball stay
   build silently serving old codegen has burned this project before.
   **SECOND GOTCHA (2026-07-31, fixed 2026-09-24):** `dev/run.sh toolchain` used to install only the
   clang+lld distribution, leaving `build/llvm-mos/bin/llc` (and `opt`/`llvm-mc`/`llvm-objdump`/
-  `llvm-readobj`/`FileCheck`/`not`) to go months stale after a green rebuild — it reproduced an
+  `llvm-readobj`/`llvm-readelf`/`llvm-config`/`count`/`split-file`/`FileCheck`/`not`) to go months stale after a green rebuild — it reproduced an
   already-fixed nondeterminism bug and produced a false 13-vs-9 lit reading during the 0040 work.
   `dev/toolchain.sh` now rebuilds that exact tool set (the ones `llvm/test/CodeGen/MOS` +
   `llvm/test/MC/MOS` RUN lines actually invoke) right after `install-distribution`, in the same

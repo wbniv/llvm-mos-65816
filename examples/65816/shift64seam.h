@@ -41,7 +41,7 @@ static uint16_t shift64seam_fold64(uint16_t h, uint64_t v) {
 
 __attribute__((noinline)) static uint16_t shift64seam_step(uint16_t h, uint16_t step) {
     uint8_t c8=shift64seam_amount(step);
-    shift64seam_count=(uint64_t)c8; // Explicitly widened: avoids the known G_ANYEXT s8->s64 gap.
+    shift64seam_count=(uint64_t)c8; // Exercise the wide-count calling convention.
     uint64_t c=shift64seam_count;
     uint64_t u=UINT64_C(0xD3A5C96E7812B40F) ^ ((uint64_t)step*UINT64_C(0x0101010101010101));
     int64_t s=(int64_t)(u|UINT64_C(0x8000000000000000));

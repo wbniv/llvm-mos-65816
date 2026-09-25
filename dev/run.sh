@@ -116,7 +116,7 @@ Targets:
   toolchain  build llvm-mos (clang/lld) FROM SOURCE -> build/llvm-mos-install
              (for M1 codegen; long first build — see dev/toolchain.sh). Also
              refreshes the lit tool set (llc/opt/llvm-mc/llvm-objdump/
-             llvm-readobj/split-file/FileCheck/not) in build/llvm-mos, so a green rebuild
+             llvm-readobj/llvm-readelf/llvm-config/count/split-file/FileCheck/not) in build/llvm-mos, so a green rebuild
              never leaves `lit` reading a stale llc (see `lit` below).
   lit        refresh that same lit tool set in build/llvm-mos, then run
              build/llvm-mos/bin/llvm-lit -s against llvm/test/CodeGen/MOS +
@@ -275,6 +275,10 @@ Targets:
              corpus_result==0x3502 both emus
   a16ptr     #321 native s16 indirect load/store: *p / a[i] use one 16-bit lda (zp)/sta (zp) in M16
              (no (zp),y byte pair); corpus_result==0xABCE both emus
+  a16indirectstore  Near indirect s16 argument stores: host/default/a16/xy16
+                    on MAME plus a16 on bsnes-jg; includes page crossings.
+  a16storebytes  Absolute s16 argument stores: host/default/a16/xy16 differential
+                on MAME plus a16 on bsnes-jg (needs toolchain + SDK + xcheck).
   a16abs     #321 native s16 absolute load/store: g = gg uses one 16-bit lda abs/sta abs in M16
              (no X/Y byte shuffle); corpus_result==0x5A3D both emus
   a16copy    #321 native s16 fused indirect copy: g = *p folds the indirect load into the store

@@ -1,5 +1,12 @@
 # `a16-*-rc-undef` — fix the `$x = COPY $rcN` "undefined physical register" MachineVerifier failure
 
+**Current reproduction note (2026-09-25, OpenAI Codex):** the measured pressure
+witnesses now pass on the integrated compiler. See the [recheck](../investigations/2026-09-25-older-defect-recheck.md)
+for the exact matrix and its limits, and the [upstream report](../upstream-rc-undef-ra-pure-virtual-issue.md)
+for the separately validated later fixes. Historical failures below remain evidence;
+passing reconstructed inputs alone does not close an unproven root cause.
+
+
 **Status:** CAUSE #1 FIXED + SHIPPED (2026-06-30, commit `f1af264`; newton demo rebuilt + deployed to
 [biohack.net/snes/newton/](https://biohack.net/snes/newton/), tag `v1.0.146`). **CAUSE #2 — DECIDED
 2026‑09‑13: no downstream fix; escalate upstream.** The `[T5]` residual ("attempt the toolchain-wide fix or

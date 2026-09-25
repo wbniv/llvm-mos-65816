@@ -1,11 +1,11 @@
 diff --git a/llvm/lib/CodeGen/InlineSpiller.cpp b/llvm/lib/CodeGen/InlineSpiller.cpp
-index f9ea5bf..71b4ac3 100644
+index 72cf158..58597c4 100644
 --- a/llvm/lib/CodeGen/InlineSpiller.cpp
 +++ b/llvm/lib/CodeGen/InlineSpiller.cpp
 @@ -881,6 +881,20 @@ bool InlineSpiller::coalesceStackAccess(MachineInstr *MI, Register Reg) {
    if (InstrReg != Reg || FI != StackSlot)
      return false;
- 
+
 +  // A target's spill hook may need scratch registers and express them as extra
 +  // virtual defs on the spill or reload it builds; getVDefInterval() above gives
 +  // those registers live intervals, and the allocator assigns them like any
@@ -22,35 +22,21 @@ index f9ea5bf..71b4ac3 100644
 +
    if (!IsLoad)
      HSpiller.rmFromMergeableSpills(*MI, StackSlot);
- 
+
 diff --git a/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
 new file mode 100644
-index 0000000..cec6883
+index 0000000..ae02122
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll
-@@ -0,0 +1,118 @@
+@@ -0,0 +1,104 @@
 +; RUN: llc -O2 -mtriple=mos -mcpu=mos65c02 -verify-machineinstrs %s -o - | FileCheck %s
 +; RUN: llc -O2 -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs %s -o - | FileCheck %s
 +
-+; A 64-bit variable shift behind a jump table. Under 65c02/65816 register
-+; pressure the greedy allocator reaches this sequence inside one inline-spill
-+; session:
-+;
-+;   1. a split inserts  %910 = COPY %911
-+;   2. spilling %911 folds that COPY into  %910, early-clobber %981:imag16 = LDStk
-+;      -- MOS's reload hook needs a 16-bit scratch pointer and expresses it as an
-+;      extra virtual def, which getVDefInterval() gives a live interval
-+;   3. %981 is allocated to $rs5 (= $rc10:$rc11)
-+;   4. spilling %910 next reaches InlineSpiller::coalesceStackAccess(), which
-+;      wants to erase that same LDStk
-+;
-+; Erasing it orphaned %981: its assignment stayed in the interference matrix over
-+; a SlotIndex with no instruction, and the next region split read that index back
-+; as "last interference" and hit
-+;   SplitKit.cpp: Assertion `MI && "enterIntvAfter called with invalid index"'
-+; (a null dereference in a no-assertions build). coalesceStackAccess now declines
-+; to erase an access that carries extra virtual defs.
-+
++; A 64-bit variable shift behind a jump table creates spill pressure. MOS
++; reloads can define both the loaded value and an early-clobber scratch pointer.
++; A scratch register's live interval and allocator assignment require its
++; defining instruction to remain present. Coalescing must retain such a reload
++; even when the loaded value already occupies the spill slot.
 +
 +declare void @abort()
 +

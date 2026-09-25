@@ -120,19 +120,23 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
   [biohack.net](https://biohack.net/snes/farspill/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/farspill/); next probe is
   #120 `bitboard64`. [plan](docs/plans/2026-08-03-131-snes-farspill.md).
-  **#120 `bitboard64` DONE + PUBLISHED 2026-08-03 — runnable positive + two backend findings:**
+  **#120 `bitboard64` DONE + PUBLISHED 2026-08-03 — runnable positive + two historical backend findings:**
   ctpop/cttz/ctlz i64 form and lower inline; helper-isolated host/default/a16/xy16 agree at `0xC074`
-  on MAME and bsnes-jg. Bring-up found (1) variable `1ULL << uint8_t` cannot legalize
-  `G_ANYEXT s8->s64`, and (2) all three inline expansions in one pressured caller leave four
-  undefined `__rc` uses under the non-LTO machine verifier. Published on
+  on MAME and bsnes-jg. Bring-up reported (1) variable `1ULL << uint8_t` failing legalization
+  at `G_ANYEXT s8->s64`, and (2) all three inline expansions in one pressured caller leaving four
+  undefined `__rc` uses under the non-LTO machine verifier. **2026-09-25 Codex recheck:** current
+  probes pass, including reconstructed inline inputs; neither historical cause is proven fixed.
+  [Evidence and qualified statuses](docs/investigations/2026-09-25-older-defect-recheck.md). Published on
   [biohack.net](https://biohack.net/snes/bitboard64/) and
-  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bitboard64/); promote #138
-  `shift64seam` next because finding 1 gives it a confirmed RED trigger.
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bitboard64/); #138
+  `shift64seam` retains the associated narrow-count input.
   [plan](docs/plans/2026-08-03-120-snes-bitboard64.md).
-  **#138 `shift64seam` DONE + PUBLISHED 2026-08-03 — runnable positive + retained backend defect:**
+  **#138 `shift64seam` DONE + PUBLISHED 2026-08-03 — runnable positive + retained historical defect report:**
   explicitly widened variable counts drive shl/lshr/ashr i64 through every 16- and 32-bit seam;
-  host/default/a16/xy16 agree at `0x2007` on MAME and bsnes-jg. The natural `uint8_t` count still
-  fails legalization at `G_ANYEXT s8->s64`, with a minimized repro retained. Published on
+  host/default/a16/xy16 agree at `0x2007` on MAME and bsnes-jg. The natural `uint8_t` count failed
+  legalization at `G_ANYEXT s8->s64` during bring-up. **2026-09-25 Codex recheck:** the retained
+  input and narrow-count runtime variants now pass, but the original failing compiler and causal
+  fix were not recovered. Status: **not reproduced**, not closed. Published on
   [biohack.net](https://biohack.net/snes/shift64seam/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/shift64seam/); next ranked probe is
   #121 `llabs64`. [plan](docs/plans/2026-08-03-138-snes-shift64seam.md).
@@ -289,7 +293,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [T4] **Far 16-bit scalar Phase 2 — native `M=0` far load/store, gated.** Phase 1 said **GO (gated)** ([measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md)). `legalizeLoadStore16` builds its native `s16` arms only for a 16-bit pointer, so a far `p2` access falls to `narrowScalar(s8)`, and no `Ac16` long pseudo exists to select into. Build `LDA`/`STA` long, `[dp]` and `[dp],y` `Ac16` pseudos (shared with the `long,X` Phase 2 word slice) plus a `p2` arm. The win: −10 to −30 B per far-global site, and −14 B / −28 cy per iteration on a far pointer walk, in both scheduler modes. Gate (§5): keep `AllUsesUnmerge` (an `A:X` return costs +3 B otherwise); go native on stores only for an `Ac16`/`Imag16` value (an `A:X` store costs +5 B otherwise); a far operand must never reach `stz`/`ldx`/`ldy`/`stx abs` or MC bank relaxation. A single `M=0` access at `$xxFFFF` carries into the next bank exactly like the byte split (bsnes-jg + MAME), so there is no bank-seam gate. Corpus winners are 3 sites of the far VRAM upload idiom. Suggested tier T4 (new pseudos + legalizer + selector + REPSEP + exclusions); the orchestrator ranks it.
 ### M2 — Optimizing Payoff
 
-- [T3] **Near `s16` store of an `A:X` value regresses under `+mos-a16`: `g = v` is 14 B / 27 cy against 7 B / 14 cy by default.** The "stores always take the native form" rule in `legalizeLoadStore16` spills `A:X` to `Imag16` and wraps `lda; sta abs` in `rep`/`sep`, where the byte path is `sta abs; stx abs+1`. This violates governing lesson 2 on one of the most common C shapes (setters, argument stores). Found in the far-scalar Phase 1 ([§4.3](docs/investigations/2026-09-25-far-scalar-split-measurement.md#43-loss-vectors-governing-lesson-2--what-an-ungated-rule-would-do)). Gate native stores on value residency, i.e. go native only for a value produced by a native 16-bit op, and measure the corpus for the size delta. Suggested tier T3 (measure first; T4 if the residency test needs more than the value's def opcode); the orchestrator ranks it.
+- [T3] **Recover failing baselines for the historical narrow-count s64 shift and inline-bitboard undefined-register reports.** The [2026-09-25 Codex recheck](docs/investigations/2026-09-25-older-defect-recheck.md) has 132 successful current-build compiles and passing runtime probes. These are **not reproduced**, not proven fixed: recover the failing compiler/configuration, and the exact bitboard input, then establish a discriminating regression or causal fix. [Shift status](docs/defects/shift64-narrow-count.json) · [pressure status](docs/defects/bitboard-inline-register-pressure.json). Keep the reentrant attribute's [contract clarification](docs/defects/reentrant-attribute-contract.json) separate; its frontend opt-out works, but it does not force a soft-stack frame.
+- [T3] **Remaining near-store profitability: values shared with native arithmetic and broader indirect contexts.** Absolute byte-only setters are fixed (14→7 B), as are plain indirect A:X setters (13→8 B; [Codex follow-up](docs/plans/2026-09-25-near-indirect-s16-store-residency.md)). `g = v; return v + 1` remains 23 B versus 11 B; indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths. Diagnose and measure these before widening either predicate. Values kept across calls must retain their current native path: blindly splitting the absolute store grows the 29 B example to 30 B. Atomic word stores must remain unsplit.
 - [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
   measuring `[dp],Y` increment 1. When a 32-bit index-scaling shift feeds a 32-bit pointer add, the pre-RA
   scheduler sinks each `rol` next to its `adc` consumer, so both carries are live at once; there
@@ -300,8 +305,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `-mllvm -enable-misched=false` — i.e. the scheduler costs ~80 B on that shape and is **already**
   costing the unmodified compiler 28 B on it today. `-enable-post-misched=false` changes nothing,
   so it is the pre-RA scheduler. This is the only reason increment 1 shows +8 B on `farindex`
-  instead of a win. No local instruction-selection predicate can see it; the fix belongs in
-  `MOSMachineScheduler`'s pressure model. Reason for T4: scheduler heuristics with an unknown blast
+  instead of a win. These are real before/after size regressions. No reliable local profitability
+  predicate has been demonstrated; investigate the scheduler pressure model or a measured gate. Reason for T4: scheduler heuristics with an unknown blast
   radius — measure across the whole corpus (governing lesson 2) before and after; a fix that helps
   this shape and hurts others is not a fix.
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
@@ -388,7 +393,9 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   `dev/a16spillir.sh`: an `llc` gate (verify-clean + `STStk/LDStk $a16` present), drift-immune companion
   to `a16spillr.c`; test-only, no vendor change
   ([P2 plan](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)).
-  Independent finding: `__attribute__((reentrant))` can't force the soft stack. It is not part of #321;
+  Independent finding: `__attribute__((reentrant))` opts out of the frontend default but
+  does not force the soft stack. The [2026-09-25 recheck](docs/investigations/2026-09-25-older-defect-recheck.md)
+  confirms the behavior; this remains a semantic-contract question, not a proven miscompile. It is not part of #321;
   its **source-verified issue body is ready to file** at
   [docs/upstream-reentrant-soft-stack-issue.md](docs/upstream-reentrant-soft-stack-issue.md), with filing
   user-triggered. [coverage plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
@@ -1182,13 +1189,11 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   makes MOS reject a physreg constraint whose operand is too wide, so `asm("" : "=a"(long))` now
   stops at that check and never reaches the generic walk. The generic defect is untouched and
   still reachable from other targets/constraints.
-- [T2] **Draft the `0043` upstream PR** (inline-asm physreg constraints reject a too-wide operand; landed
-  `84d87260`, [plan](docs/plans/2026-09-24-inline-asm-num-registers.md)). Upstream-shaped already — MOS dir
-  + one MOS lit test, no `+mos-a16` dependency, AVR precedent (`AVRISelLowering.cpp` guards each class on
-  its VT) — but has no PR body, no validation record against the pinned base, and no
-  `docs/upstream-contribution-status.md` entry. Also owes a live `dev/regen-patch.sh` round trip (blocked
-  at fix time by another worker's dirty `0002`). Reason for T2: the 0033/0036 docs are the template;
-  no design. Posting stays user-triggered.
+- [T2] **Finish the `0043` submission preparation.** [PR draft](docs/upstream-inline-asm-physreg-width-pr.md)
+  and initial pinned-base validation exist. The [September 25 review](docs/pr-preparations/2026-09-25/claude-batch-review.md)
+  extends the check to named registers, including a C register-variable reproducer.
+  Updated integrated tests and pin applicability pass; refresh isolated revision
+  validation and prepare the upstream branch. Posting stays user-triggered.
 - [T2] **Draft the `0044` upstream PR** (AsmPrinter prints an explicit `mos24()` on 24-bit address
   operands so `-S`/`-save-temps` output re-assembles to the same bytes; landed `5ea5006c`,
   [plan](docs/plans/2026-09-24-asmprinter-long-address.md)). Upstream-clean — stock 65816, no `+mos-a16`
@@ -1197,23 +1202,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   (same template, same session); cite `MC/MOS/long-address-roundtrip-65816.s` as the failing-before test and
   the `af f0 00 00 → a5 f0` one-shot as the motivating bytes. Reason for T2: 0033/0036 docs are the template;
   no design. Posting stays user-triggered.
-- [T2] **Draft the `0046` upstream PR** (`MOSFixupKinds.cpp` `Infos[]` missing-row fix; landed, patch `0046`,
-  [plan](docs/plans/2026-09-24-fixupkinds-addrasciz-row.md)). Pristine-upstream, one file, one row — as clean
-  as `0043`/`0044` — but has no PR body, no `docs/pr-preparations/` validation record against the pinned base,
-  and no `docs/upstream-contribution-status.md` entry. Pair it with `0043`/`0044`'s drafts (same template);
-  the whole "before" state is `Info.Name == nullptr` for `MOS::AddrAsciz`, confirmable with a one-line debug
-  print or gdb break in `getFixupKindInfo`. Reason for T2: matches its `0043`/`0044` twins (same size, same
-  template); no design. Posting stays user-triggered.
-- [T2] **Draft the `0047` upstream PR** (`llvm-mc -show-encoding` crashed on a symbolic `.mos_addr_asciz`;
-  landed `6eced8e4`, patch `0047`, [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md)).
-  Pristine-upstream, not 24-bit-specific: `parseDirectiveAddrAsciz` round-trips the directive as raw text
-  under `hasRawTextSupport()` (the Hexagon discriminator), `VK_ADDR_ASCIZ` gains a modifier spelling, and
-  `evaluateAsInt64`'s `llvm_unreachable` (live UB in a no-asserts build) becomes an identity pass-through.
-  No PR body, no `docs/pr-preparations/` validation record, only a placeholder line in
-  `docs/upstream-contribution-status.md`. Pair with the `0043`/`0044`/`0046` drafts; the failing-before
-  test is `MC/MOS/addr-asciz.s`'s new `-show-encoding` RUN line. Reason for T2: same template as its
-  three twins; no design. Posting stays user-triggered.
-- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
+- [T2] **Finish the `0046` submission preparation.** [PR draft](docs/upstream-fixupkinds-addrasciz-row-pr.md)
+  and initial pinned-base validation exist. The September 25 review adds an inferred
+  array bound and compile-time row-count check. Refresh isolated revision validation
+  and prepare the upstream branch; posting stays user-triggered.
+- [T2] **Finish the `0047` submission preparation.** [PR draft](docs/upstream-mc-addr-asciz-symbolic-crash-pr.md)
+  and initial pinned-base validation exist. The September 25 revision retains directive
+  text emission, removes the unintended `addrasciz()` modifier, and tests all eight
+  widths with byte-for-byte object round trips. Refresh isolated revision validation
+  and prepare the upstream branch; posting stays user-triggered.
+- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑25: 166 tests, 160 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
   (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
@@ -1390,6 +1388,21 @@ revisit) rather than active work._
 
 
 ## Done
+
+- **2026-09-25 — Older-report reproduction and evidence enforcement (OpenAI Codex; original credits retained).** Rechecked narrow-count s64 shifts, reconstructed inline-bitboard pressure, nine existing pressure witnesses, and reentrant semantics. 132 non-LTO/verifier compiles pass; narrow-shift (`0x6A2B`) and inline-bitboard (`0xC074`) runtime probes agree across host/default/a16/xy16 on MAME and a16 on bsnes-jg. The two historical failure reports remain **not reproduced**, pending missing baseline evidence; no new compiler fix is claimed. Added mandatory [evidence/closure rules](docs/howto-defect-evidence.md), three structured status records, and a pre-commit checker with 12 tests. [Full results and limitations](docs/investigations/2026-09-25-older-defect-recheck.md).
+
+- **2026-09-25 — Plain near indirect s16 argument stores fixed (OpenAI Codex; broader A:X finding by Claude).** `*p = v` now uses the ABI bytes directly: **13→8 B** in a16/xy16; store-and-return is **15→12 B**. Preserve native indexed, shared-value, arithmetic, and call-preserved contexts. Also corrected Codex's preceding absolute-store predicate to preserve atomic word stores, with indirect/absolute/shared-value atomic tests. All 153 reduced comparisons have no growth (18 improvements). Census: 407/407 native inputs verify, only the new fixture changes (−8 B per native mode); 372 default pairs are identical, with 35 matching baseline failures. Full MOS lit: 162 pass, 2 unsupported, the same 4 failures. Main compiler matches the validated candidate; both store lit tests, host/MAME/bsnes store fixtures (`0x8509`, `0xDBA7`), and native-copy control (`0x5A3D`) pass. `0002` round-trips. [Focused plan, results, and attribution](docs/plans/2026-09-25-near-indirect-s16-store-residency.md).
+
+- **2026-09-25 — Near absolute s16 argument stores fixed (OpenAI Codex; original finding by Claude).** `g = v` now uses `sta g; stx g+1; rts`: **14→7 B, estimated 27→14 cycles** in a16 and xy16. Gate on a byte-built value with local byte/absolute-store uses; preserve native producers, native consumers, and values crossing calls/inline assembly or blocks. `0002` regenerated and round-trip checked; installed main compiler updated. New lit and host/MAME/bsnes regression pass (`0xDBA7`); full MOS lit has 161 passes, 2 unsupported, and the same 4 existing failures. Census: all 406 native inputs verify, 52 smaller per mode, no larger objects (−410 B a16 / −413 B xy16); 371 successful default pairs are byte-identical, with identical diagnostics for 35 baseline failures. Of these, 51 improvements affect existing inputs; one is the new regression fixture. The subsequent indirect-store fix also corrects the atomic-store omission in this predicate; broader mixed-use costs stay in M2. [Diagnosis, evidence, reproduction, and attribution](docs/plans/2026-09-25-near-s16-store-residency.md).
+
+- ✅ 2026-09-25 — **Independent review of Claude's defect batch.** Extended 0043 to reject
+  too-wide explicit register names reachable from C; narrowed 0047 to directive text output;
+  added 0046's compile-time table-count check and missing lit build helpers. Updated tests,
+  docs, and Claude/Codex attribution. Full MOS suites: 160 pass, 2 unsupported, same 4 failures;
+  331 assembly round trips, 34 undef-lane checks, farbank on both emulators, and both rebuilt
+  video ROMs' stream/entropy checks pass. Scheduler size regressions remain open above.
+  [Review and evidence](docs/pr-preparations/2026-09-25/claude-batch-review.md).
+
 - ✅ 2026-09-25 — [rdiff-title-card-dominates] root cause: `rdiff.c`'s 32×24 grid left only ~110 B of soft-stack
   headroom (thinnest of any demo), which overran into `gs_u`/the resident `TitleLayer`, randomly reactivating
   the title for thousands of frames; shrunk grid to 32×20 (corpus gate untouched — separate 8×8 sub-grid),
@@ -1418,9 +1431,9 @@ revisit) rather than active work._
   See [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
 - ✅ 2026-09-24 — [mc-addr-asciz-symbolic-crash] `llvm-mc -show-encoding` no longer crashes on a symbolic
   `.mos_addr_asciz`: the parser now round-trips the directive as raw text when the streamer can't
-  represent an unresolved symbolic value, `VK_ADDR_ASCIZ` got a real modifier spelling, and
-  `evaluateAsInt64`'s unreachable case became a correct identity pass-through (patch `0047`,
-  pristine-upstream). See [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md).
+  represent an unresolved symbolic value (patch `0047`, pristine-upstream). The September 25
+  review removed the unnecessary modifier spelling and integer-evaluation edits; all eight
+  directive widths now have object round-trip coverage. See [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md).
 - ✅ 2026-09-24 — [roundtrip-gate] Wired `dev/probe-far-roundtrip.sh` into `dev/run.sh roundtrip` (all 3
   modes, `--all` 117-fixture default; `--far-only` opts into the fast far/packed24 subset) — confirmed
   the 0-divergent baseline and the FAIL/exit-code path. See
