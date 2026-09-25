@@ -926,32 +926,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [wip T4] <!-- agent:a9531d204579d6182 --> **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
-  independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
-  one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
-  (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
-  `snes_ppu_reset_blank()` in `main()`. Method is known: bisect the register groups with a temporary
-  probe at the top of `setup_display()`, then reset the offending block. Reason for T2: two demos, a
-  proven bisection recipe, no design. Promoted from Inbox 2026-09-24.
-  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
-  **ESCALATED 2026-09-25 — the T2 recipe is empirically falsified, this is not a missing-reset bug.**
-  Reproduced both failures exactly (byte-identical hashes to the plan's record) via standalone
-  `dev/build.sh` battery-recipe builds. Applying the precedent fix (`snes_ppu_reset_blank()` at the top
-  of `setup_display()`, the pattern that closed `mandel-oop`) had **zero effect** — byte-identical output
-  hash before/after. Root-cause ruled out by tracing `vendor/bsnes-jg/src/random.cpp`: `JGX_ENTROPY`
-  randomizes WRAM/VRAM/CGRAM, not the `$2101-2133` register block `snes_ppu_reset_blank()` resets, and it
-  deliberately skips VRAM/CGRAM/OAM data ports — so a register reset structurally cannot touch what's
-  actually randomized. Visual evidence from two different, non-generic symptoms: apollo loses its entire
-  BG3 HUD text layer (points at the `video_hud_arm()` HDMA channel-1/2 mechanism, not register state);
-  reel shows a single vertical dark-blue seam in the Mode-7 area (a wrap/scroll artifact). Suggested next
-  step: trace `REG_BGMODE`/`REG_TM`/HDMA channel 1-2 state directly in bsnes-jg across an entropy-0 vs
-  entropy-1 apollo run. Also worth checking independently: `apollo`'s `reel_palette[448]` only populates
-  CGRAM entries 0-223 of 256 — entries 224-255 stay at whatever (randomized) CGRAM already held, a
-  possible second, unrelated contributor. Reproducible standalone battery-build scripts left in the
-  escalating agent's scratchpad (not committed — described in its handback, not re-derived here).
-  **Re-ranked T2→T4 2026-09-25:** an unknown root cause behind two different symptoms, to be found by
-  tracing emulator state (HDMA channels 1-2, `REG_BGMODE`/`REG_TM`, CGRAM 224-255) across entropy-0 vs
-  entropy-1 runs — debugging, not a recipe; the T2 "no design" premise no longer holds.
 - [T2] **`rdiff`'s title card dominates both gate captures and the Gray-Scott field is never
   visible.** Measured 2026-09-15 on `main` (gate PASS, `corpus_result=0x5555`, so invisible to the
   differential): frames 500/2000/2600/3500 all show the title; frame 6000 is entirely black — title torn
@@ -1424,6 +1398,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-25 — [reel-apollo-entropy] not a display bug: the battery ROMs lacked their packed video stream; added `battery-post:` + `dev/battery-video-selfcheck.sh`. See [plan](docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
 - ✅ 2026-09-25 — [longx-global-measure] `long,X` (`bf`/`9f`) far-global Phase 1: **GO** (46→21 B, loops 86–168→20–25 B); non-indexed long ALU NO-GO. See [investigation](docs/investigations/2026-09-25-longx-global-measurement.md).
 - ✅ 2026-09-25 — [farptr-hoist-measure] NO-GO: `loop.c` hoist illegal (16-bit wrap); legal shapes already hoist, win is `[dp],Y` inc 2. See [investigation](docs/investigations/2026-09-25-farptr-hoist-measurement.md).
 - ✅ 2026-09-25 — [dpy-indexed-phase2] `[dp],Y` Phase 2 inc 1: a compile-time-constant far
