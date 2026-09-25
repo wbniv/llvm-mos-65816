@@ -927,15 +927,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T2] **`rdiff`'s title card dominates both gate captures and the Gray-Scott field is never
-  visible.** Measured 2026-09-15 on `main` (gate PASS, `corpus_result=0x5555`, so invisible to the
-  differential): frames 500/2000/2600/3500 all show the title; frame 6000 is entirely black — title torn
-  down, no Turing pattern ever drawn. The ~220 logical `title_begin`/`title_end` frames are stretching
-  across thousands of hardware frames. Demo-side visual defect, not a compiler bug; `dev/rdiff.sh`'s
-  "2000 frames yields a developed, screen-filling card" comment is false. Find why the title loop
-  runs slow (likely per-hw-frame waits inside the logical-frame loop), fix, and re-capture. Reason for
-  T2: one demo + one script, clear symptom; judgment about how, not what. Promoted from Inbox 2026-09-24.
-  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
@@ -1399,6 +1390,11 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-25 — [rdiff-title-card-dominates] root cause: `rdiff.c`'s 32×24 grid left only ~110 B of soft-stack
+  headroom (thinnest of any demo), which overran into `gs_u`/the resident `TitleLayer`, randomly reactivating
+  the title for thousands of frames; shrunk grid to 32×20 (corpus gate untouched — separate 8×8 sub-grid),
+  fixed `dev/rdiff.sh`'s false capture-timing comment + frame counts (0% → 96.4% non-black @ frame 6000). See
+  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
 - ✅ 2026-09-25 — [far-scalar-split-measure] far s16 byte-split: legalizer p2 fallback, no `Ac16` long pseudo; GO (gated), bank seam safe. See [investigation](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
 - ✅ 2026-09-25 — [reel-apollo-entropy] not a display bug: the battery ROMs lacked their packed video stream; added `battery-post:` + `dev/battery-video-selfcheck.sh`. See [plan](docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
 - ✅ 2026-09-25 — [longx-global-measure] `long,X` (`bf`/`9f`) far-global Phase 1: **GO** (46→21 B, loops 86–168→20–25 B); non-indexed long ALU NO-GO. See [investigation](docs/investigations/2026-09-25-longx-global-measurement.md).

@@ -1,22 +1,35 @@
 /* examples/snes/rdiff.c — Gray-Scott reaction-diffusion SNES demo (#8).
  * Compiler stress-test: heavy fixed-point mul-add in the GS hot loop, stressing
- * __mulsi3 (≥2 calls per cell per step, 32×28 grid, 2 steps/frame).
+ * __mulsi3 (≥2 calls per cell per step, 32×20 grid, 1 step/frame).
  * Visual: V-concentration mapped through a 16-colour navy→white palette on BG1 4bpp;
- * Turing spots self-organise from five seeded 2×2 perturbations over ~300 frames.
+ * Turing spots self-organise from a full-grid random seed (gs_init) over a few hundred frames.
  *
- * Memory layout (low WRAM, bank 0) — 16-bit fixed-point, 32×24 grid (24 rows keep it in budget):
- *   gs_u[2][GS_H*GS_W]   2 × 768 uint16_t = 3072 B  (ping-pong U buffers)
- *   gs_v[2][GS_H*GS_W]   2 × 768 uint16_t = 3072 B  (ping-pong V buffers)
- *   gstate                4 × 64  uint16_t =  512 B  (gate scratch)
- *   shadow[GS_H/2*GS_W]     12×32 uint16_t =  768 B  (half-tilemap DMA buffer)
- *   Total ≈ 7424 B — just under the 7680 B ram region.
+ * Memory layout (low WRAM, bank 0) — 16-bit fixed-point, 32×20 grid:
+ *   gs_u[2][GS_H*GS_W]         2 × 640 uint16_t = 2560 B  (ping-pong U buffers)
+ *   gs_v[2][GS_H*GS_W]         2 × 640 uint16_t = 2560 B  (ping-pong V buffers)
+ *   gstate                       4 × 64 uint16_t =  512 B  (gate scratch)
+ *   RdiffLayer.shadow[GS_H/2*GS_W] 10×32 uint16_t = 640 B  (+4 B struct overhead = 644 B)
+ *   TitleLayer (main.title)                       =  140 B  (title card; torn down before gs_init())
+ *   Total ≈ 6418 B, leaving ≈1262 B of the 7680 B ram region for the soft stack — __stack=$2000
+ *   grows DOWN into this SAME region (link.ld: "soft stack grows down from $2000; bss/heap up"),
+ *   so headroom here is stack headroom, not spare BSS.
  *
- * corpus_result = rdiff_gate_crc() on an 8×8 sub-grid (50 steps), set once at startup.
+ *   The grid was 32×24 (≈7570 B used, only ~110 B of stack headroom — the thinnest margin of
+ *   any demo in this repo, per __bss_end in the linker map) until 2026-09-25: that margin was too thin
+ *   for gs_step()'s nested __mulsi3 calls + Display's virtual dispatch, so the soft stack
+ *   silently overran into gs_u/main.title. The corruption was invisible to the corpus gate
+ *   (corpus_result is computed on the separate `gstate` sub-grid before display_init even runs)
+ *   but visibly reactivated the (still VRAM-resident) title card's TitleLayer.active flag at
+ *   random, so the title dominated screenshots for thousands of frames instead of tearing down
+ *   once around frame 600 — see docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md
+ *   (deferred section) and TODO.md's [rdiff-title-card-dominates] entry.
+ *
+ * corpus_result = rdiff_gate_crc() on an 8×8 sub-grid (8 steps) — a fixed-size gate_state
+ * independent of GS_W/GS_H, set once at startup.
  * See docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md                               */
 #include <snes.h>
 #include "snesgfx/display.h"
 #include "snesgfx/drawable.h"
-#define TITLE_RBUF_COLS TITLE_COLS   /* compact 8×8 row buffers — rdiff BSS is at capacity */
 #include "snesgfx/title_layer.h"
 #include "snesgfx/upload.h"
 #include "snesgfx/vram.h"

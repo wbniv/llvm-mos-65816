@@ -26,13 +26,17 @@
 #define GS_F    150   /* 0.0366 * 4096 (feed rate) */
 #define GS_K    254   /* 0.062 * 4096  (kill rate; the kill term uses F+k) */
 
-/* Demo grid (used by rdiff.c; 32*8=256 px wide, 24*8=192 px tall — 24 rows keeps the four
- * 16-bit double-buffers inside the 8 KB low-WRAM region; the display centres them with a 2-row
- * navy border top and bottom). */
+/* Demo grid (used by rdiff.c; 32*8=256 px wide, 20*8=160 px tall). 20 rows, not the original 24:
+ * rdiff.c's static footprint (the four 16-bit double-buffers + gate scratch + title card) shares
+ * the 7680 B low-WRAM region with the SOFT STACK, which grows down from $2000 into the same
+ * region (see link.ld) — 24 rows left only ~110 B of stack headroom, the thinnest margin of any
+ * demo in this repo, and the soft stack silently overran into gs_u/the title struct under
+ * gs_step()'s call depth. 20 rows restores ~1262 B of headroom without touching corpus_result
+ * (computed on the separate GS_GATE_W×GS_GATE_H sub-grid below). See rdiff.c's header comment. */
 #define GS_W               32
-#define GS_H               24
+#define GS_H               20
 #define GS_STEPS_PER_FRAME  1   /* GS steps computed per displayed frame (16-bit step is heavy) */
-#define GS_ROW0             2   /* tilemap row the grid's top row maps to (centres 24 in 28) */
+#define GS_ROW0             4   /* tilemap row the grid's top row maps to (centres 20 in 28) */
 
 /* Gate sub-grid (small enough to finish before corpus-a16 times out) */
 #define GS_GATE_W     8
