@@ -270,7 +270,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [T4] **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index.** Increment 1
+- [wip T4] <!-- agent:aabefe43f29486479 --> **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index.** Increment 1
   (Done 2026-09-25) folds only a compile-time-constant displacement in `[1,3]`. The
   investigation's main target is still unselected: a *runtime* index provably within the Y width.
   Gate on the **scaled** byte offset (`index × sizeof(elem)`, unsigned) — `0..255` under
@@ -283,6 +283,32 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   emits the opcode — increment 2 only widens what it accepts as the index. Reason for T4: a range
   proof plus a gate whose misclassification would regress shipped codegen; land the scheduler item
   below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
+  [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
+- [T3] **`long,X` (`bf`/`9f`) for a global far base plus a runtime index — MEASURE first.** The
+  `[dp],Y` work covers a far *pointer* held in a DP quad; when the base is a far **global** (`tbl[i]`
+  with `tbl` at a known 24-bit address) the natural form is absolute-long indexed, `lda`/`sta long,X`
+  (`bf`/`9f`), which needs no pointer materialisation at all and would beat `[dp],Y` there. The
+  2026-09-24 #320 audit census found `bf` fires exactly once (only under `+mos-xy16`) and `9f` never;
+  Phase 1 §6 constraint 6 explicitly leaves both **outside** the `[dp],Y` GO verdict — a native long form
+  is not automatically smaller (governing lesson 2). Phase 1 (this rank, T3, throwaway worktree): build the
+  `long,X` shape by hand for a global-base subscript in realistic 16-bit-ambient context, diff bytes/cycles
+  against today's output under `+mos-a16` and `+mos-xy16` (X's width, not M, bounds the index — same trap
+  as Y), record GO/NO-GO; include the long-form arithmetic/compare (`0f`/`2f`/`4f`/`6f`/`cf`/`ef`) in the
+  same census-and-measure pass since they share the operand shape. Phase 2 only on GO, re-ranked **T4**.
+  [audit §2](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#2-codegen--instruction-selection--done-for-correctness-measured-gaps-in-coverage) ·
+  [Phase 1 §6](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
+- [T3] **The 32-bit far-pointer add is never hoisted out of a loop — find out why, then MEASURE.** Phase 1
+  §4 hand-built two halves of the blit win separately: hoisting the pointer add alone took the 64-iteration
+  loop from 86 to 42 bytes (26 → 18 cyc/iter is the `[dp],Y` half on top of that). Today the full 32-bit add
+  is recomputed inside the body every iteration — no LICM, no strength reduction — and `[dp],Y` increment 2
+  leaves that half untouched by design. Phase 1 (this rank, T3, throwaway worktree): establish *why* it is
+  not hoisted (the add is a post-legalization MOS shape — is IR LICM already past, does `MachineLICM` refuse
+  the multi-instruction carry chain, or does the address-mode selection re-materialise it per access?),
+  then measure the hoist on the real blit shape and on `farindex.c` with and without `-enable-misched=false`
+  so the scheduler cliff cannot mask the number; record GO/NO-GO and *where* the hoist belongs. Phase 2 on
+  GO, re-ranked **T4** — a wrong hoist point is a cross-cutting change. Reason for T3: bounded investigation
+  with a measured target; the design decision waits for the number.
+  [Phase 1 §4](docs/investigations/2026-09-24-dpy-indexed-measurement.md) ·
   [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
 ### M2 — Optimizing Payoff
 
@@ -923,7 +949,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T4] **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
+- [wip T4] <!-- agent:a9531d204579d6182 --> **`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title** (second,
   independent uninitialised-state defect in the reels' own `setup_display()`, not the closed `m7title.h`
   one): `dev/title-entropy.sh` passes at frame 60 and fails at 100/200 on both pre- and post-fix ROMs
   (reel 2/8–3/8 entropy-1 runs differ; apollo 8/8 at 200). Both are the only adopters with no
@@ -1235,6 +1261,15 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   the whole "before" state is `Info.Name == nullptr` for `MOS::AddrAsciz`, confirmable with a one-line debug
   print or gdb break in `getFixupKindInfo`. Reason for T2: matches its `0043`/`0044` twins (same size, same
   template); no design. Posting stays user-triggered.
+- [T2] **Draft the `0047` upstream PR** (`llvm-mc -show-encoding` crashed on a symbolic `.mos_addr_asciz`;
+  landed `6eced8e4`, patch `0047`, [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md)).
+  Pristine-upstream, not 24-bit-specific: `parseDirectiveAddrAsciz` round-trips the directive as raw text
+  under `hasRawTextSupport()` (the Hexagon discriminator), `VK_ADDR_ASCIZ` gains a modifier spelling, and
+  `evaluateAsInt64`'s `llvm_unreachable` (live UB in a no-asserts build) becomes an identity pass-through.
+  No PR body, no `docs/pr-preparations/` validation record, only a placeholder line in
+  `docs/upstream-contribution-status.md`. Pair with the `0043`/`0044`/`0046` drafts; the failing-before
+  test is `MC/MOS/addr-asciz.s`'s new `-show-encoding` RUN line. Reason for T2: same template as its
+  three twins; no design. Posting stays user-triggered.
 - [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑24: 154 tests, 148 pass,
   2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
   `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
