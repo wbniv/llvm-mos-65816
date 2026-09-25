@@ -264,14 +264,16 @@ edit `dev/run.sh` while a `dev/run.sh` invocation is running.**)
 **7. `dev/run.sh roundtrip`**
 
 ```
-  default (8-bit)    round-trip: 95 identical, 0 divergent, 22 skipped (exit 0)
-  +mos-a16           round-trip: 117 identical, 0 divergent, 0 skipped (exit 0)
-  +mos-a16 +mos-xy16 round-trip: 117 identical, 0 divergent, 0 skipped (exit 0)
+  default (8-bit)    round-trip: 95 identical, 0 divergent, 23 skipped (exit 0)
+  +mos-a16           round-trip: 118 identical, 0 divergent, 0 skipped (exit 0)
+  +mos-a16 +mos-xy16 round-trip: 118 identical, 0 divergent, 0 skipped (exit 0)
 PASS  round-trip: 0 divergent in all 3 modes
 ```
 
 **PASS** — the new `b7`/`97` output survives an `-S` + `llvm-mc` round trip in all three modes
-(Phase 1 §6 constraint 7).
+(Phase 1 §6 constraint 7). Re-run after step 10 added `examples/65816/farbank.c`, which this suite
+iterates: 117 → **118** fixtures, still 0 divergent, so the bank-crossing fixture's `b7` output
+round-trips too.
 
 **8. Before/after size measurement.** Same C, same flags (`-c -Os +mos-a16`), only the compiler
 toggled — `main`'s `build/llvm-mos-install` (before) vs the worktree's (after).
@@ -344,7 +346,16 @@ default 8-bit mode: identical=93 differs=0 skipped=19
 `selectAddressingMode`'s `case 32:` (a 32-bit far pointer), which only exists under `+mos-a16`,
 and both new pseudos are `Predicates = [HasW65816]`.
 
-**9. `dev/run.sh fuzz 50 1`** — see the report.
+**9. `dev/run.sh fuzz 50 1`**
+
+```
+==> csmith: 45/50 PASS, 0 xfail, 5 skip  (0 mismatch, 0 crash, 0 error)
+    skip buckets: diverged-before-result (corpus_result GC'd)=5
+```
+
+**PASS** — matches the `~46 PASS, 0 xfail, ~4 skip (0 mismatch)` baseline `docs/agent-handoff.md`
+documents for seeds 1–50. The fuzzer compiles each program both default and `+mos-a16` against the
+host oracle, so it is the second guard (after step 8a) on the default path.
 
 **10. `dev/run.sh farbank`** — the new bank-crossing gate.
 
@@ -381,6 +392,13 @@ have folded to `0x80000001`.
   4..255 is unsafe — `Y` is 8-bit under `X=1` either way — the cap just keeps this increment to
   the slice Phase 1 measured. Widening it is a one-line change plus its own measurement, and
   `far_load_indir_idx4` in the lit test pins the current boundary so the widening is visible.
+- **No explicit 8-bit-value precondition.** `tryFarIndirectIndexedAddressing` lowers to
+  `LDIndirLongIdx`/`STIndirLongIdx`, which are 8-bit-accumulator pseudos, and it does not assert
+  that the mem-op is `s8`. Neither does `tryFarIndirectAddressing`, which it runs directly in
+  front of and whose gate it strictly narrows — so any access this could take would otherwise have
+  gone to the same 8-bit pseudo. The risk profile is therefore unchanged, but if a wider far
+  mem-op ever reaches `selectAddressingMode`'s `case 32:`, **both** functions need the guard, not
+  just this one.
 - **The `0002` regeneration was run against two of another worker's *uncommitted* patches**
   (`0020`, `0033`), because the committed versions no longer reverse out of the shared `vendor/`
   tree. That is the same baseline `main`'s own dirty `0002` was generated on, so the result is
