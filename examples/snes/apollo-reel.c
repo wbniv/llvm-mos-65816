@@ -2,13 +2,16 @@
 // behavioural gate is dev/apollo-reel.sh, which bakes the recorded real-camera
 // corpus and asserts its SHA-256; the battery bakes the synthetic corpus from
 // dev/gen-battery-video-corpus.sh, which needs no source video, so the program keeps
-// compiling and linking on every `task package`.
+// compiling and linking on every `task package`. battery-post packs that stream into
+// the ROM exactly as the gate does; without it the battery ROM links and then decodes
+// nothing (docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
 // mos-a16-only: the SVX2 decoder addresses the packed stream with 24-bit far pointers.
 // battery-config: snes-hirom
 // battery-cflags: -DSVC_USE_ASM -DAPOLLO_REEL_VBLANKS_PER_FRAME=1
 // battery-prep: bash dev/gen-battery-video-corpus.sh
 // battery-prep: PYTHONPATH=tools python3 tools/snes-video-reel-assets.py --frames 12 --packed-far --keyframe-interval 12 --frame-checks --dashboard-palette-fixup --palette-output "$GEN/apollo-reel.pal" --stream-output "$GEN/apollo-reel-stream.bin" "$BUILD/battery/corpus.tiles" "$BUILD/battery/corpus.pal" "$GEN/apollo-reel-assets.h"
 // battery-link: apollo-reel-fast.s snes-video-codec.c snes-video-dma.c snes-video-codec-fast.s
+// battery-post: python3 tools/snes-video-pack-hirom.py "$ROM" "$GEN/apollo-reel-stream.bin"
 // battery-checksum: --hirom
 /* Apollo 11 daylight launch — the SVX2 codec's hardest realistic input.
  *

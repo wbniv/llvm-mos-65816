@@ -90,6 +90,15 @@ OBJCOPY="$MOS_TOOLCHAIN/bin/llvm-objcopy"
 #   // battery-link: FILES       extra translation units / objects to link. A bare
 #                                name resolves under examples/snes; $GEN/... works.
 #   // battery-cflags: FLAGS     extra compiler flags (-D...).
+#   // battery-post: COMMAND     run after the link and BEFORE the checksum, from
+#                                $ROOT, with $ROM and $MAP exported alongside $ROOT,
+#                                $BUILD, $INSTALL and $GEN. Post-link ROM surgery —
+#                                e.g. packing a video stream into the banks the
+#                                program DMAs from. Repeatable, in source order.
+#                                A demo whose own gate script packs data into its
+#                                ROM MUST declare it here, or the battery ROM links
+#                                cleanly and then runs on data that isn't there
+#                                (docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
 #   // battery-checksum: ARGS    extra args for tools/snes-checksum.py (e.g. --hirom).
 #   // battery-not-a-program: WHY  this TU has no main() — it is a companion TU
 #                                linked into another demo. Never built standalone.
@@ -151,6 +160,7 @@ for src in "$ROOT"/examples/snes/**/*.c; do
   GEN="$GENROOT/$name"
   mkdir -p "$GEN"
   : >"$GEN/prep.log"
+  : >"$GEN/post.log"
   while IFS= read -r prep; do
     [ -n "$prep" ] || continue
     if ! ( cd "$ROOT" && ROOT="$ROOT" BUILD="$BUILD" INSTALL="$INSTALL" GEN="$GEN" \
@@ -199,6 +209,18 @@ for src in "$ROOT"/examples/snes/**/*.c; do
       -I "$GEN" -I "$ROOT/examples/snes" \
       -Os -Wl,-Map="$BUILD/$name.map" -o "$rom" "$src" "${extra_tus[@]}" "${assets[@]}"; then
     ok=0
+  fi
+  if [ "$ok" = 1 ]; then
+    while IFS= read -r post; do
+      [ -n "$post" ] || continue
+      if ! ( cd "$ROOT" && ROOT="$ROOT" BUILD="$BUILD" INSTALL="$INSTALL" GEN="$GEN" \
+               ROM="$rom" MAP="$BUILD/$name.map" eval "$post" >>"$GEN/post.log" 2>&1 ); then
+        printf '    %-22s POST FAILED: %s\n' "$name" "$post"
+        tail -5 "$GEN/post.log" || true
+        ok=0
+        break
+      fi
+    done < <(marker battery-post "$src")
   fi
   if [ "$ok" = 1 ] && ! python3 "$ROOT/tools/snes-checksum.py" "${checksum_args[@]}" "$rom"; then
     ok=0

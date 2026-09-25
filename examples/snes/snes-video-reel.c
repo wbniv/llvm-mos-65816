@@ -1,7 +1,14 @@
-// Build contract for dev/build.sh's example battery (grammar: dev/build.sh).
+// Build contract for dev/build.sh's example battery (grammar: dev/build.sh). The
+// checked-in snes-video-reel-assets.h is the 900-frame --packed-far HiROM header for the
+// checked-in assets/snes/video/svx2-full-reel.bin, so the battery builds the same HiROM
+// cartridge dev/snes-video-reel.sh does from those assets and packs the stream in; a
+// stream-less link decodes open bus (docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
 // mos-a16-only: the SVX2 decoder addresses the stream with 24-bit far pointers.
+// battery-config: snes-hirom
 // battery-cflags: -DSVC_USE_ASM
 // battery-link: snes-video-reel-fast.s snes-video-codec.c snes-video-dma.c snes-video-codec-fast.s
+// battery-post: python3 tools/snes-video-pack-hirom.py "$ROM" assets/snes/video/svx2-full-reel.bin
+// battery-checksum: --hirom --fastrom
 #include <snes.h>
 #include <stdint.h>
 

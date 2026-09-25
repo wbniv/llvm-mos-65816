@@ -2260,18 +2260,21 @@ in `~/biohack.net` or `~/indri.studio` was touched.
 
 ## Deferred
 
-- `snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback:
+- ~~`snes-video-reel` and `apollo-reel` are entropy-sensitive AFTER the title, in video playback:
   `dev/title-entropy.sh` passes at frame 60 (the title window) and fails at 100 and 200 on both the
   pre-fix and post-fix ROM (reel: 1/8 and 3/8 entropy‑1 runs differ before, 2/8 and 3/8 after, same
-  entropy‑0 reference `fe3ca7395583` at both frames; apollo: 8/8 differ at 200). Both frames sample the
-  loop after `m7splash_end(30u)` + `setup_display()`, so this is a second, independent uninitialised-state
-  defect in the reels' own display setup, not the `m7title.h` one closed above. These two are also the
-  only adopters with no `snes_ppu_reset_blank()` anywhere in `main()`. Same method applies: bisect the
-  register groups with a temporary probe at the top of `setup_display()`.
+  entropy‑0 reference `fe3ca7395583` at both frames; apollo: 8/8 differ at 200).~~ **Resolved 2026‑09‑25 —
+  not a display-setup defect.** Those were `dev/build.sh` battery ROMs, which carried no packed video
+  stream (no post-link pack step), so the decoder ran off the framebuffer on whatever the power-on WRAM
+  held. The published ROMs PASS. Fixed with a `battery-post:` marker + the `dev/battery-video-selfcheck.sh`
+  guard: [2026-09-25-reel-apollo-battery-stream-pack.md](2026-09-25-reel-apollo-battery-stream-pack.md).
 - ~~`dev/title-entropy.sh` is not wired into any gate runner yet.~~ Wired 2026-09-24 as an opt-in
   `--title-entropy` leg of `dev/verify-web-roms.sh` (over the published manifest set, 3 frames × 8 runs,
   opt-in rather than default because the sweep costs tens of seconds/ROM across 100+ published demos).
   Verified it PASSes on a freshly-rebuilt fixed `mandel-oop.sfc` and correctly FAILs on the still-open
   `snes-video-reel`/`apollo-reel` post-title defect. See [TODO.md](../../TODO.md) Done.
+  (2026‑09‑25: that FAIL was not reproduced on the published `apollo-daylight.sfc` /
+  `svx2-fastrom-video.sfc`, which PASS at 60/100/200/400 × 8 — the defect lived only in the battery ROMs;
+  see the bullet above.)
 
 
