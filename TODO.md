@@ -285,20 +285,8 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
   [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
   **Correctness flag (2026-09-25, [hoist investigation §5](docs/investigations/2026-09-25-farptr-hoist-measurement.md#5-the-dpy-interaction--flagged)):** `loop.c`'s `tab[o + j]` is `tab + zext(add i16 o, j)` with **no `nuw`** — it wraps at 16 bits, so folding it as `[tab+o],Y` with `Y=j` is a miscompile for `o ≥ 0xFFC1`; never reassociate a non-`nuw` narrow add. Legal fixtures: `tab[(uint32_t)o + j]` / `p = tab + base; p[j]` (72 B today → 32 B hand-built).
-- [T3] **`long,X` (`bf`/`9f`) for a global far base plus a runtime index — MEASURE first.** The
-  `[dp],Y` work covers a far *pointer* held in a DP quad; when the base is a far **global** (`tbl[i]`
-  with `tbl` at a known 24-bit address) the natural form is absolute-long indexed, `lda`/`sta long,X`
-  (`bf`/`9f`), which needs no pointer materialisation at all and would beat `[dp],Y` there. The
-  2026-09-24 #320 audit census found `bf` fires exactly once (only under `+mos-xy16`) and `9f` never;
-  Phase 1 §6 constraint 6 explicitly leaves both **outside** the `[dp],Y` GO verdict — a native long form
-  is not automatically smaller (governing lesson 2). Phase 1 (this rank, T3, throwaway worktree): build the
-  `long,X` shape by hand for a global-base subscript in realistic 16-bit-ambient context, diff bytes/cycles
-  against today's output under `+mos-a16` and `+mos-xy16` (X's width, not M, bounds the index — same trap
-  as Y), record GO/NO-GO; include the long-form arithmetic/compare (`0f`/`2f`/`4f`/`6f`/`cf`/`ef`) in the
-  same census-and-measure pass since they share the operand shape. Phase 2 only on GO, re-ranked **T4**.
-  [audit §2](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#2-codegen--instruction-selection--done-for-correctness-measured-gaps-in-coverage) ·
-  [Phase 1 §6](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
-  **Customer (2026-09-25, [hoist investigation §4](docs/investigations/2026-09-25-farptr-hoist-measurement.md#4-where-the-motivating-shapes-win-actually-is)):** `dev/dpy-shapes/loop.c` (`tab[o + j]`, 16-bit-wrapping index) is legal only as `lda tab,X` with a 16-bit X = `o+j` under `+mos-xy16` — it is not a `[dp],Y` customer. Today 86 B.
+- [ ] **`long,X` Phase 2 — select `lda`/`sta long,X` (`bf`/`9f`) for a far global plus a runtime index.** Phase 1 said **GO** ([measurement](docs/investigations/2026-09-25-longx-global-measurement.md)): today `tbl[i]` builds a full 32-bit pointer and does `lda [dp]`; hand-built `long,X` is 46→21 B (load) / 44→15 B (store) and 86–168 B → 20–25 B on loops, with no losing shape (also with `-enable-misched=false`). Add a `tryFarAbsoluteIndexedAddressing` to `case 32` of `MOSLegalizerInfo::selectAddressingMode` (the near `tryAbsoluteIndexedAddressing` is the template), ordered **before** `tryFarIndirectIndexedAddressing` so `[dp],Y` never claims a global base. Gate per §4/§6: scaled offset ≤ X width (X is 8-bit ambient in both modes; 16-bit needs the `+mos-xy16` bracket via `MOSInsertREPSEP`), unsigned index, i < 32768 for word/X16, X free. First increment: i8-zext index into a byte far global (no proof, no bracket); `adc`/… `long,X` (`7f` −8 cy/iter) last. Customer: `dev/dpy-shapes/loop.c` (`tab[o + j]`, legal only as 16-bit-X `long,X`). Suggested tier **T4** (range gate whose misclassification would regress shipped codegen) — orchestrator to rank.
+- [ ] **Far 16-bit scalar load is byte-split.** `x ^ fg` (far `uint16_t fg`) loads `fg` as two `M=1` `lda long` + DP spills instead of one `M=0` `lda long`: 31 B → 21 B hand-built. Found in the `long,X` Phase 1 ([§5](docs/investigations/2026-09-25-longx-global-measurement.md#5-long-form-arithmeticcompare-secondary)); needs a look at why the AS2 `s16` load is not selected natively. Suggested tier T3 (measure-first) — orchestrator to rank.
 ### M2 — Optimizing Payoff
 
 - [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
@@ -1436,6 +1424,7 @@ revisit) rather than active work._
 
 
 ## Done
+- ✅ 2026-09-25 — [longx-global-measure] `long,X` (`bf`/`9f`) far-global Phase 1: **GO** (46→21 B, loops 86–168→20–25 B); non-indexed long ALU NO-GO. See [investigation](docs/investigations/2026-09-25-longx-global-measurement.md).
 - ✅ 2026-09-25 — [farptr-hoist-measure] NO-GO: `loop.c` hoist illegal (16-bit wrap); legal shapes already hoist, win is `[dp],Y` inc 2. See [investigation](docs/investigations/2026-09-25-farptr-hoist-measurement.md).
 - ✅ 2026-09-25 — [dpy-indexed-phase2] `[dp],Y` Phase 2 inc 1: a compile-time-constant far
   displacement in `[1,3]` now folds to `lda/sta [dp],y` (`b7`/`97`) off the same Imag32 quad instead of a
