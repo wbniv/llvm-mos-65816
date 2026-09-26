@@ -1,0 +1,12 @@
+{
+  "baseline_identity_reference": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-identity.json",
+  "source_file": "llvm/lib/Target/AArch64/AArch64ISelLowering.cpp",
+  "baseline_source_sha256": "0f6a9fa9f7f8f706b6bdbfbdcbe0f38afc3fa15f53dbf46345e9837f6d101172",
+  "vendor_source_sha256": "6cf92cedbfc6bffcaad36d3496870b5082671fea8e755b24f2462bfc9f95b274",
+  "saved_upstream_revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "whole_file_identical_to_saved_upstream": true,
+  "constraint_helper_identical_in_baseline_vendor_saved_upstream": false,
+  "helper_sha256": "58955d9d0668c4039916a40842e85f876b08e547136e7e6afab8d1d06d461c11",
+  "language": "Original constructed LLVM IR, no C frontend/preprocessing stage. Failure occurs during DAG construction before MIR is available.",
+  "r_and_x_handlers_identical_in_baseline_and_vendor": true
+}

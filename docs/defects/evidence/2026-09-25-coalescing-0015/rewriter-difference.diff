@@ -1,0 +1,26 @@
+--- before0028
++++ with0028
+@@ -413,6 +413,7 @@
+     renamable $rs1 = STAImag16 killed renamable $a16
+     renamable $a16 = LDAImag16 killed renamable $rs1
+     renamable $rc2 = COPY renamable $rc30
++    renamable $rs1 = KILL renamable $rs1
+     renamable $x = COPY renamable $rc2
+     STAbs killed renamable $x, %stack.9 :: (store (s8) into %stack.9)
+     renamable $x = COPY killed renamable $rc3
+@@ -491,6 +492,7 @@
+     STAbs killed renamable $y, %stack.0 :: (store (s8) into %stack.0)
+     renamable $y = COPY killed renamable $rc27
+     STAbs killed renamable $y, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
++    renamable $rs3 = KILL renamable $rs3
+     renamable $y = COPY renamable $rc6
+     STAbs killed renamable $y, %stack.10 :: (store (s8) into %stack.10)
+     renamable $y = COPY killed renamable $rc7
+@@ -507,6 +509,7 @@
+     STAbs killed renamable $y, %stack.0 :: (store (s8) into %stack.0)
+     renamable $y = COPY killed renamable $rc27
+     STAbs killed renamable $y, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
++    renamable $rs3 = KILL renamable $rs3
+     renamable $y = COPY renamable $rc6
+     STAbs killed renamable $y, %stack.10 :: (store (s8) into %stack.10)
+     renamable $y = COPY killed renamable $rc7

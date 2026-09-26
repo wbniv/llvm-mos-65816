@@ -1,0 +1,266 @@
+{
+  "runs": [
+    {
+      "name": "lto-default-probe",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-probe.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-default-harness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-harness.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-default-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-probe.bc",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-harness.bc",
+        "-Wl,--mllvm=-verify-machineinstrs",
+        "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+        "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-default.map",
+        "-o",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-default.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-default-runtime",
+      "command": [
+        "/home/will/llvm-mos-65816/build/jgxcheck",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-default.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x21a",
+        "2",
+        "0x479E",
+        "480"
+      ],
+      "exit_code": 0,
+      "rom_sha256": "604a8d8a9957779c0adb42995d129d153dc1fe1042c6d8293b4c41b731fab158",
+      "map_sha256": "19679c15b16c15fd0c26f1d2526f03e810e75dc7cb1ff3e5511d22070cb03655"
+    },
+    {
+      "name": "lto-a16-probe",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-a16-harness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-a16-baseline",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc",
+        "-Wl,--mllvm=-verify-machineinstrs",
+        "-fuse-ld=/home/will/llvm-mos-65816/build/inlineasm-bounds-fix/lld-before-0055",
+        "-o",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-baseline.sfc"
+      ],
+      "exit_code": 1,
+      "same_failure_signature": false
+    },
+    {
+      "name": "lto-a16-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc",
+        "-Wl,--mllvm=-verify-machineinstrs",
+        "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+        "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-a16.map",
+        "-o",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-a16.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-a16-runtime",
+      "command": [
+        "/home/will/llvm-mos-65816/build/jgxcheck",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-a16.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x21a",
+        "2",
+        "0x479E",
+        "480"
+      ],
+      "exit_code": 0,
+      "rom_sha256": "6d5b887d3b56f4c8c1b62e56e9a673266c1621064b3d043a196ccf1533304e98",
+      "map_sha256": "b0130966a283a14a0fa02787c62c1ef7aeb1faeb1c5db44807d40e55b9fc4ddf"
+    },
+    {
+      "name": "lto-xy16-probe",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-probe.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-xy16-harness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--target=mos",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-Os",
+        "-flto",
+        "-c",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-harness.bc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-xy16-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-probe.bc",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-harness.bc",
+        "-Wl,--mllvm=-verify-machineinstrs",
+        "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+        "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-xy16.map",
+        "-o",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-xy16.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "name": "lto-xy16-runtime",
+      "command": [
+        "/home/will/llvm-mos-65816/build/jgxcheck",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-xy16.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x21a",
+        "2",
+        "0x479E",
+        "480"
+      ],
+      "exit_code": 0,
+      "rom_sha256": "0e6254678041aede6751188e77919de0f73cc4fa54ababfc9637151db6cf90e8",
+      "map_sha256": "77136b12bc965d6fe4a2d7949b3819335018175df6ccac39116c2992101a0ffd"
+    },
+    {
+      "name": "lto-a16-baseline-valid",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+        "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Os",
+        "-flto",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc",
+        "-Wl,--mllvm=-verify-machineinstrs",
+        "-fuse-ld=/home/will/llvm-mos-65816/build/inlineasm-bounds-fix/baseline-linker/ld.lld",
+        "-o",
+        "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-baseline.sfc"
+      ],
+      "exit_code": 1,
+      "same_failure_signature": true
+    }
+  ],
+  "lld_hashes": {
+    "build/inlineasm-bounds-fix/lld-before-0055": "bae956918303398db4c01f993249c75a8f4a959a914154be5f6562cad2bb3dd6",
+    "build/llvm-mos/bin/ld.lld": "d60822d83863b4d5be2b888787dd9fec61e7a5f8d0c7cf2c47ebadd91b3f1316"
+  },
+  "installed_lld_sha256": "d60822d83863b4d5be2b888787dd9fec61e7a5f8d0c7cf2c47ebadd91b3f1316",
+  "bitcode_sha256": {
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-harness.bc": "66b1eb8a070e22120db099a335807abdd1e71a787848c575cdb5ba6e26183ba4",
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc": "5891aa1f74774a305d8e89ea24fbeb6a58ef147c76af1f93387ab64e0734cc4b",
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-probe.bc": "2720c4ac1603706f2f81061cf12a40fcf0be902953ee5f0123f650043735515d",
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-harness.bc": "0501eef3f31adc9f913f734a39faabbf4f5695462d6554ad038e9fff1dc5ed8a",
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc": "b85c818058213e04691e64a9fe6fa1e0e08daf55ef60fcf98e5a7688f5bbeacc",
+    "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-probe.bc": "75477348290a257b44961fe84a6eb8e4d648a9dace21c26282289ced0ae072eb"
+  }
+}

@@ -1,0 +1,218 @@
+*** Begin Patch
+*** Add File: /home/will/llvm-mos-65816/examples/65816/bitboard64.h
++// Bitboard Knight Tour (#120) — s64 popcount/clz/ctz libcall coverage.
++#ifndef BITBOARD64_H
++#define BITBOARD64_H
++
++#include <stdint.h>
++
++#define BITBOARD64_STEPS 96u
++
++typedef struct {
++    uint64_t current;
++    uint64_t visited;
++    uint64_t reachable;
++    uint8_t square;
++    uint8_t degree;
++    uint8_t leading;
++} Bitboard64State;
++
++static Bitboard64State bitboard64_state;
++
++static uint64_t bitboard64_attacks(uint64_t b) {
++    uint64_t left1  = (b >> 1) & UINT64_C(0x7F7F7F7F7F7F7F7F);
++    uint64_t left2  = (b >> 2) & UINT64_C(0x3F3F3F3F3F3F3F3F);
++    uint64_t right1 = (b << 1) & UINT64_C(0xFEFEFEFEFEFEFEFE);
++    uint64_t right2 = (b << 2) & UINT64_C(0xFCFCFCFCFCFCFCFC);
++    uint64_t horizontal1 = left1 | right1;
++    uint64_t horizontal2 = left2 | right2;
++    return (horizontal1 << 16) | (horizontal1 >> 16)
++         | (horizontal2 << 8)  | (horizontal2 >> 8);
++}
++
++static void bitboard64_reset(void) {
++    bitboard64_state.current = UINT64_C(1);
++    bitboard64_state.visited = UINT64_C(1);
++    bitboard64_state.reachable = bitboard64_attacks(UINT64_C(1));
++    bitboard64_state.square = 0u;
++    bitboard64_state.degree = 2u;
++    bitboard64_state.leading = 63u;
++}
++
++__attribute__((noinline))
++static uint16_t bitboard64_step(uint16_t h, uint16_t round) {
++    uint64_t moves = bitboard64_attacks(bitboard64_state.current);
++    uint64_t candidates = moves & ~bitboard64_state.visited;
++    uint8_t degree = (uint8_t)__builtin_popcountll(moves);
++    uint8_t next;
++    if (candidates) {
++        next = (uint8_t)__builtin_ctzll(candidates);
++    } else {
++        // Keep the visual moving after a closed component while preserving a nonzero ctz input.
++        uint64_t seed = UINT64_C(1) << (uint8_t)((round * 13u + degree * 7u) & 63u);
++        next = (uint8_t)__builtin_ctzll(seed);
++        bitboard64_state.visited = 0u;
++    }
++    uint64_t next_bit = UINT64_C(1) << next;
++    uint8_t leading = (uint8_t)__builtin_clzll(next_bit);
++    bitboard64_state.current = next_bit;
++    bitboard64_state.visited |= next_bit;
++    bitboard64_state.reachable = bitboard64_attacks(next_bit);
++    bitboard64_state.square = next;
++    bitboard64_state.degree = degree;
++    bitboard64_state.leading = leading;
++
++    h = (uint16_t)((h << 5) | (h >> 11));
++    h ^= (uint16_t)next | (uint16_t)((uint16_t)degree << 8);
++    h = (uint16_t)(h + leading + (uint16_t)bitboard64_state.visited
++                   + (uint16_t)(bitboard64_state.visited >> 32));
++    return h;
++}
++
++static uint16_t bitboard64_model(void) {
++    uint16_t h = 0xB120u;
++    bitboard64_reset();
++    for (uint16_t round = 0; round < BITBOARD64_STEPS; round++)
++        h = bitboard64_step(h, round);
++    return h;
++}
++
++#endif
+*** Add File: /home/will/llvm-mos-65816/examples/65816/bitboard64-probe.c
++#include "bitboard64.h"
++
++volatile uint16_t bitboard64_probe_result;
++
++void bitboard64_probe(void) {
++    bitboard64_reset();
++    bitboard64_probe_result = bitboard64_step(0x120Bu, 23u);
++}
+*** Add File: /home/will/llvm-mos-65816/tools/bitboard64-sim.c
++#include <stdio.h>
++#include "../examples/65816/bitboard64.h"
++
++int main(void) {
++    printf("bitboard64 gate_crc = 0x%04X\n", bitboard64_model());
++    return 0;
++}
+*** Add File: /home/will/llvm-mos-65816/examples/snes/bitboard64.c
++// Bitboard Knight Tour — #120 of the compiler stress-test battery (Round 7).
++#include <snes.h>
++#define CANVAS_FLUSH_TILES 256
++#include "snesgfx/display.h"
++#include "snesgfx/bitmap_canvas.h"
++#include "snesgfx/text_layer.h"
++#include "snesgfx/title_layer.h"
++#include "../65816/bitboard64.h"
++
++#define CANVAS_CHR 0x0000u
++#define CANVAS_MAP 0x4000u
++
++typedef struct {
++    Display screen;
++    BitmapCanvas canvas;
++    TextLayer text;
++    uint16_t round;
++    uint16_t visual_h;
++} App;
++
++volatile uint16_t corpus_result;
++
++static const uint16_t pal[4] = {
++    SNES_RGB(1,2,6), SNES_RGB(4,9,17), SNES_RGB(4,25,27), SNES_RGB(31,26,7)
++};
++
++static void put_hex(TextLayer *t, uint16_t v) {
++    static const char H[]="0123456789ABCDEF";
++    char b[9]={'C','R','C','=',0,0,0,0,0};
++    b[4]=H[(v>>12)&15u]; b[5]=H[(v>>8)&15u]; b[6]=H[(v>>4)&15u]; b[7]=H[v&15u];
++    text_puts(t,1,1,b);
++}
++
++static void paint(App *a) {
++    a->visual_h = bitboard64_step(a->visual_h, a->round++);
++    for (uint8_t rank=0; rank<8u; rank++) for (uint8_t file=0; file<8u; file++) {
++        uint8_t sq=(uint8_t)(rank*8u+file);
++        uint64_t bit=UINT64_C(1)<<sq;
++        uint8_t c=(uint8_t)(((file^rank)&1u) ? 1u : 0u);
++        if (bitboard64_state.visited & bit) c=1u;
++        if (bitboard64_state.reachable & bit) c=2u;
++        if (bitboard64_state.current & bit) c=3u;
++        uint8_t tx=(uint8_t)(file*2u), ty=(uint8_t)(rank*2u);
++        canvas_fill_solid_tile(&a->canvas,tx,ty,c);
++        canvas_fill_solid_tile(&a->canvas,(uint8_t)(tx+1u),ty,c);
++        canvas_fill_solid_tile(&a->canvas,tx,(uint8_t)(ty+1u),c);
++        canvas_fill_solid_tile(&a->canvas,(uint8_t)(tx+1u),(uint8_t)(ty+1u),c);
++    }
++    a->canvas.lo=0u;
++    a->canvas.hi=(uint16_t)(CANVAS_NTILES-1u);
++}
++
++int main(void) {
++    static App a;
++    static TitleLayer title;
++    display_init(&a.screen);
++    canvas_init(&a.canvas,CANVAS_CHR,CANVAS_MAP,8,6);
++    text_init(&a.text,CANVAS_MAP,1,25);
++    display_add(&a.screen,(Drawable *)&a.canvas);
++    display_add(&a.screen,(Drawable *)&a.text);
++    upq_push_cgram(&a.screen.q,0,pal,0,(uint8_t)sizeof pal);
++    text_puts(&a.text,0,2,"BITBOARD KNIGHT TOUR");
++    title_begin16(&a.screen,&title,"BITBOARD64","POP CLZ CTZ");
++    title_end(&a.screen,&title,30);
++    corpus_result=bitboard64_model();
++    put_hex(&a.text,corpus_result);
++    bitboard64_reset();
++    a.visual_h=0xB120u;
++    for (;;) { paint(&a); display_frame(&a.screen); }
++}
+*** Add File: /home/will/llvm-mos-65816/dev/bitboard64.sh
++#!/usr/bin/env bash
++# Round 7 #120: s64 bitboard popcount/clz/ctz lowering and runtime differential.
++set -euo pipefail
++ROOT=/work
++BUILD="$ROOT/build"
++TOOL="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin"
++CFG="$BUILD/install/bin/mos-snes.cfg"
++SRC="$ROOT/examples/snes/bitboard64.c"
++VENDOR="$ROOT/vendor/bsnes-jg"
++A16=(-Xclang -target-feature -Xclang +mos-a16)
++XY16=(-Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16)
++
++cc -O2 "$ROOT/tools/bitboard64-sim.c" -o "$BUILD/bitboard64-sim"
++EXPECT=$("$BUILD/bitboard64-sim" | grep -oE '0x[0-9A-Fa-f]{4}' | head -1)
++echo "==> host oracle: bitboard64 gate hash = $EXPECT"
++
++for mode in default a16 xy16; do
++  feat=(); [ "$mode" = a16 ] && feat=("${A16[@]}"); [ "$mode" = xy16 ] && feat=("${XY16[@]}")
++  "$TOOL/mos-clang" --config "$CFG" -mcpu=mosw65816 "${feat[@]}" -Os \
++    -mllvm -verify-machineinstrs -Wl,-Map="$BUILD/bitboard64-$mode.map" \
++    -o "$BUILD/bitboard64-$mode.sfc" "$SRC"
++  python3 "$ROOT/tools/snes-checksum.py" "$BUILD/bitboard64-$mode.sfc" >/dev/null
++done
++
++echo "==> s64 bit-operation disassembly gate"
++"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -fno-lto \
++  -mllvm -verify-machineinstrs -c "$ROOT/examples/65816/bitboard64-probe.c" \
++  -o "$BUILD/bitboard64-probe.o"
++dis=$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$BUILD/bitboard64-probe.o")
++for sym in __popcountdi2 __ctzdi2 __clzdi2; do
++  printf '%s\n' "$dis" | grep -q "$sym" || { echo "FAIL: missing $sym call"; exit 1; }
++done
++echo "    PASS: popcountll/ctzll/clzll reach all three s64 runtime helpers"
++
++rc=0
++export SMOKE_SETTLE="${SMOKE_SETTLE:-480}"
++export SMOKE_SECONDS="${SMOKE_SECONDS:-12}"
++source "$ROOT/dev/_emu.sh"
++require_bios || exit $?
++for mode in default a16 xy16; do
++  run_assert "$BUILD/bitboard64-$mode.sfc" "$BUILD/bitboard64-$mode.map" corpus_result "$EXPECT" || rc=1
++  VMA=$(awk '$NF=="corpus_result"{print $1; exit}' "$BUILD/bitboard64-$mode.map")
++  "$BUILD/jgxcheck" "$BUILD/bitboard64-$mode.sfc" "$VENDOR/Database" "0x$VMA" 2 "$EXPECT" 480 \
++    "$BUILD/bitboard64-$mode-jg.png" || rc=1
++done
++[ "$rc" -eq 0 ] && echo "RESULT: PASS — Bitboard Knight Tour; host == default == a16 == xy16 == $EXPECT on MAME + bsnes-jg" || \
++  echo "RESULT: FAIL — s64 bit operation changed the tour"
++exit "$rc"
+*** End Patch

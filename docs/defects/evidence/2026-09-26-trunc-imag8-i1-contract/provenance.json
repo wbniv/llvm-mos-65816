@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-26",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort",
+  "session_id": "01a0dafb-5a4b-7562-bec3-0488c07748a1",
+  "upstream_revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "upstream_tracked_diff": "",
+  "source_hashes": {
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSInstrLogical.td": "89b7f415f2bcce47b661c4fe85d3d24f94c89a75aa92f66045fac3b0cde126ff",
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp": "d699c7132a69f5edc4c3407abbfd8b73ec8df93159c76146ff0e886b514ef9f5",
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/CodeGen/RegisterBankInfo.cpp": "7cdd0d4cf439602edee5b98c917f56969c5a73e9a677099f89b0aa8ce51c8390",
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h": "4851fd3a285a274036ecc8f84f4fec93714c8fa839d9faf2cfecfee030d9f5a5",
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/CodeGen/GlobalISel/Utils.cpp": "78371f00d74bca15efa50eac68a9bca449cf0aef1bb5a3f80a0e1a1c8cc7e75a",
+    "8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSInstructionSelector.cpp": "5e2d4d5a21f782c080e2c512431838cb07371d33307bb78db2547b2a0b7926dc",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSInstrLogical.td": "89b7f415f2bcce47b661c4fe85d3d24f94c89a75aa92f66045fac3b0cde126ff",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp": "d699c7132a69f5edc4c3407abbfd8b73ec8df93159c76146ff0e886b514ef9f5",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/lib/CodeGen/RegisterBankInfo.cpp": "154285e1da6e6f9a04b79d0779ef26b42282a5619b77f5be9c2cb051f82dc349",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h": "e2d155a11117273521563160183945979271cc1d86ff9a4df05aa3a27dd4d942",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/lib/CodeGen/GlobalISel/Utils.cpp": "180b64b7a01a8e05f6698fe12975747adbd6d55ad4db2351c24f562ae5f88066",
+    "742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSInstructionSelector.cpp": "5e2d4d5a21f782c080e2c512431838cb07371d33307bb78db2547b2a0b7926dc"
+  },
+  "tablegen_command": [
+    "build/upstream-llc/bin/llvm-tblgen",
+    "-gen-global-isel",
+    "-I",
+    "build/0028-upstream-src/llvm/lib/Target/MOS",
+    "-I",
+    "build/0028-upstream-src/llvm/include",
+    "-I",
+    "build/upstream-llc/include",
+    "build/0028-upstream-src/llvm/lib/Target/MOS/MOS.td",
+    "-o",
+    "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/upstream-MOSGenGlobalISel.inc"
+  ],
+  "tablegen_sha256": "0cc76609800db3ce2816931ecf164af726ff47838a5361317defb3d093586102",
+  "tablegen_exit_code": 0,
+  "generated_matcher_sha256": "489d3479ed2b0fd3d2066a7b36ffe5a5fc57eae31e0cb4a2fe662709c0c67426",
+  "existing_generated_matcher_sha256": "489d3479ed2b0fd3d2066a7b36ffe5a5fc57eae31e0cb4a2fe662709c0c67426",
+  "execution_environment": "Native host Linux; saved upstream llc runs directly. The container image recorded in the original manifest is no longer present; the archived binary hash still matches SHA256SUMS.",
+  "preserved_comparison": "build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+  "scope": "Disprove the independent claim that an Imag8 source register class rejects the s8-to-s1 pattern. No assertion about the unrecovered original #320 far-pointer failure."
+}

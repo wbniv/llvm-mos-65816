@@ -1,0 +1,16 @@
+[
+  {
+    "kind": "vendor",
+    "patch": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+    "sha256": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035",
+    "apply_check": true,
+    "exact_source_match": true
+  },
+  {
+    "kind": "upstream",
+    "patch": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/0057-upstream-based.patch",
+    "sha256": "fcc8b2b037415ef1333654ce1171ed661d86136858cde35fef2337e09e7953fc",
+    "apply_check": true,
+    "exact_source_match": true
+  }
+]

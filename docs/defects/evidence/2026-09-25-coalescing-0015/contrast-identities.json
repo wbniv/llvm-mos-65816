@@ -1,0 +1,20 @@
+{
+  "llc": {
+    "path": "build/coalescing-0015-contrast/llc",
+    "sha256": "78b6f42bf064d9515c4ab13a907ecede67d6e22d3c4424ac6eaf91f755eae424"
+  },
+  "llc-guard-no0028": {
+    "path": "build/coalescing-0015-contrast/llc-guard-no0028",
+    "sha256": "b40c7153abcf35205d441b1ab0516b12c8e031c4cf04ac6bc921e24dba61c366"
+  },
+  "llc-noguard-no0028": {
+    "path": "build/coalescing-0015-contrast/llc-noguard-no0028",
+    "sha256": "66e65f403c904c116701c7f2f111fdcc275f3187830d10c2734e56dc1fa24462"
+  },
+  "source_comparison": {
+    "reverse_current_0028_exactly_matches_baseline_translation_unit": true,
+    "baseline_vregmap_sha256": "8bacf912bc897019b891563f453d2e8e8863840624be2b3e8dc33d605094c20e",
+    "candidate_vregmap_sha256": "3f29a16e800a7dd8b658dc997227cd96640a6bfe17ec84be04fba9733806ea8d",
+    "changes_in_noguard_to_noguard_no0028": "Only VirtRegMap.cpp.o inside LLVMCodeGen differs; the same guard-disabled MOS archive is used."
+  }
+}

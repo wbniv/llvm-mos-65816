@@ -1,0 +1,2 @@
+$ python3 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/rcundef-reduced-serial.mir
+exit_code=0

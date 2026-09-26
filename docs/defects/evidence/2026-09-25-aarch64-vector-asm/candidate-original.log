@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /tmp/vector-parts-original.out
+error: incompatible vector register parts, possible invalid constraint for vector type
+
+exit_code=1

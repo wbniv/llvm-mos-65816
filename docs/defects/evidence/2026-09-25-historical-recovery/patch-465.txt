@@ -1,0 +1,27 @@
+*** Begin Patch
+*** Update File: /home/will/llvm-mos-65816/examples/65816/bitboard64.h
+@@
+ static Bitboard64State bitboard64_state;
++static volatile uint64_t bitboard64_opaque;
+@@
+     uint64_t moves = bitboard64_attacks(bitboard64_state.current);
+     uint64_t candidates = moves & ~bitboard64_state.visited;
+-    uint8_t degree = (uint8_t)__builtin_popcountll(moves);
++    bitboard64_opaque = moves;
++    uint8_t degree = (uint8_t)__builtin_popcountll(bitboard64_opaque);
+@@
+     if (candidates) {
+-        next = (uint8_t)__builtin_ctzll(candidates);
++        bitboard64_opaque = candidates;
++        next = (uint8_t)__builtin_ctzll(bitboard64_opaque);
+@@
+         uint64_t seed = UINT64_C(1) << (uint8_t)((round * 13u + degree * 7u) & 63u);
+-        next = (uint8_t)__builtin_ctzll(seed);
++        bitboard64_opaque = seed;
++        next = (uint8_t)__builtin_ctzll(bitboard64_opaque);
+@@
+     uint64_t next_bit = UINT64_C(1) << next;
+-    uint8_t leading = (uint8_t)__builtin_clzll(next_bit);
++    bitboard64_opaque = next_bit;
++    uint8_t leading = (uint8_t)__builtin_clzll(bitboard64_opaque);
+*** End Patch

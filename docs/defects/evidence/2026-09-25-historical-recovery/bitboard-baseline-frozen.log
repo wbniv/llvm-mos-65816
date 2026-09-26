@@ -1,0 +1,1937 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028 -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null
+
+# After Virtual Register Rewriter
+********** INTERVALS **********
+RegMasks:
+********** MACHINEINSTRS **********
+# Machine code for function bitboard64_step: NoPHIs, TracksLiveness, NoVRegs, Legalized, RegBankSelected, Selected, TiedOpsRewritten, TracksDebugUserValues
+Frame Objects:
+  fi#0: size=2, align=1, at location [SP]
+  fi#1: size=2, align=1, at location [SP]
+  fi#2: size=1, align=1, at location [SP]
+  fi#3: size=1, align=1, at location [SP]
+  fi#4: size=1, align=1, at location [SP]
+  fi#5: size=1, align=1, at location [SP]
+  fi#6: size=1, align=1, at location [SP]
+  fi#7: size=1, align=1, at location [SP]
+  fi#8: size=1, align=1, at location [SP]
+  fi#9: size=1, align=1, at location [SP]
+  fi#10: size=1, align=1, at location [SP]
+  fi#11: size=1, align=1, at location [SP]
+  fi#12: size=1, align=1, at location [SP]
+  fi#13: size=1, align=1, at location [SP]
+  fi#14: size=2, align=1, at location [SP]
+  fi#15: size=2, align=1, at location [SP]
+  fi#16: size=2, align=1, at location [SP]
+  fi#17: size=2, align=1, at location [SP]
+  fi#18: size=1, align=1, at location [SP]
+  fi#19: size=1, align=1, at location [SP]
+  fi#20: size=2, align=1, at location [SP]
+  fi#21: size=2, align=1, at location [SP]
+  fi#22: size=2, align=1, at location [SP]
+save/restore points:
+save points are empty
+restore points are empty
+
+0B	bb.0 (%ir-block.0):
+	  successors: %bb.2(0x30000000), %bb.1(0x50000000); %bb.2(37.50%), %bb.1(62.50%)
+
+112B	  renamable $x = LDAbs @bitboard64_state.0 + 6 :: (dereferenceable load (s8) from @bitboard64_state.0 + 6, !tbaa !6)
+128B	  renamable $y = LDAbs @bitboard64_state.0 + 7 :: (dereferenceable load (s8) from @bitboard64_state.0 + 7, !tbaa !6)
+176B	  renamable $rc18 = COPY renamable $y
+184B	  renamable $rc28 = COPY killed renamable $y
+192B	  renamable $rc18, renamable $c = LSR killed renamable $rc18(tied-def 0)
+224B	  renamable $rc19 = COPY renamable $x
+232B	  renamable $rc26 = COPY killed renamable $x
+256B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+272B	  renamable $y = LDAbs @bitboard64_state.0 + 5 :: (dereferenceable load (s8) from @bitboard64_state.0 + 5, !tbaa !6)
+320B	  renamable $rc14 = COPY renamable $y
+336B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+352B	  renamable $a = LDAbs @bitboard64_state.0 + 4 :: (dereferenceable load (s8) from @bitboard64_state.0 + 4, !tbaa !6)
+400B	  renamable $rc15 = COPY renamable $a
+408B	  renamable $rc8 = COPY killed renamable $a
+416B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+432B	  renamable $x = LDAbs @bitboard64_state.0 + 3 :: (dereferenceable load (s8) from @bitboard64_state.0 + 3, !tbaa !6)
+464B	  renamable $rc12 = COPY renamable $x
+496B	  renamable $rc12, renamable $c = ROR killed renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+512B	  renamable $a = LDAbs @bitboard64_state.0 + 2 :: (dereferenceable load (s8) from @bitboard64_state.0 + 2, !tbaa !6)
+544B	  renamable $rc13 = COPY renamable $a
+552B	  renamable $rc6 = COPY killed renamable $a
+576B	  renamable $rc13, renamable $c = ROR killed renamable $rc13(tied-def 0), killed renamable $c(tied-def 1)
+592B	  renamable $a = LDAbs @bitboard64_state.0 + 1 :: (dereferenceable load (s8) from @bitboard64_state.0 + 1, !tbaa !6)
+640B	  renamable $rc10 = COPY renamable $a
+648B	  renamable $rc29 = COPY killed renamable $a
+656B	  renamable $rc10, renamable $c = ROR killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+672B	  renamable $a = LDAbs @bitboard64_state.0 :: (dereferenceable load (s8) from @bitboard64_state.0, !tbaa !6)
+720B	  renamable $rc4 = COPY renamable $a
+728B	  renamable $rc30 = COPY killed renamable $a
+736B	  renamable $rc4, dead renamable $c = ROR killed renamable $rc4(tied-def 0), killed renamable $c(tied-def 1)
+752B	  renamable $rc2 = COPY renamable $rc4
+768B	  renamable $rc3 = COPY renamable $rc10
+880B	  renamable $a16 = LDAImag16 killed renamable $rs1
+912B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 32639
+928B	  renamable $rs1 = STAImag16 killed renamable $a16
+940B	  renamable $a = COPY renamable $rc2
+948B	  STAbs killed renamable $a, %stack.15 :: (store (s8) into %stack.15)
+952B	  renamable $a = COPY killed renamable $rc3
+960B	  STAbs killed renamable $a, %stack.15 + 1 :: (store (s8) into %stack.15 + 1)
+968B	  renamable $rc2 = COPY renamable $rc13
+976B	  renamable $rc3 = COPY renamable $rc12
+984B	  renamable $a16 = LDAImag16 killed renamable $rs1
+1008B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 32639
+1024B	  renamable $rs1 = STAImag16 killed renamable $a16
+1036B	  renamable $a = COPY renamable $rc2
+1044B	  STAbs killed renamable $a, %stack.16 :: (store (s8) into %stack.16)
+1048B	  renamable $a = COPY killed renamable $rc3
+1056B	  STAbs killed renamable $a, %stack.16 + 1 :: (store (s8) into %stack.16 + 1)
+1064B	  renamable $rc2 = COPY renamable $rc15
+1072B	  renamable $rc3 = COPY renamable $rc14
+1080B	  renamable $a16 = LDAImag16 killed renamable $rs1
+1104B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 32639
+1120B	  renamable $rs1 = STAImag16 killed renamable $a16
+1132B	  renamable $a = COPY renamable $rc2
+1140B	  STAbs killed renamable $a, %stack.17 :: (store (s8) into %stack.17)
+1144B	  renamable $a = COPY killed renamable $rc3
+1152B	  STAbs killed renamable $a, %stack.17 + 1 :: (store (s8) into %stack.17 + 1)
+1160B	  renamable $rc2 = COPY renamable $rc19
+1168B	  renamable $rc3 = COPY renamable $rc18
+1176B	  renamable $a16 = LDAImag16 killed renamable $rs1
+1200B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 32639
+1216B	  renamable $rs1 = STAImag16 killed renamable $a16
+1228B	  renamable $a = COPY renamable $rc2
+1236B	  STAbs killed renamable $a, %stack.20 :: (store (s8) into %stack.20)
+1240B	  renamable $a = COPY killed renamable $rc3
+1248B	  STAbs killed renamable $a, %stack.20 + 1 :: (store (s8) into %stack.20 + 1)
+1264B	  renamable $rc18, renamable $c = LSR killed renamable $rc18(tied-def 0)
+1296B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+1344B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+1392B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+1440B	  renamable $rc12, renamable $c = ROR killed renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+1488B	  renamable $rc13, renamable $c = ROR killed renamable $rc13(tied-def 0), killed renamable $c(tied-def 1)
+1536B	  renamable $rc10, renamable $c = ROR killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+1584B	  renamable $rc4, dead renamable $c = ROR killed renamable $rc4(tied-def 0), killed renamable $c(tied-def 1)
+1616B	  renamable $rc5 = COPY killed renamable $rc10
+1728B	  renamable $a16 = LDAImag16 killed renamable $rs2
+1760B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 16191
+1776B	  renamable $rs5 = STAImag16 killed renamable $a16
+1792B	  renamable $rc4 = COPY killed renamable $rc13
+1808B	  renamable $rc5 = COPY killed renamable $rc12
+1824B	  renamable $a16 = LDAImag16 killed renamable $rs2
+1856B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 16191
+1872B	  renamable $rs6 = STAImag16 killed renamable $a16
+1888B	  renamable $rc4 = COPY killed renamable $rc15
+1904B	  renamable $rc5 = COPY killed renamable $rc14
+1920B	  renamable $a16 = LDAImag16 killed renamable $rs2
+1952B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 16191
+1968B	  renamable $rs7 = STAImag16 killed renamable $a16
+1984B	  renamable $rc4 = COPY killed renamable $rc19
+2000B	  renamable $rc5 = COPY killed renamable $rc18
+2016B	  renamable $a16 = LDAImag16 killed renamable $rs2
+2048B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 16191
+2064B	  renamable $rs9 = STAImag16 killed renamable $a16
+2112B	  renamable $rc30, renamable $c = ASL killed renamable $rc30(tied-def 0)
+2176B	  renamable $rc29, renamable $c = ROL killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+2576B	  renamable $rc4 = COPY renamable $rc30
+2592B	  renamable $rc5 = COPY renamable $rc29
+2704B	  renamable $a16 = LDAImag16 killed renamable $rs2
+2736B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 65278
+2752B	  renamable $rs10 = STAImag16 killed renamable $a16
+2768B	  renamable $rc6, renamable $c = ROL killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+2776B	  renamable $a = COPY killed renamable $x
+2784B	  renamable $a, renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+2800B	  renamable $rc4 = COPY renamable $rc6
+2816B	  renamable $rc5 = COPY renamable $a
+2824B	  renamable $rc7 = COPY killed renamable $a
+2832B	  renamable $a16 = LDAImag16 killed renamable $rs2
+2864B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 65278
+2880B	  renamable $rs11 = STAImag16 killed renamable $a16
+2896B	  renamable $rc8, renamable $c = ROL killed renamable $rc8(tied-def 0), killed renamable $c(tied-def 1)
+2904B	  renamable $a = COPY killed renamable $y
+2912B	  renamable $a, renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+2928B	  renamable $rc4 = COPY renamable $rc8
+2944B	  renamable $rc5 = COPY renamable $a
+2952B	  renamable $rc9 = COPY killed renamable $a
+2960B	  renamable $a16 = LDAImag16 killed renamable $rs2
+2992B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 65278
+3008B	  renamable $rs12 = STAImag16 killed renamable $a16
+3016B	  renamable $a = COPY killed renamable $rc26
+3024B	  renamable $a, renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+3040B	  renamable $rc28, dead renamable $c = ROL killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+3056B	  renamable $rc4 = COPY renamable $a
+3064B	  renamable $rc2 = COPY killed renamable $a
+3072B	  renamable $rc5 = COPY renamable $rc28
+3088B	  renamable $a16 = LDAImag16 killed renamable $rs2
+3120B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 65278
+3136B	  renamable $rs13 = STAImag16 killed renamable $a16
+3168B	  renamable $rc30, renamable $c = ASL killed renamable $rc30(tied-def 0)
+3520B	  renamable $rc4 = COPY killed renamable $rc30
+3528B	  renamable $rc5 = COPY killed renamable $rc29
+3536B	  renamable $rc5, renamable $c = ROL killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+3568B	  renamable $rc6, renamable $c = ROL killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+3600B	  renamable $rc7, renamable $c = ROL killed renamable $rc7(tied-def 0), killed renamable $c(tied-def 1)
+3632B	  renamable $rc8, renamable $c = ROL killed renamable $rc8(tied-def 0), killed renamable $c(tied-def 1)
+3664B	  renamable $rc9, renamable $c = ROL killed renamable $rc9(tied-def 0), killed renamable $c(tied-def 1)
+3696B	  renamable $rc2, renamable $c = ROL killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+3704B	  renamable $rc3 = COPY killed renamable $rc28
+3712B	  renamable $rc3, dead renamable $c = ROL killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+3760B	  renamable $a16 = LDAImag16 killed renamable $rs2
+3792B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 64764
+3808B	  renamable $rs14 = STAImag16 killed renamable $a16
+3824B	  renamable $a16 = LDAImag16 killed renamable $rs3
+3856B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 64764
+3872B	  renamable $rs15 = STAImag16 killed renamable $a16
+3888B	  renamable $a16 = LDAImag16 killed renamable $rs4
+3920B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 64764
+3936B	  renamable $rs3 = STAImag16 killed renamable $a16
+3952B	  renamable $a16 = LDAImag16 killed renamable $rs1
+3984B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 64764
+4000B	  renamable $rs4 = STAImag16 killed renamable $a16
+4008B	  renamable $x = LDAbs %stack.15 :: (load (s8) from %stack.15)
+4012B	  renamable $rc2 = COPY killed renamable $x
+4020B	  renamable $x = LDAbs %stack.15 + 1 :: (load (s8) from %stack.15 + 1)
+4024B	  renamable $rc3 = COPY killed renamable $x
+4040B	  renamable $a16 = LDAImag16 killed renamable $rs1
+4056B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs10
+4064B	  renamable $rs2 = STAImag16 killed renamable $a16
+4072B	  renamable $x = LDAbs %stack.16 :: (load (s8) from %stack.16)
+4076B	  renamable $rc2 = COPY killed renamable $x
+4084B	  renamable $x = LDAbs %stack.16 + 1 :: (load (s8) from %stack.16 + 1)
+4088B	  renamable $rc3 = COPY killed renamable $x
+4104B	  renamable $a16 = LDAImag16 killed renamable $rs1
+4120B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs11
+4128B	  renamable $rs10 = STAImag16 killed renamable $a16
+4136B	  renamable $x = LDAbs %stack.17 :: (load (s8) from %stack.17)
+4140B	  renamable $rc2 = COPY killed renamable $x
+4148B	  renamable $x = LDAbs %stack.17 + 1 :: (load (s8) from %stack.17 + 1)
+4152B	  renamable $rc3 = COPY killed renamable $x
+4168B	  renamable $a16 = LDAImag16 killed renamable $rs1
+4184B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+4192B	  renamable $rs11 = STAImag16 killed renamable $a16
+4200B	  renamable $x = LDAbs %stack.20 :: (load (s8) from %stack.20)
+4204B	  renamable $rc2 = COPY killed renamable $x
+4212B	  renamable $x = LDAbs %stack.20 + 1 :: (load (s8) from %stack.20 + 1)
+4216B	  renamable $rc3 = COPY killed renamable $x
+4232B	  renamable $a16 = LDAImag16 killed renamable $rs1
+4248B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs13
+4256B	  renamable $rs12 = STAImag16 killed renamable $a16
+4272B	  renamable $a16 = LDAImag16 killed renamable $rs5
+4304B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs14
+4320B	  renamable $rs1 = STAImag16 killed renamable $a16
+4336B	  renamable $a16 = LDAImag16 killed renamable $rs6
+4368B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs15
+4384B	  renamable $rs5 = STAImag16 killed renamable $a16
+4400B	  renamable $a16 = LDAImag16 killed renamable $rs7
+4432B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs3
+4448B	  renamable $rs6 = STAImag16 killed renamable $a16
+4464B	  renamable $a16 = LDAImag16 killed renamable $rs9
+4496B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs4
+4512B	  renamable $rs3 = STAImag16 killed renamable $a16
+4528B	  renamable $a16 = LDAImag16 killed renamable $rs2
+4560B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs11
+4576B	  renamable $rs2 = STAImag16 killed renamable $a16
+4592B	  renamable $a16 = LDAImag16 renamable $rs10
+4624B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+4640B	  renamable $rs4 = STAImag16 killed renamable $a16
+4784B	  renamable $rc24 = LDZ
+4816B	  renamable $rc25 = COPY renamable $rc2
+4832B	  renamable $rc14 = COPY killed renamable $rc3
+4848B	  renamable $rc15 = COPY renamable $rc10
+4864B	  renamable $rc18 = COPY killed renamable $rc11
+4880B	  renamable $rc19 = COPY renamable $rc12
+4896B	  renamable $rc2 = COPY killed renamable $rc13
+4912B	  renamable $rc3 = COPY renamable $rc6
+4928B	  renamable $a16 = LDAImag16 killed renamable $rs10
+4960B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs12
+4976B	  renamable $rs5 = STAImag16 killed renamable $a16
+4992B	  renamable $a16 = LDAImag16 killed renamable $rs2
+5024B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs7
+5040B	  renamable $rs2 = STAImag16 killed renamable $a16
+5056B	  renamable $a16 = LDAImag16 killed renamable $rs4
+5088B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs9
+5104B	  renamable $rs4 = STAImag16 killed renamable $a16
+5120B	  renamable $a16 = LDAImag16 killed renamable $rs11
+5152B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs1
+5168B	  renamable $rs10 = STAImag16 killed renamable $a16
+5184B	  renamable $rc6 = COPY killed renamable $rc7
+5192B	  renamable $rc12 = COPY renamable $rc24
+5204B	  renamable $x = COPY renamable $rc12
+5208B	  STAbs killed renamable $x, %stack.0 :: (store (s8) into %stack.0)
+5216B	  renamable $x = COPY killed renamable $rc13
+5220B	  STAbs killed renamable $x, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+5224B	  renamable $rc7 = COPY killed renamable $rc24
+5232B	  renamable $a16 = LDAImag16 killed renamable $rs5
+5248B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs7
+5264B	  renamable $rs5 = STAImag16 killed renamable $a16
+5280B	  renamable $a16 = LDAImag16 killed renamable $rs2
+5312B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs9
+5328B	  renamable $rs6 = STAImag16 killed renamable $a16
+5344B	  renamable $a16 = LDAImag16 killed renamable $rs4
+5376B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+5392B	  renamable $rs7 = STAImag16 killed renamable $a16
+5408B	  renamable $a16 = LDAImag16 killed renamable $rs10
+5440B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs3
+5456B	  renamable $rs9 = STAImag16 killed renamable $a16
+5472B	  renamable $a = LDAbs @bitboard64_state.1 :: (dereferenceable load (s8) from @bitboard64_state.1, !tbaa !9)
+5488B	  renamable $x = LDAbs @bitboard64_state.1 + 1 :: (dereferenceable load (s8) from @bitboard64_state.1 + 1, !tbaa !9)
+5504B	  renamable $y = LDAbs @bitboard64_state.1 + 2 :: (dereferenceable load (s8) from @bitboard64_state.1 + 2, !tbaa !9)
+5512B	  renamable $rc4 = COPY killed renamable $y
+5520B	  renamable $y = LDAbs @bitboard64_state.1 + 3 :: (dereferenceable load (s8) from @bitboard64_state.1 + 3, !tbaa !9)
+5528B	  renamable $rc5 = COPY killed renamable $y
+5536B	  renamable $y = LDAbs @bitboard64_state.1 + 4 :: (dereferenceable load (s8) from @bitboard64_state.1 + 4, !tbaa !9)
+5544B	  renamable $rc9 = COPY killed renamable $y
+5552B	  renamable $y = LDAbs @bitboard64_state.1 + 5 :: (dereferenceable load (s8) from @bitboard64_state.1 + 5, !tbaa !9)
+5556B	  renamable $rc8 = COPY killed renamable $y
+5560B	  renamable $rc31 = COPY renamable $a
+5600B	  renamable $rc2 = COPY killed renamable $a
+5608B	  renamable $a = COPY renamable $x
+5620B	  STAbs killed renamable $a, %stack.2 :: (store (s8) into %stack.2)
+5628B	  renamable $rc3 = COPY killed renamable $x
+5632B	  renamable $x = LDAbs @bitboard64_state.1 + 6 :: (dereferenceable load (s8) from @bitboard64_state.1 + 6, !tbaa !9)
+5640B	  renamable $rc20 = COPY killed renamable $x
+5648B	  renamable $y = LDAbs @bitboard64_state.1 + 7 :: (dereferenceable load (s8) from @bitboard64_state.1 + 7, !tbaa !9)
+5760B	  renamable $a16 = LDAImag16 killed renamable $rs1
+5792B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+5808B	  renamable $rs1 = STAImag16 killed renamable $a16
+5816B	  renamable $x = COPY renamable $rc4
+5828B	  STAbs killed renamable $x, %stack.3 :: (store (s8) into %stack.3)
+5844B	  renamable $x = COPY renamable $rc5
+5856B	  STAbs killed renamable $x, %stack.4 :: (store (s8) into %stack.4)
+5872B	  renamable $a16 = LDAImag16 killed renamable $rs2
+5888B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+5904B	  renamable $rs3 = STAImag16 killed renamable $a16
+5908B	  renamable $rc4 = COPY killed renamable $rc9
+5912B	  renamable $x = COPY renamable $rc4
+5924B	  STAbs killed renamable $x, %stack.13 :: (store (s8) into %stack.13)
+5936B	  renamable $rc5 = COPY killed renamable $rc8
+5940B	  renamable $x = COPY renamable $rc5
+5952B	  STAbs killed renamable $x, %stack.18 :: (store (s8) into %stack.18)
+5968B	  renamable $a16 = LDAImag16 killed renamable $rs2
+5984B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+6000B	  renamable $rs4 = STAImag16 killed renamable $a16
+6004B	  renamable $rc4 = COPY killed renamable $rc20
+6008B	  renamable $x = COPY renamable $rc4
+6020B	  STAbs killed renamable $x, %stack.19 :: (store (s8) into %stack.19)
+6032B	  renamable $x = COPY killed renamable $y
+6036B	  renamable $rc30 = COPY renamable $x
+6044B	  renamable $rc5 = COPY killed renamable $x
+6048B	  renamable $a16 = LDAImag16 killed renamable $rs2
+6080B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+6096B	  renamable $rs10 = STAImag16 killed renamable $a16
+6112B	  renamable $a16 = LDAImag16 renamable $rs5
+6144B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+6160B	  renamable $rs2 = STAImag16 killed renamable $a16
+6176B	  renamable $a16 = LDAImag16 renamable $rs6
+6208B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs3
+6224B	  renamable $rs3 = STAImag16 killed renamable $a16
+6240B	  renamable $a16 = LDAImag16 renamable $rs7
+6272B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs4
+6288B	  renamable $rs4 = STAImag16 killed renamable $a16
+6304B	  renamable $a16 = LDAImag16 renamable $rs9
+6336B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs10
+6340B	  STAbs16 killed renamable $a16, %stack.14 :: (store (s16) into %stack.14, align 1)
+6368B	  renamable $x = COPY renamable $rc10
+6496B	  STAbs killed renamable $x, @bitboard64_opaque :: (volatile store (s8) into @bitboard64_opaque, align 8, !tbaa !10)
+6512B	  renamable $x = COPY killed renamable $rc11
+6528B	  STAbs killed renamable $x, @bitboard64_opaque + 1 :: (volatile store (s8) into @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+6544B	  renamable $x = COPY renamable $rc12
+6560B	  STAbs killed renamable $x, @bitboard64_opaque + 2 :: (volatile store (s8) into @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+6576B	  renamable $x = COPY killed renamable $rc13
+6592B	  STAbs killed renamable $x, @bitboard64_opaque + 3 :: (volatile store (s8) into @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+6608B	  renamable $x = COPY renamable $rc14
+6624B	  STAbs killed renamable $x, @bitboard64_opaque + 4 :: (volatile store (s8) into @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+6640B	  renamable $x = COPY killed renamable $rc15
+6656B	  STAbs killed renamable $x, @bitboard64_opaque + 5 :: (volatile store (s8) into @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+6672B	  renamable $x = COPY renamable $rc18
+6688B	  STAbs killed renamable $x, @bitboard64_opaque + 6 :: (volatile store (s8) into @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+6704B	  renamable $x = COPY killed renamable $rc19
+6720B	  STAbs killed renamable $x, @bitboard64_opaque + 7 :: (volatile store (s8) into @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+6736B	  renamable $x = LDAbs @bitboard64_opaque :: (volatile dereferenceable load (s8) from @bitboard64_opaque, align 8, !tbaa !10)
+6744B	  renamable $rc26 = COPY killed renamable $x
+6752B	  renamable $x = LDAbs @bitboard64_opaque + 1 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+6760B	  renamable $rc25 = COPY killed renamable $x
+6768B	  renamable $x = LDAbs @bitboard64_opaque + 2 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+6776B	  renamable $rc23 = COPY killed renamable $x
+6784B	  renamable $x = LDAbs @bitboard64_opaque + 3 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+6792B	  renamable $rc22 = COPY killed renamable $x
+6800B	  renamable $x = LDAbs @bitboard64_opaque + 4 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+6808B	  renamable $rc20 = COPY killed renamable $x
+6816B	  renamable $a = LDAbs @bitboard64_opaque + 5 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+6832B	  renamable $y = LDAbs @bitboard64_opaque + 6 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+6848B	  renamable $x = LDAbs @bitboard64_opaque + 7 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+6880B	  renamable $rc14 = COPY renamable $x
+6928B	  renamable $rc15 = COPY renamable $y
+6936B	  renamable $rc21 = COPY killed renamable $y
+6944B	  renamable $rc14, renamable $c = LSR killed renamable $rc14(tied-def 0)
+6976B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+7024B	  renamable $rc12 = COPY renamable $a
+7032B	  renamable $rc24 = COPY killed renamable $a
+7040B	  renamable $rc12, renamable $c = ROR killed renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+7088B	  renamable $rc13 = COPY renamable $rc20
+7104B	  renamable $rc13, renamable $c = ROR killed renamable $rc13(tied-def 0), killed renamable $c(tied-def 1)
+7136B	  renamable $rc10 = COPY renamable $rc22
+7168B	  renamable $rc10, renamable $c = ROR killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+7200B	  renamable $rc11 = COPY renamable $rc23
+7232B	  renamable $rc11, renamable $c = ROR killed renamable $rc11(tied-def 0), killed renamable $c(tied-def 1)
+7280B	  renamable $a = COPY renamable $rc25
+7296B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+7344B	  renamable $rc2 = COPY renamable $rc26
+7360B	  renamable $rc2, dead renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+7392B	  renamable $rc3 = COPY killed renamable $a
+7504B	  renamable $a16 = LDAImag16 killed renamable $rs1
+7536B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+7552B	  renamable $rs1 = STAImag16 killed renamable $a16
+7568B	  renamable $rc18 = COPY killed renamable $rc11
+7584B	  renamable $rc19 = COPY killed renamable $rc10
+7600B	  renamable $a16 = LDAImag16 killed renamable $rs9
+7632B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+7648B	  renamable $rs5 = STAImag16 killed renamable $a16
+7664B	  renamable $rc18 = COPY killed renamable $rc13
+7680B	  renamable $rc19 = COPY killed renamable $rc12
+7696B	  renamable $a16 = LDAImag16 killed renamable $rs9
+7728B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+7744B	  renamable $rs6 = STAImag16 killed renamable $a16
+7760B	  renamable $rc18 = COPY killed renamable $rc15
+7776B	  renamable $rc19 = COPY killed renamable $rc14
+7792B	  renamable $a16 = LDAImag16 killed renamable $rs9
+7824B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+7840B	  renamable $rs7 = STAImag16 killed renamable $a16
+8016B	  renamable $c = LDImm1 -1
+8024B	  renamable $a = COPY killed renamable $rc26
+8032B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc2, killed renamable $c(tied-def 1)
+8040B	  renamable $rc29 = COPY killed renamable $a
+8072B	  renamable $a = COPY killed renamable $rc25
+8080B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c(tied-def 1)
+8088B	  renamable $y = COPY killed renamable $a
+8120B	  renamable $a = COPY killed renamable $rc23
+8128B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc10, killed renamable $c(tied-def 1)
+8136B	  renamable $rc26 = COPY killed renamable $a
+8168B	  renamable $a = COPY killed renamable $rc22
+8176B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c(tied-def 1)
+8184B	  renamable $rc25 = COPY killed renamable $a
+8216B	  renamable $a = COPY killed renamable $rc20
+8224B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc12, killed renamable $c(tied-def 1)
+8232B	  renamable $rc28 = COPY killed renamable $a
+8264B	  renamable $a = COPY killed renamable $rc24
+8272B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c(tied-def 1)
+8280B	  renamable $rc27 = COPY killed renamable $a
+8312B	  renamable $a = COPY killed renamable $rc21
+8320B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c(tied-def 1)
+8328B	  renamable $rc24 = COPY killed renamable $a
+8360B	  renamable $a = COPY killed renamable $x
+8368B	  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c(tied-def 1)
+8400B	  renamable $rc3 = COPY renamable $a
+8408B	  renamable $x = COPY killed renamable $a
+8448B	  renamable $rc10 = COPY renamable $rc24
+8464B	  renamable $rc3, renamable $c = LSR killed renamable $rc3(tied-def 0)
+8496B	  renamable $rc10, renamable $c = ROR killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+8528B	  renamable $rc11 = COPY renamable $rc27
+8560B	  renamable $rc11, renamable $c = ROR killed renamable $rc11(tied-def 0), killed renamable $c(tied-def 1)
+8608B	  renamable $rc12 = COPY renamable $rc28
+8624B	  renamable $rc12, renamable $c = ROR killed renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+8656B	  renamable $rc2 = COPY renamable $rc25
+8688B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+8720B	  renamable $rc13 = COPY renamable $rc26
+8752B	  renamable $rc13, renamable $c = ROR killed renamable $rc13(tied-def 0), killed renamable $c(tied-def 1)
+8784B	  renamable $a = COPY renamable $y
+8816B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+8864B	  renamable $rc14 = COPY renamable $rc29
+8880B	  renamable $rc14, dead renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+8912B	  renamable $rc3, renamable $c = LSR killed renamable $rc3(tied-def 0)
+8960B	  renamable $rc10, renamable $c = ROR killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+9008B	  renamable $rc11, renamable $c = ROR killed renamable $rc11(tied-def 0), killed renamable $c(tied-def 1)
+9056B	  renamable $rc12, renamable $c = ROR killed renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+9104B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+9152B	  renamable $rc13, renamable $c = ROR killed renamable $rc13(tied-def 0), killed renamable $c(tied-def 1)
+9200B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+9248B	  renamable $rc14, dead renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+9280B	  renamable $rc15 = COPY killed renamable $a
+9392B	  renamable $a16 = LDAImag16 killed renamable $rs7
+9424B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+9440B	  renamable $rs7 = STAImag16 killed renamable $a16
+9456B	  renamable $rc18 = COPY killed renamable $rc13
+9472B	  renamable $rc19 = COPY killed renamable $rc2
+9488B	  renamable $a16 = LDAImag16 killed renamable $rs9
+9520B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+9536B	  renamable $rs11 = STAImag16 killed renamable $a16
+9568B	  renamable $rc13 = COPY killed renamable $rc11
+9584B	  renamable $a16 = LDAImag16 killed renamable $rs6
+9616B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+9632B	  renamable $rs6 = STAImag16 killed renamable $a16
+9648B	  renamable $rc2 = COPY killed renamable $rc10
+9680B	  renamable $a16 = LDAImag16 killed renamable $rs1
+9712B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+9728B	  renamable $rs10 = STAImag16 killed renamable $a16
+9744B	  renamable $rc2 = COPY killed renamable $rc29
+9760B	  renamable $rc3 = COPY killed renamable $y
+9872B	  renamable $a16 = LDAImag16 killed renamable $rs1
+9904B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+9920B	  renamable $rs5 = STAImag16 killed renamable $a16
+9936B	  renamable $rc2 = COPY killed renamable $rc26
+9952B	  renamable $rc3 = COPY killed renamable $rc25
+9968B	  renamable $a16 = LDAImag16 killed renamable $rs1
+10000B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+10016B	  renamable $rs1 = STAImag16 killed renamable $a16
+10032B	  renamable $rc18 = COPY killed renamable $rc28
+10048B	  renamable $rc19 = COPY killed renamable $rc27
+10064B	  renamable $a16 = LDAImag16 killed renamable $rs9
+10096B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+10112B	  renamable $rs13 = STAImag16 killed renamable $a16
+10128B	  renamable $rc18 = COPY killed renamable $rc24
+10144B	  renamable $rc19 = COPY killed renamable $x
+10160B	  renamable $a16 = LDAImag16 killed renamable $rs9
+10192B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+10208B	  renamable $rs12 = STAImag16 killed renamable $a16
+10368B	  renamable $a = COPY renamable $rc10
+10504B	  renamable $c = LDImm1 0
+10512B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c
+10528B	  renamable $rc18 = COPY killed renamable $a
+10544B	  renamable $a = COPY killed renamable $rc11
+10576B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+10592B	  renamable $rc15 = COPY killed renamable $a
+10608B	  renamable $a = COPY renamable $rc2
+10640B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc22, killed renamable $c
+10656B	  renamable $rc11 = COPY killed renamable $a
+10672B	  renamable $a = COPY killed renamable $rc3
+10704B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc23, killed renamable $c
+10720B	  renamable $rc14 = COPY killed renamable $a
+10736B	  renamable $a = COPY renamable $rc26
+10768B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc12, killed renamable $c
+10784B	  renamable $rc10 = COPY killed renamable $a
+10800B	  renamable $a = COPY killed renamable $rc27
+10832B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c
+10848B	  renamable $rc13 = COPY killed renamable $a
+10864B	  renamable $a = COPY renamable $rc24
+10896B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc20, killed renamable $c
+10912B	  renamable $rc3 = COPY killed renamable $a
+10928B	  renamable $a = COPY killed renamable $rc25
+10960B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc21, killed renamable $c
+10976B	  renamable $rc12 = COPY killed renamable $a
+11008B	  renamable $rc22 = COPY renamable $rc12
+11024B	  renamable $rc22, renamable $c = LSR killed renamable $rc22(tied-def 0)
+11056B	  renamable $rc2 = COPY renamable $rc3
+11088B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+11136B	  renamable $rc23 = COPY renamable $rc13
+11152B	  renamable $rc23, renamable $c = ROR killed renamable $rc23(tied-def 0), killed renamable $c(tied-def 1)
+11200B	  renamable $rc24 = COPY renamable $rc10
+11216B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+11248B	  renamable $rc21 = COPY renamable $rc14
+11280B	  renamable $rc21, renamable $c = ROR killed renamable $rc21(tied-def 0), killed renamable $c(tied-def 1)
+11312B	  renamable $rc20 = COPY renamable $rc11
+11344B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+11392B	  renamable $rc19 = COPY renamable $rc15
+11408B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+11456B	  renamable $a = COPY renamable $rc18
+11472B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+11504B	  renamable $rc22, renamable $c = LSR killed renamable $rc22(tied-def 0)
+11552B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+11600B	  renamable $rc23, renamable $c = ROR killed renamable $rc23(tied-def 0), killed renamable $c(tied-def 1)
+11648B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+11696B	  renamable $rc21, renamable $c = ROR killed renamable $rc21(tied-def 0), killed renamable $c(tied-def 1)
+11744B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+11792B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+11840B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+11872B	  renamable $rc22, renamable $c = LSR killed renamable $rc22(tied-def 0)
+11920B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+11968B	  renamable $rc23, renamable $c = ROR killed renamable $rc23(tied-def 0), killed renamable $c(tied-def 1)
+12016B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+12064B	  renamable $rc21, renamable $c = ROR killed renamable $rc21(tied-def 0), killed renamable $c(tied-def 1)
+12112B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+12160B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+12208B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+12240B	  renamable $rc22, renamable $c = LSR killed renamable $rc22(tied-def 0)
+12304B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+12368B	  renamable $rc23, renamable $c = ROR killed renamable $rc23(tied-def 0), killed renamable $c(tied-def 1)
+12432B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+12496B	  renamable $rc21, renamable $c = ROR killed renamable $rc21(tied-def 0), killed renamable $c(tied-def 1)
+12560B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+12624B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+12688B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+12728B	  renamable $c = LDImm1 0
+12736B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc18, killed renamable $c
+12976B	  renamable $rc18 = COPY killed renamable $a
+12984B	  renamable $a = COPY killed renamable $rc19
+12992B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+13008B	  renamable $rc19 = COPY killed renamable $a
+13120B	  renamable $a16 = LDAImag16 killed renamable $rs9
+13152B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+13168B	  renamable $rs9 = STAImag16 killed renamable $a16
+13176B	  renamable $a = COPY killed renamable $rc20
+13184B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c
+13200B	  renamable $rc20 = COPY killed renamable $a
+13208B	  renamable $a = COPY killed renamable $rc21
+13216B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc14, killed renamable $c
+13232B	  renamable $rc21 = COPY killed renamable $a
+13248B	  renamable $a16 = LDAImag16 killed renamable $rs10
+13280B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+13296B	  renamable $rs7 = STAImag16 killed renamable $a16
+13304B	  renamable $a = COPY killed renamable $rc24
+13312B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc10, killed renamable $c
+13328B	  renamable $rc10 = COPY killed renamable $a
+13336B	  renamable $a = COPY killed renamable $rc23
+13344B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c
+13360B	  renamable $rc11 = COPY killed renamable $a
+13376B	  renamable $a16 = LDAImag16 killed renamable $rs5
+13408B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+13424B	  renamable $rs5 = STAImag16 killed renamable $a16
+13432B	  renamable $a = COPY killed renamable $rc2
+13440B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+13456B	  renamable $rc2 = COPY killed renamable $a
+13464B	  renamable $a = COPY killed renamable $rc22
+13472B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc12, killed renamable $c
+13488B	  renamable $rc3 = COPY killed renamable $a
+13504B	  renamable $a16 = LDAImag16 killed renamable $rs1
+13536B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+13552B	  renamable $rs6 = STAImag16 killed renamable $a16
+13808B	  renamable $c = LDImm1 0
+13824B	  renamable $a = COPY renamable $rc18
+13856B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+13864B	  renamable $xlsb = COPY killed renamable $c
+13872B	  renamable $rc3 = COPY renamable $a
+14224B	  renamable $c = LDImm1 0
+14240B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+14248B	  renamable $ylsb = COPY killed renamable $c
+14256B	  renamable $rc20 = COPY renamable $a
+14656B	  renamable $c = LDImm1 0
+14688B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+14696B	  renamable $rc21lsb = COPY killed renamable $c
+14704B	  renamable $a = COPY renamable $rc19
+14712B	  renamable $c = COPY killed renamable $xlsb
+14720B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc18, killed renamable $c
+14728B	  renamable $rc22lsb = COPY killed renamable $c
+14736B	  renamable $rc2 = COPY renamable $a
+14748B	  renamable $c = COPY killed renamable $ylsb
+14752B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+14760B	  renamable $ylsb = COPY killed renamable $c
+14768B	  renamable $rc18 = COPY renamable $a
+14824B	  renamable $c = COPY killed renamable $rc21lsb
+14832B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+14840B	  renamable $xlsb = COPY killed renamable $c
+14848B	  renamable $a = COPY renamable $rc14
+14856B	  renamable $c = COPY killed renamable $rc22lsb
+14864B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+14872B	  renamable $rc21lsb = COPY killed renamable $c
+14880B	  renamable $rc19 = COPY renamable $a
+14888B	  renamable $c = COPY killed renamable $ylsb
+14896B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+14904B	  renamable $ylsb = COPY killed renamable $c
+14912B	  renamable $rc3 = COPY renamable $a
+14968B	  renamable $c = COPY killed renamable $xlsb
+14976B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+14984B	  renamable $rc22lsb = COPY killed renamable $c
+14992B	  renamable $a = COPY renamable $rc15
+15000B	  renamable $c = COPY killed renamable $rc21lsb
+15008B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c
+15016B	  renamable $rc21lsb = COPY killed renamable $c
+15024B	  renamable $rc14 = COPY renamable $a
+15032B	  renamable $c = COPY killed renamable $ylsb
+15040B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+15048B	  renamable $xlsb = COPY killed renamable $c
+15056B	  renamable $rc2 = COPY renamable $a
+15112B	  renamable $c = COPY killed renamable $rc22lsb
+15120B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+15128B	  renamable $rc22lsb = COPY killed renamable $c
+15136B	  renamable $a = COPY renamable $rc10
+15144B	  renamable $c = COPY killed renamable $rc21lsb
+15152B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+15160B	  renamable $ylsb = COPY killed renamable $c
+15168B	  renamable $rc15 = COPY renamable $a
+15176B	  renamable $c = COPY killed renamable $xlsb
+15184B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+15192B	  renamable $rc19lsb = COPY killed renamable $c
+15208B	  renamable $c = COPY killed renamable $rc22lsb
+15216B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc20, killed renamable $c
+15224B	  renamable $xlsb = COPY killed renamable $c
+15232B	  renamable $a = COPY renamable $rc11
+15240B	  renamable $c = COPY killed renamable $ylsb
+15248B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc10, killed renamable $c
+15256B	  renamable $ylsb = COPY killed renamable $c
+15264B	  renamable $rc10 = COPY renamable $a
+15272B	  renamable $c = COPY killed renamable $rc19lsb
+15280B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc14, killed renamable $c
+15288B	  renamable $rc19lsb = COPY killed renamable $c
+15304B	  renamable $c = COPY killed renamable $xlsb
+15312B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc18, killed renamable $c
+15320B	  renamable $rc14lsb = COPY killed renamable $c
+15328B	  renamable $a = COPY renamable $rc12
+15336B	  renamable $c = COPY killed renamable $ylsb
+15344B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c
+15348B	  renamable $rc18lsb = COPY killed renamable $c
+15352B	  renamable $c = COPY killed renamable $rc19lsb
+15360B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+15368B	  renamable $rc11lsb = COPY killed renamable $c
+15384B	  renamable $c = COPY killed renamable $rc14lsb
+15392B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+15400B	  renamable $rc3lsb = COPY killed renamable $c
+15408B	  renamable $a = COPY renamable $rc13
+15416B	  renamable $c = COPY killed renamable $rc18lsb
+15424B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc12, killed renamable $c
+15432B	  renamable $c = COPY killed renamable $rc11lsb
+15440B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc10, killed renamable $c
+15464B	  renamable $c = COPY killed renamable $rc3lsb
+15472B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+15488B	  renamable $rc11 = COPY killed renamable $a
+15496B	  renamable $a16 = LDAbs16 %stack.14 :: (load (s16) from %stack.14, align 1)
+15504B	  renamable $rs1 = STAImag16 killed renamable $a16
+15664B	  CmpBrZeroMultiByte %bb.2, 1, renamable $rc4, renamable $rc5, renamable $rc6, renamable $rc7, renamable $rc8, renamable $rc9, renamable $rc2, renamable $rc3, implicit-def dead $c
+
+15680B	bb.1:
+	; predecessors: %bb.0
+	  successors: %bb.6(0x80000000); %bb.6(100.00%)
+	  liveins: $rc30, $rc31, $rs1:0x0000000000000022, $rs2:0x0000000000000022, $rs3:0x0000000000000022, $rs4:0x0000000000000022, $rs5:0x0000000000000020
+15684B	  renamable $rc24 = COPY killed renamable $rc31
+15700B	  renamable $x = COPY renamable $rc10
+15704B	  STAbs killed renamable $x, %stack.1 :: (store (s8) into %stack.1)
+15712B	  renamable $x = COPY killed renamable $rc11
+15716B	  STAbs killed renamable $x, %stack.1 + 1 :: (store (s8) into %stack.1 + 1)
+15824B	  renamable $y = COPY renamable $rc4
+15840B	  renamable $a = COPY killed renamable $rc5
+15920B	  renamable $rc5 = COPY renamable $rc2
+15936B	  renamable $rc10 = COPY killed renamable $rc3
+16080B	  BRA %bb.6
+
+16096B	bb.2 (%ir-block.25):
+	; predecessors: %bb.0
+	  successors: %bb.3(0x30000000), %bb.4(0x50000000); %bb.3(37.50%), %bb.4(62.50%)
+	  liveins: $rs5:0x0000000000000020
+16128B	  renamable $a = COPY renamable $rc11
+16144B	  renamable $a, dead renamable $c = ASL killed renamable $a(tied-def 0)
+16176B	  renamable $a, dead renamable $c = ASL killed renamable $a(tied-def 0)
+16208B	  renamable $a, dead renamable $c = ASL killed renamable $a(tied-def 0)
+16240B	  renamable $c = LDCImm -1
+16288B	  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc11, killed renamable $c(tied-def 1)
+16304B	  renamable $c = LDCImm 0
+16352B	  renamable $a, dead renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 43, killed renamable $c(tied-def 1)
+16384B	  renamable $a = ANDImm killed renamable $a(tied-def 0), 63
+16400B	  CmpBrZero %bb.4, undef $z, 0, renamable $a, implicit-def dead $c
+
+16416B	bb.3:
+	; predecessors: %bb.2
+	  successors: %bb.6(0x80000000); %bb.6(100.00%)
+	  liveins: $rs5:0x0000000000000020
+16424B	  renamable $rc3 = COPY killed renamable $rc11
+16436B	  renamable $x = COPY renamable $rc2
+16440B	  STAbs killed renamable $x, %stack.1 :: (store (s8) into %stack.1)
+16448B	  renamable $x = COPY killed renamable $rc3
+16452B	  STAbs killed renamable $x, %stack.1 + 1 :: (store (s8) into %stack.1 + 1)
+16456B	  renamable $a = LDZ
+16464B	  renamable $y = LDImm 1
+16600B	  renamable $rc24 = LDZ
+16616B	  renamable $x = LDZ
+16628B	  STAbs killed renamable $x, %stack.2 :: (store (s8) into %stack.2)
+16644B	  renamable $x = LDZ
+16656B	  STAbs killed renamable $x, %stack.3 :: (store (s8) into %stack.3)
+16672B	  renamable $x = LDZ
+16684B	  STAbs killed renamable $x, %stack.4 :: (store (s8) into %stack.4)
+16700B	  renamable $x = LDZ
+16712B	  STAbs killed renamable $x, %stack.13 :: (store (s8) into %stack.13)
+16728B	  renamable $x = LDZ
+16740B	  STAbs killed renamable $x, %stack.18 :: (store (s8) into %stack.18)
+16756B	  renamable $x = LDZ
+16768B	  STAbs killed renamable $x, %stack.19 :: (store (s8) into %stack.19)
+16784B	  renamable $rc30 = LDZ
+16796B	  renamable $rc6 = LDZ
+16804B	  renamable $rc7 = LDZ
+16812B	  renamable $rc8 = LDZ
+16820B	  renamable $rc9 = LDZ
+16828B	  renamable $rc5 = LDZ
+16836B	  renamable $rc10 = LDZ
+16840B	  BRA %bb.6
+
+16848B	bb.4..preheader:
+	; predecessors: %bb.2
+	  successors: %bb.5(0x80000000); %bb.5(100.00%)
+	  liveins: $a, $rs5:0x0000000000000020
+16872B	  renamable $y = LDImm 1
+16896B	  renamable $rc4 = LDZ
+16920B	  renamable $rc6 = LDZ
+16936B	  renamable $rc7 = LDZ
+16952B	  renamable $rc8 = LDZ
+16968B	  renamable $rc9 = LDZ
+16984B	  renamable $rc5 = LDZ
+17000B	  renamable $rc10 = LDZ
+
+17024B	bb.5 (%ir-block.31):
+	; predecessors: %bb.4, %bb.5
+	  successors: %bb.11(0x04000000), %bb.5(0x7c000000); %bb.11(3.12%), %bb.5(96.88%)
+	  liveins: $a, $y, $rc4, $rc5, $rc6, $rc7, $rc8, $rc9, $rc10, $rs5:0x0000000000000020
+17200B	  renamable $a = nsw DEC killed renamable $a(tied-def 0)
+17224B	  renamable $rc2 = COPY killed renamable $y
+17232B	  renamable $rc2, renamable $c = ASL killed renamable $rc2(tied-def 0)
+17240B	  renamable $y = COPY killed renamable $rc2
+17280B	  renamable $rc4, renamable $c = ROL killed renamable $rc4(tied-def 0), killed renamable $c(tied-def 1)
+17328B	  renamable $rc6, renamable $c = ROL killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+17376B	  renamable $rc7, renamable $c = ROL killed renamable $rc7(tied-def 0), killed renamable $c(tied-def 1)
+17424B	  renamable $rc8, renamable $c = ROL killed renamable $rc8(tied-def 0), killed renamable $c(tied-def 1)
+17472B	  renamable $rc9, renamable $c = ROL killed renamable $rc9(tied-def 0), killed renamable $c(tied-def 1)
+17520B	  renamable $rc5, renamable $c = ROL killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+17568B	  renamable $rc10, dead renamable $c = ROL killed renamable $rc10(tied-def 0), killed renamable $c(tied-def 1)
+17728B	  CmpBrZero %bb.5, undef $z, 0, renamable $a, implicit-def $c
+
+17744B	bb.11:
+	; predecessors: %bb.5
+	  successors: %bb.6(0x80000000); %bb.6(100.00%)
+	  liveins: $y, $rc4, $rc5, $rc6, $rc7, $rc8, $rc9, $rc10, $rs5:0x0000000000000020
+17748B	  renamable $rc24 = LDZ
+17752B	  renamable $rc3 = COPY killed renamable $rc11
+17764B	  renamable $x = COPY renamable $rc2
+17768B	  STAbs killed renamable $x, %stack.1 :: (store (s8) into %stack.1)
+17776B	  renamable $x = COPY killed renamable $rc3
+17780B	  STAbs killed renamable $x, %stack.1 + 1 :: (store (s8) into %stack.1 + 1)
+17912B	  renamable $x = LDZ
+17924B	  STAbs killed renamable $x, %stack.2 :: (store (s8) into %stack.2)
+17940B	  renamable $x = LDZ
+17952B	  STAbs killed renamable $x, %stack.3 :: (store (s8) into %stack.3)
+17968B	  renamable $x = LDZ
+17980B	  STAbs killed renamable $x, %stack.4 :: (store (s8) into %stack.4)
+17996B	  renamable $x = LDZ
+18008B	  STAbs killed renamable $x, %stack.13 :: (store (s8) into %stack.13)
+18024B	  renamable $x = LDZ
+18036B	  STAbs killed renamable $x, %stack.18 :: (store (s8) into %stack.18)
+18052B	  renamable $x = LDZ
+18064B	  STAbs killed renamable $x, %stack.19 :: (store (s8) into %stack.19)
+18080B	  renamable $rc30 = LDZ
+18092B	  renamable $a = COPY killed renamable $rc4
+
+18100B	bb.6 (%ir-block.37):
+	; predecessors: %bb.1, %bb.3, %bb.11
+	  successors: %bb.7(0x30000000), %bb.8(0x50000000); %bb.7(37.50%), %bb.8(62.50%)
+	  liveins: $a, $y, $rc5, $rc6, $rc7, $rc8, $rc9, $rc10, $rc24, $rc30
+18288B	  STAbs killed renamable $y, @bitboard64_opaque :: (volatile store (s8) into @bitboard64_opaque, align 8, !tbaa !10)
+18304B	  STAbs killed renamable $a, @bitboard64_opaque + 1 :: (volatile store (s8) into @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+18312B	  renamable $x = COPY killed renamable $rc6
+18320B	  STAbs killed renamable $x, @bitboard64_opaque + 2 :: (volatile store (s8) into @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+18328B	  renamable $x = COPY killed renamable $rc7
+18336B	  STAbs killed renamable $x, @bitboard64_opaque + 3 :: (volatile store (s8) into @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+18344B	  renamable $x = COPY killed renamable $rc8
+18352B	  STAbs killed renamable $x, @bitboard64_opaque + 4 :: (volatile store (s8) into @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+18360B	  renamable $x = COPY killed renamable $rc9
+18368B	  STAbs killed renamable $x, @bitboard64_opaque + 5 :: (volatile store (s8) into @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+18376B	  renamable $x = COPY killed renamable $rc5
+18384B	  STAbs killed renamable $x, @bitboard64_opaque + 6 :: (volatile store (s8) into @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+18392B	  renamable $x = COPY killed renamable $rc10
+18400B	  STAbs killed renamable $x, @bitboard64_opaque + 7 :: (volatile store (s8) into @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+18416B	  renamable $a = LDAbs @bitboard64_opaque :: (volatile dereferenceable load (s8) from @bitboard64_opaque, align 8, !tbaa !10)
+18432B	  renamable $x = LDAbs @bitboard64_opaque + 1 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+18440B	  renamable $rc5 = COPY killed renamable $x
+18448B	  renamable $x = LDAbs @bitboard64_opaque + 2 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+18464B	  renamable $y = LDAbs @bitboard64_opaque + 3 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+18472B	  renamable $rc13 = COPY killed renamable $y
+18576B	  renamable $rc4 = COPY renamable $x
+19056B	  renamable $rc2 = COPY killed renamable $x
+19072B	  renamable $x = LDAbs @bitboard64_opaque + 4 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+19088B	  renamable $rc6 = COPY renamable $x
+19104B	  renamable $rc3 = COPY killed renamable $x
+19120B	  renamable $x = LDAbs @bitboard64_opaque + 5 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+19128B	  renamable $rc19 = COPY killed renamable $x
+19136B	  renamable $x = LDAbs @bitboard64_opaque + 6 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+19152B	  renamable $rc8 = COPY renamable $x
+19184B	  renamable $rc10 = COPY renamable $a
+19192B	  renamable $rc18 = COPY killed renamable $a
+19196B	  renamable $y = COPY killed renamable $rc5
+19200B	  renamable $rc11 = COPY renamable $y
+19216B	  renamable $rc12 = COPY killed renamable $y
+19232B	  renamable $y = LDAbs @bitboard64_opaque + 7 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+19248B	  renamable $a16 = LDAImag16 killed renamable $rs5
+19264B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+19280B	  renamable $rs5 = STAImag16 killed renamable $a16
+19296B	  renamable $rc5 = COPY renamable $rc13
+19312B	  renamable $a16 = LDAImag16 killed renamable $rs2
+19328B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+19344B	  renamable $rs2 = STAImag16 killed renamable $a16
+19360B	  renamable $rc7 = COPY renamable $rc19
+19376B	  renamable $a16 = LDAImag16 killed renamable $rs3
+19392B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+19408B	  renamable $rs3 = STAImag16 killed renamable $a16
+19424B	  renamable $rc9 = COPY renamable $y
+19440B	  renamable $a16 = LDAImag16 killed renamable $rs4
+19456B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 65535
+19472B	  renamable $rs7 = STAImag16 killed renamable $a16
+19504B	  renamable $rc8 = COPY killed renamable $rc19
+19520B	  renamable $rc9 = COPY killed renamable $rc18
+19552B	  dead early-clobber renamable $a, renamable $rc9, renamable $rc12, renamable $rc2, renamable $rc13, renamable $rc3, renamable $rc8, renamable $x, renamable $y = DecMB killed renamable $rc9(tied-def 1), killed renamable $rc12(tied-def 2), killed renamable $rc2(tied-def 3), killed renamable $rc13(tied-def 4), killed renamable $rc3(tied-def 5), killed renamable $rc8(tied-def 6), killed renamable $x(tied-def 7), killed renamable $y(tied-def 8), implicit-def dead $c, implicit-def dead $v
+19568B	  renamable $rc18 = COPY killed renamable $rc9
+19584B	  renamable $rc19 = COPY killed renamable $rc12
+19600B	  renamable $rc12 = COPY killed renamable $rc2
+19632B	  renamable $rc2 = COPY killed renamable $rc3
+19648B	  renamable $rc3 = COPY killed renamable $rc8
+19664B	  renamable $rc20 = COPY killed renamable $x
+19680B	  renamable $rc21 = COPY killed renamable $y
+19696B	  renamable $a16 = LDAImag16 killed renamable $rs5
+19728B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs9
+19744B	  renamable $rs5 = STAImag16 killed renamable $a16
+19760B	  renamable $a16 = LDAImag16 killed renamable $rs2
+19792B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs6
+19808B	  renamable $rs4 = STAImag16 killed renamable $a16
+19824B	  renamable $a16 = LDAImag16 killed renamable $rs3
+19856B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+19872B	  renamable $rs3 = STAImag16 killed renamable $a16
+19888B	  renamable $a16 = LDAImag16 killed renamable $rs7
+19920B	  renamable $a16 = ANDImag16 killed renamable $a16(tied-def 0), killed renamable $rs10
+19936B	  renamable $rs2 = STAImag16 killed renamable $a16
+20080B	  renamable $rc13 = COPY renamable $rc5
+20096B	  renamable $rc13, renamable $c = LSR renamable $rc13(tied-def 0)
+20112B	  renamable $rc12 = COPY renamable $rc4
+20144B	  renamable $rc12, renamable $c = ROR renamable $rc12(tied-def 0), killed renamable $c(tied-def 1)
+20160B	  renamable $rc15 = COPY renamable $rc7
+20192B	  renamable $rc15, renamable $c = ROR renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+20224B	  renamable $rc14 = COPY renamable $rc6
+20240B	  renamable $rc14, renamable $c = ROR renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+20272B	  renamable $rc3 = COPY renamable $rc9
+20288B	  renamable $rc3, renamable $c = ROR renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+20320B	  renamable $rc2 = COPY renamable $rc8
+20336B	  renamable $rc2, renamable $c = ROR renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+20352B	  renamable $rc19 = COPY renamable $rc11
+20384B	  renamable $rc19, renamable $c = ROR renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+20400B	  renamable $rc18 = COPY renamable $rc10
+20432B	  renamable $rc18, dead renamable $c = ROR renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+20576B	  renamable $a16 = LDAImag16 killed renamable $rs9
+20608B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+20624B	  renamable $rs9 = STAImag16 killed renamable $a16
+20640B	  renamable $a16 = LDAImag16 killed renamable $rs1
+20672B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+20688B	  renamable $rs1 = STAImag16 killed renamable $a16
+20704B	  renamable $a16 = LDAImag16 killed renamable $rs7
+20736B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+20752B	  renamable $rs7 = STAImag16 killed renamable $a16
+20768B	  renamable $a16 = LDAImag16 killed renamable $rs6
+20800B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+20816B	  renamable $rs6 = STAImag16 killed renamable $a16
+20832B	  renamable $a = COPY renamable $rc10
+21112B	  renamable $c = LDImm1 -1
+21120B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc18, killed renamable $c(tied-def 1)
+21128B	  renamable $y = COPY killed renamable $a
+21160B	  renamable $a = COPY killed renamable $rc11
+21168B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c(tied-def 1)
+21176B	  renamable $x = COPY killed renamable $a
+21184B	  renamable $a = COPY renamable $rc8
+21232B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc2, killed renamable $c(tied-def 1)
+21240B	  renamable $rc10 = COPY killed renamable $a
+21248B	  renamable $a = COPY killed renamable $rc9
+21296B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c(tied-def 1)
+21304B	  renamable $rc11 = COPY killed renamable $a
+21312B	  renamable $a = COPY renamable $rc6
+21360B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c(tied-def 1)
+21368B	  renamable $rc18 = COPY killed renamable $a
+21376B	  renamable $a = COPY killed renamable $rc7
+21424B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c(tied-def 1)
+21432B	  renamable $rc19 = COPY killed renamable $a
+21440B	  renamable $a = COPY renamable $rc4
+21488B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc12, killed renamable $c(tied-def 1)
+21496B	  renamable $rc2 = COPY killed renamable $a
+21504B	  renamable $a = COPY killed renamable $rc5
+21552B	  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c(tied-def 1)
+21584B	  renamable $rc4 = COPY renamable $a
+21592B	  renamable $rc21 = COPY killed renamable $a
+21624B	  renamable $a = COPY killed renamable $rc2
+21632B	  renamable $rc5 = COPY renamable $a
+21640B	  renamable $rc20 = COPY killed renamable $a
+21648B	  renamable $rc4, renamable $c = LSR killed renamable $rc4(tied-def 0)
+21680B	  renamable $rc5, renamable $c = ROR killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+21728B	  renamable $rc8 = COPY renamable $rc19
+21744B	  renamable $rc8, renamable $c = ROR killed renamable $rc8(tied-def 0), killed renamable $c(tied-def 1)
+21776B	  renamable $rc9 = COPY renamable $rc18
+21808B	  renamable $rc9, renamable $c = ROR killed renamable $rc9(tied-def 0), killed renamable $c(tied-def 1)
+21840B	  renamable $rc2 = COPY renamable $rc11
+21872B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+21920B	  renamable $rc3 = COPY renamable $rc10
+21936B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+21968B	  renamable $a = COPY renamable $x
+22000B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+22048B	  renamable $rc6 = COPY renamable $y
+22064B	  renamable $rc6, dead renamable $c = ROR killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+22096B	  renamable $rc4, renamable $c = LSR killed renamable $rc4(tied-def 0)
+22144B	  renamable $rc5, renamable $c = ROR killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+22192B	  renamable $rc8, renamable $c = ROR killed renamable $rc8(tied-def 0), killed renamable $c(tied-def 1)
+22240B	  renamable $rc9, renamable $c = ROR killed renamable $rc9(tied-def 0), killed renamable $c(tied-def 1)
+22288B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+22336B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+22384B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+22432B	  renamable $rc6, dead renamable $c = ROR killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+22464B	  renamable $rc7 = COPY killed renamable $a
+22576B	  renamable $a16 = LDAImag16 killed renamable $rs3
+22608B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+22624B	  renamable $rs7 = STAImag16 killed renamable $a16
+22640B	  renamable $rc6 = COPY killed renamable $rc3
+22656B	  renamable $rc7 = COPY killed renamable $rc2
+22672B	  renamable $a16 = LDAImag16 killed renamable $rs3
+22704B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+22720B	  renamable $rs3 = STAImag16 killed renamable $a16
+22736B	  renamable $rc2 = COPY killed renamable $rc9
+22752B	  renamable $rc3 = COPY killed renamable $rc8
+22768B	  renamable $a16 = LDAImag16 killed renamable $rs1
+22800B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+22816B	  renamable $rs4 = STAImag16 killed renamable $a16
+22832B	  renamable $rc2 = COPY killed renamable $rc5
+22848B	  renamable $rc3 = COPY killed renamable $rc4
+22864B	  renamable $a16 = LDAImag16 killed renamable $rs1
+22896B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+22912B	  renamable $rs6 = STAImag16 killed renamable $a16
+22928B	  renamable $rc2 = COPY killed renamable $y
+22944B	  renamable $rc3 = COPY killed renamable $x
+22960B	  renamable $rc4 = COPY killed renamable $rc10
+22976B	  renamable $rc5 = COPY killed renamable $rc11
+22992B	  renamable $rc10 = COPY killed renamable $rc18
+23008B	  renamable $rc11 = COPY killed renamable $rc19
+23056B	  renamable $a16 = LDAImag16 killed renamable $rs1
+23088B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+23104B	  renamable $rs11 = STAImag16 killed renamable $a16
+23120B	  renamable $a16 = LDAImag16 killed renamable $rs2
+23152B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+23168B	  renamable $rs2 = STAImag16 killed renamable $a16
+23184B	  renamable $a16 = LDAImag16 killed renamable $rs5
+23216B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+23232B	  renamable $rs9 = STAImag16 killed renamable $a16
+23248B	  renamable $a16 = LDAImag16 killed renamable $rs10
+23280B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+23296B	  renamable $rs1 = STAImag16 killed renamable $a16
+23440B	  renamable $a = COPY renamable $rc22
+23576B	  renamable $xlsb = LDImm1 0
+23588B	  renamable $c = COPY renamable $xlsb
+23596B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c
+23620B	  renamable $rc11 = COPY killed renamable $a
+23628B	  renamable $rc10 = COPY renamable $rc4
+23640B	  renamable $a = COPY killed renamable $rc23
+23648B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+23664B	  renamable $rc4 = COPY killed renamable $a
+23680B	  renamable $y = COPY killed renamable $rc5
+23704B	  renamable $a = COPY killed renamable $rc10
+23712B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc6, killed renamable $c
+23728B	  renamable $rc5 = COPY killed renamable $a
+23768B	  renamable $a = COPY killed renamable $y
+23776B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc7, killed renamable $c
+23792B	  renamable $rc6 = COPY killed renamable $a
+23832B	  renamable $a = COPY killed renamable $rc18
+23840B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc8, killed renamable $c
+23856B	  renamable $rc7 = COPY killed renamable $a
+23896B	  renamable $a = COPY killed renamable $rc19
+23904B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc9, killed renamable $c
+23920B	  renamable $rc8 = COPY killed renamable $a
+23960B	  renamable $a = COPY killed renamable $rc2
+23968B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc12, killed renamable $c
+23984B	  renamable $rc9 = COPY killed renamable $a
+24008B	  renamable $a = COPY killed renamable $rc3
+24016B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c
+24032B	  renamable $rc10 = COPY killed renamable $a
+24064B	  renamable $a = COPY renamable $rc10
+24080B	  renamable $a, renamable $c = LSR killed renamable $a(tied-def 0)
+24088B	  renamable $rc12 = COPY killed renamable $a
+24112B	  renamable $a = COPY renamable $rc9
+24144B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+24152B	  renamable $y = COPY killed renamable $a
+24176B	  renamable $rc14 = COPY renamable $rc8
+24208B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+24256B	  renamable $rc15 = COPY renamable $rc7
+24272B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+24320B	  renamable $rc18 = COPY renamable $rc6
+24336B	  renamable $rc18, renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+24368B	  renamable $rc19 = COPY renamable $rc5
+24400B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+24448B	  renamable $rc3 = COPY renamable $rc4
+24464B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+24496B	  renamable $a = COPY renamable $rc11
+24528B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+24560B	  renamable $rc12, renamable $c = LSR killed renamable $rc12(tied-def 0)
+24600B	  renamable $rc2 = COPY killed renamable $y
+24608B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+24656B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+24704B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+24752B	  renamable $rc18, renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+24800B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+24848B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+24896B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+24928B	  renamable $rc12, renamable $c = LSR killed renamable $rc12(tied-def 0)
+24976B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+25024B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+25072B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+25120B	  renamable $rc18, renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+25168B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+25216B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+25264B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+25296B	  renamable $rc12, renamable $c = LSR killed renamable $rc12(tied-def 0)
+25360B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+25368B	  renamable $rc13 = COPY killed renamable $rc2
+25424B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+25488B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+25552B	  renamable $rc18, renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+25616B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+25680B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+25744B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+25784B	  renamable $c = COPY renamable $xlsb
+25792B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c
+26032B	  renamable $rc2 = COPY killed renamable $a
+26040B	  renamable $a = COPY killed renamable $rc3
+26048B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c
+26064B	  renamable $rc3 = COPY killed renamable $a
+26072B	  renamable $a = COPY killed renamable $rc19
+26080B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+26096B	  renamable $rc4 = COPY killed renamable $a
+26104B	  renamable $a = COPY killed renamable $rc18
+26112B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc6, killed renamable $c
+26128B	  renamable $rc5 = COPY killed renamable $a
+26136B	  renamable $a = COPY killed renamable $rc15
+26144B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc7, killed renamable $c
+26160B	  renamable $rc6 = COPY killed renamable $a
+26168B	  renamable $a = COPY killed renamable $rc14
+26176B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc8, killed renamable $c
+26192B	  renamable $rc7 = COPY killed renamable $a
+26200B	  renamable $a = COPY killed renamable $rc13
+26208B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc9, killed renamable $c
+26212B	  renamable $y = COPY killed renamable $a
+26216B	  renamable $a = COPY killed renamable $rc12
+26224B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc10, killed renamable $c
+26240B	  renamable $rc12 = COPY killed renamable $y
+26256B	  renamable $rc13 = COPY killed renamable $a
+26272B	  renamable $a16 = LDAImag16 killed renamable $rs1
+26304B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+26320B	  renamable $rs5 = STAImag16 killed renamable $a16
+26336B	  renamable $a16 = LDAImag16 killed renamable $rs2
+26368B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+26384B	  renamable $rs4 = STAImag16 killed renamable $a16
+26400B	  renamable $a16 = LDAImag16 killed renamable $rs3
+26432B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+26448B	  renamable $rs2 = STAImag16 killed renamable $a16
+26464B	  renamable $a16 = LDAImag16 killed renamable $rs6
+26496B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+26512B	  renamable $rs3 = STAImag16 killed renamable $a16
+26640B	  renamable $a = COPY renamable $rc10
+26656B	  renamable $y = COPY renamable $rc11
+26784B	  renamable $c = LDImm1 0
+26800B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+26808B	  renamable $rc2lsb = COPY killed renamable $c
+26816B	  renamable $rc12 = COPY renamable $a
+27152B	  renamable $c = LDImm1 0
+27184B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+27192B	  renamable $rc3lsb = COPY killed renamable $c
+27200B	  renamable $rc13 = COPY renamable $a
+27624B	  renamable $c = COPY killed renamable $xlsb
+27632B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+27640B	  renamable $rc14lsb = COPY killed renamable $c
+27648B	  renamable $x = COPY renamable $rc8
+27656B	  renamable $a = COPY killed renamable $y
+27660B	  renamable $c = COPY killed renamable $rc2lsb
+27664B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc10, killed renamable $c
+27672B	  renamable $rc10lsb = COPY killed renamable $c
+27680B	  renamable $rc2 = COPY renamable $a
+27692B	  renamable $c = COPY killed renamable $rc3lsb
+27696B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+27704B	  renamable $rc15lsb = COPY killed renamable $c
+27712B	  renamable $rc3 = COPY renamable $a
+27768B	  renamable $c = COPY killed renamable $rc14lsb
+27776B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+27784B	  renamable $rc14lsb = COPY killed renamable $c
+27792B	  renamable $y = COPY renamable $rc9
+27800B	  renamable $a = COPY killed renamable $x
+27804B	  renamable $c = COPY killed renamable $rc10lsb
+27808B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c
+27812B	  renamable $rc18lsb = COPY killed renamable $c
+27824B	  renamable $rc10 = COPY renamable $a
+27836B	  renamable $c = COPY killed renamable $rc15lsb
+27840B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc12, killed renamable $c
+27844B	  renamable $rc12lsb = COPY killed renamable $c
+27856B	  renamable $rc11 = COPY renamable $a
+27912B	  renamable $c = COPY killed renamable $rc14lsb
+27920B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+27928B	  renamable $rc15lsb = COPY killed renamable $c
+27936B	  renamable $x = COPY renamable $rc4
+27944B	  renamable $a = COPY killed renamable $y
+27948B	  renamable $c = COPY killed renamable $rc18lsb
+27952B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc8, killed renamable $c
+27960B	  renamable $rc14lsb = COPY killed renamable $c
+27968B	  renamable $rc8 = COPY renamable $a
+27976B	  renamable $c = COPY killed renamable $rc12lsb
+27984B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+27992B	  renamable $rc12lsb = COPY killed renamable $c
+28000B	  renamable $rc2 = COPY renamable $a
+28056B	  renamable $c = COPY killed renamable $rc15lsb
+28064B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+28072B	  renamable $rc15lsb = COPY killed renamable $c
+28080B	  renamable $y = COPY renamable $rc5
+28088B	  renamable $a = COPY killed renamable $x
+28092B	  renamable $c = COPY killed renamable $rc14lsb
+28096B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc9, killed renamable $c
+28100B	  renamable $rc14lsb = COPY killed renamable $c
+28112B	  renamable $rc9 = COPY renamable $a
+28124B	  renamable $c = COPY killed renamable $rc12lsb
+28128B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc10, killed renamable $c
+28132B	  renamable $rc10lsb = COPY killed renamable $c
+28156B	  renamable $c = COPY killed renamable $rc15lsb
+28160B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc13, killed renamable $c
+28168B	  renamable $rc12lsb = COPY killed renamable $c
+28176B	  renamable $x = COPY renamable $rc6
+28184B	  renamable $a = COPY killed renamable $y
+28188B	  renamable $c = COPY killed renamable $rc14lsb
+28192B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc4, killed renamable $c
+28200B	  renamable $rc13lsb = COPY killed renamable $c
+28208B	  renamable $rc4 = COPY renamable $a
+28216B	  renamable $c = COPY killed renamable $rc10lsb
+28224B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc8, killed renamable $c
+28228B	  renamable $rc8lsb = COPY killed renamable $c
+28248B	  renamable $c = COPY killed renamable $rc12lsb
+28256B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+28264B	  renamable $rc3lsb = COPY killed renamable $c
+28280B	  renamable $a = COPY killed renamable $x
+28284B	  renamable $c = COPY killed renamable $rc13lsb
+28288B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+28296B	  renamable $y = COPY killed renamable $a
+28300B	  renamable $a = COPY killed renamable $rc7
+28304B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc6, killed renamable $c
+28308B	  renamable $x = COPY killed renamable $a
+28312B	  renamable $a = COPY killed renamable $y
+28316B	  renamable $c = COPY killed renamable $rc8lsb
+28320B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc9, killed renamable $c
+28324B	  renamable $rc5lsb = COPY killed renamable $c
+28348B	  renamable $c = COPY killed renamable $rc3lsb
+28352B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc11, killed renamable $c
+28356B	  renamable $rc3lsb = COPY killed renamable $c
+28360B	  renamable $a = COPY killed renamable $x
+28364B	  renamable $c = COPY killed renamable $rc5lsb
+28368B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c
+28392B	  renamable $c = COPY killed renamable $rc3lsb
+28400B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+28416B	  CmpBrZeroMultiByte %bb.8, 0, renamable $a, implicit-def dead $c
+
+28432B	bb.7:
+	; predecessors: %bb.6
+	  successors: %bb.10(0x80000000); %bb.10(100.00%)
+	  liveins: $a, $rc24, $rc30
+28440B	  renamable $rc6 = COPY killed renamable $a
+28456B	  renamable $y = LDImm 1
+28488B	  renamable $rc18 = LDZ
+28504B	  renamable $rc14 = LDZ
+28520B	  renamable $rc15 = LDZ
+28536B	  renamable $rc3 = LDZ
+28552B	  renamable $rc5 = LDZ
+28560B	  renamable $a = LDZ
+28580B	  renamable $rc2 = LDZ
+28592B	  BRA %bb.10
+
+28608B	bb.8 (%ir-block.43):
+	; predecessors: %bb.6
+	  successors: %bb.9(0x80000000); %bb.9(100.00%)
+	  liveins: $a, $rc24, $rc30
+28632B	  renamable $rc18 = LDZ
+28648B	  renamable $y = LDImm 1
+28652B	  renamable $rc6 = COPY renamable $a
+28784B	  renamable $x = COPY killed renamable $a
+28808B	  renamable $rc14 = LDZ
+28824B	  renamable $rc15 = LDZ
+28840B	  renamable $rc3 = LDZ
+28856B	  renamable $rc5 = LDZ
+28864B	  renamable $a = LDZ
+28884B	  renamable $rc2 = LDZ
+
+28896B	bb.9 (%ir-block.45):
+	; predecessors: %bb.8, %bb.9
+	  successors: %bb.10(0x04000000), %bb.9(0x7c000000); %bb.10(3.12%), %bb.9(96.88%)
+	  liveins: $a, $x, $y, $rc2, $rc3, $rc5, $rc6, $rc14, $rc15, $rc18, $rc24, $rc30
+29072B	  renamable $x = nsw DEC killed renamable $x(tied-def 0)
+29096B	  renamable $rc4 = COPY killed renamable $y
+29104B	  renamable $rc4, renamable $c = ASL killed renamable $rc4(tied-def 0)
+29112B	  renamable $y = COPY killed renamable $rc4
+29152B	  renamable $rc18, renamable $c = ROL killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+29200B	  renamable $rc14, renamable $c = ROL killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+29248B	  renamable $rc15, renamable $c = ROL killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+29296B	  renamable $rc3, renamable $c = ROL killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+29344B	  renamable $rc5, renamable $c = ROL killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+29392B	  renamable $a, renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+29440B	  renamable $rc2, dead renamable $c = ROL killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+29728B	  CmpBrZero %bb.9, undef $z, 0, renamable $x, implicit-def dead $c
+29744B	  BRA %bb.10
+
+29760B	bb.10 (%ir-block.51):
+	; predecessors: %bb.9, %bb.7
+	  liveins: $a, $y, $rc2, $rc3, $rc5, $rc6, $rc14, $rc15, $rc18, $rc24, $rc30
+29768B	  STAbs renamable $a, %stack.11 :: (store (s8) into %stack.11)
+29788B	  renamable $x = COPY renamable $rc6
+29796B	  STAbs killed renamable $x, %stack.21 :: (store (s8) into %stack.21)
+29800B	  renamable $x = COPY killed renamable $rc7
+29808B	  STAbs killed renamable $x, %stack.21 + 1 :: (store (s8) into %stack.21 + 1)
+29816B	  renamable $rc12 = COPY killed renamable $rc24
+29824B	  renamable $x = LDAbs %stack.2 :: (load (s8) from %stack.2)
+29832B	  renamable $rc13 = COPY killed renamable $x
+29848B	  renamable $x = LDAbs %stack.3 :: (load (s8) from %stack.3)
+29856B	  renamable $rc10 = COPY killed renamable $x
+29872B	  renamable $x = LDAbs %stack.4 :: (load (s8) from %stack.4)
+29880B	  renamable $rc11 = COPY killed renamable $x
+29896B	  renamable $x = LDAbs %stack.13 :: (load (s8) from %stack.13)
+29904B	  renamable $rc8 = COPY killed renamable $x
+29920B	  renamable $x = LDAbs %stack.18 :: (load (s8) from %stack.18)
+29928B	  renamable $rc9 = COPY killed renamable $x
+29944B	  renamable $x = LDAbs %stack.19 :: (load (s8) from %stack.19)
+29952B	  renamable $rc6 = COPY killed renamable $x
+29968B	  renamable $rc7 = COPY killed renamable $rc30
+29980B	  renamable $x = COPY renamable $rc6
+29988B	  STAbs killed renamable $x, %stack.22 :: (store (s8) into %stack.22)
+29992B	  renamable $x = COPY killed renamable $rc7
+30000B	  STAbs killed renamable $x, %stack.22 + 1 :: (store (s8) into %stack.22 + 1)
+30088B	  STAbs renamable $y, %stack.12 :: (store (s8) into %stack.12)
+30096B	  STAbs killed renamable $y, @bitboard64_opaque :: (volatile store (s8) into @bitboard64_opaque, align 8, !tbaa !10)
+30112B	  renamable $x = COPY killed renamable $rc18
+30120B	  STAbs renamable $x, %stack.10 :: (store (s8) into %stack.10)
+30128B	  STAbs killed renamable $x, @bitboard64_opaque + 1 :: (volatile store (s8) into @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+30144B	  renamable $x = COPY killed renamable $rc14
+30152B	  STAbs renamable $x, %stack.6 :: (store (s8) into %stack.6)
+30160B	  STAbs killed renamable $x, @bitboard64_opaque + 2 :: (volatile store (s8) into @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+30176B	  renamable $x = COPY killed renamable $rc15
+30184B	  STAbs renamable $x, %stack.7 :: (store (s8) into %stack.7)
+30192B	  STAbs killed renamable $x, @bitboard64_opaque + 3 :: (volatile store (s8) into @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+30208B	  renamable $x = COPY killed renamable $rc3
+30216B	  STAbs renamable $x, %stack.5 :: (store (s8) into %stack.5)
+30224B	  STAbs killed renamable $x, @bitboard64_opaque + 4 :: (volatile store (s8) into @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+30240B	  renamable $x = COPY killed renamable $rc5
+30248B	  STAbs renamable $x, %stack.9 :: (store (s8) into %stack.9)
+30256B	  STAbs killed renamable $x, @bitboard64_opaque + 5 :: (volatile store (s8) into @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+30272B	  STAbs killed renamable $a, @bitboard64_opaque + 6 :: (volatile store (s8) into @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+30280B	  renamable $x = COPY killed renamable $rc2
+30288B	  STAbs renamable $x, %stack.8 :: (store (s8) into %stack.8)
+30296B	  STAbs killed renamable $x, @bitboard64_opaque + 7 :: (volatile store (s8) into @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+30312B	  renamable $x = LDAbs @bitboard64_opaque :: (volatile dereferenceable load (s8) from @bitboard64_opaque, align 8, !tbaa !10)
+30316B	  renamable $rc20 = COPY killed renamable $x
+30320B	  renamable $x = LDAbs @bitboard64_opaque + 1 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 1, basealign 8, !tbaa !10)
+30324B	  renamable $rc21 = COPY killed renamable $x
+30328B	  renamable $x = LDAbs @bitboard64_opaque + 2 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 2, align 2, basealign 8, !tbaa !10)
+30332B	  renamable $rc23 = COPY killed renamable $x
+30336B	  renamable $x = LDAbs @bitboard64_opaque + 3 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 3, basealign 8, !tbaa !10)
+30340B	  renamable $rc7 = COPY killed renamable $x
+30344B	  renamable $x = LDAbs @bitboard64_opaque + 4 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 4, align 4, basealign 8, !tbaa !10)
+30348B	  renamable $rc6 = COPY killed renamable $x
+30352B	  renamable $y = LDAbs @bitboard64_opaque + 5 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 5, basealign 8, !tbaa !10)
+30360B	  renamable $x = LDAbs @bitboard64_opaque + 6 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 6, align 2, basealign 8, !tbaa !10)
+30368B	  renamable $a = LDAbs @bitboard64_opaque + 7 :: (volatile dereferenceable load (s8) from @bitboard64_opaque + 7, basealign 8, !tbaa !10)
+30400B	  renamable $rc5 = COPY renamable $a
+30404B	  renamable $rc4 = COPY killed renamable $a
+30432B	  renamable $rc22 = COPY renamable $x
+30440B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+30448B	  renamable $rc22, renamable $c = ROR killed renamable $rc22(tied-def 0), killed renamable $c(tied-def 1)
+30480B	  renamable $rc2 = COPY renamable $y
+30512B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+30544B	  renamable $rc3 = COPY renamable $rc6
+30576B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+30608B	  renamable $rc18 = COPY renamable $rc7
+30640B	  renamable $rc18, renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+30688B	  renamable $rc19 = COPY renamable $rc23
+30704B	  renamable $rc19, renamable $c = ROR killed renamable $rc19(tied-def 0), killed renamable $c(tied-def 1)
+30752B	  renamable $a = COPY renamable $rc21
+30768B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+30816B	  renamable $rc14 = COPY renamable $rc20
+30832B	  renamable $rc14, dead renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+30992B	  renamable $rc15 = COPY killed renamable $a
+31104B	  renamable $a16 = LDAImag16 killed renamable $rs10
+31136B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs7
+31152B	  renamable $rs7 = STAImag16 killed renamable $a16
+31168B	  renamable $rc20 = COPY killed renamable $rc23
+31184B	  renamable $rc21 = COPY killed renamable $rc7
+31200B	  renamable $rc24 = COPY killed renamable $rc19
+31216B	  renamable $rc25 = COPY killed renamable $rc18
+31232B	  renamable $a16 = LDAImag16 killed renamable $rs10
+31264B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+31280B	  renamable $rs9 = STAImag16 killed renamable $a16
+31296B	  renamable $rc20 = COPY killed renamable $rc6
+31312B	  renamable $rc21 = COPY killed renamable $y
+31328B	  renamable $rc24 = COPY killed renamable $rc3
+31344B	  renamable $rc25 = COPY killed renamable $rc2
+31360B	  renamable $a16 = LDAImag16 killed renamable $rs10
+31392B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+31408B	  renamable $rs10 = STAImag16 killed renamable $a16
+31424B	  renamable $rc2 = COPY killed renamable $x
+31440B	  renamable $rc3 = COPY killed renamable $rc4
+31472B	  renamable $rc23 = COPY killed renamable $rc5
+31488B	  renamable $a16 = LDAImag16 killed renamable $rs1
+31520B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs11
+31536B	  renamable $rs11 = STAImag16 killed renamable $a16
+31680B	  renamable $rc5 = COPY renamable $rc23
+31728B	  renamable $rc24 = COPY renamable $rc22
+31744B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+31760B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+31776B	  renamable $rc25 = COPY renamable $rc21
+31808B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+31824B	  renamable $rc2 = COPY renamable $rc20
+31856B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+31872B	  renamable $rc3 = COPY renamable $rc19
+31904B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+31936B	  renamable $rc26 = COPY renamable $rc18
+31952B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+31984B	  renamable $a = COPY renamable $rc15
+32000B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+32016B	  renamable $rc27 = COPY renamable $rc14
+32048B	  renamable $rc27, dead renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+32080B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+32128B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+32176B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+32224B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+32272B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+32320B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+32368B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+32416B	  renamable $rc27, dead renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+32432B	  renamable $rc28 = COPY killed renamable $rc27
+32448B	  renamable $rc29 = COPY killed renamable $a
+32560B	  renamable $a16 = LDAImag16 killed renamable $rs7
+32592B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs14
+32608B	  renamable $rs7 = STAImag16 killed renamable $a16
+32640B	  renamable $rc27 = COPY killed renamable $rc3
+32656B	  renamable $a16 = LDAImag16 killed renamable $rs9
+32688B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs13
+32704B	  renamable $rs9 = STAImag16 killed renamable $a16
+32736B	  renamable $rc3 = COPY killed renamable $rc25
+32752B	  renamable $a16 = LDAImag16 killed renamable $rs10
+32784B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+32800B	  renamable $rs10 = STAImag16 killed renamable $a16
+32832B	  renamable $rc25 = COPY killed renamable $rc5
+32848B	  renamable $a16 = LDAImag16 killed renamable $rs11
+32880B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+32896B	  renamable $rs11 = STAImag16 killed renamable $a16
+33040B	  renamable $rc5 = COPY renamable $rc23
+33088B	  renamable $rc24 = COPY renamable $rc22
+33104B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+33120B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+33136B	  renamable $rc25 = COPY renamable $rc21
+33168B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+33184B	  renamable $rc26 = COPY renamable $rc20
+33216B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+33248B	  renamable $rc27 = COPY renamable $rc19
+33264B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+33296B	  renamable $rc28 = COPY renamable $rc18
+33312B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+33344B	  renamable $rc29 = COPY renamable $rc15
+33360B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+33376B	  renamable $rc30 = COPY renamable $rc14
+33408B	  renamable $rc30, dead renamable $c = ROR killed renamable $rc30(tied-def 0), killed renamable $c(tied-def 1)
+33440B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+33488B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+33536B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+33584B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+33632B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+33680B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+33728B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+33776B	  renamable $rc30, dead renamable $c = ROR killed renamable $rc30(tied-def 0), killed renamable $c(tied-def 1)
+33808B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+33856B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+33904B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+33952B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+34000B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+34048B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+34096B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+34144B	  renamable $rc30, dead renamable $c = ROR killed renamable $rc30(tied-def 0), killed renamable $c(tied-def 1)
+34176B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+34224B	  renamable $rc24, renamable $c = ROR killed renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+34272B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+34320B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+34368B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+34416B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+34464B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+34512B	  renamable $rc30, dead renamable $c = ROR killed renamable $rc30(tied-def 0), killed renamable $c(tied-def 1)
+34544B	  renamable $rc31 = COPY killed renamable $rc29
+34656B	  renamable $a16 = LDAImag16 killed renamable $rs7
+34688B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs15
+34704B	  renamable $rs7 = STAImag16 killed renamable $a16
+34736B	  renamable $rc29 = COPY killed renamable $rc27
+34752B	  renamable $a16 = LDAImag16 killed renamable $rs9
+34784B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs14
+34800B	  renamable $rs9 = STAImag16 killed renamable $a16
+34832B	  renamable $rc27 = COPY killed renamable $rc25
+34848B	  renamable $a16 = LDAImag16 killed renamable $rs10
+34880B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs13
+34896B	  renamable $rs10 = STAImag16 killed renamable $a16
+34928B	  renamable $rc25 = COPY killed renamable $rc5
+34944B	  renamable $a16 = LDAImag16 killed renamable $rs11
+34976B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs12
+34992B	  renamable $rs1 = STAImag16 killed renamable $a16
+35120B	  renamable $rc22 = COPY renamable $rc15
+35136B	  renamable $rc23 = COPY renamable $rc18
+35248B	  renamable $a16 = LDAImag16 killed renamable $rs7
+35280B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs11
+35296B	  renamable $rs11 = STAImag16 killed renamable $a16
+35312B	  renamable $rc14 = COPY renamable $rc19
+35328B	  renamable $rc15 = COPY renamable $rc20
+35344B	  renamable $a16 = LDAImag16 killed renamable $rs9
+35376B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs7
+35392B	  renamable $rs9 = STAImag16 killed renamable $a16
+35408B	  renamable $rc14 = COPY renamable $rc21
+35424B	  renamable $rc15 = COPY renamable $rc2
+35440B	  renamable $a16 = LDAImag16 killed renamable $rs10
+35472B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs7
+35488B	  renamable $rs10 = STAImag16 killed renamable $a16
+35504B	  renamable $rc14 = COPY renamable $rc3
+35520B	  renamable $rc15 = LDZ
+35552B	  renamable $a16 = LDAImag16 killed renamable $rs1
+35584B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs7
+35600B	  renamable $rs7 = STAImag16 killed renamable $a16
+35616B	  renamable $a16 = LDAImag16 killed renamable $rs11
+35648B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs9
+35664B	  renamable $rs1 = STAImag16 killed renamable $a16
+35680B	  renamable $a16 = LDAImag16 killed renamable $rs9
+35712B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs10
+35728B	  renamable $rs12 = STAImag16 killed renamable $a16
+35744B	  renamable $a16 = LDAImag16 killed renamable $rs10
+35776B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs7
+35792B	  renamable $rs9 = STAImag16 killed renamable $a16
+35808B	  renamable $a16 = LDAImag16 killed renamable $rs1
+35840B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs9
+35856B	  renamable $rs11 = STAImag16 killed renamable $a16
+35872B	  renamable $a16 = LDAImag16 killed renamable $rs12
+35904B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), renamable $rs7
+35920B	  renamable $rs10 = STAImag16 killed renamable $a16
+36064B	  renamable $rc25 = COPY renamable $rc15
+36080B	  renamable $rc25, renamable $c = LSR renamable $rc25(tied-def 0)
+36096B	  renamable $rc24 = COPY renamable $rc14
+36128B	  renamable $rc24, renamable $c = ROR renamable $rc24(tied-def 0), killed renamable $c(tied-def 1)
+36160B	  renamable $rc27 = COPY renamable $rc19
+36176B	  renamable $rc27, renamable $c = ROR renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+36208B	  renamable $rc26 = COPY renamable $rc18
+36224B	  renamable $rc26, renamable $c = ROR renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+36256B	  renamable $rc3 = COPY renamable $rc21
+36272B	  renamable $rc3, renamable $c = ROR renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+36304B	  renamable $rc2 = COPY renamable $rc20
+36320B	  renamable $rc2, renamable $c = ROR renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+36336B	  renamable $rc29 = COPY renamable $rc23
+36368B	  renamable $rc29, renamable $c = ROR renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+36384B	  renamable $rc28 = COPY renamable $rc22
+36416B	  renamable $rc28, dead renamable $c = ROR renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+36560B	  renamable $a16 = LDAImag16 killed renamable $rs14
+36592B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+36608B	  renamable $rs14 = STAImag16 killed renamable $a16
+36624B	  renamable $a16 = LDAImag16 killed renamable $rs1
+36656B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+36672B	  renamable $rs1 = STAImag16 killed renamable $a16
+36688B	  renamable $a16 = LDAImag16 killed renamable $rs13
+36720B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+36736B	  renamable $rs13 = STAImag16 killed renamable $a16
+36752B	  renamable $a16 = LDAImag16 killed renamable $rs12
+36784B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 21845
+36800B	  renamable $rs12 = STAImag16 killed renamable $a16
+37088B	  renamable $c = LDImm1 -1
+37104B	  renamable $a = COPY renamable $rc22
+37136B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc28, killed renamable $c(tied-def 1)
+37144B	  renamable $rc31 = COPY killed renamable $a
+37152B	  renamable $a = COPY killed renamable $rc23
+37200B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc29, killed renamable $c(tied-def 1)
+37208B	  renamable $x = COPY killed renamable $a
+37216B	  renamable $a = COPY renamable $rc20
+37264B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc2, killed renamable $c(tied-def 1)
+37272B	  renamable $rc4 = COPY killed renamable $a
+37280B	  renamable $a = COPY killed renamable $rc21
+37328B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c(tied-def 1)
+37336B	  renamable $rc28 = COPY killed renamable $a
+37344B	  renamable $a = COPY renamable $rc18
+37392B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc26, killed renamable $c(tied-def 1)
+37400B	  renamable $y = COPY killed renamable $a
+37408B	  renamable $a = COPY killed renamable $rc19
+37456B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc27, killed renamable $c(tied-def 1)
+37464B	  renamable $rc30 = COPY killed renamable $a
+37472B	  renamable $a = COPY renamable $rc14
+37520B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), renamable $rc24, killed renamable $c(tied-def 1)
+37528B	  renamable $rc2 = COPY killed renamable $a
+37536B	  renamable $a = COPY killed renamable $rc15
+37584B	  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc25, killed renamable $c(tied-def 1)
+37616B	  renamable $rc5 = COPY renamable $a
+37624B	  renamable $rc6 = COPY killed renamable $a
+37656B	  renamable $a = COPY killed renamable $rc2
+37664B	  renamable $rc14 = COPY renamable $a
+37672B	  renamable $rc29 = COPY killed renamable $a
+37680B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+37712B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+37744B	  renamable $rc15 = COPY renamable $rc30
+37776B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+37808B	  renamable $rc20 = COPY renamable $y
+37840B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+37888B	  renamable $rc2 = COPY renamable $rc28
+37904B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+37952B	  renamable $rc3 = COPY renamable $rc4
+37968B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+38016B	  renamable $a = COPY renamable $x
+38032B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+38064B	  renamable $rc18 = COPY renamable $rc31
+38096B	  renamable $rc18, dead renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+38128B	  renamable $rc5, renamable $c = LSR killed renamable $rc5(tied-def 0)
+38176B	  renamable $rc14, renamable $c = ROR killed renamable $rc14(tied-def 0), killed renamable $c(tied-def 1)
+38224B	  renamable $rc15, renamable $c = ROR killed renamable $rc15(tied-def 0), killed renamable $c(tied-def 1)
+38272B	  renamable $rc20, renamable $c = ROR killed renamable $rc20(tied-def 0), killed renamable $c(tied-def 1)
+38320B	  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+38368B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+38416B	  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+38464B	  renamable $rc18, dead renamable $c = ROR killed renamable $rc18(tied-def 0), killed renamable $c(tied-def 1)
+38496B	  renamable $rc19 = COPY killed renamable $a
+38608B	  renamable $a16 = LDAImag16 killed renamable $rs9
+38640B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+38656B	  renamable $rs9 = STAImag16 killed renamable $a16
+38672B	  renamable $rc22 = COPY killed renamable $rc3
+38688B	  renamable $rc23 = COPY killed renamable $rc2
+38704B	  renamable $a16 = LDAImag16 killed renamable $rs11
+38736B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+38752B	  renamable $rs13 = STAImag16 killed renamable $a16
+38784B	  renamable $rc21 = COPY killed renamable $rc15
+38800B	  renamable $a16 = LDAImag16 killed renamable $rs10
+38832B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+38848B	  renamable $rs10 = STAImag16 killed renamable $a16
+38880B	  renamable $rc15 = COPY killed renamable $rc5
+38896B	  renamable $a16 = LDAImag16 killed renamable $rs7
+38928B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+38944B	  renamable $rs12 = STAImag16 killed renamable $a16
+38960B	  renamable $rc2 = COPY killed renamable $rc31
+38976B	  renamable $rc3 = COPY killed renamable $x
+39088B	  renamable $a16 = LDAImag16 killed renamable $rs1
+39120B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+39136B	  renamable $rs7 = STAImag16 killed renamable $a16
+39152B	  renamable $rc2 = COPY killed renamable $rc4
+39168B	  renamable $rc3 = COPY killed renamable $rc28
+39184B	  renamable $a16 = LDAImag16 killed renamable $rs1
+39216B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+39232B	  renamable $rs1 = STAImag16 killed renamable $a16
+39248B	  renamable $rc22 = COPY killed renamable $y
+39264B	  renamable $rc23 = COPY killed renamable $rc30
+39280B	  renamable $a16 = LDAImag16 killed renamable $rs11
+39312B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+39328B	  renamable $rs15 = STAImag16 killed renamable $a16
+39344B	  renamable $rc22 = COPY killed renamable $rc29
+39360B	  renamable $rc23 = COPY killed renamable $rc6
+39376B	  renamable $a16 = LDAImag16 killed renamable $rs11
+39408B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 13107
+39424B	  renamable $rs14 = STAImag16 killed renamable $a16
+39584B	  renamable $a = COPY renamable $rc14
+39720B	  renamable $c = LDImm1 0
+39728B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc18, killed renamable $c
+39744B	  renamable $rc22 = COPY killed renamable $a
+39760B	  renamable $a = COPY killed renamable $rc15
+39792B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+39808B	  renamable $rc19 = COPY killed renamable $a
+39824B	  renamable $a = COPY renamable $rc2
+39856B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc26, killed renamable $c
+39872B	  renamable $rc15 = COPY killed renamable $a
+39888B	  renamable $a = COPY killed renamable $rc3
+39920B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc27, killed renamable $c
+39936B	  renamable $rc18 = COPY killed renamable $a
+39952B	  renamable $a = COPY renamable $rc30
+39984B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc20, killed renamable $c
+40000B	  renamable $rc14 = COPY killed renamable $a
+40016B	  renamable $a = COPY killed renamable $rc31
+40048B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc21, killed renamable $c
+40064B	  renamable $rc21 = COPY killed renamable $a
+40080B	  renamable $a = COPY renamable $rc28
+40112B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc24, killed renamable $c
+40128B	  renamable $rc5 = COPY killed renamable $a
+40144B	  renamable $a = COPY killed renamable $rc29
+40176B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc25, killed renamable $c
+40192B	  renamable $rc20 = COPY killed renamable $a
+40224B	  renamable $rc24 = COPY renamable $rc20
+40240B	  renamable $rc24, renamable $c = LSR killed renamable $rc24(tied-def 0)
+40272B	  renamable $rc25 = COPY renamable $rc5
+40304B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+40352B	  renamable $rc26 = COPY renamable $rc21
+40368B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+40400B	  renamable $rc27 = COPY renamable $rc14
+40432B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+40480B	  renamable $rc28 = COPY renamable $rc18
+40496B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+40544B	  renamable $rc29 = COPY renamable $rc15
+40560B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+40592B	  renamable $rc3 = COPY renamable $rc19
+40624B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+40672B	  renamable $a = COPY renamable $rc22
+40688B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+40720B	  renamable $rc24, renamable $c = LSR killed renamable $rc24(tied-def 0)
+40768B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+40816B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+40864B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+40912B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+40960B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+41008B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+41056B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+41088B	  renamable $rc24, renamable $c = LSR killed renamable $rc24(tied-def 0)
+41136B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+41184B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+41232B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+41280B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+41328B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+41376B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+41424B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+41456B	  renamable $rc24, renamable $c = LSR killed renamable $rc24(tied-def 0)
+41520B	  renamable $rc25, renamable $c = ROR killed renamable $rc25(tied-def 0), killed renamable $c(tied-def 1)
+41584B	  renamable $rc26, renamable $c = ROR killed renamable $rc26(tied-def 0), killed renamable $c(tied-def 1)
+41648B	  renamable $rc27, renamable $c = ROR killed renamable $rc27(tied-def 0), killed renamable $c(tied-def 1)
+41712B	  renamable $rc28, renamable $c = ROR killed renamable $rc28(tied-def 0), killed renamable $c(tied-def 1)
+41776B	  renamable $rc29, renamable $c = ROR killed renamable $rc29(tied-def 0), killed renamable $c(tied-def 1)
+41840B	  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+41904B	  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+41944B	  renamable $c = LDImm1 0
+41952B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc22, killed renamable $c
+42192B	  renamable $rc2 = COPY killed renamable $a
+42200B	  renamable $a = COPY killed renamable $rc3
+42208B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+42224B	  renamable $rc3 = COPY killed renamable $a
+42336B	  renamable $a16 = LDAImag16 killed renamable $rs1
+42368B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+42384B	  renamable $rs11 = STAImag16 killed renamable $a16
+42392B	  renamable $a = COPY killed renamable $rc29
+42400B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+42416B	  renamable $rc2 = COPY killed renamable $a
+42424B	  renamable $a = COPY killed renamable $rc28
+42432B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc18, killed renamable $c
+42448B	  renamable $rc3 = COPY killed renamable $a
+42464B	  renamable $a16 = LDAImag16 killed renamable $rs1
+42496B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+42512B	  renamable $rs9 = STAImag16 killed renamable $a16
+42520B	  renamable $a = COPY killed renamable $rc27
+42528B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc14, killed renamable $c
+42544B	  renamable $rc2 = COPY killed renamable $a
+42552B	  renamable $a = COPY killed renamable $rc26
+42560B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc21, killed renamable $c
+42576B	  renamable $rc3 = COPY killed renamable $a
+42592B	  renamable $a16 = LDAImag16 killed renamable $rs1
+42624B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+42640B	  renamable $rs7 = STAImag16 killed renamable $a16
+42648B	  renamable $a = COPY killed renamable $rc25
+42656B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+42672B	  renamable $rc2 = COPY killed renamable $a
+42680B	  renamable $a = COPY killed renamable $rc24
+42688B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc20, killed renamable $c
+42704B	  renamable $rc3 = COPY killed renamable $a
+42720B	  renamable $a16 = LDAImag16 killed renamable $rs1
+42752B	  renamable $a16 = ANDImm16 killed renamable $a16(tied-def 0), 3855
+42768B	  renamable $rs10 = STAImag16 killed renamable $a16
+42776B	  renamable $x = LDAbs %stack.12 :: (load (s8) from %stack.12)
+44352B	  STAbs renamable $x, @bitboard64_state.0 :: (store (s8) into @bitboard64_state.0, !tbaa !6)
+44608B	  renamable $rc2 = COPY killed renamable $x
+44612B	  renamable $x = LDAbs %stack.10 :: (load (s8) from %stack.10)
+44636B	  STAbs renamable $x, @bitboard64_state.0 + 1 :: (store (s8) into @bitboard64_state.0 + 1, !tbaa !6)
+44640B	  renamable $rc3 = COPY killed renamable $x
+44644B	  renamable $x = LDAbs %stack.6 :: (load (s8) from %stack.6)
+44668B	  STAbs renamable $x, @bitboard64_state.0 + 2 :: (store (s8) into @bitboard64_state.0 + 2, !tbaa !6)
+44672B	  renamable $y = LDAbs %stack.7 :: (load (s8) from %stack.7)
+44696B	  STAbs renamable $y, @bitboard64_state.0 + 3 :: (store (s8) into @bitboard64_state.0 + 3, !tbaa !6)
+44704B	  renamable $a = LDAbs %stack.5 :: (load (s8) from %stack.5)
+44712B	  renamable $rc25 = COPY killed renamable $a
+44728B	  renamable $a = COPY renamable $rc25
+44744B	  STAbs killed renamable $a, @bitboard64_state.0 + 4 :: (store (s8) into @bitboard64_state.0 + 4, !tbaa !6)
+44748B	  renamable $a = LDAbs %stack.9 :: (load (s8) from %stack.9)
+44756B	  renamable $rc24 = COPY killed renamable $a
+44772B	  renamable $a = COPY renamable $rc24
+44788B	  STAbs killed renamable $a, @bitboard64_state.0 + 5 :: (store (s8) into @bitboard64_state.0 + 5, !tbaa !6)
+44796B	  renamable $a = LDAbs %stack.11 :: (load (s8) from %stack.11)
+44808B	  STAbs killed renamable $a, @bitboard64_state.0 + 6 :: (store (s8) into @bitboard64_state.0 + 6, !tbaa !6)
+44816B	  renamable $a = LDAbs %stack.8 :: (load (s8) from %stack.8)
+44824B	  renamable $rc5 = COPY killed renamable $a
+44840B	  renamable $a = COPY renamable $rc5
+44856B	  STAbs killed renamable $a, @bitboard64_state.0 + 7 :: (store (s8) into @bitboard64_state.0 + 7, !tbaa !6)
+44912B	  renamable $a16 = LDAImag16 killed renamable $rs6
+44928B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+44936B	  renamable $rs6 = STAImag16 killed renamable $a16
+44944B	  renamable $rc2 = COPY killed renamable $x
+44952B	  renamable $rc3 = COPY killed renamable $y
+44960B	  renamable $a16 = LDAImag16 killed renamable $rs5
+44976B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+44992B	  renamable $rs5 = STAImag16 killed renamable $a16
+45008B	  renamable $rc2 = COPY killed renamable $rc25
+45024B	  renamable $rc3 = COPY killed renamable $rc24
+45040B	  renamable $a16 = LDAImag16 killed renamable $rs4
+45072B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+45088B	  renamable $rs4 = STAImag16 killed renamable $a16
+45096B	  renamable $x = LDAbs %stack.11 :: (load (s8) from %stack.11)
+45100B	  renamable $rc2 = COPY killed renamable $x
+45120B	  renamable $rc3 = COPY killed renamable $rc5
+45132B	  renamable $x = LDAbs %stack.22 :: (load (s8) from %stack.22)
+45140B	  renamable $rc4 = COPY killed renamable $x
+45144B	  renamable $x = LDAbs %stack.22 + 1 :: (load (s8) from %stack.22 + 1)
+45152B	  renamable $rc5 = COPY killed renamable $x
+45160B	  renamable $a16 = LDAImag16 killed renamable $rs2
+45176B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs1
+45184B	  renamable $rs3 = STAImag16 killed renamable $a16
+45200B	  renamable $a = COPY renamable $rc22
+45216B	  renamable $c = LDImm1 0
+45232B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45240B	  renamable $rc4lsb = COPY killed renamable $c
+45248B	  renamable $rc2 = COPY renamable $a
+45264B	  renamable $c = LDImm1 0
+45280B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45288B	  renamable $xlsb = COPY killed renamable $c
+45296B	  renamable $rc3 = COPY renamable $a
+45312B	  renamable $c = LDImm1 0
+45328B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45336B	  renamable $ylsb = COPY killed renamable $c
+45344B	  renamable $a = COPY renamable $rc23
+45352B	  renamable $c = COPY killed renamable $rc4lsb
+45360B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc22, killed renamable $c
+45368B	  renamable $rc24lsb = COPY killed renamable $c
+45376B	  renamable $rc5 = COPY renamable $a
+45384B	  renamable $c = COPY killed renamable $xlsb
+45392B	  renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45400B	  renamable $rc4lsb = COPY killed renamable $c
+45408B	  renamable $rc22 = COPY renamable $a
+45416B	  renamable $c = COPY killed renamable $ylsb
+45424B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45432B	  renamable $xlsb = COPY killed renamable $c
+45440B	  renamable $a = COPY renamable $rc18
+45448B	  renamable $c = COPY killed renamable $rc24lsb
+45456B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc23, killed renamable $c
+45464B	  renamable $ylsb = COPY killed renamable $c
+45472B	  renamable $rc23 = COPY renamable $a
+45480B	  renamable $c = COPY killed renamable $rc4lsb
+45488B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+45496B	  renamable $rc4lsb = COPY killed renamable $c
+45504B	  renamable $rc2 = COPY renamable $a
+45512B	  renamable $c = COPY killed renamable $xlsb
+45520B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45528B	  renamable $rc24lsb = COPY killed renamable $c
+45536B	  renamable $a = COPY renamable $rc19
+45544B	  renamable $c = COPY killed renamable $ylsb
+45552B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc18, killed renamable $c
+45560B	  renamable $xlsb = COPY killed renamable $c
+45568B	  renamable $rc18 = COPY renamable $a
+45576B	  renamable $c = COPY killed renamable $rc4lsb
+45584B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+45592B	  renamable $rc4lsb = COPY killed renamable $c
+45600B	  renamable $rc5 = COPY renamable $a
+45608B	  renamable $c = COPY killed renamable $rc24lsb
+45616B	  dead renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+45624B	  renamable $rc24lsb = COPY killed renamable $c
+45632B	  renamable $a = COPY renamable $rc14
+45640B	  renamable $c = COPY killed renamable $xlsb
+45648B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+45656B	  renamable $ylsb = COPY killed renamable $c
+45664B	  renamable $rc19 = COPY renamable $a
+45672B	  renamable $c = COPY killed renamable $rc4lsb
+45680B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc23, killed renamable $c
+45688B	  renamable $rc4lsb = COPY killed renamable $c
+45692B	  renamable $c = COPY killed renamable $rc24lsb
+45696B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+45704B	  renamable $xlsb = COPY killed renamable $c
+45712B	  renamable $a = COPY renamable $rc15
+45720B	  renamable $c = COPY killed renamable $ylsb
+45728B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), renamable $rc14, killed renamable $c
+45736B	  renamable $rc14lsb = COPY killed renamable $c
+45744B	  renamable $rc3 = COPY renamable $a
+45752B	  renamable $c = COPY killed renamable $rc4lsb
+45760B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc18, killed renamable $c
+45764B	  renamable $rc4lsb = COPY killed renamable $c
+45768B	  renamable $c = COPY killed renamable $xlsb
+45776B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc22, killed renamable $c
+45784B	  renamable $rc18lsb = COPY killed renamable $c
+45792B	  renamable $a = COPY renamable $rc20
+45800B	  renamable $c = COPY killed renamable $rc14lsb
+45808B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc15, killed renamable $c
+45812B	  renamable $rc14lsb = COPY killed renamable $c
+45816B	  renamable $c = COPY killed renamable $rc4lsb
+45824B	  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc19, killed renamable $c
+45832B	  renamable $rc4lsb = COPY killed renamable $c
+45836B	  renamable $c = COPY killed renamable $rc18lsb
+45840B	  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+45848B	  renamable $rc2lsb = COPY killed renamable $c
+45856B	  renamable $a = COPY renamable $rc21
+45864B	  renamable $c = COPY killed renamable $rc14lsb
+45872B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc20, killed renamable $c
+45896B	  renamable $c = COPY killed renamable $rc4lsb
+45904B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+45912B	  renamable $c = COPY killed renamable $rc2lsb
+45920B	  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+45936B	  renamable $rc2 = COPY killed renamable $a
+45952B	  renamable $a = COPY renamable $rc12
+45968B	  renamable $y = COPY renamable $rc13
+45984B	  renamable $x = COPY renamable $rc10
+46080B	  STAbs killed renamable $a, @bitboard64_state.1 :: (store (s8) into @bitboard64_state.1, !tbaa !9)
+46096B	  renamable $a = COPY killed renamable $rc11
+46112B	  STAbs killed renamable $y, @bitboard64_state.1 + 1 :: (store (s8) into @bitboard64_state.1 + 1, !tbaa !9)
+46128B	  renamable $y = COPY renamable $rc8
+46144B	  STAbs killed renamable $x, @bitboard64_state.1 + 2 :: (store (s8) into @bitboard64_state.1 + 2, !tbaa !9)
+46160B	  renamable $x = COPY renamable $rc9
+46176B	  STAbs killed renamable $a, @bitboard64_state.1 + 3 :: (store (s8) into @bitboard64_state.1 + 3, !tbaa !9)
+46192B	  renamable $a = COPY renamable $rc6
+46208B	  STAbs killed renamable $y, @bitboard64_state.1 + 4 :: (store (s8) into @bitboard64_state.1 + 4, !tbaa !9)
+46224B	  renamable $y = COPY killed renamable $rc7
+46240B	  STAbs killed renamable $x, @bitboard64_state.1 + 5 :: (store (s8) into @bitboard64_state.1 + 5, !tbaa !9)
+46256B	  STAbs killed renamable $a, @bitboard64_state.1 + 6 :: (store (s8) into @bitboard64_state.1 + 6, !tbaa !9)
+46272B	  STAbs killed renamable $y, @bitboard64_state.1 + 7 :: (store (s8) into @bitboard64_state.1 + 7, !tbaa !9)
+46300B	  renamable $x = LDAbs %stack.0 :: (load (s8) from %stack.0)
+46308B	  renamable $rc6 = COPY killed renamable $x
+46312B	  renamable $x = LDAbs %stack.0 + 1 :: (load (s8) from %stack.0 + 1)
+46320B	  renamable $rc7 = COPY killed renamable $x
+46328B	  renamable $x = LDAbs %stack.21 :: (load (s8) from %stack.21)
+46336B	  renamable $rc4 = COPY killed renamable $x
+46340B	  renamable $x = LDAbs %stack.21 + 1 :: (load (s8) from %stack.21 + 1)
+46348B	  renamable $rc5 = COPY killed renamable $x
+46364B	  renamable $rc5 = COPY killed renamable $rc6
+46372B	  renamable $x = LDAbs %stack.1 :: (load (s8) from %stack.1)
+46380B	  renamable $rc6 = COPY killed renamable $x
+46388B	  renamable $x = LDAbs %stack.1 + 1 :: (load (s8) from %stack.1 + 1)
+46396B	  renamable $rc7 = COPY killed renamable $x
+46420B	  renamable $rc6 = LDZ
+46444B	  renamable $a16 = LDAImag16 killed renamable $rs3
+46460B	  renamable $a16 = ORAImag16 killed renamable $a16(tied-def 0), killed renamable $rs2
+46468B	  renamable $rs2 = STAImag16 killed renamable $a16
+46476B	  renamable $a16 = LDAImag16 killed renamable $rs2
+46492B	  renamable $a16 = EORImm16 killed renamable $a16(tied-def 0), 16738
+46500B	  renamable $rs2 = STAImag16 killed renamable $a16
+46508B	  renamable $a = LDImm 64
+46512B	  renamable $c = LDImm1 -1
+46516B	  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c(tied-def 1)
+46520B	  renamable $rc2 = COPY killed renamable $a
+46524B	  renamable $a = LDZ
+46528B	  renamable $a, dead renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+46560B	  renamable $rc3 = COPY killed renamable $a
+46576B	  renamable $a16 = LDAImag16 killed renamable $rs2
+46600B	  renamable $c = LDImm1 0
+46608B	  renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16(tied-def 0), killed renamable $rs1, killed renamable $c
+46624B	  renamable $rs1 = STAImag16 killed renamable $a16
+46640B	  renamable $a16 = LDAImag16 killed renamable $rs1
+46664B	  renamable $c = LDImm1 0
+46672B	  renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16(tied-def 0), killed renamable $rs6, killed renamable $c
+46688B	  renamable $rs1 = STAImag16 killed renamable $a16
+46704B	  renamable $a16 = LDAImag16 killed renamable $rs1
+46728B	  renamable $c = LDImm1 0
+46736B	  renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16(tied-def 0), killed renamable $rs4, killed renamable $c
+46752B	  renamable $rs1 = STAImag16 killed renamable $a16
+46816B	  $x = COPY renamable $rc3
+46832B	  $a = COPY killed renamable $rc2
+46848B	  RTS implicit $a, implicit $x
+
+# End machine code for function bitboard64_step.
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    bitboard64_step
+- basic block: %bb.0  (0x65239b550490) [0B;15680B)
+- instruction: 5216B	renamable $x = COPY killed renamable $rc13
+- operand 1:   killed renamable $rc13
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    bitboard64_step
+- basic block: %bb.3  (0x65239b620ca0) [16416B;16848B)
+- instruction: 16436B	renamable $x = COPY renamable $rc2
+- operand 1:   renamable $rc2
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    bitboard64_step
+- basic block: %bb.11  (0x65239b631de0) [17744B;18100B)
+- instruction: 17764B	renamable $x = COPY renamable $rc2
+- operand 1:   renamable $rc2
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    bitboard64_step
+- basic block: %bb.10  (0x65239b555e28) [29760B;46864B)
+- instruction: 29800B	renamable $x = COPY killed renamable $rc7
+- operand 1:   killed renamable $rc7
+LLVM ERROR: Found 4 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028 -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll'.
+2.	Running pass 'Verify generated machine code' on function '@bitboard64_step'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-without-0028 0x0000652389981388 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc-without-0028 0x000065238997e665 llvm::sys::RunSignalHandlers() + 293
+2  llc-without-0028 0x0000652389982101
+3  libc.so.6        0x00007b2842645cb0
+4  libc.so.6        0x00007b28426a61ac pthread_kill + 284
+5  libc.so.6        0x00007b2842645b7e gsignal + 30
+6  libc.so.6        0x00007b28426288ec abort + 39
+7  llc-without-0028 0x00006523898eeca5 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc-without-0028 0x0000652388a56827
+9  llc-without-0028 0x0000652388a57b01
+10 llc-without-0028 0x000065238897a103 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+11 llc-without-0028 0x0000652388dd061a llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+12 llc-without-0028 0x0000652388dd6cbc llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+13 llc-without-0028 0x0000652388dd1349 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+14 llc-without-0028 0x000065238842921d
+15 llc-without-0028 0x0000652388426bb3 main + 1331
+16 libc.so.6        0x00007b284262a601
+17 libc.so.6        0x00007b284262a718 __libc_start_main + 136
+18 llc-without-0028 0x0000652388422f25 _start + 37
+
+exit_code=-6

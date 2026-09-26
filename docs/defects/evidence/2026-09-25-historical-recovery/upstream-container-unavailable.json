@@ -1,0 +1,58 @@
+[
+  {
+    "status": "fulfilled",
+    "value": {
+      "stage": "shift",
+      "cpu": "mos6502",
+      "command": "dev/upstream-reference.sh clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -c docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o build/historical-upstream-shift-mos6502.o",
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mos6502.log",
+      "chunk_id": "5ef1ec",
+      "wall_time_seconds": 0.000038636,
+      "exit_code": 125,
+      "original_token_count": 43,
+      "output": "docker: Error response from daemon: No such image: sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46\n\nRun 'docker run --help' for more information\n"
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "stage": "shift",
+      "cpu": "mosw65816",
+      "command": "dev/upstream-reference.sh clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -c docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o build/historical-upstream-shift-mosw65816.o",
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mosw65816.log",
+      "chunk_id": "04bb64",
+      "wall_time_seconds": 0.000029616,
+      "exit_code": 125,
+      "original_token_count": 43,
+      "output": "docker: Error response from daemon: No such image: sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46\n\nRun 'docker run --help' for more information\n"
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "stage": "inline",
+      "cpu": "mos6502",
+      "command": "dev/upstream-reference.sh clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -c docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o build/historical-upstream-inline-mos6502.o",
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mos6502.log",
+      "chunk_id": "b1ddb1",
+      "wall_time_seconds": 0.008386157,
+      "exit_code": 125,
+      "original_token_count": 43,
+      "output": "docker: Error response from daemon: No such image: sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46\n\nRun 'docker run --help' for more information\n"
+    }
+  },
+  {
+    "status": "fulfilled",
+    "value": {
+      "stage": "inline",
+      "cpu": "mosw65816",
+      "command": "dev/upstream-reference.sh clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -c docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o build/historical-upstream-inline-mosw65816.o",
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mosw65816.log",
+      "chunk_id": "4e728b",
+      "wall_time_seconds": 0.000036903,
+      "exit_code": 125,
+      "original_token_count": 43,
+      "output": "docker: Error response from daemon: No such image: sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46\n\nRun 'docker run --help' for more information\n"
+    }
+  }
+]

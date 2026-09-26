@@ -1,0 +1,35 @@
+$ /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll -o /dev/null
+llc-0041: /work/build/register-exhaustion-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:10149: std::optional<unsigned int> getRegistersForValue(SelectionDAG &, const SDLoc &, SDISelAsmOperandInfo &, SDISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@bad_tied'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-0041  0x00005f1debf3f25b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-0041  0x00005f1debf3c0e1 llvm::sys::RunSignalHandlers() + 369
+2  llc-0041  0x00005f1debf4006b
+3  libc.so.6 0x00007534b2845cb0
+4  libc.so.6 0x00007534b28a61ac pthread_kill + 284
+5  libc.so.6 0x00007534b2845b7e gsignal + 30
+6  libc.so.6 0x00007534b28288ec abort + 39
+7  libc.so.6 0x00007534b2829979
+8  libc.so.6 0x00007534b283bf75 __assert_fail + 181
+9  llc-0041  0x00005f1debc8173e
+10 llc-0041  0x00005f1debc52d40 llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&, llvm::BasicBlock const*) + 5024
+11 llc-0041  0x00005f1debc342e6 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+12 llc-0041  0x00005f1debd09ce5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+13 llc-0041  0x00005f1debd0927a llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6858
+14 llc-0041  0x00005f1debd06541 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+15 llc-0041  0x00005f1debd03bdc llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+16 llc-0041  0x00005f1deabda059 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+17 llc-0041  0x00005f1deb16c840 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+18 llc-0041  0x00005f1deb174942 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc-0041  0x00005f1deb16d604 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+20 llc-0041  0x00005f1de9b3c80b
+21 llc-0041  0x00005f1de9b39ad3 main + 1443
+22 libc.so.6 0x00007534b282a601
+23 libc.so.6 0x00007534b282a718 __libc_start_main + 136
+24 llc-0041  0x00005f1de9b38ce5 _start + 37
+
+exit_code=-6

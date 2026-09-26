@@ -1,0 +1,7 @@
+$ /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null
+error: not enough registers for inline asm constraint '{cc}'
+error: not enough registers for inline asm constraint '{cc}'
+error: not enough registers for inline asm constraint '{cc}'
+error: not enough registers for inline asm constraint '{cc}'
+
+exit_code=1

@@ -1,0 +1,13 @@
+{
+  "session": {
+    "id": "01a0d7d4-5da2-7fe0-a88c-0137eaa043a7",
+    "cli_version": "0.157.0",
+    "originator": "codex-tui"
+  },
+  "model": "gpt-6-astra",
+  "effort": "xhigh",
+  "settings": {
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh"
+  }
+}

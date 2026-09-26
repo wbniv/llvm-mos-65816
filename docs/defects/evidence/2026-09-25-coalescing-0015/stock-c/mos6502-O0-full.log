@@ -1,0 +1,2193 @@
+$ /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0-full.out
+
+# After Post-RA pseudo instruction expansion pass
+# Machine code for function newton_step: NoPHIs, TracksLiveness, Legalized, RegBankSelected, Selected, TiedOpsRewritten, TracksDebugUserValues
+Frame Objects:
+  fi#0: size=2, align=1, at location [SP-2]
+  fi#1: size=2, align=1, at location [SP-4]
+  fi#2: size=2, align=1, at location [SP-6]
+  fi#3: size=2, align=1, at location [SP-8]
+  fi#4: size=2, align=1, at location [SP-10]
+  fi#5: size=2, align=1, at location [SP-12]
+  fi#6: size=2, align=1, at location [SP-14]
+  fi#7: size=2, align=1, at location [SP-16]
+  fi#8: size=2, align=1, at location [SP-18]
+  fi#9: size=2, align=1, at location [SP-20]
+  fi#10: size=2, align=1, at location [SP-22]
+  fi#11: size=2, align=1, at location [SP-24]
+  fi#12: size=4, align=1, at location [SP-28]
+  fi#13: size=4, align=1, at location [SP-32]
+  fi#14: size=4, align=1, at location [SP-36]
+  fi#15: size=4, align=1, at location [SP-40]
+  fi#16: size=4, align=1, at location [SP-44]
+  fi#17: size=4, align=1, at location [SP-48]
+  fi#18: size=4, align=1, at location [SP-52]
+  fi#19: size=1, align=1, at location [SP-53]
+  fi#20: size=1, align=1, at location [SP-54]
+  fi#21: size=1, align=1, at location [SP-55]
+  fi#22: size=1, align=1, at location [SP-56]
+  fi#23: size=1, align=1, at location [SP-57]
+  fi#24: size=1, align=1, at location [SP-58]
+  fi#25: size=1, align=1, at location [SP-59]
+  fi#26: size=1, align=1, at location [SP-60]
+save/restore points:
+save points are empty
+restore points are empty
+
+bb.0 (%ir-block.2):
+  successors: %bb.1(0x40000000), %bb.2(0x40000000); %bb.1(50.00%), %bb.2(50.00%)
+  liveins: $rs1, $rs2, $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31
+  $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, $c, $v = ADCImm $a(tied-def 0), 196, $c(tied-def 1)
+  $rc0 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, $c, $v = ADCImm $a(tied-def 0), 255, $c(tied-def 1)
+  $rc1 = STImag8 $a
+  $a = LDImag8 $rc20
+  frame-setup PH killed $a
+  $a = LDImag8 $rc21
+  frame-setup PH killed $a
+  $a = LDImag8 $rc22
+  frame-setup PH killed $a
+  $a = LDImag8 $rc23
+  frame-setup PH killed $a
+  $a = LDImag8 $rc24
+  $y = LDImm 7
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.19)
+  $a = LDImag8 $rc25
+  $y = LDImm 6
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.20)
+  $a = LDImag8 $rc26
+  $y = LDImm 5
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.21)
+  $a = LDImag8 $rc27
+  $y = LDImm 4
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.22)
+  $a = LDImag8 $rc28
+  $y = LDImm 3
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.23)
+  $a = LDImag8 $rc29
+  $y = LDImm 2
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.24)
+  $a = LDImag8 $rc30
+  $y = LDImm 1
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.25)
+  $a = LDImag8 $rc31
+  $y = LDImm 0
+  STIndirIdx killed $a, $rs0, killed $y :: (store (s8) into %stack.26)
+  $a = LDImag8 $rc2
+  %0:gpr = LDImag8 $rc3
+  $rc6 = STImag8 %0:gpr
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 58, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.3)
+  renamable $x = LDImm 0
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.3 + 1)
+  $a = LDImag8 $rc4
+  %1:gpr = LDImag8 $rc5
+  $rc7 = STImag8 %1:gpr
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 56, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $a = PL
+  $rc6 = STImag8 $x
+  $y = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs2, killed renamable $y :: (store (s8) into %ir.4)
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc7
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.4 + 1)
+  $rc7 = STImag8 $y
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.3)
+  $rc8 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.3 + 1)
+  $x = LDImag8 $rc7
+  %2:gpr = LDImag8 $rc8
+  $rc2 = STImag8 %2:gpr
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.22)
+  $rc8 = STImag8 $y
+  $rc7 = STImag8 $a
+  $rc6 = STImag8 $x
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.22 + 1)
+  $rc6 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = LDImag8 $rc7
+  $y = LDImag8 $rc8
+  STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.5)
+  $rc7 = STImag8 $y
+  $a = LDImag8 $rc6
+  %3:ac = T_A $x
+  $y = TA %3:ac
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.5 + 1)
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs2, renamable $y :: (load (s8) from %ir.4)
+  $rc6 = STImag8 $a
+  %4:ac = T_A $x
+  $y = TA %4:ac
+  renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.4 + 1)
+  $rc4 = STImag8 $x
+  %5:gpr = LDImag8 $rc6
+  $rc4 = STImag8 %5:gpr
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs2, renamable $y :: (load (s8) from %ir.24)
+  $rc9 = STImag8 $y
+  $rc7 = STImag8 $a
+  %6:ac = T_A $x
+  $y = TA %6:ac
+  renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.24 + 1)
+  $rc6 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc8 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $a = LDImag8 $rc7
+  $y = LDImag8 $rc9
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.6)
+  $rc7 = STImag8 $y
+  $a = LDImag8 $rc6
+  $y = LDImag8 $rc8
+  STIndirIdx killed renamable $a, killed renamable $rs2, killed renamable $y :: (store (s8) into %ir.6 + 1)
+  renamable $x = LDImm 1
+  $rc4 = STImag8 $x
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc9 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.1, killed $n, 1
+  JMP %bb.2
+
+bb.1 (%ir-block.2):
+; predecessors: %bb.0
+  successors: %bb.3(0x80000000); %bb.3(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm -1
+  JMP %bb.3
+
+bb.2 (%ir-block.2):
+; predecessors: %bb.0
+  successors: %bb.3(0x80000000); %bb.3(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm 0
+  JMP %bb.3
+
+bb.3 (%ir-block.2):
+; predecessors: %bb.1, %bb.2
+  successors: %bb.4(0x40000000), %bb.5(0x40000000); %bb.4(50.00%), %bb.5(50.00%)
+  liveins: $x, $rc8, $rc9
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.4, killed $n, 1
+  JMP %bb.5
+
+bb.4 (%ir-block.2):
+; predecessors: %bb.3
+  successors: %bb.6(0x80000000); %bb.6(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm -1
+  JMP %bb.6
+
+bb.5 (%ir-block.2):
+; predecessors: %bb.3
+  successors: %bb.6(0x80000000); %bb.6(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm 0
+  JMP %bb.6
+
+bb.6 (%ir-block.2):
+; predecessors: %bb.4, %bb.5
+  successors: %bb.7(0x40000000), %bb.8(0x40000000); %bb.7(50.00%), %bb.8(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc22 = STImag8 $a
+  $rc21 = STImag8 $x
+  %7:gpr = LDImag8 $rc2
+  $rc20 = STImag8 %7:gpr
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+  $rc9 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.7, killed $n, 1
+  JMP %bb.8
+
+bb.7 (%ir-block.2):
+; predecessors: %bb.6
+  successors: %bb.9(0x80000000); %bb.9(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm -1
+  JMP %bb.9
+
+bb.8 (%ir-block.2):
+; predecessors: %bb.6
+  successors: %bb.9(0x80000000); %bb.9(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm 0
+  JMP %bb.9
+
+bb.9 (%ir-block.2):
+; predecessors: %bb.7, %bb.8
+  successors: %bb.10(0x40000000), %bb.11(0x40000000); %bb.10(50.00%), %bb.11(50.00%)
+  liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.10, killed $n, 1
+  JMP %bb.11
+
+bb.10 (%ir-block.2):
+; predecessors: %bb.9
+  successors: %bb.12(0x80000000); %bb.12(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm -1
+  JMP %bb.12
+
+bb.11 (%ir-block.2):
+; predecessors: %bb.9
+  successors: %bb.12(0x80000000); %bb.12(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm 0
+  JMP %bb.12
+
+bb.12 (%ir-block.2):
+; predecessors: %bb.10, %bb.11
+  successors: %bb.13(0x40000000), %bb.14(0x40000000); %bb.13(50.00%), %bb.14(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc3 = STImag8 $a
+  $rc4 = STImag8 $x
+  $x = LDImag8 $rc22
+  renamable $c = CMPImag8 killed renamable $x, killed renamable $rc3
+  $a = LDImag8 $rc21
+  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc20
+  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c(tied-def 1)
+  $rc4 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 50, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.7)
+  renamable $x = LDImm 0
+  $rc5 = STImag8 $x
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc4
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.7 + 1)
+  renamable $x = LDImm 1
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc9 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.13, killed $n, 1
+  JMP %bb.14
+
+bb.13 (%ir-block.2):
+; predecessors: %bb.12
+  successors: %bb.15(0x80000000); %bb.15(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm -1
+  JMP %bb.15
+
+bb.14 (%ir-block.2):
+; predecessors: %bb.12
+  successors: %bb.15(0x80000000); %bb.15(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm 0
+  JMP %bb.15
+
+bb.15 (%ir-block.2):
+; predecessors: %bb.13, %bb.14
+  successors: %bb.16(0x40000000), %bb.17(0x40000000); %bb.16(50.00%), %bb.17(50.00%)
+  liveins: $x, $rc8, $rc9
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.16, killed $n, 1
+  JMP %bb.17
+
+bb.16 (%ir-block.2):
+; predecessors: %bb.15
+  successors: %bb.18(0x80000000); %bb.18(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm -1
+  JMP %bb.18
+
+bb.17 (%ir-block.2):
+; predecessors: %bb.15
+  successors: %bb.18(0x80000000); %bb.18(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm 0
+  JMP %bb.18
+
+bb.18 (%ir-block.2):
+; predecessors: %bb.16, %bb.17
+  successors: %bb.19(0x40000000), %bb.20(0x40000000); %bb.19(50.00%), %bb.20(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  dead renamable $a, renamable $c = ASL killed renamable $a(tied-def 0)
+  $a = T_A $x
+  renamable $a, renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc2
+  renamable $a, dead renamable $c = ROL killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 48, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  $a = LDImag8 $rc4
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.8)
+  renamable $x = LDImm 0
+  $rc4 = STImag8 $x
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc5
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.8 + 1)
+  renamable $x = LDImm 1
+  $rc5 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 50, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+  $rc9 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.19, killed $n, 1
+  JMP %bb.20
+
+bb.19 (%ir-block.2):
+; predecessors: %bb.18
+  successors: %bb.21(0x80000000); %bb.21(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm -1
+  JMP %bb.21
+
+bb.20 (%ir-block.2):
+; predecessors: %bb.18
+  successors: %bb.21(0x80000000); %bb.21(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm 0
+  JMP %bb.21
+
+bb.21 (%ir-block.2):
+; predecessors: %bb.19, %bb.20
+  successors: %bb.22(0x40000000), %bb.23(0x40000000); %bb.22(50.00%), %bb.23(50.00%)
+  liveins: $x, $rc8, $rc9
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.22, killed $n, 1
+  JMP %bb.23
+
+bb.22 (%ir-block.2):
+; predecessors: %bb.21
+  successors: %bb.24(0x80000000); %bb.24(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm -1
+  JMP %bb.24
+
+bb.23 (%ir-block.2):
+; predecessors: %bb.21
+  successors: %bb.24(0x80000000); %bb.24(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm 0
+  JMP %bb.24
+
+bb.24 (%ir-block.2):
+; predecessors: %bb.22, %bb.23
+  successors: %bb.25(0x40000000), %bb.26(0x40000000); %bb.25(50.00%), %bb.26(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc22 = STImag8 $a
+  $rc21 = STImag8 $x
+  %8:gpr = LDImag8 $rc2
+  $rc20 = STImag8 %8:gpr
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 48, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+  $rc9 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.25, killed $n, 1
+  JMP %bb.26
+
+bb.25 (%ir-block.2):
+; predecessors: %bb.24
+  successors: %bb.27(0x80000000); %bb.27(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm -1
+  JMP %bb.27
+
+bb.26 (%ir-block.2):
+; predecessors: %bb.24
+  successors: %bb.27(0x80000000); %bb.27(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm 0
+  JMP %bb.27
+
+bb.27 (%ir-block.2):
+; predecessors: %bb.25, %bb.26
+  successors: %bb.28(0x40000000), %bb.29(0x40000000); %bb.28(50.00%), %bb.29(50.00%)
+  liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.28, killed $n, 1
+  JMP %bb.29
+
+bb.28 (%ir-block.2):
+; predecessors: %bb.27
+  successors: %bb.30(0x80000000); %bb.30(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm -1
+  JMP %bb.30
+
+bb.29 (%ir-block.2):
+; predecessors: %bb.27
+  successors: %bb.30(0x80000000); %bb.30(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm 0
+  JMP %bb.30
+
+bb.30 (%ir-block.2):
+; predecessors: %bb.28, %bb.29
+  successors: %bb.31(0x40000000), %bb.32(0x40000000); %bb.31(50.00%), %bb.32(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc3 = STImag8 $a
+  $rc4 = STImag8 $x
+  $x = LDImag8 $rc22
+  renamable $c = CMPImag8 killed renamable $x, killed renamable $rc3
+  $a = LDImag8 $rc21
+  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc20
+  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c(tied-def 1)
+  $rc4 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 46, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.9)
+  renamable $x = LDImm 0
+  $rc5 = STImag8 $x
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc4
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.9 + 1)
+  renamable $x = LDImm 1
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 50, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+  $rc9 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.31, killed $n, 1
+  JMP %bb.32
+
+bb.31 (%ir-block.2):
+; predecessors: %bb.30
+  successors: %bb.33(0x80000000); %bb.33(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm -1
+  JMP %bb.33
+
+bb.32 (%ir-block.2):
+; predecessors: %bb.30
+  successors: %bb.33(0x80000000); %bb.33(100.00%)
+  liveins: $rc8, $rc9
+  renamable $x = LDImm 0
+  JMP %bb.33
+
+bb.33 (%ir-block.2):
+; predecessors: %bb.31, %bb.32
+  successors: %bb.34(0x40000000), %bb.35(0x40000000); %bb.34(50.00%), %bb.35(50.00%)
+  liveins: $x, $rc8, $rc9
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.34, killed $n, 1
+  JMP %bb.35
+
+bb.34 (%ir-block.2):
+; predecessors: %bb.33
+  successors: %bb.36(0x80000000); %bb.36(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm -1
+  JMP %bb.36
+
+bb.35 (%ir-block.2):
+; predecessors: %bb.33
+  successors: %bb.36(0x80000000); %bb.36(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9
+  renamable $y = LDImm 0
+  JMP %bb.36
+
+bb.36 (%ir-block.2):
+; predecessors: %bb.34, %bb.35
+  successors: %bb.37(0x40000000), %bb.38(0x40000000); %bb.37(50.00%), %bb.38(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc22 = STImag8 $a
+  $rc21 = STImag8 $x
+  %9:gpr = LDImag8 $rc2
+  $rc20 = STImag8 %9:gpr
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 48, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+  $rc9 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+  $rc8 = STImag8 $a
+  CmpZero renamable $rc8, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.37, killed $n, 1
+  JMP %bb.38
+
+bb.37 (%ir-block.2):
+; predecessors: %bb.36
+  successors: %bb.39(0x80000000); %bb.39(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm -1
+  JMP %bb.39
+
+bb.38 (%ir-block.2):
+; predecessors: %bb.36
+  successors: %bb.39(0x80000000); %bb.39(100.00%)
+  liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $x = LDImm 0
+  JMP %bb.39
+
+bb.39 (%ir-block.2):
+; predecessors: %bb.37, %bb.38
+  successors: %bb.40(0x40000000), %bb.41(0x40000000); %bb.40(50.00%), %bb.41(50.00%)
+  liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.40, killed $n, 1
+  JMP %bb.41
+
+bb.40 (%ir-block.2):
+; predecessors: %bb.39
+  successors: %bb.42(0x80000000); %bb.42(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm -1
+  JMP %bb.42
+
+bb.41 (%ir-block.2):
+; predecessors: %bb.39
+  successors: %bb.42(0x80000000); %bb.42(100.00%)
+  liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  renamable $y = LDImm 0
+  JMP %bb.42
+
+bb.42 (%ir-block.2):
+; predecessors: %bb.40, %bb.41
+  successors: %bb.43(0x40000000), %bb.44(0x40000000); %bb.43(50.00%), %bb.44(50.00%)
+  liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc3 = STImag8 $a
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc22
+  dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+  $a = LDImag8 $rc21
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c
+  $x = TA $a
+  $a = LDImag8 $rc20
+  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+  $rc4 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 44, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.10)
+  renamable $x = LDImm 0
+  $rc6 = STImag8 $x
+  $a = LDImag8 $rc4
+  renamable $y = LDImm 1
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.10 + 1)
+  renamable $x = LDImm 1
+  $rc7 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 46, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs2, killed renamable $y :: (load (s8) from %ir.9)
+  $rc8 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.9 + 1)
+  $rc4 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc7 = STImag8 $x
+  renamable $c = LDCImm -1
+  $a = LDImag8 $rc8
+  renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc8 = STImag8 $a
+  $a = LDImag8 $rc4
+  renamable $a, dead renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 1, killed renamable $c(tied-def 1)
+  $rc9 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 42, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc6
+  $a = LDImag8 $rc8
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.11)
+  $y = LDImag8 $rc7
+  $a = LDImag8 $rc9
+  STIndirIdx killed renamable $a, killed renamable $rs2, killed renamable $y :: (store (s8) into %ir.11 + 1)
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.10)
+  $rc8 = STImag8 $y
+  $rc6 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 40, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs1, renamable $y :: (load (s8) from %ir.10 + 1)
+  $rc3 = STImag8 $a
+  $rc2 = STImag8 $y
+  $a = LDImag8 $rc6
+  $y = LDImag8 $rc8
+  STIndirIdx killed renamable $a, renamable $rs2, killed renamable $y :: (store (s8) into %ir.12)
+  $y = LDImag8 $rc2
+  $a = LDImag8 $rc3
+  STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.12 + 1)
+  $rc5 = STImag8 $y
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 50, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc8
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.43, killed $n, 1
+  JMP %bb.44
+
+bb.43 (%ir-block.2):
+; predecessors: %bb.42
+  successors: %bb.45(0x80000000); %bb.45(100.00%)
+  liveins: $a, $rc4
+  renamable $y = LDImm -1
+  JMP %bb.45
+
+bb.44 (%ir-block.2):
+; predecessors: %bb.42
+  successors: %bb.45(0x80000000); %bb.45(100.00%)
+  liveins: $a, $rc4
+  renamable $y = LDImm 0
+  JMP %bb.45
+
+bb.45 (%ir-block.2):
+; predecessors: %bb.43, %bb.44
+  successors: %bb.46(0x40000000), %bb.47(0x40000000); %bb.46(50.00%), %bb.47(50.00%)
+  liveins: $a, $y, $rc4
+  renamable $x = LDImm 0
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $rc20 = STImag8 $x
+  renamable $a = LDImm 3
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def dead $rc2, implicit-def dead $rc3
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 38, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  $y = LDImag8 $rc20
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.13)
+  renamable $y = LDImm 1
+  $a = T_A $x
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.13 + 1)
+  renamable $x = LDImm 1
+  $rc5 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 48, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc20
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+  CmpZero renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.46, killed $n, 1
+  JMP %bb.47
+
+bb.46 (%ir-block.2):
+; predecessors: %bb.45
+  successors: %bb.48(0x80000000); %bb.48(100.00%)
+  liveins: $a, $rc4
+  renamable $y = LDImm -1
+  JMP %bb.48
+
+bb.47 (%ir-block.2):
+; predecessors: %bb.45
+  successors: %bb.48(0x80000000); %bb.48(100.00%)
+  liveins: $a, $rc4
+  renamable $y = LDImm 0
+  JMP %bb.48
+
+bb.48 (%ir-block.2):
+; predecessors: %bb.46, %bb.47
+  successors: %bb.49(0x40000000), %bb.50(0x40000000); %bb.49(50.00%), %bb.50(50.00%)
+  liveins: $a, $y, $rc4
+  renamable $x = LDImm 0
+  $rc2 = STImag8 $x
+  $rc3 = STImag8 $x
+  $rc5 = STImag8 $a
+  $rc6 = STImag8 $y
+  $rc7 = STImag8 $y
+  $rc20 = STImag8 $x
+  renamable $a = LDImm 3
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def dead $rc2, implicit-def dead $rc3
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 36, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  $y = LDImag8 $rc20
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.14)
+  renamable $y = LDImm 1
+  $a = T_A $x
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.14 + 1)
+  renamable $x = LDImm 1
+  $rc5 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 42, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc20
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.11)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.11 + 1)
+  $x = TA $a
+  CmpZero renamable $x, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.49, killed $n, 1
+  JMP %bb.50
+
+bb.49 (%ir-block.2):
+; predecessors: %bb.48
+  successors: %bb.51(0x80000000); %bb.51(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm -1
+  JMP %bb.51
+
+bb.50 (%ir-block.2):
+; predecessors: %bb.48
+  successors: %bb.51(0x80000000); %bb.51(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm 0
+  JMP %bb.51
+
+bb.51 (%ir-block.2):
+; predecessors: %bb.49, %bb.50
+  successors: %bb.52(0x40000000), %bb.53(0x40000000); %bb.52(50.00%), %bb.53(50.00%)
+  liveins: $a, $x, $rc4
+  renamable $c = CMPImm renamable $a, 128
+  $y = TA $a
+  $rc5 = STImag8 $y
+  renamable $rc5, renamable $c = ROR killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc6 = STImag8 $x
+  renamable $rc6, renamable $c = ROR killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc4
+  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 32, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15)
+  renamable $y = LDImm 0
+  $rc4 = STImag8 $y
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 1)
+  renamable $y = LDImm 1
+  $rc6 = STImag8 $y
+  renamable $y = LDImm 2
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 2)
+  renamable $y = LDImm 3
+  $a = LDImag8 $rc5
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 3)
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 40, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.12)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.12 + 1)
+  $x = TA $a
+  CmpZero renamable $x, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.52, killed $n, 1
+  JMP %bb.53
+
+bb.52 (%ir-block.2):
+; predecessors: %bb.51
+  successors: %bb.54(0x80000000); %bb.54(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm -1
+  JMP %bb.54
+
+bb.53 (%ir-block.2):
+; predecessors: %bb.51
+  successors: %bb.54(0x80000000); %bb.54(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm 0
+  JMP %bb.54
+
+bb.54 (%ir-block.2):
+; predecessors: %bb.52, %bb.53
+  successors: %bb.55(0x40000000), %bb.56(0x40000000); %bb.55(50.00%), %bb.56(50.00%)
+  liveins: $a, $x, $rc4
+  renamable $c = CMPImm renamable $a, 128
+  $y = TA $a
+  $rc5 = STImag8 $y
+  renamable $rc5, renamable $c = ROR killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc6 = STImag8 $x
+  renamable $rc6, renamable $c = ROR killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc4
+  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 28, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16)
+  renamable $y = LDImm 0
+  $rc4 = STImag8 $y
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 1)
+  renamable $y = LDImm 1
+  $rc6 = STImag8 $y
+  renamable $y = LDImm 2
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 2)
+  renamable $y = LDImm 3
+  $a = LDImag8 $rc5
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 3)
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 38, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.13)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.13 + 1)
+  $x = TA $a
+  CmpZero renamable $x, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.55, killed $n, 1
+  JMP %bb.56
+
+bb.55 (%ir-block.2):
+; predecessors: %bb.54
+  successors: %bb.57(0x80000000); %bb.57(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm -1
+  JMP %bb.57
+
+bb.56 (%ir-block.2):
+; predecessors: %bb.54
+  successors: %bb.57(0x80000000); %bb.57(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm 0
+  JMP %bb.57
+
+bb.57 (%ir-block.2):
+; predecessors: %bb.55, %bb.56
+  successors: %bb.58(0x40000000), %bb.59(0x40000000); %bb.58(50.00%), %bb.59(50.00%)
+  liveins: $a, $x, $rc4
+  renamable $c = CMPImm renamable $a, 128
+  $y = TA $a
+  $rc5 = STImag8 $y
+  renamable $rc5, renamable $c = ROR killed renamable $rc5(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc6 = STImag8 $x
+  renamable $rc6, renamable $c = ROR killed renamable $rc6(tied-def 0), killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc4
+  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 24, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17)
+  renamable $y = LDImm 0
+  $rc4 = STImag8 $y
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 1)
+  renamable $y = LDImm 1
+  $rc6 = STImag8 $y
+  renamable $y = LDImm 2
+  $a = T_A $x
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 2)
+  renamable $y = LDImm 3
+  $a = LDImag8 $rc5
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 3)
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 36, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.14)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.14 + 1)
+  $x = TA $a
+  CmpZero renamable $x, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.58, killed $n, 1
+  JMP %bb.59
+
+bb.58 (%ir-block.2):
+; predecessors: %bb.57
+  successors: %bb.60(0x80000000); %bb.60(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm -1
+  JMP %bb.60
+
+bb.59 (%ir-block.2):
+; predecessors: %bb.57
+  successors: %bb.60(0x80000000); %bb.60(100.00%)
+  liveins: $x, $rc4
+  renamable $a = LDImm 0
+  JMP %bb.60
+
+bb.60 (%ir-block.2):
+; predecessors: %bb.58, %bb.59
+  successors: %bb.61, %bb.62
+  liveins: $a, $x, $rc4
+  renamable $c = CMPImm renamable $a, 128
+  $y = TA $a
+  $rc2 = STImag8 $y
+  renamable $rc2, renamable $c = ROR killed renamable $rc2(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $a, renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $x
+  renamable $rc3, renamable $c = ROR killed renamable $rc3(tied-def 0), killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $a = LDImag8 $rc4
+  renamable $a, dead renamable $c = ROR killed renamable $a(tied-def 0), killed renamable $c(tied-def 1)
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 20, $c(tied-def 1)
+  $rc20 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc21 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18)
+  renamable $x = LDImm 0
+  $rc4 = STImag8 $x
+  renamable $y = LDImm 1
+  $a = LDImag8 $rc3
+  STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 1)
+  renamable $x = LDImm 1
+  renamable $y = LDImm 2
+  $a = LDImag8 $rc5
+  STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 2)
+  renamable $y = LDImm 2
+  $rc7 = STImag8 $y
+  renamable $y = LDImm 3
+  $a = LDImag8 $rc2
+  STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 3)
+  renamable $y = LDImm 3
+  $rc9 = STImag8 $y
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 24, $c(tied-def 1)
+  $rc10 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc11 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17)
+  $rc8 = STImag8 $a
+  $rc5 = STImag8 $x
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 1)
+  $x = TA $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 2)
+  $rc2 = STImag8 $a
+  $y = LDImag8 $rc9
+  renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 3)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17)
+  $rc4 = STImag8 $a
+  $rc26 = STImag8 $y
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17 + 2)
+  $rc6 = STImag8 $a
+  $rc27 = STImag8 $y
+  $y = LDImag8 $rc9
+  renamable $a = LDIndirIdx killed renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 3)
+  $rc7 = STImag8 $a
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+  $rc25 = STImag8 $a
+  $rc22 = STImag8 $x
+  %10:gpr = LDImag8 $rc2
+  $rc23 = STImag8 %10:gpr
+  %11:gpr = LDImag8 $rc3
+  $rc24 = STImag8 %11:gpr
+  $y = LDImag8 $rc26
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18)
+  $rc4 = STImag8 $y
+  $rc8 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18 + 1)
+  $rc5 = STImag8 $y
+  $rc9 = STImag8 $a
+  $y = LDImag8 $rc27
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 2)
+  $rc2 = STImag8 $a
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18 + 3)
+  $rc7 = STImag8 $y
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 1)
+  $rc5 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc26 = STImag8 $x
+  $y = LDImag8 $rc27
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 3)
+  renamable $x = LDImm 3
+  $rc20 = STImag8 $x
+  $rc7 = STImag8 $a
+  $x = LDImag8 $rc9
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+  $rc4 = STImag8 $a
+  $rc5 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc25
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c
+  $rc7 = STImag8 $a
+  $a = LDImag8 $rc22
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc5, killed renamable $c
+  $rc5 = STImag8 $a
+  $a = LDImag8 $rc23
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc24
+  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+  $rc6 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 16, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $y = LDImm 0
+  $a = LDImag8 $rc7
+  STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.19)
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19)
+  $rc7 = STImag8 $a
+  $a = LDImag8 $rc5
+  %12:gpr = LDImag8 $rc26
+  $rc5 = STImag8 %12:gpr
+  $y = LDImag8 $rc5
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.19 + 1)
+  renamable $y = LDImm 2
+  $a = LDImag8 $rc4
+  STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.19 + 2)
+  $rc8 = STImag8 $y
+  $a = LDImag8 $rc6
+  %13:gpr = LDImag8 $rc20
+  $rc4 = STImag8 %13:gpr
+  $y = LDImag8 $rc4
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.19 + 3)
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc8
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 3)
+  CmpBrZeroMultiByte %bb.61, 1, killed renamable $rc7, killed renamable $rc5, killed renamable $rc6, killed renamable $a, implicit-def dead $c
+  JMP %bb.62
+
+bb.61 (%ir-block.104):
+; predecessors: %bb.60
+  successors: %bb.83(0x80000000); %bb.83(100.00%)
+
+  JMP %bb.83
+
+bb.62 (%ir-block.105):
+; predecessors: %bb.60
+  successors: %bb.63(0x40000000), %bb.64(0x40000000); %bb.63(50.00%), %bb.64(50.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 32, $c(tied-def 1)
+  $rc20 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc21 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15)
+  $rc8 = STImag8 $a
+  renamable $x = LDImm 0
+  $rc24 = STImag8 $x
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 1)
+  $rc9 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc28 = STImag8 $x
+  renamable $y = LDImm 2
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 24, $c(tied-def 1)
+  $rc22 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc23 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 2)
+  $rc2 = STImag8 $a
+  renamable $x = LDImm 2
+  $rc6 = STImag8 $x
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 3)
+  renamable $x = LDImm 3
+  $rc7 = STImag8 $x
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc24
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc28
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 3)
+  renamable $x = LDImm 3
+  $rc29 = STImag8 $x
+  $rc7 = STImag8 $a
+  $x = LDImag8 $rc9
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc25 = STImag8 $a
+  $rc26 = STImag8 $x
+  %14:gpr = LDImag8 $rc2
+  $rc27 = STImag8 %14:gpr
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 28, $c(tied-def 1)
+  $rc30 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc31 = STImag8 $a
+  $y = LDImag8 $rc24
+  renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16)
+  $rc4 = STImag8 $y
+  $rc8 = STImag8 $a
+  $y = LDImag8 $rc28
+  renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 1)
+  $rc5 = STImag8 $y
+  $x = TA $a
+  renamable $y = LDImm 2
+  $rc2 = STImag8 $y
+  renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 2)
+  $rc6 = STImag8 $y
+  $rc2 = STImag8 $a
+  $y = LDImag8 $rc29
+  renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 3)
+  $rc7 = STImag8 $y
+  $rc3 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 20, $c(tied-def 1)
+  $rc28 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc29 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18)
+  $rc4 = STImag8 $a
+  $rc24 = STImag8 $y
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 3)
+  $rc7 = STImag8 $a
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc3 = STImag8 $a
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc25
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c
+  $rc8 = STImag8 $a
+  $a = LDImag8 $rc26
+  renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c
+  $x = TA $a
+  $a = LDImag8 $rc27
+  renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c
+  $rc3 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 16, $c(tied-def 1)
+  $rc26 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc27 = STImag8 $a
+  $y = LDImag8 $rc24
+  renamable $a = LDIndirIdx renamable $rs13, renamable $y :: (load (s8) from %ir.19)
+  $rc4 = STImag8 $a
+  $rc9 = STImag8 $y
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 1)
+  $rc5 = STImag8 $a
+  renamable $y = LDImm 2
+  renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 2)
+  $rc6 = STImag8 $a
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 3)
+  $rc2 = STImag8 $x
+  $rc7 = STImag8 $a
+  $x = LDImag8 $rc8
+  $a = LDImag8 $rc9
+  JSR &__divsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 12, $c(tied-def 1)
+  $rc24 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc25 = STImag8 $a
+  $a = PL
+  renamable $y = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20)
+  $rc5 = STImag8 $y
+  renamable $x = LDImm 1
+  %15:ac = T_A $x
+  $y = TA %15:ac
+  $a = LDImag8 $rc4
+  STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 1)
+  $rc4 = STImag8 $y
+  renamable $y = LDImm 2
+  $a = LDImag8 $rc2
+  STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 2)
+  $rc6 = STImag8 $y
+  renamable $y = LDImm 3
+  $a = LDImag8 $rc3
+  STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 3)
+  $rc7 = STImag8 $y
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16)
+  $rc8 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 1)
+  $rc9 = STImag8 $a
+  $rc10 = STImag8 $y
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 2)
+  $rc2 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 3)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17)
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc10
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 3)
+  renamable $x = LDImm 3
+  $rc30 = STImag8 $x
+  $rc7 = STImag8 $a
+  $x = LDImag8 $rc9
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc23 = STImag8 $a
+  $rc22 = STImag8 $x
+  %16:gpr = LDImag8 $rc2
+  $rc31 = STImag8 %16:gpr
+  renamable $y = LDImm 0
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15)
+  $rc8 = STImag8 $a
+  $rc4 = STImag8 $y
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 1)
+  $rc5 = STImag8 $y
+  $rc9 = STImag8 $a
+  renamable $y = LDImm 2
+  renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 2)
+  $rc6 = STImag8 $y
+  $rc2 = STImag8 $a
+  $y = LDImag8 $rc30
+  renamable $a = LDIndirIdx killed renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 3)
+  $rc7 = STImag8 $y
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc4
+  renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18)
+  $rc4 = STImag8 $a
+  $rc20 = STImag8 $y
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 1)
+  $rc5 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc30 = STImag8 $x
+  $y = LDImag8 $rc6
+  renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18 + 2)
+  $rc6 = STImag8 $a
+  $rc21 = STImag8 $y
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs14, renamable $y :: (load (s8) from %ir.18 + 3)
+  $rc28 = STImag8 $y
+  $rc7 = STImag8 $a
+  $x = LDImag8 $rc9
+  $a = LDImag8 $rc8
+  JSR &__mulsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+  $rc3 = STImag8 $a
+  $rc4 = STImag8 $x
+  renamable $c = LDCImm -1
+  $a = LDImag8 $rc23
+  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc3, killed renamable $c(tied-def 1)
+  $x = TA $a
+  $a = LDImag8 $rc22
+  renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc4, killed renamable $c(tied-def 1)
+  $rc9 = STImag8 $a
+  $a = LDImag8 $rc31
+  renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a(tied-def 0), killed renamable $rc2, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc20
+  renamable $a = LDIndirIdx renamable $rs13, renamable $y :: (load (s8) from %ir.19)
+  $rc4 = STImag8 $a
+  $rc8 = STImag8 $y
+  $y = LDImag8 $rc30
+  renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 1)
+  $rc5 = STImag8 $a
+  $y = LDImag8 $rc21
+  renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 2)
+  $rc6 = STImag8 $a
+  $y = LDImag8 $rc28
+  renamable $a = LDIndirIdx killed renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 3)
+  %17:gpr = LDImag8 $rc9
+  $rc2 = STImag8 %17:gpr
+  $rc7 = STImag8 $a
+  $a = LDImag8 $rc8
+  $rc20 = STImag8 $a
+  JSR &__divsi3, <regmask $rc20 $rc21 $rc22 $rc23 $rc24 $rc25 $rc26 $rc27 $rc28 $rc29 $rc30 $rc31 $rs10 $rs11 $rs12 $rs13 $rs14 $rs15 $rc20lsb $rc21lsb $rc22lsb $rc23lsb $rc24lsb $rc25lsb $rc26lsb $rc27lsb $rc28lsb $rc29lsb $rc30lsb $rc31lsb>, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+  $rc6 = STImag8 $x
+  $x = LDImag8 $rc3
+  renamable $c = LDCImm 0
+  PH $a
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  $a = PL
+  $y = LDImag8 $rc20
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21)
+  renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20)
+  $rc7 = STImag8 $a
+  $y = LDImag8 $rc30
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 1)
+  renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc21
+  $a = LDImag8 $rc2
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 2)
+  renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 2)
+  $rc2 = STImag8 $a
+  renamable $y = LDImm 3
+  $a = T_A $x
+  STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 3)
+  renamable $a = LDIndirIdx killed renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 3)
+  $x = TA $a
+  $y = LDImag8 $rc7
+  renamable $c = CMPImm killed renamable $y, 1
+  $a = LDImag8 $rc3
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 2, killed renamable $c(tied-def 1)
+  $a = LDImag8 $rc2
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $a = T_A $x
+  renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  BR %bb.63, killed renamable $v, 1, implicit-def dead $c
+  JMP %bb.64
+
+bb.63 (%ir-block.105):
+; predecessors: %bb.62
+  successors: %bb.65(0x80000000); %bb.65(100.00%)
+  liveins: $a
+  renamable $a = EORImm killed renamable $a(tied-def 0), -128
+  JMP %bb.65
+
+bb.64 (%ir-block.105):
+; predecessors: %bb.62
+  successors: %bb.65(0x80000000); %bb.65(100.00%)
+  liveins: $a
+  JMP %bb.65
+
+bb.65 (%ir-block.105):
+; predecessors: %bb.63, %bb.64
+  successors: %bb.66, %bb.67
+  liveins: $a
+  CmpZero killed renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.66, killed $n, 0
+  JMP %bb.67
+
+bb.66 (%ir-block.128):
+; predecessors: %bb.65
+  successors: %bb.67(0x80000000); %bb.67(100.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 12, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20)
+  renamable $x = LDImm 0
+  renamable $y = LDImm 1
+  renamable $a = LDImm 2
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 1)
+  renamable $y = LDImm 2
+  $a = T_A $x
+  STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 2)
+  renamable $y = LDImm 3
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 3)
+  JMP %bb.67
+
+bb.67 (%ir-block.129):
+; predecessors: %bb.66, %bb.65
+  successors: %bb.68(0x40000000), %bb.69(0x40000000); %bb.68(50.00%), %bb.69(50.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 12, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20)
+  $rc6 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 1)
+  $rc5 = STImag8 $a
+  renamable $y = LDImm 2
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 2)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 3)
+  $x = TA $a
+  $y = LDImag8 $rc6
+  renamable $c = CMPImm killed renamable $y, 0
+  $a = LDImag8 $rc5
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 254, killed renamable $c(tied-def 1)
+  $a = LDImag8 $rc4
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 255, killed renamable $c(tied-def 1)
+  $a = T_A $x
+  renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a(tied-def 0), 255, killed renamable $c(tied-def 1)
+  BR %bb.68, killed renamable $v, 1, implicit-def dead $c
+  JMP %bb.69
+
+bb.68 (%ir-block.129):
+; predecessors: %bb.67
+  successors: %bb.70(0x80000000); %bb.70(100.00%)
+  liveins: $a
+  renamable $a = EORImm killed renamable $a(tied-def 0), -128
+  JMP %bb.70
+
+bb.69 (%ir-block.129):
+; predecessors: %bb.67
+  successors: %bb.70(0x80000000); %bb.70(100.00%)
+  liveins: $a
+  JMP %bb.70
+
+bb.70 (%ir-block.129):
+; predecessors: %bb.68, %bb.69
+  successors: %bb.71, %bb.72
+  liveins: $a
+  CmpZero killed renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.71, killed $n, 1
+  JMP %bb.72
+
+bb.71 (%ir-block.132):
+; predecessors: %bb.70
+  successors: %bb.72(0x80000000); %bb.72(100.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 12, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20)
+  renamable $y = LDImm 1
+  renamable $a = LDImm -2
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 1)
+  renamable $y = LDImm 2
+  renamable $a = LDImm -1
+  STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 2)
+  renamable $y = LDImm 3
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 3)
+  JMP %bb.72
+
+bb.72 (%ir-block.133):
+; predecessors: %bb.71, %bb.70
+  successors: %bb.73(0x40000000), %bb.74(0x40000000); %bb.73(50.00%), %bb.74(50.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21)
+  $rc6 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 1)
+  $rc5 = STImag8 $a
+  renamable $y = LDImm 2
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 2)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 3)
+  $x = TA $a
+  $y = LDImag8 $rc6
+  renamable $c = CMPImm killed renamable $y, 1
+  $a = LDImag8 $rc5
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 2, killed renamable $c(tied-def 1)
+  $a = LDImag8 $rc4
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $a = T_A $x
+  renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  BR %bb.73, killed renamable $v, 1, implicit-def dead $c
+  JMP %bb.74
+
+bb.73 (%ir-block.133):
+; predecessors: %bb.72
+  successors: %bb.75(0x80000000); %bb.75(100.00%)
+  liveins: $a
+  renamable $a = EORImm killed renamable $a(tied-def 0), -128
+  JMP %bb.75
+
+bb.74 (%ir-block.133):
+; predecessors: %bb.72
+  successors: %bb.75(0x80000000); %bb.75(100.00%)
+  liveins: $a
+  JMP %bb.75
+
+bb.75 (%ir-block.133):
+; predecessors: %bb.73, %bb.74
+  successors: %bb.76, %bb.77
+  liveins: $a
+  CmpZero killed renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.76, killed $n, 0
+  JMP %bb.77
+
+bb.76 (%ir-block.136):
+; predecessors: %bb.75
+  successors: %bb.77(0x80000000); %bb.77(100.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21)
+  renamable $x = LDImm 0
+  renamable $y = LDImm 1
+  renamable $a = LDImm 2
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 1)
+  renamable $y = LDImm 2
+  $a = T_A $x
+  STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 2)
+  renamable $y = LDImm 3
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 3)
+  JMP %bb.77
+
+bb.77 (%ir-block.137):
+; predecessors: %bb.76, %bb.75
+  successors: %bb.78(0x40000000), %bb.79(0x40000000); %bb.78(50.00%), %bb.79(50.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21)
+  $rc6 = STImag8 $a
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 1)
+  $rc5 = STImag8 $a
+  renamable $y = LDImm 2
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 2)
+  $rc4 = STImag8 $a
+  renamable $y = LDImm 3
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 3)
+  $x = TA $a
+  $y = LDImag8 $rc6
+  renamable $c = CMPImm killed renamable $y, 0
+  $a = LDImag8 $rc5
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 254, killed renamable $c(tied-def 1)
+  $a = LDImag8 $rc4
+  dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a(tied-def 0), 255, killed renamable $c(tied-def 1)
+  $a = T_A $x
+  renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a(tied-def 0), 255, killed renamable $c(tied-def 1)
+  BR %bb.78, killed renamable $v, 1, implicit-def dead $c
+  JMP %bb.79
+
+bb.78 (%ir-block.137):
+; predecessors: %bb.77
+  successors: %bb.80(0x80000000); %bb.80(100.00%)
+  liveins: $a
+  renamable $a = EORImm killed renamable $a(tied-def 0), -128
+  JMP %bb.80
+
+bb.79 (%ir-block.137):
+; predecessors: %bb.77
+  successors: %bb.80(0x80000000); %bb.80(100.00%)
+  liveins: $a
+  JMP %bb.80
+
+bb.80 (%ir-block.137):
+; predecessors: %bb.78, %bb.79
+  successors: %bb.81, %bb.82
+  liveins: $a
+  CmpZero killed renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+  BR %bb.81, killed $n, 1
+  JMP %bb.82
+
+bb.81 (%ir-block.140):
+; predecessors: %bb.80
+  successors: %bb.82(0x80000000); %bb.82(100.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDImm 0
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21)
+  renamable $y = LDImm 1
+  renamable $a = LDImm -2
+  STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 1)
+  renamable $y = LDImm 2
+  renamable $a = LDImm -1
+  STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 2)
+  renamable $y = LDImm 3
+  STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 3)
+  JMP %bb.82
+
+bb.82 (%ir-block.141):
+; predecessors: %bb.81, %bb.80
+  successors: %bb.83(0x80000000); %bb.83(100.00%)
+
+  renamable $y = LDImm 0
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 54, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+  $rc5 = STImag8 $a
+  renamable $x = LDImm 0
+  $rc7 = STImag8 $x
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+  $rc4 = STImag8 $a
+  renamable $x = LDImm 1
+  $rc6 = STImag8 $x
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 12, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $c = LDCImm -1
+  $a = LDImag8 $rc5
+  %18:gpr = LDImag8 $rc7
+  $rc5 = STImag8 %18:gpr
+  $y = LDImag8 $rc5
+  renamable $a, renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a(tied-def 0), renamable $rs1, killed renamable $y, killed renamable $c(tied-def 1) :: (load (s8) from %ir.20)
+  $x = TA $a
+  $a = LDImag8 $rc4
+  $y = LDImag8 $rc6
+  renamable $a, dead renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a(tied-def 0), killed renamable $rs1, renamable $y, killed renamable $c(tied-def 1) :: (load (s8) from %ir.20 + 1)
+  $rc6 = STImag8 $a
+  $rc7 = STImag8 $y
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 58, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  $y = LDImag8 $rc5
+  renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.3)
+  $rc8 = STImag8 $y
+  $rc4 = STImag8 $a
+  $y = LDImag8 $rc7
+  renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.3 + 1)
+  $rc5 = STImag8 $a
+  $a = T_A $x
+  $y = LDImag8 $rc8
+  STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.146)
+  $rc9 = STImag8 $y
+  $y = LDImag8 $rc7
+  $a = LDImag8 $rc6
+  STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.146 + 1)
+  $rc8 = STImag8 $y
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 52, $c(tied-def 1)
+  $rc2 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc3 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 8, $c(tied-def 1)
+  $rc4 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc5 = STImag8 $a
+  renamable $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 56, $c(tied-def 1)
+  $rc6 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, dead renamable $c, dead renamable $v = ADCImm $a(tied-def 0), 0, killed renamable $c(tied-def 1)
+  $rc7 = STImag8 $a
+  $y = LDImag8 $rc9
+  renamable $a = LDIndirIdx renamable $rs3, killed renamable $y :: (load (s8) from %ir.4)
+  $x = TA $a
+  $y = LDImag8 $rc8
+  renamable $a = LDIndirIdx killed renamable $rs3, killed renamable $y :: (load (s8) from %ir.4 + 1)
+  $rc7 = STImag8 $a
+  $rc6 = STImag8 $x
+  $y = LDImag8 $rc9
+  renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.6)
+  renamable $c = LDCImm -1
+  renamable $a, renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a(tied-def 0), renamable $rs2, renamable $y, killed renamable $c(tied-def 1) :: (load (s8) from %ir.21)
+  STIndirIdx killed renamable $a, renamable $rs3, killed renamable $y :: (store (s8) into %ir.151)
+  renamable $y = LDImm 1
+  renamable $a = LDIndirIdx killed renamable $rs1, renamable $y :: (load (s8) from %ir.6 + 1)
+  renamable $a, dead renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a(tied-def 0), killed renamable $rs2, renamable $y, killed renamable $c(tied-def 1) :: (load (s8) from %ir.21 + 1)
+  STIndirIdx killed renamable $a, killed renamable $rs3, killed renamable $y :: (store (s8) into %ir.151 + 1)
+  JMP %bb.83
+
+bb.83 (%ir-block.152):
+; predecessors: %bb.82, %bb.61
+
+  $y = LDImm 0
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.26)
+  $rc31 = STImag8 $a
+  $y = LDImm 1
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.25)
+  $rc30 = STImag8 $a
+  $y = LDImm 2
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.24)
+  $rc29 = STImag8 $a
+  $y = LDImm 3
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.23)
+  $rc28 = STImag8 $a
+  $y = LDImm 4
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.22)
+  $rc27 = STImag8 $a
+  $y = LDImm 5
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.21)
+  $rc26 = STImag8 $a
+  $y = LDImm 6
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.20)
+  $rc25 = STImag8 $a
+  $y = LDImm 7
+  $a = LDIndirIdx $rs0, killed $y :: (load (s8) from %stack.19)
+  $rc24 = STImag8 $a
+  $a = frame-destroy PL
+  $rc23 = STImag8 $a
+  $a = frame-destroy PL
+  $rc22 = STImag8 $a
+  $a = frame-destroy PL
+  $rc21 = STImag8 $a
+  $a = frame-destroy PL
+  $rc20 = STImag8 $a
+  $c = LDCImm 0
+  $a = LDImag8 $rc0
+  $a, $c, $v = ADCImm $a(tied-def 0), 60, $c(tied-def 1)
+  $rc0 = STImag8 $a
+  $a = LDImag8 $rc1
+  $a, $c, $v = ADCImm $a(tied-def 0), 0, $c(tied-def 1)
+  $rc1 = STImag8 $a
+  RTS implicit $rc20, implicit $rc21, implicit $rc22, implicit $rc23, implicit $rc24, implicit $rc25, implicit $rc26, implicit $rc27, implicit $rc28, implicit $rc29, implicit $rc30, implicit $rc31
+
+# End machine code for function newton_step.
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    newton_step
+- basic block: %bb.62  (0x570851e17e30)
+- instruction: $rc6 = STImag8 $y
+- operand 1:   $y
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0-full.out
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll'.
+2.	Running pass 'Verify generated machine code' on function '@newton_step'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000570818d4a3cb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x0000570818d47625 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x0000570818d4b15b
+3  libc.so.6 0x000076f91ec45cb0
+4  libc.so.6 0x000076f91eca61ac pthread_kill + 284
+5  libc.so.6 0x000076f91ec45b7e gsignal + 30
+6  libc.so.6 0x000076f91ec288ec abort + 39
+7  llc       0x0000570818cb6f05 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x0000570817e7571d
+9  llc       0x0000570817e76a19
+10 llc       0x0000570817d9fb52 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 418
+11 llc       0x00005708181dc3c0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1088
+12 llc       0x00005708181e248c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+13 llc       0x00005708181dd034 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1972
+14 llc       0x00005708178b06ed
+15 llc       0x00005708178adbf3 main + 1331
+16 libc.so.6 0x000076f91ec2a601
+17 libc.so.6 0x000076f91ec2a718 __libc_start_main + 136
+18 llc       0x00005708178acfe5 _start + 37
+exit_code=-6

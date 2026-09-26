@@ -74,6 +74,11 @@ are correct. Register known semantic dependencies explicitly.
    python3 dev/docs-deps.py
    ```
 
+   The upstream-pages generator also refreshes the existing
+   `/tmp/llvm-mos-upstream-flowchart.html` and
+   `/tmp/llvm-mos-upstream-status-2026-09-21.html` browser files. Their filenames
+   stay stable, while their content and visible snapshot dates follow the source
+   documents. The overview renderer requires Python's `markdown_it` package.
    A renderer-only invocation does not update the dependency receipt; use
    `--refresh` for the complete workflow.
    Registered generators run in dependency order.

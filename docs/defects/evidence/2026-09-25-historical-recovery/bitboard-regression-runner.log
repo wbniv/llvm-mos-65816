@@ -1,0 +1,6 @@
+$ python3 /home/will/llvm-mos-65816/dev/recheck-historical-bitboard.py --clang /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --llc /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /tmp/bitboard-check-ixh79581/probe.o
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /tmp/bitboard-check-ixh79581/probe.s
+Inline bitboard C and retained IR: PASS
+
+exit_code=0

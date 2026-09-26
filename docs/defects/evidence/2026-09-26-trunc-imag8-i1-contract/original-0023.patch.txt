@@ -1,0 +1,85 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -1048,6 +1048,8 @@ def : Pat<(i16 (anyext Anyi8:$s)), (INSERT_SUBREG (IMPLICIT_DEF), Anyi8:$s, sub
+ 
+ def : Pat<(i1 (trunc Ac:$s)), (EXTRACT_SUBREG (ANDImm Ac:$s, 1), sublsb)>;
+ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
++let Predicates = [HasAccum16] in
++def : Pat<(i16 (trunc Imag32:$s)), (EXTRACT_SUBREG Imag32:$s, sublo16)>;
+ 
+ //===---------------------------------------------------------------------===//
+ // Constant Patterns
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -2316,6 +2316,23 @@ bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
+ 
+   Register From = MI.getOperand(1).getReg();
+ 
++  // The s8 -> s1 pattern requires its input in Ac so it can mask bit zero.
++  // RegBankSelect can legitimately leave the input in Imag8 (for example, a
++  // boolean materialized by the far-pointer comparison combiner).  In that
++  // case selectImpl declines the pattern and reaches this fallback.  Do not
++  // treat it as the s16 -> s1 case below: buildTrunc(s8, s8) is invalid and
++  // used to crash MachineIRBuilder.  Constrain the operand through Ac and
++  // retry the normal pattern instead.
++  if (Builder.getMRI()->getType(From) == S8) {
++    auto &MRI = *Builder.getMRI();
++    Register AcFrom = MRI.createGenericVirtualRegister(S8);
++    MRI.setRegClass(AcFrom, &MOS::AcRegClass);
++    auto Copy = Builder.buildCopy(AcFrom, From);
++    constrainGenericOp(*Copy);
++    MI.getOperand(1).setReg(AcFrom);
++    return selectImpl(MI, *CoverageInfo);
++  }
++
+   assert(Builder.getMRI()->getType(From) == LLT::scalar(16));
+   assert(Builder.getMRI()->getType(MI.getOperand(0).getReg()) ==
+          LLT::scalar(1));
+diff --git a/llvm/test/CodeGen/MOS/a16-trunc-i32.ll b/llvm/test/CodeGen/MOS/a16-trunc-i32.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-trunc-i32.ll
+@@ -0,0 +1,8 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++
++define i16 @trunc_i32_to_i16(i32 %value) {
++; CHECK-LABEL: trunc_i32_to_i16:
++; CHECK: rts
++  %low = trunc i32 %value to i16
++  ret i16 %low
++}
+diff --git a/llvm/test/CodeGen/MOS/instruction-selector.mir b/llvm/test/CodeGen/MOS/instruction-selector.mir
+--- a/llvm/test/CodeGen/MOS/instruction-selector.mir
++++ b/llvm/test/CodeGen/MOS/instruction-selector.mir
+@@ -2300,6 +2300,29 @@ body: |
+     RTS implicit %1
+ ...
+ ---
++name: trunc_imag8_1
++legalized: true
++regBankSelected: true
++body: |
++  bb.0.entry:
++    ; 6502-LABEL: name: trunc_imag8_1
++    ; 6502: [[COPY:%[0-9]+]]:imag8 = COPY $rc2
++    ; 6502-NEXT: [[COPY1:%[0-9]+]]:ac = COPY [[COPY]]
++    ; 6502-NEXT: [[ANDImm:%[0-9]+]]:ac = ANDImm [[COPY1]], 1
++    ; 6502-NEXT: [[COPY2:%[0-9]+]]:gpr_lsb = COPY [[ANDImm]].sublsb
++    ; 6502-NEXT: RTS implicit [[COPY2]]
++    ;
++    ; 65C02-LABEL: name: trunc_imag8_1
++    ; 65C02: [[COPY:%[0-9]+]]:imag8 = COPY $rc2
++    ; 65C02-NEXT: [[COPY1:%[0-9]+]]:ac = COPY [[COPY]]
++    ; 65C02-NEXT: [[ANDImm:%[0-9]+]]:ac = ANDImm [[COPY1]], 1
++    ; 65C02-NEXT: [[COPY2:%[0-9]+]]:gpr_lsb = COPY [[ANDImm]].sublsb
++    ; 65C02-NEXT: RTS implicit [[COPY2]]
++    %0:imag8(s8) = COPY $rc2
++    %1:any(s1) = G_TRUNC %0
++    RTS implicit %1
++...
++---
+ name: trunc_16_8
+ legalized: true
+ regBankSelected: true

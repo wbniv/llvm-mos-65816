@@ -1,0 +1,32 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-output.mir
+cwd=/home/will/llvm-mos-65816
+exit_code=-11
+stdout:
+
+stderr:
+*** Reducing Instructions (instructions)...
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-output.mir
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llvm-reduce 0x00005de6fbeceb28
+1  llvm-reduce 0x00005de6fbecbf65
+2  llvm-reduce 0x00005de6fbecf891
+3  libc.so.6   0x00007978a2445cb0
+4  llvm-reduce 0x00005de6fb45dba0
+5  llvm-reduce 0x00005de6fb082087
+6  llvm-reduce 0x00005de6fb068651
+7  llvm-reduce 0x00005de6fb0682e9
+8  llvm-reduce 0x00005de6fb069ee9
+9  llvm-reduce 0x00005de6fb0697f3
+10 llvm-reduce 0x00005de6fb069737
+11 libc.so.6   0x00007978a24a9514
+12 libc.so.6   0x00007978a24a9589 pthread_once + 25
+13 llvm-reduce 0x00005de6fb069d0f
+14 llvm-reduce 0x00005de6fb066961
+15 llvm-reduce 0x00005de6fb059f73
+16 llvm-reduce 0x00005de6fb089139
+17 libc.so.6   0x00007978a242a601
+18 libc.so.6   0x00007978a242a718 __libc_start_main + 136
+19 llvm-reduce 0x00005de6fb059325
+

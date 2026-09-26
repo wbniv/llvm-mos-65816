@@ -1,0 +1,58 @@
+[
+  {
+    "compiler": "upstream",
+    "cpu": "mos6502",
+    "passes": "none",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mos6502-none.out"
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mos6502",
+    "passes": "greedy,virtregrewriter",
+    "exit": -6,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mos6502-greedy_virtregrewriter.out"
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mosw65816",
+    "passes": "none",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mosw65816-none.out"
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mosw65816",
+    "passes": "greedy,virtregrewriter",
+    "exit": -6,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mosw65816-greedy_virtregrewriter.out"
+  },
+  {
+    "compiler": "candidate",
+    "cpu": "mos6502",
+    "passes": "none",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mos6502 -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-candidate-mos6502-none.out"
+  },
+  {
+    "compiler": "candidate",
+    "cpu": "mos6502",
+    "passes": "greedy,virtregrewriter",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mos6502 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-candidate-mos6502-greedy_virtregrewriter.out"
+  },
+  {
+    "compiler": "candidate",
+    "cpu": "mosw65816",
+    "passes": "none",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-candidate-mosw65816-none.out"
+  },
+  {
+    "compiler": "candidate",
+    "cpu": "mosw65816",
+    "passes": "greedy,virtregrewriter",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-candidate-mosw65816-greedy_virtregrewriter.out"
+  }
+]

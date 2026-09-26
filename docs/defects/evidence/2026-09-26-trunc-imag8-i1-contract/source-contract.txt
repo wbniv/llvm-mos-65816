@@ -1,0 +1,357 @@
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSInstrLogical.td
+620: def : Pat<(i1 (trunc Ac:$s)), (EXTRACT_SUBREG (ANDImm Ac:$s, 1), sublsb)>;
+621: def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+622: 
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp
+54:     ValMappings[I.index()] =
+55:         &getValueMapping(0, Ty.getSizeInBits(), MOS::AnyRegBank);
+56:   }
+57:   return getInstructionMapping(/*ID=*/1, /*Cost=*/1,
+58:                                getOperandsMapping(ValMappings), NumOperands);
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp
+67: MOSRegisterBankInfo::getRegBankFromRegClass(const TargetRegisterClass &RC,
+68:                                             LLT Ty) const {
+69:   return MOS::AnyRegBank;
+70: }
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/CodeGen/RegisterBankInfo.cpp
+84: RegisterBankInfo::getRegBank(Register Reg, const MachineRegisterInfo &MRI,
+85:                              const TargetRegisterInfo &TRI) const {
+86:   if (!Reg.isVirtual()) {
+87:     // FIXME: This was probably a copy to a virtual register that does have a
+88:     // type we could use.
+89:     const TargetRegisterClass *RC = getMinimalPhysRegClass(Reg, TRI);
+90:     return RC ? &getRegBankFromRegClass(*RC, LLT()) : nullptr;
+91:   }
+92: 
+93:   const RegClassOrRegBank &RegClassOrBank = MRI.getRegClassOrRegBank(Reg);
+94:   if (auto *RB = dyn_cast_if_present<const RegisterBank *>(RegClassOrBank))
+95:     return RB;
+96:   if (auto *RC =
+97:           dyn_cast_if_present<const TargetRegisterClass *>(RegClassOrBank))
+98:     return &getRegBankFromRegClass(*RC, MRI.getType(Reg));
+99:   return nullptr;
+100: }
+101: 
+102: const TargetRegisterClass *
+103: RegisterBankInfo::getMinimalPhysRegClass(MCRegister Reg,
+104:                                          const TargetRegisterInfo &TRI) const {
+105:   const auto [RegRCIt, Inserted] = PhysRegMinimalRCs.try_emplace(Reg);
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h
+811:     case GIM_RootCheckRegBankForClass:
+812:     case GIM_CheckRegBankForClass: {
+813:       uint64_t InsnID =
+814:           (MatcherOpcode == GIM_RootCheckRegBankForClass) ? 0 : readULEB();
+815:       uint64_t OpIdx = readULEB();
+816:       uint16_t RCEnum = readU16();
+817:       DEBUG_WITH_TYPE(TgtExecutor::getName(),
+818:                       dbgs() << CurrentIdx << ": GIM_CheckRegBankForClass(MIs["
+819:                              << InsnID << "]->getOperand(" << OpIdx
+820:                              << "), RCEnum=" << RCEnum << ")\n");
+821:       assert(State.MIs[InsnID] != nullptr && "Used insn before defined");
+822:       MachineOperand &MO = State.MIs[InsnID]->getOperand(OpIdx);
+823:       if (!MO.isReg() ||
+824:           &RBI.getRegBankFromRegClass(*TRI.getRegClass(RCEnum),
+825:                                       MRI.getType(MO.getReg())) !=
+826:               RBI.getRegBank(MO.getReg(), MRI, TRI)) {
+827:         if (handleReject() == RejectAndGiveUp)
+828:           return false;
+829:       }
+830:       break;
+831:     }
+832: 
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h
+1462:     case GIR_RootConstrainSelectedInstOperands:
+1463:     case GIR_ConstrainSelectedInstOperands: {
+1464:       uint64_t InsnID = (MatcherOpcode == GIR_RootConstrainSelectedInstOperands)
+1465:                             ? 0
+1466:                             : readULEB();
+1467:       assert(OutMIs[InsnID] && "Attempted to add to undefined instruction");
+1468:       constrainSelectedInstRegOperands(*OutMIs[InsnID].getInstr(), TII, TRI,
+1469:                                        RBI);
+1470:       DEBUG_WITH_TYPE(TgtExecutor::getName(),
+1471:                       dbgs() << CurrentIdx
+1472:                              << ": GIR_ConstrainSelectedInstOperands(OutMIs["
+1473:                              << InsnID << "])\n");
+1474:       break;
+1475:     }
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/CodeGen/GlobalISel/Utils.cpp
+46: Register llvm::constrainRegToClass(MachineRegisterInfo &MRI,
+47:                                    const TargetInstrInfo &TII,
+48:                                    const RegisterBankInfo &RBI, Register Reg,
+49:                                    const TargetRegisterClass &RegClass) {
+50:   if (!RBI.constrainGenericRegister(Reg, RegClass, MRI))
+51:     return MRI.createVirtualRegister(&RegClass);
+52: 
+53:   return Reg;
+54: }
+55: 
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/CodeGen/GlobalISel/Utils.cpp
+56: Register llvm::constrainOperandRegClass(
+57:     const MachineFunction &MF, const TargetRegisterInfo &TRI,
+58:     MachineRegisterInfo &MRI, const TargetInstrInfo &TII,
+59:     const RegisterBankInfo &RBI, MachineInstr &InsertPt,
+60:     const TargetRegisterClass &RegClass, MachineOperand &RegMO) {
+61:   Register Reg = RegMO.getReg();
+62:   // Assume physical registers are properly constrained.
+63:   assert(Reg.isVirtual() && "PhysReg not implemented");
+64: 
+65:   // Save the old register class to check whether
+66:   // the change notifications will be required.
+67:   // TODO: A better approach would be to pass
+68:   // the observers to constrainRegToClass().
+69:   auto *OldRegClass = MRI.getRegClassOrNull(Reg);
+70:   Register ConstrainedReg = constrainRegToClass(MRI, TII, RBI, Reg, RegClass);
+71:   // If we created a new virtual register because the class is not compatible
+72:   // then create a copy between the new and the old register.
+73:   if (ConstrainedReg != Reg) {
+74:     MachineBasicBlock::iterator InsertIt(&InsertPt);
+75:     MachineBasicBlock &MBB = *InsertPt.getParent();
+76:     // FIXME: The copy needs to have the classes constrained for its operands.
+77:     // Use operand's regbank to get the class for old register (Reg).
+78:     if (RegMO.isUse()) {
+79:       BuildMI(MBB, InsertIt, InsertPt.getDebugLoc(),
+80:               TII.get(TargetOpcode::COPY), ConstrainedReg)
+81:           .addReg(Reg);
+82:     } else {
+83:       assert(RegMO.isDef() && "Must be a definition");
+84:       BuildMI(MBB, std::next(InsertIt), InsertPt.getDebugLoc(),
+85:               TII.get(TargetOpcode::COPY), Reg)
+86:           .addReg(ConstrainedReg);
+87:     }
+88:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+89:       Observer->changingInstr(*RegMO.getParent());
+90:     }
+91:     RegMO.setReg(ConstrainedReg);
+92:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+93:       Observer->changedInstr(*RegMO.getParent());
+94:     }
+95:   } else if (OldRegClass != MRI.getRegClassOrNull(Reg)) {
+96:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+97:       if (!RegMO.isDef()) {
+98:         MachineInstr *RegDef = MRI.getVRegDef(Reg);
+99:         Observer->changedInstr(*RegDef);
+100:       }
+101:       Observer->changingAllUsesOfReg(MRI, Reg);
+102:       Observer->finishedChangingAllUsesOfReg();
+103:     }
+104:   }
+105:   return ConstrainedReg;
+106: }
+107: 
+108: Register llvm::constrainOperandRegClass(
+109:     const MachineFunction &MF, const TargetRegisterInfo &TRI,
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+209:   if (selectImpl(MI, *CoverageInfo))
+210:     return true;
+211: 
+
+8be0546128a55e78c63ca571d466aa72a782cd36:llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+1718: bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
+1719:   MachineIRBuilder Builder(MI);
+1720: 
+1721:   LLT S8 = LLT::scalar(8);
+1722: 
+1723:   Register From = MI.getOperand(1).getReg();
+1724: 
+1725:   assert(Builder.getMRI()->getType(From) == LLT::scalar(16));
+1726:   assert(Builder.getMRI()->getType(MI.getOperand(0).getReg()) ==
+1727:          LLT::scalar(1));
+1728: 
+1729:   MachineInstrSpan MIS(MI, MI.getParent());
+1730:   MI.getOperand(1).setReg(Builder.buildTrunc(S8, From).getReg(0));
+1731:   selectAll(MIS);
+1732:   return true;
+1733: }
+1734: 
+1735: bool MOSInstructionSelector::selectAddE(MachineInstr &MI) {
+1736:   auto &Add = cast<GAddSubCarryInOut>(MI);
+1737:   Register Result = Add.getDstReg();
+1738:   Register CarryOut = Add.getCarryOutReg();
+1739:   Register L = Add.getLHS().getReg();
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSInstrLogical.td
+620: def : Pat<(i1 (trunc Ac:$s)), (EXTRACT_SUBREG (ANDImm Ac:$s, 1), sublsb)>;
+621: def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+622: 
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp
+54:     ValMappings[I.index()] =
+55:         &getValueMapping(0, Ty.getSizeInBits(), MOS::AnyRegBank);
+56:   }
+57:   return getInstructionMapping(/*ID=*/1, /*Cost=*/1,
+58:                                getOperandsMapping(ValMappings), NumOperands);
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSRegisterBankInfo.cpp
+67: MOSRegisterBankInfo::getRegBankFromRegClass(const TargetRegisterClass &RC,
+68:                                             LLT Ty) const {
+69:   return MOS::AnyRegBank;
+70: }
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/CodeGen/RegisterBankInfo.cpp
+84: RegisterBankInfo::getRegBank(Register Reg, const MachineRegisterInfo &MRI,
+85:                              const TargetRegisterInfo &TRI) const {
+86:   if (!Reg.isVirtual()) {
+87:     // FIXME: This was probably a copy to a virtual register that does have a
+88:     // type we could use.
+89:     const TargetRegisterClass *RC = getMinimalPhysRegClass(Reg, TRI);
+90:     return RC ? &getRegBankFromRegClass(*RC, LLT()) : nullptr;
+91:   }
+92: 
+93:   const RegClassOrRegBank &RegClassOrBank = MRI.getRegClassOrRegBank(Reg);
+94:   if (auto *RB = dyn_cast_if_present<const RegisterBank *>(RegClassOrBank))
+95:     return RB;
+96:   if (auto *RC =
+97:           dyn_cast_if_present<const TargetRegisterClass *>(RegClassOrBank))
+98:     return &getRegBankFromRegClass(*RC, MRI.getType(Reg));
+99:   return nullptr;
+100: }
+101: 
+102: const TargetRegisterClass *
+103: RegisterBankInfo::getMinimalPhysRegClass(MCRegister Reg,
+104:                                          const TargetRegisterInfo &TRI) const {
+105:   const auto [RegRCIt, Inserted] = PhysRegMinimalRCs.try_emplace(Reg);
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h
+826:     case GIM_RootCheckRegBankForClass:
+827:     case GIM_CheckRegBankForClass: {
+828:       uint64_t InsnID =
+829:           (MatcherOpcode == GIM_RootCheckRegBankForClass) ? 0 : readULEB();
+830:       uint64_t OpIdx = readULEB();
+831:       uint16_t RCEnum = readU16();
+832:       DEBUG_WITH_TYPE(TgtExecutor::getName(),
+833:                       dbgs() << CurrentIdx << ": GIM_CheckRegBankForClass(MIs["
+834:                              << InsnID << "]->getOperand(" << OpIdx
+835:                              << "), RCEnum=" << RCEnum << ")\n");
+836:       assert(State.MIs[InsnID] != nullptr && "Used insn before defined");
+837:       MachineOperand &MO = State.MIs[InsnID]->getOperand(OpIdx);
+838:       if (!MO.isReg() ||
+839:           &RBI.getRegBankFromRegClass(*TRI.getRegClass(RCEnum),
+840:                                       MRI.getType(MO.getReg())) !=
+841:               RBI.getRegBank(MO.getReg(), MRI, TRI)) {
+842:         if (handleReject() == RejectAndGiveUp)
+843:           return false;
+844:       }
+845:       break;
+846:     }
+847: 
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/include/llvm/CodeGen/GlobalISel/GIMatchTableExecutorImpl.h
+1479:     case GIR_RootConstrainSelectedInstOperands:
+1480:     case GIR_ConstrainSelectedInstOperands: {
+1481:       uint64_t InsnID = (MatcherOpcode == GIR_RootConstrainSelectedInstOperands)
+1482:                             ? 0
+1483:                             : readULEB();
+1484:       assert(OutMIs[InsnID] && "Attempted to add to undefined instruction");
+1485:       constrainSelectedInstRegOperands(*OutMIs[InsnID].getInstr(), TII, TRI,
+1486:                                        RBI);
+1487:       DEBUG_WITH_TYPE(TgtExecutor::getName(),
+1488:                       dbgs() << CurrentIdx
+1489:                              << ": GIR_ConstrainSelectedInstOperands(OutMIs["
+1490:                              << InsnID << "])\n");
+1491:       break;
+1492:     }
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/CodeGen/GlobalISel/Utils.cpp
+50: Register llvm::constrainRegToClass(MachineRegisterInfo &MRI,
+51:                                    const TargetInstrInfo &TII,
+52:                                    const RegisterBankInfo &RBI, Register Reg,
+53:                                    const TargetRegisterClass &RegClass) {
+54:   if (!RBI.constrainGenericRegister(Reg, RegClass, MRI))
+55:     return MRI.createVirtualRegister(&RegClass);
+56: 
+57:   return Reg;
+58: }
+59: 
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/CodeGen/GlobalISel/Utils.cpp
+60: Register llvm::constrainOperandRegClass(
+61:     const MachineFunction &MF, const TargetRegisterInfo &TRI,
+62:     MachineRegisterInfo &MRI, const TargetInstrInfo &TII,
+63:     const RegisterBankInfo &RBI, MachineInstr &InsertPt,
+64:     const TargetRegisterClass &RegClass, MachineOperand &RegMO) {
+65:   Register Reg = RegMO.getReg();
+66:   // Assume physical registers are properly constrained.
+67:   assert(Reg.isVirtual() && "PhysReg not implemented");
+68: 
+69:   // Save the old register class to check whether
+70:   // the change notifications will be required.
+71:   // TODO: A better approach would be to pass
+72:   // the observers to constrainRegToClass().
+73:   auto *OldRegClass = MRI.getRegClassOrNull(Reg);
+74:   Register ConstrainedReg = constrainRegToClass(MRI, TII, RBI, Reg, RegClass);
+75:   // If we created a new virtual register because the class is not compatible
+76:   // then create a copy between the new and the old register.
+77:   if (ConstrainedReg != Reg) {
+78:     MachineBasicBlock::iterator InsertIt(&InsertPt);
+79:     MachineBasicBlock &MBB = *InsertPt.getParent();
+80:     // FIXME: The copy needs to have the classes constrained for its operands.
+81:     // Use operand's regbank to get the class for old register (Reg).
+82:     if (RegMO.isUse()) {
+83:       BuildMI(MBB, InsertIt, InsertPt.getDebugLoc(),
+84:               TII.get(TargetOpcode::COPY), ConstrainedReg)
+85:           .addReg(Reg);
+86:     } else {
+87:       assert(RegMO.isDef() && "Must be a definition");
+88:       BuildMI(MBB, std::next(InsertIt), InsertPt.getDebugLoc(),
+89:               TII.get(TargetOpcode::COPY), Reg)
+90:           .addReg(ConstrainedReg);
+91:     }
+92:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+93:       Observer->changingInstr(*RegMO.getParent());
+94:     }
+95:     RegMO.setReg(ConstrainedReg);
+96:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+97:       Observer->changedInstr(*RegMO.getParent());
+98:     }
+99:   } else if (OldRegClass != MRI.getRegClassOrNull(Reg)) {
+100:     if (GISelChangeObserver *Observer = MF.getObserver()) {
+101:       if (!RegMO.isDef()) {
+102:         MachineInstr *RegDef = MRI.getVRegDef(Reg);
+103:         Observer->changedInstr(*RegDef);
+104:       }
+105:       Observer->changingAllUsesOfReg(MRI, Reg);
+106:       Observer->finishedChangingAllUsesOfReg();
+107:     }
+108:   }
+109:   return ConstrainedReg;
+110: }
+111: 
+112: Register llvm::constrainOperandRegClass(
+113:     const MachineFunction &MF, const TargetRegisterInfo &TRI,
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+209:   if (selectImpl(MI, *CoverageInfo))
+210:     return true;
+211: 
+
+742d554bf08042b8df93d791c335260fadd16643:llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+1718: bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
+1719:   MachineIRBuilder Builder(MI);
+1720: 
+1721:   LLT S8 = LLT::scalar(8);
+1722: 
+1723:   Register From = MI.getOperand(1).getReg();
+1724: 
+1725:   assert(Builder.getMRI()->getType(From) == LLT::scalar(16));
+1726:   assert(Builder.getMRI()->getType(MI.getOperand(0).getReg()) ==
+1727:          LLT::scalar(1));
+1728: 
+1729:   MachineInstrSpan MIS(MI, MI.getParent());
+1730:   MI.getOperand(1).setReg(Builder.buildTrunc(S8, From).getReg(0));
+1731:   selectAll(MIS);
+1732:   return true;
+1733: }
+1734: 
+1735: bool MOSInstructionSelector::selectAddE(MachineInstr &MI) {
+1736:   auto &Add = cast<GAddSubCarryInOut>(MI);
+1737:   Register Result = Add.getDstReg();
+1738:   Register CarryOut = Add.getCarryOutReg();
+1739:   Register L = Add.getLHS().getReg();

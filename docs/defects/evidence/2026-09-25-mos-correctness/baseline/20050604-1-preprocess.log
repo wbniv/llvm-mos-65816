@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/clang --target=mos -mcpu=mos6502 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1.i
+exit_code=0

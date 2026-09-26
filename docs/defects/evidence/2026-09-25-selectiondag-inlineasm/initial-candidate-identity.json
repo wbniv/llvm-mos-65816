@@ -1,0 +1,5 @@
+{
+  "binary": "build/selectiondag-inlineasm-fix/llc",
+  "sha256": "7ebb7255a231fe88e17d26454754bd7e113436a5d54c6091ed60f45bf2b93735",
+  "qualification": "Initial candidate before callbr recovery handling; source and build recipe retained."
+}

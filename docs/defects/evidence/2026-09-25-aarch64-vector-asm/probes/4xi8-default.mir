@@ -1,0 +1,105 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/4xi8-default.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/4xi8-default.ll"
+  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32"
+  target triple = "aarch64"
+  
+  define void @f(ptr %p) {
+    %v = load <4 x i8>, ptr %p, align 4
+    call void asm sideeffect "", "r"(<4 x i8> %v)
+    ret void
+  }
+...
+---
+name:            f
+alignment:       4
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr64common, preferred-register: '', flags: [  ] }
+  - { id: 2, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 3, class: gpr32common, preferred-register: '', flags: [  ] }
+  - { id: 4, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 5, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 6, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 7, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 8, class: fpr32, preferred-register: '', flags: [  ] }
+  - { id: 9, class: gpr32, preferred-register: '', flags: [  ] }
+  - { id: 10, class: fpr32, preferred-register: '', flags: [  ] }
+  - { id: 11, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 12, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 13, class: fpr128, preferred-register: '', flags: [  ] }
+liveins:
+  - { reg: '$x0', virtual-reg: '%0' }
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    4
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 4, alignment: 4, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $x0
+  
+    %0:gpr64 = COPY $x0
+    %1:gpr64common = COPY killed %0
+    %10:fpr32 = LDRSui %1, 0 :: (load (s32) from %ir.p)
+    %11:fpr128 = SUBREG_TO_REG killed %10, %subreg.ssub
+    %12:fpr64 = COPY %11.dsub
+    %13:fpr128 = USHLLv8i8_shift killed %12, 0
+    %2:fpr64 = COPY %13.dsub
+    %5:fpr64 = IMPLICIT_DEF
+    %4:fpr64 = UZP1v8i8 %2, killed %5
+    %7:fpr128 = IMPLICIT_DEF
+    %6:fpr128 = INSERT_SUBREG %7, killed %4, %subreg.dsub
+    %8:fpr32 = COPY %6.ssub
+    STRSui killed %8, %stack.0, 0 :: (store (s32) into %stack.0)
+    %9:gpr32 = LDRWui %stack.0, 0 :: (load (s32) from %stack.0)
+    %3:gpr32common = COPY %9
+    INLINEASM &"", sideeffect attdialect, reguse:GPR32common, %3
+    RET_ReallyLR
+...

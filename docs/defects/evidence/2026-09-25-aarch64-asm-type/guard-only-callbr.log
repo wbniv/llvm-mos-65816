@@ -1,0 +1,33 @@
+$ /tmp/aarch64-asm-type-fix/llc-guard-only -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll -o /dev/null
+error: could not allocate output register for constraint 'r'
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /tmp/aarch64-asm-type-fix/llc-guard-only -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@branch'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-guard-only 0x00005dc54093c22b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-guard-only 0x00005dc5409390b1 llvm::sys::RunSignalHandlers() + 369
+2  llc-guard-only 0x00005dc54093d03b
+3  libc.so.6      0x000074c8fcc45cb0
+4  llc-guard-only 0x00005dc5406b7d67 llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDNodeFlags) + 39
+5  llc-guard-only 0x00005dc5406c058e llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::ArrayRef<llvm::SDValue>, llvm::SDNodeFlags) + 270
+6  llc-guard-only 0x00005dc5406e2089 llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::SDVTList, llvm::ArrayRef<llvm::SDValue>, llvm::SDNodeFlags) + 73
+7  llc-guard-only 0x00005dc5406704d4 llvm::SelectionDAGBuilder::visitCallBrLandingPad(llvm::CallInst const&) + 2532
+8  llc-guard-only 0x00005dc54066296d llvm::SelectionDAGBuilder::visitIntrinsicCall(llvm::CallInst const&, unsigned int) + 27373
+9  llc-guard-only 0x00005dc5406312b6 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+10 llc-guard-only 0x00005dc540706cb5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+11 llc-guard-only 0x00005dc54070624a llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6858
+12 llc-guard-only 0x00005dc540703511 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+13 llc-guard-only 0x00005dc540700bac llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+14 llc-guard-only 0x00005dc53f5d7029 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+15 llc-guard-only 0x00005dc53fb69810 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+16 llc-guard-only 0x00005dc53fb71912 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+17 llc-guard-only 0x00005dc53fb6a5d4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+18 llc-guard-only 0x00005dc53e5397cb
+19 llc-guard-only 0x00005dc53e536a93 main + 1443
+20 libc.so.6      0x000074c8fcc2a601
+21 libc.so.6      0x000074c8fcc2a718 __libc_start_main + 136
+22 llc-guard-only 0x00005dc53e535ca5 _start + 37
+
+exit_code=-11

@@ -1,0 +1,4 @@
+{
+  "llc_sha256": "ab303b6de03af03a4cdfef62b556f21cd75449648619e83587978246d926c3df",
+  "patch": "0049-mos-vector-scalarize-backport.patch"
+}

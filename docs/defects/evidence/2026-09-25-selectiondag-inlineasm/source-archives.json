@@ -1,0 +1,37 @@
+{
+  "format": "gzip, deterministic mtime=0; no source contents edited",
+  "snapshots": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.baseline.cpp.gz",
+      "sha256": "1e605ae1167b1837b3117d0db3352c6b2da09a4542331041177cf5c820167680",
+      "member": "SelectionDAGBuilder.baseline.cpp",
+      "uncompressed_sha256": "03d5123a8ec017297b381782c2d943264df81dda85769a67707c270eb3b96bf4",
+      "uncompressed_bytes": 526753,
+      "round_trip_verified": true
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.candidate.cpp.gz",
+      "sha256": "97ed29ad3186455a4c7fe0a63e54934590236af9f1a28b061ae881d4107f7f6a",
+      "member": "SelectionDAGBuilder.candidate.cpp",
+      "uncompressed_sha256": "727de875a6a6c635f209d93f18083870bbdc9a1837b42051d0467a437426fe8c",
+      "uncompressed_bytes": 526731,
+      "round_trip_verified": true
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.initial-candidate.cpp.gz",
+      "sha256": "a5dd4c37efd4ddea02873258d57a5f3a0d079bb2473cf801c0a207546836dcd0",
+      "member": "SelectionDAGBuilder.initial-candidate.cpp",
+      "uncompressed_sha256": "30eb6da61fcee9935f7befa73c905c3c0f0e127621d0b79ef7294582778f298c",
+      "uncompressed_bytes": 526430,
+      "round_trip_verified": true
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.vendor-baseline.cpp.gz",
+      "sha256": "03ddabfdcfeb80131ae97db2d109d762d0bf95ea117fba83f566bf81ce0fe561",
+      "member": "SelectionDAGBuilder.vendor-baseline.cpp",
+      "uncompressed_sha256": "129185ce083726a2352484e7e484fdda132457f909e96a1ed824ad912f5823af",
+      "uncompressed_bytes": 523152,
+      "round_trip_verified": true
+    }
+  ]
+}

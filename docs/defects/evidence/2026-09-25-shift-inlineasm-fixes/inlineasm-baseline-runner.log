@@ -1,0 +1,36 @@
+$ python3 /home/will/llvm-mos-65816/dev/check-inlineasm-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041
+$ /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll -o /dev/null
+llc-0041: /work/build/register-exhaustion-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:155: void getRegistersForValue(MachineFunction &, MachineIRBuilder &, GISelAsmOperandInfo &, GISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll'.
+2.	Running pass 'IRTranslator' on function '@wide'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-0041  0x00005ba7ad79f25b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-0041  0x00005ba7ad79c0e1 llvm::sys::RunSignalHandlers() + 369
+2  llc-0041  0x00005ba7ad7a006b
+3  libc.so.6 0x000077b635a45cb0
+4  libc.so.6 0x000077b635aa61ac pthread_kill + 284
+5  libc.so.6 0x000077b635a45b7e gsignal + 30
+6  libc.so.6 0x000077b635a288ec abort + 39
+7  libc.so.6 0x000077b635a29979
+8  libc.so.6 0x000077b635a3bf75 __assert_fail + 181
+9  llc-0041  0x00005ba7ade43a7c llvm::InlineAsmLowering::lowerInlineAsm(llvm::MachineIRBuilder&, llvm::CallBase const&, std::function<llvm::ArrayRef<llvm::Register> (llvm::Value const&)>) const + 13692
+10 llc-0041  0x00005ba7ade3324e llvm::IRTranslatorImpl::translateInlineAsm(llvm::CallBase const&, llvm::MachineIRBuilder&) + 110
+11 llc-0041  0x00005ba7ade334bd llvm::IRTranslatorImpl::translateCall(llvm::User const&, llvm::MachineIRBuilder&) + 445
+12 llc-0041  0x00005ba7ade3ac7c llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) + 4124
+13 llc-0041  0x00005ba7ade3bbea llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) + 554
+14 llc-0041  0x00005ba7ac43a059 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+15 llc-0041  0x00005ba7ac9cc840 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+16 llc-0041  0x00005ba7ac9d4942 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+17 llc-0041  0x00005ba7ac9cd604 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+18 llc-0041  0x00005ba7ab39c80b
+19 llc-0041  0x00005ba7ab399ad3 main + 1443
+20 libc.so.6 0x000077b635a2a601
+21 libc.so.6 0x000077b635a2a718 __libc_start_main + 136
+22 llc-0041  0x00005ba7ab398ce5 _start + 37
+compiler_exit_code=-6
+Clean inline-asm diagnostic: FAIL
+
+exit_code=1

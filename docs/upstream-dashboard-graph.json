@@ -1,0 +1,188 @@
+{
+  "schemaVersion": 1,
+  "source": "docs/upstream-pending-work.md#flowchart",
+  "sourceHash": "103a1ba97ff1ba59b56a5f5b639d76a1a7fe4230c8ed4d67a96c254d8baf9ac3",
+  "sourceSnapshotDate": "2026-09-26",
+  "manifestSourceHash": "14453e3f09c18870ef38567bac6986db2372f5cb099a23a35de3ce22deeea293",
+  "mermaid": "flowchart TD\n  subgraph Independent[Independent fixes]\n    MC[MVN/MVP complete fix] --> MCT[Validated: five checks; 130 suite tests pass]\n    MCT --> MCP[Compiler PR 604 posted] --> MCM[Review and merge]\n    Z[Common SDK longjmp zero fix] --> ZT[Integrated SDK regression: 20 pass]\n    ZT --> ZP[SDK PR 450 posted] --> ZM[Review and merge]\n    OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589] --> REVIEW[Review / CI follow-up] --> MERGED[Merge]\n    COALESCE0015[0015 recovered witness: root repaired by 0028] --> UNDEF\n    UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]\n    HOLD --> FINAL[Choose implementation and review submission]\n    FINAL --> UNDEFPR[Publish fix PR] --> MERGED\n    RA[Register-exhaustion fix 0029: reviewed, full suites] --> RAPR[Publish fix PR] --> MERGED\n    COPY[Physical-copy liveness fix 0030: reviewed and audited] --> COPYPR[Publish fix PR] --> MERGED\n    COPYPR --> REUSEPR[Publish 0031 destination reuse on top of 0030] --> MERGED\n    SCAV[Scavenger live-P fix 0011: stock-6502 producer, upstream-runnable test] --> SCAVPR[Publish fix PR] --> MERGED\n    SYM[Register-named symbols 0032: reviewed and audited, full-corpus round trip] --> SYMPR[Publish fix PR] --> MERGED\n    HOIST[Spill-hoist guard 0033: audited, accounting revised and revalidated] --> HOISTPR[Publish fix PR, drops driver flag] --> MERGED\n    PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --> PREFETCHMOS[Submit 0034 to llvm-mos] --> MERGED\n    PREFETCH --> PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --> MERGED\n    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --> ASMGREVIEW[Audit complete; validate extracted upstream submission] --> ASMGPR[Submit to llvm/llvm-project] --> MERGED\n    ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Review audited; submission preparation] --> ZPPR[Publish fix PR] --> MERGED\n    RETFRAME[Return and frame address 0038: fixed and validated] --> PREP[Prepare and validate standalone submissions]\n    COALESCE[Spill coalescing 0040: fixed and validated] --> PREP\n    ASMMULTI[Multi-register inline asm 0041: fixed and validated] --> PREP\n    MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: fixed locally] --> PREP\n    MOSFIX[Floating vectors 0050, byte index 0051, bank offset 0052: fixed locally] --> PREP\n    VECTORBASE[0049: vector prerequisite backport] --> MOSFIX\n    SAVERANGE[Status-save range 0054: fixed and validated] --> PREP\n    GISBOUNDS[GlobalISel register bounds 0056: fixed and installed] --> PREP\n    DAGBOUNDS[SelectionDAG register bounds 0057: fixed and installed] --> PREP\n    DAGBOUNDS -->|callbr recovery prerequisite| INTTYPE[AArch64 unknown asm types 0058: fixed and validated]\n    INTTYPE --> PREP\n    DAGBOUNDS -->|original vector regression prerequisite| VECTORPARTS[SelectionDAG vector parts 0059: fixed and installed]\n    VECTORPARTS --> PREP\n    PREP --> APPROVED[Publish when requested] --> MERGED\n  end\n  subgraph SNES[SNES platform — separate track]\n    EXIST[Existing SDK PR 415 + our platform] --> RECON[Reconcile baseline target and CPU mode]\n    NATIVE[Our native startup + stack contract + setjmp override] --> RECON\n    RECON --> SDKPR[Post additive platform changes]\n    SDKPR --> SDKMERGE[Review and merge SNES support]\n  end\n  subgraph Features[Compiler feature tracks]\n    FARABI[Far ABI agreement] --> FAR[Prepare and post 320 series] --> FARDONE[Merge far support]\n    ACCEPT[Agree proper 65816 support required by SDK 415] --> SDKMERGE\n    WIDTHABI[Native-width ABI and clean extraction] --> WIDTH[Prepare and post 321 series] --> WIDTHDONE[Merge native-width support]\n    SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --> WIDTH\n    NATIVEPRINT[Native immediate printing 0045: fixed locally] --> WIDTH\n    FARDONE --> FARSDK[Integrate far SDK support]\n    SDKMERGE --> FARSDK\n    WIDTHDONE --> WIDTHSDK[Integrate native-width SDK opt-ins]\n    SDKMERGE --> WIDTHSDK\n  end\n  subgraph Validation[Validation coverage]\n    OPCODEPLAN[65816 all-opcode roundtrip: plan written, implementation deferred] --> OPCODEORACLE[Review independent oracle and width context]\n    OPCODEORACLE --> OPCODEGATE[Implement and validate 256 opcodes in four M/X contexts]\n  end\n  subgraph Reports[Reports needing decisions or development]\n    REDUCER[Fixed locally: llvm-reduce parallel MIR crash] --> REDUCEDIAG[Assess published-upstream applicability]\n    REDUCEDIAG --> FIX\n    CONTRACT[Reentrant contract question] --> DECIDE[Agree semantics] --> FIX[Develop and test fix or documentation]\n    GUARDS[0023: independent Imag8 rejection cause disproved] --> TRUNCKEEP[Retain with feature series; historical far-pointer cause unknown]\n    FIX --> REPORTPR[Post fix PR; link issue if one exists] --> REPORTMERGE[Review and merge]\n  end\n  classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21\n  classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d\n  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT fixed",
+  "nodes": {
+    "MC": {
+      "workId": "sub:604",
+      "label": "MVN/MVP bank order"
+    },
+    "MCP": {
+      "workId": "sub:604",
+      "label": "Compiler PR #604"
+    },
+    "Z": {
+      "workId": "sub:sdk450",
+      "label": "SDK longjmp zero return"
+    },
+    "ZP": {
+      "workId": "sub:sdk450",
+      "label": "SDK PR #450"
+    },
+    "COALESCE0015": {
+      "workId": "defect:mos-coalescing-rc-undef",
+      "label": "0015 coalescing witness"
+    },
+    "UNDEF": {
+      "workId": "sub:0028",
+      "label": "0028 undefined register lane"
+    },
+    "RA": {
+      "workId": "sub:0029",
+      "label": "0029 register exhaustion"
+    },
+    "COPY": {
+      "workId": "sub:0030",
+      "label": "0030 physical-copy liveness"
+    },
+    "SCAV": {
+      "workId": "sub:0011",
+      "label": "0011 scavenger live-P"
+    },
+    "SYM": {
+      "workId": "sub:0032",
+      "label": "0032 register-named symbols"
+    },
+    "HOIST": {
+      "workId": "sub:0033",
+      "label": "0033 spill-hoisting guard"
+    },
+    "PREFETCHMOS": {
+      "workId": "sub:0034",
+      "label": "0034 MOS prefetch"
+    },
+    "PREFETCHCLANG": {
+      "workId": "sub:0035",
+      "label": "0035 Clang prefetch"
+    },
+    "ASMG": {
+      "workId": "sub:0037",
+      "label": "0037 indirect inline asm"
+    },
+    "ZPIDX": {
+      "workId": "sub:0036",
+      "label": "0036 zero-page indexed globals"
+    },
+    "RETFRAME": {
+      "workId": "sub:0038",
+      "label": "0038 return/frame address"
+    },
+    "COALESCE": {
+      "workId": "sub:0040",
+      "label": "0040 spill coalescing"
+    },
+    "ASMMULTI": {
+      "workId": "sub:0041",
+      "label": "0041 multi-register inline asm"
+    },
+    "MOSFIX": {
+      "workId": "sub:0049-0054",
+      "label": "0049–0054 correctness batch"
+    },
+    "SHIFTFIX": {
+      "workId": "sub:0055",
+      "label": "0055 narrow-count shifts"
+    },
+    "EXIST": {
+      "workId": "platform:snes415",
+      "label": "SNES SDK #415"
+    },
+    "FARABI": {
+      "workId": "platform:320",
+      "label": "#320 far ABI"
+    },
+    "WIDTHABI": {
+      "workId": "platform:321",
+      "label": "#321 native-width ABI"
+    },
+    "REDUCER": {
+      "workId": "sub:0060",
+      "label": "0060 parallel MIR reducer"
+    },
+    "CONTRACT": {
+      "workId": "defect:reentrant-attribute-contract",
+      "label": "Reentrant attribute contract"
+    },
+    "GUARDS": {
+      "workId": "defect:mos-trunc-imag8-i1",
+      "label": "0023 matcher contract audit"
+    }
+  },
+  "tracks": [
+    {
+      "id": "independent",
+      "label": "Independent fixes",
+      "description": "Compiler and SDK fixes that can proceed outside the SNES platform submission.",
+      "workIds": [
+        "sub:604",
+        "sub:sdk450",
+        "sub:0028",
+        "sub:0029",
+        "sub:0030",
+        "sub:0031",
+        "sub:0011",
+        "sub:0032",
+        "sub:0033",
+        "sub:0034",
+        "sub:0035",
+        "sub:0036",
+        "sub:0037",
+        "sub:0038",
+        "sub:0040",
+        "sub:0041",
+        "sub:0049-0054",
+        "sub:0056-0059"
+      ]
+    },
+    {
+      "id": "far",
+      "label": "Far ABI #320",
+      "description": "Address-space and far-memory work; compiler dependencies precede the SDK integration.",
+      "workIds": [
+        "platform:320",
+        "defect:mos-far-memset-wrong-bank",
+        "opt:0061",
+        "opt:0062",
+        "sub:0028"
+      ]
+    },
+    {
+      "id": "native",
+      "label": "Native widths #321",
+      "description": "Native accumulator and index support, including dependent shifts and far-word accesses.",
+      "workIds": [
+        "platform:321",
+        "sub:0055",
+        "opt:0062",
+        "opt:0063",
+        "defect:shift64-narrow-count"
+      ]
+    },
+    {
+      "id": "snes",
+      "label": "SNES SDK #415",
+      "description": "A separate platform and runtime review track with its stated compiler merge prerequisites.",
+      "workIds": [
+        "platform:snes415",
+        "platform:320",
+        "platform:321",
+        "sub:sdk450"
+      ]
+    },
+    {
+      "id": "reports",
+      "label": "Reports and decisions",
+      "description": "Qualified defects, contract questions, and local fixes still needing upstream assessment.",
+      "workIds": [
+        "defect:reentrant-attribute-contract",
+        "defect:mos-trunc-imag8-i1",
+        "sub:0060",
+        "opt:carry-scheduler",
+        "opt:dpy-runtime-index"
+      ]
+    }
+  ]
+}

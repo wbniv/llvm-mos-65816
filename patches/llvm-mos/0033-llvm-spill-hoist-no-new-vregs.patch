@@ -77,20 +77,20 @@ index 82309cf8ef64..30997d809bb7 100644
      NumSpills -= SpillsToRm.size();
 diff --git a/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
 new file mode 100644
-index 000000000000..144c2d260e2d
+index 000000000000..eaf3792b7420
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll
 @@ -0,0 +1,63 @@
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
 +; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -disable-spill-hoist < %s | FileCheck %s
 +
-+; Reduced with llvm-reduce from gcc.c-torture/execute/950714-1.c. The function
-+; is not marked nonreentrant, so its spills use the soft stack: STStk pseudos
-+; whose frame address is a scratch Imag16 virtual register that frame-index
-+; elimination materialises later. Greedy's global spill hoisting runs after the
-+; allocation queue has drained and re-emits the merged spills through
-+; storeRegToStackSlot, so each hoisted spill would mint a scratch register
-+; nothing allocates. The hoister must keep the original spills in that case.
++; This function's soft-stack spills use STStk pseudos with a scratch Imag16
++; frame-address register. Frame-index elimination materialises the address
++; later. Greedy's global spill hoisting runs after the allocation queue has
++; drained and re-emits merged spills through storeRegToStackSlot. A hook that
++; needs a scratch register cannot use that path because no allocation follows.
++; The hoister must keep the original spills in that case. Hooks needing no
++; additional virtual registers remain eligible.
 +;
 +; CHECK-LABEL: main:
 +; CHECK: rts

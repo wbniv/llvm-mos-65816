@@ -132,9 +132,11 @@ is required before opening another compiler defect or fix plan.
   ctpop/cttz/ctlz i64 form and lower inline; helper-isolated host/default/a16/xy16 agree at `0xC074`
   on MAME and bsnes-jg. Bring-up reported (1) variable `1ULL << uint8_t` failing legalization
   at `G_ANYEXT s8->s64`, and (2) all three inline expansions in one pressured caller leaving four
-  undefined `__rc` uses under the non-LTO machine verifier. **2026-09-25 Codex recheck:** current
-  probes pass, including reconstructed inline inputs; neither historical cause is proven fixed.
-  [Evidence and qualified statuses](docs/investigations/2026-09-25-older-defect-recheck.md). Published on
+  undefined `__rc` uses under the non-LTO machine verifier. **2026-09-25 recovery:** the original
+  source edits and diagnostics are recovered; patch 0055 repairs the full shift caller in fork
+  a16/xy16, while a comparison differing only by patch 0028 establishes the inline-bitboard repair.
+  Both C inputs pass supported unpatched-upstream configurations.
+  [Evidence, limits, and attribution](docs/investigations/2026-09-25-historical-baseline-recovery.md). Published on
   [biohack.net](https://biohack.net/snes/bitboard64/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bitboard64/); #138
   `shift64seam` retains the associated narrow-count input.
@@ -142,9 +144,11 @@ is required before opening another compiler defect or fix plan.
   **#138 `shift64seam` DONE + PUBLISHED 2026-08-03 — runnable positive + retained historical defect report:**
   explicitly widened variable counts drive shl/lshr/ashr i64 through every 16- and 32-bit seam;
   host/default/a16/xy16 agree at `0x2007` on MAME and bsnes-jg. The natural `uint8_t` count failed
-  legalization at `G_ANYEXT s8->s64` during bring-up. **2026-09-25 Codex recheck:** the retained
-  input and narrow-count runtime variants now pass, but the original failing compiler and causal
-  fix were not recovered. Status: **not reproduced**, not closed. Published on
+  legalization at `G_ANYEXT s8->s64` during bring-up. **2026-09-25 recovery:** the retained minimal
+  input passes, but the recovered full bitboard caller reproduces the same failure on the captured
+  fork in a16/xy16. Status: **fixed by 0055**, with matching-input evidence and runtime checks;
+  supported upstream configurations pass.
+  [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md). Published on
   [biohack.net](https://biohack.net/snes/shift64seam/) and
   [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/shift64seam/); next ranked probe is
   #121 `llabs64`. [plan](docs/plans/2026-08-03-138-snes-shift64seam.md).
@@ -297,12 +301,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
   [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
   **Correctness flag (2026-09-25, [hoist investigation §5](docs/investigations/2026-09-25-farptr-hoist-measurement.md#5-the-dpy-interaction--flagged)):** `loop.c`'s `tab[o + j]` is `tab + zext(add i16 o, j)` with **no `nuw`** — it wraps at 16 bits, so folding it as `[tab+o],Y` with `Y=j` is a miscompile for `o ≥ 0xFFC1`; never reassociate a non-`nuw` narrow add. Legal fixtures: `tab[(uint32_t)o + j]` / `p = tab + base; p[j]` (72 B today → 32 B hand-built).
-- [T4] **`long,X` Phase 2 — select `lda`/`sta long,X` (`bf`/`9f`) for a far global plus a runtime index.** Phase 1 said **GO** ([measurement](docs/investigations/2026-09-25-longx-global-measurement.md)): today `tbl[i]` builds a full 32-bit pointer and does `lda [dp]`; hand-built `long,X` is 46→21 B (load) / 44→15 B (store) and 86–168 B → 20–25 B on loops, with no losing shape (also with `-enable-misched=false`). Add a `tryFarAbsoluteIndexedAddressing` to `case 32` of `MOSLegalizerInfo::selectAddressingMode` (the near `tryAbsoluteIndexedAddressing` is the template), ordered **before** `tryFarIndirectIndexedAddressing` so `[dp],Y` never claims a global base. Gate per §4/§6: scaled offset ≤ X width (X is 8-bit ambient in both modes; 16-bit needs the `+mos-xy16` bracket via `MOSInsertREPSEP`), unsigned index, i < 32768 for word/X16, X free. First increment: i8-zext index into a byte far global (no proof, no bracket); `adc`/… `long,X` (`7f` −8 cy/iter) last. Customer: `dev/dpy-shapes/loop.c` (`tab[o + j]`, legal only as 16-bit-X `long,X`). Suggested tier **T4** (range gate whose misclassification would regress shipped codegen) — orchestrator to rank.
-- [T4] **Far 16-bit scalar Phase 2 — native `M=0` far load/store, gated.** Phase 1 said **GO (gated)** ([measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md)). `legalizeLoadStore16` builds its native `s16` arms only for a 16-bit pointer, so a far `p2` access falls to `narrowScalar(s8)`, and no `Ac16` long pseudo exists to select into. Build `LDA`/`STA` long, `[dp]` and `[dp],y` `Ac16` pseudos (shared with the `long,X` Phase 2 word slice) plus a `p2` arm. The win: −10 to −30 B per far-global site, and −14 B / −28 cy per iteration on a far pointer walk, in both scheduler modes. Gate (§5): keep `AllUsesUnmerge` (an `A:X` return costs +3 B otherwise); go native on stores only for an `Ac16`/`Imag16` value (an `A:X` store costs +5 B otherwise); a far operand must never reach `stz`/`ldx`/`ldy`/`stx abs` or MC bank relaxation. A single `M=0` access at `$xxFFFF` carries into the next bank exactly like the byte split (bsnes-jg + MAME), so there is no bank-seam gate. Corpus winners are 3 sites of the far VRAM upload idiom. Suggested tier T4 (new pseudos + legalizer + selector + REPSEP + exclusions); the orchestrator ranks it.
+- [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing remains a separate open item above.
+- [x] **Native 16-bit far loads and stores — implemented locally in patch 0062.** `M=0` long absolute, long,X, `[dp]`, and `[dp],Y` accesses select native word operations when the value contract permits it; ABI byte-return and byte-argument paths retain their byte operations. The focused lit checks, `farindex`/`farbank` emulator gates, and machine verifier pass. [Patch](patches/llvm-mos/0062-mos-native-far-word.patch) · [measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
 ### M2 — Optimizing Payoff
 
-- [T3] **Recover failing baselines for the historical narrow-count s64 shift and inline-bitboard undefined-register reports.** The [2026-09-25 Codex recheck](docs/investigations/2026-09-25-older-defect-recheck.md) has 132 successful current-build compiles and passing runtime probes. These are **not reproduced**, not proven fixed: recover the failing compiler/configuration, and the exact bitboard input, then establish a discriminating regression or causal fix. [Shift status](docs/defects/shift64-narrow-count.json) · [pressure status](docs/defects/bitboard-inline-register-pressure.json). Keep the reentrant attribute's [contract clarification](docs/defects/reentrant-attribute-contract.json) separate; its frontend opt-out works, but it does not force a soft-stack frame.
-- [T3] **Remaining near-store profitability: values shared with native arithmetic and broader indirect contexts.** Absolute byte-only setters are fixed (14→7 B), as are plain indirect A:X setters (13→8 B; [Codex follow-up](docs/plans/2026-09-25-near-indirect-s16-store-residency.md)). `g = v; return v + 1` remains 23 B versus 11 B; indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths. Diagnose and measure these before widening either predicate. Values kept across calls must retain their current native path: blindly splitting the absolute store grows the 29 B example to 30 B. Atomic word stores must remain unsplit.
+- [x] **Independent Imag8→i1 rejection diagnosis resolved (2026-09-26).** The matcher checks the shared `Any` bank and inserts an `Ac` copy; its source contract disproves Imag8-only rejection. All 72 compiler runs and 48 selection checks pass. No fix or failing baseline is claimed. Keep 0023 and its tests with the feature series; the original far-pointer observation remains qualified. [Evidence and attribution](docs/investigations/2026-09-26-trunc-imag8-i1-contract.md) · [record](docs/defects/mos-trunc-imag8-i1.json).
+- [x] **Narrow-count s64 shift legalization repaired by 0055 (2026-09-25).** Native-width s8/s16/s32-to-s64 `G_ANYEXT` uses the existing zero-extension lowering. The original recovered preprocessed input and reduced masked-byte IR fail on the preserved baseline and pass on the candidate. All 36 recovered-source configurations and nine SNES runtime checks pass, including three LTO runs; installed Clang and LLD are refreshed. Existing patch 0028 repairs the inline-bitboard verifier failure. [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md) · [shift status](docs/defects/shift64-narrow-count.json) · [bitboard resolution](docs/defects/bitboard-inline-register-pressure.json). The reentrant attribute remains a separate [contract clarification](docs/defects/reentrant-attribute-contract.json).
+- [x] **Near store shared with unit arithmetic — implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1`/`-1` consumer can remain in byte operations. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch).
+- [T3] **Broader near-store profitability remains open.** Indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths; measure each before widening the predicate. Values live across calls and atomic word stores retain their existing contracts.
 - [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
   measuring `[dp],Y` increment 1. When a 32-bit index-scaling shift feeds a 32-bit pointer add, the pre-RA
   scheduler sinks each `rol` next to its `adc` consumer, so both carries are live at once; there
@@ -998,6 +1004,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 ### Upstream / Contribution
 
 **Work/dependency view:** [pending-work chart and flowchart](docs/upstream-pending-work.md).
+**Document dependencies:** [inventory and refresh workflow](docs/howto-document-dependencies.md).
 SNES is a separate platform track: prioritize reconciling #415, including the runtime
 contract of native mode, while independent fixes continue in parallel.
 
@@ -1189,20 +1196,62 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [PR draft](docs/upstream-gisel-inline-asm-multi-register-pr.md) ·
   [validation](docs/pr-preparations/2026-09-24/0041-validation.md).
   Remaining: publish (user-triggered).
-- [T2] **Physreg-constrained inline-asm operand wider than its register class asserts `Ran out of
-  registers to allocate!`** (`asm("" : "=a"(long))` on MOS: `getRegistersForValue`'s physreg walk runs
-  off the end of the 3-register `GPR` class when asked for 4; generic `InlineAsmLowering`, identical
-  before and after 0041). Emit a clean diagnostic instead. Reason for T2: small and self-contained
-  once the wording is chosen (found in the 0041 work). **Needs a new reproducer:** patch `0043`
-  makes MOS reject a physreg constraint whose operand is too wide, so `asm("" : "=a"(long))` now
-  stops at that check and never reaches the generic walk. The generic defect is untouched and
-  still reachable from other targets/constraints.
+- [x] **GlobalISel physical-register inline-asm exhaustion repaired by 0056 (2026-09-25).**
+  An independent AArch64 i128 `{cc}` input reproduces `Ran out of registers to allocate!`
+  on the preserved assertion-enabled baseline. The generic helper validates the entire
+  physical range and emits a clean diagnostic; virtual allocation is independent of class
+  member count. Direct output, input, tied, and indirect-output checks pass at O0/O2 with
+  fallback enabled/disabled, and the 1,067-test AArch64/ARM/X86 GlobalISel run succeeds.
+  MOS's older `=a` witness remains intercepted by 0043. [Evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md)
+  · [structured record](docs/defects/gisel-inline-asm-register-bounds.json). Publication remains separate.
+- [x] **SelectionDAG physical-register inline-asm exhaustion repaired by 0057 (2026-09-25).**
+  Seven isolated operand forms fail on the preserved assertion-enabled baseline
+  and receive clean diagnostics at O0/O2 with the fix, including live `callbr`
+  results on both edges. Cross-target inline-asm/callbr and MOS suites pass;
+  rebuilt Clang and LLD are installed. [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-inlineasm.md)
+  · [structured record](docs/defects/selectiondag-inline-asm-register-bounds.json).
+- [x] **AArch64 unknown inline-asm operand type abort repaired by 0058 (2026-09-25).**
+  The original `i4096` input aborts on both preserved baselines and receives a
+  clean diagnostic with the `r`/`x` type guards. All 32 diagnostic cases pass;
+  277 cross-target tests pass with four existing expected failures. The full
+  regression uses 0057's `callbr` error recovery. AArch64 candidate retained;
+  submission preparation remains. [Evidence and attribution](docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)
+  · [structured record](docs/defects/selectiondag-inline-asm-nonstandard-integer.json).
+- [x] **SelectionDAG vector conversion assertions repaired by 0059 (2026-09-25).**
+  The unchanged `<64 x i64>` input fails on preserved 0057/0058 compilers and
+  receives the expected diagnostic with the generic split/join checks. Thirty
+  crashing configurations now diagnose; supported conversions still compile.
+  Cross-target suites: 278 pass; MOS suites: 173 pass. Clang/LLD rebuilt and
+  installed. The original regression requires 0057's virtual-allocation repair;
+  independent review and submission preparation remain.
+  [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-vector-parts.md)
+  · [record](docs/defects/selectiondag-inline-asm-vector-parts.json).
+- [x] **Revalidate coalescing guard 0015 (2026-09-25).**
+  The recovered C witness is repaired by existing 0028, with matching-input
+  evidence and unchanged allocations; 0015 avoids the trigger. The stock MIR
+  model reproduces; stock C reachability remains unproven. Retain the guard and
+  historical evidence; route this witness through 0028 rather than a separate
+  allocator-fix PR. [Investigation](docs/investigations/2026-09-25-coalescing-0015-revalidation.md)
+  · [record](docs/defects/mos-coalescing-rc-undef.json).
+- [x] **Fix llvm-reduce parallel MIR crash.**
+  Patch `0060` keeps machine functions in parallel MIR workers. The retained
+  eight-instruction input fails on the preserved reducer and reduces with the
+  candidate at `-j 2`; the output remains interesting. The focused MIR test
+  and existing parallel IR test pass. Published-upstream applicability remains
+  to be assessed. [Fix](docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
+  · [record](docs/defects/llvm-reduce-parallel-mir-crash.json).
+- [T2] **Plan exhaustive 65816 opcode roundtrip coverage (2026-09-25).**
+  [Plan](docs/plans/2026-09-25-65816-all-opcode-roundtrip.md) written; implementation
+  is deferred at the user's request. Require all 256 opcodes in all four M/X
+  contexts, independent expected bytes, instruction boundaries, and reassembly.
+  Resolve the BRK signature contract and add WDM to the 255-row oracle coverage.
+  This is planned test coverage, not a newly confirmed compiler defect.
 - [T2] **Finish the `0043` submission preparation.** [PR draft](docs/upstream-inline-asm-physreg-width-pr.md)
   and initial pinned-base validation exist. The [September 25 review](docs/pr-preparations/2026-09-25/claude-batch-review.md)
   extends the check to named registers, including a C register-variable reproducer.
   Updated integrated tests and pin applicability pass; refresh isolated revision
   validation and prepare the upstream branch. Posting stays user-triggered.
-- [T2] **Draft the `0044` upstream PR** (AsmPrinter prints an explicit `mos24()` on 24-bit address
+- [wip T2] <!-- agent:ab109ea0a2517440e --> **Draft the `0044` upstream PR** (AsmPrinter prints an explicit `mos24()` on 24-bit address
   operands so `-S`/`-save-temps` output re-assembles to the same bytes; landed `5ea5006c`,
   [plan](docs/plans/2026-09-24-asmprinter-long-address.md)). Upstream-clean — stock 65816, no `+mos-a16`
   code, its lit test needs no fork patch — but has no PR body, no `docs/pr-preparations/` validation record
@@ -1219,27 +1268,21 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   text emission, removes the unintended `addrasciz()` modifier, and tests all eight
   widths with byte-for-byte object round trips. Refresh isolated revision validation
   and prepare the upstream branch; posting stays user-triggered.
-- [T3] **Vendor MOS lit suite has four failing tests** (`dev/run.sh lit`, 2026‑09‑25: 166 tests, 160 pass,
-  2 unsupported, 4 fail — `CodeGen/MOS/legalizer.mir` ("unable to legalize instruction: G_TRUNC"),
-  `CodeGen/MOS/scavenger-p-undef-6502.ll`, `CodeGen/MOS/shift-rotate.ll`, `MC/MOS/addressing-modes-65816.s`
-  (a disassembly-byte CHECK mismatch)). Each is either CHECK drift from the a16 patch stack or a real
-  defect; decide per test, fix or re-baseline with a reason, and get the suite to 0 fail so the lit
-  target is a usable gate. Reason for T3: four independent judgements, no design.
-  **`addressing-modes-65816.s` root-caused 2026-09-24** (found while fixing `0039`, deliberately left
-  out of that fix's scope): `lda addr24 ; CHECK: af 00 00 00` assembles to `ad 00 00` because
-  `MOSOperand::isImmInRange`'s `isa<MCSymbolRefExpr>` exit returns `true` unconditionally, regardless of
-  the candidate operand's width — a bare unresolved symbol (here `.text + 0x30303`, section-relative, so
-  genuinely unknown at parse time) always matches the narrowest candidate instead of the widest.
-  Different from `0039`'s bug (a *known* constant's value was ignored; here the value truly isn't known
-  yet), and fixing it needs a parse-time notion of a symbol's addressing width — a design question, not
-  width arithmetic. Verified `0039` neither fixes nor worsens it (byte-identical failure output
-  before/after). [diagnosis §2.3](docs/plans/2026-09-24-mos16-constant-truncation.md#23-scope-boundary--what-this-does-not-fix) ·
-  [validation](docs/pr-preparations/2026-09-24/0039-validation.md). **Low severity in isolation** per the
-  2026-09-24 #320 audit (relaxation covers the defined-symbol case) — fixing the AsmPrinter long-address
-  gap below removes the practical need for this one; see
-  [audit §1](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#1-assembler--parser--mostly-done-one-real-gap-already-tracked).
-- [T3] **Scalarize float vector arithmetic** (`<4 x float>` FADD, `<2 x double>` FDIV; 8
-  compilations from vector-extension tests). Reason for T3: legalizer rules, no design choice.
+- [x] **MOS correctness queue repaired (2026-09-25).** Patches `0049`–`0054` backport
+  generic vector scalarization, scalarize float/double arithmetic, repair the byte-index
+  `G_TRUNC`, preserve out-of-bank section-offset relaxation, correct two stale test
+  expectations, and revalidate status-register save ranges during backward scavenging.
+  The section-offset failure was in downstream relaxation suppression; this supersedes
+  the earlier parser-width diagnosis retained in the September 24 investigation.
+  **171 lit passes, 2 unsupported, 0 failures; 36/36 vector configurations compile.**
+  Both original vector tests compile at `-O0` with a16/xy16; the focused status-save
+  regression fails on the preserved baseline and passes compilation and SNES runtime.
+  Installed tools refreshed. Upstream submissions remain separate work.
+  [Evidence and attribution](docs/plans/2026-09-25-mos-correctness-queue.md) ·
+  [float vectors](docs/defects/mos-float-vector-legalization.json) ·
+  [byte index](docs/defects/mos-zp-index-same-width-trunc.json) ·
+  [bank relaxation](docs/defects/mos-bank-relax-section-offset.json) ·
+  [status scavenging](docs/defects/mos-vector-o0-status-scavenge.json).
 - [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
   `hoistAllSpills` re-emits spills through `storeRegToStackSlot`; MOS's soft-stack `STStk` mints a scratch
   `Imag16` vreg that is never assigned: `Remaining virtual register` on assertion builds, a segfault in
@@ -2530,4 +2573,6 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
      work. fp:bd244e96fd5c633a -->
 <!-- triaged 2026-09-24: already closed — see Done [title-entropy-gate-wiring]. Not work.
      fp:26cd0e82ac7f98dd -->
+- [verify] **2026-09-26-live-upstream-dashboard** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-26-live-upstream-dashboard.md](docs/plans/2026-09-26-live-upstream-dashboard.md)_  <!-- fp:44f1274ae25851fd -->
+- [verify] **2026-09-26-live-upstream-dashboard** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-26-live-upstream-dashboard.md](docs/plans/2026-09-26-live-upstream-dashboard.md)_  <!-- fp:44f1274ae25851fd -->
 <!-- END auto-captured-deferrals -->

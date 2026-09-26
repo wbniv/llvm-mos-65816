@@ -1,0 +1,6 @@
+# The Imag8 allocation must survive selection through a separate Ac copy.
+# CHECK: [[SRC:%[0-9]+]]:imag8 = COPY
+# CHECK: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+# CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+# CHECK-NEXT: {{%[0-9]+}}:gpr_lsb = COPY [[MASK]].sublsb
+# CHECK-NOT: G_TRUNC

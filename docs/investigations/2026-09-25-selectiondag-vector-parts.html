@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SelectionDAG vector parts — patch 0059</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;line-height:1.6}
+body{max-width:1040px;margin:32px auto;padding:0 24px;background:#f8fafc;color:#202938}
+nav{font-size:.9rem;margin-bottom:24px}a{color:#1754b8}h1{line-height:1.2}
+h2{margin-top:2em}code{background:#e8edf5;padding:2px 5px;border-radius:4px}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #cdd7e5;padding:9px 12px;text-align:left}
+details{margin:24px 0;padding:16px 20px;border:1px solid #cdd7e5;border-radius:8px;background:#fff}
+summary{cursor:pointer;font-weight:650}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85rem}
+@media(prefers-color-scheme:dark){body{background:#111722;color:#e1e8f2}a{color:#92bdff}
+code{background:#263347}details{background:#172130}th,td,details{border-color:#34445a}}
+</style></head><body>
+<nav><a href="../mos-upstream-status-2026-09-21.html">Upstream status</a> ·
+<a href="../mos-upstream-flowchart.html">Dependency flowchart</a> ·
+<a href="#transcript">Work-session transcript</a></nav>
+<h1 id="selectiondag-inline-assembly-vector-parts">SelectionDAG inline-assembly vector parts</h1>
+<p>Patch <a href="../../patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch">0059</a>
+repairs the <a href="../defects/selectiondag-inline-asm-vector-parts.json">vector part-type assertion</a>.
+Incompatible vector/register combinations now produce normal compiler diagnostics.
+Supported vector conversions still compile. The generic change is included in
+the rebuilt and installed MOS Clang and LLD.</p>
+<p>Diagnosis, implementation, validation, and documentation: OpenAI Codex CLI
+0.157.0 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort, verified
+from <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/session-identity.json">session metadata</a>.</p>
+<h2 id="contract-and-repair">Contract and repair</h2>
+<p>SelectionDAG selects a register class from the inline-assembly constraint, while
+its generic vector converters use the target's normal vector breakdown. Those
+two choices can disagree. For example, AArch64's <code>r</code> constraint selects scalar
+general-purpose registers for vectors that normally use SIMD register parts.
+The generic split and join helpers asserted that the part counts and types
+matched. A single-part input could instead assert when its scalar register was
+too small for the vector.</p>
+<p>The converters now diagnose incompatible part counts/types and lossy single-part
+conversion, and provide correctly typed undef values for error recovery. The
+target's custom split/join hooks still run first. The diagnostic helper recognizes
+both ordinary inline-assembly calls and <code>callbr</code> (<code>asm goto</code>).</p>
+<p>Rejecting every large vector in AArch64's constraint handler would discard
+supported paths. Equal-width vector/scalar bitcasts, scalarized vectors with
+NEON disabled, floating-point inputs, and LS64's 512-bit register class remain
+accepted. This repair defines failure behavior for unsupported conversions; it
+does not introduce a new ABI or promise arbitrary vector support for <code>r</code>.</p>
+<h2 id="preserved-baseline-and-causality">Preserved baseline and causality</h2>
+<p>The <a href="../defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll">original input</a>
+loads <code>&lt;64 x i64&gt;</code> and supplies it to an <code>r</code> input. Its input bytes, baseline
+record, compiler, and initial diagnostic log are unchanged. This is constructed
+LLVM IR: there is no C source or preprocessing stage, and the abort precedes
+MIR emission. The <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/baseline-replay.log">replay</a>
+checks the compiler hash and repeats <code>Part type doesn't match vector breakdown!</code>.</p>
+<p>The baseline compiler includes 0057 and earlier patches; it is <strong>not an unpatched
+upstream binary</strong>. Before 0057, the same input hits the separate finite-class
+iterator assertion. Thus 0057's virtual-allocation repair is a prerequisite for
+this original regression. The affected conversion helpers were unchanged by
+0057, and the complete pre-0057 source matches saved published upstream revision
+<code>742d554bf08042b8df93d791c335260fadd16643</code>. <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/source-provenance.json">Source provenance</a>
+records this distinction; no latest-upstream comparison is claimed.</p>
+<p>The preserved 0058 compiler also aborts for the same reason. The new
+<a href="../defects/evidence/2026-09-25-aarch64-vector-asm/candidate-identity.json">candidate</a>
+changes only SelectionDAGBuilder.cpp's object relative to that predecessor.
+The <a href="../../dev/check-vector-asm-diagnostic.py">runner</a> uses the original input
+and configuration, requiring compiler exit 1 with exactly the vector-parts
+diagnostic. Both preserved compilers fail the runner; the candidate passes.
+The full compilation also exits normally, sometimes reporting register pressure
+in addition to the conversion diagnostic for the oversized operand.</p>
+<h2 id="validation">Validation</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original input, recorded O0/finalize-isel configuration</td>
+<td>Both preserved compilers abort; candidate diagnoses normally</td>
+</tr>
+<tr>
+<td>Input, output, tied, indirect output, and callbr forms at O0/O2</td>
+<td>30 crashing configurations now diagnose; six existing rejection controls remain rejected</td>
+</tr>
+<tr>
+<td>Supported vector forms, O0/O2</td>
+<td>All six configurations pass on predecessor and candidate</td>
+</tr>
+<tr>
+<td>AArch64/ARM/X86 asm, callbr, and LS64 suites plus regressions</td>
+<td>278 pass; four existing expected failures</td>
+</tr>
+<tr>
+<td>MOS code-generation and MC suites after rebuild</td>
+<td>173 pass; two unsupported</td>
+</tr>
+<tr>
+<td>Patch application against vendor and upstream-based 0057 source</td>
+<td>Exact candidate source and test reproduced</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/inline-asm-vector-parts-formatted.ll">regression</a>
+isolates each rejected operand. Callbr results are consumed on both edges.
+<a href="../defects/evidence/2026-09-25-aarch64-vector-asm/forms-summary.json">Individual form runs</a>,
+<a href="../defects/evidence/2026-09-25-aarch64-vector-asm/positive-summary.json">supported controls</a>,
+and <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/validation-summary.json">suite results</a>
+retain the evidence. Runtime execution is not applicable to rejected IR.
+The initial sandboxed lit invocation could not start multiprocessing workers;
+the permitted run completed successfully.</p>
+<p>The assertion-enabled cross-target compiler is retained at
+<code>build/selectiondag-vector-parts-fix/llc</code>, with its <a href="../defects/evidence/2026-09-25-aarch64-vector-asm/build-candidate.py">build recipe</a>.
+The MOS compiler was rebuilt and Clang/LLD installed;
+<a href="../defects/evidence/2026-09-25-aarch64-vector-asm/installed-identity.json">binary identities</a>
+record those artifacts. No additional full worktree was created.</p>
+<h2 id="submission-and-document-dependencies">Submission and document dependencies</h2>
+<p>Independent review and generic LLVM submission preparation remain. The full
+original regression requires 0057; 0058 is retained in the tested stack but does
+not repair this vector conversion contract. No PR has been posted for 0059.</p>
+<p>The document-impact review updates TODO, pending work, contribution status,
+the earlier investigations' follow-ups, and both generated status views.
+The rendered report keeps session and diagnostic transcripts collapsed.
+Earlier evidence and attribution remain intact. The structured inventory now
+contains ten fixed defects and one reentrant contract clarification; unconfirmed
+candidates still need evidence before choosing a fix.</p>
+<details id="transcript"><summary>Work-session transcript</summary>
+<h1 id="work-session-transcript-selectiondag-vector-parts">Work-session transcript: SelectionDAG vector parts</h1>
+<p>Visible user and assistant messages for this task; tool payloads and private reasoning are excluded.</p>
+<h2 id="user">User</h2>
+<p>fix next defect</p>
+<h2 id="assistant">Assistant</h2>
+<p>I’ll take the remaining SelectionDAG vector part-type crash, replay its preserved baseline, and determine the correct constraint handling before changing the compiler.</p>
+<h2 id="assistant">Assistant</h2>
+<p>The original failure reproduces. The vector’s normal register breakdown disagrees with the register class selected by <code>r</code>. I’m checking smaller vectors and target features to distinguish unsupported combinations from valid conversions that must keep working.</p>
+<h2 id="assistant">Assistant</h2>
+<p>Some larger vectors already lower successfully, including scalarized vectors with NEON disabled and LS64 operands. I’ll preserve those paths and repair the generic conversion failure: incompatible register parts should produce a diagnostic instead of an assertion.</p>
+<h2 id="user">User</h2>
+<p>is there a 65816 test with ALL of its opcodes? (to test aassembly and disassembly roundtrip)</p>
+<h2 id="assistant">Assistant</h2>
+<p>There is <a href="/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/MC/MOS/all-65816-opcodes.s:1">all-65816-opcodes.s</a>, but it covers <strong>97 distinct opcode bytes</strong> and checks assembly encoding only. It does <strong>not</strong> test a full assembly → disassembly → reassembly roundtrip.</p>
+<p>Other files cover inherited instructions and selected roundtrips. The missing comprehensive test would cover <strong>all 256 opcodes</strong>, including both immediate widths controlled by the M/X flags.</p>
+<h2 id="assistant">Assistant</h2>
+<p>The vector inline-assembly candidate now diagnoses the original input instead of aborting. I’m checking output operands, tied operands, and <code>asm goto</code>, along with the supported vector conversions that must keep working.</p>
+<h2 id="assistant">Assistant</h2>
+<p>The new regression passes for rejected inputs and outputs, including <code>asm goto</code>; supported scalarized and LS64 vectors still compile. The MOS rebuild is complete, and the broader MOS and cross-target suites are running. I’m also preserving the evidence and updating the dependency-tracked documents.</p>
+<h2 id="assistant">Assistant</h2>
+<p>Validation passed: <strong>278 cross-target tests and 173 MOS tests</strong>, with only the existing expected failures and unsupported tests. The preserved compiler still reproduces the original assertion; patch 0059 gives the expected diagnostic. Rebuilt MOS Clang and LLD are installed. I’m finishing the evidence record and refreshing both browser status pages.</p>
+</details>
+<details><summary>Compiler diagnostic transcript — baseline and candidate</summary><pre>$ python3 dev/check-vector-asm-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc
+$ /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &amp;, const SDLoc &amp;, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional&lt;CallingConv::ID&gt;): Assertion `RegisterVT == PartVT &amp;&amp; &quot;Part type doesn&#x27;t match vector breakdown!&quot;&#x27; failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+1.	Running pass &#x27;Function Pass Manager&#x27; on module &#x27;/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll&#x27;.
+2.	Running pass &#x27;AArch64 Instruction Selection&#x27; on function &#x27;@many_virtual&#x27;
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000583fc615600b llvm::sys::PrintStackTrace(llvm::raw_ostream&amp;, int) + 43
+1  llc       0x0000583fc6152e91 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x0000583fc6156e1b
+3  libc.so.6 0x0000734aadc45cb0
+4  libc.so.6 0x0000734aadca61ac pthread_kill + 284
+5  libc.so.6 0x0000734aadc45b7e gsignal + 30
+6  libc.so.6 0x0000734aadc288ec abort + 39
+7  libc.so.6 0x0000734aadc29979
+8  libc.so.6 0x0000734aadc3bf75 __assert_fail + 181
+9  llc       0x0000583fc5e47313
+10 llc       0x0000583fc5e44fe9 llvm::RegsForValue::getCopyToRegs(llvm::SDValue, llvm::SelectionDAG&amp;, llvm::SDLoc const&amp;, llvm::SDValue&amp;, llvm::SDValue*, llvm::Value const*, llvm::ISD::NodeType) const + 617
+11 llc       0x0000583fc5e69f4b llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&amp;, llvm::BasicBlock const*) + 5739
+12 llc       0x0000583fc5e4b226 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&amp;) + 246
+13 llc       0x0000583fc5f20a95 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, true, false, void, true, llvm::BasicBlock&gt;, false, true&gt;, llvm::ilist_iterator_w_bits&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, true, false, void, true, llvm::BasicBlock&gt;, false, true&gt;, bool&amp;) + 261
+14 llc       0x0000583fc5f1fb8b llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&amp;) + 5675
+15 llc       0x0000583fc5f1d2f1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&amp;) + 609
+16 llc       0x0000583fc5f1a98c llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&amp;) + 140
+17 llc       0x0000583fc4df0f99 llvm::MachineFunctionPass::runOnFunction(llvm::Function&amp;) + 649
+18 llc       0x0000583fc5383780 llvm::FPPassManager::runOnFunction(llvm::Function&amp;) + 1120
+19 llc       0x0000583fc538b882 llvm::FPPassManager::runOnModule(llvm::Module&amp;) + 50
+20 llc       0x0000583fc5384544 llvm::legacy::PassManagerImpl::run(llvm::Module&amp;) + 2228
+21 llc       0x0000583fc3d5374b
+22 llc       0x0000583fc3d50a13 main + 1443
+23 libc.so.6 0x0000734aadc2a601
+24 libc.so.6 0x0000734aadc2a718 __libc_start_main + 136
+25 llc       0x0000583fc3d4fc25 _start + 37
+compiler_exit_code=-6
+Vector constraint diagnostic: FAIL
+runner_exit_code=1
+
+$ python3 dev/check-vector-asm-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+error: incompatible vector register parts, possible invalid constraint for vector type
+compiler_exit_code=1
+Vector constraint diagnostic: PASS
+runner_exit_code=0
+</pre></details>
+</body></html>

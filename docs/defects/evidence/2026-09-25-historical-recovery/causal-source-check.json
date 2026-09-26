@@ -1,0 +1,7 @@
+{
+  "patch": "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch",
+  "patch_sha256": "946d7093460d5d270b145f13d6cd968854c71350f960b581c3b7ea7a3891b878",
+  "matches_current_source": true,
+  "reconstructed_source_sha256": "8bacf912bc897019b891563f453d2e8e8863840624be2b3e8dc33d605094c20e",
+  "current_source_sha256": "3f29a16e800a7dd8b658dc997227cd96640a6bfe17ec84be04fba9733806ea8d"
+}

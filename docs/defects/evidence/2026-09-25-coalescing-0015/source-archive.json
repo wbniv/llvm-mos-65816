@@ -1,0 +1,9 @@
+{
+  "original_command_path": "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c",
+  "retained_plain_source": "build/defect-baselines/2026-09-25-coalescing-0015/source/rcundef.c",
+  "tracked_compressed_source": "docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c.gz",
+  "uncompressed_sha256": "dee0258eddaa44fbef3b781e35b586c86420627a85022af20f34770312618bba",
+  "archive_sha256": "ebcf3750ccfe403e39a997b7adbde54cb86fc3fb85dab1a1502ee5140c8e3855",
+  "reason": "Preserve the original historical source comments as frozen evidence, separate from authored source files. Source bytes are unchanged. LLVM IR baseline/candidate inputs and configurations are unchanged.",
+  "replay": "Decompress original/rcundef.c.gz to original/rcundef.c before replaying the recorded frontend commands; direct llc baseline/candidate replay uses the retained native-c/a16-Os.ll and requires no decompression."
+}

@@ -1,0 +1,7 @@
+$ python3 /home/will/llvm-mos-65816/dev/check-inlineasm-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc
+$ /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll -o /dev/null
+error: not enough registers for inline asm constraint '{cc}'
+compiler_exit_code=1
+Clean inline-asm diagnostic: PASS
+
+exit_code=0

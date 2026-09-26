@@ -1,0 +1,149 @@
+{
+  "reference_manifest": {
+    "revision": "742d554bf08042b8df93d791c335260fadd16643",
+    "upstream_url": "https://github.com/llvm-mos/llvm-mos",
+    "unpatched": true,
+    "tracked_source_diff": "empty",
+    "created_utc": "2026-09-22T00:29:30.934063+00:00",
+    "container_image_id": "sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46",
+    "container_image_tag": "llvm-mos-65816-dev",
+    "source_checkout": "build/0028-upstream-src",
+    "incremental_build": "build/upstream-llc",
+    "build_type": "Release",
+    "llvm_enable_assertions": false,
+    "targets": [
+      "MOS"
+    ],
+    "clang_version": "clang version 24.0.0git (/home/will/llvm-mos 742d554bf08042b8df93d791c335260fadd16643)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /work/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin\n",
+    "llc_version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n",
+    "untracked_source_files": [
+      "llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+      "llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir"
+    ]
+  },
+  "compiler_sha256": "b48000f510c8769ea48709c09d985c32d3933e64856ace67fc8fe861b30497aa",
+  "host": {
+    "system": "Linux",
+    "node": "will-latitude5320",
+    "release": "7.0.0-31-generic",
+    "version": "#31-Ubuntu SMP PREEMPT_DYNAMIC Sat Aug  1 04:26:38 UTC 2026",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "execution_environment": "Native host; the original recorded Docker image is unavailable. Saved compiler snapshot checksums verified before execution.",
+  "runs": [
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mos6502.i",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mos6502-preprocess.log",
+      "stage": "shift",
+      "cpu": "mos6502",
+      "kind": "preprocess",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mos6502.ll",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mos6502-ir.log",
+      "stage": "shift",
+      "cpu": "mos6502",
+      "kind": "ir",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-shift-mos6502.o",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mos6502-compile.log",
+      "stage": "shift",
+      "cpu": "mos6502",
+      "kind": "compile",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mosw65816.i",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mosw65816-preprocess.log",
+      "stage": "shift",
+      "cpu": "mosw65816",
+      "kind": "preprocess",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-shift-mosw65816.ll",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mosw65816-ir.log",
+      "stage": "shift",
+      "cpu": "mosw65816",
+      "kind": "ir",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-shift-mosw65816.o",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mosw65816-compile.log",
+      "stage": "shift",
+      "cpu": "mosw65816",
+      "kind": "compile",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mos6502.i",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mos6502-preprocess.log",
+      "stage": "inline",
+      "cpu": "mos6502",
+      "kind": "preprocess",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mos6502.ll",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mos6502-ir.log",
+      "stage": "inline",
+      "cpu": "mos6502",
+      "kind": "ir",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mos6502 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-inline-mos6502.o",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mos6502-compile.log",
+      "stage": "inline",
+      "cpu": "mos6502",
+      "kind": "compile",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mosw65816.i",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mosw65816-preprocess.log",
+      "stage": "inline",
+      "cpu": "mosw65816",
+      "kind": "preprocess",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/upstream-inline-mosw65816.ll",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mosw65816-ir.log",
+      "stage": "inline",
+      "cpu": "mosw65816",
+      "kind": "ir",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-inline-mosw65816.o",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mosw65816-compile.log",
+      "stage": "inline",
+      "cpu": "mosw65816",
+      "kind": "compile",
+      "source": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-unsupported-features.o",
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-unsupported-features.log"
+    }
+  ]
+}

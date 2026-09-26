@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-with-0028-without-0015 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /dev/null
+exit_code=0

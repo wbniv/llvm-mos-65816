@@ -1,0 +1,78 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @trunc_imag8_1() #0 {
+  entry:
+    unreachable
+  }
+  
+  attributes #0 = { "target-cpu"="mos6502" }
+...
+---
+name:            trunc_imag8_1
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr_lsb, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0.entry:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %1:gpr_lsb = COPY %2.sublsb
+    RTS implicit %1
+...

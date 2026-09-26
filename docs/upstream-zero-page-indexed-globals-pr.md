@@ -30,16 +30,23 @@ assertions enabled and this change alone:
   identical direct objects. Machine verification passes throughout.
 
 - Independent review on an assertion build carrying the other prepared fixes:
-  the three tests pass, the MOS suites pass (140, one unsupported), indexed
-  accesses with large positive and negative symbol offsets still produce
-  identical direct and reassembled objects, and neither the gcc C-torture
-  corpus (4,170 backend compilations) nor a 137-program SNES corpus changes a
-  single byte, since neither places globals in zero-page sections; the
-  downstream emulator gate passes 79 of 79 programs with the change installed.
+  the three tests pass, and the MOS suites pass (140, one unsupported). Nine
+  additional offset/CPU checks produce identical direct and reassembled objects.
+  Of 4,170 C-torture backend comparisons, 4,109 compile on both sides with
+  byte-identical assembly; 61 fail on both sides. No new failure is observed.
+- Supplemental SNES integration checks cover 137 corpus programs, including
+  kernels from the published [By-Value Boundary Trio](https://biohack.net/snes/byvaledge/)
+  and [Newton's Fractal](https://biohack.net/snes/newton/) ROM demos. All 137
+  direct objects are byte-identical before and after the change, and direct
+  emission matches assembly/reassembly on both builds; total `.text` remains
+  214,821 bytes. This corpus does not exercise section-placed zero-page globals,
+  so it provides regression coverage rather than additional bug reproducers.
+  With the change installed, the separate 79-program runtime gate passes on
+  MAME and bsnes-jg against the host results.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
-reasoning effort) for investigation, implementation, tests, validation, and
-PR drafting.
+reasoning effort) for investigation, implementation, tests, validation, PR
+drafting, and the follow-up audit of the independent review.
+
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
-reasoning effort) for the independent review and the corpus, offset and
-emulator-gate checks.
+reasoning effort) for independent review, corpus validation, and emulator checks.

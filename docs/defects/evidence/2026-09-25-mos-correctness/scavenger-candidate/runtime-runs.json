@@ -1,0 +1,20 @@
+[
+  {
+    "mode": "default",
+    "rom_sha256": "8bdcc3d11e9228d1a8c20130818e2aef959c1db9f934eeca04422e1865f8c120",
+    "map_sha256": "7b9c23807764b2bba3bfaf667331bcb96799cc63fe4cdec0ab968c25bee78af2",
+    "value": "0x600d"
+  },
+  {
+    "mode": "a16",
+    "rom_sha256": "8bdcc3d11e9228d1a8c20130818e2aef959c1db9f934eeca04422e1865f8c120",
+    "map_sha256": "f35fa2ca4cabe977926654ceb4f6728b58d63e05c0d5594664dbfb5fe41ab2b3",
+    "value": "0x600d"
+  },
+  {
+    "mode": "xy16",
+    "rom_sha256": "8bdcc3d11e9228d1a8c20130818e2aef959c1db9f934eeca04422e1865f8c120",
+    "map_sha256": "d8342e0fd9073f63553f187c024d81ce57aa3329a53a49ea41da1399d2eede8f",
+    "value": "0x600d"
+  }
+]

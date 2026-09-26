@@ -1,0 +1,182 @@
+[
+  {
+    "name": "20050604-1-O0-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-O0-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-O0-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-O2-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-O2-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-O2-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-Os-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-Os-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "20050604-1-Os-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O0-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O0-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O0-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O2-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O2-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-O2-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-Os-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-Os-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "20060420-1-Os-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O0-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O0-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O0-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O2-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O2-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-O2-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-Os-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-Os-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec1-Os-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O0-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O0-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O0-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O2-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O2-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-O2-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O2.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-Os-6502",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-Os-a16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-Os.ll -o /dev/null"
+  },
+  {
+    "name": "scal-to-vec3-Os-xy16",
+    "exit_code": 0,
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-Os.ll -o /dev/null"
+  }
+]

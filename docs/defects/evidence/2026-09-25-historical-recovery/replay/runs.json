@@ -1,0 +1,182 @@
+[
+  {
+    "name": "shift-stage-preprocess",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-E",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "shift-stage-ir",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-S",
+      "-emit-llvm",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "shift-stage-preprocessed-valid",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-x",
+      "cpp-output",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "shift-stage-mir",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-stop-before=legalizer",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage-prelegalizer.mir"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "shift-stage-llc",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "inline-stage-preprocess",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-E",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-ir",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-S",
+      "-emit-llvm",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-preprocessed-valid",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-x",
+      "cpp-output",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-mir",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-stop-before=legalizer",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage-prelegalizer.mir"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-llc",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  }
+]

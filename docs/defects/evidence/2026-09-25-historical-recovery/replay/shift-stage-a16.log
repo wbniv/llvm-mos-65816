@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll -o /dev/null
+LLVM ERROR: unable to legalize instruction: %2730:_(s64) = G_ANYEXT %1823:_(s8) (in function: bitboard64_step)
+
+exit_code=1

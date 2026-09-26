@@ -1,0 +1,80 @@
+{
+  "tools": [
+    {
+      "path": "build/llvm-mos/bin/clang",
+      "sha256": "660a187e4512ba62357c98bf4a65760b12f61fd12e2bf9cbe00b2d09aced9013"
+    },
+    {
+      "path": "build/llvm-mos/bin/llc",
+      "sha256": "8faec859f2a1d3c1859976f97e0bda0c06b020c5920f31871d65817de375f122"
+    },
+    {
+      "path": "build/llvm-mos-install/bin/mos-clang",
+      "sha256": "660a187e4512ba62357c98bf4a65760b12f61fd12e2bf9cbe00b2d09aced9013"
+    },
+    {
+      "path": "build/inlineasm-bounds-fix/llc",
+      "sha256": "301f6c7d313f116049197707b2f07ac9c21088c9e2441232bb023b2551ac4c2d"
+    },
+    {
+      "path": "build/llvm-mos/bin/ld.lld",
+      "sha256": "bae956918303398db4c01f993249c75a8f4a959a914154be5f6562cad2bb3dd6"
+    },
+    {
+      "path": "build/jgxcheck",
+      "sha256": "4d4531d9355f60b70f98bbbba67c17615e04eaf0fe18157163bd1ecb43e4075d"
+    }
+  ],
+  "candidate_sources": [
+    {
+      "path": "vendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+      "sha256": "e3012e3694854d2d12d796684c4a3d15a1b02b3a13cad3f60b1ea6f3d8699498"
+    },
+    {
+      "path": "vendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp",
+      "sha256": "ec5fa57342e8bc91df689a184271ca9d618d3aae0ae8e28d2de7fbcd8cfba5f1"
+    }
+  ],
+  "reduced_regression_runs": [
+    {
+      "label": "baseline",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 1,
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/masked-extension-baseline.log",
+        "sha256": "be8cc7301905f409fe5638346137468934c5e704a545763efcbd8265e79b1381"
+      }
+    },
+    {
+      "label": "candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit_code": 0,
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/masked-extension-candidate.log",
+        "sha256": "40f76919c9a15efd451c091ee07ad5022ebde7363e0dd47a450ff0269d87d9f4"
+      }
+    }
+  ],
+  "four_error_forms_checked_in_four_configurations": true,
+  "installed_matches_build": true
+}

@@ -1,0 +1,46 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/clang --target=mos -mcpu=mos6502 -O2 -S -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.s
+exit_code=1
+fatal error: error in backend: unable to legalize instruction: %6:_(s8) = G_TRUNC %0:_(s8) (in function: load_zp)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/clang --target=mos -mcpu=mos6502 -O2 -S -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.s
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.c'.
+4.	Running pass 'Legalizer' on function '@load_zp'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  clang     0x000061fce4833c48 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  clang     0x000061fce4830f25 llvm::sys::RunSignalHandlers() + 293
+2  clang     0x000061fce47a708e
+3  clang     0x000061fce47a704b
+4  clang     0x000061fce482da27 llvm::sys::Process::Exit(int, bool) + 39
+5  clang     0x000061fce3a6f3f6
+6  clang     0x000061fce47acad6 llvm::report_fatal_error(llvm::Twine const&, bool) + 262
+7  clang     0x000061fce47accb8
+8  clang     0x000061fce5f8cbdc
+9  clang     0x000061fce5f8cf28 llvm::reportGISelFailure(llvm::MachineFunction&, llvm::MachineOptimizationRemarkEmitter&, char const*, llvm::StringRef, llvm::MachineInstr const&) + 808
+10 clang     0x000061fce5f271e6 llvm::Legalizer::runOnMachineFunction(llvm::MachineFunction&) + 1126
+11 clang     0x000061fce3e3ed33 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+12 clang     0x000061fce43708fa llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+13 clang     0x000061fce4376f9c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+14 clang     0x000061fce4371629 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+15 clang     0x000061fce4ee3075 clang::emitBackendOutput(clang::CompilerInstance&, clang::CodeGenOptions&, llvm::StringRef, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) + 8245
+16 clang     0x000061fce4ef8430 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) + 1792
+17 clang     0x000061fce67f8bc9 clang::ParseAST(clang::Sema&, bool, bool) + 617
+18 clang     0x000061fce541303d clang::FrontendAction::Execute() + 29
+19 clang     0x000061fce537b8db clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) + 1435
+20 clang     0x000061fce54eca39 clang::ExecuteCompilerInvocation(clang::CompilerInstance*) + 729
+21 clang     0x000061fce3a6ecfb cc1_main(llvm::ArrayRef<char const*>, char const*, void*) + 6987
+22 clang     0x000061fce3a6b6d7
+23 clang     0x000061fce3a6d10d
+24 clang     0x000061fce51c52d9
+25 clang     0x000061fce47a7028 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) + 136
+26 clang     0x000061fce51c4c85 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const + 325
+27 clang     0x000061fce5186cbf clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const + 479
+28 clang     0x000061fce5186e5e clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const + 126
+29 clang     0x000061fce51a253d clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) + 333
+30 clang     0x000061fce3a6b124 clang_main(int, char**, llvm::ToolContext const&) + 6756
+31 clang     0x000061fce3a7980d main + 93
+32 libc.so.6 0x00007028f902a601
+33 libc.so.6 0x00007028f902a718 __libc_start_main + 136
+34 clang     0x000061fce3a693a5 _start + 37

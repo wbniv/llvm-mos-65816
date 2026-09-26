@@ -1,8 +1,7 @@
 # [GlobalISel] Support indirect register outputs in inline asm
 
-`asm("" : "+g"(x))`, the usual optimization-barrier idiom, fails to compile on
-every GlobalISel-only target and on any target when GlobalISel is not allowed
-to fall back:
+`asm("" : "+g"(x))`, an optimization-barrier idiom, fails to compile on MOS
+and on AArch64 with GlobalISel fallback disabled:
 
 ```text
 error: unable to translate instruction: call (in function: g)
@@ -30,14 +29,15 @@ alignment. Tied inputs referring to such an output need no change: the output
 is still a register def. Outputs needing more than one register remain
 unsupported, as they are for direct outputs.
 
-Tests: a MOS test with the `"=*imr,0"` idiom and a bare `"=*r"` output,
-checked at the IR-translator boundary (the `G_STORE` through the pointer) and
-through full codegen with the verifier at `-O0` and `-O2`; an AArch64
-GlobalISel test with `-global-isel-abort=1` for the same idiom, plus an `i8`
-output in a 32-bit register to cover the truncating path.
+The submitted AArch64 GlobalISel test uses `-global-isel-abort=1` and checks
+the store at the IR-translator boundary and through full code generation. It
+covers the tied `"=*imr,0"` idiom and an `i8` output in a 32-bit register to
+exercise truncation. A companion MOS test is retained in the llvm-mos stack.
 
 Validated on llvm-mos `742d554bf08042b8df93d791c335260fadd16643` with
-assertions enabled:
+assertions enabled. The initial corpus and complete cross-target runs used a
+stacked build holding other fixes constant; independent checks also built this
+change alone:
 
 - Both new tests fail on the unpatched `llc` at every RUN line (`unable to
   translate instruction: call`) and pass with the change.
@@ -46,11 +46,21 @@ assertions enabled:
   before and after. 10 compilations newly succeed (`pr65053-1` at `-O0`;
   `pr65053-2`, `pr65956` and `pr88904` at all three levels), none newly fails,
   and all 4,109 compilations that succeed on both sides produce identical
-  assembly.
+  assembly. Another 51 compilations fail on both sides.
 - MOS CodeGen and MC suites: 141 pass, 1 unsupported, 0 fail.
 - The complete `test/CodeGen/{X86,ARM,AArch64}` suites, since the change is in
-  generic code: 11,460 tests: 11,436 pass, 23 expectedly fail, none fails (the AArch64 GlobalISel directory, 785 tests, rerun after a CHECK spelling fix to the new test: all pass).
+  generic code: 11,460 tests: 11,437 pass and 23 expected failures after the
+  AArch64 GlobalISel directory rerun resolves the new test's CHECK spelling
+  failure. The combined count matches tests by name.
+- Fresh build containing this change alone: 130 MOS CodeGen/MC tests and 785
+  AArch64 GlobalISel tests pass, one unsupported. The four affected torture
+  sources compile at all three levels; pristine upstream fails ten of those
+  twelve cases.
 
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
 reasoning effort) for the diagnosis, implementation, tests, validation, and PR
 drafting.
+
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
+reasoning effort) for independent review, standalone validation, submission
+extraction, and corrections to the validation and scope claims.

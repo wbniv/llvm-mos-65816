@@ -1,0 +1,13 @@
+$ /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Os -fno-lto -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/historical-upstream-unsupported-features.o
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-xy16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-xy16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-xy16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-xy16' is not a recognized feature for this target (ignoring feature)
+'+mos-a16' is not a recognized feature for this target (ignoring feature)
+'+mos-xy16' is not a recognized feature for this target (ignoring feature)
+
+exit_code=0

@@ -31,7 +31,8 @@ Validation against llvm-mos `742d554bf08042b8df93d791c335260fadd16643`:
   assertion. An integration build carrying the scavenger fix completes all 18.
 - Stacked assertion build with the current revision: the reduced test passes
   with hoisting enabled and disabled; MOS CodeGen and MC 141 pass, 1
-  unsupported; X86/ARM/AArch64 CodeGen suites 11,460 tests: 11,436 pass, 23 expectedly fail, none fails (the AArch64 GlobalISel directory, 785 tests, rerun after a CHECK spelling fix to the new test: all pass).
+  unsupported; X86/ARM/AArch64 CodeGen suites 11,460 tests: 11,437 pass and 23 expected failures after the AArch64
+  GlobalISel directory rerun resolves the new test's CHECK spelling failure.
 - A saved integration comparison of guarded hoisting enabled versus disabled
   has 4,109 successful pairs and 61 failures on both sides. Sixteen compilations
   change; independently reassembled `.text` totals fall from 290,375 to 285,865
@@ -43,5 +44,5 @@ Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`,
 validation and drafting.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
-reasoning effort) for independent review, standalone validation, and corrections
-to the analysis and submission evidence.
+reasoning effort) for independent review, standalone validation, final revision
+checks, comment cleanup, and corrections to the analysis and submission evidence.

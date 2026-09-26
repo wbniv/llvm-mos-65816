@@ -1,0 +1,11 @@
+Script completed
+Wall time 1.9 seconds
+Output:
+
+DEPRECATED: The legacy builder is deprecated and will be removed in a future release.
+            Install the buildx component to build images with BuildKit:
+            https://docs.docker.com/go/buildx/
+
+==> host oracle: bitboard64 gate hash = 0xC074
+LLVM ERROR: unable to legalize instruction: %3655:_(s64) = G_ANYEXT %2121:_(s8) (in function: bitboard64_step)
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)

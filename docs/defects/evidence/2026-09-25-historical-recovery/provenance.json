@@ -1,0 +1,35 @@
+{
+  "source_session": "/home/will/.codex/sessions/2026/08/03/rollout-2026-08-03T20-57-04-019fcab4-0821-7a41-a2c7-6b8b125d1338.jsonl",
+  "source_session_sha256": "7b03cae902837cd918cbecc901d7c2989ee9743aee01c0343db1054d6d38ac20",
+  "line_numbers": [
+    437,
+    438,
+    453,
+    454,
+    465,
+    466,
+    469,
+    470,
+    475,
+    476,
+    480,
+    481,
+    484,
+    485,
+    490,
+    491,
+    580,
+    581
+  ],
+  "historical_tool": {
+    "id": "019fcab4-0821-7a41-a2c7-6b8b125d1338",
+    "cli_version": "0.146.0",
+    "originator": "codex-tui"
+  },
+  "historical_context": {
+    "model": "gpt-5.6-sol",
+    "reasoning_effort": null,
+    "reasoning_effort_status": "unknown: session collaboration settings store null; no explicit effort recovered"
+  },
+  "recovery_attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort"
+}

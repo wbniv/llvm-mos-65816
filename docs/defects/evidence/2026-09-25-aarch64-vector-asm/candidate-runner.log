@@ -1,0 +1,6 @@
+$ python3 dev/check-vector-asm-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+error: incompatible vector register parts, possible invalid constraint for vector type
+compiler_exit_code=1
+Vector constraint diagnostic: PASS
+runner_exit_code=0

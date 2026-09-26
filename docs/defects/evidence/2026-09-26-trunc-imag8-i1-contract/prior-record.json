@@ -1,0 +1,71 @@
+{
+  "schema": 1,
+  "id": "mos-trunc-imag8-i1",
+  "title": "Independent Imag8 to i1 truncation fallback in patch 0023",
+  "status": "not_reproduced",
+  "reproducer_origin": "reconstructed",
+  "summary": "A stock MOS C-derived producer reaches Imag8 and trunc i8 to i1, but the unpatched selector inserts the Ac copy and passes; no independent upstream red baseline is established.",
+  "report": "docs/investigations/2026-09-25-trunc-0023-upstream-trigger.md",
+  "attribution": [
+    "OpenAI Codex API (version unknown), GPT-6 (exact model ID and version unknown), reasoning effort unknown."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/source.c",
+      "sha256": "ddbc6aa98c1df978f6b520ac1dce1a2b95bab94f46b2421339f0dbefd27c1157"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/source.i",
+      "sha256": "ddbc6aa98c1df978f6b520ac1dce1a2b95bab94f46b2421339f0dbefd27c1157"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/pre-select.mir",
+      "sha256": "6807dc24f699f2f265c98d9d689627b2de91d8a3dc8ba83bd01fd09fda3e70e5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-selector.cpp",
+      "sha256": "5acb907b79ab94de4d6580b4c246e437f3d6d2797d14da59ce103a790c676b95"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/runs.json",
+      "sha256": "a7919b0f68ae1f419d3f93c919c7fba1d3bb732918efc552cba6eaecb9b9f4ff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-selected.mir",
+      "sha256": "e23c2bc1d8856f3d3b45dd42272a264374458f5ab50d5a5bd206e3aaca86b4fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-selected.mir",
+      "sha256": "018f63e65e829bec6dbae7014191671a4dd7d466a9d752b1530e875b2294692b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-clang-selected.mir",
+      "sha256": "d148e29512658572238108b732d25c14806bf7159f2d2415ee8d53eabad4a80f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-clang-selected.mir",
+      "sha256": "d148e29512658572238108b732d25c14806bf7159f2d2415ee8d53eabad4a80f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-direct.mir",
+      "sha256": "fa1ceeae2ae5ae6631b83511a4f01e6179a327bb901554da0e7a2d8d9d6ee408"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-direct.mir",
+      "sha256": "1c08e64c4cecc29f8edbe893d0098f24cd83f0d48c928c2281442f16c42d8e23"
+    }
+  ],
+  "unknowns": "No failing stock-upstream input or captured historical #320 far-pointer failure is available; it remains unknown whether any valid input can make the s8-to-s1 matcher decline."
+}

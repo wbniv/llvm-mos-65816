@@ -1,0 +1,99 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: norecurse
+  define void @extend_masked(ptr %out, i8 %value) #0 {
+    %scaled = mul i8 %value, 7
+    %masked = and i8 %scaled, 63
+    %extended = zext nneg i8 %masked to i64
+    store volatile i64 %extended, ptr %out, align 1
+    ret void
+  }
+  
+  attributes #0 = { norecurse "nonreentrant" "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+...
+---
+name:            extend_masked
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    liveins: $a, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %1:_(s8) = COPY $a
+    %7:_(s8) = G_CONSTANT i8 3
+    %11:_(s6) = G_TRUNC %1(s8)
+    %14:_(s6) = G_SHL %11, %7(s8)
+    %12:_(s6) = G_SUB %14, %11
+    %6:_(s64) = G_ZEXT %12(s6)
+    G_STORE %6(s64), %0(p0) :: (volatile store (s64) into %ir.out, align 1)
+    RTS
+...

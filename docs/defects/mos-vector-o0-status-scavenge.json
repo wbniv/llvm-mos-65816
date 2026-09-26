@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "id": "mos-vector-o0-status-scavenge",
+  "title": "O0 65816 vector code exhausts status-register scavenging",
+  "status": "fixed",
+  "reproducer_origin": "original",
+  "summary": "Fixed: backward scavenger search rechecks target save feasibility before extending the selected spill range. Both original vector tests compile at O0 in a16 and xy16.",
+  "report": "docs/plans/2026-09-25-mos-correctness-queue.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0d7d4-5da2-7fe0-a88c-0137eaa043a7."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-baseline/scal-to-vec3-before-pei.mir",
+      "sha256": "12d4ea892c622bba3aceee76c058c2163a50d8ae4a456b72af01c35e634195c4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/vector-c-matrix.json",
+      "sha256": "bfd445383349fe38f66c121768fe5822a2cfddc6f495ea954acc387d13bb5aab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir",
+      "sha256": "62690ca29c2b68febb46aafa981c58a7f7298a3337bc453ff7b9d096c22a057c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-runtime.c",
+      "sha256": "1b270bd95c2b22368f6afdf8b2d891195ba186ffd4d162a6356e0572b46daaf9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-runs.json",
+      "sha256": "67ebd9f97261ea31fdbb7c00206013c060dfd31f533d7516fc246882988d7bed"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-a16.log",
+      "sha256": "f9c6b4063d58bdff2b8f1b3d23239f31a504b7120f73d9f527f3084b97be83d8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-xy16.log",
+      "sha256": "c7d3fa888477171e407055415fd3a4a7345fccd402e31e504514c7238c620d9a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/runtime.log",
+      "sha256": "547124d16c3c06b633159e35d6da41a06b8b1519bd8c13ce732c342ac128bafc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/runtime-runs.json",
+      "sha256": "57f5bad747b0d5879a25136db2327f7ec6ed871a3eef54f2515d8f6f6729b3fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/c-integration-runs.json",
+      "sha256": "4b1181f115b794e03e1ef77607d7e4aa7396e52630b9a4568ae48dcb6352407d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/installed-smoke.log",
+      "sha256": "39089df1041fbc87aafd74da48daf065005bcc1f344c2f3221eebd111a53c3e2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/vector-c-matrix.json",
+      "sha256": "523e087f5b5775c7cd586b6fe32efc8047bac09da25b88961dd76782ac1e8fcd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/identity.json",
+      "sha256": "575a4be0dc9e320e132fe243be9e9e7da4267725a51570ac1a9137f315df8fc9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/lit.log",
+      "sha256": "b35c02714a15759f544dc5faa0d7ba056e1c86a25784e7d29513a4a0be8a04d0"
+    }
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": "+mos-a16",
+      "optimization": "O0",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled",
+    "toolchain_sha256": "02fe7e90db8325184966e99518b3feeb0e400e494bd7a83f0beb0f3313bc6bea",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll",
+      "sha256": "74a4aa0973b281a6bf3dfdf8072dfd7978d359738b72baf18db6a80d49050dd5"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-baseline/failure.log",
+      "sha256": "375afaaf6b159e53740985efe1ff68b8496aacf9ed96ab7ce162319076dc4268"
+    },
+    "exit_code": -6,
+    "failure_signature": "cannot preserve a live processor-status register across an unbalanced stack range with no free index register"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0054-llvm-scavenger-save-range.patch",
+    "causal_explanation": "findSurvivorBackwards validated a survivor at Pos, then moved Pos to earlier virtual-register instructions without validating the larger range. Crossing PH/PL made the selected status save unbalanced while X/Y remained live. Recheck canSaveScavengerRegister at each proposed extension and retain the last feasible range. Targets using the default always-true hook keep their search behavior.",
+    "trigger_check": "The identical original scal-to-vec3-O0.ll fails with the recorded status-save abort on preserved llc-vector-enabled and passes with the generic scavenger change. The separately constructed 54-line MIR reproduces that exact baseline abort in both a16/xy16 and checks PHP/PLP nested within PHA/PLA. Executing the same MIR after PEI on bsnes-jg yields bytes 6,6,7,1 in default/a16/xy16, consuming the preserved carry and both index registers. Both original C inputs pass all four formerly failing configurations using the installed compiler.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll",
+      "sha256": "74a4aa0973b281a6bf3dfdf8072dfd7978d359738b72baf18db6a80d49050dd5"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": "+mos-a16",
+        "optimization": "O0",
+        "verify_machineinstrs": true
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll",
+        "sha256": "74a4aa0973b281a6bf3dfdf8072dfd7978d359738b72baf18db6a80d49050dd5"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-vector-o0-status-scavenge.log",
+        "sha256": "52ddedba87323c117388f900bf354dac2914f55fd91376c9f20c33ac00877a34"
+      },
+      "exit_code": 0
+    }
+  }
+}

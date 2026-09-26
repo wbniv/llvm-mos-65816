@@ -1,0 +1,2588 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: noinline nounwind optnone
+  define dso_local i16 @main(i16 noundef %0, ptr noundef %1) #0 {
+    %3 = alloca i16, align 1
+    %4 = alloca i16, align 1
+    %5 = alloca ptr, align 1
+    %6 = alloca <4 x float>, align 16
+    %7 = alloca <4 x float>, align 16
+    %8 = alloca <4 x float>, align 16
+    %9 = alloca <2 x double>, align 16
+    %10 = alloca <2 x double>, align 16
+    %11 = alloca <2 x double>, align 16
+    %12 = alloca <4 x float>, align 16
+    %13 = alloca i16, align 1
+    %14 = alloca <4 x float>, align 16
+    %15 = alloca i16, align 1
+    %16 = alloca <4 x float>, align 16
+    %17 = alloca i16, align 1
+    %18 = alloca <4 x float>, align 16
+    %19 = alloca i16, align 1
+    %20 = alloca <4 x float>, align 16
+    %21 = alloca i16, align 1
+    %22 = alloca <4 x float>, align 16
+    %23 = alloca i16, align 1
+    %24 = alloca <4 x float>, align 16
+    %25 = alloca i16, align 1
+    %26 = alloca <4 x float>, align 16
+    %27 = alloca i16, align 1
+    %28 = alloca <2 x double>, align 16
+    %29 = alloca i16, align 1
+    %30 = alloca <2 x double>, align 16
+    %31 = alloca i16, align 1
+    %32 = alloca <2 x double>, align 16
+    %33 = alloca i16, align 1
+    %34 = alloca <2 x double>, align 16
+    %35 = alloca i16, align 1
+    %36 = alloca <2 x double>, align 16
+    %37 = alloca i16, align 1
+    %38 = alloca <2 x double>, align 16
+    %39 = alloca i16, align 1
+    %40 = alloca <2 x double>, align 16
+    %41 = alloca i16, align 1
+    %42 = alloca <2 x double>, align 16
+    %43 = alloca i16, align 1
+    store i16 0, ptr %3, align 1
+    store i16 %0, ptr %4, align 1
+    store ptr %1, ptr %5, align 1
+    store <4 x float> <float 1.000000e+00, float 2.000000e+00, float 3.000000e+00, float 4.000000e+00>, ptr %6, align 16
+    store <2 x double> <double 1.000000e+00, double 2.000000e+00>, ptr %9, align 16
+    %44 = load <4 x float>, ptr %6, align 16
+    %45 = fadd <4 x float> splat (float 2.000000e+00), %44
+    store <4 x float> %45, ptr %7, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %12, align 16
+    %46 = load <4 x float>, ptr %12, align 16
+    %47 = load <4 x float>, ptr %6, align 16
+    %48 = fadd <4 x float> %46, %47
+    store <4 x float> %48, ptr %8, align 16
+    br label %49
+  
+  49:                                               ; preds = %2
+    store i16 0, ptr %13, align 1
+    br label %50
+  
+  50:                                               ; preds = %63, %49
+    %51 = load i16, ptr %13, align 1
+    %52 = icmp slt i16 %51, 4
+    br i1 %52, label %53, label %66
+  
+  53:                                               ; preds = %50
+    %54 = load i16, ptr %13, align 1
+    %55 = getelementptr inbounds float, ptr %7, i16 %54
+    %56 = load float, ptr %55, align 4
+    %57 = load i16, ptr %13, align 1
+    %58 = getelementptr inbounds float, ptr %8, i16 %57
+    %59 = load float, ptr %58, align 4
+    %60 = fcmp une float %56, %59
+    br i1 %60, label %61, label %62
+  
+  61:                                               ; preds = %53
+    call void @abort() #2
+    unreachable
+  
+  62:                                               ; preds = %53
+    br label %63
+  
+  63:                                               ; preds = %62
+    %64 = load i16, ptr %13, align 1
+    %65 = add nsw i16 %64, 1
+    store i16 %65, ptr %13, align 1
+    br label %50, !llvm.loop !2
+  
+  66:                                               ; preds = %50
+    br label %67
+  
+  67:                                               ; preds = %66
+    %68 = load <4 x float>, ptr %6, align 16
+    %69 = fsub <4 x float> splat (float 2.000000e+00), %68
+    store <4 x float> %69, ptr %7, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %14, align 16
+    %70 = load <4 x float>, ptr %14, align 16
+    %71 = load <4 x float>, ptr %6, align 16
+    %72 = fsub <4 x float> %70, %71
+    store <4 x float> %72, ptr %8, align 16
+    br label %73
+  
+  73:                                               ; preds = %67
+    store i16 0, ptr %15, align 1
+    br label %74
+  
+  74:                                               ; preds = %87, %73
+    %75 = load i16, ptr %15, align 1
+    %76 = icmp slt i16 %75, 4
+    br i1 %76, label %77, label %90
+  
+  77:                                               ; preds = %74
+    %78 = load i16, ptr %15, align 1
+    %79 = getelementptr inbounds float, ptr %7, i16 %78
+    %80 = load float, ptr %79, align 4
+    %81 = load i16, ptr %15, align 1
+    %82 = getelementptr inbounds float, ptr %8, i16 %81
+    %83 = load float, ptr %82, align 4
+    %84 = fcmp une float %80, %83
+    br i1 %84, label %85, label %86
+  
+  85:                                               ; preds = %77
+    call void @abort() #2
+    unreachable
+  
+  86:                                               ; preds = %77
+    br label %87
+  
+  87:                                               ; preds = %86
+    %88 = load i16, ptr %15, align 1
+    %89 = add nsw i16 %88, 1
+    store i16 %89, ptr %15, align 1
+    br label %74, !llvm.loop !4
+  
+  90:                                               ; preds = %74
+    br label %91
+  
+  91:                                               ; preds = %90
+    %92 = load <4 x float>, ptr %6, align 16
+    %93 = fmul <4 x float> splat (float 2.000000e+00), %92
+    store <4 x float> %93, ptr %7, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %16, align 16
+    %94 = load <4 x float>, ptr %16, align 16
+    %95 = load <4 x float>, ptr %6, align 16
+    %96 = fmul <4 x float> %94, %95
+    store <4 x float> %96, ptr %8, align 16
+    br label %97
+  
+  97:                                               ; preds = %91
+    store i16 0, ptr %17, align 1
+    br label %98
+  
+  98:                                               ; preds = %111, %97
+    %99 = load i16, ptr %17, align 1
+    %100 = icmp slt i16 %99, 4
+    br i1 %100, label %101, label %114
+  
+  101:                                              ; preds = %98
+    %102 = load i16, ptr %17, align 1
+    %103 = getelementptr inbounds float, ptr %7, i16 %102
+    %104 = load float, ptr %103, align 4
+    %105 = load i16, ptr %17, align 1
+    %106 = getelementptr inbounds float, ptr %8, i16 %105
+    %107 = load float, ptr %106, align 4
+    %108 = fcmp une float %104, %107
+    br i1 %108, label %109, label %110
+  
+  109:                                              ; preds = %101
+    call void @abort() #2
+    unreachable
+  
+  110:                                              ; preds = %101
+    br label %111
+  
+  111:                                              ; preds = %110
+    %112 = load i16, ptr %17, align 1
+    %113 = add nsw i16 %112, 1
+    store i16 %113, ptr %17, align 1
+    br label %98, !llvm.loop !5
+  
+  114:                                              ; preds = %98
+    br label %115
+  
+  115:                                              ; preds = %114
+    %116 = load <4 x float>, ptr %6, align 16
+    %117 = fdiv <4 x float> splat (float 2.000000e+00), %116
+    store <4 x float> %117, ptr %7, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %18, align 16
+    %118 = load <4 x float>, ptr %18, align 16
+    %119 = load <4 x float>, ptr %6, align 16
+    %120 = fdiv <4 x float> %118, %119
+    store <4 x float> %120, ptr %8, align 16
+    br label %121
+  
+  121:                                              ; preds = %115
+    store i16 0, ptr %19, align 1
+    br label %122
+  
+  122:                                              ; preds = %135, %121
+    %123 = load i16, ptr %19, align 1
+    %124 = icmp slt i16 %123, 4
+    br i1 %124, label %125, label %138
+  
+  125:                                              ; preds = %122
+    %126 = load i16, ptr %19, align 1
+    %127 = getelementptr inbounds float, ptr %7, i16 %126
+    %128 = load float, ptr %127, align 4
+    %129 = load i16, ptr %19, align 1
+    %130 = getelementptr inbounds float, ptr %8, i16 %129
+    %131 = load float, ptr %130, align 4
+    %132 = fcmp une float %128, %131
+    br i1 %132, label %133, label %134
+  
+  133:                                              ; preds = %125
+    call void @abort() #2
+    unreachable
+  
+  134:                                              ; preds = %125
+    br label %135
+  
+  135:                                              ; preds = %134
+    %136 = load i16, ptr %19, align 1
+    %137 = add nsw i16 %136, 1
+    store i16 %137, ptr %19, align 1
+    br label %122, !llvm.loop !6
+  
+  138:                                              ; preds = %122
+    br label %139
+  
+  139:                                              ; preds = %138
+    %140 = load <4 x float>, ptr %6, align 16
+    %141 = fadd <4 x float> %140, splat (float 2.000000e+00)
+    store <4 x float> %141, ptr %7, align 16
+    %142 = load <4 x float>, ptr %6, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %20, align 16
+    %143 = load <4 x float>, ptr %20, align 16
+    %144 = fadd <4 x float> %142, %143
+    store <4 x float> %144, ptr %8, align 16
+    br label %145
+  
+  145:                                              ; preds = %139
+    store i16 0, ptr %21, align 1
+    br label %146
+  
+  146:                                              ; preds = %159, %145
+    %147 = load i16, ptr %21, align 1
+    %148 = icmp slt i16 %147, 4
+    br i1 %148, label %149, label %162
+  
+  149:                                              ; preds = %146
+    %150 = load i16, ptr %21, align 1
+    %151 = getelementptr inbounds float, ptr %7, i16 %150
+    %152 = load float, ptr %151, align 4
+    %153 = load i16, ptr %21, align 1
+    %154 = getelementptr inbounds float, ptr %8, i16 %153
+    %155 = load float, ptr %154, align 4
+    %156 = fcmp une float %152, %155
+    br i1 %156, label %157, label %158
+  
+  157:                                              ; preds = %149
+    call void @abort() #2
+    unreachable
+  
+  158:                                              ; preds = %149
+    br label %159
+  
+  159:                                              ; preds = %158
+    %160 = load i16, ptr %21, align 1
+    %161 = add nsw i16 %160, 1
+    store i16 %161, ptr %21, align 1
+    br label %146, !llvm.loop !7
+  
+  162:                                              ; preds = %146
+    br label %163
+  
+  163:                                              ; preds = %162
+    %164 = load <4 x float>, ptr %6, align 16
+    %165 = fsub <4 x float> %164, splat (float 2.000000e+00)
+    store <4 x float> %165, ptr %7, align 16
+    %166 = load <4 x float>, ptr %6, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %22, align 16
+    %167 = load <4 x float>, ptr %22, align 16
+    %168 = fsub <4 x float> %166, %167
+    store <4 x float> %168, ptr %8, align 16
+    br label %169
+  
+  169:                                              ; preds = %163
+    store i16 0, ptr %23, align 1
+    br label %170
+  
+  170:                                              ; preds = %183, %169
+    %171 = load i16, ptr %23, align 1
+    %172 = icmp slt i16 %171, 4
+    br i1 %172, label %173, label %186
+  
+  173:                                              ; preds = %170
+    %174 = load i16, ptr %23, align 1
+    %175 = getelementptr inbounds float, ptr %7, i16 %174
+    %176 = load float, ptr %175, align 4
+    %177 = load i16, ptr %23, align 1
+    %178 = getelementptr inbounds float, ptr %8, i16 %177
+    %179 = load float, ptr %178, align 4
+    %180 = fcmp une float %176, %179
+    br i1 %180, label %181, label %182
+  
+  181:                                              ; preds = %173
+    call void @abort() #2
+    unreachable
+  
+  182:                                              ; preds = %173
+    br label %183
+  
+  183:                                              ; preds = %182
+    %184 = load i16, ptr %23, align 1
+    %185 = add nsw i16 %184, 1
+    store i16 %185, ptr %23, align 1
+    br label %170, !llvm.loop !8
+  
+  186:                                              ; preds = %170
+    br label %187
+  
+  187:                                              ; preds = %186
+    %188 = load <4 x float>, ptr %6, align 16
+    %189 = fmul <4 x float> %188, splat (float 2.000000e+00)
+    store <4 x float> %189, ptr %7, align 16
+    %190 = load <4 x float>, ptr %6, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %24, align 16
+    %191 = load <4 x float>, ptr %24, align 16
+    %192 = fmul <4 x float> %190, %191
+    store <4 x float> %192, ptr %8, align 16
+    br label %193
+  
+  193:                                              ; preds = %187
+    store i16 0, ptr %25, align 1
+    br label %194
+  
+  194:                                              ; preds = %207, %193
+    %195 = load i16, ptr %25, align 1
+    %196 = icmp slt i16 %195, 4
+    br i1 %196, label %197, label %210
+  
+  197:                                              ; preds = %194
+    %198 = load i16, ptr %25, align 1
+    %199 = getelementptr inbounds float, ptr %7, i16 %198
+    %200 = load float, ptr %199, align 4
+    %201 = load i16, ptr %25, align 1
+    %202 = getelementptr inbounds float, ptr %8, i16 %201
+    %203 = load float, ptr %202, align 4
+    %204 = fcmp une float %200, %203
+    br i1 %204, label %205, label %206
+  
+  205:                                              ; preds = %197
+    call void @abort() #2
+    unreachable
+  
+  206:                                              ; preds = %197
+    br label %207
+  
+  207:                                              ; preds = %206
+    %208 = load i16, ptr %25, align 1
+    %209 = add nsw i16 %208, 1
+    store i16 %209, ptr %25, align 1
+    br label %194, !llvm.loop !9
+  
+  210:                                              ; preds = %194
+    br label %211
+  
+  211:                                              ; preds = %210
+    %212 = load <4 x float>, ptr %6, align 16
+    %213 = fdiv <4 x float> %212, splat (float 2.000000e+00)
+    store <4 x float> %213, ptr %7, align 16
+    %214 = load <4 x float>, ptr %6, align 16
+    store <4 x float> splat (float 2.000000e+00), ptr %26, align 16
+    %215 = load <4 x float>, ptr %26, align 16
+    %216 = fdiv <4 x float> %214, %215
+    store <4 x float> %216, ptr %8, align 16
+    br label %217
+  
+  217:                                              ; preds = %211
+    store i16 0, ptr %27, align 1
+    br label %218
+  
+  218:                                              ; preds = %231, %217
+    %219 = load i16, ptr %27, align 1
+    %220 = icmp slt i16 %219, 4
+    br i1 %220, label %221, label %234
+  
+  221:                                              ; preds = %218
+    %222 = load i16, ptr %27, align 1
+    %223 = getelementptr inbounds float, ptr %7, i16 %222
+    %224 = load float, ptr %223, align 4
+    %225 = load i16, ptr %27, align 1
+    %226 = getelementptr inbounds float, ptr %8, i16 %225
+    %227 = load float, ptr %226, align 4
+    %228 = fcmp une float %224, %227
+    br i1 %228, label %229, label %230
+  
+  229:                                              ; preds = %221
+    call void @abort() #2
+    unreachable
+  
+  230:                                              ; preds = %221
+    br label %231
+  
+  231:                                              ; preds = %230
+    %232 = load i16, ptr %27, align 1
+    %233 = add nsw i16 %232, 1
+    store i16 %233, ptr %27, align 1
+    br label %218, !llvm.loop !10
+  
+  234:                                              ; preds = %218
+    br label %235
+  
+  235:                                              ; preds = %234
+    %236 = load <2 x double>, ptr %9, align 16
+    %237 = fadd <2 x double> splat (double 2.000000e+00), %236
+    store <2 x double> %237, ptr %10, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %28, align 16
+    %238 = load <2 x double>, ptr %28, align 16
+    %239 = load <2 x double>, ptr %9, align 16
+    %240 = fadd <2 x double> %238, %239
+    store <2 x double> %240, ptr %11, align 16
+    br label %241
+  
+  241:                                              ; preds = %235
+    store i16 0, ptr %29, align 1
+    br label %242
+  
+  242:                                              ; preds = %255, %241
+    %243 = load i16, ptr %29, align 1
+    %244 = icmp slt i16 %243, 2
+    br i1 %244, label %245, label %258
+  
+  245:                                              ; preds = %242
+    %246 = load i16, ptr %29, align 1
+    %247 = getelementptr inbounds double, ptr %10, i16 %246
+    %248 = load double, ptr %247, align 8
+    %249 = load i16, ptr %29, align 1
+    %250 = getelementptr inbounds double, ptr %11, i16 %249
+    %251 = load double, ptr %250, align 8
+    %252 = fcmp une double %248, %251
+    br i1 %252, label %253, label %254
+  
+  253:                                              ; preds = %245
+    call void @abort() #2
+    unreachable
+  
+  254:                                              ; preds = %245
+    br label %255
+  
+  255:                                              ; preds = %254
+    %256 = load i16, ptr %29, align 1
+    %257 = add nsw i16 %256, 1
+    store i16 %257, ptr %29, align 1
+    br label %242, !llvm.loop !11
+  
+  258:                                              ; preds = %242
+    br label %259
+  
+  259:                                              ; preds = %258
+    %260 = load <2 x double>, ptr %9, align 16
+    %261 = fsub <2 x double> splat (double 2.000000e+00), %260
+    store <2 x double> %261, ptr %10, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %30, align 16
+    %262 = load <2 x double>, ptr %30, align 16
+    %263 = load <2 x double>, ptr %9, align 16
+    %264 = fsub <2 x double> %262, %263
+    store <2 x double> %264, ptr %11, align 16
+    br label %265
+  
+  265:                                              ; preds = %259
+    store i16 0, ptr %31, align 1
+    br label %266
+  
+  266:                                              ; preds = %279, %265
+    %267 = load i16, ptr %31, align 1
+    %268 = icmp slt i16 %267, 2
+    br i1 %268, label %269, label %282
+  
+  269:                                              ; preds = %266
+    %270 = load i16, ptr %31, align 1
+    %271 = getelementptr inbounds double, ptr %10, i16 %270
+    %272 = load double, ptr %271, align 8
+    %273 = load i16, ptr %31, align 1
+    %274 = getelementptr inbounds double, ptr %11, i16 %273
+    %275 = load double, ptr %274, align 8
+    %276 = fcmp une double %272, %275
+    br i1 %276, label %277, label %278
+  
+  277:                                              ; preds = %269
+    call void @abort() #2
+    unreachable
+  
+  278:                                              ; preds = %269
+    br label %279
+  
+  279:                                              ; preds = %278
+    %280 = load i16, ptr %31, align 1
+    %281 = add nsw i16 %280, 1
+    store i16 %281, ptr %31, align 1
+    br label %266, !llvm.loop !12
+  
+  282:                                              ; preds = %266
+    br label %283
+  
+  283:                                              ; preds = %282
+    %284 = load <2 x double>, ptr %9, align 16
+    %285 = fmul <2 x double> splat (double 2.000000e+00), %284
+    store <2 x double> %285, ptr %10, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %32, align 16
+    %286 = load <2 x double>, ptr %32, align 16
+    %287 = load <2 x double>, ptr %9, align 16
+    %288 = fmul <2 x double> %286, %287
+    store <2 x double> %288, ptr %11, align 16
+    br label %289
+  
+  289:                                              ; preds = %283
+    store i16 0, ptr %33, align 1
+    br label %290
+  
+  290:                                              ; preds = %303, %289
+    %291 = load i16, ptr %33, align 1
+    %292 = icmp slt i16 %291, 2
+    br i1 %292, label %293, label %306
+  
+  293:                                              ; preds = %290
+    %294 = load i16, ptr %33, align 1
+    %295 = getelementptr inbounds double, ptr %10, i16 %294
+    %296 = load double, ptr %295, align 8
+    %297 = load i16, ptr %33, align 1
+    %298 = getelementptr inbounds double, ptr %11, i16 %297
+    %299 = load double, ptr %298, align 8
+    %300 = fcmp une double %296, %299
+    br i1 %300, label %301, label %302
+  
+  301:                                              ; preds = %293
+    call void @abort() #2
+    unreachable
+  
+  302:                                              ; preds = %293
+    br label %303
+  
+  303:                                              ; preds = %302
+    %304 = load i16, ptr %33, align 1
+    %305 = add nsw i16 %304, 1
+    store i16 %305, ptr %33, align 1
+    br label %290, !llvm.loop !13
+  
+  306:                                              ; preds = %290
+    br label %307
+  
+  307:                                              ; preds = %306
+    %308 = load <2 x double>, ptr %9, align 16
+    %309 = fdiv <2 x double> splat (double 2.000000e+00), %308
+    store <2 x double> %309, ptr %10, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %34, align 16
+    %310 = load <2 x double>, ptr %34, align 16
+    %311 = load <2 x double>, ptr %9, align 16
+    %312 = fdiv <2 x double> %310, %311
+    store <2 x double> %312, ptr %11, align 16
+    br label %313
+  
+  313:                                              ; preds = %307
+    store i16 0, ptr %35, align 1
+    br label %314
+  
+  314:                                              ; preds = %327, %313
+    %315 = load i16, ptr %35, align 1
+    %316 = icmp slt i16 %315, 2
+    br i1 %316, label %317, label %330
+  
+  317:                                              ; preds = %314
+    %318 = load i16, ptr %35, align 1
+    %319 = getelementptr inbounds double, ptr %10, i16 %318
+    %320 = load double, ptr %319, align 8
+    %321 = load i16, ptr %35, align 1
+    %322 = getelementptr inbounds double, ptr %11, i16 %321
+    %323 = load double, ptr %322, align 8
+    %324 = fcmp une double %320, %323
+    br i1 %324, label %325, label %326
+  
+  325:                                              ; preds = %317
+    call void @abort() #2
+    unreachable
+  
+  326:                                              ; preds = %317
+    br label %327
+  
+  327:                                              ; preds = %326
+    %328 = load i16, ptr %35, align 1
+    %329 = add nsw i16 %328, 1
+    store i16 %329, ptr %35, align 1
+    br label %314, !llvm.loop !14
+  
+  330:                                              ; preds = %314
+    br label %331
+  
+  331:                                              ; preds = %330
+    %332 = load <2 x double>, ptr %9, align 16
+    %333 = fadd <2 x double> %332, splat (double 2.000000e+00)
+    store <2 x double> %333, ptr %10, align 16
+    %334 = load <2 x double>, ptr %9, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %36, align 16
+    %335 = load <2 x double>, ptr %36, align 16
+    %336 = fadd <2 x double> %334, %335
+    store <2 x double> %336, ptr %11, align 16
+    br label %337
+  
+  337:                                              ; preds = %331
+    store i16 0, ptr %37, align 1
+    br label %338
+  
+  338:                                              ; preds = %351, %337
+    %339 = load i16, ptr %37, align 1
+    %340 = icmp slt i16 %339, 2
+    br i1 %340, label %341, label %354
+  
+  341:                                              ; preds = %338
+    %342 = load i16, ptr %37, align 1
+    %343 = getelementptr inbounds double, ptr %10, i16 %342
+    %344 = load double, ptr %343, align 8
+    %345 = load i16, ptr %37, align 1
+    %346 = getelementptr inbounds double, ptr %11, i16 %345
+    %347 = load double, ptr %346, align 8
+    %348 = fcmp une double %344, %347
+    br i1 %348, label %349, label %350
+  
+  349:                                              ; preds = %341
+    call void @abort() #2
+    unreachable
+  
+  350:                                              ; preds = %341
+    br label %351
+  
+  351:                                              ; preds = %350
+    %352 = load i16, ptr %37, align 1
+    %353 = add nsw i16 %352, 1
+    store i16 %353, ptr %37, align 1
+    br label %338, !llvm.loop !15
+  
+  354:                                              ; preds = %338
+    br label %355
+  
+  355:                                              ; preds = %354
+    %356 = load <2 x double>, ptr %9, align 16
+    %357 = fsub <2 x double> %356, splat (double 2.000000e+00)
+    store <2 x double> %357, ptr %10, align 16
+    %358 = load <2 x double>, ptr %9, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %38, align 16
+    %359 = load <2 x double>, ptr %38, align 16
+    %360 = fsub <2 x double> %358, %359
+    store <2 x double> %360, ptr %11, align 16
+    br label %361
+  
+  361:                                              ; preds = %355
+    store i16 0, ptr %39, align 1
+    br label %362
+  
+  362:                                              ; preds = %375, %361
+    %363 = load i16, ptr %39, align 1
+    %364 = icmp slt i16 %363, 2
+    br i1 %364, label %365, label %378
+  
+  365:                                              ; preds = %362
+    %366 = load i16, ptr %39, align 1
+    %367 = getelementptr inbounds double, ptr %10, i16 %366
+    %368 = load double, ptr %367, align 8
+    %369 = load i16, ptr %39, align 1
+    %370 = getelementptr inbounds double, ptr %11, i16 %369
+    %371 = load double, ptr %370, align 8
+    %372 = fcmp une double %368, %371
+    br i1 %372, label %373, label %374
+  
+  373:                                              ; preds = %365
+    call void @abort() #2
+    unreachable
+  
+  374:                                              ; preds = %365
+    br label %375
+  
+  375:                                              ; preds = %374
+    %376 = load i16, ptr %39, align 1
+    %377 = add nsw i16 %376, 1
+    store i16 %377, ptr %39, align 1
+    br label %362, !llvm.loop !16
+  
+  378:                                              ; preds = %362
+    br label %379
+  
+  379:                                              ; preds = %378
+    %380 = load <2 x double>, ptr %9, align 16
+    %381 = fmul <2 x double> %380, splat (double 2.000000e+00)
+    store <2 x double> %381, ptr %10, align 16
+    %382 = load <2 x double>, ptr %9, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %40, align 16
+    %383 = load <2 x double>, ptr %40, align 16
+    %384 = fmul <2 x double> %382, %383
+    store <2 x double> %384, ptr %11, align 16
+    br label %385
+  
+  385:                                              ; preds = %379
+    store i16 0, ptr %41, align 1
+    br label %386
+  
+  386:                                              ; preds = %399, %385
+    %387 = load i16, ptr %41, align 1
+    %388 = icmp slt i16 %387, 2
+    br i1 %388, label %389, label %402
+  
+  389:                                              ; preds = %386
+    %390 = load i16, ptr %41, align 1
+    %391 = getelementptr inbounds double, ptr %10, i16 %390
+    %392 = load double, ptr %391, align 8
+    %393 = load i16, ptr %41, align 1
+    %394 = getelementptr inbounds double, ptr %11, i16 %393
+    %395 = load double, ptr %394, align 8
+    %396 = fcmp une double %392, %395
+    br i1 %396, label %397, label %398
+  
+  397:                                              ; preds = %389
+    call void @abort() #2
+    unreachable
+  
+  398:                                              ; preds = %389
+    br label %399
+  
+  399:                                              ; preds = %398
+    %400 = load i16, ptr %41, align 1
+    %401 = add nsw i16 %400, 1
+    store i16 %401, ptr %41, align 1
+    br label %386, !llvm.loop !17
+  
+  402:                                              ; preds = %386
+    br label %403
+  
+  403:                                              ; preds = %402
+    %404 = load <2 x double>, ptr %9, align 16
+    %405 = fdiv <2 x double> %404, splat (double 2.000000e+00)
+    store <2 x double> %405, ptr %10, align 16
+    %406 = load <2 x double>, ptr %9, align 16
+    store <2 x double> splat (double 2.000000e+00), ptr %42, align 16
+    %407 = load <2 x double>, ptr %42, align 16
+    %408 = fdiv <2 x double> %406, %407
+    store <2 x double> %408, ptr %11, align 16
+    br label %409
+  
+  409:                                              ; preds = %403
+    store i16 0, ptr %43, align 1
+    br label %410
+  
+  410:                                              ; preds = %423, %409
+    %411 = load i16, ptr %43, align 1
+    %412 = icmp slt i16 %411, 2
+    br i1 %412, label %413, label %426
+  
+  413:                                              ; preds = %410
+    %414 = load i16, ptr %43, align 1
+    %415 = getelementptr inbounds double, ptr %10, i16 %414
+    %416 = load double, ptr %415, align 8
+    %417 = load i16, ptr %43, align 1
+    %418 = getelementptr inbounds double, ptr %11, i16 %417
+    %419 = load double, ptr %418, align 8
+    %420 = fcmp une double %416, %419
+    br i1 %420, label %421, label %422
+  
+  421:                                              ; preds = %413
+    call void @abort() #2
+    unreachable
+  
+  422:                                              ; preds = %413
+    br label %423
+  
+  423:                                              ; preds = %422
+    %424 = load i16, ptr %43, align 1
+    %425 = add nsw i16 %424, 1
+    store i16 %425, ptr %43, align 1
+    br label %410, !llvm.loop !18
+  
+  426:                                              ; preds = %410
+    br label %427
+  
+  427:                                              ; preds = %426
+    ret i16 0
+  }
+  
+  ; Function Attrs: noreturn nounwind
+  declare dso_local void @abort() #1
+  
+  attributes #0 = { noinline nounwind optnone "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+  attributes #1 = { noreturn nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+  attributes #2 = { noreturn nounwind }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = distinct !{!2, !3}
+  !3 = !{!"llvm.loop.mustprogress"}
+  !4 = distinct !{!4, !3}
+  !5 = distinct !{!5, !3}
+  !6 = distinct !{!6, !3}
+  !7 = distinct !{!7, !3}
+  !8 = distinct !{!8, !3}
+  !9 = distinct !{!9, !3}
+  !10 = distinct !{!10, !3}
+  !11 = distinct !{!11, !3}
+  !12 = distinct !{!12, !3}
+  !13 = distinct !{!13, !3}
+  !14 = distinct !{!14, !3}
+  !15 = distinct !{!15, !3}
+  !16 = distinct !{!16, !3}
+  !17 = distinct !{!17, !3}
+  !18 = distinct !{!18, !3}
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: _, preferred-register: '', flags: [  ] }
+  - { id: 47, class: _, preferred-register: '', flags: [  ] }
+  - { id: 48, class: _, preferred-register: '', flags: [  ] }
+  - { id: 49, class: _, preferred-register: '', flags: [  ] }
+  - { id: 50, class: _, preferred-register: '', flags: [  ] }
+  - { id: 51, class: _, preferred-register: '', flags: [  ] }
+  - { id: 52, class: _, preferred-register: '', flags: [  ] }
+  - { id: 53, class: _, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: _, preferred-register: '', flags: [  ] }
+  - { id: 57, class: _, preferred-register: '', flags: [  ] }
+  - { id: 58, class: _, preferred-register: '', flags: [  ] }
+  - { id: 59, class: _, preferred-register: '', flags: [  ] }
+  - { id: 60, class: _, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: _, preferred-register: '', flags: [  ] }
+  - { id: 64, class: _, preferred-register: '', flags: [  ] }
+  - { id: 65, class: _, preferred-register: '', flags: [  ] }
+  - { id: 66, class: _, preferred-register: '', flags: [  ] }
+  - { id: 67, class: _, preferred-register: '', flags: [  ] }
+  - { id: 68, class: _, preferred-register: '', flags: [  ] }
+  - { id: 69, class: _, preferred-register: '', flags: [  ] }
+  - { id: 70, class: _, preferred-register: '', flags: [  ] }
+  - { id: 71, class: _, preferred-register: '', flags: [  ] }
+  - { id: 72, class: _, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: _, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: _, preferred-register: '', flags: [  ] }
+  - { id: 78, class: _, preferred-register: '', flags: [  ] }
+  - { id: 79, class: _, preferred-register: '', flags: [  ] }
+  - { id: 80, class: _, preferred-register: '', flags: [  ] }
+  - { id: 81, class: _, preferred-register: '', flags: [  ] }
+  - { id: 82, class: _, preferred-register: '', flags: [  ] }
+  - { id: 83, class: _, preferred-register: '', flags: [  ] }
+  - { id: 84, class: _, preferred-register: '', flags: [  ] }
+  - { id: 85, class: _, preferred-register: '', flags: [  ] }
+  - { id: 86, class: _, preferred-register: '', flags: [  ] }
+  - { id: 87, class: _, preferred-register: '', flags: [  ] }
+  - { id: 88, class: _, preferred-register: '', flags: [  ] }
+  - { id: 89, class: _, preferred-register: '', flags: [  ] }
+  - { id: 90, class: _, preferred-register: '', flags: [  ] }
+  - { id: 91, class: _, preferred-register: '', flags: [  ] }
+  - { id: 92, class: _, preferred-register: '', flags: [  ] }
+  - { id: 93, class: _, preferred-register: '', flags: [  ] }
+  - { id: 94, class: _, preferred-register: '', flags: [  ] }
+  - { id: 95, class: _, preferred-register: '', flags: [  ] }
+  - { id: 96, class: _, preferred-register: '', flags: [  ] }
+  - { id: 97, class: _, preferred-register: '', flags: [  ] }
+  - { id: 98, class: _, preferred-register: '', flags: [  ] }
+  - { id: 99, class: _, preferred-register: '', flags: [  ] }
+  - { id: 100, class: _, preferred-register: '', flags: [  ] }
+  - { id: 101, class: _, preferred-register: '', flags: [  ] }
+  - { id: 102, class: _, preferred-register: '', flags: [  ] }
+  - { id: 103, class: _, preferred-register: '', flags: [  ] }
+  - { id: 104, class: _, preferred-register: '', flags: [  ] }
+  - { id: 105, class: _, preferred-register: '', flags: [  ] }
+  - { id: 106, class: _, preferred-register: '', flags: [  ] }
+  - { id: 107, class: _, preferred-register: '', flags: [  ] }
+  - { id: 108, class: _, preferred-register: '', flags: [  ] }
+  - { id: 109, class: _, preferred-register: '', flags: [  ] }
+  - { id: 110, class: _, preferred-register: '', flags: [  ] }
+  - { id: 111, class: _, preferred-register: '', flags: [  ] }
+  - { id: 112, class: _, preferred-register: '', flags: [  ] }
+  - { id: 113, class: _, preferred-register: '', flags: [  ] }
+  - { id: 114, class: _, preferred-register: '', flags: [  ] }
+  - { id: 115, class: _, preferred-register: '', flags: [  ] }
+  - { id: 116, class: _, preferred-register: '', flags: [  ] }
+  - { id: 117, class: _, preferred-register: '', flags: [  ] }
+  - { id: 118, class: _, preferred-register: '', flags: [  ] }
+  - { id: 119, class: _, preferred-register: '', flags: [  ] }
+  - { id: 120, class: _, preferred-register: '', flags: [  ] }
+  - { id: 121, class: _, preferred-register: '', flags: [  ] }
+  - { id: 122, class: _, preferred-register: '', flags: [  ] }
+  - { id: 123, class: _, preferred-register: '', flags: [  ] }
+  - { id: 124, class: _, preferred-register: '', flags: [  ] }
+  - { id: 125, class: _, preferred-register: '', flags: [  ] }
+  - { id: 126, class: _, preferred-register: '', flags: [  ] }
+  - { id: 127, class: _, preferred-register: '', flags: [  ] }
+  - { id: 128, class: _, preferred-register: '', flags: [  ] }
+  - { id: 129, class: _, preferred-register: '', flags: [  ] }
+  - { id: 130, class: _, preferred-register: '', flags: [  ] }
+  - { id: 131, class: _, preferred-register: '', flags: [  ] }
+  - { id: 132, class: _, preferred-register: '', flags: [  ] }
+  - { id: 133, class: _, preferred-register: '', flags: [  ] }
+  - { id: 134, class: _, preferred-register: '', flags: [  ] }
+  - { id: 135, class: _, preferred-register: '', flags: [  ] }
+  - { id: 136, class: _, preferred-register: '', flags: [  ] }
+  - { id: 137, class: _, preferred-register: '', flags: [  ] }
+  - { id: 138, class: _, preferred-register: '', flags: [  ] }
+  - { id: 139, class: _, preferred-register: '', flags: [  ] }
+  - { id: 140, class: _, preferred-register: '', flags: [  ] }
+  - { id: 141, class: _, preferred-register: '', flags: [  ] }
+  - { id: 142, class: _, preferred-register: '', flags: [  ] }
+  - { id: 143, class: _, preferred-register: '', flags: [  ] }
+  - { id: 144, class: _, preferred-register: '', flags: [  ] }
+  - { id: 145, class: _, preferred-register: '', flags: [  ] }
+  - { id: 146, class: _, preferred-register: '', flags: [  ] }
+  - { id: 147, class: _, preferred-register: '', flags: [  ] }
+  - { id: 148, class: _, preferred-register: '', flags: [  ] }
+  - { id: 149, class: _, preferred-register: '', flags: [  ] }
+  - { id: 150, class: _, preferred-register: '', flags: [  ] }
+  - { id: 151, class: _, preferred-register: '', flags: [  ] }
+  - { id: 152, class: _, preferred-register: '', flags: [  ] }
+  - { id: 153, class: _, preferred-register: '', flags: [  ] }
+  - { id: 154, class: _, preferred-register: '', flags: [  ] }
+  - { id: 155, class: _, preferred-register: '', flags: [  ] }
+  - { id: 156, class: _, preferred-register: '', flags: [  ] }
+  - { id: 157, class: _, preferred-register: '', flags: [  ] }
+  - { id: 158, class: _, preferred-register: '', flags: [  ] }
+  - { id: 159, class: _, preferred-register: '', flags: [  ] }
+  - { id: 160, class: _, preferred-register: '', flags: [  ] }
+  - { id: 161, class: _, preferred-register: '', flags: [  ] }
+  - { id: 162, class: _, preferred-register: '', flags: [  ] }
+  - { id: 163, class: _, preferred-register: '', flags: [  ] }
+  - { id: 164, class: _, preferred-register: '', flags: [  ] }
+  - { id: 165, class: _, preferred-register: '', flags: [  ] }
+  - { id: 166, class: _, preferred-register: '', flags: [  ] }
+  - { id: 167, class: _, preferred-register: '', flags: [  ] }
+  - { id: 168, class: _, preferred-register: '', flags: [  ] }
+  - { id: 169, class: _, preferred-register: '', flags: [  ] }
+  - { id: 170, class: _, preferred-register: '', flags: [  ] }
+  - { id: 171, class: _, preferred-register: '', flags: [  ] }
+  - { id: 172, class: _, preferred-register: '', flags: [  ] }
+  - { id: 173, class: _, preferred-register: '', flags: [  ] }
+  - { id: 174, class: _, preferred-register: '', flags: [  ] }
+  - { id: 175, class: _, preferred-register: '', flags: [  ] }
+  - { id: 176, class: _, preferred-register: '', flags: [  ] }
+  - { id: 177, class: _, preferred-register: '', flags: [  ] }
+  - { id: 178, class: _, preferred-register: '', flags: [  ] }
+  - { id: 179, class: _, preferred-register: '', flags: [  ] }
+  - { id: 180, class: _, preferred-register: '', flags: [  ] }
+  - { id: 181, class: _, preferred-register: '', flags: [  ] }
+  - { id: 182, class: _, preferred-register: '', flags: [  ] }
+  - { id: 183, class: _, preferred-register: '', flags: [  ] }
+  - { id: 184, class: _, preferred-register: '', flags: [  ] }
+  - { id: 185, class: _, preferred-register: '', flags: [  ] }
+  - { id: 186, class: _, preferred-register: '', flags: [  ] }
+  - { id: 187, class: _, preferred-register: '', flags: [  ] }
+  - { id: 188, class: _, preferred-register: '', flags: [  ] }
+  - { id: 189, class: _, preferred-register: '', flags: [  ] }
+  - { id: 190, class: _, preferred-register: '', flags: [  ] }
+  - { id: 191, class: _, preferred-register: '', flags: [  ] }
+  - { id: 192, class: _, preferred-register: '', flags: [  ] }
+  - { id: 193, class: _, preferred-register: '', flags: [  ] }
+  - { id: 194, class: _, preferred-register: '', flags: [  ] }
+  - { id: 195, class: _, preferred-register: '', flags: [  ] }
+  - { id: 196, class: _, preferred-register: '', flags: [  ] }
+  - { id: 197, class: _, preferred-register: '', flags: [  ] }
+  - { id: 198, class: _, preferred-register: '', flags: [  ] }
+  - { id: 199, class: _, preferred-register: '', flags: [  ] }
+  - { id: 200, class: _, preferred-register: '', flags: [  ] }
+  - { id: 201, class: _, preferred-register: '', flags: [  ] }
+  - { id: 202, class: _, preferred-register: '', flags: [  ] }
+  - { id: 203, class: _, preferred-register: '', flags: [  ] }
+  - { id: 204, class: _, preferred-register: '', flags: [  ] }
+  - { id: 205, class: _, preferred-register: '', flags: [  ] }
+  - { id: 206, class: _, preferred-register: '', flags: [  ] }
+  - { id: 207, class: _, preferred-register: '', flags: [  ] }
+  - { id: 208, class: _, preferred-register: '', flags: [  ] }
+  - { id: 209, class: _, preferred-register: '', flags: [  ] }
+  - { id: 210, class: _, preferred-register: '', flags: [  ] }
+  - { id: 211, class: _, preferred-register: '', flags: [  ] }
+  - { id: 212, class: _, preferred-register: '', flags: [  ] }
+  - { id: 213, class: _, preferred-register: '', flags: [  ] }
+  - { id: 214, class: _, preferred-register: '', flags: [  ] }
+  - { id: 215, class: _, preferred-register: '', flags: [  ] }
+  - { id: 216, class: _, preferred-register: '', flags: [  ] }
+  - { id: 217, class: _, preferred-register: '', flags: [  ] }
+  - { id: 218, class: _, preferred-register: '', flags: [  ] }
+  - { id: 219, class: _, preferred-register: '', flags: [  ] }
+  - { id: 220, class: _, preferred-register: '', flags: [  ] }
+  - { id: 221, class: _, preferred-register: '', flags: [  ] }
+  - { id: 222, class: _, preferred-register: '', flags: [  ] }
+  - { id: 223, class: _, preferred-register: '', flags: [  ] }
+  - { id: 224, class: _, preferred-register: '', flags: [  ] }
+  - { id: 225, class: _, preferred-register: '', flags: [  ] }
+  - { id: 226, class: _, preferred-register: '', flags: [  ] }
+  - { id: 227, class: _, preferred-register: '', flags: [  ] }
+  - { id: 228, class: _, preferred-register: '', flags: [  ] }
+  - { id: 229, class: _, preferred-register: '', flags: [  ] }
+  - { id: 230, class: _, preferred-register: '', flags: [  ] }
+  - { id: 231, class: _, preferred-register: '', flags: [  ] }
+  - { id: 232, class: _, preferred-register: '', flags: [  ] }
+  - { id: 233, class: _, preferred-register: '', flags: [  ] }
+  - { id: 234, class: _, preferred-register: '', flags: [  ] }
+  - { id: 235, class: _, preferred-register: '', flags: [  ] }
+  - { id: 236, class: _, preferred-register: '', flags: [  ] }
+  - { id: 237, class: _, preferred-register: '', flags: [  ] }
+  - { id: 238, class: _, preferred-register: '', flags: [  ] }
+  - { id: 239, class: _, preferred-register: '', flags: [  ] }
+  - { id: 240, class: _, preferred-register: '', flags: [  ] }
+  - { id: 241, class: _, preferred-register: '', flags: [  ] }
+  - { id: 242, class: _, preferred-register: '', flags: [  ] }
+  - { id: 243, class: _, preferred-register: '', flags: [  ] }
+  - { id: 244, class: _, preferred-register: '', flags: [  ] }
+  - { id: 245, class: _, preferred-register: '', flags: [  ] }
+  - { id: 246, class: _, preferred-register: '', flags: [  ] }
+  - { id: 247, class: _, preferred-register: '', flags: [  ] }
+  - { id: 248, class: _, preferred-register: '', flags: [  ] }
+  - { id: 249, class: _, preferred-register: '', flags: [  ] }
+  - { id: 250, class: _, preferred-register: '', flags: [  ] }
+  - { id: 251, class: _, preferred-register: '', flags: [  ] }
+  - { id: 252, class: _, preferred-register: '', flags: [  ] }
+  - { id: 253, class: _, preferred-register: '', flags: [  ] }
+  - { id: 254, class: _, preferred-register: '', flags: [  ] }
+  - { id: 255, class: _, preferred-register: '', flags: [  ] }
+  - { id: 256, class: _, preferred-register: '', flags: [  ] }
+  - { id: 257, class: _, preferred-register: '', flags: [  ] }
+  - { id: 258, class: _, preferred-register: '', flags: [  ] }
+  - { id: 259, class: _, preferred-register: '', flags: [  ] }
+  - { id: 260, class: _, preferred-register: '', flags: [  ] }
+  - { id: 261, class: _, preferred-register: '', flags: [  ] }
+  - { id: 262, class: _, preferred-register: '', flags: [  ] }
+  - { id: 263, class: _, preferred-register: '', flags: [  ] }
+  - { id: 264, class: _, preferred-register: '', flags: [  ] }
+  - { id: 265, class: _, preferred-register: '', flags: [  ] }
+  - { id: 266, class: _, preferred-register: '', flags: [  ] }
+  - { id: 267, class: _, preferred-register: '', flags: [  ] }
+  - { id: 268, class: _, preferred-register: '', flags: [  ] }
+  - { id: 269, class: _, preferred-register: '', flags: [  ] }
+  - { id: 270, class: _, preferred-register: '', flags: [  ] }
+  - { id: 271, class: _, preferred-register: '', flags: [  ] }
+  - { id: 272, class: _, preferred-register: '', flags: [  ] }
+  - { id: 273, class: _, preferred-register: '', flags: [  ] }
+  - { id: 274, class: _, preferred-register: '', flags: [  ] }
+  - { id: 275, class: _, preferred-register: '', flags: [  ] }
+  - { id: 276, class: _, preferred-register: '', flags: [  ] }
+  - { id: 277, class: _, preferred-register: '', flags: [  ] }
+  - { id: 278, class: _, preferred-register: '', flags: [  ] }
+  - { id: 279, class: _, preferred-register: '', flags: [  ] }
+  - { id: 280, class: _, preferred-register: '', flags: [  ] }
+  - { id: 281, class: _, preferred-register: '', flags: [  ] }
+  - { id: 282, class: _, preferred-register: '', flags: [  ] }
+  - { id: 283, class: _, preferred-register: '', flags: [  ] }
+  - { id: 284, class: _, preferred-register: '', flags: [  ] }
+  - { id: 285, class: _, preferred-register: '', flags: [  ] }
+  - { id: 286, class: _, preferred-register: '', flags: [  ] }
+  - { id: 287, class: _, preferred-register: '', flags: [  ] }
+  - { id: 288, class: _, preferred-register: '', flags: [  ] }
+  - { id: 289, class: _, preferred-register: '', flags: [  ] }
+  - { id: 290, class: _, preferred-register: '', flags: [  ] }
+  - { id: 291, class: _, preferred-register: '', flags: [  ] }
+  - { id: 292, class: _, preferred-register: '', flags: [  ] }
+  - { id: 293, class: _, preferred-register: '', flags: [  ] }
+  - { id: 294, class: _, preferred-register: '', flags: [  ] }
+  - { id: 295, class: _, preferred-register: '', flags: [  ] }
+  - { id: 296, class: _, preferred-register: '', flags: [  ] }
+  - { id: 297, class: _, preferred-register: '', flags: [  ] }
+  - { id: 298, class: _, preferred-register: '', flags: [  ] }
+  - { id: 299, class: _, preferred-register: '', flags: [  ] }
+  - { id: 300, class: _, preferred-register: '', flags: [  ] }
+  - { id: 301, class: _, preferred-register: '', flags: [  ] }
+  - { id: 302, class: _, preferred-register: '', flags: [  ] }
+  - { id: 303, class: _, preferred-register: '', flags: [  ] }
+  - { id: 304, class: _, preferred-register: '', flags: [  ] }
+  - { id: 305, class: _, preferred-register: '', flags: [  ] }
+  - { id: 306, class: _, preferred-register: '', flags: [  ] }
+  - { id: 307, class: _, preferred-register: '', flags: [  ] }
+  - { id: 308, class: _, preferred-register: '', flags: [  ] }
+  - { id: 309, class: _, preferred-register: '', flags: [  ] }
+  - { id: 310, class: _, preferred-register: '', flags: [  ] }
+  - { id: 311, class: _, preferred-register: '', flags: [  ] }
+  - { id: 312, class: _, preferred-register: '', flags: [  ] }
+  - { id: 313, class: _, preferred-register: '', flags: [  ] }
+  - { id: 314, class: _, preferred-register: '', flags: [  ] }
+  - { id: 315, class: _, preferred-register: '', flags: [  ] }
+  - { id: 316, class: _, preferred-register: '', flags: [  ] }
+  - { id: 317, class: _, preferred-register: '', flags: [  ] }
+  - { id: 318, class: _, preferred-register: '', flags: [  ] }
+  - { id: 319, class: _, preferred-register: '', flags: [  ] }
+  - { id: 320, class: _, preferred-register: '', flags: [  ] }
+  - { id: 321, class: _, preferred-register: '', flags: [  ] }
+  - { id: 322, class: _, preferred-register: '', flags: [  ] }
+  - { id: 323, class: _, preferred-register: '', flags: [  ] }
+  - { id: 324, class: _, preferred-register: '', flags: [  ] }
+  - { id: 325, class: _, preferred-register: '', flags: [  ] }
+  - { id: 326, class: _, preferred-register: '', flags: [  ] }
+  - { id: 327, class: _, preferred-register: '', flags: [  ] }
+  - { id: 328, class: _, preferred-register: '', flags: [  ] }
+  - { id: 329, class: _, preferred-register: '', flags: [  ] }
+  - { id: 330, class: _, preferred-register: '', flags: [  ] }
+  - { id: 331, class: _, preferred-register: '', flags: [  ] }
+  - { id: 332, class: _, preferred-register: '', flags: [  ] }
+  - { id: 333, class: _, preferred-register: '', flags: [  ] }
+  - { id: 334, class: _, preferred-register: '', flags: [  ] }
+  - { id: 335, class: _, preferred-register: '', flags: [  ] }
+  - { id: 336, class: _, preferred-register: '', flags: [  ] }
+  - { id: 337, class: _, preferred-register: '', flags: [  ] }
+  - { id: 338, class: _, preferred-register: '', flags: [  ] }
+  - { id: 339, class: _, preferred-register: '', flags: [  ] }
+  - { id: 340, class: _, preferred-register: '', flags: [  ] }
+  - { id: 341, class: _, preferred-register: '', flags: [  ] }
+  - { id: 342, class: _, preferred-register: '', flags: [  ] }
+  - { id: 343, class: _, preferred-register: '', flags: [  ] }
+  - { id: 344, class: _, preferred-register: '', flags: [  ] }
+  - { id: 345, class: _, preferred-register: '', flags: [  ] }
+  - { id: 346, class: _, preferred-register: '', flags: [  ] }
+  - { id: 347, class: _, preferred-register: '', flags: [  ] }
+  - { id: 348, class: _, preferred-register: '', flags: [  ] }
+  - { id: 349, class: _, preferred-register: '', flags: [  ] }
+  - { id: 350, class: _, preferred-register: '', flags: [  ] }
+  - { id: 351, class: _, preferred-register: '', flags: [  ] }
+  - { id: 352, class: _, preferred-register: '', flags: [  ] }
+  - { id: 353, class: _, preferred-register: '', flags: [  ] }
+  - { id: 354, class: _, preferred-register: '', flags: [  ] }
+  - { id: 355, class: _, preferred-register: '', flags: [  ] }
+  - { id: 356, class: _, preferred-register: '', flags: [  ] }
+  - { id: 357, class: _, preferred-register: '', flags: [  ] }
+  - { id: 358, class: _, preferred-register: '', flags: [  ] }
+  - { id: 359, class: _, preferred-register: '', flags: [  ] }
+  - { id: 360, class: _, preferred-register: '', flags: [  ] }
+  - { id: 361, class: _, preferred-register: '', flags: [  ] }
+  - { id: 362, class: _, preferred-register: '', flags: [  ] }
+  - { id: 363, class: _, preferred-register: '', flags: [  ] }
+  - { id: 364, class: _, preferred-register: '', flags: [  ] }
+  - { id: 365, class: _, preferred-register: '', flags: [  ] }
+  - { id: 366, class: _, preferred-register: '', flags: [  ] }
+  - { id: 367, class: _, preferred-register: '', flags: [  ] }
+  - { id: 368, class: _, preferred-register: '', flags: [  ] }
+  - { id: 369, class: _, preferred-register: '', flags: [  ] }
+  - { id: 370, class: _, preferred-register: '', flags: [  ] }
+  - { id: 371, class: _, preferred-register: '', flags: [  ] }
+  - { id: 372, class: _, preferred-register: '', flags: [  ] }
+  - { id: 373, class: _, preferred-register: '', flags: [  ] }
+  - { id: 374, class: _, preferred-register: '', flags: [  ] }
+  - { id: 375, class: _, preferred-register: '', flags: [  ] }
+  - { id: 376, class: _, preferred-register: '', flags: [  ] }
+  - { id: 377, class: _, preferred-register: '', flags: [  ] }
+  - { id: 378, class: _, preferred-register: '', flags: [  ] }
+  - { id: 379, class: _, preferred-register: '', flags: [  ] }
+  - { id: 380, class: _, preferred-register: '', flags: [  ] }
+  - { id: 381, class: _, preferred-register: '', flags: [  ] }
+  - { id: 382, class: _, preferred-register: '', flags: [  ] }
+  - { id: 383, class: _, preferred-register: '', flags: [  ] }
+  - { id: 384, class: _, preferred-register: '', flags: [  ] }
+  - { id: 385, class: _, preferred-register: '', flags: [  ] }
+  - { id: 386, class: _, preferred-register: '', flags: [  ] }
+  - { id: 387, class: _, preferred-register: '', flags: [  ] }
+  - { id: 388, class: _, preferred-register: '', flags: [  ] }
+  - { id: 389, class: _, preferred-register: '', flags: [  ] }
+  - { id: 390, class: _, preferred-register: '', flags: [  ] }
+  - { id: 391, class: _, preferred-register: '', flags: [  ] }
+  - { id: 392, class: _, preferred-register: '', flags: [  ] }
+  - { id: 393, class: _, preferred-register: '', flags: [  ] }
+  - { id: 394, class: _, preferred-register: '', flags: [  ] }
+  - { id: 395, class: _, preferred-register: '', flags: [  ] }
+  - { id: 396, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    16
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 17, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 18, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 19, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 20, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 21, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 22, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 23, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 24, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 25, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 26, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 27, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 28, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 29, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 30, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 31, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 32, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 33, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 34, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 35, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 36, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 37, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 38, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 39, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 40, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    successors: %bb.2(0x80000000)
+    liveins: $a, $x, $rs1
+  
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %0:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    %1:_(p0) = COPY $rs1
+    %45:_(s16) = G_CONSTANT i16 0
+    %47:_(s32) = G_FCONSTANT float 1.000000e+00
+    %48:_(s32) = G_FCONSTANT float 2.000000e+00
+    %49:_(s32) = G_FCONSTANT float 3.000000e+00
+    %50:_(s32) = G_FCONSTANT float 4.000000e+00
+    %46:_(<4 x s32>) = G_BUILD_VECTOR %47(s32), %48(s32), %49(s32), %50(s32)
+    %52:_(s64) = G_FCONSTANT double 1.000000e+00
+    %53:_(s64) = G_FCONSTANT double 2.000000e+00
+    %51:_(<2 x s64>) = G_BUILD_VECTOR %52(s64), %53(s64)
+    %55:_(<4 x s32>) = G_BUILD_VECTOR %48(s32), %48(s32), %48(s32), %48(s32)
+    %61:_(s16) = G_CONSTANT i16 4
+    %113:_(<2 x s64>) = G_BUILD_VECTOR %53(s64), %53(s64)
+    %119:_(s16) = G_CONSTANT i16 2
+    %185:_(s16) = G_CONSTANT i16 1
+    %4:_(p0) = G_FRAME_INDEX %stack.0
+    %5:_(p0) = G_FRAME_INDEX %stack.1
+    %6:_(p0) = G_FRAME_INDEX %stack.2
+    %7:_(p0) = G_FRAME_INDEX %stack.3
+    %8:_(p0) = G_FRAME_INDEX %stack.4
+    %9:_(p0) = G_FRAME_INDEX %stack.5
+    %10:_(p0) = G_FRAME_INDEX %stack.6
+    %11:_(p0) = G_FRAME_INDEX %stack.7
+    %12:_(p0) = G_FRAME_INDEX %stack.8
+    %13:_(p0) = G_FRAME_INDEX %stack.9
+    %14:_(p0) = G_FRAME_INDEX %stack.10
+    %15:_(p0) = G_FRAME_INDEX %stack.11
+    %16:_(p0) = G_FRAME_INDEX %stack.12
+    %17:_(p0) = G_FRAME_INDEX %stack.13
+    %18:_(p0) = G_FRAME_INDEX %stack.14
+    %19:_(p0) = G_FRAME_INDEX %stack.15
+    %20:_(p0) = G_FRAME_INDEX %stack.16
+    %21:_(p0) = G_FRAME_INDEX %stack.17
+    %22:_(p0) = G_FRAME_INDEX %stack.18
+    %23:_(p0) = G_FRAME_INDEX %stack.19
+    %24:_(p0) = G_FRAME_INDEX %stack.20
+    %25:_(p0) = G_FRAME_INDEX %stack.21
+    %26:_(p0) = G_FRAME_INDEX %stack.22
+    %27:_(p0) = G_FRAME_INDEX %stack.23
+    %28:_(p0) = G_FRAME_INDEX %stack.24
+    %29:_(p0) = G_FRAME_INDEX %stack.25
+    %30:_(p0) = G_FRAME_INDEX %stack.26
+    %31:_(p0) = G_FRAME_INDEX %stack.27
+    %32:_(p0) = G_FRAME_INDEX %stack.28
+    %33:_(p0) = G_FRAME_INDEX %stack.29
+    %34:_(p0) = G_FRAME_INDEX %stack.30
+    %35:_(p0) = G_FRAME_INDEX %stack.31
+    %36:_(p0) = G_FRAME_INDEX %stack.32
+    %37:_(p0) = G_FRAME_INDEX %stack.33
+    %38:_(p0) = G_FRAME_INDEX %stack.34
+    %39:_(p0) = G_FRAME_INDEX %stack.35
+    %40:_(p0) = G_FRAME_INDEX %stack.36
+    %41:_(p0) = G_FRAME_INDEX %stack.37
+    %42:_(p0) = G_FRAME_INDEX %stack.38
+    %43:_(p0) = G_FRAME_INDEX %stack.39
+    %44:_(p0) = G_FRAME_INDEX %stack.40
+    G_STORE %45(s16), %4(p0) :: (store (s16) into %ir.3, align 1)
+    G_STORE %0(s16), %5(p0) :: (store (s16) into %ir.4, align 1)
+    G_STORE %1(p0), %6(p0) :: (store (p0) into %ir.5, align 1)
+    G_STORE %46(<4 x s32>), %7(p0) :: (store (<4 x s32>) into %ir.6)
+    G_STORE %51(<2 x s64>), %10(p0) :: (store (<2 x s64>) into %ir.9)
+    %54:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %56:_(<4 x s32>) = G_FADD %55, %54
+    G_STORE %56(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    G_STORE %55(<4 x s32>), %13(p0) :: (store (<4 x s32>) into %ir.12)
+    %57:_(<4 x s32>) = G_LOAD %13(p0) :: (dereferenceable load (<4 x s32>) from %ir.12)
+    %58:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %59:_(<4 x s32>) = G_FADD %57, %58
+    G_STORE %59(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.2
+  
+  bb.2 (%ir-block.49):
+    successors: %bb.3(0x80000000)
+  
+    G_STORE %45(s16), %14(p0) :: (store (s16) into %ir.13, align 1)
+    G_BR %bb.3
+  
+  bb.3 (%ir-block.50):
+    successors: %bb.4(0x40000000), %bb.8(0x40000000)
+  
+    %60:_(s16) = G_LOAD %14(p0) :: (dereferenceable load (s16) from %ir.13, align 1)
+    %62:_(s1) = G_ICMP intpred(slt), %60(s16), %61
+    G_BRCOND %62(s1), %bb.4
+    G_BR %bb.8
+  
+  bb.4 (%ir-block.53):
+    successors: %bb.5(0x40000000), %bb.6(0x40000000)
+  
+    %383:_(s16) = G_LOAD %14(p0) :: (dereferenceable load (s16) from %ir.13, align 1)
+    %384:_(s16) = G_CONSTANT i16 4
+    %385:_(s16) = nsw G_MUL %383, %384
+    %386:_(p0) = nusw inbounds G_PTR_ADD %8, %385(s16)
+    %387:_(p0) = COPY %386(p0)
+    %388:_(s32) = G_LOAD %387(p0) :: (load (s32) from %ir.55)
+    %389:_(s16) = G_LOAD %14(p0) :: (dereferenceable load (s16) from %ir.13, align 1)
+    %390:_(s16) = nsw G_MUL %389, %384
+    %391:_(p0) = nusw inbounds G_PTR_ADD %9, %390(s16)
+    %392:_(p0) = COPY %391(p0)
+    %393:_(s32) = G_LOAD %392(p0) :: (load (s32) from %ir.58)
+    %394:_(s1) = G_FCMP floatpred(une), %388(s32), %393
+    G_BRCOND %394(s1), %bb.5
+    G_BR %bb.6
+  
+  bb.5 (%ir-block.61):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.6 (%ir-block.62):
+    successors: %bb.7(0x80000000)
+  
+    G_BR %bb.7
+  
+  bb.7 (%ir-block.63):
+    successors: %bb.3(0x80000000)
+  
+    %395:_(s16) = G_LOAD %14(p0) :: (dereferenceable load (s16) from %ir.13, align 1)
+    %396:_(s16) = nsw G_ADD %395, %185
+    G_STORE %396(s16), %14(p0) :: (store (s16) into %ir.13, align 1)
+    G_BR %bb.3
+  
+  bb.8 (%ir-block.66):
+    successors: %bb.9(0x80000000)
+  
+    G_BR %bb.9
+  
+  bb.9 (%ir-block.67):
+    successors: %bb.10(0x80000000)
+  
+    %63:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %64:_(<4 x s32>) = G_FSUB %55, %63
+    G_STORE %64(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    G_STORE %55(<4 x s32>), %15(p0) :: (store (<4 x s32>) into %ir.14)
+    %65:_(<4 x s32>) = G_LOAD %15(p0) :: (dereferenceable load (<4 x s32>) from %ir.14)
+    %66:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %67:_(<4 x s32>) = G_FSUB %65, %66
+    G_STORE %67(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.10
+  
+  bb.10 (%ir-block.73):
+    successors: %bb.11(0x80000000)
+  
+    G_STORE %45(s16), %16(p0) :: (store (s16) into %ir.15, align 1)
+    G_BR %bb.11
+  
+  bb.11 (%ir-block.74):
+    successors: %bb.12(0x40000000), %bb.16(0x40000000)
+  
+    %68:_(s16) = G_LOAD %16(p0) :: (dereferenceable load (s16) from %ir.15, align 1)
+    %69:_(s1) = G_ICMP intpred(slt), %68(s16), %61
+    G_BRCOND %69(s1), %bb.12
+    G_BR %bb.16
+  
+  bb.12 (%ir-block.77):
+    successors: %bb.13(0x40000000), %bb.14(0x40000000)
+  
+    %369:_(s16) = G_LOAD %16(p0) :: (dereferenceable load (s16) from %ir.15, align 1)
+    %370:_(s16) = G_CONSTANT i16 4
+    %371:_(s16) = nsw G_MUL %369, %370
+    %372:_(p0) = nusw inbounds G_PTR_ADD %8, %371(s16)
+    %373:_(p0) = COPY %372(p0)
+    %374:_(s32) = G_LOAD %373(p0) :: (load (s32) from %ir.79)
+    %375:_(s16) = G_LOAD %16(p0) :: (dereferenceable load (s16) from %ir.15, align 1)
+    %376:_(s16) = nsw G_MUL %375, %370
+    %377:_(p0) = nusw inbounds G_PTR_ADD %9, %376(s16)
+    %378:_(p0) = COPY %377(p0)
+    %379:_(s32) = G_LOAD %378(p0) :: (load (s32) from %ir.82)
+    %380:_(s1) = G_FCMP floatpred(une), %374(s32), %379
+    G_BRCOND %380(s1), %bb.13
+    G_BR %bb.14
+  
+  bb.13 (%ir-block.85):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.14 (%ir-block.86):
+    successors: %bb.15(0x80000000)
+  
+    G_BR %bb.15
+  
+  bb.15 (%ir-block.87):
+    successors: %bb.11(0x80000000)
+  
+    %381:_(s16) = G_LOAD %16(p0) :: (dereferenceable load (s16) from %ir.15, align 1)
+    %382:_(s16) = nsw G_ADD %381, %185
+    G_STORE %382(s16), %16(p0) :: (store (s16) into %ir.15, align 1)
+    G_BR %bb.11
+  
+  bb.16 (%ir-block.90):
+    successors: %bb.17(0x80000000)
+  
+    G_BR %bb.17
+  
+  bb.17 (%ir-block.91):
+    successors: %bb.18(0x80000000)
+  
+    %70:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %71:_(<4 x s32>) = G_FMUL %55, %70
+    G_STORE %71(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    G_STORE %55(<4 x s32>), %17(p0) :: (store (<4 x s32>) into %ir.16)
+    %72:_(<4 x s32>) = G_LOAD %17(p0) :: (dereferenceable load (<4 x s32>) from %ir.16)
+    %73:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %74:_(<4 x s32>) = G_FMUL %72, %73
+    G_STORE %74(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.18
+  
+  bb.18 (%ir-block.97):
+    successors: %bb.19(0x80000000)
+  
+    G_STORE %45(s16), %18(p0) :: (store (s16) into %ir.17, align 1)
+    G_BR %bb.19
+  
+  bb.19 (%ir-block.98):
+    successors: %bb.20(0x40000000), %bb.24(0x40000000)
+  
+    %75:_(s16) = G_LOAD %18(p0) :: (dereferenceable load (s16) from %ir.17, align 1)
+    %76:_(s1) = G_ICMP intpred(slt), %75(s16), %61
+    G_BRCOND %76(s1), %bb.20
+    G_BR %bb.24
+  
+  bb.20 (%ir-block.101):
+    successors: %bb.21(0x40000000), %bb.22(0x40000000)
+  
+    %355:_(s16) = G_LOAD %18(p0) :: (dereferenceable load (s16) from %ir.17, align 1)
+    %356:_(s16) = G_CONSTANT i16 4
+    %357:_(s16) = nsw G_MUL %355, %356
+    %358:_(p0) = nusw inbounds G_PTR_ADD %8, %357(s16)
+    %359:_(p0) = COPY %358(p0)
+    %360:_(s32) = G_LOAD %359(p0) :: (load (s32) from %ir.103)
+    %361:_(s16) = G_LOAD %18(p0) :: (dereferenceable load (s16) from %ir.17, align 1)
+    %362:_(s16) = nsw G_MUL %361, %356
+    %363:_(p0) = nusw inbounds G_PTR_ADD %9, %362(s16)
+    %364:_(p0) = COPY %363(p0)
+    %365:_(s32) = G_LOAD %364(p0) :: (load (s32) from %ir.106)
+    %366:_(s1) = G_FCMP floatpred(une), %360(s32), %365
+    G_BRCOND %366(s1), %bb.21
+    G_BR %bb.22
+  
+  bb.21 (%ir-block.109):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.22 (%ir-block.110):
+    successors: %bb.23(0x80000000)
+  
+    G_BR %bb.23
+  
+  bb.23 (%ir-block.111):
+    successors: %bb.19(0x80000000)
+  
+    %367:_(s16) = G_LOAD %18(p0) :: (dereferenceable load (s16) from %ir.17, align 1)
+    %368:_(s16) = nsw G_ADD %367, %185
+    G_STORE %368(s16), %18(p0) :: (store (s16) into %ir.17, align 1)
+    G_BR %bb.19
+  
+  bb.24 (%ir-block.114):
+    successors: %bb.25(0x80000000)
+  
+    G_BR %bb.25
+  
+  bb.25 (%ir-block.115):
+    successors: %bb.26(0x80000000)
+  
+    %77:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %78:_(<4 x s32>) = G_FDIV %55, %77
+    G_STORE %78(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    G_STORE %55(<4 x s32>), %19(p0) :: (store (<4 x s32>) into %ir.18)
+    %79:_(<4 x s32>) = G_LOAD %19(p0) :: (dereferenceable load (<4 x s32>) from %ir.18)
+    %80:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %81:_(<4 x s32>) = G_FDIV %79, %80
+    G_STORE %81(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.26
+  
+  bb.26 (%ir-block.121):
+    successors: %bb.27(0x80000000)
+  
+    G_STORE %45(s16), %20(p0) :: (store (s16) into %ir.19, align 1)
+    G_BR %bb.27
+  
+  bb.27 (%ir-block.122):
+    successors: %bb.28(0x40000000), %bb.32(0x40000000)
+  
+    %82:_(s16) = G_LOAD %20(p0) :: (dereferenceable load (s16) from %ir.19, align 1)
+    %83:_(s1) = G_ICMP intpred(slt), %82(s16), %61
+    G_BRCOND %83(s1), %bb.28
+    G_BR %bb.32
+  
+  bb.28 (%ir-block.125):
+    successors: %bb.29(0x40000000), %bb.30(0x40000000)
+  
+    %341:_(s16) = G_LOAD %20(p0) :: (dereferenceable load (s16) from %ir.19, align 1)
+    %342:_(s16) = G_CONSTANT i16 4
+    %343:_(s16) = nsw G_MUL %341, %342
+    %344:_(p0) = nusw inbounds G_PTR_ADD %8, %343(s16)
+    %345:_(p0) = COPY %344(p0)
+    %346:_(s32) = G_LOAD %345(p0) :: (load (s32) from %ir.127)
+    %347:_(s16) = G_LOAD %20(p0) :: (dereferenceable load (s16) from %ir.19, align 1)
+    %348:_(s16) = nsw G_MUL %347, %342
+    %349:_(p0) = nusw inbounds G_PTR_ADD %9, %348(s16)
+    %350:_(p0) = COPY %349(p0)
+    %351:_(s32) = G_LOAD %350(p0) :: (load (s32) from %ir.130)
+    %352:_(s1) = G_FCMP floatpred(une), %346(s32), %351
+    G_BRCOND %352(s1), %bb.29
+    G_BR %bb.30
+  
+  bb.29 (%ir-block.133):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.30 (%ir-block.134):
+    successors: %bb.31(0x80000000)
+  
+    G_BR %bb.31
+  
+  bb.31 (%ir-block.135):
+    successors: %bb.27(0x80000000)
+  
+    %353:_(s16) = G_LOAD %20(p0) :: (dereferenceable load (s16) from %ir.19, align 1)
+    %354:_(s16) = nsw G_ADD %353, %185
+    G_STORE %354(s16), %20(p0) :: (store (s16) into %ir.19, align 1)
+    G_BR %bb.27
+  
+  bb.32 (%ir-block.138):
+    successors: %bb.33(0x80000000)
+  
+    G_BR %bb.33
+  
+  bb.33 (%ir-block.139):
+    successors: %bb.34(0x80000000)
+  
+    %84:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %85:_(<4 x s32>) = G_FADD %84, %55
+    G_STORE %85(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    %86:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    G_STORE %55(<4 x s32>), %21(p0) :: (store (<4 x s32>) into %ir.20)
+    %87:_(<4 x s32>) = G_LOAD %21(p0) :: (dereferenceable load (<4 x s32>) from %ir.20)
+    %88:_(<4 x s32>) = G_FADD %86, %87
+    G_STORE %88(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.34
+  
+  bb.34 (%ir-block.145):
+    successors: %bb.35(0x80000000)
+  
+    G_STORE %45(s16), %22(p0) :: (store (s16) into %ir.21, align 1)
+    G_BR %bb.35
+  
+  bb.35 (%ir-block.146):
+    successors: %bb.36(0x40000000), %bb.40(0x40000000)
+  
+    %89:_(s16) = G_LOAD %22(p0) :: (dereferenceable load (s16) from %ir.21, align 1)
+    %90:_(s1) = G_ICMP intpred(slt), %89(s16), %61
+    G_BRCOND %90(s1), %bb.36
+    G_BR %bb.40
+  
+  bb.36 (%ir-block.149):
+    successors: %bb.37(0x40000000), %bb.38(0x40000000)
+  
+    %327:_(s16) = G_LOAD %22(p0) :: (dereferenceable load (s16) from %ir.21, align 1)
+    %328:_(s16) = G_CONSTANT i16 4
+    %329:_(s16) = nsw G_MUL %327, %328
+    %330:_(p0) = nusw inbounds G_PTR_ADD %8, %329(s16)
+    %331:_(p0) = COPY %330(p0)
+    %332:_(s32) = G_LOAD %331(p0) :: (load (s32) from %ir.151)
+    %333:_(s16) = G_LOAD %22(p0) :: (dereferenceable load (s16) from %ir.21, align 1)
+    %334:_(s16) = nsw G_MUL %333, %328
+    %335:_(p0) = nusw inbounds G_PTR_ADD %9, %334(s16)
+    %336:_(p0) = COPY %335(p0)
+    %337:_(s32) = G_LOAD %336(p0) :: (load (s32) from %ir.154)
+    %338:_(s1) = G_FCMP floatpred(une), %332(s32), %337
+    G_BRCOND %338(s1), %bb.37
+    G_BR %bb.38
+  
+  bb.37 (%ir-block.157):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.38 (%ir-block.158):
+    successors: %bb.39(0x80000000)
+  
+    G_BR %bb.39
+  
+  bb.39 (%ir-block.159):
+    successors: %bb.35(0x80000000)
+  
+    %339:_(s16) = G_LOAD %22(p0) :: (dereferenceable load (s16) from %ir.21, align 1)
+    %340:_(s16) = nsw G_ADD %339, %185
+    G_STORE %340(s16), %22(p0) :: (store (s16) into %ir.21, align 1)
+    G_BR %bb.35
+  
+  bb.40 (%ir-block.162):
+    successors: %bb.41(0x80000000)
+  
+    G_BR %bb.41
+  
+  bb.41 (%ir-block.163):
+    successors: %bb.42(0x80000000)
+  
+    %91:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %92:_(<4 x s32>) = G_FSUB %91, %55
+    G_STORE %92(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    %93:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    G_STORE %55(<4 x s32>), %23(p0) :: (store (<4 x s32>) into %ir.22)
+    %94:_(<4 x s32>) = G_LOAD %23(p0) :: (dereferenceable load (<4 x s32>) from %ir.22)
+    %95:_(<4 x s32>) = G_FSUB %93, %94
+    G_STORE %95(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.42
+  
+  bb.42 (%ir-block.169):
+    successors: %bb.43(0x80000000)
+  
+    G_STORE %45(s16), %24(p0) :: (store (s16) into %ir.23, align 1)
+    G_BR %bb.43
+  
+  bb.43 (%ir-block.170):
+    successors: %bb.44(0x40000000), %bb.48(0x40000000)
+  
+    %96:_(s16) = G_LOAD %24(p0) :: (dereferenceable load (s16) from %ir.23, align 1)
+    %97:_(s1) = G_ICMP intpred(slt), %96(s16), %61
+    G_BRCOND %97(s1), %bb.44
+    G_BR %bb.48
+  
+  bb.44 (%ir-block.173):
+    successors: %bb.45(0x40000000), %bb.46(0x40000000)
+  
+    %313:_(s16) = G_LOAD %24(p0) :: (dereferenceable load (s16) from %ir.23, align 1)
+    %314:_(s16) = G_CONSTANT i16 4
+    %315:_(s16) = nsw G_MUL %313, %314
+    %316:_(p0) = nusw inbounds G_PTR_ADD %8, %315(s16)
+    %317:_(p0) = COPY %316(p0)
+    %318:_(s32) = G_LOAD %317(p0) :: (load (s32) from %ir.175)
+    %319:_(s16) = G_LOAD %24(p0) :: (dereferenceable load (s16) from %ir.23, align 1)
+    %320:_(s16) = nsw G_MUL %319, %314
+    %321:_(p0) = nusw inbounds G_PTR_ADD %9, %320(s16)
+    %322:_(p0) = COPY %321(p0)
+    %323:_(s32) = G_LOAD %322(p0) :: (load (s32) from %ir.178)
+    %324:_(s1) = G_FCMP floatpred(une), %318(s32), %323
+    G_BRCOND %324(s1), %bb.45
+    G_BR %bb.46
+  
+  bb.45 (%ir-block.181):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.46 (%ir-block.182):
+    successors: %bb.47(0x80000000)
+  
+    G_BR %bb.47
+  
+  bb.47 (%ir-block.183):
+    successors: %bb.43(0x80000000)
+  
+    %325:_(s16) = G_LOAD %24(p0) :: (dereferenceable load (s16) from %ir.23, align 1)
+    %326:_(s16) = nsw G_ADD %325, %185
+    G_STORE %326(s16), %24(p0) :: (store (s16) into %ir.23, align 1)
+    G_BR %bb.43
+  
+  bb.48 (%ir-block.186):
+    successors: %bb.49(0x80000000)
+  
+    G_BR %bb.49
+  
+  bb.49 (%ir-block.187):
+    successors: %bb.50(0x80000000)
+  
+    %98:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %99:_(<4 x s32>) = G_FMUL %98, %55
+    G_STORE %99(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    %100:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    G_STORE %55(<4 x s32>), %25(p0) :: (store (<4 x s32>) into %ir.24)
+    %101:_(<4 x s32>) = G_LOAD %25(p0) :: (dereferenceable load (<4 x s32>) from %ir.24)
+    %102:_(<4 x s32>) = G_FMUL %100, %101
+    G_STORE %102(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.50
+  
+  bb.50 (%ir-block.193):
+    successors: %bb.51(0x80000000)
+  
+    G_STORE %45(s16), %26(p0) :: (store (s16) into %ir.25, align 1)
+    G_BR %bb.51
+  
+  bb.51 (%ir-block.194):
+    successors: %bb.52(0x40000000), %bb.56(0x40000000)
+  
+    %103:_(s16) = G_LOAD %26(p0) :: (dereferenceable load (s16) from %ir.25, align 1)
+    %104:_(s1) = G_ICMP intpred(slt), %103(s16), %61
+    G_BRCOND %104(s1), %bb.52
+    G_BR %bb.56
+  
+  bb.52 (%ir-block.197):
+    successors: %bb.53(0x40000000), %bb.54(0x40000000)
+  
+    %299:_(s16) = G_LOAD %26(p0) :: (dereferenceable load (s16) from %ir.25, align 1)
+    %300:_(s16) = G_CONSTANT i16 4
+    %301:_(s16) = nsw G_MUL %299, %300
+    %302:_(p0) = nusw inbounds G_PTR_ADD %8, %301(s16)
+    %303:_(p0) = COPY %302(p0)
+    %304:_(s32) = G_LOAD %303(p0) :: (load (s32) from %ir.199)
+    %305:_(s16) = G_LOAD %26(p0) :: (dereferenceable load (s16) from %ir.25, align 1)
+    %306:_(s16) = nsw G_MUL %305, %300
+    %307:_(p0) = nusw inbounds G_PTR_ADD %9, %306(s16)
+    %308:_(p0) = COPY %307(p0)
+    %309:_(s32) = G_LOAD %308(p0) :: (load (s32) from %ir.202)
+    %310:_(s1) = G_FCMP floatpred(une), %304(s32), %309
+    G_BRCOND %310(s1), %bb.53
+    G_BR %bb.54
+  
+  bb.53 (%ir-block.205):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.54 (%ir-block.206):
+    successors: %bb.55(0x80000000)
+  
+    G_BR %bb.55
+  
+  bb.55 (%ir-block.207):
+    successors: %bb.51(0x80000000)
+  
+    %311:_(s16) = G_LOAD %26(p0) :: (dereferenceable load (s16) from %ir.25, align 1)
+    %312:_(s16) = nsw G_ADD %311, %185
+    G_STORE %312(s16), %26(p0) :: (store (s16) into %ir.25, align 1)
+    G_BR %bb.51
+  
+  bb.56 (%ir-block.210):
+    successors: %bb.57(0x80000000)
+  
+    G_BR %bb.57
+  
+  bb.57 (%ir-block.211):
+    successors: %bb.58(0x80000000)
+  
+    %105:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    %106:_(<4 x s32>) = G_FDIV %105, %55
+    G_STORE %106(<4 x s32>), %8(p0) :: (store (<4 x s32>) into %ir.7)
+    %107:_(<4 x s32>) = G_LOAD %7(p0) :: (dereferenceable load (<4 x s32>) from %ir.6)
+    G_STORE %55(<4 x s32>), %27(p0) :: (store (<4 x s32>) into %ir.26)
+    %108:_(<4 x s32>) = G_LOAD %27(p0) :: (dereferenceable load (<4 x s32>) from %ir.26)
+    %109:_(<4 x s32>) = G_FDIV %107, %108
+    G_STORE %109(<4 x s32>), %9(p0) :: (store (<4 x s32>) into %ir.8)
+    G_BR %bb.58
+  
+  bb.58 (%ir-block.217):
+    successors: %bb.59(0x80000000)
+  
+    G_STORE %45(s16), %28(p0) :: (store (s16) into %ir.27, align 1)
+    G_BR %bb.59
+  
+  bb.59 (%ir-block.218):
+    successors: %bb.60(0x40000000), %bb.64(0x40000000)
+  
+    %110:_(s16) = G_LOAD %28(p0) :: (dereferenceable load (s16) from %ir.27, align 1)
+    %111:_(s1) = G_ICMP intpred(slt), %110(s16), %61
+    G_BRCOND %111(s1), %bb.60
+    G_BR %bb.64
+  
+  bb.60 (%ir-block.221):
+    successors: %bb.61(0x40000000), %bb.62(0x40000000)
+  
+    %285:_(s16) = G_LOAD %28(p0) :: (dereferenceable load (s16) from %ir.27, align 1)
+    %286:_(s16) = G_CONSTANT i16 4
+    %287:_(s16) = nsw G_MUL %285, %286
+    %288:_(p0) = nusw inbounds G_PTR_ADD %8, %287(s16)
+    %289:_(p0) = COPY %288(p0)
+    %290:_(s32) = G_LOAD %289(p0) :: (load (s32) from %ir.223)
+    %291:_(s16) = G_LOAD %28(p0) :: (dereferenceable load (s16) from %ir.27, align 1)
+    %292:_(s16) = nsw G_MUL %291, %286
+    %293:_(p0) = nusw inbounds G_PTR_ADD %9, %292(s16)
+    %294:_(p0) = COPY %293(p0)
+    %295:_(s32) = G_LOAD %294(p0) :: (load (s32) from %ir.226)
+    %296:_(s1) = G_FCMP floatpred(une), %290(s32), %295
+    G_BRCOND %296(s1), %bb.61
+    G_BR %bb.62
+  
+  bb.61 (%ir-block.229):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.62 (%ir-block.230):
+    successors: %bb.63(0x80000000)
+  
+    G_BR %bb.63
+  
+  bb.63 (%ir-block.231):
+    successors: %bb.59(0x80000000)
+  
+    %297:_(s16) = G_LOAD %28(p0) :: (dereferenceable load (s16) from %ir.27, align 1)
+    %298:_(s16) = nsw G_ADD %297, %185
+    G_STORE %298(s16), %28(p0) :: (store (s16) into %ir.27, align 1)
+    G_BR %bb.59
+  
+  bb.64 (%ir-block.234):
+    successors: %bb.65(0x80000000)
+  
+    G_BR %bb.65
+  
+  bb.65 (%ir-block.235):
+    successors: %bb.66(0x80000000)
+  
+    %112:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %114:_(<2 x s64>) = G_FADD %113, %112
+    G_STORE %114(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    G_STORE %113(<2 x s64>), %29(p0) :: (store (<2 x s64>) into %ir.28)
+    %115:_(<2 x s64>) = G_LOAD %29(p0) :: (dereferenceable load (<2 x s64>) from %ir.28)
+    %116:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %117:_(<2 x s64>) = G_FADD %115, %116
+    G_STORE %117(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.66
+  
+  bb.66 (%ir-block.241):
+    successors: %bb.67(0x80000000)
+  
+    G_STORE %45(s16), %30(p0) :: (store (s16) into %ir.29, align 1)
+    G_BR %bb.67
+  
+  bb.67 (%ir-block.242):
+    successors: %bb.68(0x40000000), %bb.72(0x40000000)
+  
+    %118:_(s16) = G_LOAD %30(p0) :: (dereferenceable load (s16) from %ir.29, align 1)
+    %120:_(s1) = G_ICMP intpred(slt), %118(s16), %119
+    G_BRCOND %120(s1), %bb.68
+    G_BR %bb.72
+  
+  bb.68 (%ir-block.245):
+    successors: %bb.69(0x40000000), %bb.70(0x40000000)
+  
+    %271:_(s16) = G_LOAD %30(p0) :: (dereferenceable load (s16) from %ir.29, align 1)
+    %272:_(s16) = G_CONSTANT i16 8
+    %273:_(s16) = nsw G_MUL %271, %272
+    %274:_(p0) = nusw inbounds G_PTR_ADD %11, %273(s16)
+    %275:_(p0) = COPY %274(p0)
+    %276:_(s64) = G_LOAD %275(p0) :: (load (s64) from %ir.247)
+    %277:_(s16) = G_LOAD %30(p0) :: (dereferenceable load (s16) from %ir.29, align 1)
+    %278:_(s16) = nsw G_MUL %277, %272
+    %279:_(p0) = nusw inbounds G_PTR_ADD %12, %278(s16)
+    %280:_(p0) = COPY %279(p0)
+    %281:_(s64) = G_LOAD %280(p0) :: (load (s64) from %ir.250)
+    %282:_(s1) = G_FCMP floatpred(une), %276(s64), %281
+    G_BRCOND %282(s1), %bb.69
+    G_BR %bb.70
+  
+  bb.69 (%ir-block.253):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.70 (%ir-block.254):
+    successors: %bb.71(0x80000000)
+  
+    G_BR %bb.71
+  
+  bb.71 (%ir-block.255):
+    successors: %bb.67(0x80000000)
+  
+    %283:_(s16) = G_LOAD %30(p0) :: (dereferenceable load (s16) from %ir.29, align 1)
+    %284:_(s16) = nsw G_ADD %283, %185
+    G_STORE %284(s16), %30(p0) :: (store (s16) into %ir.29, align 1)
+    G_BR %bb.67
+  
+  bb.72 (%ir-block.258):
+    successors: %bb.73(0x80000000)
+  
+    G_BR %bb.73
+  
+  bb.73 (%ir-block.259):
+    successors: %bb.74(0x80000000)
+  
+    %121:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %122:_(<2 x s64>) = G_FSUB %113, %121
+    G_STORE %122(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    G_STORE %113(<2 x s64>), %31(p0) :: (store (<2 x s64>) into %ir.30)
+    %123:_(<2 x s64>) = G_LOAD %31(p0) :: (dereferenceable load (<2 x s64>) from %ir.30)
+    %124:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %125:_(<2 x s64>) = G_FSUB %123, %124
+    G_STORE %125(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.74
+  
+  bb.74 (%ir-block.265):
+    successors: %bb.75(0x80000000)
+  
+    G_STORE %45(s16), %32(p0) :: (store (s16) into %ir.31, align 1)
+    G_BR %bb.75
+  
+  bb.75 (%ir-block.266):
+    successors: %bb.76(0x40000000), %bb.80(0x40000000)
+  
+    %126:_(s16) = G_LOAD %32(p0) :: (dereferenceable load (s16) from %ir.31, align 1)
+    %127:_(s1) = G_ICMP intpred(slt), %126(s16), %119
+    G_BRCOND %127(s1), %bb.76
+    G_BR %bb.80
+  
+  bb.76 (%ir-block.269):
+    successors: %bb.77(0x40000000), %bb.78(0x40000000)
+  
+    %257:_(s16) = G_LOAD %32(p0) :: (dereferenceable load (s16) from %ir.31, align 1)
+    %258:_(s16) = G_CONSTANT i16 8
+    %259:_(s16) = nsw G_MUL %257, %258
+    %260:_(p0) = nusw inbounds G_PTR_ADD %11, %259(s16)
+    %261:_(p0) = COPY %260(p0)
+    %262:_(s64) = G_LOAD %261(p0) :: (load (s64) from %ir.271)
+    %263:_(s16) = G_LOAD %32(p0) :: (dereferenceable load (s16) from %ir.31, align 1)
+    %264:_(s16) = nsw G_MUL %263, %258
+    %265:_(p0) = nusw inbounds G_PTR_ADD %12, %264(s16)
+    %266:_(p0) = COPY %265(p0)
+    %267:_(s64) = G_LOAD %266(p0) :: (load (s64) from %ir.274)
+    %268:_(s1) = G_FCMP floatpred(une), %262(s64), %267
+    G_BRCOND %268(s1), %bb.77
+    G_BR %bb.78
+  
+  bb.77 (%ir-block.277):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.78 (%ir-block.278):
+    successors: %bb.79(0x80000000)
+  
+    G_BR %bb.79
+  
+  bb.79 (%ir-block.279):
+    successors: %bb.75(0x80000000)
+  
+    %269:_(s16) = G_LOAD %32(p0) :: (dereferenceable load (s16) from %ir.31, align 1)
+    %270:_(s16) = nsw G_ADD %269, %185
+    G_STORE %270(s16), %32(p0) :: (store (s16) into %ir.31, align 1)
+    G_BR %bb.75
+  
+  bb.80 (%ir-block.282):
+    successors: %bb.81(0x80000000)
+  
+    G_BR %bb.81
+  
+  bb.81 (%ir-block.283):
+    successors: %bb.82(0x80000000)
+  
+    %128:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %129:_(<2 x s64>) = G_FMUL %113, %128
+    G_STORE %129(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    G_STORE %113(<2 x s64>), %33(p0) :: (store (<2 x s64>) into %ir.32)
+    %130:_(<2 x s64>) = G_LOAD %33(p0) :: (dereferenceable load (<2 x s64>) from %ir.32)
+    %131:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %132:_(<2 x s64>) = G_FMUL %130, %131
+    G_STORE %132(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.82
+  
+  bb.82 (%ir-block.289):
+    successors: %bb.83(0x80000000)
+  
+    G_STORE %45(s16), %34(p0) :: (store (s16) into %ir.33, align 1)
+    G_BR %bb.83
+  
+  bb.83 (%ir-block.290):
+    successors: %bb.84(0x40000000), %bb.88(0x40000000)
+  
+    %133:_(s16) = G_LOAD %34(p0) :: (dereferenceable load (s16) from %ir.33, align 1)
+    %134:_(s1) = G_ICMP intpred(slt), %133(s16), %119
+    G_BRCOND %134(s1), %bb.84
+    G_BR %bb.88
+  
+  bb.84 (%ir-block.293):
+    successors: %bb.85(0x40000000), %bb.86(0x40000000)
+  
+    %243:_(s16) = G_LOAD %34(p0) :: (dereferenceable load (s16) from %ir.33, align 1)
+    %244:_(s16) = G_CONSTANT i16 8
+    %245:_(s16) = nsw G_MUL %243, %244
+    %246:_(p0) = nusw inbounds G_PTR_ADD %11, %245(s16)
+    %247:_(p0) = COPY %246(p0)
+    %248:_(s64) = G_LOAD %247(p0) :: (load (s64) from %ir.295)
+    %249:_(s16) = G_LOAD %34(p0) :: (dereferenceable load (s16) from %ir.33, align 1)
+    %250:_(s16) = nsw G_MUL %249, %244
+    %251:_(p0) = nusw inbounds G_PTR_ADD %12, %250(s16)
+    %252:_(p0) = COPY %251(p0)
+    %253:_(s64) = G_LOAD %252(p0) :: (load (s64) from %ir.298)
+    %254:_(s1) = G_FCMP floatpred(une), %248(s64), %253
+    G_BRCOND %254(s1), %bb.85
+    G_BR %bb.86
+  
+  bb.85 (%ir-block.301):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.86 (%ir-block.302):
+    successors: %bb.87(0x80000000)
+  
+    G_BR %bb.87
+  
+  bb.87 (%ir-block.303):
+    successors: %bb.83(0x80000000)
+  
+    %255:_(s16) = G_LOAD %34(p0) :: (dereferenceable load (s16) from %ir.33, align 1)
+    %256:_(s16) = nsw G_ADD %255, %185
+    G_STORE %256(s16), %34(p0) :: (store (s16) into %ir.33, align 1)
+    G_BR %bb.83
+  
+  bb.88 (%ir-block.306):
+    successors: %bb.89(0x80000000)
+  
+    G_BR %bb.89
+  
+  bb.89 (%ir-block.307):
+    successors: %bb.90(0x80000000)
+  
+    %135:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %136:_(<2 x s64>) = G_FDIV %113, %135
+    G_STORE %136(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    G_STORE %113(<2 x s64>), %35(p0) :: (store (<2 x s64>) into %ir.34)
+    %137:_(<2 x s64>) = G_LOAD %35(p0) :: (dereferenceable load (<2 x s64>) from %ir.34)
+    %138:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %139:_(<2 x s64>) = G_FDIV %137, %138
+    G_STORE %139(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.90
+  
+  bb.90 (%ir-block.313):
+    successors: %bb.91(0x80000000)
+  
+    G_STORE %45(s16), %36(p0) :: (store (s16) into %ir.35, align 1)
+    G_BR %bb.91
+  
+  bb.91 (%ir-block.314):
+    successors: %bb.92(0x40000000), %bb.96(0x40000000)
+  
+    %140:_(s16) = G_LOAD %36(p0) :: (dereferenceable load (s16) from %ir.35, align 1)
+    %141:_(s1) = G_ICMP intpred(slt), %140(s16), %119
+    G_BRCOND %141(s1), %bb.92
+    G_BR %bb.96
+  
+  bb.92 (%ir-block.317):
+    successors: %bb.93(0x40000000), %bb.94(0x40000000)
+  
+    %229:_(s16) = G_LOAD %36(p0) :: (dereferenceable load (s16) from %ir.35, align 1)
+    %230:_(s16) = G_CONSTANT i16 8
+    %231:_(s16) = nsw G_MUL %229, %230
+    %232:_(p0) = nusw inbounds G_PTR_ADD %11, %231(s16)
+    %233:_(p0) = COPY %232(p0)
+    %234:_(s64) = G_LOAD %233(p0) :: (load (s64) from %ir.319)
+    %235:_(s16) = G_LOAD %36(p0) :: (dereferenceable load (s16) from %ir.35, align 1)
+    %236:_(s16) = nsw G_MUL %235, %230
+    %237:_(p0) = nusw inbounds G_PTR_ADD %12, %236(s16)
+    %238:_(p0) = COPY %237(p0)
+    %239:_(s64) = G_LOAD %238(p0) :: (load (s64) from %ir.322)
+    %240:_(s1) = G_FCMP floatpred(une), %234(s64), %239
+    G_BRCOND %240(s1), %bb.93
+    G_BR %bb.94
+  
+  bb.93 (%ir-block.325):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.94 (%ir-block.326):
+    successors: %bb.95(0x80000000)
+  
+    G_BR %bb.95
+  
+  bb.95 (%ir-block.327):
+    successors: %bb.91(0x80000000)
+  
+    %241:_(s16) = G_LOAD %36(p0) :: (dereferenceable load (s16) from %ir.35, align 1)
+    %242:_(s16) = nsw G_ADD %241, %185
+    G_STORE %242(s16), %36(p0) :: (store (s16) into %ir.35, align 1)
+    G_BR %bb.91
+  
+  bb.96 (%ir-block.330):
+    successors: %bb.97(0x80000000)
+  
+    G_BR %bb.97
+  
+  bb.97 (%ir-block.331):
+    successors: %bb.98(0x80000000)
+  
+    %142:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %143:_(<2 x s64>) = G_FADD %142, %113
+    G_STORE %143(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    %144:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    G_STORE %113(<2 x s64>), %37(p0) :: (store (<2 x s64>) into %ir.36)
+    %145:_(<2 x s64>) = G_LOAD %37(p0) :: (dereferenceable load (<2 x s64>) from %ir.36)
+    %146:_(<2 x s64>) = G_FADD %144, %145
+    G_STORE %146(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.98
+  
+  bb.98 (%ir-block.337):
+    successors: %bb.99(0x80000000)
+  
+    G_STORE %45(s16), %38(p0) :: (store (s16) into %ir.37, align 1)
+    G_BR %bb.99
+  
+  bb.99 (%ir-block.338):
+    successors: %bb.100(0x40000000), %bb.104(0x40000000)
+  
+    %147:_(s16) = G_LOAD %38(p0) :: (dereferenceable load (s16) from %ir.37, align 1)
+    %148:_(s1) = G_ICMP intpred(slt), %147(s16), %119
+    G_BRCOND %148(s1), %bb.100
+    G_BR %bb.104
+  
+  bb.100 (%ir-block.341):
+    successors: %bb.101(0x40000000), %bb.102(0x40000000)
+  
+    %215:_(s16) = G_LOAD %38(p0) :: (dereferenceable load (s16) from %ir.37, align 1)
+    %216:_(s16) = G_CONSTANT i16 8
+    %217:_(s16) = nsw G_MUL %215, %216
+    %218:_(p0) = nusw inbounds G_PTR_ADD %11, %217(s16)
+    %219:_(p0) = COPY %218(p0)
+    %220:_(s64) = G_LOAD %219(p0) :: (load (s64) from %ir.343)
+    %221:_(s16) = G_LOAD %38(p0) :: (dereferenceable load (s16) from %ir.37, align 1)
+    %222:_(s16) = nsw G_MUL %221, %216
+    %223:_(p0) = nusw inbounds G_PTR_ADD %12, %222(s16)
+    %224:_(p0) = COPY %223(p0)
+    %225:_(s64) = G_LOAD %224(p0) :: (load (s64) from %ir.346)
+    %226:_(s1) = G_FCMP floatpred(une), %220(s64), %225
+    G_BRCOND %226(s1), %bb.101
+    G_BR %bb.102
+  
+  bb.101 (%ir-block.349):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.102 (%ir-block.350):
+    successors: %bb.103(0x80000000)
+  
+    G_BR %bb.103
+  
+  bb.103 (%ir-block.351):
+    successors: %bb.99(0x80000000)
+  
+    %227:_(s16) = G_LOAD %38(p0) :: (dereferenceable load (s16) from %ir.37, align 1)
+    %228:_(s16) = nsw G_ADD %227, %185
+    G_STORE %228(s16), %38(p0) :: (store (s16) into %ir.37, align 1)
+    G_BR %bb.99
+  
+  bb.104 (%ir-block.354):
+    successors: %bb.105(0x80000000)
+  
+    G_BR %bb.105
+  
+  bb.105 (%ir-block.355):
+    successors: %bb.106(0x80000000)
+  
+    %149:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %150:_(<2 x s64>) = G_FSUB %149, %113
+    G_STORE %150(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    %151:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    G_STORE %113(<2 x s64>), %39(p0) :: (store (<2 x s64>) into %ir.38)
+    %152:_(<2 x s64>) = G_LOAD %39(p0) :: (dereferenceable load (<2 x s64>) from %ir.38)
+    %153:_(<2 x s64>) = G_FSUB %151, %152
+    G_STORE %153(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.106
+  
+  bb.106 (%ir-block.361):
+    successors: %bb.107(0x80000000)
+  
+    G_STORE %45(s16), %40(p0) :: (store (s16) into %ir.39, align 1)
+    G_BR %bb.107
+  
+  bb.107 (%ir-block.362):
+    successors: %bb.108(0x40000000), %bb.112(0x40000000)
+  
+    %154:_(s16) = G_LOAD %40(p0) :: (dereferenceable load (s16) from %ir.39, align 1)
+    %155:_(s1) = G_ICMP intpred(slt), %154(s16), %119
+    G_BRCOND %155(s1), %bb.108
+    G_BR %bb.112
+  
+  bb.108 (%ir-block.365):
+    successors: %bb.109(0x40000000), %bb.110(0x40000000)
+  
+    %201:_(s16) = G_LOAD %40(p0) :: (dereferenceable load (s16) from %ir.39, align 1)
+    %202:_(s16) = G_CONSTANT i16 8
+    %203:_(s16) = nsw G_MUL %201, %202
+    %204:_(p0) = nusw inbounds G_PTR_ADD %11, %203(s16)
+    %205:_(p0) = COPY %204(p0)
+    %206:_(s64) = G_LOAD %205(p0) :: (load (s64) from %ir.367)
+    %207:_(s16) = G_LOAD %40(p0) :: (dereferenceable load (s16) from %ir.39, align 1)
+    %208:_(s16) = nsw G_MUL %207, %202
+    %209:_(p0) = nusw inbounds G_PTR_ADD %12, %208(s16)
+    %210:_(p0) = COPY %209(p0)
+    %211:_(s64) = G_LOAD %210(p0) :: (load (s64) from %ir.370)
+    %212:_(s1) = G_FCMP floatpred(une), %206(s64), %211
+    G_BRCOND %212(s1), %bb.109
+    G_BR %bb.110
+  
+  bb.109 (%ir-block.373):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.110 (%ir-block.374):
+    successors: %bb.111(0x80000000)
+  
+    G_BR %bb.111
+  
+  bb.111 (%ir-block.375):
+    successors: %bb.107(0x80000000)
+  
+    %213:_(s16) = G_LOAD %40(p0) :: (dereferenceable load (s16) from %ir.39, align 1)
+    %214:_(s16) = nsw G_ADD %213, %185
+    G_STORE %214(s16), %40(p0) :: (store (s16) into %ir.39, align 1)
+    G_BR %bb.107
+  
+  bb.112 (%ir-block.378):
+    successors: %bb.113(0x80000000)
+  
+    G_BR %bb.113
+  
+  bb.113 (%ir-block.379):
+    successors: %bb.114(0x80000000)
+  
+    %156:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %157:_(<2 x s64>) = G_FMUL %156, %113
+    G_STORE %157(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    %158:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    G_STORE %113(<2 x s64>), %41(p0) :: (store (<2 x s64>) into %ir.40)
+    %159:_(<2 x s64>) = G_LOAD %41(p0) :: (dereferenceable load (<2 x s64>) from %ir.40)
+    %160:_(<2 x s64>) = G_FMUL %158, %159
+    G_STORE %160(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.114
+  
+  bb.114 (%ir-block.385):
+    successors: %bb.115(0x80000000)
+  
+    G_STORE %45(s16), %42(p0) :: (store (s16) into %ir.41, align 1)
+    G_BR %bb.115
+  
+  bb.115 (%ir-block.386):
+    successors: %bb.116(0x40000000), %bb.120(0x40000000)
+  
+    %161:_(s16) = G_LOAD %42(p0) :: (dereferenceable load (s16) from %ir.41, align 1)
+    %162:_(s1) = G_ICMP intpred(slt), %161(s16), %119
+    G_BRCOND %162(s1), %bb.116
+    G_BR %bb.120
+  
+  bb.116 (%ir-block.389):
+    successors: %bb.117(0x40000000), %bb.118(0x40000000)
+  
+    %187:_(s16) = G_LOAD %42(p0) :: (dereferenceable load (s16) from %ir.41, align 1)
+    %188:_(s16) = G_CONSTANT i16 8
+    %189:_(s16) = nsw G_MUL %187, %188
+    %190:_(p0) = nusw inbounds G_PTR_ADD %11, %189(s16)
+    %191:_(p0) = COPY %190(p0)
+    %192:_(s64) = G_LOAD %191(p0) :: (load (s64) from %ir.391)
+    %193:_(s16) = G_LOAD %42(p0) :: (dereferenceable load (s16) from %ir.41, align 1)
+    %194:_(s16) = nsw G_MUL %193, %188
+    %195:_(p0) = nusw inbounds G_PTR_ADD %12, %194(s16)
+    %196:_(p0) = COPY %195(p0)
+    %197:_(s64) = G_LOAD %196(p0) :: (load (s64) from %ir.394)
+    %198:_(s1) = G_FCMP floatpred(une), %192(s64), %197
+    G_BRCOND %198(s1), %bb.117
+    G_BR %bb.118
+  
+  bb.117 (%ir-block.397):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.118 (%ir-block.398):
+    successors: %bb.119(0x80000000)
+  
+    G_BR %bb.119
+  
+  bb.119 (%ir-block.399):
+    successors: %bb.115(0x80000000)
+  
+    %199:_(s16) = G_LOAD %42(p0) :: (dereferenceable load (s16) from %ir.41, align 1)
+    %200:_(s16) = nsw G_ADD %199, %185
+    G_STORE %200(s16), %42(p0) :: (store (s16) into %ir.41, align 1)
+    G_BR %bb.115
+  
+  bb.120 (%ir-block.402):
+    successors: %bb.121(0x80000000)
+  
+    G_BR %bb.121
+  
+  bb.121 (%ir-block.403):
+    successors: %bb.122(0x80000000)
+  
+    %163:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    %164:_(<2 x s64>) = G_FDIV %163, %113
+    G_STORE %164(<2 x s64>), %11(p0) :: (store (<2 x s64>) into %ir.10)
+    %165:_(<2 x s64>) = G_LOAD %10(p0) :: (dereferenceable load (<2 x s64>) from %ir.9)
+    G_STORE %113(<2 x s64>), %43(p0) :: (store (<2 x s64>) into %ir.42)
+    %166:_(<2 x s64>) = G_LOAD %43(p0) :: (dereferenceable load (<2 x s64>) from %ir.42)
+    %167:_(<2 x s64>) = G_FDIV %165, %166
+    G_STORE %167(<2 x s64>), %12(p0) :: (store (<2 x s64>) into %ir.11)
+    G_BR %bb.122
+  
+  bb.122 (%ir-block.409):
+    successors: %bb.123(0x80000000)
+  
+    G_STORE %45(s16), %44(p0) :: (store (s16) into %ir.43, align 1)
+    G_BR %bb.123
+  
+  bb.123 (%ir-block.410):
+    successors: %bb.124(0x40000000), %bb.128(0x40000000)
+  
+    %168:_(s16) = G_LOAD %44(p0) :: (dereferenceable load (s16) from %ir.43, align 1)
+    %169:_(s1) = G_ICMP intpred(slt), %168(s16), %119
+    G_BRCOND %169(s1), %bb.124
+    G_BR %bb.128
+  
+  bb.124 (%ir-block.413):
+    successors: %bb.125(0x40000000), %bb.126(0x40000000)
+  
+    %172:_(s16) = G_LOAD %44(p0) :: (dereferenceable load (s16) from %ir.43, align 1)
+    %173:_(s16) = G_CONSTANT i16 8
+    %174:_(s16) = nsw G_MUL %172, %173
+    %175:_(p0) = nusw inbounds G_PTR_ADD %11, %174(s16)
+    %176:_(p0) = COPY %175(p0)
+    %177:_(s64) = G_LOAD %176(p0) :: (load (s64) from %ir.415)
+    %178:_(s16) = G_LOAD %44(p0) :: (dereferenceable load (s16) from %ir.43, align 1)
+    %179:_(s16) = nsw G_MUL %178, %173
+    %180:_(p0) = nusw inbounds G_PTR_ADD %12, %179(s16)
+    %181:_(p0) = COPY %180(p0)
+    %182:_(s64) = G_LOAD %181(p0) :: (load (s64) from %ir.418)
+    %183:_(s1) = G_FCMP floatpred(une), %177(s64), %182
+    G_BRCOND %183(s1), %bb.125
+    G_BR %bb.126
+  
+  bb.125 (%ir-block.421):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.126 (%ir-block.422):
+    successors: %bb.127(0x80000000)
+  
+    G_BR %bb.127
+  
+  bb.127 (%ir-block.423):
+    successors: %bb.123(0x80000000)
+  
+    %184:_(s16) = G_LOAD %44(p0) :: (dereferenceable load (s16) from %ir.43, align 1)
+    %186:_(s16) = nsw G_ADD %184, %185
+    G_STORE %186(s16), %44(p0) :: (store (s16) into %ir.43, align 1)
+    G_BR %bb.123
+  
+  bb.128 (%ir-block.426):
+    successors: %bb.129(0x80000000)
+  
+    G_BR %bb.129
+  
+  bb.129 (%ir-block.427):
+    %170:_(s8), %171:_(s8) = G_UNMERGE_VALUES %45(s16)
+    $a = COPY %170(s8)
+    $x = COPY %171(s8)
+    RTS implicit $a, implicit $x
+...

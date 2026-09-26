@@ -1,0 +1,26 @@
+[
+  {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-sim.cfg -fno-lto -O0 -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-O0",
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/build/install/bin/mos-sim /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-O0",
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-sim.cfg -fno-lto -O2 -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-O2",
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/build/install/bin/mos-sim /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-O2",
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-sim.cfg -fno-lto -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-Os",
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/build/install/bin/mos-sim /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-Os",
+    "exit_code": 0
+  }
+]

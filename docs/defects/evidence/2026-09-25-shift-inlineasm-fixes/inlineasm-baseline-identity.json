@@ -1,0 +1,29 @@
+{
+  "baseline": {
+    "path": "build/0041-inlineasm-build/llc-0041",
+    "sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660"
+  },
+  "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+  "source_revision": "ee21f8b6ba30cfd1721a0ebf1e99529f5c48515e",
+  "source_diff": {
+    "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-source.patch",
+    "sha256": "e9e1620ff4678b0e9ca48d276e5652cd2d151824e9fe193482ea7eea1a311690"
+  },
+  "upstream_revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "register_assignment_helper_identical_to_unpatched_upstream": true,
+  "helper_sha256": "7dd3e72bc073109822216793a594575fec68ab2fe3a34f3c7c518a8223b38e39",
+  "baseline_source": {
+    "path": "build/inlineasm-bounds-fix/InlineAsmLowering.baseline.cpp",
+    "sha256": "2d65e981fd7d053a0fc893bf9b9cf01d2c38fddb7fc48f39f5387468ed64819c"
+  },
+  "vendor_source_before_fix": {
+    "path": "build/inlineasm-bounds-fix/InlineAsmLowering.vendor-baseline.cpp",
+    "sha256": "e7c369c333453190297014206adedbdf4891e138f31f355f1756ed453a684352"
+  },
+  "cmake_cache": {
+    "path": "build/0041-inlineasm-build/CMakeCache.txt",
+    "sha256": "a1defc65f76a7ebe98548b3ce9a0e5be030bc967527a3328919e3abbac213e27"
+  },
+  "language": "LLVM IR; this constructed input has no C preprocessing stage",
+  "baseline_scope": "Upstream-based assertion-enabled multi-target build with existing patches through 0041, not a clean unpatched build."
+}

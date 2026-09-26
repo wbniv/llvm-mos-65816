@@ -1,0 +1,2742 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: readwrite)
+  define dso_local void @newton_step(ptr noundef captures(none) %0, ptr noundef captures(none) %1) local_unnamed_addr #0 {
+    %3 = load i16, ptr %0, align 1, !tbaa !2
+    %4 = load i16, ptr %1, align 1, !tbaa !2
+    %5 = sext i16 %3 to i32
+    %6 = sext i16 %4 to i32
+    %7 = add nsw i32 %6, %5
+    %8 = sub nsw i32 %5, %6
+    %9 = shl nsw i32 %8, 8
+    %10 = mul i32 %9, %7
+    %11 = ashr i32 %10, 16
+    %12 = shl nsw i32 %5, 9
+    %13 = mul i32 %12, %6
+    %14 = ashr i32 %13, 16
+    %15 = trunc nsw i32 %11 to i16
+    %16 = mul i16 %15, 3
+    %17 = trunc nsw i32 %14 to i16
+    %18 = mul i16 %17, 3
+    %19 = ashr i16 %16, 1
+    %20 = sext i16 %19 to i32
+    %21 = ashr i16 %18, 1
+    %22 = sext i16 %21 to i32
+    %23 = mul nsw i32 %20, %20
+    %24 = mul nsw i32 %22, %22
+    %25 = add nuw nsw i32 %23, %24
+    %26 = icmp eq i32 %25, 0
+    br i1 %26, label %71, label %27
+  
+  27:                                               ; preds = %2
+    %28 = sext i16 %21 to i32
+    %29 = sext i16 %19 to i32
+    %30 = sext i16 %4 to i32
+    %31 = sext i16 %3 to i32
+    %32 = mul nsw i32 %11, %30
+    %33 = mul nsw i32 %14, %31
+    %34 = add nsw i32 %32, %33
+    %35 = shl i32 %34, 8
+    %36 = ashr i32 %35, 17
+    %37 = mul nsw i32 %11, %31
+    %38 = mul nsw i32 %14, %30
+    %39 = sub nsw i32 %37, %38
+    %40 = lshr i32 %39, 8
+    %41 = trunc i32 %40 to i16
+    %42 = add nsw i16 %41, -256
+    %43 = ashr i16 %42, 1
+    %44 = sext i16 %43 to i32
+    %45 = mul nsw i32 %44, %29
+    %46 = mul nsw i32 %36, %28
+    %47 = add nsw i32 %45, %46
+    %48 = shl i32 %47, 8
+    %49 = sdiv i32 %48, %25
+    %50 = mul nsw i32 %36, %29
+    %51 = mul nsw i32 %44, %28
+    %52 = sub nsw i32 %50, %51
+    %53 = shl i32 %52, 8
+    %54 = sdiv i32 %53, %25
+    %55 = icmp sgt i32 %49, 512
+    br i1 %55, label %60, label %56
+  
+  56:                                               ; preds = %27
+    %57 = icmp slt i32 %49, -512
+    %58 = trunc nsw i32 %49 to i16
+    br i1 %57, label %59, label %60
+  
+  59:                                               ; preds = %56
+    br label %60
+  
+  60:                                               ; preds = %59, %56, %27
+    %61 = phi i16 [ -512, %59 ], [ %58, %56 ], [ 512, %27 ]
+    %62 = icmp sgt i32 %54, 512
+    br i1 %62, label %67, label %63
+  
+  63:                                               ; preds = %60
+    %64 = icmp slt i32 %54, -512
+    %65 = trunc nsw i32 %54 to i16
+    br i1 %64, label %66, label %67
+  
+  66:                                               ; preds = %63
+    br label %67
+  
+  67:                                               ; preds = %66, %63, %60
+    %68 = phi i16 [ -512, %66 ], [ %65, %63 ], [ 512, %60 ]
+    %69 = sub nsw i16 %3, %61
+    store i16 %69, ptr %0, align 1, !tbaa !2
+    %70 = sub nsw i16 %4, %68
+    store i16 %70, ptr %1, align 1, !tbaa !2
+    br label %71
+  
+  71:                                               ; preds = %67, %2
+    ret void
+  }
+  
+  attributes #0 = { mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+...
+---
+name:            newton_step
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:
+  - { id: 0, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: any, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 47, class: any, preferred-register: '', flags: [  ] }
+  - { id: 48, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 49, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 50, class: _, preferred-register: '', flags: [  ] }
+  - { id: 51, class: _, preferred-register: '', flags: [  ] }
+  - { id: 52, class: _, preferred-register: '', flags: [  ] }
+  - { id: 53, class: _, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: _, preferred-register: '', flags: [  ] }
+  - { id: 57, class: _, preferred-register: '', flags: [  ] }
+  - { id: 58, class: _, preferred-register: '', flags: [  ] }
+  - { id: 59, class: _, preferred-register: '', flags: [  ] }
+  - { id: 60, class: _, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: _, preferred-register: '', flags: [  ] }
+  - { id: 64, class: _, preferred-register: '', flags: [  ] }
+  - { id: 65, class: _, preferred-register: '', flags: [  ] }
+  - { id: 66, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 67, class: _, preferred-register: '', flags: [  ] }
+  - { id: 68, class: _, preferred-register: '', flags: [  ] }
+  - { id: 69, class: _, preferred-register: '', flags: [  ] }
+  - { id: 70, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 71, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 72, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: _, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 78, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 79, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 80, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 81, class: _, preferred-register: '', flags: [  ] }
+  - { id: 82, class: _, preferred-register: '', flags: [  ] }
+  - { id: 83, class: _, preferred-register: '', flags: [  ] }
+  - { id: 84, class: _, preferred-register: '', flags: [  ] }
+  - { id: 85, class: _, preferred-register: '', flags: [  ] }
+  - { id: 86, class: _, preferred-register: '', flags: [  ] }
+  - { id: 87, class: _, preferred-register: '', flags: [  ] }
+  - { id: 88, class: _, preferred-register: '', flags: [  ] }
+  - { id: 89, class: _, preferred-register: '', flags: [  ] }
+  - { id: 90, class: _, preferred-register: '', flags: [  ] }
+  - { id: 91, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 92, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 93, class: _, preferred-register: '', flags: [  ] }
+  - { id: 94, class: _, preferred-register: '', flags: [  ] }
+  - { id: 95, class: _, preferred-register: '', flags: [  ] }
+  - { id: 96, class: _, preferred-register: '', flags: [  ] }
+  - { id: 97, class: _, preferred-register: '', flags: [  ] }
+  - { id: 98, class: _, preferred-register: '', flags: [  ] }
+  - { id: 99, class: _, preferred-register: '', flags: [  ] }
+  - { id: 100, class: _, preferred-register: '', flags: [  ] }
+  - { id: 101, class: _, preferred-register: '', flags: [  ] }
+  - { id: 102, class: _, preferred-register: '', flags: [  ] }
+  - { id: 103, class: any, preferred-register: '', flags: [  ] }
+  - { id: 104, class: any, preferred-register: '', flags: [  ] }
+  - { id: 105, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 106, class: any, preferred-register: '', flags: [  ] }
+  - { id: 107, class: any, preferred-register: '', flags: [  ] }
+  - { id: 108, class: any, preferred-register: '', flags: [  ] }
+  - { id: 109, class: ac, preferred-register: '%1047', flags: [  ] }
+  - { id: 110, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 111, class: any, preferred-register: '', flags: [  ] }
+  - { id: 112, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 113, class: any, preferred-register: '', flags: [  ] }
+  - { id: 114, class: ac, preferred-register: '%155', flags: [  ] }
+  - { id: 115, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 116, class: any, preferred-register: '', flags: [  ] }
+  - { id: 117, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 118, class: any, preferred-register: '', flags: [  ] }
+  - { id: 119, class: ac, preferred-register: '%1044', flags: [  ] }
+  - { id: 120, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 121, class: any, preferred-register: '', flags: [  ] }
+  - { id: 122, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 123, class: any, preferred-register: '', flags: [  ] }
+  - { id: 124, class: any, preferred-register: '', flags: [  ] }
+  - { id: 125, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 126, class: any, preferred-register: '', flags: [  ] }
+  - { id: 127, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 128, class: any, preferred-register: '', flags: [  ] }
+  - { id: 129, class: any, preferred-register: '', flags: [  ] }
+  - { id: 130, class: any, preferred-register: '', flags: [  ] }
+  - { id: 131, class: any, preferred-register: '', flags: [  ] }
+  - { id: 132, class: any, preferred-register: '', flags: [  ] }
+  - { id: 133, class: _, preferred-register: '', flags: [  ] }
+  - { id: 134, class: _, preferred-register: '', flags: [  ] }
+  - { id: 135, class: _, preferred-register: '', flags: [  ] }
+  - { id: 136, class: _, preferred-register: '', flags: [  ] }
+  - { id: 137, class: _, preferred-register: '', flags: [  ] }
+  - { id: 138, class: _, preferred-register: '', flags: [  ] }
+  - { id: 139, class: _, preferred-register: '', flags: [  ] }
+  - { id: 140, class: _, preferred-register: '', flags: [  ] }
+  - { id: 141, class: _, preferred-register: '', flags: [  ] }
+  - { id: 142, class: _, preferred-register: '', flags: [  ] }
+  - { id: 143, class: _, preferred-register: '', flags: [  ] }
+  - { id: 144, class: any, preferred-register: '', flags: [  ] }
+  - { id: 145, class: any, preferred-register: '', flags: [  ] }
+  - { id: 146, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 147, class: any, preferred-register: '', flags: [  ] }
+  - { id: 148, class: any, preferred-register: '', flags: [  ] }
+  - { id: 149, class: any, preferred-register: '', flags: [  ] }
+  - { id: 150, class: ac, preferred-register: '%1047', flags: [  ] }
+  - { id: 151, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 152, class: any, preferred-register: '', flags: [  ] }
+  - { id: 153, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 154, class: any, preferred-register: '', flags: [  ] }
+  - { id: 155, class: ac, preferred-register: '%114', flags: [  ] }
+  - { id: 156, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 157, class: any, preferred-register: '', flags: [  ] }
+  - { id: 158, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 159, class: any, preferred-register: '', flags: [  ] }
+  - { id: 160, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 161, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 162, class: any, preferred-register: '', flags: [  ] }
+  - { id: 163, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 164, class: any, preferred-register: '', flags: [  ] }
+  - { id: 165, class: any, preferred-register: '', flags: [  ] }
+  - { id: 166, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 167, class: any, preferred-register: '', flags: [  ] }
+  - { id: 168, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 169, class: any, preferred-register: '', flags: [  ] }
+  - { id: 170, class: any, preferred-register: '', flags: [  ] }
+  - { id: 171, class: any, preferred-register: '', flags: [  ] }
+  - { id: 172, class: any, preferred-register: '', flags: [  ] }
+  - { id: 173, class: any, preferred-register: '', flags: [  ] }
+  - { id: 174, class: any, preferred-register: '', flags: [  ] }
+  - { id: 175, class: any, preferred-register: '', flags: [  ] }
+  - { id: 176, class: _, preferred-register: '', flags: [  ] }
+  - { id: 177, class: _, preferred-register: '', flags: [  ] }
+  - { id: 178, class: _, preferred-register: '', flags: [  ] }
+  - { id: 179, class: _, preferred-register: '', flags: [  ] }
+  - { id: 180, class: _, preferred-register: '', flags: [  ] }
+  - { id: 181, class: _, preferred-register: '', flags: [  ] }
+  - { id: 182, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 183, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 184, class: _, preferred-register: '', flags: [  ] }
+  - { id: 185, class: _, preferred-register: '', flags: [  ] }
+  - { id: 186, class: _, preferred-register: '', flags: [  ] }
+  - { id: 187, class: _, preferred-register: '', flags: [  ] }
+  - { id: 188, class: _, preferred-register: '', flags: [  ] }
+  - { id: 189, class: _, preferred-register: '', flags: [  ] }
+  - { id: 190, class: _, preferred-register: '', flags: [  ] }
+  - { id: 191, class: _, preferred-register: '', flags: [  ] }
+  - { id: 192, class: _, preferred-register: '', flags: [  ] }
+  - { id: 193, class: _, preferred-register: '', flags: [  ] }
+  - { id: 194, class: any, preferred-register: '', flags: [  ] }
+  - { id: 195, class: any, preferred-register: '', flags: [  ] }
+  - { id: 196, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 197, class: any, preferred-register: '', flags: [  ] }
+  - { id: 198, class: any, preferred-register: '', flags: [  ] }
+  - { id: 199, class: any, preferred-register: '', flags: [  ] }
+  - { id: 200, class: ac, preferred-register: '%1043', flags: [  ] }
+  - { id: 201, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 202, class: any, preferred-register: '', flags: [  ] }
+  - { id: 203, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 204, class: any, preferred-register: '', flags: [  ] }
+  - { id: 205, class: ac, preferred-register: '%246', flags: [  ] }
+  - { id: 206, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 207, class: any, preferred-register: '', flags: [  ] }
+  - { id: 208, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 209, class: any, preferred-register: '', flags: [  ] }
+  - { id: 210, class: ac, preferred-register: '%1040', flags: [  ] }
+  - { id: 211, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 212, class: any, preferred-register: '', flags: [  ] }
+  - { id: 213, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 214, class: any, preferred-register: '', flags: [  ] }
+  - { id: 215, class: any, preferred-register: '', flags: [  ] }
+  - { id: 216, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 217, class: any, preferred-register: '', flags: [  ] }
+  - { id: 218, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 219, class: any, preferred-register: '', flags: [  ] }
+  - { id: 220, class: any, preferred-register: '', flags: [  ] }
+  - { id: 221, class: any, preferred-register: '', flags: [  ] }
+  - { id: 222, class: any, preferred-register: '', flags: [  ] }
+  - { id: 223, class: any, preferred-register: '', flags: [  ] }
+  - { id: 224, class: _, preferred-register: '', flags: [  ] }
+  - { id: 225, class: _, preferred-register: '', flags: [  ] }
+  - { id: 226, class: _, preferred-register: '', flags: [  ] }
+  - { id: 227, class: _, preferred-register: '', flags: [  ] }
+  - { id: 228, class: _, preferred-register: '', flags: [  ] }
+  - { id: 229, class: _, preferred-register: '', flags: [  ] }
+  - { id: 230, class: _, preferred-register: '', flags: [  ] }
+  - { id: 231, class: _, preferred-register: '', flags: [  ] }
+  - { id: 232, class: _, preferred-register: '', flags: [  ] }
+  - { id: 233, class: _, preferred-register: '', flags: [  ] }
+  - { id: 234, class: _, preferred-register: '', flags: [  ] }
+  - { id: 235, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 236, class: any, preferred-register: '', flags: [  ] }
+  - { id: 237, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 238, class: any, preferred-register: '', flags: [  ] }
+  - { id: 239, class: any, preferred-register: '', flags: [  ] }
+  - { id: 240, class: any, preferred-register: '', flags: [  ] }
+  - { id: 241, class: ac, preferred-register: '%1043', flags: [  ] }
+  - { id: 242, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 243, class: any, preferred-register: '', flags: [  ] }
+  - { id: 244, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 245, class: any, preferred-register: '', flags: [  ] }
+  - { id: 246, class: ac, preferred-register: '%205', flags: [  ] }
+  - { id: 247, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 248, class: any, preferred-register: '', flags: [  ] }
+  - { id: 249, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 250, class: any, preferred-register: '', flags: [  ] }
+  - { id: 251, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 252, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 253, class: any, preferred-register: '', flags: [  ] }
+  - { id: 254, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 255, class: any, preferred-register: '', flags: [  ] }
+  - { id: 256, class: any, preferred-register: '', flags: [  ] }
+  - { id: 257, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 258, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 259, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 260, class: any, preferred-register: '', flags: [  ] }
+  - { id: 261, class: any, preferred-register: '', flags: [  ] }
+  - { id: 262, class: any, preferred-register: '', flags: [  ] }
+  - { id: 263, class: any, preferred-register: '', flags: [  ] }
+  - { id: 264, class: any, preferred-register: '', flags: [  ] }
+  - { id: 265, class: any, preferred-register: '', flags: [  ] }
+  - { id: 266, class: any, preferred-register: '', flags: [  ] }
+  - { id: 267, class: _, preferred-register: '', flags: [  ] }
+  - { id: 268, class: _, preferred-register: '', flags: [  ] }
+  - { id: 269, class: _, preferred-register: '', flags: [  ] }
+  - { id: 270, class: _, preferred-register: '', flags: [  ] }
+  - { id: 271, class: _, preferred-register: '', flags: [  ] }
+  - { id: 272, class: _, preferred-register: '', flags: [  ] }
+  - { id: 273, class: _, preferred-register: '', flags: [  ] }
+  - { id: 274, class: _, preferred-register: '', flags: [  ] }
+  - { id: 275, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 276, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 277, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 278, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 279, class: _, preferred-register: '', flags: [  ] }
+  - { id: 280, class: _, preferred-register: '', flags: [  ] }
+  - { id: 281, class: _, preferred-register: '', flags: [  ] }
+  - { id: 282, class: _, preferred-register: '', flags: [  ] }
+  - { id: 283, class: _, preferred-register: '', flags: [  ] }
+  - { id: 284, class: _, preferred-register: '', flags: [  ] }
+  - { id: 285, class: _, preferred-register: '', flags: [  ] }
+  - { id: 286, class: _, preferred-register: '', flags: [  ] }
+  - { id: 287, class: _, preferred-register: '', flags: [  ] }
+  - { id: 288, class: _, preferred-register: '', flags: [  ] }
+  - { id: 289, class: _, preferred-register: '', flags: [  ] }
+  - { id: 290, class: _, preferred-register: '', flags: [  ] }
+  - { id: 291, class: _, preferred-register: '', flags: [  ] }
+  - { id: 292, class: _, preferred-register: '', flags: [  ] }
+  - { id: 293, class: _, preferred-register: '', flags: [  ] }
+  - { id: 294, class: _, preferred-register: '', flags: [  ] }
+  - { id: 295, class: _, preferred-register: '', flags: [  ] }
+  - { id: 296, class: _, preferred-register: '', flags: [  ] }
+  - { id: 297, class: _, preferred-register: '', flags: [  ] }
+  - { id: 298, class: _, preferred-register: '', flags: [  ] }
+  - { id: 299, class: _, preferred-register: '', flags: [  ] }
+  - { id: 300, class: _, preferred-register: '', flags: [  ] }
+  - { id: 301, class: _, preferred-register: '', flags: [  ] }
+  - { id: 302, class: _, preferred-register: '', flags: [  ] }
+  - { id: 303, class: _, preferred-register: '', flags: [  ] }
+  - { id: 304, class: _, preferred-register: '', flags: [  ] }
+  - { id: 305, class: _, preferred-register: '', flags: [  ] }
+  - { id: 306, class: _, preferred-register: '', flags: [  ] }
+  - { id: 307, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 308, class: _, preferred-register: '', flags: [  ] }
+  - { id: 309, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 310, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 311, class: any, preferred-register: '', flags: [  ] }
+  - { id: 312, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 313, class: any, preferred-register: '', flags: [  ] }
+  - { id: 314, class: _, preferred-register: '', flags: [  ] }
+  - { id: 315, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 316, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 317, class: any, preferred-register: '', flags: [  ] }
+  - { id: 318, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 319, class: any, preferred-register: '', flags: [  ] }
+  - { id: 320, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 321, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 322, class: any, preferred-register: '', flags: [  ] }
+  - { id: 323, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 324, class: any, preferred-register: '', flags: [  ] }
+  - { id: 325, class: _, preferred-register: '', flags: [  ] }
+  - { id: 326, class: _, preferred-register: '', flags: [  ] }
+  - { id: 327, class: _, preferred-register: '', flags: [  ] }
+  - { id: 328, class: _, preferred-register: '', flags: [  ] }
+  - { id: 329, class: _, preferred-register: '', flags: [  ] }
+  - { id: 330, class: _, preferred-register: '', flags: [  ] }
+  - { id: 331, class: _, preferred-register: '', flags: [  ] }
+  - { id: 332, class: _, preferred-register: '', flags: [  ] }
+  - { id: 333, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 334, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 335, class: imag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 336, class: _, preferred-register: '', flags: [  ] }
+  - { id: 337, class: _, preferred-register: '', flags: [  ] }
+  - { id: 338, class: _, preferred-register: '', flags: [  ] }
+  - { id: 339, class: _, preferred-register: '', flags: [  ] }
+  - { id: 340, class: _, preferred-register: '', flags: [  ] }
+  - { id: 341, class: _, preferred-register: '', flags: [  ] }
+  - { id: 342, class: _, preferred-register: '', flags: [  ] }
+  - { id: 343, class: _, preferred-register: '', flags: [  ] }
+  - { id: 344, class: _, preferred-register: '', flags: [  ] }
+  - { id: 345, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 346, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 347, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 348, class: _, preferred-register: '', flags: [  ] }
+  - { id: 349, class: _, preferred-register: '', flags: [  ] }
+  - { id: 350, class: _, preferred-register: '', flags: [  ] }
+  - { id: 351, class: _, preferred-register: '', flags: [  ] }
+  - { id: 352, class: _, preferred-register: '', flags: [  ] }
+  - { id: 353, class: _, preferred-register: '', flags: [  ] }
+  - { id: 354, class: _, preferred-register: '', flags: [  ] }
+  - { id: 355, class: _, preferred-register: '', flags: [  ] }
+  - { id: 356, class: _, preferred-register: '', flags: [  ] }
+  - { id: 357, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 358, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 359, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 360, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 361, class: _, preferred-register: '', flags: [  ] }
+  - { id: 362, class: _, preferred-register: '', flags: [  ] }
+  - { id: 363, class: _, preferred-register: '', flags: [  ] }
+  - { id: 364, class: _, preferred-register: '', flags: [  ] }
+  - { id: 365, class: _, preferred-register: '', flags: [  ] }
+  - { id: 366, class: _, preferred-register: '', flags: [  ] }
+  - { id: 367, class: _, preferred-register: '', flags: [  ] }
+  - { id: 368, class: _, preferred-register: '', flags: [  ] }
+  - { id: 369, class: _, preferred-register: '', flags: [  ] }
+  - { id: 370, class: _, preferred-register: '', flags: [  ] }
+  - { id: 371, class: _, preferred-register: '', flags: [  ] }
+  - { id: 372, class: _, preferred-register: '', flags: [  ] }
+  - { id: 373, class: _, preferred-register: '', flags: [  ] }
+  - { id: 374, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 375, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 376, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 377, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 378, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 379, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 380, class: _, preferred-register: '', flags: [  ] }
+  - { id: 381, class: _, preferred-register: '', flags: [  ] }
+  - { id: 382, class: _, preferred-register: '', flags: [  ] }
+  - { id: 383, class: _, preferred-register: '', flags: [  ] }
+  - { id: 384, class: _, preferred-register: '', flags: [  ] }
+  - { id: 385, class: _, preferred-register: '', flags: [  ] }
+  - { id: 386, class: _, preferred-register: '', flags: [  ] }
+  - { id: 387, class: _, preferred-register: '', flags: [  ] }
+  - { id: 388, class: _, preferred-register: '', flags: [  ] }
+  - { id: 389, class: _, preferred-register: '', flags: [  ] }
+  - { id: 390, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 391, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 392, class: imag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 393, class: _, preferred-register: '', flags: [  ] }
+  - { id: 394, class: _, preferred-register: '', flags: [  ] }
+  - { id: 395, class: _, preferred-register: '', flags: [  ] }
+  - { id: 396, class: _, preferred-register: '', flags: [  ] }
+  - { id: 397, class: _, preferred-register: '', flags: [  ] }
+  - { id: 398, class: _, preferred-register: '', flags: [  ] }
+  - { id: 399, class: _, preferred-register: '', flags: [  ] }
+  - { id: 400, class: _, preferred-register: '', flags: [  ] }
+  - { id: 401, class: _, preferred-register: '', flags: [  ] }
+  - { id: 402, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 403, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 404, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 405, class: _, preferred-register: '', flags: [  ] }
+  - { id: 406, class: _, preferred-register: '', flags: [  ] }
+  - { id: 407, class: _, preferred-register: '', flags: [  ] }
+  - { id: 408, class: _, preferred-register: '', flags: [  ] }
+  - { id: 409, class: _, preferred-register: '', flags: [  ] }
+  - { id: 410, class: _, preferred-register: '', flags: [  ] }
+  - { id: 411, class: _, preferred-register: '', flags: [  ] }
+  - { id: 412, class: _, preferred-register: '', flags: [  ] }
+  - { id: 413, class: _, preferred-register: '', flags: [  ] }
+  - { id: 414, class: _, preferred-register: '', flags: [  ] }
+  - { id: 415, class: _, preferred-register: '', flags: [  ] }
+  - { id: 416, class: _, preferred-register: '', flags: [  ] }
+  - { id: 417, class: _, preferred-register: '', flags: [  ] }
+  - { id: 418, class: _, preferred-register: '', flags: [  ] }
+  - { id: 419, class: _, preferred-register: '', flags: [  ] }
+  - { id: 420, class: _, preferred-register: '', flags: [  ] }
+  - { id: 421, class: _, preferred-register: '', flags: [  ] }
+  - { id: 422, class: _, preferred-register: '', flags: [  ] }
+  - { id: 423, class: _, preferred-register: '', flags: [  ] }
+  - { id: 424, class: _, preferred-register: '', flags: [  ] }
+  - { id: 425, class: _, preferred-register: '', flags: [  ] }
+  - { id: 426, class: _, preferred-register: '', flags: [  ] }
+  - { id: 427, class: _, preferred-register: '', flags: [  ] }
+  - { id: 428, class: _, preferred-register: '', flags: [  ] }
+  - { id: 429, class: _, preferred-register: '', flags: [  ] }
+  - { id: 430, class: _, preferred-register: '', flags: [  ] }
+  - { id: 431, class: _, preferred-register: '', flags: [  ] }
+  - { id: 432, class: _, preferred-register: '', flags: [  ] }
+  - { id: 433, class: _, preferred-register: '', flags: [  ] }
+  - { id: 434, class: _, preferred-register: '', flags: [  ] }
+  - { id: 435, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 436, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 437, class: any, preferred-register: '', flags: [  ] }
+  - { id: 438, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 439, class: any, preferred-register: '', flags: [  ] }
+  - { id: 440, class: _, preferred-register: '', flags: [  ] }
+  - { id: 441, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 442, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 443, class: any, preferred-register: '', flags: [  ] }
+  - { id: 444, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 445, class: any, preferred-register: '', flags: [  ] }
+  - { id: 446, class: any, preferred-register: '', flags: [  ] }
+  - { id: 447, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 448, class: any, preferred-register: '', flags: [  ] }
+  - { id: 449, class: any, preferred-register: '', flags: [  ] }
+  - { id: 450, class: any, preferred-register: '', flags: [  ] }
+  - { id: 451, class: _, preferred-register: '', flags: [  ] }
+  - { id: 452, class: _, preferred-register: '', flags: [  ] }
+  - { id: 453, class: _, preferred-register: '', flags: [  ] }
+  - { id: 454, class: _, preferred-register: '', flags: [  ] }
+  - { id: 455, class: _, preferred-register: '', flags: [  ] }
+  - { id: 456, class: _, preferred-register: '', flags: [  ] }
+  - { id: 457, class: _, preferred-register: '', flags: [  ] }
+  - { id: 458, class: _, preferred-register: '', flags: [  ] }
+  - { id: 459, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 460, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 461, class: imag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 462, class: _, preferred-register: '', flags: [  ] }
+  - { id: 463, class: _, preferred-register: '', flags: [  ] }
+  - { id: 464, class: _, preferred-register: '', flags: [  ] }
+  - { id: 465, class: _, preferred-register: '', flags: [  ] }
+  - { id: 466, class: _, preferred-register: '', flags: [  ] }
+  - { id: 467, class: _, preferred-register: '', flags: [  ] }
+  - { id: 468, class: _, preferred-register: '', flags: [  ] }
+  - { id: 469, class: _, preferred-register: '', flags: [  ] }
+  - { id: 470, class: _, preferred-register: '', flags: [  ] }
+  - { id: 471, class: gpr, preferred-register: '$a', flags: [  ] }
+  - { id: 472, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 473, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 474, class: _, preferred-register: '', flags: [  ] }
+  - { id: 475, class: _, preferred-register: '', flags: [  ] }
+  - { id: 476, class: _, preferred-register: '', flags: [  ] }
+  - { id: 477, class: _, preferred-register: '', flags: [  ] }
+  - { id: 478, class: _, preferred-register: '', flags: [  ] }
+  - { id: 479, class: _, preferred-register: '', flags: [  ] }
+  - { id: 480, class: _, preferred-register: '', flags: [  ] }
+  - { id: 481, class: _, preferred-register: '', flags: [  ] }
+  - { id: 482, class: _, preferred-register: '', flags: [  ] }
+  - { id: 483, class: _, preferred-register: '', flags: [  ] }
+  - { id: 484, class: _, preferred-register: '', flags: [  ] }
+  - { id: 485, class: _, preferred-register: '', flags: [  ] }
+  - { id: 486, class: _, preferred-register: '', flags: [  ] }
+  - { id: 487, class: _, preferred-register: '', flags: [  ] }
+  - { id: 488, class: _, preferred-register: '', flags: [  ] }
+  - { id: 489, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 490, class: aimag8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 491, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 492, class: ac, preferred-register: '%490', flags: [  ] }
+  - { id: 493, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 494, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 495, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 496, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 497, class: any, preferred-register: '', flags: [  ] }
+  - { id: 498, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 499, class: any, preferred-register: '', flags: [  ] }
+  - { id: 500, class: any, preferred-register: '', flags: [  ] }
+  - { id: 501, class: any, preferred-register: '', flags: [  ] }
+  - { id: 502, class: _, preferred-register: '', flags: [  ] }
+  - { id: 503, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 504, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 505, class: _, preferred-register: '', flags: [  ] }
+  - { id: 506, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 507, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 508, class: _, preferred-register: '', flags: [  ] }
+  - { id: 509, class: _, preferred-register: '', flags: [  ] }
+  - { id: 510, class: _, preferred-register: '', flags: [  ] }
+  - { id: 511, class: _, preferred-register: '', flags: [  ] }
+  - { id: 512, class: _, preferred-register: '', flags: [  ] }
+  - { id: 513, class: _, preferred-register: '', flags: [  ] }
+  - { id: 514, class: _, preferred-register: '', flags: [  ] }
+  - { id: 515, class: _, preferred-register: '', flags: [  ] }
+  - { id: 516, class: _, preferred-register: '', flags: [  ] }
+  - { id: 517, class: _, preferred-register: '', flags: [  ] }
+  - { id: 518, class: _, preferred-register: '', flags: [  ] }
+  - { id: 519, class: _, preferred-register: '', flags: [  ] }
+  - { id: 520, class: _, preferred-register: '', flags: [  ] }
+  - { id: 521, class: _, preferred-register: '', flags: [  ] }
+  - { id: 522, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 523, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 524, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 525, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 526, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 527, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 528, class: _, preferred-register: '', flags: [  ] }
+  - { id: 529, class: _, preferred-register: '', flags: [  ] }
+  - { id: 530, class: _, preferred-register: '', flags: [  ] }
+  - { id: 531, class: _, preferred-register: '', flags: [  ] }
+  - { id: 532, class: _, preferred-register: '', flags: [  ] }
+  - { id: 533, class: _, preferred-register: '', flags: [  ] }
+  - { id: 534, class: _, preferred-register: '', flags: [  ] }
+  - { id: 535, class: _, preferred-register: '', flags: [  ] }
+  - { id: 536, class: _, preferred-register: '', flags: [  ] }
+  - { id: 537, class: _, preferred-register: '', flags: [  ] }
+  - { id: 538, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 539, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 540, class: imag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 541, class: _, preferred-register: '', flags: [  ] }
+  - { id: 542, class: _, preferred-register: '', flags: [  ] }
+  - { id: 543, class: _, preferred-register: '', flags: [  ] }
+  - { id: 544, class: _, preferred-register: '', flags: [  ] }
+  - { id: 545, class: _, preferred-register: '', flags: [  ] }
+  - { id: 546, class: _, preferred-register: '', flags: [  ] }
+  - { id: 547, class: _, preferred-register: '', flags: [  ] }
+  - { id: 548, class: _, preferred-register: '', flags: [  ] }
+  - { id: 549, class: _, preferred-register: '', flags: [  ] }
+  - { id: 550, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 551, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 552, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 553, class: _, preferred-register: '', flags: [  ] }
+  - { id: 554, class: _, preferred-register: '', flags: [  ] }
+  - { id: 555, class: _, preferred-register: '', flags: [  ] }
+  - { id: 556, class: _, preferred-register: '', flags: [  ] }
+  - { id: 557, class: _, preferred-register: '', flags: [  ] }
+  - { id: 558, class: _, preferred-register: '', flags: [  ] }
+  - { id: 559, class: _, preferred-register: '', flags: [  ] }
+  - { id: 560, class: _, preferred-register: '', flags: [  ] }
+  - { id: 561, class: _, preferred-register: '', flags: [  ] }
+  - { id: 562, class: _, preferred-register: '', flags: [  ] }
+  - { id: 563, class: _, preferred-register: '', flags: [  ] }
+  - { id: 564, class: _, preferred-register: '', flags: [  ] }
+  - { id: 565, class: _, preferred-register: '', flags: [  ] }
+  - { id: 566, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 567, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 568, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 569, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 570, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 571, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 572, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 573, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 574, class: any, preferred-register: '', flags: [  ] }
+  - { id: 575, class: _, preferred-register: '', flags: [  ] }
+  - { id: 576, class: _, preferred-register: '', flags: [  ] }
+  - { id: 577, class: _, preferred-register: '', flags: [  ] }
+  - { id: 578, class: _, preferred-register: '', flags: [  ] }
+  - { id: 579, class: _, preferred-register: '', flags: [  ] }
+  - { id: 580, class: _, preferred-register: '', flags: [  ] }
+  - { id: 581, class: _, preferred-register: '', flags: [  ] }
+  - { id: 582, class: _, preferred-register: '', flags: [  ] }
+  - { id: 583, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 584, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 585, class: imag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 586, class: imag8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 587, class: _, preferred-register: '', flags: [  ] }
+  - { id: 588, class: _, preferred-register: '', flags: [  ] }
+  - { id: 589, class: _, preferred-register: '', flags: [  ] }
+  - { id: 590, class: _, preferred-register: '', flags: [  ] }
+  - { id: 591, class: _, preferred-register: '', flags: [  ] }
+  - { id: 592, class: _, preferred-register: '', flags: [  ] }
+  - { id: 593, class: _, preferred-register: '', flags: [  ] }
+  - { id: 594, class: _, preferred-register: '', flags: [  ] }
+  - { id: 595, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 596, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 597, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 598, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 599, class: _, preferred-register: '', flags: [  ] }
+  - { id: 600, class: _, preferred-register: '', flags: [  ] }
+  - { id: 601, class: _, preferred-register: '', flags: [  ] }
+  - { id: 602, class: _, preferred-register: '', flags: [  ] }
+  - { id: 603, class: _, preferred-register: '', flags: [  ] }
+  - { id: 604, class: _, preferred-register: '', flags: [  ] }
+  - { id: 605, class: _, preferred-register: '', flags: [  ] }
+  - { id: 606, class: _, preferred-register: '', flags: [  ] }
+  - { id: 607, class: _, preferred-register: '', flags: [  ] }
+  - { id: 608, class: _, preferred-register: '', flags: [  ] }
+  - { id: 609, class: any, preferred-register: '', flags: [  ] }
+  - { id: 610, class: _, preferred-register: '', flags: [  ] }
+  - { id: 611, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 612, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 613, class: _, preferred-register: '', flags: [  ] }
+  - { id: 614, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 615, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 616, class: any, preferred-register: '', flags: [  ] }
+  - { id: 617, class: _, preferred-register: '', flags: [  ] }
+  - { id: 618, class: _, preferred-register: '', flags: [  ] }
+  - { id: 619, class: _, preferred-register: '', flags: [  ] }
+  - { id: 620, class: _, preferred-register: '', flags: [  ] }
+  - { id: 621, class: _, preferred-register: '', flags: [  ] }
+  - { id: 622, class: _, preferred-register: '', flags: [  ] }
+  - { id: 623, class: _, preferred-register: '', flags: [  ] }
+  - { id: 624, class: _, preferred-register: '', flags: [  ] }
+  - { id: 625, class: _, preferred-register: '', flags: [  ] }
+  - { id: 626, class: _, preferred-register: '', flags: [  ] }
+  - { id: 627, class: _, preferred-register: '', flags: [  ] }
+  - { id: 628, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 629, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 630, class: _, preferred-register: '', flags: [  ] }
+  - { id: 631, class: _, preferred-register: '', flags: [  ] }
+  - { id: 632, class: _, preferred-register: '', flags: [  ] }
+  - { id: 633, class: _, preferred-register: '', flags: [  ] }
+  - { id: 634, class: _, preferred-register: '', flags: [  ] }
+  - { id: 635, class: _, preferred-register: '', flags: [  ] }
+  - { id: 636, class: _, preferred-register: '', flags: [  ] }
+  - { id: 637, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 638, class: _, preferred-register: '', flags: [  ] }
+  - { id: 639, class: _, preferred-register: '', flags: [  ] }
+  - { id: 640, class: _, preferred-register: '', flags: [  ] }
+  - { id: 641, class: _, preferred-register: '', flags: [  ] }
+  - { id: 642, class: _, preferred-register: '', flags: [  ] }
+  - { id: 643, class: _, preferred-register: '', flags: [  ] }
+  - { id: 644, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 645, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 646, class: aimag8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 647, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 648, class: aimag8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 649, class: _, preferred-register: '', flags: [  ] }
+  - { id: 650, class: _, preferred-register: '', flags: [  ] }
+  - { id: 651, class: _, preferred-register: '', flags: [  ] }
+  - { id: 652, class: _, preferred-register: '', flags: [  ] }
+  - { id: 653, class: _, preferred-register: '', flags: [  ] }
+  - { id: 654, class: _, preferred-register: '', flags: [  ] }
+  - { id: 655, class: _, preferred-register: '', flags: [  ] }
+  - { id: 656, class: _, preferred-register: '', flags: [  ] }
+  - { id: 657, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 658, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 659, class: _, preferred-register: '', flags: [  ] }
+  - { id: 660, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 661, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 662, class: _, preferred-register: '', flags: [  ] }
+  - { id: 663, class: _, preferred-register: '', flags: [  ] }
+  - { id: 664, class: _, preferred-register: '', flags: [  ] }
+  - { id: 665, class: _, preferred-register: '', flags: [  ] }
+  - { id: 666, class: _, preferred-register: '', flags: [  ] }
+  - { id: 667, class: _, preferred-register: '', flags: [  ] }
+  - { id: 668, class: _, preferred-register: '', flags: [  ] }
+  - { id: 669, class: _, preferred-register: '', flags: [  ] }
+  - { id: 670, class: _, preferred-register: '', flags: [  ] }
+  - { id: 671, class: _, preferred-register: '', flags: [  ] }
+  - { id: 672, class: _, preferred-register: '', flags: [  ] }
+  - { id: 673, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 674, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 675, class: _, preferred-register: '', flags: [  ] }
+  - { id: 676, class: _, preferred-register: '', flags: [  ] }
+  - { id: 677, class: _, preferred-register: '', flags: [  ] }
+  - { id: 678, class: _, preferred-register: '', flags: [  ] }
+  - { id: 679, class: _, preferred-register: '', flags: [  ] }
+  - { id: 680, class: _, preferred-register: '', flags: [  ] }
+  - { id: 681, class: _, preferred-register: '', flags: [  ] }
+  - { id: 682, class: _, preferred-register: '', flags: [  ] }
+  - { id: 683, class: _, preferred-register: '', flags: [  ] }
+  - { id: 684, class: _, preferred-register: '', flags: [  ] }
+  - { id: 685, class: _, preferred-register: '', flags: [  ] }
+  - { id: 686, class: _, preferred-register: '', flags: [  ] }
+  - { id: 687, class: _, preferred-register: '', flags: [  ] }
+  - { id: 688, class: _, preferred-register: '', flags: [  ] }
+  - { id: 689, class: _, preferred-register: '', flags: [  ] }
+  - { id: 690, class: _, preferred-register: '', flags: [  ] }
+  - { id: 691, class: _, preferred-register: '', flags: [  ] }
+  - { id: 692, class: _, preferred-register: '', flags: [  ] }
+  - { id: 693, class: _, preferred-register: '', flags: [  ] }
+  - { id: 694, class: _, preferred-register: '', flags: [  ] }
+  - { id: 695, class: _, preferred-register: '', flags: [  ] }
+  - { id: 696, class: _, preferred-register: '', flags: [  ] }
+  - { id: 697, class: any, preferred-register: '', flags: [  ] }
+  - { id: 698, class: _, preferred-register: '', flags: [  ] }
+  - { id: 699, class: _, preferred-register: '', flags: [  ] }
+  - { id: 700, class: _, preferred-register: '', flags: [  ] }
+  - { id: 701, class: _, preferred-register: '', flags: [  ] }
+  - { id: 702, class: _, preferred-register: '', flags: [  ] }
+  - { id: 703, class: _, preferred-register: '', flags: [  ] }
+  - { id: 704, class: _, preferred-register: '', flags: [  ] }
+  - { id: 705, class: ac, preferred-register: '%1029', flags: [  ] }
+  - { id: 706, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 707, class: any, preferred-register: '', flags: [  ] }
+  - { id: 708, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 709, class: any, preferred-register: '', flags: [  ] }
+  - { id: 710, class: _, preferred-register: '', flags: [  ] }
+  - { id: 711, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 712, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 713, class: any, preferred-register: '', flags: [  ] }
+  - { id: 714, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 715, class: any, preferred-register: '', flags: [  ] }
+  - { id: 716, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 717, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 718, class: any, preferred-register: '', flags: [  ] }
+  - { id: 719, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 720, class: any, preferred-register: '', flags: [  ] }
+  - { id: 721, class: _, preferred-register: '', flags: [  ] }
+  - { id: 722, class: _, preferred-register: '', flags: [  ] }
+  - { id: 723, class: _, preferred-register: '', flags: [  ] }
+  - { id: 724, class: _, preferred-register: '', flags: [  ] }
+  - { id: 725, class: _, preferred-register: '', flags: [  ] }
+  - { id: 726, class: _, preferred-register: '', flags: [  ] }
+  - { id: 727, class: _, preferred-register: '', flags: [  ] }
+  - { id: 728, class: _, preferred-register: '', flags: [  ] }
+  - { id: 729, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 730, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 731, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 732, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 733, class: ac, preferred-register: '%735', flags: [  ] }
+  - { id: 734, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 735, class: ac, preferred-register: '%733', flags: [  ] }
+  - { id: 736, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 737, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 738, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 739, class: any, preferred-register: '', flags: [  ] }
+  - { id: 740, class: any, preferred-register: '', flags: [  ] }
+  - { id: 741, class: any, preferred-register: '', flags: [  ] }
+  - { id: 742, class: _, preferred-register: '', flags: [  ] }
+  - { id: 743, class: _, preferred-register: '', flags: [  ] }
+  - { id: 744, class: _, preferred-register: '', flags: [  ] }
+  - { id: 745, class: _, preferred-register: '', flags: [  ] }
+  - { id: 746, class: _, preferred-register: '', flags: [  ] }
+  - { id: 747, class: _, preferred-register: '', flags: [  ] }
+  - { id: 748, class: _, preferred-register: '', flags: [  ] }
+  - { id: 749, class: _, preferred-register: '', flags: [  ] }
+  - { id: 750, class: _, preferred-register: '', flags: [  ] }
+  - { id: 751, class: _, preferred-register: '', flags: [  ] }
+  - { id: 752, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 753, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 754, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 755, class: any, preferred-register: '', flags: [  ] }
+  - { id: 756, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 757, class: _, preferred-register: '', flags: [  ] }
+  - { id: 758, class: any, preferred-register: '', flags: [  ] }
+  - { id: 759, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 760, class: any, preferred-register: '', flags: [  ] }
+  - { id: 761, class: any, preferred-register: '', flags: [  ] }
+  - { id: 762, class: any, preferred-register: '', flags: [  ] }
+  - { id: 763, class: any, preferred-register: '', flags: [  ] }
+  - { id: 764, class: _, preferred-register: '', flags: [  ] }
+  - { id: 765, class: _, preferred-register: '', flags: [  ] }
+  - { id: 766, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 767, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 768, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 769, class: any, preferred-register: '', flags: [  ] }
+  - { id: 770, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 771, class: _, preferred-register: '', flags: [  ] }
+  - { id: 772, class: any, preferred-register: '', flags: [  ] }
+  - { id: 773, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 774, class: any, preferred-register: '', flags: [  ] }
+  - { id: 775, class: any, preferred-register: '', flags: [  ] }
+  - { id: 776, class: any, preferred-register: '', flags: [  ] }
+  - { id: 777, class: _, preferred-register: '', flags: [  ] }
+  - { id: 778, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 779, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 780, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 781, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 782, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 783, class: any, preferred-register: '', flags: [  ] }
+  - { id: 784, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 785, class: _, preferred-register: '', flags: [  ] }
+  - { id: 786, class: any, preferred-register: '', flags: [  ] }
+  - { id: 787, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 788, class: any, preferred-register: '', flags: [  ] }
+  - { id: 789, class: any, preferred-register: '', flags: [  ] }
+  - { id: 790, class: any, preferred-register: '', flags: [  ] }
+  - { id: 791, class: _, preferred-register: '', flags: [  ] }
+  - { id: 792, class: _, preferred-register: '', flags: [  ] }
+  - { id: 793, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 794, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 795, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 796, class: any, preferred-register: '', flags: [  ] }
+  - { id: 797, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 798, class: _, preferred-register: '', flags: [  ] }
+  - { id: 799, class: any, preferred-register: '', flags: [  ] }
+  - { id: 800, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 801, class: any, preferred-register: '', flags: [  ] }
+  - { id: 802, class: any, preferred-register: '', flags: [  ] }
+  - { id: 803, class: any, preferred-register: '', flags: [  ] }
+  - { id: 804, class: _, preferred-register: '', flags: [  ] }
+  - { id: 805, class: _, preferred-register: '', flags: [  ] }
+  - { id: 806, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 807, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 808, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 809, class: any, preferred-register: '', flags: [  ] }
+  - { id: 810, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 811, class: _, preferred-register: '', flags: [  ] }
+  - { id: 812, class: any, preferred-register: '', flags: [  ] }
+  - { id: 813, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 814, class: any, preferred-register: '', flags: [  ] }
+  - { id: 815, class: any, preferred-register: '', flags: [  ] }
+  - { id: 816, class: any, preferred-register: '', flags: [  ] }
+  - { id: 817, class: _, preferred-register: '', flags: [  ] }
+  - { id: 818, class: _, preferred-register: '', flags: [  ] }
+  - { id: 819, class: _, preferred-register: '', flags: [  ] }
+  - { id: 820, class: _, preferred-register: '', flags: [  ] }
+  - { id: 821, class: _, preferred-register: '', flags: [  ] }
+  - { id: 822, class: _, preferred-register: '', flags: [  ] }
+  - { id: 823, class: _, preferred-register: '', flags: [  ] }
+  - { id: 824, class: _, preferred-register: '', flags: [  ] }
+  - { id: 825, class: _, preferred-register: '', flags: [  ] }
+  - { id: 826, class: _, preferred-register: '', flags: [  ] }
+  - { id: 827, class: _, preferred-register: '', flags: [  ] }
+  - { id: 828, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 829, class: any, preferred-register: '', flags: [  ] }
+  - { id: 830, class: any, preferred-register: '', flags: [  ] }
+  - { id: 831, class: any, preferred-register: '', flags: [  ] }
+  - { id: 832, class: any, preferred-register: '', flags: [  ] }
+  - { id: 833, class: any, preferred-register: '', flags: [  ] }
+  - { id: 834, class: _, preferred-register: '', flags: [  ] }
+  - { id: 835, class: _, preferred-register: '', flags: [  ] }
+  - { id: 836, class: _, preferred-register: '', flags: [  ] }
+  - { id: 837, class: _, preferred-register: '', flags: [  ] }
+  - { id: 838, class: _, preferred-register: '', flags: [  ] }
+  - { id: 839, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 840, class: any, preferred-register: '', flags: [  ] }
+  - { id: 841, class: any, preferred-register: '', flags: [  ] }
+  - { id: 842, class: any, preferred-register: '', flags: [  ] }
+  - { id: 843, class: any, preferred-register: '', flags: [  ] }
+  - { id: 844, class: any, preferred-register: '', flags: [  ] }
+  - { id: 845, class: _, preferred-register: '', flags: [  ] }
+  - { id: 846, class: _, preferred-register: '', flags: [  ] }
+  - { id: 847, class: _, preferred-register: '', flags: [  ] }
+  - { id: 848, class: _, preferred-register: '', flags: [  ] }
+  - { id: 849, class: _, preferred-register: '', flags: [  ] }
+  - { id: 850, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 851, class: any, preferred-register: '', flags: [  ] }
+  - { id: 852, class: any, preferred-register: '', flags: [  ] }
+  - { id: 853, class: any, preferred-register: '', flags: [  ] }
+  - { id: 854, class: any, preferred-register: '', flags: [  ] }
+  - { id: 855, class: any, preferred-register: '', flags: [  ] }
+  - { id: 856, class: _, preferred-register: '', flags: [  ] }
+  - { id: 857, class: _, preferred-register: '', flags: [  ] }
+  - { id: 858, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 859, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 860, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 861, class: any, preferred-register: '', flags: [  ] }
+  - { id: 862, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 863, class: _, preferred-register: '', flags: [  ] }
+  - { id: 864, class: any, preferred-register: '', flags: [  ] }
+  - { id: 865, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 866, class: any, preferred-register: '', flags: [  ] }
+  - { id: 867, class: any, preferred-register: '', flags: [  ] }
+  - { id: 868, class: any, preferred-register: '', flags: [  ] }
+  - { id: 869, class: _, preferred-register: '', flags: [  ] }
+  - { id: 870, class: _, preferred-register: '', flags: [  ] }
+  - { id: 871, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 872, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 873, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 874, class: any, preferred-register: '', flags: [  ] }
+  - { id: 875, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 876, class: _, preferred-register: '', flags: [  ] }
+  - { id: 877, class: any, preferred-register: '', flags: [  ] }
+  - { id: 878, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 879, class: any, preferred-register: '', flags: [  ] }
+  - { id: 880, class: any, preferred-register: '', flags: [  ] }
+  - { id: 881, class: any, preferred-register: '', flags: [  ] }
+  - { id: 882, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 883, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 884, class: any, preferred-register: '', flags: [  ] }
+  - { id: 885, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 886, class: any, preferred-register: '', flags: [  ] }
+  - { id: 887, class: any, preferred-register: '', flags: [  ] }
+  - { id: 888, class: any, preferred-register: '', flags: [  ] }
+  - { id: 889, class: any, preferred-register: '', flags: [  ] }
+  - { id: 890, class: any, preferred-register: '', flags: [  ] }
+  - { id: 891, class: any, preferred-register: '', flags: [  ] }
+  - { id: 892, class: any, preferred-register: '', flags: [  ] }
+  - { id: 893, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 894, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 895, class: any, preferred-register: '', flags: [  ] }
+  - { id: 896, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 897, class: any, preferred-register: '', flags: [  ] }
+  - { id: 898, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 899, class: any, preferred-register: '', flags: [  ] }
+  - { id: 900, class: any, preferred-register: '', flags: [  ] }
+  - { id: 901, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 902, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 903, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 904, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 905, class: gpr, preferred-register: '%1030', flags: [  ] }
+  - { id: 906, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 907, class: any, preferred-register: '', flags: [  ] }
+  - { id: 908, class: any, preferred-register: '', flags: [  ] }
+  - { id: 909, class: any, preferred-register: '', flags: [  ] }
+  - { id: 910, class: any, preferred-register: '', flags: [  ] }
+  - { id: 911, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 912, class: any, preferred-register: '', flags: [  ] }
+  - { id: 913, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 914, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 915, class: any, preferred-register: '', flags: [  ] }
+  - { id: 916, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 917, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 918, class: any, preferred-register: '', flags: [  ] }
+  - { id: 919, class: any, preferred-register: '', flags: [  ] }
+  - { id: 920, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 921, class: any, preferred-register: '', flags: [  ] }
+  - { id: 922, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 923, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 924, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 925, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 926, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 927, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 928, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 929, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 930, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 931, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 932, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 933, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 934, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 935, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 936, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 937, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 938, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 939, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 940, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 941, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 942, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 943, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 944, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 945, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 946, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 947, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 948, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 949, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 950, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 951, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 952, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 953, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 954, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 955, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 956, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 957, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 958, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 959, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 960, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 961, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 962, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 963, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 964, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 965, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 966, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 967, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 968, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 969, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 970, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 971, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 972, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 973, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 974, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 975, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 976, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 977, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 978, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 979, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 980, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 981, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 982, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 983, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 984, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 985, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 986, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 987, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 988, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 989, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 990, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 991, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 992, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 993, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 994, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 995, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 996, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 997, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 998, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 999, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1000, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1001, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1002, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 1003, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1004, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1005, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 1006, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1007, class: imag8, preferred-register: '%1029', flags: [  ] }
+  - { id: 1008, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 1009, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1010, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1011, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 1012, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1013, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1014, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1015, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1016, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1017, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1018, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1019, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1020, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1021, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1022, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1023, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1024, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 1025, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1026, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1027, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 1028, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 1029, class: gpr, preferred-register: '%648', flags: [  ] }
+  - { id: 1030, class: imag8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1031, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1032, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1033, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1034, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1035, class: cv_gpr_lsb, preferred-register: '', flags: [  ] }
+  - { id: 1036, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1037, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1038, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1039, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1040, class: ac, preferred-register: '%210', flags: [  ] }
+  - { id: 1041, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1042, class: gpr, preferred-register: '$a', flags: [  ] }
+  - { id: 1043, class: gpr, preferred-register: '$x', flags: [  ] }
+  - { id: 1044, class: ac, preferred-register: '%119', flags: [  ] }
+  - { id: 1045, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1046, class: gpr, preferred-register: '$a', flags: [  ] }
+  - { id: 1047, class: gpr, preferred-register: '$x', flags: [  ] }
+  - { id: 1048, class: imag16, preferred-register: '%1049', flags: [  ] }
+  - { id: 1049, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1050, class: imag16, preferred-register: '%1048', flags: [  ] }
+  - { id: 1051, class: imag16, preferred-register: '%1049', flags: [  ] }
+  - { id: 1052, class: imag16, preferred-register: '%1051', flags: [  ] }
+  - { id: 1053, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1054, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1055, class: imag16, preferred-register: '%1050', flags: [  ] }
+  - { id: 1056, class: imag16, preferred-register: '%1055', flags: [  ] }
+  - { id: 1057, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1058, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1059, class: imag16, preferred-register: '%1060', flags: [  ] }
+  - { id: 1060, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 1061, class: imag16, preferred-register: '%1060', flags: [  ] }
+  - { id: 1062, class: imag16, preferred-register: '%1061', flags: [  ] }
+  - { id: 1063, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1064, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1065, class: imag16, preferred-register: '%1066', flags: [  ] }
+  - { id: 1066, class: imag16, preferred-register: '%1065', flags: [  ] }
+  - { id: 1067, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1068, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1069, class: imag16, preferred-register: '%1070', flags: [  ] }
+  - { id: 1070, class: imag16, preferred-register: '%1069', flags: [  ] }
+  - { id: 1071, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1072, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1073, class: imag16, preferred-register: '%1069', flags: [  ] }
+  - { id: 1074, class: imag16, preferred-register: '%1070', flags: [  ] }
+  - { id: 1075, class: imag16, preferred-register: '%1074', flags: [  ] }
+  - { id: 1076, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1077, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1078, class: imag16, preferred-register: '%1071', flags: [  ] }
+  - { id: 1079, class: imag16, preferred-register: '%1078', flags: [  ] }
+  - { id: 1080, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1081, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1082, class: imag16, preferred-register: '%1072', flags: [  ] }
+  - { id: 1083, class: imag16, preferred-register: '%1082', flags: [  ] }
+  - { id: 1084, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1085, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1086, class: imag16, preferred-register: '%1073', flags: [  ] }
+  - { id: 1087, class: imag16, preferred-register: '%1086', flags: [  ] }
+  - { id: 1088, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1089, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1090, class: imag16, preferred-register: '%1073', flags: [  ] }
+  - { id: 1091, class: imag16, preferred-register: '%1090', flags: [  ] }
+  - { id: 1092, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1093, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1094, class: imag16, preferred-register: '%1095', flags: [  ] }
+  - { id: 1095, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1096, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1097, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1098, class: imag16, preferred-register: '%1094', flags: [  ] }
+  - { id: 1099, class: imag16, preferred-register: '%1095', flags: [  ] }
+  - { id: 1100, class: imag16, preferred-register: '%1099', flags: [  ] }
+  - { id: 1101, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1102, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1103, class: imag16, preferred-register: '%1096', flags: [  ] }
+  - { id: 1104, class: imag16, preferred-register: '%1103', flags: [  ] }
+  - { id: 1105, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1106, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1107, class: imag16, preferred-register: '%1097', flags: [  ] }
+  - { id: 1108, class: imag16, preferred-register: '%1107', flags: [  ] }
+  - { id: 1109, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1110, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1111, class: imag16, preferred-register: '%1098', flags: [  ] }
+  - { id: 1112, class: imag16, preferred-register: '%1111', flags: [  ] }
+  - { id: 1113, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1114, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1115, class: imag16, preferred-register: '%1098', flags: [  ] }
+  - { id: 1116, class: imag16, preferred-register: '%1115', flags: [  ] }
+  - { id: 1117, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1118, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1119, class: gpr, preferred-register: '%1122', flags: [  ] }
+  - { id: 1120, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1121, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1122, class: anyi8, preferred-register: '%705', flags: [  ] }
+  - { id: 1123, class: anyi8, preferred-register: '%648', flags: [  ] }
+  - { id: 1124, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1125, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1126, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1127, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1128, class: anyi8, preferred-register: '%1122', flags: [  ] }
+  - { id: 1129, class: gpr, preferred-register: '%1128', flags: [  ] }
+  - { id: 1130, class: anyi8, preferred-register: '%1131', flags: [  ] }
+  - { id: 1131, class: gpr, preferred-register: '%1130', flags: [  ] }
+  - { id: 1132, class: anyi8, preferred-register: '%1122', flags: [  ] }
+  - { id: 1133, class: gpr, preferred-register: '%1132', flags: [  ] }
+  - { id: 1134, class: anyi8, preferred-register: '%1124', flags: [  ] }
+  - { id: 1135, class: gpr, preferred-register: '%1134', flags: [  ] }
+  - { id: 1136, class: anyi8, preferred-register: '%1125', flags: [  ] }
+  - { id: 1137, class: gpr, preferred-register: '%1136', flags: [  ] }
+  - { id: 1138, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1139, class: anyi8, preferred-register: '%648', flags: [  ] }
+  - { id: 1140, class: gpr, preferred-register: '%1139', flags: [  ] }
+  - { id: 1141, class: anyi8, preferred-register: '%1142', flags: [  ] }
+  - { id: 1142, class: imag8, preferred-register: '%735', flags: [  ] }
+  - { id: 1143, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1144, class: anyi8, preferred-register: '%1145', flags: [  ] }
+  - { id: 1145, class: ac, preferred-register: '$a', flags: [  ] }
+  - { id: 1146, class: anyi8, preferred-register: '$rc4', flags: [  ] }
+  - { id: 1147, class: anyi8, preferred-register: '%1145', flags: [  ] }
+  - { id: 1148, class: gpr, preferred-register: '%1147', flags: [  ] }
+  - { id: 1149, class: anyi8, preferred-register: '%1146', flags: [  ] }
+  - { id: 1150, class: gpr, preferred-register: '%1149', flags: [  ] }
+  - { id: 1151, class: anyi8, preferred-register: '%1152', flags: [  ] }
+  - { id: 1152, class: ac, preferred-register: '%1151', flags: [  ] }
+  - { id: 1153, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1154, class: anyi8, preferred-register: '%1152', flags: [  ] }
+  - { id: 1155, class: gpr, preferred-register: '%1154', flags: [  ] }
+  - { id: 1156, class: anyi8, preferred-register: '%1153', flags: [  ] }
+  - { id: 1157, class: gpr, preferred-register: '%1156', flags: [  ] }
+  - { id: 1158, class: anyi8, preferred-register: '%1159', flags: [  ] }
+  - { id: 1159, class: ac, preferred-register: '%1158', flags: [  ] }
+  - { id: 1160, class: anyi8, preferred-register: '$rc7', flags: [  ] }
+  - { id: 1161, class: anyi8, preferred-register: '%1159', flags: [  ] }
+  - { id: 1162, class: gpr, preferred-register: '%1161', flags: [  ] }
+  - { id: 1163, class: anyi8, preferred-register: '%1160', flags: [  ] }
+  - { id: 1164, class: gpr, preferred-register: '%1163', flags: [  ] }
+  - { id: 1165, class: imag16, preferred-register: '%1166', flags: [  ] }
+  - { id: 1166, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 1167, class: imag16, preferred-register: '%1166', flags: [  ] }
+  - { id: 1168, class: imag16, preferred-register: '%1167', flags: [  ] }
+  - { id: 1169, class: imag16, preferred-register: '%1167', flags: [  ] }
+  - { id: 1170, class: imag16, preferred-register: '%1166', flags: [  ] }
+  - { id: 1171, class: imag16, preferred-register: '%1170', flags: [  ] }
+  - { id: 1172, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1173, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1174, class: imag16, preferred-register: '%1175', flags: [  ] }
+  - { id: 1175, class: imag16, preferred-register: '%1174', flags: [  ] }
+  - { id: 1176, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1177, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1178, class: imag16, preferred-register: '%1179', flags: [  ] }
+  - { id: 1179, class: imag16, preferred-register: '%1178', flags: [  ] }
+  - { id: 1180, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1181, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1182, class: anyi8, preferred-register: '%1183', flags: [  ] }
+  - { id: 1183, class: ac, preferred-register: '%1182', flags: [  ] }
+  - { id: 1184, class: anyi8, preferred-register: '$rc5', flags: [  ] }
+  - { id: 1185, class: anyi8, preferred-register: '%1183', flags: [  ] }
+  - { id: 1186, class: gpr, preferred-register: '%1185', flags: [  ] }
+  - { id: 1187, class: anyi8, preferred-register: '%1184', flags: [  ] }
+  - { id: 1188, class: gpr, preferred-register: '%1187', flags: [  ] }
+  - { id: 1189, class: imag16, preferred-register: '%1190', flags: [  ] }
+  - { id: 1190, class: imag16, preferred-register: '$rs1', flags: [  ] }
+  - { id: 1191, class: imag16, preferred-register: '%1190', flags: [  ] }
+  - { id: 1192, class: imag16, preferred-register: '%1191', flags: [  ] }
+  - { id: 1193, class: imag16, preferred-register: '%1191', flags: [  ] }
+  - { id: 1194, class: imag16, preferred-register: '%1190', flags: [  ] }
+  - { id: 1195, class: imag16, preferred-register: '%1194', flags: [  ] }
+  - { id: 1196, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1197, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1198, class: imag16, preferred-register: '%1190', flags: [  ] }
+  - { id: 1199, class: imag16, preferred-register: '%1198', flags: [  ] }
+  - { id: 1200, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1201, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1202, class: imag16, preferred-register: '%1203', flags: [  ] }
+  - { id: 1203, class: imag16, preferred-register: '%1202', flags: [  ] }
+  - { id: 1204, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1205, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1206, class: imag16, preferred-register: '%1207', flags: [  ] }
+  - { id: 1207, class: imag16, preferred-register: '%1206', flags: [  ] }
+  - { id: 1208, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1209, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1210, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1211, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1212, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1213, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1214, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1215, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1216, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1217, class: anyi8, preferred-register: '%1218', flags: [  ] }
+  - { id: 1218, class: gpr, preferred-register: '%1217', flags: [  ] }
+  - { id: 1219, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1220, class: gpr, preferred-register: '%1223', flags: [  ] }
+  - { id: 1221, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1222, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1223, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1224, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1225, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1226, class: anyi8, preferred-register: '%1223', flags: [  ] }
+  - { id: 1227, class: gpr, preferred-register: '%1226', flags: [  ] }
+  - { id: 1228, class: anyi8, preferred-register: '%1219', flags: [  ] }
+  - { id: 1229, class: gpr, preferred-register: '%1228', flags: [  ] }
+  - { id: 1230, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1231, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1232, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1233, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1234, class: gpr, preferred-register: '%1237', flags: [  ] }
+  - { id: 1235, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1236, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1237, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1238, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1239, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1240, class: anyi8, preferred-register: '%1237', flags: [  ] }
+  - { id: 1241, class: gpr, preferred-register: '%1240', flags: [  ] }
+  - { id: 1242, class: imag16, preferred-register: '%1243', flags: [  ] }
+  - { id: 1243, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1244, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1245, class: imag16, preferred-register: '%1246', flags: [  ] }
+  - { id: 1246, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1247, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1248, class: imag16, preferred-register: '%1246', flags: [  ] }
+  - { id: 1249, class: imag16, preferred-register: '%1248', flags: [  ] }
+  - { id: 1250, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1251, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1252, class: imag16, preferred-register: '%1247', flags: [  ] }
+  - { id: 1253, class: imag16, preferred-register: '%1252', flags: [  ] }
+  - { id: 1254, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1255, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1256, class: anyi8, preferred-register: '%1257', flags: [  ] }
+  - { id: 1257, class: ac, preferred-register: '%1256', flags: [  ] }
+  - { id: 1258, class: aimag8, preferred-register: '%1256', flags: [  ] }
+  - { id: 1259, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1260, class: anyi8, preferred-register: '%1258', flags: [  ] }
+  - { id: 1261, class: ac16, preferred-register: '%1262', flags: [  ] }
+  - { id: 1262, class: ac16, preferred-register: '%1261', flags: [  ] }
+  - { id: 1263, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1264, class: anyi8, preferred-register: '%1265', flags: [  ] }
+  - { id: 1265, class: ac, preferred-register: '%1264', flags: [  ] }
+  - { id: 1266, class: aimag8, preferred-register: '%1264', flags: [  ] }
+  - { id: 1267, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1268, class: anyi8, preferred-register: '%1266', flags: [  ] }
+  - { id: 1269, class: anyi8, preferred-register: '%1270', flags: [  ] }
+  - { id: 1270, class: gpr, preferred-register: '%1269', flags: [  ] }
+  - { id: 1271, class: gpr, preferred-register: '$a', flags: [  ] }
+  - { id: 1272, class: gpr, preferred-register: '%1273', flags: [  ] }
+  - { id: 1273, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1274, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1275, class: anyi8, preferred-register: '%200', flags: [  ] }
+  - { id: 1276, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1277, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1278, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1279, class: anyi8, preferred-register: '%1280', flags: [  ] }
+  - { id: 1280, class: ac, preferred-register: '%490', flags: [  ] }
+  - { id: 1281, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1282, class: imag16, preferred-register: '%1243', flags: [  ] }
+  - { id: 1283, class: imag16, preferred-register: '%1282', flags: [  ] }
+  - { id: 1284, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1285, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1286, class: imag16, preferred-register: '%1244', flags: [  ] }
+  - { id: 1287, class: imag16, preferred-register: '%1286', flags: [  ] }
+  - { id: 1288, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1289, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1290, class: anyi8, preferred-register: '%1291', flags: [  ] }
+  - { id: 1291, class: aimag8, preferred-register: '%1280', flags: [  ] }
+  - { id: 1292, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1293, class: gpr, preferred-register: '%1291', flags: [  ] }
+  - { id: 1294, class: anyi8, preferred-register: '%1292', flags: [  ] }
+  - { id: 1295, class: gpr, preferred-register: '%1294', flags: [  ] }
+  - { id: 1296, class: ac16, preferred-register: '%1297', flags: [  ] }
+  - { id: 1297, class: ac16, preferred-register: '%1296', flags: [  ] }
+  - { id: 1298, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1299, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1300, class: gpr, preferred-register: '%1299', flags: [  ] }
+  - { id: 1301, class: gpr, preferred-register: '%1299', flags: [  ] }
+  - { id: 1302, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1303, class: gpr, preferred-register: '%109', flags: [  ] }
+  - { id: 1304, class: anyi8, preferred-register: '%150', flags: [  ] }
+  - { id: 1305, class: anyi8, preferred-register: '%1273', flags: [  ] }
+  - { id: 1306, class: gpr, preferred-register: '%1305', flags: [  ] }
+  - { id: 1307, class: gpr, preferred-register: '%1305', flags: [  ] }
+  - { id: 1308, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1309, class: ac, preferred-register: '%1308', flags: [  ] }
+  - { id: 1310, class: anyi8, preferred-register: '%1044', flags: [  ] }
+  - { id: 1311, class: anyi8, preferred-register: '%1313', flags: [  ] }
+  - { id: 1312, class: ac, preferred-register: '%1311', flags: [  ] }
+  - { id: 1313, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1314, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1315, class: anyi8, preferred-register: '%155', flags: [  ] }
+  - { id: 1316, class: ac, preferred-register: '%1314', flags: [  ] }
+  - { id: 1317, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 1318, class: imag16, preferred-register: '%1319', flags: [  ] }
+  - { id: 1319, class: imag16, preferred-register: '%1318', flags: [  ] }
+  - { id: 1320, class: anyi8, preferred-register: '%1321', flags: [  ] }
+  - { id: 1321, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1322, class: ac, preferred-register: '%1320', flags: [  ] }
+  - { id: 1323, class: imag16, preferred-register: '%1318', flags: [  ] }
+  - { id: 1324, class: imag16, preferred-register: '%1323', flags: [  ] }
+  - { id: 1325, class: imag16, preferred-register: '%1318', flags: [  ] }
+  - { id: 1326, class: imag16, preferred-register: '%1325', flags: [  ] }
+  - { id: 1327, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1328, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1329, class: imag16, preferred-register: '%1324', flags: [  ] }
+  - { id: 1330, class: imag16, preferred-register: '%1329', flags: [  ] }
+  - { id: 1331, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1332, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1333, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1334, class: anyi8, preferred-register: '%1040', flags: [  ] }
+  - { id: 1335, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1336, class: gpr, preferred-register: '%1335', flags: [  ] }
+  - { id: 1337, class: anyi8, preferred-register: '%1334', flags: [  ] }
+  - { id: 1338, class: gpr, preferred-register: '%1337', flags: [  ] }
+  - { id: 1339, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1340, class: anyi8, preferred-register: '%246', flags: [  ] }
+  - { id: 1341, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1342, class: gpr, preferred-register: '%1341', flags: [  ] }
+  - { id: 1343, class: anyi8, preferred-register: '%1340', flags: [  ] }
+  - { id: 1344, class: gpr, preferred-register: '%1343', flags: [  ] }
+  - { id: 1345, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1346, class: anyi8, preferred-register: '%241', flags: [  ] }
+  - { id: 1347, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1348, class: gpr, preferred-register: '%1269', flags: [  ] }
+  - { id: 1349, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1350, class: gpr, preferred-register: '%1349', flags: [  ] }
+  - { id: 1351, class: anyi8, preferred-register: '%1346', flags: [  ] }
+  - { id: 1352, class: gpr, preferred-register: '%1351', flags: [  ] }
+  - { id: 1353, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1354, class: gpr, preferred-register: '%1353', flags: [  ] }
+  - { id: 1355, class: anyi8, preferred-register: '%1348', flags: [  ] }
+  - { id: 1356, class: gpr, preferred-register: '%1355', flags: [  ] }
+  - { id: 1357, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1358, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1359, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1360, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1361, class: gpr, preferred-register: '%1360', flags: [  ] }
+  - { id: 1362, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1363, class: gpr, preferred-register: '%1362', flags: [  ] }
+  - { id: 1364, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1365, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1366, class: gpr, preferred-register: '%1365', flags: [  ] }
+  - { id: 1367, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1368, class: gpr, preferred-register: '%1367', flags: [  ] }
+  - { id: 1369, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1370, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1371, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1372, class: ac, preferred-register: '%1371', flags: [  ] }
+  - { id: 1373, class: ac16, preferred-register: '%1374', flags: [  ] }
+  - { id: 1374, class: ac16, preferred-register: '%1373', flags: [  ] }
+  - { id: 1375, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 1376, class: ac16, preferred-register: '%1374', flags: [  ] }
+  - { id: 1377, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1378, class: ac, preferred-register: '%1377', flags: [  ] }
+  - { id: 1379, class: gpr, preferred-register: '%1382', flags: [  ] }
+  - { id: 1380, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1381, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1382, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1383, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1384, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1385, class: anyi8, preferred-register: '%1382', flags: [  ] }
+  - { id: 1386, class: gpr, preferred-register: '%1385', flags: [  ] }
+  - { id: 1387, class: gpr, preferred-register: '%1370', flags: [  ] }
+  - { id: 1388, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1389, class: gpr, preferred-register: '%1388', flags: [  ] }
+  - { id: 1390, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1391, class: ac, preferred-register: '%1390', flags: [  ] }
+  - { id: 1392, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1393, class: anyi8, preferred-register: '%1371', flags: [  ] }
+  - { id: 1394, class: ac, preferred-register: '%1393', flags: [  ] }
+  - { id: 1395, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1396, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1397, class: ac, preferred-register: '%1396', flags: [  ] }
+  - { id: 1398, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1399, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1400, class: ac, preferred-register: '%1147', flags: [  ] }
+  - { id: 1401, class: anyi8, preferred-register: '%1400', flags: [  ] }
+  - { id: 1402, class: ac, preferred-register: '%1403', flags: [  ] }
+  - { id: 1403, class: anyi8, preferred-register: '%1161', flags: [  ] }
+  - { id: 1404, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 1405, class: ac, preferred-register: '%1404', flags: [  ] }
+  - { id: 1406, class: anyi8, preferred-register: '%1403', flags: [  ] }
+  - { id: 1407, class: ac, preferred-register: '%1399', flags: [  ] }
+  - { id: 1408, class: anyi8, preferred-register: '%1147', flags: [  ] }
+  - { id: 1409, class: imag16, preferred-register: '%1410', flags: [  ] }
+  - { id: 1410, class: imag16, preferred-register: '$rs2', flags: [  ] }
+  - { id: 1411, class: imag16, preferred-register: '%1410', flags: [  ] }
+  - { id: 1412, class: imag16, preferred-register: '%1411', flags: [  ] }
+  - { id: 1413, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1414, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1415, class: imag16, preferred-register: '%1410', flags: [  ] }
+  - { id: 1416, class: imag16, preferred-register: '%1415', flags: [  ] }
+  - { id: 1417, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1418, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1419, class: imag16, preferred-register: '%1052', flags: [  ] }
+  - { id: 1420, class: imag16, preferred-register: '%1419', flags: [  ] }
+  - { id: 1421, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1422, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1423, class: ac, preferred-register: '%1424', flags: [  ] }
+  - { id: 1424, class: anyi8, preferred-register: '%1154', flags: [  ] }
+  - { id: 1425, class: anyi8, preferred-register: '$rc4', flags: [  ] }
+  - { id: 1426, class: ac, preferred-register: '%1425', flags: [  ] }
+  - { id: 1427, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1428, class: ac, preferred-register: '%1427', flags: [  ] }
+  - { id: 1429, class: anyi8, preferred-register: '%1424', flags: [  ] }
+  - { id: 1430, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1431, class: ac, preferred-register: '%1430', flags: [  ] }
+  - { id: 1432, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1433, class: anyi8, preferred-register: '%1377', flags: [  ] }
+  - { id: 1434, class: ac, preferred-register: '%1433', flags: [  ] }
+  - { id: 1435, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1436, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1437, class: ac, preferred-register: '%1436', flags: [  ] }
+  - { id: 1438, class: anyi8, preferred-register: '$rc5', flags: [  ] }
+  - { id: 1439, class: ac, preferred-register: '%1438', flags: [  ] }
+  - { id: 1440, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1441, class: ac, preferred-register: '%1440', flags: [  ] }
+  - { id: 1442, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1443, class: ac, preferred-register: '%1442', flags: [  ] }
+  - { id: 1444, class: anyi8, preferred-register: '%1443', flags: [  ] }
+  - { id: 1445, class: anyi8, preferred-register: '$rc7', flags: [  ] }
+  - { id: 1446, class: ac, preferred-register: '%733', flags: [  ] }
+  - { id: 1447, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1448, class: ac, preferred-register: '%1256', flags: [  ] }
+  - { id: 1449, class: anyi8, preferred-register: '%1446', flags: [  ] }
+  - { id: 1450, class: ac, preferred-register: '%1449', flags: [  ] }
+  - { id: 1451, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 1452, class: anyi8, preferred-register: '%1142', flags: [  ] }
+  - { id: 1453, class: ac, preferred-register: '%1445', flags: [  ] }
+  - { id: 1454, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1455, class: ac, preferred-register: '%1454', flags: [  ] }
+  - { id: 1456, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1457, class: gpr, preferred-register: '%1456', flags: [  ] }
+  - { id: 1458, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1459, class: ac, preferred-register: '%1458', flags: [  ] }
+  - { id: 1460, class: anyi8, preferred-register: '%1461', flags: [  ] }
+  - { id: 1461, class: ac, preferred-register: '%1460', flags: [  ] }
+  - { id: 1462, class: anyi8, preferred-register: '%1460', flags: [  ] }
+  - { id: 1463, class: ac, preferred-register: '%1462', flags: [  ] }
+  - { id: 1464, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1465, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1466, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1467, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1468, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1469, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 1470, class: ac, preferred-register: '%1469', flags: [  ] }
+  - { id: 1471, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1472, class: anyi1, preferred-register: '', flags: [  ] }
+  - { id: 1473, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1474, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1475, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 1476, class: anyi8, preferred-register: '%1399', flags: [  ] }
+  - { id: 1477, class: ac, preferred-register: '%1476', flags: [  ] }
+  - { id: 1478, class: anyi8, preferred-register: '%1408', flags: [  ] }
+  - { id: 1479, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1480, class: ac, preferred-register: '%1462', flags: [  ] }
+  - { id: 1481, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1482, class: ac, preferred-register: '%1264', flags: [  ] }
+  - { id: 1483, class: anyi1, preferred-register: '%1484', flags: [  ] }
+  - { id: 1484, class: cc, preferred-register: '%1483', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 17, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 18, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 19, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 20, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 21, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 22, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 23, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.2):
+    successors: %bb.2(0x40000000), %bb.1(0x40000000)
+    liveins: $rs1, $rs2
+  
+    %1060:imag16 = COPY $rs1
+    %1410:imag16 = COPY $rs2
+    %1061:imag16 = COPY %1060
+    %1062:imag16 = COPY %1061
+    %1063:gpr = COPY %1062.sublo
+    STAbs %1063, %stack.1 :: (store (s8) into %stack.1)
+    %1064:gpr = COPY %1062.subhi
+    STAbs %1064, %stack.1 + 1 :: (store (s8) into %stack.1 + 1)
+    %1021:ac16 = LDAIndir16 %1060 :: (load (s16) from %ir.0, align 1, !tbaa !2)
+    %1070:imag16 = STAImag16 %1021
+    %1020:ac16 = LDAImag16 %1070
+    %1020:ac16 = EORImm16 %1020, 32768
+    %875:imag16 = STAImag16 %1020
+    %1018:ac16 = LDAImag16 %875
+    %878:cc = CMPImm16 %1018, 32768
+    GBR %bb.2, %878, 1, implicit-def dead $c
+    BRA %bb.1
+  
+  bb.1 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+  
+    %1138:gpr = LDImm -1
+    STAbs %1138, %stack.4 :: (store (s8) into %stack.4)
+    BRA %bb.3
+  
+  bb.2 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+  
+    %1130:anyi8 = LDZ
+    %1131:gpr = COPY %1130
+    STAbs %1131, %stack.4 :: (store (s8) into %stack.4)
+    BRA %bb.3
+  
+  bb.3 (%ir-block.2):
+    successors: %bb.5(0x40000000), %bb.4(0x40000000)
+  
+    %1017:ac16 = LDAIndir16 %1410 :: (load (s16) from %ir.1, align 1, !tbaa !2)
+    %1095:imag16 = STAImag16 %1017
+    %1016:ac16 = LDAImag16 %1095
+    %1016:ac16 = EORImm16 %1016, 32768
+    %862:imag16 = STAImag16 %1016
+    %1014:ac16 = LDAImag16 %862
+    %865:cc = CMPImm16 %1014, 32768
+    GBR %bb.5, %865, 1, implicit-def dead $c
+    BRA %bb.4
+  
+  bb.4 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+  
+    %905:gpr = LDImm -1
+    %1142:imag8 = COPY %905
+    BRA %bb.6
+  
+  bb.5 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+  
+    %1142:imag8 = LDZ
+    BRA %bb.6
+  
+  bb.6 (%ir-block.2):
+    successors: %bb.7(0x40000000), %bb.8(0x40000000)
+  
+    %883:cc = LDImm1 0
+    %1426:ac = COPY %1070.sublo
+    %1426:ac, %730:cc, dead %1011:vc = ADCImag8 %1426, %1095.sublo, %883
+    %1425:anyi8 = COPY %1426
+    %1439:ac = COPY %1070.subhi
+    %1439:ac, %732:cc, dead %1008:vc = ADCImag8 %1439, %1095.subhi, %730
+    %1438:anyi8 = COPY %1439
+    %1133:gpr = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    %1132:anyi8 = COPY %1133
+    %1122:anyi8 = COPY %1132
+    %1007:imag8 = COPY %1122
+    %1452:anyi8 = COPY %1142
+    %1449:anyi8 = COPY %1452
+    %1450:ac = COPY %1449
+    %1450:ac, %734:cc, dead %1005:vc = ADCImag8 %1450, %1007, %732
+    %1451:anyi8 = COPY %1450
+    %1453:ac = COPY %1452
+    %1453:ac, dead %736:cc, dead %1002:vc = ADCImag8 %1453, %1007, %734
+    %1445:anyi8 = COPY %1453
+    %712:cc = LDImm1 -1
+    %1459:ac = COPY %1070.sublo
+    %1459:ac, %712:cc, dead %719:vc = SBCImag8 %1459, %1095.sublo, %712
+    %1458:anyi8 = COPY %1459
+    %1470:ac = COPY %1070.subhi
+    %1470:ac, %712:cc, dead %714:vc = SBCImag8 %1470, %1095.subhi, %712
+    %1469:anyi8 = COPY %1470
+    %705:ac = COPY %1122
+    %1141:anyi8 = COPY %1142
+    %705:ac, dead %712:cc, dead %708:vc = SBCImag8 %705, %1142, %712
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    undef %657.subhi:imag16 = LDZ
+    $rc2 = COPY %1469
+    $rc3 = COPY %705
+    $rc4 = COPY %1425
+    $rc5 = COPY %1438
+    $rc6 = COPY %1451
+    $rc7 = COPY %1445
+    $x = COPY %1458
+    $a = COPY %657.subhi
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def dead $a, implicit-def dead $x, implicit-def $rc2, implicit-def $rc3
+    undef %1166.sublo:imag16 = COPY $rc2
+    %657.sublo:imag16 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    CmpBrZero %bb.7, undef $n, 1, %657.sublo, implicit-def dead $c
+    BRA %bb.8
+  
+  bb.7 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+  
+    %904:gpr = LDImm -1
+    %657.subhi:imag16 = COPY %904
+    BRA %bb.9
+  
+  bb.8 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+  
+    BRA %bb.9
+  
+  bb.9 (%ir-block.2):
+    successors: %bb.10(0x40000000), %bb.11(0x40000000)
+  
+    %1262:ac16 = LDAImag16 %657
+    %1262:ac16 = ASLAcc16 %1262, implicit-def dead $c
+    STAbs16 %1262, %stack.13 :: (store (s16) into %stack.13, align 1)
+    %644:aimag8 = COPY %1070.sublo
+    %644:aimag8, %637:cc = ASL %644
+    %646:aimag8 = COPY %1070.subhi
+    %646:aimag8, %637:cc = ROL %646, %637
+    %1140:gpr = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    %1139:anyi8 = COPY %1140
+    %648:aimag8 = COPY %1139
+    %648:aimag8, dead %637:cc = ROL %648, %637
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    undef %611.subhi:imag16 = LDZ
+    $rc2 = COPY %646
+    $rc3 = COPY %648
+    $rc4 = COPY %1095.sublo
+    $rc5 = COPY %1095.subhi
+    %1143:anyi8 = COPY %1141
+    $rc6 = COPY %1143
+    $rc7 = COPY %1143
+    $x = COPY %644
+    $a = COPY %611.subhi
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def dead $a, implicit-def dead $x, implicit-def $rc2, implicit-def $rc3
+    undef %1190.sublo:imag16 = COPY $rc2
+    %611.sublo:imag16 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    CmpBrZero %bb.10, undef $n, 1, %611.sublo, implicit-def dead $c
+    BRA %bb.11
+  
+  bb.10 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+  
+    %903:gpr = LDImm -1
+    %611.subhi:imag16 = COPY %903
+    BRA %bb.12
+  
+  bb.11 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+  
+    BRA %bb.12
+  
+  bb.12 (%ir-block.2):
+    successors: %bb.14(0x40000000), %bb.13(0x40000000)
+  
+    %1375:ac16 = LDAImag16 %611
+    STAbs16 %1375, %stack.16 :: (store (s16) into %stack.16, align 1)
+    %1166.subhi:imag16 = COPY %657.sublo
+    %997:ac16 = LDAImag16 %1166
+    %997:ac16 = ASLAcc16 %997, implicit-def dead $c
+    %77:imag16 = STAImag16 %997
+    %993:ac16 = LDAImag16 %77
+    undef %1170.sublo:imag16 = COPY %1166.sublo
+    %1171:imag16 = COPY %1170
+    %1172:gpr = COPY %1171.sublo
+    STAbs %1172, %stack.8 :: (store (s8) into %stack.8)
+    %1173:gpr = COPY %1171.subhi
+    STAbs %1173, %stack.8 + 1 :: (store (s8) into %stack.8 + 1)
+    %1466:cc = LDImm1 0
+    %993:ac16, dead %994:cc, dead %995:vc = ADCImag16 %993, %1166, %1466
+    %78:imag16 = STAImag16 %993
+    %1190.subhi:imag16 = COPY %611.sublo
+    %990:ac16 = LDAImag16 %1190
+    %990:ac16 = ASLAcc16 %990, implicit-def dead $c
+    %79:imag16 = STAImag16 %990
+    %986:ac16 = LDAImag16 %79
+    %1467:cc = LDImm1 0
+    %986:ac16, dead %987:cc, dead %988:vc = ADCImag16 %986, %1190, %1467
+    %80:imag16 = STAImag16 %986
+    %981:ac16 = LDAImag16 %78
+    %982:cc = CMPImm16 %981, 32768
+    %981:ac16, dead %983:cc = RORAcc16 %981, %982
+    %1243:imag16 = STAImag16 %981
+    %979:ac16 = LDAImag16 %1243
+    %979:ac16 = EORImm16 %979, 32768
+    %756:imag16 = STAImag16 %979
+    %977:ac16 = LDAImag16 %756
+    %1484:cc = CMPImm16 %977, 32768
+    %1483:anyi1 = COPY %1484
+    %1376:ac16 = LDAbs16 %stack.16 :: (load (s16) from %stack.16, align 1)
+    %1374:ac16 = COPY %1376
+    %1374:ac16 = ASLAcc16 %1374, implicit-def dead $c
+    STAbs16 %1374, %stack.16 :: (store (s16) into %stack.16, align 1)
+    %1074:imag16 = COPY %1070
+    %1075:imag16 = COPY %1074
+    %1076:gpr = COPY %1075.sublo
+    STAbs %1076, %stack.2 :: (store (s8) into %stack.2)
+    %1077:gpr = COPY %1075.subhi
+    STAbs %1077, %stack.2 + 1 :: (store (s8) into %stack.2 + 1)
+    GBR %bb.14, %1483, 1, implicit-def dead $c
+    BRA %bb.13
+  
+  bb.13 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+  
+    %1033:gpr = LDImm -1
+    BRA %bb.15
+  
+  bb.14 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+  
+    %1033:gpr = LDZ
+    BRA %bb.15
+  
+  bb.15 (%ir-block.2):
+    successors: %bb.17(0x40000000), %bb.16(0x40000000)
+  
+    %974:ac16 = LDAImag16 %80
+    %975:cc = CMPImm16 %974, 32768
+    %974:ac16, dead %976:cc = RORAcc16 %974, %975
+    %1246:imag16 = STAImag16 %974
+    %972:ac16 = LDAImag16 %1246
+    %972:ac16 = EORImm16 %972, 32768
+    %770:imag16 = STAImag16 %972
+    %970:ac16 = LDAImag16 %770
+    %773:cc = CMPImm16 %970, 32768
+    %1099:imag16 = COPY %1095
+    %1100:imag16 = COPY %1099
+    %1101:gpr = COPY %1100.sublo
+    STAbs %1101, %stack.3 :: (store (s8) into %stack.3)
+    %1102:gpr = COPY %1100.subhi
+    STAbs %1102, %stack.3 + 1 :: (store (s8) into %stack.3 + 1)
+    GBR %bb.17, %773, 1, implicit-def dead $c
+    BRA %bb.16
+  
+  bb.16 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+  
+    %1415:imag16 = COPY %1410
+    %1416:imag16 = COPY %1415
+    %1417:gpr = COPY %1416.sublo
+    STAbs %1417, %stack.0 :: (store (s8) into %stack.0)
+    %1418:gpr = COPY %1416.subhi
+    STAbs %1418, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    undef %1194.sublo:imag16 = COPY %1190.sublo
+    %1195:imag16 = COPY %1194
+    %1196:gpr = COPY %1195.sublo
+    STAbs %1196, %stack.10 :: (store (s8) into %stack.10)
+    %1197:gpr = COPY %1195.subhi
+    STAbs %1197, %stack.10 + 1 :: (store (s8) into %stack.10 + 1)
+    %1386:gpr = LDImm -1
+    %1385:anyi8 = COPY %1386
+    BRA %bb.18
+  
+  bb.17 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+  
+    %1411:imag16 = COPY %1410
+    %1412:imag16 = COPY %1411
+    %1413:gpr = COPY %1412.sublo
+    STAbs %1413, %stack.0 :: (store (s8) into %stack.0)
+    %1414:gpr = COPY %1412.subhi
+    STAbs %1414, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    undef %1198.sublo:imag16 = COPY %1190.sublo
+    %1199:imag16 = COPY %1198
+    %1200:gpr = COPY %1199.sublo
+    STAbs %1200, %stack.10 :: (store (s8) into %stack.10)
+    %1201:gpr = COPY %1199.subhi
+    STAbs %1201, %stack.10 + 1 :: (store (s8) into %stack.10 + 1)
+    %1385:anyi8 = LDZ
+    BRA %bb.18
+  
+  bb.18 (%ir-block.2):
+    successors: %bb.48(0x30000000), %bb.19(0x50000000)
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %1033
+    $rc3 = COPY %1033
+    $rc4 = COPY %1243.sublo
+    $rc5 = COPY %1243.subhi
+    $rc6 = COPY %1033
+    $rc7 = COPY %1033
+    $x = COPY %1243.subhi
+    $a = COPY %1243.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    %1399:anyi8 = COPY $a
+    %596:imag8 = COPY $x
+    %1427:anyi8 = COPY $rc2
+    %1404:anyi8 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    %1382:anyi8 = COPY %1385
+    $rc2 = COPY %1382
+    $rc3 = COPY %1382
+    $rc4 = COPY %1246.sublo
+    $rc5 = COPY %1246.subhi
+    $rc6 = COPY %1382
+    $rc7 = COPY %1382
+    $x = COPY %1246.subhi
+    $a = COPY %1246.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    %583:imag8 = COPY $a
+    %1479:anyi8 = COPY $x
+    %585:imag8 = COPY $rc2
+    %586:imag8 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1231:cc = LDImm1 0
+    %1476:anyi8 = COPY %1399
+    %1477:ac = COPY %1476
+    %1477:ac, %567:cc, dead %969:vc = ADCImag8 %1477, %583, %1231
+    %1478:anyi8 = COPY %1477
+    %1480:ac = COPY %1479
+    %1480:ac, %569:cc, dead %968:vc = ADCImag8 %1480, %596, %567
+    %1462:anyi8 = COPY %1480
+    %1428:ac = COPY %1427
+    %1428:ac, %571:cc, dead %967:vc = ADCImag8 %1428, %585, %569
+    %1429:anyi8 = COPY %1428
+    %1405:ac = COPY %1404
+    %1405:ac, dead %573:cc, dead %966:vc = ADCImag8 %1405, %586, %571
+    %1406:anyi8 = COPY %1405
+    %1408:anyi8 = COPY %1478
+    %1147:anyi8 = COPY %1408
+    %1401:anyi8 = COPY %1408
+    %1148:gpr = COPY %1147
+    STAbs %1148, %stack.5 :: (store (s8) into %stack.5)
+    %1424:anyi8 = COPY %1429
+    %1154:anyi8 = COPY %1424
+    %1155:gpr = COPY %1154
+    STAbs %1155, %stack.6 :: (store (s8) into %stack.6)
+    %1403:anyi8 = COPY %1406
+    %1161:anyi8 = COPY %1403
+    %1162:gpr = COPY %1161
+    STAbs %1162, %stack.7 :: (store (s8) into %stack.7)
+    %1460:anyi8 = COPY %1462
+    CmpBrZeroMultiByte %bb.48, 1, %1401, %1462, %1424, %1403, implicit-def dead $c
+    BRA %bb.19
+  
+  bb.19 (%ir-block.27):
+    successors: %bb.21(0x40000000), %bb.20(0x40000000)
+  
+    %1185:anyi8 = COPY %1460
+    %1186:gpr = COPY %1185
+    STAbs %1186, %stack.9 :: (store (s8) into %stack.9)
+    %1421:gpr = LDAbs %stack.0 :: (load (s8) from %stack.0)
+    undef %1420.sublo:imag16 = COPY %1421
+    %1422:gpr = LDAbs %stack.0 + 1 :: (load (s8) from %stack.0 + 1)
+    %1420.subhi:imag16 = COPY %1422
+    %1419:imag16 = COPY %1420
+    %1052:imag16 = COPY %1419
+    %1053:gpr = COPY %1052.sublo
+    STAbs %1053, %stack.0 :: (store (s8) into %stack.0)
+    %1054:gpr = COPY %1052.subhi
+    STAbs %1054, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    %965:ac16 = LDAImag16 %1246
+    %965:ac16 = EORImm16 %965, 32768
+    %784:imag16 = STAImag16 %965
+    %963:ac16 = LDAImag16 %784
+    %787:cc = CMPImm16 %963, 32768
+    %1035:cv_gpr_lsb = LDImm1 0
+    GBR %bb.21, %787, 1, implicit-def dead $c
+    BRA %bb.20
+  
+  bb.20 (%ir-block.27):
+    successors: %bb.21(0x80000000)
+  
+    %1035:cv_gpr_lsb = LDImm1 -1
+    BRA %bb.21
+  
+  bb.21 (%ir-block.27):
+    successors: %bb.23(0x40000000), %bb.22(0x40000000)
+  
+    %1248:imag16 = COPY %1246
+    %1249:imag16 = COPY %1248
+    %1250:gpr = COPY %1249.sublo
+    STAbs %1250, %stack.12 :: (store (s8) into %stack.12)
+    %1251:gpr = COPY %1249.subhi
+    STAbs %1251, %stack.12 + 1 :: (store (s8) into %stack.12 + 1)
+    %1263:ac16 = LDAbs16 %stack.13 :: (load (s16) from %stack.13, align 1)
+    %658:imag16 = STAImag16 %1263
+    %1298:ac16 = LDAbs16 %stack.16 :: (load (s16) from %stack.16, align 1)
+    %612:imag16 = STAImag16 %1298
+    %1227:gpr = LDImm -1
+    %1226:anyi8 = COPY %1227
+    %1218:gpr = LDImm -1
+    GBR %bb.23, %1035, 1, implicit-def dead $c
+    BRA %bb.22
+  
+  bb.22 (%ir-block.27):
+    successors: %bb.23(0x80000000)
+  
+    %1218:gpr = LDZ
+    BRA %bb.23
+  
+  bb.23 (%ir-block.27):
+    successors: %bb.24(0x40000000), %bb.25(0x40000000)
+  
+    STAbs %1218, %stack.11 :: (store (s8) into %stack.11)
+    %1282:imag16 = COPY %1243
+    %1283:imag16 = COPY %1282
+    %1284:gpr = COPY %1283.sublo
+    STAbs %1284, %stack.14 :: (store (s8) into %stack.14)
+    %1285:gpr = COPY %1283.subhi
+    STAbs %1285, %stack.14 + 1 :: (store (s8) into %stack.14 + 1)
+    %962:ac16 = LDAImag16 %1243
+    %962:ac16 = EORImm16 %962, 32768
+    %797:imag16 = STAImag16 %962
+    %960:ac16 = LDAImag16 %797
+    %800:cc = CMPImm16 %960, 32768
+    %1241:gpr = LDImm -1
+    %1240:anyi8 = COPY %1241
+    GBR %bb.24, %800, 1, implicit-def dead $c
+    BRA %bb.25
+  
+  bb.24 (%ir-block.27):
+    successors: %bb.25(0x80000000)
+  
+    %1240:anyi8 = LDZ
+    BRA %bb.25
+  
+  bb.25 (%ir-block.27):
+    successors: %bb.27(0x40000000), %bb.26(0x40000000)
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %658.subhi
+    $rc3 = COPY %658.subhi
+    %1105:gpr = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    undef %1104.sublo:imag16 = COPY %1105
+    %1106:gpr = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    %1104.subhi:imag16 = COPY %1106
+    %1103:imag16 = COPY %1104
+    %1096:imag16 = COPY %1103
+    $rc4 = COPY %1096.sublo
+    $rc5 = COPY %1096.subhi
+    $rc6 = COPY %1143
+    $rc7 = COPY %1143
+    $x = COPY %657.sublo
+    %1176:gpr = LDAbs %stack.8 :: (load (s8) from %stack.8)
+    undef %1175.sublo:imag16 = COPY %1176
+    %1177:gpr = LDAbs %stack.8 + 1 :: (load (s8) from %stack.8 + 1)
+    %1175.subhi:imag16 = COPY %1177
+    %1174:imag16 = COPY %1175
+    $a = COPY %1174.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %1454:anyi8 = COPY $a
+    %551:imag8 = COPY $x
+    %1447:anyi8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %612.subhi
+    $rc3 = COPY %612.subhi
+    %1080:gpr = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    undef %1079.sublo:imag16 = COPY %1080
+    %1081:gpr = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    %1079.subhi:imag16 = COPY %1081
+    %1078:imag16 = COPY %1079
+    %1071:imag16 = COPY %1078
+    $rc4 = COPY %1071.sublo
+    $rc5 = COPY %1071.subhi
+    %1135:gpr = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    %1134:anyi8 = COPY %1135
+    %1124:anyi8 = COPY %1134
+    $rc6 = COPY %1124
+    $rc7 = COPY %1124
+    $x = COPY %611.sublo
+    %1204:gpr = LDAbs %stack.10 :: (load (s8) from %stack.10)
+    undef %1203.sublo:imag16 = COPY %1204
+    %1205:gpr = LDAbs %stack.10 + 1 :: (load (s8) from %stack.10 + 1)
+    %1203.subhi:imag16 = COPY %1205
+    %1202:imag16 = COPY %1203
+    $a = COPY %1202.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %538:imag8 = COPY $a
+    %1481:anyi8 = COPY $x
+    %540:imag8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1232:cc = LDImm1 0
+    %1455:ac = COPY %1454
+    dead %1455:ac, %523:cc, dead %959:vc = ADCImag8 %1455, %538, %1232
+    %1482:ac = COPY %1481
+    %1482:ac, %525:cc, dead %958:vc = ADCImag8 %1482, %551, %523
+    %1264:anyi8 = COPY %1482
+    %1448:ac = COPY %1447
+    %1448:ac, dead %527:cc, dead %957:vc = ADCImag8 %1448, %540, %525
+    %1038:gpr = LDImm -1
+    %1256:anyi8 = COPY %1448
+    CmpBrZero %bb.27, undef $n, 1, %1256, implicit-def dead $c
+    BRA %bb.26
+  
+  bb.26 (%ir-block.27):
+    successors: %bb.27(0x80000000)
+  
+    %1038:gpr = LDZ
+    BRA %bb.27
+  
+  bb.27 (%ir-block.27):
+    successors: %bb.28(0x40000000), %bb.29(0x40000000)
+  
+    %1258:aimag8 = COPY %1256
+    undef %503.sublo:imag16 = COPY %1258
+    %503.subhi:imag16 = COPY %1038
+    %956:ac16 = LDAImag16 %503
+    %956:ac16 = ASLAcc16 %956, implicit-def dead $c
+    %504:imag16 = STAImag16 %956
+    %1280:ac = COPY %504.subhi
+    %493:cc = CMPImm %1280, 128
+    %1291:aimag8 = COPY %1280
+    %1291:aimag8, %493:cc = ROR %1291, %493
+    %1293:gpr = COPY %1291
+    STAbs %1293, %stack.15 :: (store (s8) into %stack.15)
+    %1280:ac, %493:cc = ROR %1280, %493
+    %1279:anyi8 = COPY %1280
+    %1258:aimag8, %493:cc = ROR %1258, %493
+    %1260:anyi8 = COPY %1258
+    %1266:aimag8 = COPY %1264
+    %1266:aimag8, dead %493:cc = ROR %1266, %493
+    %1268:anyi8 = COPY %1266
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %658.subhi
+    $rc3 = COPY %658.subhi
+    %1084:gpr = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    undef %1083.sublo:imag16 = COPY %1084
+    %1085:gpr = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    %1083.subhi:imag16 = COPY %1085
+    %1082:imag16 = COPY %1083
+    %1072:imag16 = COPY %1082
+    $rc4 = COPY %1072.sublo
+    $rc5 = COPY %1072.subhi
+    %1137:gpr = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    %1136:anyi8 = COPY %1137
+    %1125:anyi8 = COPY %1136
+    $rc6 = COPY %1125
+    $rc7 = COPY %1125
+    $x = COPY %657.sublo
+    %1180:gpr = LDAbs %stack.8 :: (load (s8) from %stack.8)
+    undef %1179.sublo:imag16 = COPY %1180
+    %1181:gpr = LDAbs %stack.8 + 1 :: (load (s8) from %stack.8 + 1)
+    %1179.subhi:imag16 = COPY %1181
+    %1178:imag16 = COPY %1179
+    $a = COPY %1178.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %1456:anyi8 = COPY $a
+    %1442:anyi8 = COPY $x
+    %1440:anyi8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %612.subhi
+    $rc3 = COPY %612.subhi
+    %1109:gpr = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    undef %1108.sublo:imag16 = COPY %1109
+    %1110:gpr = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    %1108.subhi:imag16 = COPY %1110
+    %1107:imag16 = COPY %1108
+    %1097:imag16 = COPY %1107
+    $rc4 = COPY %1097.sublo
+    $rc5 = COPY %1097.subhi
+    $rc6 = COPY %1143
+    $rc7 = COPY %1143
+    $x = COPY %611.sublo
+    %1208:gpr = LDAbs %stack.10 :: (load (s8) from %stack.10)
+    undef %1207.sublo:imag16 = COPY %1208
+    %1209:gpr = LDAbs %stack.10 + 1 :: (load (s8) from %stack.10 + 1)
+    %1207.subhi:imag16 = COPY %1209
+    %1206:imag16 = COPY %1207
+    $a = COPY %1206.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %459:imag8 = COPY $a
+    %460:imag8 = COPY $x
+    %461:imag8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1457:gpr = COPY %1456
+    %436:cc = CMPImag8 %1457, %459
+    %1443:ac = COPY %1442
+    %1443:ac, %436:cc, dead %444:vc = SBCImag8 %1443, %460, %436
+    %1444:anyi8 = COPY %1443
+    %1441:ac = COPY %1440
+    %1441:ac, dead %436:cc, dead %438:vc = SBCImag8 %1441, %461, %436
+    undef %46.sublo:imag16 = COPY %1444
+    %46.subhi:imag16 = COPY %1441
+    %952:ac16 = LDAImag16 %46
+    %951:cc = LDImm1 0
+    %952:ac16, dead %953:cc, dead %954:vc = ADCImm16 %952, 65280, %951
+    %48:imag16 = STAImag16 %952
+    %947:ac16 = LDAImag16 %48
+    %948:cc = CMPImm16 %947, 32768
+    %947:ac16, dead %949:cc = RORAcc16 %947, %948
+    %1318:imag16 = STAImag16 %947
+    %945:ac16 = LDAImag16 %1318
+    %945:ac16 = EORImm16 %945, 32768
+    %810:imag16 = STAImag16 %945
+    %943:ac16 = LDAImag16 %810
+    %813:cc = CMPImm16 %943, 32768
+    GBR %bb.28, %813, 1, implicit-def dead $c
+    BRA %bb.29
+  
+  bb.28 (%ir-block.27):
+    successors: %bb.29(0x80000000)
+  
+    %1226:anyi8 = LDZ
+    BRA %bb.29
+  
+  bb.29 (%ir-block.27):
+    successors: %bb.30(0x40000000), %bb.31(0x40000000)
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    %1223:anyi8 = COPY %1226
+    $rc2 = COPY %1223
+    $rc3 = COPY %1223
+    %1288:gpr = LDAbs %stack.14 :: (load (s8) from %stack.14)
+    undef %1287.sublo:imag16 = COPY %1288
+    %1289:gpr = LDAbs %stack.14 + 1 :: (load (s8) from %stack.14 + 1)
+    %1287.subhi:imag16 = COPY %1289
+    %1286:imag16 = COPY %1287
+    %1244:imag16 = COPY %1286
+    $rc4 = COPY %1244.sublo
+    $rc5 = COPY %1244.subhi
+    %1237:anyi8 = COPY %1240
+    $rc6 = COPY %1237
+    $rc7 = COPY %1237
+    $x = COPY %1318.subhi
+    $a = COPY %1318.sublo
+    %1325:imag16 = COPY %1318
+    %1326:imag16 = COPY %1325
+    %1327:gpr = COPY %1326.sublo
+    STAbs %1327, %stack.17 :: (store (s8) into %stack.17)
+    %1328:gpr = COPY %1326.subhi
+    STAbs %1328, %stack.17 + 1 :: (store (s8) into %stack.17 + 1)
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %1377:anyi8 = COPY $a
+    %1430:anyi8 = COPY $x
+    %1436:anyi8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    %1360:anyi8 = COPY %1279
+    %1361:gpr = COPY %1360
+    STAbs %1361, %stack.22 :: (store (s8) into %stack.22)
+    $rc2 = COPY %1360
+    %1295:gpr = LDAbs %stack.15 :: (load (s8) from %stack.15)
+    %1294:anyi8 = COPY %1295
+    %1365:anyi8 = COPY %1294
+    %1366:gpr = COPY %1365
+    STAbs %1366, %stack.15 :: (store (s8) into %stack.15)
+    $rc3 = COPY %1365
+    %1254:gpr = LDAbs %stack.12 :: (load (s8) from %stack.12)
+    undef %1253.sublo:imag16 = COPY %1254
+    %1255:gpr = LDAbs %stack.12 + 1 :: (load (s8) from %stack.12 + 1)
+    %1253.subhi:imag16 = COPY %1255
+    %1252:imag16 = COPY %1253
+    %1247:imag16 = COPY %1252
+    $rc4 = COPY %1247.sublo
+    $rc5 = COPY %1247.subhi
+    %1229:gpr = LDAbs %stack.11 :: (load (s8) from %stack.11)
+    %1228:anyi8 = COPY %1229
+    %1219:anyi8 = COPY %1228
+    $rc6 = COPY %1219
+    $rc7 = COPY %1219
+    %1259:anyi8 = COPY %1260
+    $x = COPY %1259
+    %1370:anyi8 = COPY %1268
+    %1387:gpr = COPY %1370
+    STAbs %1387, %stack.23 :: (store (s8) into %stack.23)
+    $a = COPY %1370
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %390:imag8 = COPY $a
+    %391:imag8 = COPY $x
+    %392:imag8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1233:cc = LDImm1 0
+    %1433:anyi8 = COPY %1377
+    %1434:ac = COPY %1433
+    %1434:ac, %375:cc, dead %942:vc = ADCImag8 %1434, %390, %1233
+    %1435:anyi8 = COPY %1434
+    %1431:ac = COPY %1430
+    %1431:ac, %377:cc, dead %941:vc = ADCImag8 %1431, %391, %375
+    %1432:anyi8 = COPY %1431
+    %1437:ac = COPY %1436
+    %1437:ac, dead %379:cc, dead %940:vc = ADCImag8 %1437, %392, %377
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %1432
+    $rc3 = COPY %1437
+    %1150:gpr = LDAbs %stack.5 :: (load (s8) from %stack.5)
+    %1149:anyi8 = COPY %1150
+    %1146:anyi8 = COPY %1149
+    $rc4 = COPY %1146
+    %1188:gpr = LDAbs %stack.9 :: (load (s8) from %stack.9)
+    %1187:anyi8 = COPY %1188
+    %1184:anyi8 = COPY %1187
+    $rc5 = COPY %1184
+    %1157:gpr = LDAbs %stack.6 :: (load (s8) from %stack.6)
+    %1156:anyi8 = COPY %1157
+    %1153:anyi8 = COPY %1156
+    $rc6 = COPY %1153
+    %1164:gpr = LDAbs %stack.7 :: (load (s8) from %stack.7)
+    %1163:anyi8 = COPY %1164
+    %1160:anyi8 = COPY %1163
+    $rc7 = COPY %1160
+    $x = COPY %1435
+    %1357:anyi8 = LDZ
+    $a = COPY %1357
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    %1353:anyi8 = COPY $a
+    %1354:gpr = COPY %1353
+    STAbs %1354, %stack.21 :: (store (s8) into %stack.21)
+    %1349:anyi8 = COPY $x
+    %1350:gpr = COPY %1349
+    STAbs %1350, %stack.20 :: (store (s8) into %stack.20)
+    %1341:anyi8 = COPY $rc2
+    %1342:gpr = COPY %1341
+    STAbs %1342, %stack.19 :: (store (s8) into %stack.19)
+    %1335:anyi8 = COPY $rc3
+    %1336:gpr = COPY %1335
+    STAbs %1336, %stack.18 :: (store (s8) into %stack.18)
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    %1363:gpr = LDAbs %stack.22 :: (load (s8) from %stack.22)
+    %1362:anyi8 = COPY %1363
+    $rc2 = COPY %1362
+    %1368:gpr = LDAbs %stack.15 :: (load (s8) from %stack.15)
+    %1367:anyi8 = COPY %1368
+    $rc3 = COPY %1367
+    $rc4 = COPY %1244.sublo
+    $rc5 = COPY %1244.subhi
+    $rc6 = COPY %1237
+    $rc7 = COPY %1237
+    $x = COPY %1259
+    %1389:gpr = LDAbs %stack.23 :: (load (s8) from %stack.23)
+    %1388:anyi8 = COPY %1389
+    $a = COPY %1388
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %1371:anyi8 = COPY $a
+    %1396:anyi8 = COPY $x
+    %1390:anyi8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %1223
+    $rc3 = COPY %1223
+    $rc4 = COPY %1247.sublo
+    $rc5 = COPY %1247.subhi
+    $rc6 = COPY %1219
+    $rc7 = COPY %1219
+    %1331:gpr = LDAbs %stack.17 :: (load (s8) from %stack.17)
+    undef %1330.sublo:imag16 = COPY %1331
+    %1332:gpr = LDAbs %stack.17 + 1 :: (load (s8) from %stack.17 + 1)
+    %1330.subhi:imag16 = COPY %1332
+    %1329:imag16 = COPY %1330
+    %1324:imag16 = COPY %1329
+    $x = COPY %1324.subhi
+    $a = COPY %1324.sublo
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    %333:imag8 = COPY $a
+    %334:imag8 = COPY $x
+    %335:imag8 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1212:cc = LDImm1 -1
+    %1393:anyi8 = COPY %1371
+    %1394:ac = COPY %1393
+    %1394:ac, %1212:cc, dead %323:vc = SBCImag8 %1394, %333, %1212
+    %1395:anyi8 = COPY %1394
+    %1397:ac = COPY %1396
+    %1397:ac, %1212:cc, dead %318:vc = SBCImag8 %1397, %334, %1212
+    %1398:anyi8 = COPY %1397
+    %1391:ac = COPY %1390
+    %1391:ac, dead %1212:cc, dead %312:vc = SBCImag8 %1391, %335, %1212
+    %1392:anyi8 = COPY %1391
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY %1398
+    $rc3 = COPY %1392
+    $rc4 = COPY %1146
+    $rc5 = COPY %1184
+    $rc6 = COPY %1153
+    $rc7 = COPY %1160
+    $x = COPY %1395
+    %1358:anyi8 = LDZ
+    $a = COPY %1358
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    %1299:anyi8 = COPY $a
+    %1302:anyi8 = COPY $x
+    %1314:anyi8 = COPY $rc2
+    %1308:anyi8 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %1356:gpr = LDAbs %stack.21 :: (load (s8) from %stack.21)
+    %1355:anyi8 = COPY %1356
+    %1348:gpr = COPY %1355
+    %1269:anyi8 = COPY %1348
+    %247:cc = CMPImm %1348, 1
+    %1352:gpr = LDAbs %stack.20 :: (load (s8) from %stack.20)
+    %1351:anyi8 = COPY %1352
+    %1346:anyi8 = COPY %1351
+    %1305:anyi8 = COPY %1346
+    %241:ac = COPY %1346
+    dead %241:ac, %247:cc, dead %244:vc = SBCImm %241, 2, %247
+    %1344:gpr = LDAbs %stack.19 :: (load (s8) from %stack.19)
+    %1343:anyi8 = COPY %1344
+    %1340:anyi8 = COPY %1343
+    %1320:anyi8 = COPY %1340
+    %246:ac = COPY %1340
+    dead %246:ac, %247:cc, dead %249:vc = SBCImm %246, 0, %247
+    %1338:gpr = LDAbs %stack.18 :: (load (s8) from %stack.18)
+    %1337:anyi8 = COPY %1338
+    %1334:anyi8 = COPY %1337
+    %1311:anyi8 = COPY %1334
+    %1040:ac = COPY %1334
+    %1040:ac, dead %247:cc, %254:vc = SBCImm %1040, 0, %247
+    %1057:gpr = LDAbs %stack.0 :: (load (s8) from %stack.0)
+    undef %1056.sublo:imag16 = COPY %1057
+    %1058:gpr = LDAbs %stack.0 + 1 :: (load (s8) from %stack.0 + 1)
+    %1056.subhi:imag16 = COPY %1058
+    %1055:imag16 = COPY %1056
+    %1050:imag16 = COPY %1055
+    GBR %bb.30, %254, 1, implicit-def dead $c
+    BRA %bb.31
+  
+  bb.30 (%ir-block.27):
+    successors: %bb.32(0x80000000)
+  
+    %1040:ac = EORImm %1040, -128
+    %1088:gpr = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    undef %1087.sublo:imag16 = COPY %1088
+    %1089:gpr = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    %1087.subhi:imag16 = COPY %1089
+    %1086:imag16 = COPY %1087
+    %1073:imag16 = COPY %1086
+    %1113:gpr = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    undef %1112.sublo:imag16 = COPY %1113
+    %1114:gpr = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    %1112.subhi:imag16 = COPY %1114
+    %1111:imag16 = COPY %1112
+    %1098:imag16 = COPY %1111
+    BRA %bb.32
+  
+  bb.31 (%ir-block.27):
+    successors: %bb.32(0x80000000)
+  
+    %1092:gpr = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    undef %1091.sublo:imag16 = COPY %1092
+    %1093:gpr = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    %1091.subhi:imag16 = COPY %1093
+    %1090:imag16 = COPY %1091
+    %1073:imag16 = COPY %1090
+    %1117:gpr = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    undef %1116.sublo:imag16 = COPY %1117
+    %1118:gpr = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    %1116.subhi:imag16 = COPY %1118
+    %1115:imag16 = COPY %1116
+    %1098:imag16 = COPY %1115
+    BRA %bb.32
+  
+  bb.32 (%ir-block.27):
+    successors: %bb.49(0x40000000), %bb.33(0x40000000)
+  
+    %1270:gpr = COPY %1269
+    CmpBrZero %bb.33, undef $n, 1, %1040, implicit-def $c
+  
+  bb.49:
+    successors: %bb.38(0x80000000)
+  
+    %1270:gpr = LDZ
+    %1306:gpr = LDImm 2
+    %1305:anyi8 = COPY %1306
+    BRA %bb.38
+  
+  bb.33 (%ir-block.56):
+    successors: %bb.34(0x40000000), %bb.35(0x40000000)
+  
+    %206:cc = CMPImm %1270, 0
+    %1275:anyi8 = COPY %1305
+    %200:ac = COPY %1275
+    dead %200:ac, %206:cc, dead %203:vc = SBCImm %200, 254, %206
+    %1322:ac = COPY %1320
+    dead %1322:ac, %206:cc, dead %208:vc = SBCImm %1322, 255, %206
+    %1312:ac = COPY %1311
+    %1312:ac, dead %206:cc, %213:vc = SBCImm %1312, 255, %206
+    GBR %bb.34, %213, 1, implicit-def dead $c
+    BRA %bb.35
+  
+  bb.34 (%ir-block.56):
+    successors: %bb.36(0x80000000)
+  
+    %1312:ac = EORImm %1312, -128
+    BRA %bb.36
+  
+  bb.35 (%ir-block.56):
+    successors: %bb.36(0x80000000)
+  
+    BRA %bb.36
+  
+  bb.36 (%ir-block.56):
+    successors: %bb.37(0x40000000), %bb.38(0x40000000)
+  
+    CmpBrZero %bb.38, undef $n, 0, %1312, implicit-def dead $c
+    BRA %bb.37
+  
+  bb.37 (%ir-block.59):
+    successors: %bb.38(0x80000000)
+  
+    %1307:gpr = LDImm -2
+    %1305:anyi8 = COPY %1307
+    %1270:gpr = LDZ
+  
+  bb.38 (%ir-block.60):
+    successors: %bb.39(0x40000000), %bb.40(0x40000000)
+  
+    %1301:gpr = COPY %1299
+    %156:cc = CMPImm %1301, 1
+    %1304:anyi8 = COPY %1302
+    %150:ac = COPY %1304
+    dead %150:ac, %156:cc, dead %153:vc = SBCImm %150, 2, %156
+    %1315:anyi8 = COPY %1314
+    %155:ac = COPY %1315
+    dead %155:ac, %156:cc, dead %158:vc = SBCImm %155, 0, %156
+    %1310:anyi8 = COPY %1308
+    %1044:ac = COPY %1310
+    %1044:ac, dead %156:cc, %163:vc = SBCImm %1044, 0, %156
+    GBR %bb.39, %163, 1, implicit-def dead $c
+    BRA %bb.40
+  
+  bb.39 (%ir-block.60):
+    successors: %bb.41(0x80000000)
+  
+    %1044:ac = EORImm %1044, -128
+    BRA %bb.41
+  
+  bb.40 (%ir-block.60):
+    successors: %bb.41(0x80000000)
+  
+    BRA %bb.41
+  
+  bb.41 (%ir-block.60):
+    successors: %bb.50(0x40000000), %bb.42(0x40000000)
+  
+    undef %66.sublo:imag16 = COPY %1270
+    %66.subhi:imag16 = COPY %1305
+    CmpBrZero %bb.42, undef $n, 1, %1044, implicit-def $c
+  
+  bb.50:
+    successors: %bb.47(0x80000000)
+  
+    %1300:gpr = LDZ
+    %1303:gpr = LDImm 2
+    BRA %bb.47
+  
+  bb.42 (%ir-block.63):
+    successors: %bb.43(0x40000000), %bb.44(0x40000000)
+  
+    %1300:gpr = COPY %1299
+    %115:cc = CMPImm %1300, 0
+    %1303:gpr = COPY %1302
+    %109:ac = COPY %1303
+    dead %109:ac, %115:cc, dead %112:vc = SBCImm %109, 254, %115
+    %1316:ac = COPY %1314
+    dead %1316:ac, %115:cc, dead %117:vc = SBCImm %1316, 255, %115
+    %1309:ac = COPY %1308
+    %1309:ac, dead %115:cc, %122:vc = SBCImm %1309, 255, %115
+    GBR %bb.43, %122, 1, implicit-def dead $c
+    BRA %bb.44
+  
+  bb.43 (%ir-block.63):
+    successors: %bb.45(0x80000000)
+  
+    %1309:ac = EORImm %1309, -128
+    BRA %bb.45
+  
+  bb.44 (%ir-block.63):
+    successors: %bb.45(0x80000000)
+  
+    BRA %bb.45
+  
+  bb.45 (%ir-block.63):
+    successors: %bb.46(0x40000000), %bb.47(0x40000000)
+  
+    CmpBrZero %bb.47, undef $n, 0, %1309, implicit-def dead $c
+    BRA %bb.46
+  
+  bb.46 (%ir-block.66):
+    successors: %bb.47(0x80000000)
+  
+    %1303:gpr = LDImm -2
+    %1300:gpr = LDZ
+  
+  bb.47 (%ir-block.67):
+    successors: %bb.48(0x80000000)
+  
+    undef %70.sublo:imag16 = COPY %1300
+    %70.subhi:imag16 = COPY %1303
+    %937:ac16 = LDAImag16 %1073
+    %1473:cc = LDImm1 -1
+    %937:ac16, dead %938:cc, dead %939:vc = SBCImag16 %937, %66, %1473
+    %71:imag16 = STAImag16 %937
+    %934:ac16 = LDAImag16 %71
+    %1067:gpr = LDAbs %stack.1 :: (load (s8) from %stack.1)
+    undef %1066.sublo:imag16 = COPY %1067
+    %1068:gpr = LDAbs %stack.1 + 1 :: (load (s8) from %stack.1 + 1)
+    %1066.subhi:imag16 = COPY %1068
+    %1065:imag16 = COPY %1066
+    STAIndir16 %934, %1065 :: (store (s16) into %ir.0, align 1, !tbaa !2)
+    %931:ac16 = LDAImag16 %1098
+    %1474:cc = LDImm1 -1
+    %931:ac16, dead %932:cc, dead %933:vc = SBCImag16 %931, %70, %1474
+    %72:imag16 = STAImag16 %931
+    %928:ac16 = LDAImag16 %72
+    STAIndir16 %928, %1050 :: (store (s16) into %ir.1, align 1, !tbaa !2)
+  
+  bb.48 (%ir-block.71):
+    RTS
+...

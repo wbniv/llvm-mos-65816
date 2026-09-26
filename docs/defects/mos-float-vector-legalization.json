@@ -1,0 +1,100 @@
+{
+  "schema": 1,
+  "id": "mos-float-vector-legalization",
+  "title": "MOS float-vector arithmetic and scalarization prerequisites",
+  "status": "fixed",
+  "reproducer_origin": "reconstructed",
+  "summary": "Fixed: vector arithmetic reaches scalar float/double libcalls; generic vector prerequisites are backported at the pinned revision.",
+  "report": "docs/plans/2026-09-25-mos-correctness-queue.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified from session 01a0d7d4-5da2-7fe0-a88c-0137eaa043a7."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/identity.json",
+      "sha256": "faf164f3c59d23931326cd1b64fdcc2feafa81a5088b0c4587743e3789d0df86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/runs.json",
+      "sha256": "d94d5460c0ec8cc762277e7ed2559114079f056e5160dd4f0f3aad042c12aa5c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/lit.log",
+      "sha256": "947237df5bf0aac623d2e6420508c7ea76907a5b9950c80f6f807351553c371b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/vector-prerequisite/identity.json",
+      "sha256": "bc956b635cacccbf406290084c8292033743ec1d3658493789a120f1886e0f27"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/vector-runtime.log",
+      "sha256": "2ba92a17e51675e1c45ee822efe2de75d4709e437ed27bb48e08f26cd06988d9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/vector-snes-split-runtime.log",
+      "sha256": "a06803d331d77c31ec5d97b7bb669561197878ad25b868049e5d8bcb72aa3a5d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/vector-c-matrix.json",
+      "sha256": "523e087f5b5775c7cd586b6fe32efc8047bac09da25b88961dd76782ac1e8fcd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/identity.json",
+      "sha256": "575a4be0dc9e320e132fe243be9e9e7da4267725a51570ac1a9137f315df8fc9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/lit.log",
+      "sha256": "b35c02714a15759f544dc5faa0d7ba056e1c86a25784e7d29513a4a0be8a04d0"
+    }
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mos6502",
+      "optimization": "O2",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-mos-correctness/bin; source reconstruction snapshot alongside bin",
+    "toolchain_sha256": "ccc7e32369eb2983d3f66a31e4749a24ef4e1cfb7a69d1563c0cfa13ef42a58c",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+      "sha256": "04697d5166408f81d342a27294605b844865b9deeae4121138ae378045c4207c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.log",
+      "sha256": "fed1125bf31655e74fc9927c17162a706db97545779cbcfab0a757d9fa38417f"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0049-mos-vector-scalarize-backport.patch and patches/llvm-mos/0050-mos-float-vector-arithmetic.patch",
+    "causal_explanation": "The pin lacked generic vector scalarization, and the floating arithmetic builder accepted only scalar S32/S64. Backport the generic rules and scalarize operand 0 before scalar libcall selection. The intermediate prerequisite-only compiler still fails on G_FADD for the retained direct regression.",
+    "trigger_check": "The same direct float-vector.ll fails on the captured baseline and passes on the candidate, with lane-count libcall checks. All 36 original C-derived IR configurations compile. Runtime compares 96 vector/scalar lanes at O0/O2/Os on mos-sim and executes split float/double tests in three SNES modes.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+      "sha256": "04697d5166408f81d342a27294605b844865b9deeae4121138ae378045c4207c"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mos6502",
+        "optimization": "O2",
+        "verify_machineinstrs": true
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+        "sha256": "04697d5166408f81d342a27294605b844865b9deeae4121138ae378045c4207c"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-float-vector-legalization.log",
+        "sha256": "b58bac1e2e61107d0054b860fc6df925cbd537b54eaec8362de2e3c39b1126ad"
+      },
+      "exit_code": 0
+    }
+  }
+}

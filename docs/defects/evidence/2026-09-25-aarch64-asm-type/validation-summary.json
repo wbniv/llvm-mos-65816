@@ -1,0 +1,20 @@
+{
+  "matrix": {
+    "negative_cases_per_build": 32,
+    "positive_cases_per_build": 4,
+    "builds": [
+      "original baseline",
+      "0057 baseline",
+      "candidate"
+    ],
+    "all_expected_outcomes": 108
+  },
+  "cross_lit": {
+    "PASS": 277,
+    "XFAIL": 4
+  },
+  "cross_command": "build/llvm-mos/bin/llvm-lit -s -j 2 --filter='(?i)(asm|callbr|ls64)' -o docs/defects/evidence/2026-09-25-aarch64-asm-type/cross-lit-results.json /tmp/aarch64-asm-type-lit/test/CodeGen/AArch64 /tmp/aarch64-asm-type-lit/test/CodeGen/ARM /tmp/aarch64-asm-type-lit/test/CodeGen/X86 /tmp/aarch64-asm-type-lit/regression",
+  "scope": "AArch64-only lowering change. Installed MOS-only compiler has no AArch64 backend, so no MOS compiler rebuild or runtime claim applies. Assertion-enabled cross-target candidate retained.",
+  "initial_check_correction": "Initial matrix expectations used vendor diagnostic wording (couldn't); saved upstream uses could not. Compiler outcomes/logs are unchanged; final matrix checks exact upstream wording.",
+  "initial_lit_attempt": "Sandbox multiprocessing startup failed before tests; retry outside sandbox completed."
+}

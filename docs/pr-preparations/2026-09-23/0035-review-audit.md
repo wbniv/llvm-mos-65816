@@ -3,9 +3,10 @@
 September 23, 2026. Reviewed the existing [validation record](0034-0035-validation.md),
 [patch](../../../patches/llvm-mos/0035-clang-prefetch-int16-operands.patch),
 [PR draft](../../upstream-clang-prefetch-int16-pr.md), builtin declaration,
-Sema range checks, CodeGen, and emitted IR. The casts are correct. The analysis
-understates the affected inputs, and the committed regression should cover the
-wider-argument case before submission.
+Sema range checks, CodeGen, and emitted IR. **Follow-up complete September 23:**
+the casts are correct, and Claude's revised test and comments address the audit.
+The exact bundled test now fails on pristine MSP430 and x86-64 and passes on
+both with the fixed frontend. No further code or test revision is requested.
 
 ## Finding: this is not limited to 16-bit `int` targets
 
@@ -39,7 +40,18 @@ types, and remove the contradictory existing `FIXME` asking whether the
 intrinsic operands should be C `int`. The PR draft and tracker now describe
 the broader scope. No implementation change is required by this finding.
 
-## Independent validation
+## Follow-up validation
+
+The current test includes `rw_only`, `long_args`, and `long_long_args`, in addition
+to the existing explicit/default forms. Both RUN lines were replayed against
+both frontends with normal verification enabled. The source comment now describes
+promoted expression types, and the misleading C-`int` FIXME is removed.
+The revised patch SHA-256 is
+`cd11cb8fead15f330464b3a90a22f476501c32435dbd7d0a9f4450b8cb997a9a`.
+Artifacts: `build/review-followups-0033-0037/run-tests.json` and `runs/0035/`.
+The compiler implementation is unchanged; no new full Clang build is claimed.
+
+## Initial independent validation
 
 The patch applies cleanly to pinned source
 `742d554bf08042b8df93d791c335260fadd16643`. Its patched `CGBuiltin.cpp` is
@@ -78,5 +90,5 @@ Artifacts: `build/0035-review-audit/`, including `apply-check/`, `probe.py`,
 - Fixed frontend: `17c93a0c91adcb9fd2f7f95eb90ec35f8342f71f8db1d7667bfd9557c7dc31f2`.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
-reasoning effort) for independent review, expanded frontend validation, and
-corrections to the analysis and submission evidence.
+reasoning effort) for independent review, expanded frontend validation, final
+revision checks, and corrections to the analysis and submission evidence.

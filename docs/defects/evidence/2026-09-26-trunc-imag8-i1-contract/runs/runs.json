@@ -1,0 +1,2116 @@
+{
+  "tools": {
+    "FileCheck": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+      "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d"
+    },
+    "upstream": {
+      "path": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+      "sha256": "d7ecc0c644292f0ac657f1868a0b1756e44c715fbbe4a6761821bd94aab25915",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    },
+    "comparison": {
+      "path": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+      "sha256": "939ab87bd091133be116f3cecb615bd6f8cd16e75a8f91620cbc37e5becbc3f2",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    },
+    "patched": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    }
+  },
+  "runs": [
+    {
+      "name": "upstream-mos6502-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "78fc97ec0b45af59f71764888221c91aa057221662ed85303425cd6451c79cfc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "upstream-mos6502-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "78fc97ec0b45af59f71764888221c91aa057221662ed85303425cd6451c79cfc"
+    },
+    {
+      "name": "upstream-mos6502-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "4d22344bd7e7dadfd34b4b20707b6b62cc7bfc769269a4a8213d694cc37c77dc",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "upstream-mos6502-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "4d22344bd7e7dadfd34b4b20707b6b62cc7bfc769269a4a8213d694cc37c77dc"
+    },
+    {
+      "name": "upstream-mos6502-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "368164a7ca374437d4c62dc9ed6ab42879b1d197700ea84c5c8afaa13570126f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos6502-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "368164a7ca374437d4c62dc9ed6ab42879b1d197700ea84c5c8afaa13570126f"
+    },
+    {
+      "name": "upstream-mos6502-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos6502-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "5cdff649a4d94d21c8ee4224880fbdb704c13853319bf4d0eaf964ef0e24cc61",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mos6502-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "5cdff649a4d94d21c8ee4224880fbdb704c13853319bf4d0eaf964ef0e24cc61"
+    },
+    {
+      "name": "upstream-mos6502-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mos65c02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "916ed1ec9ad0060c84db8922ca4efe7745235a25f0ca8b33aba66823ccf29b6d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "upstream-mos65c02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "916ed1ec9ad0060c84db8922ca4efe7745235a25f0ca8b33aba66823ccf29b6d"
+    },
+    {
+      "name": "upstream-mos65c02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "66ddf5511a7caf548738663e18a4bb8de79d1b31b53bdd260feef593a494630d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "upstream-mos65c02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "66ddf5511a7caf548738663e18a4bb8de79d1b31b53bdd260feef593a494630d"
+    },
+    {
+      "name": "upstream-mos65c02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "28628394bc4147f4f53b4260386c98686caf7659b1b56b2d695d8748252f76fd",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos65c02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "28628394bc4147f4f53b4260386c98686caf7659b1b56b2d695d8748252f76fd"
+    },
+    {
+      "name": "upstream-mos65c02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos65c02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "0450b0de27a543309869356819723b994120563474ca38650aad646c225c87c3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mos65c02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "0450b0de27a543309869356819723b994120563474ca38650aad646c225c87c3"
+    },
+    {
+      "name": "upstream-mos65c02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mos65ce02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "8624bfa2a5a91b80600cb2775a3eedc203b4d7f2fd0c8c1eb960e66a94ff2c35",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "upstream-mos65ce02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "8624bfa2a5a91b80600cb2775a3eedc203b4d7f2fd0c8c1eb960e66a94ff2c35"
+    },
+    {
+      "name": "upstream-mos65ce02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "914f4107e6882c8d4f191cdf159afa42f0cb59615385c69124f246cc1a13ae13",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "upstream-mos65ce02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "914f4107e6882c8d4f191cdf159afa42f0cb59615385c69124f246cc1a13ae13"
+    },
+    {
+      "name": "upstream-mos65ce02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "c791718997024c22bf22ed2e1d551385c52b23b4aaec5310c954c321c470e85b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos65ce02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "c791718997024c22bf22ed2e1d551385c52b23b4aaec5310c954c321c470e85b"
+    },
+    {
+      "name": "upstream-mos65ce02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mos65ce02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "4a955660bcb270d54e236e5787b297380efdaaf6217ef9c86571c5a1cc9198ee",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mos65ce02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "4a955660bcb270d54e236e5787b297380efdaaf6217ef9c86571c5a1cc9198ee"
+    },
+    {
+      "name": "upstream-mos65ce02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mosw65816-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "dfb4d234e66eff621b4fb309b46e7cb9575918720ae933a8ecc2bedabfcb7719",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "upstream-mosw65816-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "dfb4d234e66eff621b4fb309b46e7cb9575918720ae933a8ecc2bedabfcb7719"
+    },
+    {
+      "name": "upstream-mosw65816-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "bf1252c840a6b4325a0eee48c5e0c3324db0a5752ac3d51f98eac93a3ce1a2a3",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "upstream-mosw65816-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "bf1252c840a6b4325a0eee48c5e0c3324db0a5752ac3d51f98eac93a3ce1a2a3"
+    },
+    {
+      "name": "upstream-mosw65816-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "6727e085b84021328d23ad3f90e15cc67d82e05bb6f4661fb04be89e42b6a8f8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mosw65816-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "6727e085b84021328d23ad3f90e15cc67d82e05bb6f4661fb04be89e42b6a8f8"
+    },
+    {
+      "name": "upstream-mosw65816-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "upstream-mosw65816-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "5702898b31e3e5b040b19d2c8cc15190b5df4218eb2bd51c250fa5600bf2ec02",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "upstream-mosw65816-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "5702898b31e3e5b040b19d2c8cc15190b5df4218eb2bd51c250fa5600bf2ec02"
+    },
+    {
+      "name": "upstream-mosw65816-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos6502-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "comparison-mos6502-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838"
+    },
+    {
+      "name": "comparison-mos6502-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "comparison-mos6502-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064"
+    },
+    {
+      "name": "comparison-mos6502-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos6502-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13"
+    },
+    {
+      "name": "comparison-mos6502-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos6502-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos6502-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b"
+    },
+    {
+      "name": "comparison-mos6502-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos65c02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "comparison-mos65c02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c"
+    },
+    {
+      "name": "comparison-mos65c02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "comparison-mos65c02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f"
+    },
+    {
+      "name": "comparison-mos65c02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos65c02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239"
+    },
+    {
+      "name": "comparison-mos65c02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos65c02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos65c02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a"
+    },
+    {
+      "name": "comparison-mos65c02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos65ce02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "comparison-mos65ce02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8"
+    },
+    {
+      "name": "comparison-mos65ce02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "comparison-mos65ce02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b"
+    },
+    {
+      "name": "comparison-mos65ce02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos65ce02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1"
+    },
+    {
+      "name": "comparison-mos65ce02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mos65ce02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mos65ce02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a"
+    },
+    {
+      "name": "comparison-mos65ce02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mosw65816-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "comparison-mosw65816-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce"
+    },
+    {
+      "name": "comparison-mosw65816-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "comparison-mosw65816-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb"
+    },
+    {
+      "name": "comparison-mosw65816-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mosw65816-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e"
+    },
+    {
+      "name": "comparison-mosw65816-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "comparison-mosw65816-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "comparison-mosw65816-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033"
+    },
+    {
+      "name": "comparison-mosw65816-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-trunc-imag8-i1/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos6502-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "patched-mos6502-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838"
+    },
+    {
+      "name": "patched-mos6502-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "patched-mos6502-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064"
+    },
+    {
+      "name": "patched-mos6502-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos6502-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13"
+    },
+    {
+      "name": "patched-mos6502-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos6502-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos6502-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b"
+    },
+    {
+      "name": "patched-mos6502-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos65c02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "patched-mos65c02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c"
+    },
+    {
+      "name": "patched-mos65c02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "patched-mos65c02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f"
+    },
+    {
+      "name": "patched-mos65c02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos65c02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239"
+    },
+    {
+      "name": "patched-mos65c02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos65c02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos65c02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a"
+    },
+    {
+      "name": "patched-mos65c02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos65ce02-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "patched-mos65ce02-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8"
+    },
+    {
+      "name": "patched-mos65ce02-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "patched-mos65ce02-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b"
+    },
+    {
+      "name": "patched-mos65ce02-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos65ce02-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1"
+    },
+    {
+      "name": "patched-mos65ce02-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mos65ce02-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mos65ce02-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a"
+    },
+    {
+      "name": "patched-mos65ce02-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65ce02",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mosw65816-regclasses",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "name": "patched-mosw65816-regclasses-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "input_sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51",
+      "stdin_sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce"
+    },
+    {
+      "name": "patched-mosw65816-direct",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-run-pass=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "input_sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "name": "patched-mosw65816-direct-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb"
+    },
+    {
+      "name": "patched-mosw65816-input",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mosw65816-input-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e"
+    },
+    {
+      "name": "patched-mosw65816-input-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "input_sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "name": "patched-mosw65816-clang-o1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "-stop-after=instruction-select",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "name": "patched-mosw65816-clang-o1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/selected.check"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "test/upstream/trunc-imag8-i1/selected.check",
+      "input_sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041",
+      "stdin_sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033"
+    },
+    {
+      "name": "patched-mosw65816-clang-o1-asm",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O1",
+        "-verify-machineinstrs",
+        "-o",
+        "-",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll"
+      ],
+      "cwd": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "stdout_sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "input": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "input_sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    }
+  ],
+  "failures": [],
+  "compiler_runs": 72,
+  "selection_checks": 48
+}

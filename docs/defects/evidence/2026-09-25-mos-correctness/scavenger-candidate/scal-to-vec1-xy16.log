@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/scal-to-vec1-xy16.s
+exit_code=0

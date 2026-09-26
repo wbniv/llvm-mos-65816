@@ -1,0 +1,37 @@
+$ /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs -mattr=+ls64 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/tied.ll -o /dev/null
+Value type is non-standard value, Other.
+UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/include/llvm/CodeGenTypes/MachineValueType.h:375!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs -mattr=+ls64 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/tied.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/tied.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@tied'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-0041  0x00005ba443fbe25b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-0041  0x00005ba443fbb0e1 llvm::sys::RunSignalHandlers() + 369
+2  llc-0041  0x00005ba443fbf06b
+3  libc.so.6 0x000072dae9845cb0
+4  libc.so.6 0x000072dae98a61ac pthread_kill + 284
+5  libc.so.6 0x000072dae9845b7e gsignal + 30
+6  libc.so.6 0x000072dae98288ec abort + 39
+7  llc-0041  0x00005ba443f19a1f
+8  llc-0041  0x00005ba441cd002a
+9  llc-0041  0x00005ba4422cbb72
+10 llc-0041  0x00005ba443d001cd
+11 llc-0041  0x00005ba443cd1d40 llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&, llvm::BasicBlock const*) + 5024
+12 llc-0041  0x00005ba443cb32e6 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+13 llc-0041  0x00005ba443d88ce5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+14 llc-0041  0x00005ba443d8827a llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6858
+15 llc-0041  0x00005ba443d85541 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+16 llc-0041  0x00005ba443d82bdc llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+17 llc-0041  0x00005ba442c59059 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+18 llc-0041  0x00005ba4431eb840 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+19 llc-0041  0x00005ba4431f3942 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc-0041  0x00005ba4431ec604 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+21 llc-0041  0x00005ba441bbb80b
+22 llc-0041  0x00005ba441bb8ad3 main + 1443
+23 libc.so.6 0x000072dae982a601
+24 libc.so.6 0x000072dae982a718 __libc_start_main + 136
+25 llc-0041  0x00005ba441bb7ce5 _start + 37
+
+exit_code=-6

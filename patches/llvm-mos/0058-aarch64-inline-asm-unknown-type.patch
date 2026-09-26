@@ -1,0 +1,133 @@
+diff --git a/llvm/lib/Target/AArch64/AArch64ISelLowering.cpp b/llvm/lib/Target/AArch64/AArch64ISelLowering.cpp
+--- a/llvm/lib/Target/AArch64/AArch64ISelLowering.cpp
++++ b/llvm/lib/Target/AArch64/AArch64ISelLowering.cpp
+@@ -13508,7 +13508,7 @@
+   if (Constraint.size() == 1) {
+     switch (Constraint[0]) {
+     case 'r':
+-      if (VT.isScalableVector())
++      if (VT == MVT::Other || VT.isScalableVector())
+         return std::make_pair(0U, nullptr);
+       if (Subtarget->hasLS64() && VT.getSizeInBits() == 512)
+         return std::make_pair(0U, &AArch64::GPR64x8ClassRegClass);
+@@ -13539,7 +13539,7 @@
+     // The instructions that this constraint is designed for can
+     // only take 128-bit registers so just use that regclass.
+     case 'x':
+-      if (!Subtarget->hasFPARMv8())
++      if (VT == MVT::Other || !Subtarget->hasFPARMv8())
+         break;
+       if (VT.isScalableVector())
+         return std::make_pair(0U, &AArch64::ZPR_4bRegClass);
+diff --git a/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll b/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll
+@@ -0,0 +1,107 @@
++; RUN: split-file %s %t
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/input-r.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/input-r.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/input-x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-X
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/input-x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-X
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/output-r.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/output-r.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/output-x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-X
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/output-x.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-X
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/tied.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/tied.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/indirect.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/indirect.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/callbr.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/callbr.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=OUTPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/callbr-input.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-R
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/callbr-input.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=INPUT-R
++; RUN: llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/supported.ll -o /dev/null
++; RUN: llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/supported.ll -o /dev/null
++
++; Non-simple operand types have an unknown constraint MVT. Register-class
++; selection must reject them without querying the size of that unknown type.
++; Each rejected form runs alone so an earlier diagnostic cannot hide a failure.
++; INPUT-R: error: {{could not|couldn't}} allocate input reg for constraint 'r'
++; INPUT-X: error: {{could not|couldn't}} allocate input reg for constraint 'x'
++; OUTPUT-R: error: {{could not|couldn't}} allocate output register for constraint 'r'
++; OUTPUT-X: error: {{could not|couldn't}} allocate output register for constraint 'x'
++
++;--- input-r.ll
++define void @input_r(ptr %p) {
++  %v = load i4096, ptr %p
++  call void asm sideeffect "", "r"(i4096 %v)
++  ret void
++}
++
++;--- input-x.ll
++define void @input_x(ptr %p) {
++  %v = load i4096, ptr %p
++  call void asm sideeffect "", "x"(i4096 %v)
++  ret void
++}
++
++;--- output-r.ll
++define void @output_r(ptr %p) {
++  %v = call i4096 asm sideeffect "", "=r"()
++  store i4096 %v, ptr %p
++  ret void
++}
++
++;--- output-x.ll
++define void @output_x(ptr %p) {
++  %v = call i4096 asm sideeffect "", "=x"()
++  store i4096 %v, ptr %p
++  ret void
++}
++
++;--- tied.ll
++define i65 @tied(i65 %v) {
++  %r = call i65 asm sideeffect "", "=r,0"(i65 %v)
++  ret i65 %r
++}
++
++;--- indirect.ll
++define void @indirect(ptr %p) {
++  call void asm sideeffect "", "=*r"(ptr elementtype(i65) %p)
++  ret void
++}
++
++;--- callbr.ll
++define i65 @branch() {
++  %r = callbr i65 asm sideeffect "", "=r,!i"()
++      to label %fallthrough [label %indirect]
++fallthrough:
++  ret i65 %r
++indirect:
++  ret i65 %r
++}
++
++;--- callbr-input.ll
++define i64 @branch_input(i65 %v) {
++  %r = callbr i64 asm sideeffect "", "=r,r,!i"(i65 %v)
++      to label %fallthrough [label %indirect]
++fallthrough:
++  ret i64 %r
++indirect:
++  ret i64 %r
++}
++
++;--- supported.ll
++; Unknown value types remain usable as memory operands, and named register
++; clobbers do not require a value type. Supported r/x operands retain their types.
++define i64 @gpr(i32 %a, i64 %b) {
++  %r = call i64 asm sideeffect "", "=r,r,0,~{x0},~{v0},~{cc}"(i32 %a, i64 %b)
++  ret i64 %r
++}
++
++define <2 x i64> @simd(<2 x i64> %v) {
++  %r = call <2 x i64> asm sideeffect "", "=x,0"(<2 x i64> %v)
++  ret <2 x i64> %r
++}
++
++define void @memory(ptr %p) {
++  %v = load i4096, ptr %p
++  call void asm sideeffect "", "m"(i4096 %v)
++  call void asm sideeffect "", "=*m"(ptr elementtype(i4096) %p)
++  ret void
++}

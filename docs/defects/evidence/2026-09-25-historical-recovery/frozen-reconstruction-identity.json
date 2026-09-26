@@ -1,0 +1,66 @@
+{
+  "description": "Preserved reconstructed fork without patch 0028; not the original August compiler.",
+  "binary": {
+    "path": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028",
+    "sha256": "6a3e0ee8a63d219c21c72de34d8721a240497be2772c939d908680a94a04153c"
+  },
+  "candidate": {
+    "path": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+    "sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421"
+  },
+  "comparison_runs": {
+    "baseline": {
+      "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028 -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16"
+        ],
+        "frontend_optimization": "Os",
+        "backend_optimization": "O2",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "identical retained LLVM IR"
+      },
+      "toolchain_location": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028",
+      "toolchain_sha256": "6a3e0ee8a63d219c21c72de34d8721a240497be2772c939d908680a94a04153c",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+        "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-baseline-frozen.log",
+        "sha256": "bd9b26f91543a161ceb313fe9e7ad1e717d84b217e2497e001602879ee29908f"
+      },
+      "exit_code": -6,
+      "failure_signature": "Using an undefined physical register"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16"
+        ],
+        "frontend_optimization": "Os",
+        "backend_optimization": "O2",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "identical retained LLVM IR"
+      },
+      "toolchain_location": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+        "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-candidate-frozen.log",
+        "sha256": "4c7edc74e05c81d4a956e11c86238a0bea951ba8a98abc4e73c9a9c7cd9a034e"
+      },
+      "exit_code": 0
+    }
+  }
+}

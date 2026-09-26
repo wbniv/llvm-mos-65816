@@ -1,0 +1,17 @@
+{
+  "upstream": {
+    "path": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+    "sha256": "d7ecc0c644292f0ac657f1868a0b1756e44c715fbbe4a6761821bd94aab25915",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+  },
+  "upstream-assert": {
+    "path": "/home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert",
+    "sha256": "21f45c5b1cf7dbd82841995d370ce8b7511cca226c9abd21ea07b3ec934c77b3",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+  },
+  "fork": {
+    "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+    "sha256": "51fabe3cb8e56d11cfb2e0833d772b04c865175ffd26ae3b94fc71ed62c107bb",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+  }
+}

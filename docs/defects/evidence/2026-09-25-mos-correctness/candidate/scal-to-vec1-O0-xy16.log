@@ -1,0 +1,33 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /dev/null
+exit_code=-6
+LLVM ERROR: saveScavengerRegister: cannot preserve a live processor-status register across an unbalanced stack range with no free index register
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1-O0.ll'.
+2.	Running pass 'Prologue/Epilogue Insertion & Frame Finalization' on function '@main'
+ #0 0x000058c0a4cef4e8 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x201d4e8)
+ #1 0x000058c0a4cec7c5 llvm::sys::RunSignalHandlers() (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x201a7c5)
+ #2 0x000058c0a4cf0261 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007fb7c1245cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007fb7c12a61ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007fb7c1245b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007fb7c12288ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000058c0a4c5ce05 llvm::report_fatal_error(llvm::Twine const&, bool) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1f8ae05)
+ #8 0x000058c0a4c5cc46 (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1f8ac46)
+ #9 0x000058c0a37b26c0 llvm::MOSRegisterInfo::saveScavengerRegister(llvm::MachineBasicBlock&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&, llvm::TargetRegisterClass const*, llvm::Register) const MOSRegisterInfo.cpp:0:0
+#10 0x000058c0a3ed9fb4 llvm::RegScavenger::spill(llvm::Register, llvm::TargetRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1207fb4)
+#11 0x000058c0a3eda898 llvm::RegScavenger::scavengeRegisterBackwards(llvm::TargetRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1208898)
+#12 0x000058c0a3edadaf scavengeFrameVirtualRegsInBlock(llvm::MachineRegisterInfo&, llvm::RegScavenger&, llvm::MachineBasicBlock&) RegisterScavenging.cpp:0:0
+#13 0x000058c0a3eda9bb llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x12089bb)
+#14 0x000058c0a3e6a619 (anonymous namespace)::PEIImpl::run(llvm::MachineFunction&) PrologEpilogInserter.cpp:0:0
+#15 0x000058c0a3e6b4c9 (anonymous namespace)::PEILegacy::runOnMachineFunction(llvm::MachineFunction&) PrologEpilogInserter.cpp:0:0
+#16 0x000058c0a3ce8103 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1016103)
+#17 0x000058c0a413e77a llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x146c77a)
+#18 0x000058c0a4144e1c llvm::FPPassManager::runOnModule(llvm::Module&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x1472e1c)
+#19 0x000058c0a413f4a9 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0x146d4a9)
+#20 0x000058c0a379721d compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#21 0x000058c0a3794bb3 main (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0xac2bb3)
+#22 0x00007fb7c122a601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#23 0x00007fb7c122a718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#24 0x000058c0a3790f25 _start (/home/will/llvm-mos-65816/build/llvm-mos/bin/llc+0xabef25)

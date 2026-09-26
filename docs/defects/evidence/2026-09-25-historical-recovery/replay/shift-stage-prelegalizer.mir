@@ -1,0 +1,422 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @bitboard64_probe_result = dso_local global i16 0, align 1
+  @bitboard64_state.0 = internal unnamed_addr global i64 0, align 1
+  @bitboard64_state.1 = internal unnamed_addr global i64 0, align 1
+  @bitboard64_opaque = internal global i64 0, align 8
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, target_mem: none)
+  define dso_local void @bitboard64_probe() local_unnamed_addr #0 {
+    store i64 1, ptr @bitboard64_state.0, align 1, !tbaa !6
+    store i64 1, ptr @bitboard64_state.1, align 1, !tbaa !9
+    %1 = tail call fastcc i16 @bitboard64_step() #4
+    store volatile i16 %1, ptr @bitboard64_probe_result, align 1, !tbaa !2
+    ret void
+  }
+  
+  ; Function Attrs: nofree noinline norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none)
+  define internal fastcc i16 @bitboard64_step() unnamed_addr #1 {
+    %1 = load i64, ptr @bitboard64_state.0, align 1, !tbaa !6
+    %2 = lshr i64 %1, 1
+    %3 = and i64 %2, 9187201950435737471
+    %4 = lshr i64 %1, 2
+    %5 = and i64 %4, 4557430888798830399
+    %6 = shl i64 %1, 1
+    %7 = and i64 %6, -72340172838076674
+    %8 = shl i64 %1, 2
+    %9 = and i64 %8, -217020518514230020
+    %10 = or i64 %3, %7
+    %11 = or i64 %5, %9
+    %12 = shl i64 %10, 16
+    %13 = lshr i64 %10, 16
+    %14 = or i64 %12, %13
+    %15 = shl i64 %11, 8
+    %16 = or i64 %14, %15
+    %17 = lshr i64 %11, 8
+    %18 = or i64 %16, %17
+    %19 = load i64, ptr @bitboard64_state.1, align 1, !tbaa !9
+    %20 = xor i64 %19, -1
+    %21 = and i64 %18, %20
+    store volatile i64 %18, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %22 = load volatile i64, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %23 = tail call range(i64 0, 65) i64 @llvm.ctpop.i64(i64 %22)
+    %24 = icmp eq i64 %21, 0
+    br i1 %24, label %25, label %32
+  
+  25:                                               ; preds = %0
+    %26 = trunc nuw nsw i64 %23 to i8
+    %27 = mul i8 %26, 7
+    %28 = add i8 %27, 43
+    %29 = and i8 %28, 63
+    %30 = zext nneg i8 %29 to i64
+    %31 = shl nuw i64 1, %30
+    br label %32
+  
+  32:                                               ; preds = %25, %0
+    %33 = phi i64 [ %31, %25 ], [ %21, %0 ]
+    %34 = phi i64 [ 0, %25 ], [ %19, %0 ]
+    store volatile i64 %33, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %35 = load volatile i64, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %36 = tail call range(i64 0, 65) i64 @llvm.cttz.i64(i64 %35, i1 true)
+    %37 = trunc nuw nsw i64 %36 to i16
+    %38 = shl nuw i64 1, %36
+    store volatile i64 %38, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %39 = load volatile i64, ptr @bitboard64_opaque, align 8, !tbaa !10
+    %40 = tail call range(i64 0, 65) i64 @llvm.ctlz.i64(i64 %39, i1 true)
+    store i64 %38, ptr @bitboard64_state.0, align 1, !tbaa !6
+    %41 = or i64 %34, %38
+    store i64 %41, ptr @bitboard64_state.1, align 1, !tbaa !9
+    %42 = trunc nuw nsw i64 %23 to i16
+    %43 = shl nuw nsw i16 %42, 8
+    %44 = or disjoint i16 %43, %37
+    %45 = xor i16 %44, 16738
+    %46 = trunc nuw nsw i64 %40 to i16
+    %47 = add nuw nsw i16 %45, %46
+    %48 = trunc i64 %41 to i16
+    %49 = add i16 %47, %48
+    %50 = lshr i64 %41, 32
+    %51 = trunc i64 %50 to i16
+    %52 = add i16 %49, %51
+    ret i16 %52
+  }
+  
+  ; Function Attrs: nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none)
+  declare i64 @llvm.ctpop.i64(i64) #2
+  
+  ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+  declare i64 @llvm.cttz.i64(i64, i1 immarg) #3
+  
+  ; Function Attrs: nocallback nofree nosync nounwind speculatable willreturn memory(none)
+  declare i64 @llvm.ctlz.i64(i64, i1 immarg) #3
+  
+  attributes #0 = { nofree norecurse nounwind optsize memory(readwrite, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #1 = { nofree noinline norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #2 = { nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none) "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+  attributes #3 = { nocallback nofree nosync nounwind speculatable willreturn memory(none) "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+  attributes #4 = { optsize }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!7, !8, i64 0}
+  !7 = !{!"", !8, i64 0, !8, i64 8, !8, i64 16, !4, i64 24, !4, i64 25, !4, i64 26}
+  !8 = !{!"long long", !4, i64 0}
+  !9 = !{!7, !8, i64 8}
+  !10 = !{!8, !8, i64 0}
+...
+---
+name:            bitboard64_probe
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    %0:_(s64) = G_CONSTANT i64 1
+    %1:_(p0) = G_GLOBAL_VALUE @bitboard64_state.0
+    %2:_(p0) = G_GLOBAL_VALUE @bitboard64_state.1
+    %6:_(p0) = G_GLOBAL_VALUE @bitboard64_probe_result
+    G_STORE %0(s64), %1(p0) :: (store (s64) into @bitboard64_state.0, align 1, !tbaa !6)
+    G_STORE %0(s64), %2(p0) :: (store (s64) into @bitboard64_state.1, align 1, !tbaa !9)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @bitboard64_step, mos_csr, implicit-def $a, implicit-def $x
+    %4:_(s8) = COPY $a
+    %5:_(s8) = COPY $x
+    %3:_(s16) = G_MERGE_VALUES %4(s8), %5(s8)
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    G_STORE %3(s16), %6(p0) :: (volatile store (s16) into @bitboard64_probe_result, align 1, !tbaa !2)
+    RTS
+...
+---
+name:            bitboard64_step
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: _, preferred-register: '', flags: [  ] }
+  - { id: 47, class: _, preferred-register: '', flags: [  ] }
+  - { id: 48, class: _, preferred-register: '', flags: [  ] }
+  - { id: 49, class: _, preferred-register: '', flags: [  ] }
+  - { id: 50, class: _, preferred-register: '', flags: [  ] }
+  - { id: 51, class: _, preferred-register: '', flags: [  ] }
+  - { id: 52, class: _, preferred-register: '', flags: [  ] }
+  - { id: 53, class: _, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: _, preferred-register: '', flags: [  ] }
+  - { id: 57, class: _, preferred-register: '', flags: [  ] }
+  - { id: 58, class: _, preferred-register: '', flags: [  ] }
+  - { id: 59, class: _, preferred-register: '', flags: [  ] }
+  - { id: 60, class: _, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: _, preferred-register: '', flags: [  ] }
+  - { id: 64, class: _, preferred-register: '', flags: [  ] }
+  - { id: 65, class: _, preferred-register: '', flags: [  ] }
+  - { id: 66, class: _, preferred-register: '', flags: [  ] }
+  - { id: 67, class: _, preferred-register: '', flags: [  ] }
+  - { id: 68, class: _, preferred-register: '', flags: [  ] }
+  - { id: 69, class: _, preferred-register: '', flags: [  ] }
+  - { id: 70, class: _, preferred-register: '', flags: [  ] }
+  - { id: 71, class: _, preferred-register: '', flags: [  ] }
+  - { id: 72, class: _, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: _, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: _, preferred-register: '', flags: [  ] }
+  - { id: 78, class: _, preferred-register: '', flags: [  ] }
+  - { id: 79, class: _, preferred-register: '', flags: [  ] }
+  - { id: 80, class: _, preferred-register: '', flags: [  ] }
+  - { id: 81, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    successors: %bb.2(0x30000000), %bb.3(0x50000000)
+  
+    %1:_(p0) = G_GLOBAL_VALUE @bitboard64_state.0
+    %2:_(s64) = G_CONSTANT i64 1
+    %4:_(s64) = G_CONSTANT i64 9187201950435737471
+    %6:_(s64) = G_CONSTANT i64 2
+    %8:_(s64) = G_CONSTANT i64 4557430888798830399
+    %11:_(s64) = G_CONSTANT i64 -72340172838076674
+    %14:_(s64) = G_CONSTANT i64 -217020518514230020
+    %18:_(s64) = G_CONSTANT i64 16
+    %22:_(s64) = G_CONSTANT i64 8
+    %28:_(p0) = G_GLOBAL_VALUE @bitboard64_state.1
+    %29:_(s64) = G_CONSTANT i64 -1
+    %32:_(p0) = G_GLOBAL_VALUE @bitboard64_opaque
+    %35:_(s64) = G_CONSTANT i64 0
+    %56:_(s16) = G_CONSTANT i16 8
+    %59:_(s16) = G_CONSTANT i16 16738
+    %65:_(s64) = G_CONSTANT i64 32
+    %0:_(s64) = G_LOAD %1(p0) :: (dereferenceable load (s64) from @bitboard64_state.0, align 1, !tbaa !6)
+    %3:_(s64) = G_LSHR %0, %2(s64)
+    %5:_(s64) = G_AND %3, %4
+    %81:_(s64) = G_CONSTANT i64 1
+    %7:_(s64) = G_LSHR %3, %81(s64)
+    %9:_(s64) = G_AND %7, %8
+    %10:_(s64) = G_SHL %0, %2(s64)
+    %12:_(s64) = G_AND %10, %11
+    %80:_(s64) = G_CONSTANT i64 1
+    %13:_(s64) = G_SHL %10, %80(s64)
+    %15:_(s64) = G_AND %13, %14
+    %16:_(s64) = G_OR %5, %12
+    %17:_(s64) = G_OR %9, %15
+    %19:_(s64) = G_SHL %16, %18(s64)
+    %20:_(s64) = G_LSHR %16, %18(s64)
+    %21:_(s64) = G_OR %19, %20
+    %23:_(s64) = G_SHL %17, %22(s64)
+    %24:_(s64) = G_OR %21, %23
+    %25:_(s64) = G_LSHR %17, %22(s64)
+    %26:_(s64) = G_OR %24, %25
+    %27:_(s64) = G_LOAD %28(p0) :: (dereferenceable load (s64) from @bitboard64_state.1, align 1, !tbaa !9)
+    %30:_(s64) = G_XOR %27, %29
+    %31:_(s64) = G_AND %26, %30
+    G_STORE %26(s64), %32(p0) :: (volatile store (s64) into @bitboard64_opaque, !tbaa !10)
+    %33:_(s64) = G_LOAD %32(p0) :: (volatile dereferenceable load (s64) from @bitboard64_opaque, !tbaa !10)
+    %34:_(s64) = G_CTPOP %33(s64)
+    %36:_(s1) = G_ICMP intpred(ne), %31(s64), %35
+    G_BRCOND %36(s1), %bb.3
+    G_BR %bb.2
+  
+  bb.2 (%ir-block.25):
+    successors: %bb.3(0x80000000)
+  
+    %37:_(s8) = nuw nsw G_TRUNC %34(s64)
+    %73:_(s8) = G_CONSTANT i8 3
+    %74:_(s8) = G_SHL %37, %73(s8)
+    %75:_(s8) = G_SUB %74, %37
+    %76:_(s6) = G_TRUNC %75(s8)
+    %77:_(s6) = G_CONSTANT i6 -21
+    %78:_(s6) = G_ADD %76, %77
+    %44:_(s64) = G_ZEXT %78(s6)
+    %45:_(s64) = nuw G_SHL %2, %44(s64)
+  
+  bb.3 (%ir-block.32):
+    %46:_(s64) = G_PHI %45(s64), %bb.2, %31(s64), %bb.1
+    %47:_(s64) = G_PHI %35(s64), %bb.2, %27(s64), %bb.1
+    G_STORE %46(s64), %32(p0) :: (volatile store (s64) into @bitboard64_opaque, !tbaa !10)
+    %48:_(s64) = G_LOAD %32(p0) :: (volatile dereferenceable load (s64) from @bitboard64_opaque, !tbaa !10)
+    %49:_(s64) = G_CTTZ_ZERO_UNDEF %48(s64)
+    %50:_(s16) = nuw nsw G_TRUNC %49(s64)
+    %51:_(s64) = nuw G_SHL %2, %49(s64)
+    G_STORE %51(s64), %32(p0) :: (volatile store (s64) into @bitboard64_opaque, !tbaa !10)
+    %52:_(s64) = G_LOAD %32(p0) :: (volatile dereferenceable load (s64) from @bitboard64_opaque, !tbaa !10)
+    %53:_(s64) = G_CTLZ_ZERO_UNDEF %52(s64)
+    G_STORE %51(s64), %1(p0) :: (store (s64) into @bitboard64_state.0, align 1, !tbaa !6)
+    %54:_(s64) = G_OR %47, %51
+    G_STORE %54(s64), %28(p0) :: (store (s64) into @bitboard64_state.1, align 1, !tbaa !9)
+    %55:_(s16) = nuw nsw G_TRUNC %34(s64)
+    %57:_(s16) = nuw nsw G_SHL %55, %56(s16)
+    %58:_(s16) = disjoint G_OR %57, %50
+    %60:_(s16) = G_XOR %58, %59
+    %61:_(s16) = nuw nsw G_TRUNC %53(s64)
+    %62:_(s16) = nuw nsw G_ADD %60, %61
+    %63:_(s16) = G_TRUNC %54(s64)
+    %64:_(s16) = G_ADD %62, %63
+    %66:_(s64) = G_LSHR %54, %65(s64)
+    %67:_(s16) = G_TRUNC %66(s64)
+    %68:_(s16) = G_ADD %64, %67
+    %69:_(s8), %70:_(s8) = G_UNMERGE_VALUES %68(s16)
+    $a = COPY %69(s8)
+    $x = COPY %70(s8)
+    RTS implicit $a, implicit $x
+...

@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/forms/callbr-64.ll -o /dev/null
+error: incompatible vector register parts, possible invalid constraint for vector type
+error: inline assembly requires more registers than available
+exit_code=1

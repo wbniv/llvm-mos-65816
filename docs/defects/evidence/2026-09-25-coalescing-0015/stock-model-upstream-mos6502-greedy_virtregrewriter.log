@@ -1,0 +1,51 @@
+$ /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mos6502-greedy_virtregrewriter.out
+
+# After Virtual Register Rewriter
+********** INTERVALS **********
+RegMasks:
+********** MACHINEINSTRS **********
+# Machine code for function undef_lane_identity_copy: NoPHIs, TracksLiveness, NoVRegs, TracksDebugUserValues
+
+0B	bb.0:
+16B	  renamable $x = LDImm 1
+32B	  renamable $rc2 = COPY killed renamable $x
+64B	  renamable $x = COPY renamable $rc2
+80B	  STAbs killed renamable $x, 0
+96B	  renamable $x = COPY killed renamable $rc3
+112B	  STAbs killed renamable $x, 1
+128B	  RTS
+
+# End machine code for function undef_lane_identity_copy.
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    undef_lane_identity_copy
+- basic block: %bb.0  (0x587b46214ec8) [0B;144B)
+- instruction: 96B	renamable $x = COPY killed renamable $rc3
+- operand 1:   killed renamable $rc3
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-upstream-mos6502-greedy_virtregrewriter.out
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir'.
+2.	Running pass 'Verify generated machine code' on function '@undef_lane_identity_copy'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000587b4081c3cb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x0000587b40819625 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x0000587b4081d15b
+3  libc.so.6 0x00007068de645cb0
+4  libc.so.6 0x00007068de6a61ac pthread_kill + 284
+5  libc.so.6 0x00007068de645b7e gsignal + 30
+6  libc.so.6 0x00007068de6288ec abort + 39
+7  llc       0x0000587b40788f05 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x0000587b3f94771d
+9  llc       0x0000587b3f948a19
+10 llc       0x0000587b3f871b52 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 418
+11 llc       0x0000587b3fcae3c0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1088
+12 llc       0x0000587b3fcb448c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+13 llc       0x0000587b3fcaf034 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1972
+14 llc       0x0000587b3f3826ed
+15 llc       0x0000587b3f37fbf3 main + 1331
+16 libc.so.6 0x00007068de62a601
+17 libc.so.6 0x00007068de62a718 __libc_start_main + 136
+18 llc       0x0000587b3f37efe5 _start + 37
+exit_code=-6

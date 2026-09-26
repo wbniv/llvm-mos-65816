@@ -1,0 +1,1095 @@
+{
+  "schema": 1,
+  "id": "mos-trunc-imag8-i1",
+  "title": "Independent Imag8-only rejection hypothesis for i8-to-i1 truncation (0023)",
+  "status": "invalid",
+  "reproducer_origin": "reconstructed",
+  "summary": "The independent claim that an Imag8 source rejects the s8-to-s1 pattern is disproved at vendor pin 8be0546 and saved upstream 742d554: both classes map to Any, and the generated matcher inserts an Ac copy. All 72 compiler runs and 48 selection checks pass. No fix or red baseline is claimed; the unrecovered historical #320 far-pointer observation remains qualified.",
+  "report": "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
+  "attribution": [
+    "OpenAI Codex API (version unknown), GPT-6 (exact model ID and version unknown), reasoning effort unknown.",
+    "2026-09-26 contract audit and disposition: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dafb-5a4b-7562-bec3-0488c07748a1 metadata verified."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/source.c",
+      "sha256": "ddbc6aa98c1df978f6b520ac1dce1a2b95bab94f46b2421339f0dbefd27c1157"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/source.i",
+      "sha256": "ddbc6aa98c1df978f6b520ac1dce1a2b95bab94f46b2421339f0dbefd27c1157"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/clang-o1.ll",
+      "sha256": "f61c753be74aa9400f43dfed0e56e0681fd84b83b7c58df9f65d344a9cb222fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll",
+      "sha256": "30aa11276abbc256547537e39a4d1f3d9339237dc2cebf44c58096861ae2a8ae"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/direct.mir",
+      "sha256": "a873085aa2a1e284bc14dc05e186caad46141a2d0e93cd055d57fe63674473bc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/pre-select.mir",
+      "sha256": "6807dc24f699f2f265c98d9d689627b2de91d8a3dc8ba83bd01fd09fda3e70e5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-selector.cpp.txt",
+      "sha256": "5acb907b79ab94de4d6580b4c246e437f3d6d2797d14da59ce103a790c676b95"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/runs.json",
+      "sha256": "a7919b0f68ae1f419d3f93c919c7fba1d3bb732918efc552cba6eaecb9b9f4ff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-selected.mir",
+      "sha256": "e23c2bc1d8856f3d3b45dd42272a264374458f5ab50d5a5bd206e3aaca86b4fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-selected.mir",
+      "sha256": "018f63e65e829bec6dbae7014191671a4dd7d466a9d752b1530e875b2294692b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-clang-selected.mir",
+      "sha256": "d148e29512658572238108b732d25c14806bf7159f2d2415ee8d53eabad4a80f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-clang-selected.mir",
+      "sha256": "d148e29512658572238108b732d25c14806bf7159f2d2415ee8d53eabad4a80f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/unpatched-direct.mir",
+      "sha256": "fa1ceeae2ae5ae6631b83511a4f01e6179a327bb901554da0e7a2d8d9d6ee408"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-trunc-imag8-i1/candidate-direct.mir",
+      "sha256": "1c08e64c4cecc29f8edbe893d0098f24cd83f0d48c928c2281442f16c42d8e23"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/original-0023.patch.txt",
+      "sha256": "f351ec04f648550e7fa20e1baf2bcc141d9924bc4ad73e6ab88bb8e70e46141e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/prior-record.json",
+      "sha256": "6f1de5e147de242f331e893180d8e851dd99660815bbb9b5a7ae2ca00c0fb42e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/prior-summary-receipts.json",
+      "sha256": "9442fc60c8fc16c211840edc9ea51f56c07b52babd8d7692b13c0462ee0ff159"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/provenance.json",
+      "sha256": "b6edd50a09d68cdafda24633d0c8a826524edb5a9ab1f86d1094f837e116fc64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-clang-o1.stdout",
+      "sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-direct.stdout",
+      "sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-input.stdout",
+      "sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos6502-regclasses.stdout",
+      "sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-clang-o1.stdout",
+      "sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-direct.stdout",
+      "sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-input.stdout",
+      "sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65c02-regclasses.stdout",
+      "sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-clang-o1.stdout",
+      "sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-direct.stdout",
+      "sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-input.stdout",
+      "sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mos65ce02-regclasses.stdout",
+      "sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-clang-o1.stdout",
+      "sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-direct.stdout",
+      "sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-input.stdout",
+      "sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/comparison-mosw65816-regclasses.stdout",
+      "sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-clang-o1.stdout",
+      "sha256": "57acb04f09ef871bbda8686270b4e128d253d7cb08d69295261e9617efd7191b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-direct.stdout",
+      "sha256": "1f35e5dff85811a367115cb8ebe416486fb0bdb297d883e0908f2aba47248064"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-input.stdout",
+      "sha256": "ad7dc1304be856f9a2f122a504cef624130f24775d4d1f9e924993c3068d4d13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos6502-regclasses.stdout",
+      "sha256": "2b29d8ac318bdb36cfefb723d7f7c270046aae4b22c0243bf9d5c56ee08f3838"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-clang-o1.stdout",
+      "sha256": "303bf53f30cb8899e2c986e99b2ee4a7675343e2614916eb13b138d3c07bef1a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-direct.stdout",
+      "sha256": "a4eb753f7698109224c18ab53c891118e4140d859a23a2b14997eba34bb1263f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-input.stdout",
+      "sha256": "cdc1ce1f6b96d10d247b927fd992856d9930fd129324d4a8f6d555fb4184c239"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65c02-regclasses.stdout",
+      "sha256": "fbbd5f0201d88877e1d4b957cbeb868fdd76648019a59011afa6823abbe33d2c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-clang-o1.stdout",
+      "sha256": "6a29b15fae29a741605a5255d3180b0ed87f21287fba2bc71472859c95bf883a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-direct.stdout",
+      "sha256": "711aed2ed335465178c0245c6652b76c73a5622c15c6371e06e99fa91482bb8b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-input.stdout",
+      "sha256": "091fb38f33d1f5ea30c9e41a698d475cb5043552aa55a2671ee2be20c29555f1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mos65ce02-regclasses.stdout",
+      "sha256": "241d73374beb74ef1016c0a60b5a6116ee38d46c7cf6ac2f04a835e982f6ced8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-clang-o1.stdout",
+      "sha256": "35ef093714ec3b4762674edf4f7c94e6d00c8cd0671ffcb0768b03a608b59033"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-direct.stdout",
+      "sha256": "fa533f6d0c499ba8535466c897ef70a6537ac67f14eb9a16635a8b0a2e1614fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-input.stdout",
+      "sha256": "3ec3c3116cf675082b54c754bb2ec004de07674d69e16d58d125a1faf201298e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/patched-mosw65816-regclasses.stdout",
+      "sha256": "dc49f66ba52a3aedda93749d3c2162ba40f69d78060f07323137208a55999fce"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/runs.json",
+      "sha256": "6a8ee14b504ce399ee438a668c7cbbc9b4677c539127300d532edb891fc0bcd1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-clang-o1.stdout",
+      "sha256": "5cdff649a4d94d21c8ee4224880fbdb704c13853319bf4d0eaf964ef0e24cc61"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-direct.stdout",
+      "sha256": "4d22344bd7e7dadfd34b4b20707b6b62cc7bfc769269a4a8213d694cc37c77dc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-input.stdout",
+      "sha256": "368164a7ca374437d4c62dc9ed6ab42879b1d197700ea84c5c8afaa13570126f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos6502-regclasses.stdout",
+      "sha256": "78fc97ec0b45af59f71764888221c91aa057221662ed85303425cd6451c79cfc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-clang-o1.stdout",
+      "sha256": "0450b0de27a543309869356819723b994120563474ca38650aad646c225c87c3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-direct.stdout",
+      "sha256": "66ddf5511a7caf548738663e18a4bb8de79d1b31b53bdd260feef593a494630d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-input.stdout",
+      "sha256": "28628394bc4147f4f53b4260386c98686caf7659b1b56b2d695d8748252f76fd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65c02-regclasses.stdout",
+      "sha256": "916ed1ec9ad0060c84db8922ca4efe7745235a25f0ca8b33aba66823ccf29b6d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-clang-o1.stdout",
+      "sha256": "4a955660bcb270d54e236e5787b297380efdaaf6217ef9c86571c5a1cc9198ee"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-direct.stdout",
+      "sha256": "914f4107e6882c8d4f191cdf159afa42f0cb59615385c69124f246cc1a13ae13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-input.stdout",
+      "sha256": "c791718997024c22bf22ed2e1d551385c52b23b4aaec5310c954c321c470e85b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mos65ce02-regclasses.stdout",
+      "sha256": "8624bfa2a5a91b80600cb2775a3eedc203b4d7f2fd0c8c1eb960e66a94ff2c35"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1-asm.stdout",
+      "sha256": "12b5ce01a148187bf23f14251d66fd9528f18d8c4bf5337e6831f9e6ec81b460"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-clang-o1.stdout",
+      "sha256": "5702898b31e3e5b040b19d2c8cc15190b5df4218eb2bd51c250fa5600bf2ec02"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-direct-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-direct-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-direct.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-direct.stdout",
+      "sha256": "bf1252c840a6b4325a0eee48c5e0c3324db0a5752ac3d51f98eac93a3ce1a2a3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input-asm.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input-asm.stdout",
+      "sha256": "93d48db4c4bd4704aae5c552edc0bb079a27459faaad3c740e14389105a46daf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-input.stdout",
+      "sha256": "6727e085b84021328d23ad3f90e15cc67d82e05bb6f4661fb04be89e42b6a8f8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-regclasses-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-regclasses-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-regclasses.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/runs/upstream-mosw65816-regclasses.stdout",
+      "sha256": "dfb4d234e66eff621b4fb309b46e7cb9575918720ae933a8ecc2bedabfcb7719"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/source-contract.txt",
+      "sha256": "cfd9d4745632f23586dd74a0859b22f9580dc6f4b637e4dedf1493249cc31a69"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/upstream-MOSGenGlobalISel.inc",
+      "sha256": "489d3479ed2b0fd3d2066a7b36ffe5a5fc57eae31e0cb4a2fe662709c0c67426"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/upstream-build-SHA256SUMS.txt",
+      "sha256": "4724e555d9735096c9a8a905571c1c99bfbbc6991c5bf74c8587c270d60555eb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/upstream-build-manifest.json",
+      "sha256": "100a202c15ec3348e713ce4b33569816c3b01bfc721bbe915fde4213740e351c"
+    },
+    {
+      "path": "dev/check-trunc-imag8-i1.py",
+      "sha256": "1fc06a9bf670f14835fe33643b70e8dfa5ebce16400fb45d4b7f2d4e35f9bc99"
+    },
+    {
+      "path": "test/upstream/trunc-imag8-i1/regclasses.mir",
+      "sha256": "ae300670a2a105eced26feeb025c1ca64103b4d9d9d0383284a29d9e3edc8a51"
+    },
+    {
+      "path": "test/upstream/trunc-imag8-i1/selected.check",
+      "sha256": "5909debfd1b25c88a2f552e37233f192f309c5da553b515dcf7c94a20537f041"
+    }
+  ],
+  "unknowns": "The exact historical #320 far-pointer input, failing compiler, diagnostics, and pre-selection MIR remain unavailable. That original observation remains qualified; this invalid disposition does not claim it fixed or invalid. No failing valid input has been recovered for the independent claim.",
+  "scope": "Only the proposed independent Imag8 register-class rejection cause. This disposition does not invalidate the separate original #320 far-pointer observation or the native s32-to-s16 portion of patch 0023.",
+  "invalidation_reason": "The report confuses a register-bank predicate with a register-class intersection test. The retained matcher has only s1/s8 type and Any-bank predicates for this rule, with no CPU or producer condition. MOS maps Imag8, Ac, and one-bit classes to Any. Class incompatibility creates a new Ac register and COPY during instruction constraint rather than rejecting the match. Thus a valid banked Imag8(s8)-to-s1 G_TRUNC cannot fail because its source is Imag8. Source-contract evidence at both recorded revisions establishes the reporting error independently of the passing probes.",
+  "status_history": [
+    {
+      "date": "2026-09-25",
+      "status": "not_reproduced",
+      "record": "docs/defects/evidence/2026-09-26-trunc-imag8-i1-contract/prior-record.json",
+      "report": "docs/investigations/2026-09-25-trunc-0023-upstream-trigger.md"
+    },
+    {
+      "date": "2026-09-26",
+      "status": "invalid",
+      "reason": "Independent Imag8-only rejection cause disproved by matcher and register-bank contract; historical far-pointer scope preserved."
+    }
+  ]
+}

@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/0bf5b688) | docs: require and restore model, version, and effort attribution |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/6065ebec) | fix(mos): finish defect review, near-store fixes, and evidence enforcement |
 
 <!--history-meta v1
+0bf5b688	author	Will Norris
+0bf5b688	added	2
+0bf5b688	deleted	1
+0bf5b688	files	1
+0bf5b688	body	Record the user's standing attribution requirement in AGENTS.md and replace\nCLAUDE.md's hard-coded model credit with a session-verified attribution rule.\nRequire the actual agent/tool version, exact model ID/version, and reasoning\neffort in authored records and commits; mark unavailable details unknown.\n\nCorrect the Codex credits for the review, near-store fixes, older-report\nrechecks, evidence workflow, defect records, and revised PR drafts in\n6065ebec. Retain the recorded original contributors' credits.\n\nAssisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra),\nxhigh reasoning effort. Verified from session\n01a0d69b-5f24-7f10-be74-98413c05de4c and its turn contexts.\n\nValidation: staged evidence checker and whitespace check pass; repository\ncomment-history and SNES display-quality checks run in the commit hook.\n\nCo-Authored-By: OpenAI Codex CLI 0.155.1 (gpt-6-astra, xhigh) <noreply@openai.com>
 6065ebec	author	Will Norris
 6065ebec	added	155
 6065ebec	deleted	0

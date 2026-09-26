@@ -1,0 +1,164 @@
+[
+  {
+    "type": "<64 x i64>",
+    "feature": "",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<64 x i64>",
+    "feature": "-neon",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<64 x i64>",
+    "feature": "+ls64",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<2 x i64>",
+    "feature": "",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed."
+  },
+  {
+    "type": "<2 x i64>",
+    "feature": "-neon",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<2 x i64>",
+    "feature": "+ls64",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed."
+  },
+  {
+    "type": "<4 x i32>",
+    "feature": "",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed."
+  },
+  {
+    "type": "<4 x i32>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x i32>",
+    "feature": "+ls64",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed."
+  },
+  {
+    "type": "<4 x float>",
+    "feature": "",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x float>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x float>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<8 x i64>",
+    "feature": "",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<8 x i64>",
+    "feature": "-neon",
+    "exit": -6,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "type": "<8 x i64>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<8 x i8>",
+    "feature": "",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<8 x i8>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<8 x i8>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x i8>",
+    "feature": "",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x i8>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<4 x i8>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<2 x i8>",
+    "feature": "",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<2 x i8>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<2 x i8>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<1 x i8>",
+    "feature": "",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<1 x i8>",
+    "feature": "-neon",
+    "exit": 0,
+    "diagnostic": ""
+  },
+  {
+    "type": "<1 x i8>",
+    "feature": "+ls64",
+    "exit": 0,
+    "diagnostic": ""
+  }
+]

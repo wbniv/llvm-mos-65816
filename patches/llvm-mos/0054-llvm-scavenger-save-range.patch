@@ -1,0 +1,109 @@
+From: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort
+Subject: [PATCH] Revalidate scavenger save feasibility when extending its range
+
+A target's save strategy can depend on stack balance and scratch-register
+availability. Preserve the last feasible range when an earlier virtual-register
+instruction would make the save invalid.
+
+The MOS regression keeps carry and both index registers live while requiring
+a temporary carry. Its PHP/PLP must remain inside the accumulator push/pull.
+
+diff --git a/llvm/lib/CodeGen/RegisterScavenging.cpp b/llvm/lib/CodeGen/RegisterScavenging.cpp
+--- a/llvm/lib/CodeGen/RegisterScavenging.cpp
++++ b/llvm/lib/CodeGen/RegisterScavenging.cpp
+@@ -163,6 +163,10 @@
+         Used.accumulate(*std::next(From));
+     }
+     if (FoundTo) {
++      MachineBasicBlock::iterator RestorePos = std::next(From);
++      if (RestoreAfter)
++        ++RestorePos;
++
+       // Don't search to FrameSetup instructions if we were searching from
+       // Non-FrameSetup instructions. Otherwise, the spill position may point
+       // before FrameSetup instructions.
+@@ -172,10 +176,6 @@
+
+       if (Survivor == 0 || !Used.available(Survivor)) {
+         MCPhysReg AvilableReg = 0;
+-        MachineBasicBlock::iterator RestorePos = From;
+-        ++RestorePos;
+-        if (RestoreAfter)
+-          ++RestorePos;
+         for (MCPhysReg Reg : AllocationOrder) {
+           if (!MRI.isReserved(Reg) && Used.available(Reg) &&
+               TRI.canSaveScavengerRegister(Reg, Pos, RestorePos)) {
+@@ -197,8 +197,13 @@
+           break;
+         }
+       }
+-      if (FoundVReg)
++      if (FoundVReg && I != Pos) {
++        // Moving the save earlier can cross stack adjustments or require a
++        // different scratch register. Keep the last range the target can save.
++        if (!TRI.canSaveScavengerRegister(Survivor, I, RestorePos))
++          break;
+         Pos = I;
++      }
+       if (I == MBB.begin())
+         break;
+     }
+diff --git a/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir b/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir
+@@ -0,0 +1,54 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
++#
++# Both index registers and carry are live across the temporary carry value.
++# Extending its status save to the preceding virtual-register use would cross
++# PH $a without its matching PL. Keep PHP/PLP inside that balanced range so
++# neither index register is needed to preserve status. The final ADC consumes
++# the original carry; the stored bytes must be 6, 6, 7, 1.
++#
++# CHECK-LABEL: name: status_save_range
++# CHECK: bb.1:
++# CHECK: STAbs killed $y, @scavenged_values + 3
++# CHECK-NEXT: $y = PL
++# CHECK-NEXT: PH $a
++# CHECK-NEXT: PH $p
++# CHECK-NEXT: $c = LDImm1 0
++# CHECK-NEXT: $a, $c, $v = ADCImm $a, 0, $c
++# CHECK-NEXT: $p = PL
++# CHECK-NEXT: $a = PL
++# CHECK-NEXT: $a, dead $c, dead $v = ADCImm $a, 0, $c
++# CHECK-NEXT: STAbs $a, @scavenged_values
++
++--- |
++  target triple = "mos"
++  @scavenged_values = external global [4 x i8]
++  define void @status_save_range() { unreachable }
++...
++---
++name: status_save_range
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    $a = LDImm 5
++    $x = LDImm 6
++    $y = LDImm 7
++    $c = LDImm1 1
++    BRA %bb.1
++
++  bb.1:
++    liveins: $a, $x, $y, $c
++
++    %0:gpr = LDImm 1
++    STAbs %0, @scavenged_values + 3
++    PH $a
++    undef %1.subcarry:pc = LDImm1 0
++    $a, dead %1.subcarry, dead %1.subv = ADCImm $a, 0, %1.subcarry
++    $a = PL
++    $a, dead $c, dead $v = ADCImm $a, 0, $c
++    STAbs $a, @scavenged_values
++    STAbs $x, @scavenged_values + 1
++    STAbs $y, @scavenged_values + 2
++    RTS
++...

@@ -1,0 +1,42 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -DSNES -fno-lto -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-default.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-default.sfc
+ld.lld: error: section '.text' will not fit in region 'rom': overflowed by 5240 bytes
+ld.lld: error: section '.rodata' will not fit in region 'rom': overflowed by 5529 bytes
+ld.lld: error: section '.data' will not fit in region 'rom': overflowed by 5529 bytes
+ld.lld: error: section '.zp.data' will not fit in region 'rom': overflowed by 5529 bytes
+ld.lld: error: section .text virtual address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x11427]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .text load address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x11427]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+exit_code=1
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -DSNES -fno-lto -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-a16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-a16.sfc
+ld.lld: error: section '.text' will not fit in region 'rom': overflowed by 5675 bytes
+ld.lld: error: section '.rodata' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section '.data' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section '.zp.data' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section .text virtual address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x115DA]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .text load address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x115DA]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+exit_code=1
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -DSNES -fno-lto -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-xy16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-xy16.sfc
+ld.lld: error: section '.text' will not fit in region 'rom': overflowed by 5675 bytes
+ld.lld: error: section '.rodata' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section '.data' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section '.zp.data' will not fit in region 'rom': overflowed by 5969 bytes
+ld.lld: error: section .text virtual address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x115DA]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+
+ld.lld: error: section .text load address range overlaps with .snes_header
+>>> .text range is [0x8000, 0x115DA]
+>>> .snes_header range is [0xFFB0, 0xFFDF]
+clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+exit_code=1

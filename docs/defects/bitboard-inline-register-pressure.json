@@ -1,17 +1,18 @@
 {
   "schema": 1,
-  "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+  "report": "docs/investigations/2026-09-25-historical-baseline-recovery.md",
   "attribution": [
     "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
-    "OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra), xhigh reasoning effort: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+    "OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra), xhigh reasoning effort: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck.",
+    "OpenAI Codex CLI 0.146.0 (codex-tui), model gpt-5.6-sol, reasoning effort unknown (saved session setting is null): recovered historical discovery/source/diagnostics; other earlier credits remain preserved.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: source replay, preserved fork baseline, reconstructed patch-0028 comparison, upstream checks, runtime validation, regression runner, and documentation; no new compiler fix authored."
   ],
-  "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
   "id": "bitboard-inline-register-pressure",
   "title": "Undefined registers in inline bitboard operations",
-  "status": "not_reproduced",
+  "status": "fixed",
   "reproducer_origin": "reconstructed",
-  "summary": "Forced-inline bit-count probes, the full demo, and nine additional pressure witnesses verify on the current compiler. This reconstructed input does not establish closure of the original bitboard report.",
-  "unknowns": "The exact historical failing bitboard translation unit and compiler were not recovered. The cause has not been bisected to a fix.",
+  "summary": "The recovered inline-bitboard caller reproduces all four historical undefined-register errors on a reconstructed fork differing only by absence of existing patch 0028. Identical retained IR passes with 0028, and the recovered probe matches the host oracle on a16 and xy16 in bsnes-jg. The same C input passes supported unpatched-upstream configurations.",
+  "unknowns": "The original August binary and crash-preprocessed TU remain unavailable. Closure applies to the recovered trigger and isolated patch-0028 backend mechanism, established with a reconstructed comparison, not a claim to have recovered the exact August toolchain or every register-pressure failure.",
   "observations": [
     {
       "path": "docs/investigations/2026-09-25-older-defect-recheck.tsv",
@@ -20,6 +21,220 @@
     {
       "path": "docs/defects/evidence/2026-09-25-bitboard-runtime.log",
       "sha256": "a087b2cdeb137e83f82b08d1bc04834f106efddfbd9bd1352d6249acb8ec126f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/session-excerpts.jsonl",
+      "sha256": "6a6f51a0b886153e8e40c3a790d9d795b6aed3d8a4bda78285cae70da59d2f13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/provenance.json",
+      "sha256": "82b4c97b2696f85d2bc6feb176046726aad97d999cb78e680e8682c2f6e49a57"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/source-replay-validation.json",
+      "sha256": "182b9e26f213e9ef11522ff8c6a382a4e134589e5aba059b5ecb30769ade0848"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/captured-identity.json",
+      "sha256": "eab0a912e562d9a2cbfbeb4278cf3dd3975bc023a298b92d09bf3da11dad9f26"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/historical-shift-failure.log",
+      "sha256": "d74a1ada39ace0170640931204e93020e674d05676441df9e98884a309d41083"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/historical-bitboard-failure.log",
+      "sha256": "7e4a3db00133389f215218d3286e1ffeeec350914f541169e50f46879d1774f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-runs.json",
+      "sha256": "ca9274ce15a95c994f41d2948a78745b329e0b411a9b704360ea756183e70d8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-container-unavailable.json",
+      "sha256": "7b06c1bdd4c69ff41e4c9ed36f00bff00383c01dc64c46d1cf32fac96a83481e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-unsupported-features.log",
+      "sha256": "f4be7b19fb51d3b726898cd4f4426a3b85104d08a283a53e1a8062377915d7a3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mos6502-compile.log",
+      "sha256": "eb34b7667f036d9d8d092e9228f505d1a0dedc125ccb345470a43b892fa44ab1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mosw65816-compile.log",
+      "sha256": "22f67aae29842f2d72fc90ceb79802883f9dd2a35c7775ef134093adb39d55cd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mos6502-compile.log",
+      "sha256": "66ce97b7ae19bbad4b3e1521ece06f95113cec2177095978982635eb7a93154a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mosw65816-compile.log",
+      "sha256": "2af3df49d5fb8739873d1d3b5adbb8d693fad7e5cf0c3f7ab7782293ef92295e"
+    },
+    {
+      "path": "dev/recheck-historical-bitboard.py",
+      "sha256": "610901eed83a5881934eed393c13d4eedfea94d0221bb8afcbb846c945193b7d"
+    },
+    {
+      "path": "patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch",
+      "sha256": "946d7093460d5d270b145f13d6cd968854c71350f960b581c3b7ea7a3891b878"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c",
+      "sha256": "57973e4105b4f9553ced26cd3cbda2f6301adc9a3b757139a4575c8b0d34d873"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64.h",
+      "sha256": "b4e5353dced05f3b76bf15ebeffd63743819a121722c2a96947a88abf54255da"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i",
+      "sha256": "21ab82dcea2b2af5573ef0c89d0cde41d4b614e3ada78df38d2bc876c36b6832"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage-prelegalizer.mir",
+      "sha256": "5fb8c309f38f48b86c7414895a766369fdea1837cceb15f9fe2ff9a773c65d6e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-reconstructed-greedy.mir",
+      "sha256": "c48261da48b379859d8f60e6a36535c5c7ea1613c58e1696ecf2d646fb7df8a5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-current-greedy.mir",
+      "sha256": "c48261da48b379859d8f60e6a36535c5c7ea1613c58e1696ecf2d646fb7df8a5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-reconstructed-virtregrewriter.mir",
+      "sha256": "df09ed4810621ea8ab50c0a66bbcd51a4d5821a2ea615be1a98c3d69fea111c6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-current-virtregrewriter.mir",
+      "sha256": "abc5fd4f271edcb0905bddbee694772fe4cc2a99079b461960b9134e12d18537"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/reconstruction-build.log",
+      "sha256": "f24a759b8af7d12cc8ad0b215f3af7225ed5d97cb228482a17a8e257d8aaa67d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/reconstruction-identity.json",
+      "sha256": "46579186604e610bd6ff5b784df05322eccd71b0edf36fdc17c77eddb5e83afc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/frozen-reconstruction-identity.json",
+      "sha256": "f3f3c83dc3797b34d525d92da61a9fbcb2680cc13e93ce5248b42abafffd1dc2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/causal-source-check.json",
+      "sha256": "4bbe5bad749e541ebe350254f1870c29d3c79afb5f5ef7bbc57675dbcf936bd8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/mir-comparison.json",
+      "sha256": "24b9b66705a1d4adfd7cdc4fea6490734c5b93d19bc08b866a02da89006ff2b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-probe-runtime.c",
+      "sha256": "d73478ece8ed6d33ca6e5d1daa2b99791f3b47f238e6539ea3bf94faa3ad5e92"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-probe-runtime.log",
+      "sha256": "13b0dc14f08c250f3788cd9d9c9c26c9f5b3f81eb83265faff59a65e9aa006ce"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-probe-runtime.json",
+      "sha256": "2e27dce0126834cf7325afbc94c4bf80c3ddd11fbe03127b105ea68bf406bfc1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/runtime-dependencies.json",
+      "sha256": "013c117ed40f74ee578611ebaa42008bc76593c85546087600bab2cf1ff2a90c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-regression-runner.log",
+      "sha256": "84cdfda8fa1da15813caee619399e9f365301e6ce3595598a45dbaffcb7e6e97"
     }
-  ]
+  ],
+  "previous_recheck": {
+    "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+    "status": "not_reproduced",
+    "toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
+    "summary": "Forced-inline bit-count probes, the full demo, and nine additional pressure witnesses verify on the current compiler. This reconstructed input does not establish closure of the original bitboard report.",
+    "unknowns": "The exact historical failing bitboard translation unit and compiler were not recovered. The cause has not been bisected to a fix."
+  },
+  "current_toolchain_sha256": "3be96813fae5e8ad61a8cdef78e56a7ca6aea21571d21dddc896fb707a6d0d75",
+  "upstream_comparison": {
+    "revision": "742d554bf08042b8df93d791c335260fadd16643",
+    "unpatched": true,
+    "status": "not_reproduced",
+    "configuration": "-Os -fno-lto -mllvm -verify-machineinstrs; mos6502 and default mosw65816",
+    "feature_limit": "+mos-a16 and +mos-xy16 are unsupported and ignored upstream.",
+    "environment": "Saved, checksum-verified compiler executed on host; recorded Docker image unavailable."
+  },
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028 -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "frontend_optimization": "Os",
+      "backend_optimization": "O2",
+      "lto": false,
+      "verify_machineinstrs": true,
+      "input_kind": "identical retained LLVM IR"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028",
+    "toolchain_sha256": "6a3e0ee8a63d219c21c72de34d8721a240497be2772c939d908680a94a04153c",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-baseline-frozen.log",
+      "sha256": "bd9b26f91543a161ceb313fe9e7ad1e717d84b217e2497e001602879ee29908f"
+    },
+    "exit_code": -6,
+    "failure_signature": "Using an undefined physical register"
+  },
+  "resolution": {
+    "change": "Existing patches/llvm-mos/0028-llvm-virtregrewriter-undef-lane-identity-copy.patch (no new compiler implementation change)",
+    "causal_explanation": "Only VirtRegMap.cpp differs between the reconstructed baseline and candidate. Exact patch 0028 transforms the baseline source into the candidate source. Removing identity copies loses destination definitions for source lanes without live values; retaining five KILL instructions preserves those definitions and repairs the four verifier errors. Identical preallocation MIR and identical input IR rule out frontend avoidance.",
+    "trigger_check": "The retained IR contains ctpop.i64, cttz.i64 and ctlz.i64 in bitboard64_step. Baseline reports the same rc13/bb.0, rc2/bb.3, rc2/bb.11 and rc7/bb.10 undefined-register uses as the recovered historical log. The C/backend runner passes; host and a16/xy16 bsnes-jg execution of the recovered probe agree at 0x479E after 480 frames.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16"
+        ],
+        "frontend_optimization": "Os",
+        "backend_optimization": "O2",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "identical retained LLVM IR"
+      },
+      "toolchain_location": "build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+        "sha256": "8fab3d796b0884c6e06af7d76501e16202eede85440def6f904f85c3b62a754f"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/bitboard-candidate-frozen.log",
+        "sha256": "4c7edc74e05c81d4a956e11c86238a0bea951ba8a98abc4e73c9a9c7cd9a034e"
+      },
+      "exit_code": 0
+    }
+  }
 }

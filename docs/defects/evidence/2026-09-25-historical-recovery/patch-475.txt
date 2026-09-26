@@ -1,0 +1,19 @@
+*** Begin Patch
+*** Update File: /home/will/llvm-mos-65816/examples/65816/bitboard64.h
+@@
+ static void bitboard64_reset(void) {
+@@
+ }
++
++static uint64_t bitboard64_onehot(uint8_t n) {
++    uint64_t bit = UINT64_C(1);
++    while (n--) bit <<= 1;
++    return bit;
++}
+@@
+-        uint64_t seed = UINT64_C(1) << (uint8_t)((round * 13u + degree * 7u) & 63u);
++        uint64_t seed = bitboard64_onehot((uint8_t)((round * 13u + degree * 7u) & 63u));
+@@
+-    uint64_t next_bit = UINT64_C(1) << next;
++    uint64_t next_bit = bitboard64_onehot(next);
+*** End Patch

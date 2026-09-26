@@ -1,0 +1,14 @@
+[
+  {
+    "patch": "patches/llvm-mos/0055-mos-native-wide-anyext.patch",
+    "sha256": "d9195b63ff4dab33b7c7ba7550b5322b85de88234f1a0abd299e61ba4ee826f4",
+    "applies_to_preserved_source": true,
+    "matches_vendor": true
+  },
+  {
+    "patch": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "sha256": "5e9371ff0b8657706cb84b4fcaff87ede306f2b7b974f5e661e7afba6ac8d132",
+    "applies_to_preserved_source": true,
+    "matches_vendor": true
+  }
+]

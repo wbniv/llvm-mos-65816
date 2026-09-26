@@ -23,9 +23,11 @@ its live GitHub check.
 - `dev/export-upstream-dashboard.py` generates
   [`docs/upstream-dashboard.json`](../upstream-dashboard.json) from structured
   defect records and [curation](../upstream-dashboard-curation.json). The current
-  export contains 49 work items. It includes only links that exist in the
-  compiler repository's published `HEAD`; some records state that their
-  evidence awaits publication. The site bundles this reviewed export and will
+  export contains 49 work items. It includes links only for evidence present in
+  the Git index, including records staged in the same publication commit;
+  unstaged new evidence remains labeled as awaiting publication. Stage the
+  evidence before regenerating, and publish the source commit with the export.
+  The site bundles this reviewed export and will
   use the remote copy after it is published on the compiler repository's main
   branch.
 - The `v0.0.434` site checkout passed 82 tests, and its production build passed. Desktop

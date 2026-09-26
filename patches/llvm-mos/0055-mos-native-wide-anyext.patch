@@ -1,0 +1,120 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -108,10 +108,10 @@
+   {
+     auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor({{S16, S8}});
+     if (STI.hasAccum16())
+-      B.legalFor({{S32, S16}, {S32, S8}});
+-    // #321 a16: an odd source width (e.g. an s24 the combiner narrows a 20-bit AND to) has no
+-    // s16-lane decomposition; anyext's high bits are don't-care, so route it through zext (via
+-    // legalizeAnyExt), which narrows through bytes and legalizes any width. s1-source stays custom.
++      B.legalFor({{S32, S16}, {S32, S8}})
++          .customFor({{S64, S8}, {S64, S16}, {S64, S32}});
++    // Native-width s64 extensions and sources without a native lane
++    // decomposition lower through ZEXT. ANYEXT permits zero-filled high bits.
+     B.customIf([](const LegalityQuery &Q) {
+        unsigned SrcBits = Q.Types[1].getSizeInBits();
+        return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
+diff --git a/llvm/test/CodeGen/MOS/anyext-wide.mir b/llvm/test/CodeGen/MOS/anyext-wide.mir
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/anyext-wide.mir
+@@ -0,0 +1,79 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++
++# Wide extensions preserve the source bytes. A shift libcall consumes the low
++# count byte, while a store consumes all bytes of the extended value.
++---
++name: anyext_shift
++body: |
++  bb.0:
++    liveins: $a
++    ; CHECK-LABEL: name: anyext_shift
++    ; CHECK: [[COUNT:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: $rc8 = COPY [[COUNT]](s8)
++    ; CHECK-NEXT: JSR &__ashldi3
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s64) = G_ANYEXT %0
++    %2:_(s64) = G_CONSTANT i64 1
++    %3:_(s64) = G_SHL %2, %1
++    %4:_(p0) = G_CONSTANT i16 512
++    G_STORE %3, %4 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s8_s64_store
++body: |
++  bb.0:
++    liveins: $a
++    ; CHECK-LABEL: name: anyext_s8_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s64) = G_ANYEXT %0
++    %2:_(p0) = G_CONSTANT i16 512
++    G_STORE %1, %2 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s16_s64_store
++body: |
++  bb.0:
++    liveins: $a, $x
++    ; CHECK-LABEL: name: anyext_s16_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: [[HI:%[0-9]+]]:_(s8) = COPY $x
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS [[HI]](s8), 513
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s8) = COPY $x
++    %2:_(s16) = G_MERGE_VALUES %0, %1
++    %3:_(s64) = G_ANYEXT %2
++    %4:_(p0) = G_CONSTANT i16 512
++    G_STORE %3, %4 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s32_s64_store
++body: |
++  bb.0:
++    liveins: $a, $x, $rc2, $rc3
++    ; CHECK-LABEL: name: anyext_s32_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: [[HI:%[0-9]+]]:_(s8) = COPY $rc3
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS [[HI]](s8), 515
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s8) = COPY $x
++    %2:_(s8) = COPY $rc2
++    %3:_(s8) = COPY $rc3
++    %4:_(s32) = G_MERGE_VALUES %0, %1, %2, %3
++    %5:_(s64) = G_ANYEXT %4
++    %6:_(p0) = G_CONSTANT i16 512
++    G_STORE %5, %6 :: (volatile store (s64))
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/anyext-masked-byte.ll b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
+@@ -0,0 +1,13 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs %s -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %s -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %s -o /dev/null
++
++; Legalizing the masked byte store can introduce G_ANYEXT s8 -> s64. The
++; extension must lower even when native-width lanes are enabled.
++define void @extend_masked(ptr %out, i8 %value) {
++  %scaled = mul i8 %value, 7
++  %masked = and i8 %scaled, 63
++  %extended = zext i8 %masked to i64
++  store volatile i64 %extended, ptr %out, align 1
++  ret void
++}

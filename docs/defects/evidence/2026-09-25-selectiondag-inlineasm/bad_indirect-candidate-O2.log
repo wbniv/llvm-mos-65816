@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll -o /dev/null
+error: register 'NZCV' allocated for constraint '{cc}' does not match required type
+
+exit_code=1

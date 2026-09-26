@@ -1,0 +1,15 @@
+$ cc -O2 -DHOST_MAIN /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/inline-stage/examples/65816/bitboard64-probe.c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/bitboard-probe-runtime.c -o /home/will/llvm-mos-65816/build/historical-bitboard-runtime/host
+
+exit_code=0
+$ /home/will/llvm-mos-65816/build/historical-bitboard-runtime/host
+0x479E
+
+exit_code=0
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -filetype=obj /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /home/will/llvm-mos-65816/build/historical-bitboard-runtime/a16.o
+
+exit_code=0
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -fno-lto /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/bitboard-probe-runtime.c /home/will/llvm-mos-65816/build/historical-bitboard-runtime/a16.o -Wl,-Map=/home/will/llvm-mos-65816/build/historical-bitboard-runtime/a16.map -o /home/will/llvm-mos-65816/build/historical-bitboard-runtime/a16.sfc
+clang: error: unable to execute command: posix_spawn failed: No such file or directory
+clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+exit_code=1

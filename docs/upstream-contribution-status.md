@@ -1,5 +1,10 @@
 # Upstream contribution status — PR progress and submission queue
 
+The [live upstream dashboard](https://wald3n.com/open-source#compiler-upstream)
+shows current GitHub PR state alongside a separately dated, reviewed local-work
+manifest. The GitHub counts below are a 2026-09-25 snapshot; use the dashboard
+for newer remote state and this tracker for submission evidence and history.
+
 **September 26 local revalidation:** the [original far-memset report](defects/mos-far-memset-wrong-bank.json)
 is fixed by existing `a81874d` / 0013. Identical IR fails without its backend
 routing and passes with it, including all 4096 physical WRAM bytes. This updates
@@ -61,6 +66,66 @@ gh pr create --repo llvm-mos/llvm-mos \
 **Pending work, SNES dependencies and issue readiness:**
 [chart and flowchart](upstream-pending-work.md). This view supersedes historical
 queue labels when judging what can be posted next.
+
+**September 25 local correctness follow-up:** `0050`–`0052` repair floating-vector
+arithmetic, byte-index truncation, and section-offset bank relaxation; `0049`
+supplies the vector prerequisites at this pin, and `0053` updates test expectations.
+`0054` repairs status-save range validation. [Evidence](plans/2026-09-25-mos-correctness-queue.md).
+`0055` repairs native-width narrow-count shift legalization, while `0056` and
+`0057` repair the separate GlobalISel and SelectionDAG inline-asm register bounds.
+These are locally validated fixes, not posted PRs. Installed Clang and LLD are
+refreshed. [Shift/GlobalISel evidence](investigations/2026-09-25-shift-inlineasm-fixes.md)
+and [SelectionDAG evidence and subsequent type-handling findings](investigations/2026-09-25-selectiondag-inlineasm.md)
+retain the qualified upstream-baseline comparisons.
+The [AArch64 unknown-type abort](investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)
+is fixed by `0058`: 32 diagnostic cases and 277 cross-target tests pass, with four
+existing expected failures. Its full regression requires `0057`'s `callbr` recovery.
+The tested AArch64 compiler is retained separately; the installed MOS-only compiler
+does not include that backend.
+The [vector conversion assertions](investigations/2026-09-25-selectiondag-vector-parts.md)
+are fixed by `0059`: 30 crashing configurations now diagnose, supported vector
+conversions remain accepted, and the suites report 278 cross-target and 173 MOS
+passes. The original input requires 0057's virtual-allocation repair. MOS Clang
+and LLD are rebuilt and installed with the generic change. Patches 0058 and 0059
+still need submission preparation and independent review.
+
+The [65816 exhaustive opcode roundtrip plan](plans/2026-09-25-65816-all-opcode-roundtrip.md)
+is written; implementation is deferred at the user's request. It specifies
+1,024 opcode/context cases, independent expected bytes, and instruction-boundary
+checks. Its BRK signature-policy question is an investigation item, not a newly
+validated compiler defect or a submitted contribution.
+
+The [0015 revalidation](investigations/2026-09-25-coalescing-0015-revalidation.md) connects the
+recovered coalescing witness to existing fix 0028. Its separate allocator diagnosis
+is superseded for that witness. The [parallel MIR reducer crash](defects/llvm-reduce-parallel-mir-crash.json)
+captured during the investigation is [fixed locally](investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
+by patch 0060 with matching-input evidence. Published-upstream applicability
+remains to be assessed.
+
+The [0023 contract audit](investigations/2026-09-26-trunc-imag8-i1-contract.md)
+disproves the independent Imag8-only rejection diagnosis: the matcher accepts
+the shared register bank and inserts an Ac copy. All 72 compiler runs and 48
+selection checks pass, including saved unpatched upstream. No compiler fix or
+red baseline is claimed. Retain the patch and tests with the feature series;
+the original far-pointer observation still lacks its failing input and compiler.
+
+Three compiler optimizations now have separate local patches and tests:
+[0061 far-global `long,X`](../patches/llvm-mos/0061-mos-far-global-long-x.patch),
+[0062 native 16-bit far loads/stores](../patches/llvm-mos/0062-mos-native-far-word.patch),
+and [0063 near stores shared with unit arithmetic](../patches/llvm-mos/0063-mos-near-shared-store.patch).
+They apply in that order and reproduce the tested vendor source. The MOS lit suite
+reported 175 passes and two unsupported tests; far-index, far-bank, and A16-store
+gates passed on MAME and bsnes-jg. Each is implemented locally and unposted.
+The [pending-work chart](upstream-pending-work.md#chart--other-pending-work)
+tracks its separate submission and compiler prerequisites.
+
+The [HTML overview](mos-upstream-status-2026-09-21.html) keeps its original filename
+for existing bookmarks. Regenerate it and the [zoomable flowchart](mos-upstream-flowchart.html)
+with `python3 dev/docs-deps.py --refresh`; run `python3 dev/docs-deps.py` to detect
+stale dependencies. The [document inventory](document-dependencies.md) covers the
+rest of the documentation too. This refresh reads the dated GitHub snapshot above; it does not
+perform a new remote-status check. Synchronization and rendering: OpenAI Codex
+CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
 
 **Local preparation updated September 23:** independent reviews and audits are recorded
 for 0011 and 0029–0037, including the 0033/0035 revision follow-ups. The [0033 audit](pr-preparations/2026-09-23/0033-review-audit.md)
@@ -367,7 +432,7 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
   [live compiler product page](https://indri.studio/apps/llvm-mos-65816/#upstream-contributions);
   website deployment and live entry verified September 20.
 - The rotate-Ac RA companion was withdrawn September 14 after #578's root cause was identified.
-- `0011` now has a stock-`mos6502` `-O0` upstream producer (gcc torture `strlen-4.c`; [record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md)) and an upstream-runnable test; ready to post. `0015` still requires upstream producer/reachability review.
+- `0011` now has a stock-`mos6502` `-O0` upstream producer (gcc torture `strlen-4.c`; [record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md)) and an upstream-runnable test; ready to post. `0015` has been [revalidated](investigations/2026-09-25-coalescing-0015-revalidation.md): the recovered witness is repaired by existing 0028; stock MIR reproduces, while stock C reachability remains unproven.
   `0012` is retired and must not be posted.
 - Design notes and the #320/#321 feature series retain their existing ABI/review prerequisites.
   Posting new items remains user-triggered; retain fork branches under the standing policy.
@@ -387,7 +452,7 @@ reviewer-facing slice — just the **bug-fix PRs** that touch the patch stack �
 | 9 | **coalesce-rotate-Ac** — silent miscompile: rotate value coalesced into A-only `Ac` | **issue + fix PR** | Default-8bit miscompile (no `+mos-a16`): the register coalescer merges two shift/rotate-referenced values into the A-only `Ac` class, stranding a loop-carried CRC byte in `Y` while the back-edge `ROL` reads a stale `A` (inlined CRC16 bit loop under pressure). Both `-verify-machineinstrs`/`-verify-coalescing` clean. **Fix** = `MOSRegisterInfo::shouldCoalesce` refuses the join (`NewRC==Ac` ∧ both operands rotate-referenced) + a `-run-pass=register-coalescer` lit test; carried as fork patch `0010`, validated (repro `0xE60E`→`0xF56C`, corpus 7/7, torture 30/30, csmith 54/60 0-mismatch). ✅ **POSTED 2026-07-26** (PR only — the miscompile narrative lives in the PR body); **v2 2026-07-31** (critique pass): + `coalesce-rotate-ac-no-pessimize.ll`, body scope/root-cause section, companion RA issue drafted (row 16). **mysterymath 2026‑08‑22: "papering over a bug elsewhere… we really should get to the bottom of why."** **REDIAGNOSED + REVISION PUBLISHED 2026‑09‑14** with Will's approval (the [2026‑09‑13 bundle](pr-revisions/2026-09-13/README.md)): the coalescer and greedy RA were correct; the defect is `MOSCopyOpt`'s single post-order live-in recompute after copy forwarding leaves A off the latch live-ins, so `mos-late-opt` treats A as scratch. Fix = `fullyRecomputeLiveIns` before dead-copy cleanup; the `shouldCoalesce` guard and both its tests are **removed**. Branch fast-forwarded `edc9bbd23b71` → `b4749221bf37`; title now "Recompute loop liveness after copy forwarding"; body replaced (includes the measured compile-time cost: +0.8 % instructions corpus-wide, worst +2.4 %). Pre-publish review + red/green + runtime CRC in [validation.md](pr-revisions/2026-09-13/validation.md). [Reply posted](https://github.com/llvm-mos/llvm-mos/pull/578#issuecomment-5660390141) conceding his point and giving the mechanism in one paragraph. **Fork: landed 2026‑09‑14** ([plan](plans/2026-09-14-fork-patch-followups.md)) — `0010` now carries the published `MOSCopyOpt` fix + `copy-opt-loop.mir`/`copy-opt-chain.mir` and is applied by `dev/toolchain.sh` after `0002` (the `0003`/`0022` lifecycle); the `shouldCoalesce` guard is gone from `0002`; row 16 is obsolete (below). | [PR body](upstream-coalesce-rotate-ac-pr.md) (mirror of the published `578-body.md`) · patch `patches/llvm-mos/0010-coalesce-rotate-ac.patch` | [**PR #578**](https://github.com/llvm-mos/llvm-mos/pull/578) (`wbniv:mos-coalesce-rotate-ac` @ `b4749221bf37`) |
 | 10 | ⛔ **RETIRED — DO NOT POST (user decision 2026-08-05)** — **`LDCImm` set lowering** | ~~fix PR~~ | `MOSMCInstLower` accepts the canonical carry-set encoding `-1`; no current upstream producer emits `LDCImm 1`. The former downstream a16 producer was corrected by `0027` (`357fe37`) to emit canonical `-1`, leaving the proposed baseline MIR test to manufacture an otherwise unreachable state. Accepting every nonzero immediate would also weaken the existing producer invariant. Assertions red/green evidence remains useful as investigation history, but it does not justify an upstream change without a real producer. | [retired investigation/PR draft](upstream-ldcimm-set-lowering-pr.md) · historical fork patch `patches/llvm-mos/0012-mos-ldcimm-set-lowering.patch` | **never pushed or posted; removed from submission queue** |
 | 11 | ⛔ **RETRACTED — MISDIAGNOSIS (do NOT post)** — "LTO + `+mos-a16` bitmask-loop early exit" | ~~issue~~ | **Disproven 2026-06-28** by a controlled rebuild experiment ([plan](plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md)). The `cmp #$10` is the loop's `q->n < UPQ_MAX_JOBS` guard (`UPQ_MAX_JOBS=16=0x10`), **not** the shift counter `r`: overriding `-DUPQ_MAX_JOBS=20` moves the constant to `cmp #$14` (tracks the macro). The `jmp rts` is the correct per-vblank DMA-budget exit (≤16 jobs/frame; 28 rows over 2 frames); the real `r<28` bound `cpy #$1c` is present. No row-skip miscompile exists. The original demo stall is a *separate, unverified* question (possible 32-bit `==0` LTO miscompile or frame ordering) → would need a **fresh, correctly-characterized** issue, not this one. | [issue body (banner-retracted)](321-upstream-lto-a16-bitmask-loop-early-exit-issue.md) | n/a — not to be posted |
-| 12 | **coalesce-rc-undef** — verifier reject: call-clobbered `$rcN` value coalesced into a pair across the clobber | **fix PR** | `+mos-a16`/`+mos-xy16` under pressure: the register coalescer folds a value read straight out of a call-clobbered imaginary register (`vreg = COPY $rcN`) into an `Imag16` pair (sub-register copy) that outlives the clobbering call → the allocator re-binds the pair to `$rcN` across the clobber → disconnected `$x = COPY $rcN` def→use (`-verify-machineinstrs`: "Using an undefined physical register"; runs correctly, latent hazard). **Fix** = `MOSRegisterInfo::shouldCoalesce` refuses the join (`NewRC==Imag16` ∧ sub-register ∧ an operand's unique def is `COPY $rcN` live across a call clobbering `$rcN` via `checkRegMaskInterference`) + a `-run-pass=register-coalescer` lit test. Correctness-safe by construction; 4/34 corpus programs change (all `-verify` clean + differential green), 30 byte-identical. Validated: newton `0x4D8B` unchanged (MAME+bsnes-jg), `rcundef.c`+`newton_step` verify clean `-O0/-O1/-Os` a16+xy16. **Mint-ready:** the self-contained change (cpp + lit test) is `patches/llvm-mos/0015-321-coalesce-rc-undef.patch`, **verified `git apply --check` clean against pristine `c798c3141`** (the `0010` model); it also lands in the comprehensive fork patch `0002` for the live build. **Scope:** a second, distinct cause (RA binding a *pure-virtual* value to a clobbered `$rc` pair — lsystem/newton-`-O1`, item 13) is NOT fixed by this guard. | [PR body + mint cmd](upstream-coalesce-rc-undef-pr.md) · patch `patches/llvm-mos/0015-321-coalesce-rc-undef.patch` (clean vs pristine) | not yet pushed (`wbniv:mos-coalesce-rc-undef` to mint) |
+| 12 | **0015 coalescing guard — revalidated 2026-09-25** | **Historical workaround; route recovered witness through 0028** | A reconstructed 2×2 comparison reproduces the retained C witness only without both 0015 and 0028. Adding 0028 retains three required KILL pseudos with unchanged allocations. The original separate allocator/regmask diagnosis is superseded for this witness. Stock MIR reproduces on saved unpatched upstream; naturally generated stock C reachability remains unproven. Guard and historical evidence retained. | [Evidence and attribution](investigations/2026-09-25-coalescing-0015-revalidation.md) · [record](defects/mos-coalescing-rc-undef.json) | **Do not post the old standalone diagnosis; follow 0028's prerequisites** |
 | 14 | ⚠️ **RECLASSIFIED 2026-07-26 — NOT a postable artifact; dissolves into the #321 series** — a16 s64↔s16 (un)merge + odd-width `G_ANYEXT` | ~~fix PR~~ **series content** | `+mos-a16`/`+mos-xy16` abort (default 8-bit OK): 64-bit arithmetic emits `G_UNMERGE_VALUES {S16,S64}` (split s64 into 16-bit lanes) and, for a mask-narrowed value, `G_ANYEXT {S32,S24}` — neither had a legalizer rule (the #321 fork added s32↔s16/s8 glue but not the s64 level). **Fix** = add the s64↔s16 (un)merge glue mirroring the s32 handlers (`legalizeMergeS64FromWords`/`legalizeUnmergeS64ToWords`, 2-level `s64↔2×s32↔4×s16`) + route odd-width `G_ANYEXT` through `G_ZEXT` (don't-care high bits); all `hasAccum16()`-gated. Found by SNES demo #61 (DH 64-bit modexp). Validated: repro + demo compile, **62 corpus slices 0 regressions**, 64-bit demos differential-green, `-verify` clean. Carried as fork patch `0017` (round-trip vs pristine `c798c3141`). | [investigation + repro](investigations/2026-06-30-a16-s64-unmerge-anyext-legalize-crash.md) · patch file kept as **provenance only** (content folded into `0002` 2026-07-26) | n/a — completes OUR OWN a16 legalizer glue ("the #321 fork added s32↔s16/s8 glue but not the s64 level"), so upstream must only ever see the finished feature; same class as `0009`/`0014`/the zp-alloc Imag32 fix |
 | 13 | **Undefined Imag16 lane after RA** | investigation + fix needed | Fork `rcundef2.c` still fails at `-Os +mos-a16` (2026-09-20). Some witnesses have a live store, not only dead reads. Latest analysis suspects LiveIntervals/subrange propagation; generic LLVM responsibility and stock-upstream reproduction remain unproven. | [Focused report and history](upstream-rc-undef-ra-pure-virtual-issue.md) | unposted; reduce/diagnose before a fix PR |
 | 15 | ✅ **POSTED 2026-07-31** — **late-opt non-GPR LDImm** — `mos-late-opt` null-pointer crash on an SPC700 `LDImm` to an imaginary register | **fix PR** | Upstream hard crash from 7 lines of plain C at `-O1`+: `combineLdImm` switches its `ImmLoad*` over `{A,X,Y}` then stores through it unconditionally, but on SPC700 `MOSInstrInfo::getRegClass` widens `LDImm`'s destination to `Anyi8`, so `$rcN = LDImm imm` is legal, verifier-clean MIR → null store. **Fix** = GPR-class guard + defensive invalidation of any modified tracked GPR (`7eedb14`), + sibling `TA`-handler hardening from the 2026-07-31 critique pass (`3ce98fe`); `late-opt-spc700.mir` red/green (SIGSEGV before, lit green after). Found via the 138 LZSS-gallery far-decode investigation (32-bit imaginary register hit the same store). | [PR body mirror](upstream-late-opt-nongpr-ldimm-pr.md) · provenance: [138 plan](plans/2026-07-27-138-lzss-far-decode-mos-late-optimization-crash.md) | [**PR #584**](https://github.com/llvm-mos/llvm-mos/pull/584) (`wbniv:mos-late-opt-nongpr-ldimm` @ `3ce98fed82de`); PR body's live-byte claim corrected to the measured matrix (3 live bytes crash at O1+, 2 at `-Oz`); fork carry `patches/llvm-mos/0003-late-opt-nongpr-ldimm-dest.patch` (`0999cfa`, merged to main 2026-08-01; **re-synced 2026‑09‑14 to the published `7f4c37de6219` form** — filter folded into the existing `LDImm` condition, [plan](plans/2026-09-14-fork-patch-followups.md)) |

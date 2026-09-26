@@ -119,4 +119,14 @@ integer bases. It needs a separate assembler-width fix and tests; 0036 changes
 neither that parser nor the handling of integer bases.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
-reasoning effort).
+reasoning effort) for investigation, implementation, validation, and the
+follow-up audit of the independent review.
+
+**Review complete:** [Claude review](0036-claude-review.md) and
+[Codex follow-up audit](0036-review-audit.md). No implementation revision requested;
+validation counts corrected. Published SNES demo evidence is included in the
+PR with direct links, per Will's clarification; the restriction concerns
+premature SNES code/config submission.
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`,
+`high` reasoning effort) for independent review and integration validation.

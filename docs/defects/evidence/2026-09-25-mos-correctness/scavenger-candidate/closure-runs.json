@@ -1,0 +1,63 @@
+{
+  "mos-float-vector-legalization": {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mos6502",
+      "optimization": "O2",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+    "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+      "sha256": "04697d5166408f81d342a27294605b844865b9deeae4121138ae378045c4207c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-float-vector-legalization.log",
+      "sha256": "b58bac1e2e61107d0054b860fc6df925cbd537b54eaec8362de2e3c39b1126ad"
+    },
+    "exit_code": 0
+  },
+  "mos-zp-index-same-width-trunc": {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "triple": "mos",
+      "pass": "legalizer",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+    "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+      "sha256": "83a56dd0e9c2655df6a64f1b87ac475caa1bd91c18ed99714788125f13145c32"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-zp-index-same-width-trunc.log",
+      "sha256": "e7c951687217037aa28aa60d963e365b2a71c58a63966186a9618ed468ab3f96"
+    },
+    "exit_code": 0
+  },
+  "mos-vector-o0-status-scavenge": {
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": "+mos-a16",
+      "optimization": "O0",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+    "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3-O0.ll",
+      "sha256": "74a4aa0973b281a6bf3dfdf8072dfd7978d359738b72baf18db6a80d49050dd5"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-vector-o0-status-scavenge.log",
+      "sha256": "52ddedba87323c117388f900bf354dac2914f55fd91376c9f20c33ac00877a34"
+    },
+    "exit_code": 0
+  }
+}

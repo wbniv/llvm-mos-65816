@@ -1,0 +1,78 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos-unknown-unknown"
+  
+  define void @undef_lane_identity_copy() {
+  entry:
+    unreachable
+  }
+...
+---
+name:            undef_lane_identity_copy
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 3, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 4, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 5, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 6, class: imag16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    undef %6.sublo:imag16 = IMPLICIT_DEF
+    %2:imag16 = COPY %6
+    %4:gpr = COPY %2.subhi
+    RTS
+...

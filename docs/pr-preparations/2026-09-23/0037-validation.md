@@ -8,7 +8,7 @@ compilations (`pr65053-1`, `pr65053-2`, `pr65956`, `pr88904`).
 - [x] Root cause: Clang lowers `+g` to `"=*imr,0"`. `InlineAsmLowering` picks the register
   alternative for the indirect output but never stores it back through the pointer, then rejects
   the call because the indirect output is counted as a missing call result (`ResRegs=0,
-  OutputOperands=1`). SelectionDAG stores such defs through the pointer (`IndirectStoresToEmit`).
+  OutputOperands=1`). SelectionDAG stores such defs through the pointer (`DAG.getStore`, collected in `OutChains`).
 - [x] Layer: generic `InlineAsmLowering`, not a MOS hook. The failure reproduces on AArch64 with
   `-global-isel -global-isel-abort=1`; X86's GlobalISel has no inline-asm lowering at all.
 - [x] Fix: record the indirect operand's element type, keep indirect register outputs out of the
@@ -49,3 +49,17 @@ Artifacts under `build/0030-claude-review/`: `diff7.py` / `diff7-results.json` /
 `diff8.py` / `diff8-results.json` / `diff8/`, `suite-asmg.out`, `suite-final.out`,
 `lit-final-*.json`, `build-asmg3.log`, `build-hoist2.log`, `toolchain-asmg.log`,
 `corpus-a16-asmg.log`, `toolchain-final.log`, `corpus-a16-final.log`.
+
+**Independent review complete:** [audit](0037-review-audit.md). No implementation
+revision requested. Fresh 0037-only MOS/AArch64 GlobalISel suites: 915 pass, one
+unsupported; all 12 focused corpus compilations pass. The combined cross-target
+run plus named-test rerun totals 11,437 passes and 23 expected failures.
+The [llvm/llvm-project submission variant](0037-llvm-project.patch) contains the
+generic source change and AArch64 test. Current-main applicability remains to
+be checked before submission.
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`,
+`high` reasoning effort) for diagnosis, implementation, tests, initial validation, and PR drafting.
+
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
+reasoning effort) for independent review, standalone validation, submission extraction, and evidence corrections.

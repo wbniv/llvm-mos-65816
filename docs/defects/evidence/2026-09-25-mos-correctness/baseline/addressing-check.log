@@ -1,0 +1,69 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s --input-file=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing.dis
+exit_code=1
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s:70:22: error: CHECK: expected string not found in input
+ lda addr24 ; CHECK: af 00 00 00
+                     ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing.dis:113:38: note: scanning from here
+ 0003032d: R_MOS_ADDR24 .text+0x30303
+                                     ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing.dis:176:9: note: possible intended match here
+ 30375: bf 00 00 00 lda mos24($0),x ; 0x0 <.text>
+        ^
+
+Input file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing.dis
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+          108:  30324: af 00 00 00 lda mos24($0) ; 0x0 <.text> 
+          109:  00030325: R_MOS_ADDR24 .text+0x1 
+          110:  30328: af 00 00 00 lda mos24($0) ; 0x0 <.text> 
+          111:  00030329: R_MOS_ADDR24 .text+0x202 
+          112:  3032c: af 00 00 00 lda mos24($0) ; 0x0 <.text> 
+          113:  0003032d: R_MOS_ADDR24 .text+0x30303 
+check:70'0                                          X error: no match found
+          114:  30330: ad 00 00 lda $0 ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          115:  00030331: R_MOS_ADDR16 .text+0x30303 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          116:  30333: a5 00 lda $0 ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          117:  00030334: R_MOS_ADDR8 .text+0x1 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          118:  30335: a5 00 lda $0 ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            .
+            .
+            .
+          171:  0003036d: R_MOS_ADDR16 .text+0x1 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          172:  3036f: b9 00 00 lda $0,y ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          173:  00030370: R_MOS_ADDR16 .text+0x202 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          174:  30372: b9 00 00 lda $0,y ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          175:  00030373: R_MOS_ADDR16 .text+0x30303 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          176:  30375: bf 00 00 00 lda mos24($0),x ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check:70'1             ?                                          possible intended match
+          177:  00030376: R_MOS_ADDR24 .text+0x1 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          178:  30379: bf 00 00 00 lda mos24($0),x ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          179:  0003037a: R_MOS_ADDR24 .text+0x202 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          180:  3037d: bf 00 00 00 lda mos24($0),x ; 0x0 <.text> 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          181:  0003037e: R_MOS_ADDR24 .text+0x30303 
+check:70'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

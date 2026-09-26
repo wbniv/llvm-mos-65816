@@ -1,0 +1,18 @@
+[
+  {
+    "source": "vendor",
+    "directory": "/tmp/asm-type-patch-vendor-dyrxkv4d",
+    "command": "git apply /home/will/llvm-mos-65816/patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "exit_code": 0,
+    "source_matches_tested_candidate": true,
+    "test_matches_regression": true
+  },
+  {
+    "source": "upstream",
+    "directory": "/tmp/asm-type-patch-upstream-ze5n03nr",
+    "command": "git apply /home/will/llvm-mos-65816/patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "exit_code": 0,
+    "source_matches_tested_candidate": true,
+    "test_matches_regression": true
+  }
+]

@@ -1,0 +1,66 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=prologepilog",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-a16.mir"
+    ],
+    "exit_code": -6,
+    "toolchain_sha256": "02fe7e90db8325184966e99518b3feeb0e400e494bd7a83f0beb0f3313bc6bea",
+    "log": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-a16.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=prologepilog",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-candidate-a16.mir"
+    ],
+    "exit_code": 0,
+    "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "log": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-candidate-a16.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-xy16",
+      "-run-pass=prologepilog",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-xy16.mir"
+    ],
+    "exit_code": -6,
+    "toolchain_sha256": "02fe7e90db8325184966e99518b3feeb0e400e494bd7a83f0beb0f3313bc6bea",
+    "log": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-xy16.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-xy16",
+      "-run-pass=prologepilog",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-candidate-xy16.mir"
+    ],
+    "exit_code": 0,
+    "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "log": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-candidate-xy16.log"
+  }
+]

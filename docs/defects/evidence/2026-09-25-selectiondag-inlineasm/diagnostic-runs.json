@@ -1,0 +1,28 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  }
+]

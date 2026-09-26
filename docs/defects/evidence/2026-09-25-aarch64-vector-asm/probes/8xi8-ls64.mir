@@ -1,0 +1,85 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/8xi8-ls64.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/8xi8-ls64.ll"
+  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32"
+  target triple = "aarch64"
+  
+  define void @f(ptr %p) #0 {
+    %v = load <8 x i8>, ptr %p, align 8
+    call void asm sideeffect "", "r"(<8 x i8> %v)
+    ret void
+  }
+  
+  attributes #0 = { "target-features"="+ls64" }
+...
+---
+name:            f
+alignment:       4
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr64common, preferred-register: '', flags: [  ] }
+  - { id: 2, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 3, class: gpr64common, preferred-register: '', flags: [  ] }
+  - { id: 4, class: gpr64, preferred-register: '', flags: [  ] }
+liveins:
+  - { reg: '$x0', virtual-reg: '%0' }
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $x0
+  
+    %0:gpr64 = COPY $x0
+    %1:gpr64common = COPY killed %0
+    %2:fpr64 = LDRDui %1, 0 :: (load (s64) from %ir.p)
+    %4:gpr64 = COPY %2
+    %3:gpr64common = COPY %4
+    INLINEASM &"", sideeffect attdialect, reguse:GPR64common, %3
+    RET_ReallyLR
+...

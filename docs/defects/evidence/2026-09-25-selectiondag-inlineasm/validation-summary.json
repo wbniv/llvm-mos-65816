@@ -1,0 +1,14 @@
+{
+  "cross": {
+    "PASS": 275,
+    "XFAIL": 4
+  },
+  "mos": {
+    "PASS": 173,
+    "UNSUPPORTED": 2
+  },
+  "cross_command": "build/llvm-mos/bin/llvm-lit -s -j 2 --filter='(?i)(asm|callbr)' -o docs/defects/evidence/2026-09-25-selectiondag-inlineasm/cross-lit-results.json build/selectiondag-inlineasm-lit/test/CodeGen/AArch64 build/selectiondag-inlineasm-lit/test/CodeGen/ARM build/selectiondag-inlineasm-lit/test/CodeGen/X86 build/selectiondag-inlineasm-lit/regression",
+  "mos_command": "build/llvm-mos/bin/llvm-lit -s -j 2 -o docs/defects/evidence/2026-09-25-selectiondag-inlineasm/mos-lit-results.json build/selectiondag-mos-lit/test/CodeGen/MOS build/selectiondag-mos-lit/test/MC/MOS",
+  "build_command": "docker run --rm -v /home/will/llvm-mos-65816:/work -w /work llvm-mos-65816-dev ninja -C build/llvm-mos -j1 llc clang lld",
+  "build_exit_code": 0
+}

@@ -1,0 +1,66 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -2892,6 +2892,13 @@
+         if (Index)
+           return false;
+
++        // A zero-page pointer already has an s8 offset. Use that byte directly;
++        // only wider offsets need an explicit low-byte/high-zero decomposition.
++        if (MRI.getType(NewOffset) == S8) {
++          Index = NewOffset;
++          continue;
++        }
++
+         // NewOffset:s16 is known to have only 8 active bits (high byte = 0).
+         // A plain G_TRUNC would leave the s16 Imag16 pair with a dead high
+         // lane: the RA's live-range splitter can emit an "undef %d.sublo =
+diff --git a/llvm/test/CodeGen/MOS/legalizer.mir b/llvm/test/CodeGen/MOS/legalizer.mir
+--- a/llvm/test/CodeGen/MOS/legalizer.mir
++++ b/llvm/test/CodeGen/MOS/legalizer.mir
+@@ -2444,8 +2444,7 @@
+   bb.0.entry:
+     ; CHECK-LABEL: name: load_zp_constant_ptradd_8
+     ; CHECK: [[COPY:%[0-9]+]]:_(s8) = COPY $a
+-    ; CHECK-NEXT: [[COPY1:%[0-9]+]]:_(s8) = COPY [[COPY]](s8)
+-    ; CHECK-NEXT: [[LOAD_ZP_IDX:%[0-9]+]]:_(s8) = G_LOAD_ZP_IDX target-flags(zeropage) 123, [[COPY1]](s8) :: (load (s8))
++    ; CHECK-NEXT: [[LOAD_ZP_IDX:%[0-9]+]]:_(s8) = G_LOAD_ZP_IDX target-flags(zeropage) 123, [[COPY]](s8) :: (load (s8))
+     ; CHECK-NEXT: RTS implicit [[LOAD_ZP_IDX]](s8)
+     %0:_(p1) = G_CONSTANT i8 123
+     %1:_(s8) = COPY $a
+@@ -2531,7 +2530,6 @@
+     ; CHECK-NEXT: [[PTRTOINT:%[0-9]+]]:_(s8) = G_PTRTOINT [[COPY]](p1)
+     ; CHECK-NEXT: [[ADD:%[0-9]+]]:_(s8) = G_ADD [[PTRTOINT]], [[COPY1]]
+     ; CHECK-NEXT: [[INTTOPTR:%[0-9]+]]:_(p1) = G_INTTOPTR [[ADD]](s8)
+-    ; CHECK-NEXT: [[COPY2:%[0-9]+]]:_(s8) = COPY [[COPY1]](s8)
+     ; CHECK-NEXT: [[PTRTOINT1:%[0-9]+]]:_(s8) = G_PTRTOINT [[INTTOPTR]](p1)
+     ; CHECK-NEXT: G_STORE_ZP_IDX [[COPY1]](s8), target-flags(zeropage) 0, [[PTRTOINT1]](s8) :: (store (s8))
+     ; CHECK-NEXT: RTS
+diff --git a/llvm/test/CodeGen/MOS/zp-byte-index.ll b/llvm/test/CodeGen/MOS/zp-byte-index.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zp-byte-index.ll
+@@ -0,0 +1,23 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++
++; Zero-page pointer arithmetic has an eight-bit offset. The byte index must
++; remain eight bits when selecting indexed loads and stores.
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define i8 @load_zp(i8 %index) {
++; CHECK-LABEL: load_zp:
++; CHECK: lda {{.*}}17,{{[xy]}}
++  %p = getelementptr i8, ptr addrspace(1) inttoptr (i8 17 to ptr addrspace(1)), i8 %index
++  %v = load i8, ptr addrspace(1) %p, align 1
++  ret i8 %v
++}
++
++define void @store_zp(i8 %index, i8 %value) {
++; CHECK-LABEL: store_zp:
++; CHECK: sta {{.*}}17,{{[xy]}}
++  %p = getelementptr i8, ptr addrspace(1) inttoptr (i8 17 to ptr addrspace(1)), i8 %index
++  store i8 %value, ptr addrspace(1) %p, align 1
++  ret void
++}

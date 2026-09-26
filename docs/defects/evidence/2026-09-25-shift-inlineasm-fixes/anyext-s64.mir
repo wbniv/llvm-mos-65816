@@ -1,0 +1,9 @@
+---
+name: anyext_s64_s8
+body: |
+  bb.0:
+    liveins: $a
+    %0:_(s8) = COPY $a
+    %1:_(s64) = G_ANYEXT %0
+    RTS implicit %1
+...

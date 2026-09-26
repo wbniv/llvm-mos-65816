@@ -1,0 +1,82 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O0",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/mos-correctness-runtime/scal-to-vec1-a16.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O0",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec1.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/mos-correctness-runtime/scal-to-vec1-xy16.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O0",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/mos-correctness-runtime/scal-to-vec3-a16.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O0",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scal-to-vec3.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/mos-correctness-runtime/scal-to-vec3-xy16.o"
+    ],
+    "exit_code": 0
+  }
+]

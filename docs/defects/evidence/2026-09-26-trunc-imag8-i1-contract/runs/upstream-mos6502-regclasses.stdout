@@ -1,0 +1,362 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir'
+  source_filename = "/home/will/llvm-mos-65816/test/upstream/trunc-imag8-i1/regclasses.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @trunc_to_any() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @trunc_to_gpr_lsb() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @trunc_to_cc() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @trunc_to_vc() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @trunc_to_anyi1() #0 {
+  entry:
+    unreachable
+  }
+  
+  attributes #0 = { "target-cpu"="mos6502" }
+...
+---
+name:            trunc_to_any
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr_lsb, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %1:gpr_lsb = COPY %2.sublsb
+    RTS implicit %1
+...
+---
+name:            trunc_to_gpr_lsb
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr_lsb, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %1:gpr_lsb = COPY %2.sublsb
+    RTS implicit %1
+...
+---
+name:            trunc_to_cc
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 4, class: gpr_lsb, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %4:gpr_lsb = COPY %2.sublsb
+    %1:cc = COPY %4
+    RTS implicit %1
+...
+---
+name:            trunc_to_vc
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 4, class: gpr_lsb, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %4:gpr_lsb = COPY %2.sublsb
+    %1:vc = COPY %4
+    RTS implicit %1
+...
+---
+name:            trunc_to_anyi1
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr_lsb, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:imag8 = COPY $rc2
+    %3:ac = COPY %0
+    %2:ac = ANDImm %3, 1
+    %1:gpr_lsb = COPY %2.sublsb
+    RTS implicit %1
+...

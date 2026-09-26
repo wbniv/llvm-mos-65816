@@ -1,0 +1,478 @@
+[
+  {
+    "name": "bad_output",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-baseline-O0.log"
+  },
+  {
+    "name": "bad_output",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-baseline-O2.log"
+  },
+  {
+    "name": "bad_output",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-candidate-O0.log"
+  },
+  {
+    "name": "bad_output",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-candidate-O2.log"
+  },
+  {
+    "name": "bad_input",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-baseline-O0.log"
+  },
+  {
+    "name": "bad_input",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-baseline-O2.log"
+  },
+  {
+    "name": "bad_input",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-candidate-O0.log"
+  },
+  {
+    "name": "bad_input",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-candidate-O2.log"
+  },
+  {
+    "name": "bad_tied",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-baseline-O0.log"
+  },
+  {
+    "name": "bad_tied",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-baseline-O2.log"
+  },
+  {
+    "name": "bad_tied",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-candidate-O0.log"
+  },
+  {
+    "name": "bad_tied",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-candidate-O2.log"
+  },
+  {
+    "name": "bad_indirect",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-baseline-O0.log"
+  },
+  {
+    "name": "bad_indirect",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-baseline-O2.log"
+  },
+  {
+    "name": "bad_indirect",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-candidate-O0.log"
+  },
+  {
+    "name": "bad_indirect",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-candidate-O2.log"
+  },
+  {
+    "name": "bad_callbr",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-baseline-O0.log"
+  },
+  {
+    "name": "bad_callbr",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-baseline-O2.log"
+  },
+  {
+    "name": "bad_callbr",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-candidate-O0.log"
+  },
+  {
+    "name": "bad_callbr",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-candidate-O2.log"
+  },
+  {
+    "name": "bad_callbr_input",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-baseline-O0.log"
+  },
+  {
+    "name": "bad_callbr_input",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-baseline-O2.log"
+  },
+  {
+    "name": "bad_callbr_input",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-candidate-O0.log"
+  },
+  {
+    "name": "bad_callbr_input",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-candidate-O2.log"
+  },
+  {
+    "name": "bad_callbr_pair",
+    "tool": "baseline",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-baseline-O0.log"
+  },
+  {
+    "name": "bad_callbr_pair",
+    "tool": "baseline",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": -6,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-baseline-O2.log"
+  },
+  {
+    "name": "bad_callbr_pair",
+    "tool": "candidate",
+    "optimization": "O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-candidate-O0.log"
+  },
+  {
+    "name": "bad_callbr_pair",
+    "tool": "candidate",
+    "optimization": "O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1,
+    "log": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-candidate-O2.log"
+  }
+]

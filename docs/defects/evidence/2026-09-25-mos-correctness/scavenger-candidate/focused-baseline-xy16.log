@@ -1,0 +1,35 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=prologepilog -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-xy16.mir
+LLVM ERROR: saveScavengerRegister: cannot preserve a live processor-status register across an unbalanced stack range with no free index register
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc-vector-enabled -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=prologepilog -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-baseline-xy16.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir'.
+2.	Running pass 'Prologue/Epilogue Insertion & Frame Finalization' on function '@status_save_range'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-vector-enabled 0x00005c74e9a904e8 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc-vector-enabled 0x00005c74e9a8d7c5 llvm::sys::RunSignalHandlers() + 293
+2  llc-vector-enabled 0x00005c74e9a91261
+3  libc.so.6          0x0000762d69245cb0
+4  libc.so.6          0x0000762d692a61ac pthread_kill + 284
+5  libc.so.6          0x0000762d69245b7e gsignal + 30
+6  libc.so.6          0x0000762d692288ec abort + 39
+7  llc-vector-enabled 0x00005c74e99fde05 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc-vector-enabled 0x00005c74e99fdc46
+9  llc-vector-enabled 0x00005c74e85536c0
+10 llc-vector-enabled 0x00005c74e8c7afb4 llvm::RegScavenger::spill(llvm::Register, llvm::TargetRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) + 436
+11 llc-vector-enabled 0x00005c74e8c7b898 llvm::RegScavenger::scavengeRegisterBackwards(llvm::TargetRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) + 1592
+12 llc-vector-enabled 0x00005c74e8c7bdaf
+13 llc-vector-enabled 0x00005c74e8c7b9bb llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) + 91
+14 llc-vector-enabled 0x00005c74e8c0b619
+15 llc-vector-enabled 0x00005c74e8c0c4c9
+16 llc-vector-enabled 0x00005c74e8a89103 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+17 llc-vector-enabled 0x00005c74e8edf77a llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+18 llc-vector-enabled 0x00005c74e8ee5e1c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+19 llc-vector-enabled 0x00005c74e8ee04a9 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+20 llc-vector-enabled 0x00005c74e853821d
+21 llc-vector-enabled 0x00005c74e8535bb3 main + 1331
+22 libc.so.6          0x0000762d6922a601
+23 libc.so.6          0x0000762d6922a718 __libc_start_main + 136
+24 llc-vector-enabled 0x00005c74e8531f25 _start + 37
+
+exit_code=-6

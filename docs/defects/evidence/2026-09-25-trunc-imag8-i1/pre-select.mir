@@ -1,0 +1,104 @@
+--- |
+  ; ModuleID = 'docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll'
+  source_filename = "docs/defects/evidence/2026-09-25-trunc-imag8-i1/input.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: norecurse
+  define i8 @trunc_imag8_i1(i8 %a, i8 %x) #0 {
+  entry:
+    %bit = trunc i8 %x to i1
+    br i1 %bit, label %subtract, label %done
+  
+  subtract:                                         ; preds = %entry
+    %difference = sub i8 %a, %x
+    br label %done
+  
+  done:                                             ; preds = %subtract, %entry
+    %result = phi i8 [ %difference, %subtract ], [ %a, %entry ]
+    ret i8 %result
+  }
+  
+  attributes #0 = { norecurse "nonreentrant" }
+...
+---
+name:            trunc_imag8_i1
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: any, preferred-register: '', flags: [  ] }
+  - { id: 1, class: any, preferred-register: '', flags: [  ] }
+  - { id: 2, class: any, preferred-register: '', flags: [  ] }
+  - { id: 3, class: any, preferred-register: '', flags: [  ] }
+  - { id: 4, class: any, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1.entry:
+    successors: %bb.2(0x40000000), %bb.3(0x40000000)
+    liveins: $a, $x
+  
+    %0:any(s8) = COPY $a
+    %1:any(s8) = COPY $x
+    %2:any(s1) = G_TRUNC %1(s8)
+    G_BRCOND_IMM %2(s1), %bb.3, 0
+    G_BR %bb.2
+  
+  bb.2.subtract:
+    successors: %bb.3(0x80000000)
+  
+    %3:any(s8) = G_SUB %0, %1
+  
+  bb.3.done:
+    %4:any(s8) = G_PHI %3(s8), %bb.2, %0(s8), %bb.1
+    $a = COPY %4(s8)
+    RTS implicit $a
+...

@@ -1,0 +1,140 @@
+[
+  {
+    "name": "shift-stage-frontend-default",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "shift-stage-frontend-a16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "shift-stage-frontend-xy16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "inline-stage-frontend-default",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-frontend-a16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-frontend-xy16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-x",
+      "cpp-output",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  }
+]

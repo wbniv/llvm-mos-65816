@@ -1,0 +1,91 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — zoomable flowchart</title><meta name="source-sha256" content="103a1ba97ff1ba59b56a5f5b639d76a1a7fe4230c8ed4d67a96c254d8baf9ac3"><style>
+*{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#17233a;background:#f8fafc;height:100vh;display:flex;flex-direction:column}header{flex:none;padding:12px 22px;border-bottom:1px solid #ccd6e4;background:white}h1{font-size:21px;margin:0 0 10px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}button,a{font:inherit}button{padding:5px 13px;background:#edf2fa;border:1px solid #a7b7cc;border-radius:6px;cursor:pointer}a{color:#165ac4;margin-left:16px}.hint{color:#596579;margin-left:12px}#viewport{flex:1;min-height:0;overflow:auto;padding:32px;cursor:grab;touch-action:auto}#viewport.dragging{cursor:grabbing;user-select:none}#chart{width:max-content;background:white;border-radius:10px;padding:20px}#chart svg{max-width:none!important;display:block;height:auto}#fallback{white-space:pre-wrap;max-width:1100px}#zoom{min-width:54px;font-variant-numeric:tabular-nums}.status{font-size:13px;color:#596579;margin:8px 0 0}@media(max-width:750px){.hint{display:none}}
+</style></head><body><header><h1>Upstream work and dependencies</h1><div class="toolbar"><button id="minus" aria-label="Zoom out">−</button><span id="zoom">100%</span><button id="plus" aria-label="Zoom in">+</button><button id="actual">Readable size</button><button id="fit">Fit entire chart</button><button id="fullscreen">Full screen</button><a href="upstream-pending-work.md">Tracker and evidence</a><a href="mos-upstream-status-2026-09-21.html">Overview</a><span class="hint">Drag to pan · Ctrl + wheel to zoom</span></div><p class="status">Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25 · Fixed locally does not mean published</p></header><div id="viewport"><div id="chart"><pre id="fallback">flowchart TD
+  subgraph Independent[Independent fixes]
+    MC[MVN/MVP complete fix] --&gt; MCT[Validated: five checks; 130 suite tests pass]
+    MCT --&gt; MCP[Compiler PR 604 posted] --&gt; MCM[Review and merge]
+    Z[Common SDK longjmp zero fix] --&gt; ZT[Integrated SDK regression: 20 pass]
+    ZT --&gt; ZP[SDK PR 450 posted] --&gt; ZM[Review and merge]
+    OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589] --&gt; REVIEW[Review / CI follow-up] --&gt; MERGED[Merge]
+    COALESCE0015[0015 recovered witness: root repaired by 0028] --&gt; UNDEF
+    UNDEF[Undef-lane fix 0028 validated] --&gt; HOLD[Wait until 320 and 321 are ready to open]
+    HOLD --&gt; FINAL[Choose implementation and review submission]
+    FINAL --&gt; UNDEFPR[Publish fix PR] --&gt; MERGED
+    RA[Register-exhaustion fix 0029: reviewed, full suites] --&gt; RAPR[Publish fix PR] --&gt; MERGED
+    COPY[Physical-copy liveness fix 0030: reviewed and audited] --&gt; COPYPR[Publish fix PR] --&gt; MERGED
+    COPYPR --&gt; REUSEPR[Publish 0031 destination reuse on top of 0030] --&gt; MERGED
+    SCAV[Scavenger live-P fix 0011: stock-6502 producer, upstream-runnable test] --&gt; SCAVPR[Publish fix PR] --&gt; MERGED
+    SYM[Register-named symbols 0032: reviewed and audited, full-corpus round trip] --&gt; SYMPR[Publish fix PR] --&gt; MERGED
+    HOIST[Spill-hoist guard 0033: audited, accounting revised and revalidated] --&gt; HOISTPR[Publish fix PR, drops driver flag] --&gt; MERGED
+    PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --&gt; PREFETCHMOS[Submit 0034 to llvm-mos] --&gt; MERGED
+    PREFETCH --&gt; PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --&gt; MERGED
+    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --&gt; ASMGREVIEW[Audit complete; validate extracted upstream submission] --&gt; ASMGPR[Submit to llvm/llvm-project] --&gt; MERGED
+    ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --&gt; ZPREVIEW[Review audited; submission preparation] --&gt; ZPPR[Publish fix PR] --&gt; MERGED
+    RETFRAME[Return and frame address 0038: fixed and validated] --&gt; PREP[Prepare and validate standalone submissions]
+    COALESCE[Spill coalescing 0040: fixed and validated] --&gt; PREP
+    ASMMULTI[Multi-register inline asm 0041: fixed and validated] --&gt; PREP
+    MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: fixed locally] --&gt; PREP
+    MOSFIX[Floating vectors 0050, byte index 0051, bank offset 0052: fixed locally] --&gt; PREP
+    VECTORBASE[0049: vector prerequisite backport] --&gt; MOSFIX
+    SAVERANGE[Status-save range 0054: fixed and validated] --&gt; PREP
+    GISBOUNDS[GlobalISel register bounds 0056: fixed and installed] --&gt; PREP
+    DAGBOUNDS[SelectionDAG register bounds 0057: fixed and installed] --&gt; PREP
+    DAGBOUNDS --&gt;|callbr recovery prerequisite| INTTYPE[AArch64 unknown asm types 0058: fixed and validated]
+    INTTYPE --&gt; PREP
+    DAGBOUNDS --&gt;|original vector regression prerequisite| VECTORPARTS[SelectionDAG vector parts 0059: fixed and installed]
+    VECTORPARTS --&gt; PREP
+    PREP --&gt; APPROVED[Publish when requested] --&gt; MERGED
+  end
+  subgraph SNES[SNES platform — separate track]
+    EXIST[Existing SDK PR 415 + our platform] --&gt; RECON[Reconcile baseline target and CPU mode]
+    NATIVE[Our native startup + stack contract + setjmp override] --&gt; RECON
+    RECON --&gt; SDKPR[Post additive platform changes]
+    SDKPR --&gt; SDKMERGE[Review and merge SNES support]
+  end
+  subgraph Features[Compiler feature tracks]
+    FARABI[Far ABI agreement] --&gt; FAR[Prepare and post 320 series] --&gt; FARDONE[Merge far support]
+    ACCEPT[Agree proper 65816 support required by SDK 415] --&gt; SDKMERGE
+    WIDTHABI[Native-width ABI and clean extraction] --&gt; WIDTH[Prepare and post 321 series] --&gt; WIDTHDONE[Merge native-width support]
+    SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --&gt; WIDTH
+    NATIVEPRINT[Native immediate printing 0045: fixed locally] --&gt; WIDTH
+    FARDONE --&gt; FARSDK[Integrate far SDK support]
+    SDKMERGE --&gt; FARSDK
+    WIDTHDONE --&gt; WIDTHSDK[Integrate native-width SDK opt-ins]
+    SDKMERGE --&gt; WIDTHSDK
+  end
+  subgraph Validation[Validation coverage]
+    OPCODEPLAN[65816 all-opcode roundtrip: plan written, implementation deferred] --&gt; OPCODEORACLE[Review independent oracle and width context]
+    OPCODEORACLE --&gt; OPCODEGATE[Implement and validate 256 opcodes in four M/X contexts]
+  end
+  subgraph Reports[Reports needing decisions or development]
+    REDUCER[Fixed locally: llvm-reduce parallel MIR crash] --&gt; REDUCEDIAG[Assess published-upstream applicability]
+    REDUCEDIAG --&gt; FIX
+    CONTRACT[Reentrant contract question] --&gt; DECIDE[Agree semantics] --&gt; FIX[Develop and test fix or documentation]
+    GUARDS[0023: independent Imag8 rejection cause disproved] --&gt; TRUNCKEEP[Retain with feature series; historical far-pointer cause unknown]
+    FIX --&gt; REPORTPR[Post fix PR; link issue if one exists] --&gt; REPORTMERGE[Review and merge]
+  end
+  classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
+  classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT fixed</pre></div></div><script type="module">
+const viewport=document.querySelector('#viewport'), chart=document.querySelector('#chart');
+let svg, baseWidth, baseHeight, zoom=1;
+function setZoom(value){if(!svg)return;zoom=Math.max(.02,Math.min(4,value));svg.style.width=`${baseWidth*zoom}px`;document.querySelector('#zoom').textContent=`${Math.round(zoom*100)}%`;}
+document.querySelector('#minus').onclick=()=>setZoom(zoom/1.25);
+document.querySelector('#plus').onclick=()=>setZoom(zoom*1.25);
+document.querySelector('#actual').onclick=()=>setZoom(1);
+document.querySelector('#fit').onclick=()=>setZoom(Math.min((viewport.clientWidth-104)/baseWidth,(viewport.clientHeight-104)/baseHeight));
+document.querySelector('#fullscreen').onclick=()=>document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+viewport.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();setZoom(zoom*(e.deltaY<0?1.1:1/1.1));}},{passive:false});
+let drag;
+viewport.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button===0){drag={x:e.clientX,y:e.clientY,left:viewport.scrollLeft,top:viewport.scrollTop};viewport.setPointerCapture(e.pointerId);viewport.classList.add('dragging');}});
+viewport.addEventListener('pointermove',e=>{if(drag){viewport.scrollLeft=drag.left+drag.x-e.clientX;viewport.scrollTop=drag.top+drag.y-e.clientY;}});
+function stop(){drag=null;viewport.classList.remove('dragging');}
+viewport.addEventListener('pointerup',stop);viewport.addEventListener('pointercancel',stop);
+try{
+const {default:mermaid}=await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral',themeVariables:{fontSize:'20px',fontFamily:'system-ui, sans-serif'},flowchart:{useMaxWidth:false,nodeSpacing:40,rankSpacing:65}});
+const source=document.querySelector('#fallback').textContent;
+const result=await mermaid.render('dependency-chart',source);chart.innerHTML=result.svg;svg=chart.querySelector('svg');
+const view=svg.viewBox.baseVal;baseWidth=view.width;baseHeight=view.height;setZoom(1);
+}catch(error){console.warn(error);document.querySelector('#zoom').textContent='Text';}
+</script></body></html>

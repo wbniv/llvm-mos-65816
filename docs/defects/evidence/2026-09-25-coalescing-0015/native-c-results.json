@@ -1,0 +1,398 @@
+[
+  {
+    "mode": "default",
+    "opt": "O0",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O0",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O0-noguard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O1",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O1",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O1-noguard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O2",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O2",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O2-noguard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O3",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "O3",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-O3-noguard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "Os",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "Os",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Os-noguard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "Oz",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz-guard.s"
+  },
+  {
+    "mode": "default",
+    "opt": "Oz",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/default-Oz-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O0",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O0",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O0-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O1",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O1",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O1-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O2",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O2",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O3",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "O3",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O3-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "Os",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "Os",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os-noguard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "Oz",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz-guard.s"
+  },
+  {
+    "mode": "a16",
+    "opt": "Oz",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Oz-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O0",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O0",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O0 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O0-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O1",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O1",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O1 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O1-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O2",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O2",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O2 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O2-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O3",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "O3",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -O3 -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-O3-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "Os",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "Os",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Os-noguard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "Oz",
+    "compiler": "guard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz-guard.s"
+  },
+  {
+    "mode": "xy16",
+    "opt": "Oz",
+    "compiler": "noguard",
+    "exit": 0,
+    "frontend_commands": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -E /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.i",
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang --target=mos -mcpu=mosw65816 -Oz -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -S -emit-llvm /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.ll"
+    ],
+    "command": "/home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/xy16-Oz-noguard.s"
+  }
+]

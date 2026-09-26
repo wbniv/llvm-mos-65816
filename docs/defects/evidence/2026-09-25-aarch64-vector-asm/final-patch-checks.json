@@ -1,0 +1,10 @@
+[
+  {
+    "source": "vendor",
+    "exact_source_and_test": true
+  },
+  {
+    "source": "cross",
+    "exact_source_and_test": true
+  }
+]

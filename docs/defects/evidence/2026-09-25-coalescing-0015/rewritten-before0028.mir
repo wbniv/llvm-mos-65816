@@ -1,0 +1,1177 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/rcundef-a16-Os-before-greedy.mir'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: readwrite)
+  define dso_local void @newton_step(ptr noundef captures(none) %0, ptr noundef captures(none) %1) local_unnamed_addr #0 {
+    %3 = load i16, ptr %0, align 1, !tbaa !2
+    %4 = load i16, ptr %1, align 1, !tbaa !2
+    %5 = sext i16 %3 to i32
+    %6 = sext i16 %4 to i32
+    %7 = add nsw i32 %6, %5
+    %8 = sub nsw i32 %5, %6
+    %9 = shl nsw i32 %8, 8
+    %10 = mul i32 %9, %7
+    %11 = ashr i32 %10, 16
+    %12 = shl nsw i32 %5, 9
+    %13 = mul i32 %12, %6
+    %14 = ashr i32 %13, 16
+    %15 = trunc nsw i32 %11 to i16
+    %16 = mul i16 %15, 3
+    %17 = trunc nsw i32 %14 to i16
+    %18 = mul i16 %17, 3
+    %19 = ashr i16 %16, 1
+    %20 = sext i16 %19 to i32
+    %21 = ashr i16 %18, 1
+    %22 = sext i16 %21 to i32
+    %23 = mul nsw i32 %20, %20
+    %24 = mul nsw i32 %22, %22
+    %25 = add nuw nsw i32 %23, %24
+    %26 = icmp eq i32 %25, 0
+    br i1 %26, label %71, label %27
+  
+  27:                                               ; preds = %2
+    %28 = sext i16 %21 to i32
+    %29 = sext i16 %19 to i32
+    %30 = sext i16 %4 to i32
+    %31 = sext i16 %3 to i32
+    %32 = mul nsw i32 %11, %30
+    %33 = mul nsw i32 %14, %31
+    %34 = add nsw i32 %32, %33
+    %35 = shl i32 %34, 8
+    %36 = ashr i32 %35, 17
+    %37 = mul nsw i32 %11, %31
+    %38 = mul nsw i32 %14, %30
+    %39 = sub nsw i32 %37, %38
+    %40 = lshr i32 %39, 8
+    %41 = trunc i32 %40 to i16
+    %42 = add nsw i16 %41, -256
+    %43 = ashr i16 %42, 1
+    %44 = sext i16 %43 to i32
+    %45 = mul nsw i32 %44, %29
+    %46 = mul nsw i32 %36, %28
+    %47 = add nsw i32 %45, %46
+    %48 = shl i32 %47, 8
+    %49 = sdiv i32 %48, %25
+    %50 = mul nsw i32 %36, %29
+    %51 = mul nsw i32 %44, %28
+    %52 = sub nsw i32 %50, %51
+    %53 = shl i32 %52, 8
+    %54 = sdiv i32 %53, %25
+    %55 = icmp sgt i32 %49, 512
+    br i1 %55, label %60, label %56
+  
+  56:                                               ; preds = %27
+    %57 = icmp slt i32 %49, -512
+    %58 = trunc nsw i32 %49 to i16
+    br i1 %57, label %59, label %60
+  
+  59:                                               ; preds = %56
+    br label %60
+  
+  60:                                               ; preds = %59, %56, %27
+    %61 = phi i16 [ -512, %59 ], [ %58, %56 ], [ 512, %27 ]
+    %62 = icmp sgt i32 %54, 512
+    br i1 %62, label %67, label %63
+  
+  63:                                               ; preds = %60
+    %64 = icmp slt i32 %54, -512
+    %65 = trunc nsw i32 %54 to i16
+    br i1 %64, label %66, label %67
+  
+  66:                                               ; preds = %63
+    br label %67
+  
+  67:                                               ; preds = %66, %63, %60
+    %68 = phi i16 [ -512, %66 ], [ %65, %63 ], [ 512, %60 ]
+    %69 = sub nsw i16 %3, %61
+    store i16 %69, ptr %0, align 1, !tbaa !2
+    %70 = sub nsw i16 %4, %68
+    store i16 %70, ptr %1, align 1, !tbaa !2
+    br label %71
+  
+  71:                                               ; preds = %67, %2
+    ret void
+  }
+  
+  attributes #0 = { mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+...
+---
+name:            newton_step
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 17, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 18, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 19, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 20, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 21, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 22, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 23, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.2):
+    successors: %bb.2(0x40000000), %bb.1(0x40000000)
+    liveins: $rs1, $rs2
+  
+    renamable $rs13 = COPY $rs2
+    renamable $rs2 = COPY renamable $rs1
+    renamable $x = COPY renamable $rc4
+    STAbs killed renamable $x, %stack.1 :: (store (s8) into %stack.1)
+    renamable $x = COPY killed renamable $rc5
+    STAbs killed renamable $x, %stack.1 + 1 :: (store (s8) into %stack.1 + 1)
+    renamable $a16 = LDAIndir16 killed renamable $rs1 :: (load (s16) from %ir.0, align 1, !tbaa !2)
+    renamable $rs10 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    GBR %bb.2, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.1
+  
+  bb.1 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+    liveins: $rs10:0x0000000000000022, $rs13
+  
+    renamable $x = LDImm -1
+    STAbs killed renamable $x, %stack.4 :: (store (s8) into %stack.4)
+    BRA %bb.3
+  
+  bb.2 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+    liveins: $rs10:0x0000000000000022, $rs13
+  
+    renamable $x = LDZ
+    STAbs killed renamable $x, %stack.4 :: (store (s8) into %stack.4)
+    BRA %bb.3
+  
+  bb.3 (%ir-block.2):
+    successors: %bb.5(0x40000000), %bb.4(0x40000000)
+    liveins: $rs10:0x0000000000000022, $rs13
+  
+    renamable $a16 = LDAIndir16 renamable $rs13 :: (load (s16) from %ir.1, align 1, !tbaa !2)
+    renamable $rs11 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs11
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    GBR %bb.5, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.4
+  
+  bb.4 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+    liveins: $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13
+  
+    renamable $x = LDImm -1
+    renamable $rc3 = COPY killed renamable $x
+    BRA %bb.6
+  
+  bb.5 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+    liveins: $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13
+  
+    renamable $rc3 = LDZ
+    BRA %bb.6
+  
+  bb.6 (%ir-block.2):
+    successors: %bb.7(0x40000000), %bb.8(0x40000000)
+    liveins: $rc3, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13
+  
+    renamable $c = LDImm1 0
+    renamable $a = COPY renamable $rc20
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, renamable $rc22, killed renamable $c
+    renamable $rc4 = COPY killed renamable $a
+    renamable $a = COPY renamable $rc21
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, renamable $rc23, killed renamable $c
+    renamable $rc5 = COPY killed renamable $a
+    renamable $a = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    renamable $x = COPY killed renamable $a
+    renamable $rc2 = COPY renamable $x
+    renamable $rc7 = COPY renamable $rc3
+    renamable $a = COPY renamable $rc7
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, renamable $rc2, killed renamable $c
+    renamable $rc6 = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc7
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc7 = COPY killed renamable $a
+    renamable $c = LDImm1 -1
+    renamable $a = COPY renamable $rc20
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, renamable $rc22, killed renamable $c
+    renamable $y = COPY killed renamable $a
+    renamable $a = COPY renamable $rc21
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, renamable $rc23, killed renamable $c
+    renamable $rc2 = COPY killed renamable $a
+    renamable $a = COPY killed renamable $x
+    renamable $rc24 = COPY renamable $rc3
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc29 = LDZ
+    $rc3 = COPY killed renamable $a
+    $x = COPY killed renamable $y
+    $a = COPY renamable $rc29
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def dead $a, implicit-def dead $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc30 = COPY $rc2
+    renamable $rc28 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    CmpBrZero %bb.7, undef $n, 1, renamable $rc28, implicit-def dead $c
+    BRA %bb.8
+  
+  bb.7 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+    liveins: $rc24, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000002
+  
+    renamable $x = LDImm -1
+    renamable $rc29 = COPY killed renamable $x
+    BRA %bb.9
+  
+  bb.8 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+    liveins: $rc24, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13, $rs14:0x0000000000000022, $rs15:0x0000000000000002
+  
+    BRA %bb.9
+  
+  bb.9 (%ir-block.2):
+    successors: %bb.10(0x40000000), %bb.11(0x40000000)
+    liveins: $rc24, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs13, $rs14:0x0000000000000022, $rs15:0x0000000000000002
+  
+    renamable $a16 = LDAImag16 renamable $rs14
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    STAbs16 killed renamable $a16, %stack.13 :: (store (s16) into %stack.13, align 1)
+    renamable $a = COPY renamable $rc20
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $rc2 = COPY renamable $rc21
+    renamable $rc2, renamable $c = ROL killed renamable $rc2, killed renamable $c
+    renamable $x = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    renamable $rc3 = COPY killed renamable $x
+    renamable $rc3, dead renamable $c = ROL killed renamable $rc3, killed renamable $c
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc25 = LDZ
+    $rc4 = COPY renamable $rc22
+    $rc5 = COPY renamable $rc23
+    renamable $rc29 = COPY killed renamable $rc24
+    $rc6 = COPY renamable $rc29
+    $rc7 = COPY renamable $rc29
+    $x = COPY killed renamable $a
+    $a = COPY renamable $rc25
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def dead $a, implicit-def dead $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc6 = COPY $rc2
+    renamable $rc24 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    CmpBrZero %bb.10, undef $n, 1, renamable $rc24, implicit-def dead $c
+    BRA %bb.11
+  
+  bb.10 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+    liveins: $rc29, $rs3:0x0000000000000002, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000002
+  
+    renamable $x = LDImm -1
+    renamable $rc25 = COPY killed renamable $x
+    BRA %bb.12
+  
+  bb.11 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+    liveins: $rc29, $rs3:0x0000000000000002, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs12:0x0000000000000022, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000002
+  
+    BRA %bb.12
+  
+  bb.12 (%ir-block.2):
+    successors: %bb.14(0x40000000), %bb.13(0x40000000)
+    liveins: $rc29, $rs3:0x0000000000000002, $rs10:0x0000000000000022, $rs11:0x0000000000000022, $rs12:0x0000000000000022, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000002
+  
+    renamable $a16 = LDAImag16 renamable $rs12
+    STAbs16 killed renamable $a16, %stack.16 :: (store (s16) into %stack.16, align 1)
+    renamable $rc31 = COPY renamable $rc28
+    renamable $a16 = LDAImag16 renamable $rs15
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $rc2 = COPY renamable $rc30
+    renamable $x = COPY renamable $rc2
+    STAbs killed renamable $x, %stack.9 :: (store (s8) into %stack.9)
+    renamable $x = COPY killed renamable $rc3
+    STAbs killed renamable $x, %stack.9 + 1 :: (store (s8) into %stack.9 + 1)
+    renamable $c = LDImm1 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, killed renamable $rs15, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $rc7 = COPY renamable $rc24
+    renamable $a16 = LDAImag16 renamable $rs3
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = LDImm1 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs3, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $c = CMPImm16 renamable $a16, 32768
+    renamable $a16, dead renamable $c = RORAcc16 killed renamable $a16, killed renamable $c
+    renamable $rs15 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs15
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    renamable $rc7lsb = COPY killed renamable $c
+    renamable $a16 = LDAbs16 %stack.16 :: (load (s16) from %stack.16, align 1)
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    STAbs16 killed renamable $a16, %stack.16 :: (store (s16) into %stack.16, align 1)
+    renamable $rs2 = COPY killed renamable $rs10
+    renamable $x = COPY renamable $rc4
+    STAbs killed renamable $x, %stack.2 :: (store (s8) into %stack.2)
+    renamable $x = COPY killed renamable $rc5
+    STAbs killed renamable $x, %stack.2 + 1 :: (store (s8) into %stack.2 + 1)
+    GBR %bb.14, killed renamable $rc7lsb, 1, implicit-def dead $c
+    BRA %bb.13
+  
+  bb.13 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+    liveins: $rc29, $rs1, $rs3:0x0000000000000002, $rs11:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $x = LDImm -1
+    BRA %bb.15
+  
+  bb.14 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+    liveins: $rc29, $rs1, $rs3:0x0000000000000002, $rs11:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $x = LDZ
+    BRA %bb.15
+  
+  bb.15 (%ir-block.2):
+    successors: %bb.17(0x40000000), %bb.16(0x40000000)
+    liveins: $x, $rc29, $rs1, $rs3:0x0000000000000002, $rs11:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 renamable $a16, 32768
+    renamable $a16, dead renamable $c = RORAcc16 killed renamable $a16, killed renamable $c
+    renamable $rs10 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    renamable $y = COPY renamable $rc22
+    STAbs killed renamable $y, %stack.3 :: (store (s8) into %stack.3)
+    renamable $y = COPY killed renamable $rc23
+    STAbs killed renamable $y, %stack.3 + 1 :: (store (s8) into %stack.3 + 1)
+    GBR %bb.17, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.16
+  
+  bb.16 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+    liveins: $x, $rc29, $rs3:0x0000000000000002, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $y = COPY renamable $rc26
+    STAbs killed renamable $y, %stack.0 :: (store (s8) into %stack.0)
+    renamable $y = COPY killed renamable $rc27
+    STAbs killed renamable $y, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    renamable $y = COPY renamable $rc6
+    STAbs killed renamable $y, %stack.10 :: (store (s8) into %stack.10)
+    renamable $y = COPY killed renamable $rc7
+    STAbs killed renamable $y, %stack.10 + 1 :: (store (s8) into %stack.10 + 1)
+    renamable $y = LDImm -1
+    renamable $rc23 = COPY killed renamable $y
+    BRA %bb.18
+  
+  bb.17 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+    liveins: $x, $rc29, $rs3:0x0000000000000002, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs13, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $y = COPY renamable $rc26
+    STAbs killed renamable $y, %stack.0 :: (store (s8) into %stack.0)
+    renamable $y = COPY killed renamable $rc27
+    STAbs killed renamable $y, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    renamable $y = COPY renamable $rc6
+    STAbs killed renamable $y, %stack.10 :: (store (s8) into %stack.10)
+    renamable $y = COPY killed renamable $rc7
+    STAbs killed renamable $y, %stack.10 + 1 :: (store (s8) into %stack.10 + 1)
+    renamable $rc23 = LDZ
+    BRA %bb.18
+  
+  bb.18 (%ir-block.2):
+    successors: %bb.50(0x30000000), %bb.19(0x50000000)
+    liveins: $x, $rc23, $rc29, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY renamable $x
+    $rc4 = COPY renamable $rc30
+    $rc5 = COPY renamable $rc31
+    $rc6 = COPY renamable $x
+    $rc7 = COPY killed renamable $x
+    $x = COPY renamable $rc31
+    $a = COPY renamable $rc30
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc25 = COPY $a
+    renamable $rc22 = COPY $x
+    renamable $rc27 = COPY $rc2
+    renamable $rc26 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = COPY killed renamable $rc23
+    $rc2 = COPY renamable $x
+    $rc3 = COPY renamable $x
+    $rc4 = COPY renamable $rc20
+    $rc5 = COPY renamable $rc21
+    $rc6 = COPY renamable $x
+    $rc7 = COPY killed renamable $x
+    $x = COPY renamable $rc21
+    $a = COPY renamable $rc20
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc4 = COPY $a
+    renamable $y = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = COPY killed renamable $rc25
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = COPY killed renamable $a
+    renamable $a = COPY killed renamable $y
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc22, killed renamable $c
+    renamable $rc4 = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc27
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc2 = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc26
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $y = COPY killed renamable $a
+    renamable $a = COPY killed renamable $x
+    renamable $x = COPY renamable $a
+    STAbs killed renamable $x, %stack.5 :: (store (s8) into %stack.5)
+    renamable $rc3 = COPY killed renamable $rc2
+    renamable $rc2 = COPY renamable $rc3
+    renamable $x = COPY killed renamable $rc2
+    STAbs killed renamable $x, %stack.6 :: (store (s8) into %stack.6)
+    renamable $x = COPY renamable $y
+    STAbs killed renamable $x, %stack.7 :: (store (s8) into %stack.7)
+    renamable $x = COPY renamable $rc4
+    CmpBrZeroMultiByte %bb.50, 1, killed renamable $a, killed renamable $rc4, killed renamable $rc3, killed renamable $y, implicit-def dead $c
+    BRA %bb.19
+  
+  bb.19 (%ir-block.27):
+    successors: %bb.21(0x40000000), %bb.20(0x40000000)
+    liveins: $x, $rc29, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $a = COPY killed renamable $x
+    STAbs killed renamable $a, %stack.8 :: (store (s8) into %stack.8)
+    renamable $x = LDAbs %stack.0 :: (load (s8) from %stack.0)
+    renamable $rc26 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.0 + 1 :: (load (s8) from %stack.0 + 1)
+    renamable $rc27 = COPY killed renamable $x
+    renamable $x = COPY renamable $rc26
+    STAbs killed renamable $x, %stack.0 :: (store (s8) into %stack.0)
+    renamable $x = COPY killed renamable $rc27
+    STAbs killed renamable $x, %stack.0 + 1 :: (store (s8) into %stack.0 + 1)
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    renamable $xlsb = LDImm1 0
+    GBR %bb.21, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.20
+  
+  bb.20 (%ir-block.27):
+    successors: %bb.21(0x80000000)
+    liveins: $rc29, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $xlsb = LDImm1 -1
+    BRA %bb.21
+  
+  bb.21 (%ir-block.27):
+    successors: %bb.23(0x40000000), %bb.22(0x40000000)
+    liveins: $xlsb, $rc29, $rs10:0x0000000000000022, $rs12:0x0000000000000002, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $y = COPY renamable $rc20
+    STAbs killed renamable $y, %stack.12 :: (store (s8) into %stack.12)
+    renamable $y = COPY killed renamable $rc21
+    STAbs killed renamable $y, %stack.12 + 1 :: (store (s8) into %stack.12 + 1)
+    renamable $a16 = LDAbs16 %stack.13 :: (load (s16) from %stack.13, align 1)
+    renamable $rs11 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAbs16 %stack.16 :: (load (s16) from %stack.16, align 1)
+    renamable $rs13 = STAImag16 killed renamable $a16
+    renamable $y = LDImm -1
+    renamable $rc20 = COPY killed renamable $y
+    renamable $y = LDImm -1
+    GBR %bb.23, killed renamable $xlsb, 1, implicit-def dead $c
+    BRA %bb.22
+  
+  bb.22 (%ir-block.27):
+    successors: %bb.23(0x80000000)
+    liveins: $rc20, $rc29, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    renamable $y = LDZ
+    BRA %bb.23
+  
+  bb.23 (%ir-block.27):
+    successors: %bb.24(0x40000000), %bb.25(0x40000000)
+    liveins: $y, $rc20, $rc29, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002, $rs15:0x0000000000000022
+  
+    STAbs killed renamable $y, %stack.11 :: (store (s8) into %stack.11)
+    renamable $rs1 = COPY renamable $rs15
+    renamable $x = COPY renamable $rc2
+    STAbs killed renamable $x, %stack.14 :: (store (s8) into %stack.14)
+    renamable $x = COPY killed renamable $rc3
+    STAbs killed renamable $x, %stack.14 + 1 :: (store (s8) into %stack.14 + 1)
+    renamable $a16 = LDAImag16 killed renamable $rs15
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    renamable $x = LDImm -1
+    renamable $rc30 = COPY killed renamable $x
+    GBR %bb.24, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.25
+  
+  bb.24 (%ir-block.27):
+    successors: %bb.25(0x80000000)
+    liveins: $rc20, $rc29, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002
+  
+    renamable $rc30 = LDZ
+    BRA %bb.25
+  
+  bb.25 (%ir-block.27):
+    successors: %bb.27(0x40000000), %bb.26(0x40000000)
+    liveins: $rc20, $rc29, $rc30, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $rc23
+    $rc3 = COPY renamable $rc23
+    renamable $x = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    renamable $rc4 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    renamable $rc5 = COPY killed renamable $x
+    $rc6 = COPY renamable $rc29
+    $rc7 = COPY renamable $rc29
+    $x = COPY renamable $rc28
+    renamable $y = LDAbs %stack.9 :: (load (s8) from %stack.9)
+    renamable $rc8 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.9 + 1 :: (load (s8) from %stack.9 + 1)
+    renamable $rc9 = COPY killed renamable $y
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc25 = COPY $a
+    renamable $rc22 = COPY $x
+    renamable $rc21 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $rc27
+    $rc3 = COPY renamable $rc27
+    renamable $x = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    renamable $rc4 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    renamable $rc5 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    $rc6 = COPY renamable $x
+    $rc7 = COPY killed renamable $x
+    $x = COPY renamable $rc24
+    renamable $y = LDAbs %stack.10 :: (load (s8) from %stack.10)
+    renamable $rc8 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.10 + 1 :: (load (s8) from %stack.10 + 1)
+    renamable $rc9 = COPY killed renamable $y
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = COPY killed renamable $rc25
+    dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $a = COPY killed renamable $x
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc22, killed renamable $c
+    renamable $rc4 = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc21
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $x = LDImm -1
+    renamable $rc31 = COPY killed renamable $a
+    CmpBrZero %bb.27, undef $n, 1, renamable $rc31, implicit-def dead $c
+    BRA %bb.26
+  
+  bb.26 (%ir-block.27):
+    successors: %bb.27(0x80000000)
+    liveins: $rc4, $rc20, $rc29, $rc30, $rc31, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002
+  
+    renamable $x = LDZ
+    BRA %bb.27
+  
+  bb.27 (%ir-block.27):
+    successors: %bb.28(0x40000000), %bb.29(0x40000000)
+    liveins: $x, $rc4, $rc20, $rc29, $rc30, $rc31, $rs11:0x0000000000000020, $rs12:0x0000000000000002, $rs13:0x0000000000000020, $rs14:0x0000000000000002
+  
+    renamable $rc2 = COPY renamable $rc31
+    renamable $rc3 = COPY killed renamable $x
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a = COPY killed renamable $rc3
+    renamable $c = CMPImm renamable $a, 128
+    renamable $rc26 = COPY renamable $a
+    renamable $rc26, renamable $c = ROR killed renamable $rc26, killed renamable $c
+    renamable $a, renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc25 = COPY killed renamable $a
+    renamable $rc31, renamable $c = ROR killed renamable $rc31, killed renamable $c
+    renamable $rc4, dead renamable $c = ROR killed renamable $rc4, killed renamable $c
+    renamable $x = COPY killed renamable $rc4
+    STAbs killed renamable $x, %stack.15 :: (store (s8) into %stack.15)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $rc23
+    $rc3 = COPY killed renamable $rc23
+    renamable $x = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    renamable $rc4 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    renamable $rc5 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.4 :: (load (s8) from %stack.4)
+    $rc6 = COPY renamable $x
+    $rc7 = COPY killed renamable $x
+    $x = COPY killed renamable $rc28
+    renamable $y = LDAbs %stack.9 :: (load (s8) from %stack.9)
+    renamable $rc8 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.9 + 1 :: (load (s8) from %stack.9 + 1)
+    renamable $rc9 = COPY killed renamable $y
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc23 = COPY $a
+    renamable $rc22 = COPY $x
+    renamable $rc21 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $rc27
+    $rc3 = COPY killed renamable $rc27
+    renamable $x = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    renamable $rc4 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    renamable $rc5 = COPY killed renamable $x
+    $rc6 = COPY renamable $rc29
+    $rc7 = COPY killed renamable $rc29
+    $x = COPY killed renamable $rc24
+    renamable $y = LDAbs %stack.10 :: (load (s8) from %stack.10)
+    renamable $rc8 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.10 + 1 :: (load (s8) from %stack.10 + 1)
+    renamable $rc9 = COPY killed renamable $y
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = COPY killed renamable $rc23
+    renamable $c = CMPImag8 killed renamable $x, killed renamable $rc3
+    renamable $a = COPY killed renamable $rc22
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc21
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc2 = COPY killed renamable $x
+    renamable $rc3 = COPY killed renamable $a
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = LDImm1 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 65280, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 renamable $a16, 32768
+    renamable $a16, dead renamable $c = RORAcc16 killed renamable $a16, killed renamable $c
+    renamable $rs4 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs4
+    renamable $a16 = EORImm16 killed renamable $a16, 32768
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = CMPImm16 killed renamable $a16, 32768
+    GBR %bb.28, killed renamable $c, 1, implicit-def dead $c
+    BRA %bb.29
+  
+  bb.28 (%ir-block.27):
+    successors: %bb.29(0x80000000)
+    liveins: $rc25, $rc26, $rc30, $rc31, $rs4:0x0000000000000022
+  
+    renamable $rc20 = LDZ
+    BRA %bb.29
+  
+  bb.29 (%ir-block.27):
+    successors: %bb.30(0x40000000), %bb.31(0x40000000)
+    liveins: $rc20, $rc25, $rc26, $rc30, $rc31, $rs4:0x0000000000000022
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc22 = COPY killed renamable $rc20
+    $rc2 = COPY renamable $rc22
+    $rc3 = COPY renamable $rc22
+    renamable $x = LDAbs %stack.14 :: (load (s8) from %stack.14)
+    renamable $rc20 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.14 + 1 :: (load (s8) from %stack.14 + 1)
+    renamable $rc21 = COPY killed renamable $x
+    $rc4 = COPY renamable $rc20
+    $rc5 = COPY renamable $rc21
+    $rc6 = COPY renamable $rc30
+    $rc7 = COPY renamable $rc30
+    $x = COPY renamable $rc9
+    $a = COPY renamable $rc8
+    renamable $y = COPY renamable $rc8
+    STAbs killed renamable $y, %stack.17 :: (store (s8) into %stack.17)
+    renamable $y = COPY killed renamable $rc9
+    STAbs killed renamable $y, %stack.17 + 1 :: (store (s8) into %stack.17 + 1)
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc23 = COPY $a
+    renamable $rc27 = COPY $x
+    renamable $rc28 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $y = COPY renamable $rc25
+    STAbs killed renamable $y, %stack.22 :: (store (s8) into %stack.22)
+    $rc2 = COPY killed renamable $rc25
+    renamable $y = COPY renamable $rc26
+    STAbs killed renamable $y, %stack.23 :: (store (s8) into %stack.23)
+    $rc3 = COPY killed renamable $rc26
+    renamable $x = LDAbs %stack.12 :: (load (s8) from %stack.12)
+    renamable $rc24 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.12 + 1 :: (load (s8) from %stack.12 + 1)
+    renamable $rc25 = COPY killed renamable $x
+    $rc4 = COPY renamable $rc24
+    $rc5 = COPY renamable $rc25
+    renamable $x = LDAbs %stack.11 :: (load (s8) from %stack.11)
+    renamable $rc29 = COPY killed renamable $x
+    $rc6 = COPY renamable $rc29
+    $rc7 = COPY renamable $rc29
+    $x = COPY renamable $rc31
+    renamable $y = LDAbs %stack.15 :: (load (s8) from %stack.15)
+    renamable $rc8 = COPY killed renamable $y
+    renamable $y = COPY renamable $rc8
+    STAbs killed renamable $y, %stack.15 :: (store (s8) into %stack.15)
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = COPY killed renamable $rc23
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $y = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc27
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc28
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY killed renamable $x
+    $rc3 = COPY killed renamable $a
+    renamable $x = LDAbs %stack.5 :: (load (s8) from %stack.5)
+    renamable $rc23 = COPY killed renamable $x
+    $rc4 = COPY renamable $rc23
+    renamable $x = LDAbs %stack.8 :: (load (s8) from %stack.8)
+    renamable $rc28 = COPY killed renamable $x
+    $rc5 = COPY renamable $rc28
+    renamable $x = LDAbs %stack.6 :: (load (s8) from %stack.6)
+    renamable $rc26 = COPY killed renamable $x
+    $rc6 = COPY renamable $rc26
+    renamable $x = LDAbs %stack.7 :: (load (s8) from %stack.7)
+    renamable $rc27 = COPY killed renamable $x
+    $rc7 = COPY renamable $rc27
+    $x = COPY killed renamable $y
+    renamable $a = LDZ
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    STAbs killed renamable $a, %stack.21 :: (store (s8) into %stack.21)
+    STAbs killed renamable $x, %stack.20 :: (store (s8) into %stack.20)
+    renamable $x = COPY killed renamable $rc2
+    STAbs killed renamable $x, %stack.19 :: (store (s8) into %stack.19)
+    renamable $x = COPY killed renamable $rc3
+    STAbs killed renamable $x, %stack.18 :: (store (s8) into %stack.18)
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = LDAbs %stack.22 :: (load (s8) from %stack.22)
+    renamable $rc2 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.23 :: (load (s8) from %stack.23)
+    renamable $rc3 = COPY killed renamable $x
+    $rc4 = COPY renamable $rc20
+    $rc5 = COPY killed renamable $rc21
+    $rc6 = COPY renamable $rc30
+    $rc7 = COPY killed renamable $rc30
+    $x = COPY killed renamable $rc31
+    renamable $a = LDAbs %stack.15 :: (load (s8) from %stack.15)
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc20 = COPY $a
+    renamable $rc30 = COPY $x
+    renamable $rc21 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $rc22
+    $rc3 = COPY killed renamable $rc22
+    $rc4 = COPY renamable $rc24
+    $rc5 = COPY killed renamable $rc25
+    $rc6 = COPY renamable $rc29
+    $rc7 = COPY killed renamable $rc29
+    renamable $x = LDAbs %stack.17 :: (load (s8) from %stack.17)
+    renamable $rc8 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.17 + 1 :: (load (s8) from %stack.17 + 1)
+    renamable $rc9 = COPY killed renamable $x
+    $x = COPY renamable $rc9
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 -1
+    renamable $a = COPY killed renamable $rc20
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $x = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc30
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $y = COPY killed renamable $a
+    renamable $a = COPY killed renamable $rc21
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY killed renamable $y
+    $rc3 = COPY killed renamable $a
+    $rc4 = COPY killed renamable $rc23
+    $rc5 = COPY killed renamable $rc28
+    $rc6 = COPY killed renamable $rc26
+    $rc7 = COPY killed renamable $rc27
+    renamable $a = LDZ
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc5 = COPY $a
+    renamable $rc18 = COPY $rc2
+    renamable $rc14 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $y = LDAbs %stack.21 :: (load (s8) from %stack.21)
+    renamable $rc4 = COPY renamable $y
+    renamable $c = CMPImm killed renamable $y, 1
+    renamable $a = LDAbs %stack.20 :: (load (s8) from %stack.20)
+    renamable $rc12 = COPY renamable $a
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 2, killed renamable $c
+    renamable $a = LDAbs %stack.19 :: (load (s8) from %stack.19)
+    renamable $rc15 = COPY renamable $a
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $a = LDAbs %stack.18 :: (load (s8) from %stack.18)
+    renamable $rc13 = COPY renamable $a
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $y = LDAbs %stack.0 :: (load (s8) from %stack.0)
+    renamable $rc2 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.0 + 1 :: (load (s8) from %stack.0 + 1)
+    renamable $rc3 = COPY killed renamable $y
+    renamable $rs3 = COPY killed renamable $rs1
+    GBR %bb.30, killed renamable $v, 1, implicit-def dead $c
+    BRA %bb.31
+  
+  bb.30 (%ir-block.27):
+    successors: %bb.32(0x80000000)
+    liveins: $a, $x, $rc4, $rc5, $rc12, $rc13, $rc14, $rc15, $rc18, $rs3
+  
+    renamable $a = EORImm killed renamable $a, -128
+    renamable $y = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    renamable $rc2 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    renamable $rc3 = COPY killed renamable $y
+    renamable $rs4 = COPY killed renamable $rs1
+    renamable $y = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    renamable $rc2 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    renamable $rc3 = COPY killed renamable $y
+    renamable $rs5 = COPY killed renamable $rs1
+    BRA %bb.32
+  
+  bb.31 (%ir-block.27):
+    successors: %bb.32(0x80000000)
+    liveins: $a, $x, $rc4, $rc5, $rc12, $rc13, $rc14, $rc15, $rc18, $rs3
+  
+    renamable $y = LDAbs %stack.2 :: (load (s8) from %stack.2)
+    renamable $rc2 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.2 + 1 :: (load (s8) from %stack.2 + 1)
+    renamable $rc3 = COPY killed renamable $y
+    renamable $rs4 = COPY killed renamable $rs1
+    renamable $y = LDAbs %stack.3 :: (load (s8) from %stack.3)
+    renamable $rc2 = COPY killed renamable $y
+    renamable $y = LDAbs %stack.3 + 1 :: (load (s8) from %stack.3 + 1)
+    renamable $rc3 = COPY killed renamable $y
+    renamable $rs5 = COPY killed renamable $rs1
+    BRA %bb.32
+  
+  bb.32 (%ir-block.27):
+    successors: %bb.33(0x40000000), %bb.34(0x40000000)
+    liveins: $a, $x, $rc4, $rc5, $rc12, $rc13, $rc14, $rc15, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $y = COPY killed renamable $rc4
+    CmpBrZero %bb.34, undef $n, 1, killed renamable $a, implicit-def $c
+  
+  bb.33:
+    successors: %bb.39(0x80000000)
+    liveins: $x, $rc5, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $y = LDZ
+    renamable $a = LDImm 2
+    renamable $rc12 = COPY killed renamable $a
+    BRA %bb.39
+  
+  bb.34 (%ir-block.56):
+    successors: %bb.35(0x40000000), %bb.36(0x40000000)
+    liveins: $x, $y, $rc5, $rc12, $rc13, $rc14, $rc15, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $c = CMPImm renamable $y, 0
+    renamable $a = COPY renamable $rc12
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 254, killed renamable $c
+    renamable $a = COPY killed renamable $rc15
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    renamable $a = COPY killed renamable $rc13
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    GBR %bb.35, killed renamable $v, 1, implicit-def dead $c
+    BRA %bb.36
+  
+  bb.35 (%ir-block.56):
+    successors: %bb.37(0x80000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $a = EORImm killed renamable $a, -128
+    BRA %bb.37
+  
+  bb.36 (%ir-block.56):
+    successors: %bb.37(0x80000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    BRA %bb.37
+  
+  bb.37 (%ir-block.56):
+    successors: %bb.38(0x40000000), %bb.39(0x40000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    CmpBrZero %bb.39, undef $n, 0, killed renamable $a, implicit-def dead $c
+    BRA %bb.38
+  
+  bb.38 (%ir-block.59):
+    successors: %bb.39(0x80000000)
+    liveins: $x, $rc5, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $y = LDImm -2
+    renamable $rc12 = COPY killed renamable $y
+    renamable $y = LDZ
+  
+  bb.39 (%ir-block.60):
+    successors: %bb.40(0x40000000), %bb.41(0x40000000)
+    liveins: $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $a = COPY renamable $rc5
+    renamable $c = CMPImm killed renamable $a, 1
+    renamable $a = COPY renamable $x
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 2, killed renamable $c
+    renamable $a = COPY renamable $rc18
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $a = COPY renamable $rc14
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    GBR %bb.40, killed renamable $v, 1, implicit-def dead $c
+    BRA %bb.41
+  
+  bb.40 (%ir-block.60):
+    successors: %bb.42(0x80000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $a = EORImm killed renamable $a, -128
+    BRA %bb.42
+  
+  bb.41 (%ir-block.60):
+    successors: %bb.42(0x80000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    BRA %bb.42
+  
+  bb.42 (%ir-block.60):
+    successors: %bb.43(0x40000000), %bb.44(0x40000000)
+    liveins: $a, $x, $y, $rc5, $rc12, $rc14, $rc18, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $rc2 = COPY killed renamable $y
+    renamable $rc3 = COPY killed renamable $rc12
+    CmpBrZero %bb.44, undef $n, 1, killed renamable $a, implicit-def $c
+  
+  bb.43:
+    successors: %bb.49(0x80000000)
+    liveins: $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $y = LDZ
+    renamable $x = LDImm 2
+    BRA %bb.49
+  
+  bb.44 (%ir-block.63):
+    successors: %bb.45(0x40000000), %bb.46(0x40000000)
+    liveins: $x, $rc5, $rc14, $rc18, $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $y = COPY killed renamable $rc5
+    renamable $c = CMPImm renamable $y, 0
+    renamable $a = COPY renamable $x
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 254, killed renamable $c
+    renamable $a = COPY killed renamable $rc18
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    renamable $a = COPY killed renamable $rc14
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    GBR %bb.45, killed renamable $v, 1, implicit-def dead $c
+    BRA %bb.46
+  
+  bb.45 (%ir-block.63):
+    successors: %bb.47(0x80000000)
+    liveins: $a, $x, $y, $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $a = EORImm killed renamable $a, -128
+    BRA %bb.47
+  
+  bb.46 (%ir-block.63):
+    successors: %bb.47(0x80000000)
+    liveins: $a, $x, $y, $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    BRA %bb.47
+  
+  bb.47 (%ir-block.63):
+    successors: %bb.48(0x40000000), %bb.49(0x40000000)
+    liveins: $a, $x, $y, $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    CmpBrZero %bb.49, undef $n, 0, killed renamable $a, implicit-def dead $c
+    BRA %bb.48
+  
+  bb.48 (%ir-block.66):
+    successors: %bb.49(0x80000000)
+    liveins: $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $x = LDImm -2
+    renamable $y = LDZ
+  
+  bb.49 (%ir-block.67):
+    successors: %bb.50(0x80000000)
+    liveins: $x, $y, $rs1:0x0000000000000022, $rs3, $rs4:0x0000000000000022, $rs5:0x0000000000000022
+  
+    renamable $rc4 = COPY killed renamable $y
+    renamable $rc5 = COPY killed renamable $x
+    renamable $a16 = LDAImag16 killed renamable $rs4
+    renamable $c = LDImm1 -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs1, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $x = LDAbs %stack.1 :: (load (s8) from %stack.1)
+    renamable $rc2 = COPY killed renamable $x
+    renamable $x = LDAbs %stack.1 + 1 :: (load (s8) from %stack.1 + 1)
+    renamable $rc3 = COPY killed renamable $x
+    STAIndir16 killed renamable $a16, killed renamable $rs1 :: (store (s16) into %ir.0, align 1, !tbaa !2)
+    renamable $a16 = LDAImag16 killed renamable $rs5
+    renamable $c = LDImm1 -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs2, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    STAIndir16 killed renamable $a16, killed renamable $rs3 :: (store (s16) into %ir.1, align 1, !tbaa !2)
+  
+  bb.50 (%ir-block.71):
+    RTS
+...

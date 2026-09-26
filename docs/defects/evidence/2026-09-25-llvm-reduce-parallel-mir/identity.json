@@ -1,0 +1,28 @@
+{
+  "vendor_head": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "tool_version": "LLVM 23.0.0git",
+  "compiler": "g++ (Ubuntu 15.2.0-16ubuntu1) 15.2.0",
+  "candidate_build": "Compiled the modified Delta.cpp with g++ 15.2.0 against build/llvm-mos generated headers, then relinked the existing llvm-reduce object and static libraries with the replacement object; exact commands in build-commands.txt.",
+  "files": {
+    "baseline_tool": {
+      "path": "build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce",
+      "sha256": "993b1e90ac19b57723c03c9b6365c7864bdc1543b18bee508361a84c7f490db6"
+    },
+    "candidate_tool": {
+      "path": "build/defect-candidates/2026-09-25-llvm-reduce-parallel-mir/bin/llvm-reduce",
+      "sha256": "9f9f8351fea4032544a2ad6ca563cc2f0ef327ebf8aabbdd61226a7d221a79dd"
+    },
+    "change": {
+      "path": "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch",
+      "sha256": "d12ccaec7f42cfa51cf6dec43d86df058e8258546c24dbf5b8488d27826093a4"
+    },
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+      "sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef"
+    },
+    "interesting_test": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py",
+      "sha256": "b865970ed22b2b5589148b01402c4a7b08c3a18d9ddfd71830b4c7e72491b816"
+    }
+  }
+}

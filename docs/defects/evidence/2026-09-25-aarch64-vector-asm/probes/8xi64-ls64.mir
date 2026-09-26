@@ -1,0 +1,154 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/8xi64-ls64.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/8xi64-ls64.ll"
+  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i8:8:32-i16:16:32-i64:64-i128:128-n32:64-S128-Fn32"
+  target triple = "aarch64"
+  
+  define void @f(ptr %p) #0 {
+    %v = load <8 x i64>, ptr %p, align 64
+    call void asm sideeffect "", "r"(<8 x i64> %v)
+    ret void
+  }
+  
+  attributes #0 = { "target-features"="+ls64" }
+...
+---
+name:            f
+alignment:       4
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 1, class: gpr64common, preferred-register: '', flags: [  ] }
+  - { id: 2, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 3, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 4, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 5, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 6, class: gpr64x8class, preferred-register: '', flags: [  ] }
+  - { id: 7, class: gpr64common, preferred-register: '', flags: [  ] }
+  - { id: 8, class: gpr64sp, preferred-register: '', flags: [  ] }
+  - { id: 9, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 10, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 11, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 12, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 13, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 14, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 15, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 16, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 17, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 18, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 19, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 20, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 21, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 22, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 23, class: fpr128, preferred-register: '', flags: [  ] }
+  - { id: 24, class: fpr64, preferred-register: '', flags: [  ] }
+  - { id: 25, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 26, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 27, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 28, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 29, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 30, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 31, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 32, class: gpr64, preferred-register: '', flags: [  ] }
+  - { id: 33, class: gpr64x8class, preferred-register: '', flags: [  ] }
+liveins:
+  - { reg: '$x0', virtual-reg: '%0' }
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    16
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 64, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $x0
+  
+    %0:gpr64 = COPY $x0
+    %1:gpr64common = COPY killed %0
+    %5:fpr128 = LDRQui %1, 3 :: (load (s128) from %ir.p + 48, basealign 64)
+    %4:fpr128 = LDRQui %1, 2 :: (load (s128) from %ir.p + 32, align 32, basealign 64)
+    %3:fpr128 = LDRQui %1, 1 :: (load (s128) from %ir.p + 16, basealign 64)
+    %2:fpr128 = LDRQui %1, 0 :: (load (s128) from %ir.p, align 64)
+    %7:gpr64common = ADDXri %stack.0, 0, 0
+    %8:gpr64sp = disjoint ORRXri killed %7, 8000
+    ST1i64 %2, 1, killed %8 :: (store (s64) into %stack.0 + 8, basealign 16)
+    %9:fpr64 = COPY %2.dsub
+    STRDui killed %9, %stack.0, 0 :: (store (s64) into %stack.0, align 16)
+    %10:fpr64 = COPY %3.dsub
+    STRDui killed %10, %stack.0, 2 :: (store (s64) into %stack.0 + 16, align 16)
+    %11:fpr64 = DUPi64 %3, 1
+    %13:fpr128 = IMPLICIT_DEF
+    %12:fpr128 = INSERT_SUBREG %13, killed %11, %subreg.dsub
+    %14:fpr64 = COPY %12.dsub
+    STRDui killed %14, %stack.0, 3 :: (store (s64) into %stack.0 + 24, basealign 16)
+    %15:fpr64 = COPY %4.dsub
+    STRDui killed %15, %stack.0, 4 :: (store (s64) into %stack.0 + 32, align 16)
+    %16:fpr64 = DUPi64 %4, 1
+    %18:fpr128 = IMPLICIT_DEF
+    %17:fpr128 = INSERT_SUBREG %18, killed %16, %subreg.dsub
+    %19:fpr64 = COPY %17.dsub
+    STRDui killed %19, %stack.0, 5 :: (store (s64) into %stack.0 + 40, basealign 16)
+    %20:fpr64 = COPY %5.dsub
+    STRDui killed %20, %stack.0, 6 :: (store (s64) into %stack.0 + 48, align 16)
+    %21:fpr64 = DUPi64 %5, 1
+    %23:fpr128 = IMPLICIT_DEF
+    %22:fpr128 = INSERT_SUBREG %23, killed %21, %subreg.dsub
+    %24:fpr64 = COPY %22.dsub
+    STRDui killed %24, %stack.0, 7 :: (store (s64) into %stack.0 + 56, basealign 16)
+    %25:gpr64 = LDRXui %stack.0, 0 :: (load (s64) from %stack.0, align 16)
+    %26:gpr64 = LDRXui %stack.0, 1 :: (load (s64) from %stack.0, align 16)
+    %27:gpr64 = LDRXui %stack.0, 2 :: (load (s64) from %stack.0, align 16)
+    %28:gpr64 = LDRXui %stack.0, 3 :: (load (s64) from %stack.0, align 16)
+    %29:gpr64 = LDRXui %stack.0, 4 :: (load (s64) from %stack.0, align 16)
+    %30:gpr64 = LDRXui %stack.0, 5 :: (load (s64) from %stack.0, align 16)
+    %31:gpr64 = LDRXui %stack.0, 6 :: (load (s64) from %stack.0, align 16)
+    %32:gpr64 = LDRXui %stack.0, 7 :: (load (s64) from %stack.0, align 16)
+    %33:gpr64x8class = REG_SEQUENCE killed %25, %subreg.x8sub_0, killed %26, %subreg.x8sub_1, killed %27, %subreg.x8sub_2, killed %28, %subreg.x8sub_3, killed %29, %subreg.x8sub_4, killed %30, %subreg.x8sub_5, killed %31, %subreg.x8sub_6, killed %32, %subreg.x8sub_7
+    %6:gpr64x8class = COPY %33
+    INLINEASM &"", sideeffect attdialect, reguse:GPR64x8Class, %6
+    RET_ReallyLR
+...

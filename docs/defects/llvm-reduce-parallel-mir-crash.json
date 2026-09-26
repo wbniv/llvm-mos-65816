@@ -1,0 +1,126 @@
+{
+  "schema": 1,
+  "id": "llvm-reduce-parallel-mir-crash",
+  "title": "llvm-reduce crashes reducing MIR with two workers",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-25-coalescing-0015-revalidation.md",
+  "reproducer_origin": "original",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: verified session metadata; witness recovery, isolated 0015/0028 comparison, stock-upstream replay, and documentation.",
+    "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown: parallel MIR reducer fix and matching-input validation."
+  ],
+  "summary": "The retained MIR input crashes the preserved llvm-reduce with -j 2; keeping MachineModuleInfo in each parallel MIR work item lets the same input reduce successfully while preserving IR bitcode workers.",
+  "unknowns": [
+    "The exact September 20 source/build state is not recovered; the failing binary and exact input remain preserved."
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-output.mir",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "language": "mir",
+      "jobs": 2,
+      "max_pass_iterations": 1,
+      "test": "python3 interesting-rewriter.py"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce",
+    "toolchain_sha256": "993b1e90ac19b57723c03c9b6365c7864bdc1543b18bee508361a84c7f490db6",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+      "sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-replay.log",
+      "sha256": "41d447f6766c595cfa65b851c878ffbd861cbca67b018618242818059e2204e3"
+    },
+    "exit_code": -11,
+    "failure_signature": "exit_code=-11"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/reducer-parallel-tiny.log",
+      "sha256": "4f0527bb3db4eabc819dfb7ea71d3f32e5df5cb85cd2d05dbdbeed4a1598b382"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/reducer-observation.json",
+      "sha256": "416f012022def2a50b76c4e3cd40688996cc0fcc6e18d7e1ba2b72057be15372"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+      "sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py",
+      "sha256": "b865970ed22b2b5589148b01402c4a7b08c3a18d9ddfd71830b4c7e72491b816"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/contrast-identities.json",
+      "sha256": "980cc11ce75ebab697368cbbb39808e68ef267c8caf688ee49ae6f74ea978176"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/reduce.log",
+      "sha256": "9ffbd5a8f5da28b1f450e96e12fff952f074382986d81681e3e18b37a357a934"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/partial-reduction-check.log",
+      "sha256": "4207094d6e18f9928cdc338eae8af006f0a03100759468eee96cc4605376c82d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir",
+      "sha256": "5818c65ef6859f96e8b966ee402fae888a1d303eccfaf4a246ecd9d699f3acca"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate.log",
+      "sha256": "0dd9a1a36148510caa3c0319d483623aa92b5575c99f12eb88d21485007cf873"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-replay.log",
+      "sha256": "41d447f6766c595cfa65b851c878ffbd861cbca67b018618242818059e2204e3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+      "sha256": "a58c075d3fc316fbe1a0edb45174106035a4bd66cd6e3db1771678f850338240"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/regression-runs.json",
+      "sha256": "c30f81e1777cc41877d0f9e8f20b37f6942aad26bcaf86a985e85afd9815295f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/identity.json",
+      "sha256": "305c1b07aed838730efd7bd8e1ebff278f18078f0a28eddc4c890319e9d5a74d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/build-commands.txt",
+      "sha256": "9acfefe1b8a50cd6a7b036583cbac6701e61a44ae1e4e96964ed5bb2581cbcc5"
+    }
+  ],
+  "resolution": {
+    "change": "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch",
+    "causal_explanation": "The parallel path serialized MIR work items as LLVM IR bitcode. Reconstructing from bitcode left MachineModuleInfo null, so the MIR instruction reducer dereferenced it. MIR workers now clone the machine functions and carry their MachineModuleInfo to the result; IR workers retain separate LLVM contexts and the bitcode path.",
+    "trigger_check": "The identical retained stock MOS MIR and interestingness script produce exit -11 on the preserved baseline and exit 0 on the candidate at -j 2; the reduced candidate remains interesting. The focused parallel MIR lit input also crashes on baseline and reduces on candidate, and the existing parallel IR test passes.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+      "sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/defect-candidates/2026-09-25-llvm-reduce-parallel-mir/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "language": "mir",
+        "jobs": 2,
+        "max_pass_iterations": 1,
+        "test": "python3 interesting-rewriter.py"
+      },
+      "toolchain_location": "build/defect-candidates/2026-09-25-llvm-reduce-parallel-mir/bin/llvm-reduce",
+      "toolchain_sha256": "9f9f8351fea4032544a2ad6ca563cc2f0ef327ebf8aabbdd61226a7d221a79dd",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+        "sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate.log",
+        "sha256": "0dd9a1a36148510caa3c0319d483623aa92b5575c99f12eb88d21485007cf873"
+      },
+      "exit_code": 0
+    }
+  }
+}

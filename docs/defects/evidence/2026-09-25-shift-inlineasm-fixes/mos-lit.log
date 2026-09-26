@@ -1,0 +1,14 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-lit -q /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/MC/MOS
+-- Testing: 174 tests, 8 workers --
+FAIL: LLVM :: CodeGen/MOS/legalizer.mir (4 of 174)
+FAIL: LLVM :: MC/MOS/bank-relax-section-offset.s (89 of 174)
+********************
+Failed Tests (2):
+  LLVM :: CodeGen/MOS/legalizer.mir
+  LLVM :: MC/MOS/bank-relax-section-offset.s
+
+
+Total Discovered Tests: 174
+  Failed: 2 (1.15%)
+
+exit_code=1

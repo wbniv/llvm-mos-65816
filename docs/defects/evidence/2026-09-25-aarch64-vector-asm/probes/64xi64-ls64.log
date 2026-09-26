@@ -1,0 +1,36 @@
+$ /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel -mattr=+ls64 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/64xi64-ls64.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/64xi64-ls64.mir
+llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && "Part type doesn't match vector breakdown!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel -mattr=+ls64 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/64xi64-ls64.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/64xi64-ls64.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/probes/64xi64-ls64.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@f'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000061e0b381c01b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x000061e0b3818ea1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x000061e0b381ce2b
+3  libc.so.6 0x0000720cd4a45cb0
+4  libc.so.6 0x0000720cd4aa61ac pthread_kill + 284
+5  libc.so.6 0x0000720cd4a45b7e gsignal + 30
+6  libc.so.6 0x0000720cd4a288ec abort + 39
+7  libc.so.6 0x0000720cd4a29979
+8  libc.so.6 0x0000720cd4a3bf75 __assert_fail + 181
+9  llc       0x000061e0b350d323
+10 llc       0x000061e0b350aff9 llvm::RegsForValue::getCopyToRegs(llvm::SDValue, llvm::SelectionDAG&, llvm::SDLoc const&, llvm::SDValue&, llvm::SDValue*, llvm::Value const*, llvm::ISD::NodeType) const + 617
+11 llc       0x000061e0b352ff5b llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&, llvm::BasicBlock const*) + 5739
+12 llc       0x000061e0b3511236 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+13 llc       0x000061e0b35e6aa5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+14 llc       0x000061e0b35e5b9b llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 5675
+15 llc       0x000061e0b35e3301 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+16 llc       0x000061e0b35e099c llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+17 llc       0x000061e0b24b6fa9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+18 llc       0x000061e0b2a49790 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+19 llc       0x000061e0b2a51892 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc       0x000061e0b2a4a554 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+21 llc       0x000061e0b141974b
+22 llc       0x000061e0b1416a13 main + 1443
+23 libc.so.6 0x0000720cd4a2a601
+24 libc.so.6 0x0000720cd4a2a718 __libc_start_main + 136
+25 llc       0x000061e0b1415c25 _start + 37
+
+exit_code=-6

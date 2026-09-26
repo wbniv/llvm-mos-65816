@@ -1,0 +1,20 @@
+{
+  "binary": "/tmp/aarch64-asm-type-fix/llc-guard-only",
+  "sha256": "ab8a641c1544709118e41f0be97d8cd3b7eeade7e49fa1873f4cb74f162f1bad",
+  "link_recipe": "docs/defects/evidence/2026-09-25-aarch64-asm-type/link-guard-only.py",
+  "difference_from_original_baseline": "Only AArch64ISelLowering.cpp.o is replaced; original SelectionDAG archive remains.",
+  "runs": [
+    {
+      "input": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "exit_code": 1,
+      "log": "docs/defects/evidence/2026-09-25-aarch64-asm-type/guard-only-original.log",
+      "command": "/tmp/aarch64-asm-type-fix/llc-guard-only -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null"
+    },
+    {
+      "input": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll",
+      "exit_code": -11,
+      "log": "docs/defects/evidence/2026-09-25-aarch64-asm-type/guard-only-callbr.log",
+      "command": "/tmp/aarch64-asm-type-fix/llc-guard-only -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll -o /dev/null"
+    }
+  ]
+}

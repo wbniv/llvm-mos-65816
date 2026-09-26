@@ -1,0 +1,19 @@
+{
+  "description": "Captured September 25 compiler reproducing the recovered August source, not the unrecovered original August binary.",
+  "vendor_pin": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "tools": {
+    "build/defect-baselines/2026-09-25-historical-recovery/bin/clang": {
+      "sha256": "3be96813fae5e8ad61a8cdef78e56a7ca6aea21571d21dddc896fb707a6d0d75",
+      "version": "clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin\n"
+    },
+    "build/defect-baselines/2026-09-25-historical-recovery/bin/llc": {
+      "sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    }
+  },
+  "files": {
+    "build/defect-baselines/2026-09-25-historical-recovery/vendor.patch": "8909b852751af87d10e93bee246f5ebdbde1b6cc63e8bea7b87238e807860b63",
+    "build/defect-baselines/2026-09-25-historical-recovery/patch-stack.tar.gz": "4e78668fef5be3a9a07677ce85d9af71f73cbdc108373991f8a0f369dc98364d",
+    "build/defect-baselines/2026-09-25-historical-recovery/CMakeCache.txt": "24f57de9d76f1fad9023e398b4593b044441128388a5d08168e89d8b314324ce"
+  }
+}

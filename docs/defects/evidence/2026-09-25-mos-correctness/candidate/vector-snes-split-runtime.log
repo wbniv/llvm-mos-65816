@@ -1,0 +1,36 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -DSNES -DFLOAT_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-default.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-default.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-default.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-default.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-default.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -DSNES -DFLOAT_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-a16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-a16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-a16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-a16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-a16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -DSNES -DFLOAT_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-xy16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-xy16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-xy16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-xy16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-float-xy16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -DSNES -DDOUBLE_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-default.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-default.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-default.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-default.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-default.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -DSNES -DDOUBLE_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-a16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-a16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-a16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-a16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-a16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -DSNES -DDOUBLE_ONLY -fno-lto -ffunction-sections -fdata-sections -Os -ffp-contract=off -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/vector-runtime.c -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-xy16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-xy16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-xy16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x600d 1000 /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-xy16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/vector-double-xy16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x600D (ran 1000 frames, bsnes-jg)
+exit_code=0

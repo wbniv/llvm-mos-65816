@@ -1,6 +1,10 @@
 # Pending upstream work and dependencies
 
-**Local preparation updated 2026-09-25.** Independent reviews and validation
+The [live upstream dashboard](https://wald3n.com/open-source#compiler-upstream)
+combines current GitHub PR state with a separately dated local-work manifest.
+This tracker retains the detailed compiler, ABI, and SNES dependency rationale.
+
+**Local preparation updated 2026-09-26.** Independent reviews and validation
 for 0032–0037 remain linked below. The `mos16(constant)` parser-width defect is
 fixed in 0039. The [September 25 batch review](pr-preparations/2026-09-25/claude-batch-review.md)
 revises 0043, 0046, and 0047 and updates their PR drafts; integrated tests and
@@ -19,6 +23,48 @@ is revalidated as fixed by existing `a81874d` / 0013, with matching-input backen
 comparison and physical WRAM checks. Its stale discovery status is corrected;
 this creates no new independent fix submission. Compiler/ABI and far-runtime
 integration remain with the #320/#321 feature work.
+
+The [historical baseline recovery](investigations/2026-09-25-historical-baseline-recovery.md)
+captured a narrow-count s64 shift legalization failure in the fork's a16/xy16
+modes, now repaired by 0055. Both recovered C inputs pass supported configurations on the
+saved unpatched upstream revision `742d554bf080`; upstream does not support
+those native-width features. Existing patch 0028 causally repairs the recovered
+inline-bitboard verifier failure. Recovery and validation: OpenAI Codex CLI
+0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
+
+The [follow-up fixes](investigations/2026-09-25-shift-inlineasm-fixes.md) also
+repair generic GlobalISel physical-register inline-asm exhaustion (0056), using
+an independent AArch64 IR trigger. Both fixes are implemented and validated
+locally; submission preparation remains. The generic bounds helper matches
+unpatched upstream source, but the captured AArch64 baseline includes prior
+patches through 0041; it is not a clean upstream binary.
+
+The [SelectionDAG follow-up](investigations/2026-09-25-selectiondag-inlineasm.md)
+repairs the corresponding physical-register bounds and `callbr` error-recovery
+paths in 0057. It is validated and installed. Its complete affected source file
+matches the saved published upstream revision; its baseline binary has the same
+prior-patch qualification. The separate nonstandard-integer abort is now
+repaired by [0058](investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)'s
+AArch64 unknown-type guards; its full regression uses 0057's `callbr` recovery.
+The [vector conversion assertions](investigations/2026-09-25-selectiondag-vector-parts.md)
+are repaired by 0059's generic split/join diagnostics; supported conversions are
+preserved. The original input requires 0057's virtual-allocation repair. MOS
+Clang/LLD are rebuilt and installed. Independent review and submission preparation
+remain, with the failing baseline retained unchanged.
+
+The [exhaustive 65816 opcode roundtrip plan](plans/2026-09-25-65816-all-opcode-roundtrip.md)
+is written. Implementation is deferred at the user's request. It requires all
+256 opcodes in four M/X contexts, independently checked bytes and instruction
+boundaries, and an explicit assessment of the existing BRK signature contract.
+This is a coverage task; no new compiler failure has been captured by it.
+
+The [0015 revalidation](investigations/2026-09-25-coalescing-0015-revalidation.md) identifies the
+recovered C failure as an identity-copy lane-definition defect already repaired
+by 0028. Its separate allocator diagnosis is superseded for this witness. A new
+[parallel MIR reducer crash](defects/llvm-reduce-parallel-mir-crash.json) was
+captured during reduction. [Patch 0060](investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
+fixes it locally with matching-input red/green evidence; published-upstream
+applicability remains to be assessed.
 
 ## What remains to post
 
@@ -110,16 +156,19 @@ rank in `TODO.md`:
 | 2 | done | 10 | `asm("" : "+g"(x))`: "unable to translate instruction: call" | **fixed 2026-09-23**: generic `InlineAsmLowering` never stored indirect register outputs (`"=*imr,0"`) through their pointer; [0037](upstream-gisel-inline-asm-indirect-output-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-23/0037-validation.md) |
 | 3 | done | 12 + 3 | `llvm.returnaddress` / `llvm.frameaddress` unlegalized | **fixed 2026-09-23**: frame address = incoming soft stack pointer (fixed frame object), return address read from the hard stack by a late-expanded pseudo with a CFG dataflow for the depth; [0038](upstream-return-frame-address-pr.md); [validation](pr-preparations/2026-09-23/0038-validation.md) |
 | 4 | done | 6 | GlobalISel `InlineAsmLowering` assertion: multi-register tied operand (`"=r"(i) : "0"(x)` in `20030222-1.c`, `pr52286.c`) | **fixed 2026-09-24**: generic `InlineAsmLowering` assumed every register operand fits in one register — MOS needs four for a `long`, and the tied form asserted while the plain input and the output were rejected outright. All three now split/merge least significant piece first, as SelectionDAG's `RegsForValue` does; [0041](upstream-gisel-inline-asm-multi-register-pr.md) (for llvm/llvm-project); [validation](pr-preparations/2026-09-24/0041-validation.md) |
-| 5 | T3 | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | vector extensions; scalarization rules |
+| 5 | done | 6 + 2 | `<4 x float>` / `<2 x double>` FADD/FDIV unlegalized | **fixed 2026-09-25**: `0049` backports generic vector prerequisites at this pin; `0050` scalarizes floating arithmetic. All 36 targeted C-derived IR configurations pass, including the separately repaired O0 a16/xy16 scavenger abort (`0054`). [Evidence](plans/2026-09-25-mos-correctness-queue.md), [float defect](defects/mos-float-vector-legalization.json), [scavenger defect](defects/mos-vector-o0-status-scavenge.json). |
 | — | — | 4 | "Stack pointer decrement too large" (frames over 32 KiB) | a hard limit reported cleanly; not a defect |
 
-Recommended order: orders 1 to 4 are done; next is order 5, the only remaining
-codegen class. The zero-page-global opcode disagreement
-found in the 0032 review is fixed by 0036. Its numeric-address controls exposed
-a separate `[T4]` parser defect: `mos16(constant)` can select a zero-page opcode,
-even silently truncating `4660` to `0x34`. That finding needs a width-matching
-fix and now outranks the remaining codegen class.
-[Diagnosis and reproducer](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect).
+Orders 1 through 5 are implemented. The September 25 targeted recheck also
+repairs the byte-index truncation (`0051`), out-of-bank section-offset relaxation
+(`0052`), and status-save range extension (`0054`); the MOS lit suite now has
+171 passes, two unsupported tests, and zero failures. This is a targeted result,
+not a rerun of the entire 4,170-compilation survey. The numeric `mos16(constant)`
+width defect found during the 0036 review is already repaired by `0039`.
+The original [diagnosis](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect)
+and [new matching-input evidence](plans/2026-09-25-mos-correctness-queue.md)
+remain available. Submission preparation and historical qualified reports remain
+in the pending queue; local correctness fixes do not establish upstream PR readiness.
 
 These are unposted contributions and do not require #320/#321. The register
 exhaustion and physical-copy liveness fixes are implemented and validated. The
@@ -209,21 +258,27 @@ failure with the stock upstream frontend and backend.
 | Clang prefetch operand types (`0035`) | [Casts confirmed](pr-preparations/2026-09-23/0035-review-audit.md), including wider options on x86-64; committed test now covers `long`/`long long`/two-argument forms; submit to llvm/llvm-project |
 | GlobalISel indirect inline-asm outputs (`0037`) | [Fix prepared](upstream-gisel-inline-asm-indirect-output-pr.md): `"=*r"` defs stored through their pointer; 10 c-torture compilations repaired, MOS and AArch64 tests; [validation](pr-preparations/2026-09-23/0037-validation.md); [review complete](pr-preparations/2026-09-23/0037-review-audit.md); check and validate the extracted llvm/llvm-project submission against current upstream |
 | Zero-page indexed globals (`0036`) | [Fix prepared](upstream-zero-page-indexed-globals-pr.md), standalone suites and C round trips pass, installed locally; [review audited](pr-preparations/2026-09-23/0036-review-audit.md); submission preparation remains |
-| Explicit constant address width | `mos16(constant)` can select an 8-bit address encoding and truncate it; [reduced and diagnosed](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect), parser fix pending |
+| Explicit constant address width | Fixed locally by `0039`; the [original diagnosis](pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect) is retained, with [matching-input validation](plans/2026-09-25-mos-correctness-queue.md) |
 | Scavenger live-P (`0011`) | Producer established (gcc torture `strlen-4.c`, stock `mos6502` `-O0`); test replaced by an upstream-runnable one; validated; post |
-| Call-clobbered coalescing guard (`0015`) | Revalidate diagnosis and upstream reachability; prefer a root-cause fix |
-| Trunc-selection fallback (`0023`) | Establish a real upstream producer for the independent Imag8-to-i1 portion; retain fork-specific content with its feature series |
+| Call-clobbered coalescing guard (`0015`) | [Revalidated](investigations/2026-09-25-coalescing-0015-revalidation.md): recovered witness repaired by existing 0028; stock MIR reproduces, stock C reachability unproven; retain guard/evidence, route root fix through 0028 |
+| Trunc-selection fallback (`0023`) | [Independent Imag8 rejection cause disproved](investigations/2026-09-26-trunc-imag8-i1-contract.md): the matcher checks the shared bank and inserts an Ac copy; retain 0023 with its feature series, with the original far-pointer observation still qualified |
+| Native-width s64 extension (`0055`) | Fixed and installed; retained original-input failure/success evidence and SNES runtime validation; carry with the native-width series |
+| GlobalISel inline-asm register bounds (`0056`) | Fixed and installed; independent AArch64 diagnostic regression and assertion-enabled cross-target suites pass; prepare the generic submission separately |
+| SelectionDAG inline-asm register bounds (`0057`) | Fixed and installed; 14 matching-input diagnostic checks and cross-target inline-asm/callbr suites pass; generic submission preparation remains |
+| AArch64 unknown inline-asm types (`0058`) | [Nonstandard integer abort](defects/selectiondag-inline-asm-nonstandard-integer.json) fixed; 32 clean diagnostic cases and 277 suite passes; retained AArch64 candidate; full regression requires 0057's `callbr` recovery; prepare llvm/llvm-project submission |
+| SelectionDAG vector inline-asm parts (`0059`) | [Vector conversion assertions](defects/selectiondag-inline-asm-vector-parts.json) fixed; 30 crashing configurations now diagnose, 278 cross-target and 173 MOS passes; original regression requires 0057; installed locally, submission preparation remains |
 
 The ABI notes are discussion contributions, separate from publishing the compiler
 series. The far calling-convention evidence follows the #320 design discussion.
 Older notes need a current-content review before publication.
 
-**Already posted:** six compiler PRs (#578, #584, #586, #588, #589, #604) and SDK
-#450. No new merges or reviews since September 20; all seven have no merge conflicts.
-#604 now has verified Ubuntu/macOS passes and a Windows failure; SDK #450 reports
-no checks. #589 still carries `CHANGES_REQUESTED` despite the published revision.
-See the [live-status snapshot](upstream-contribution-status.md#current-pr-progress)
-for the complete CI table. Job failure causes were not re-audited September 21.
+**Already posted, from the September 25 recorded snapshot:** six compiler PRs
+(#578, #584, #586, #588, #589, #604) and SDK #450. The contribution tracker records
+no new merges or reviews; #589 still carries `CHANGES_REQUESTED` despite the
+published revision. #604 has Ubuntu/macOS passes and a Windows failure, whose
+unrelated baseline test mismatch was checked September 25. SDK #450 reports no
+checks. See the [dated status snapshot](upstream-contribution-status.md#current-pr-progress)
+for the full table and the scope of each CI diagnosis.
 
 ## Recommended order
 
@@ -298,7 +353,7 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Reentrant attribute contract | Source behavior confirmed; no agreed semantic fix | **Unposted question/report** | Decide whether attribute only cancels `-fnonreentrant` or must force reentrant allocation; then fix/docs + tests | No |
 | Undef register-lane verifier failure | Constructed stock-MOS MIR reproducer; generic fix and regression validated | **Held until #320/#321 are ready to open** | Choose smaller fix or refactor; revalidate exact submission before publication | No technical SDK dependency; publication timing tied to feature presentation |
 | Scavenger live-P (`0011`) | Fix, draft, stock-6502 producer and upstream-runnable test | **Ready to post** | [Reachability record](pr-preparations/2026-09-22/0011-stock-6502-reachability.md) | No SDK dependency; otherwise include with native compiler feature |
-| Call-clobbered coalescing guard (`0015`) | Downstream workaround/draft exists | **Not ready to post** | Revalidate diagnosis and stock-upstream reachability; prefer root-cause fix | No SDK dependency; currently triggered by fork features |
+| Call-clobbered coalescing guard (`0015`) | Recovered witness has matching-input 0028 red/green evidence; 0015 avoids its trigger | **Root fix already installed; standalone 0015 diagnosis superseded for this witness** | Route through 0028; stock MIR reproduces, ordinary stock C reachability remains unproven; [evidence](investigations/2026-09-25-coalescing-0015-revalidation.md) | Follow 0028's existing publication prerequisites |
 | Mixed-width pointer across call: RA exhausts registers | Patch 0029 validated, final and independent reviews complete; MOS suite and complete X86/ARM/AArch64 CodeGen suites pass | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | Post-RA physical-copy reuse: stale Y kill | Patch 0030 validated and review audited; six focused cases and MOS CodeGen/MC pass; original assembly unchanged at six levels | **Fix PR prepared, unposted** | Check current upstream applicability, prepare branch, and publish | No |
 | Physical-copy destination reuse | Patch 0031 independently reviewed against 0030 alone; MOS CodeGen 85 pass / one unsupported, MC 46 pass; net size saving with six small increases | **Fix PR prepared, unposted; depends on 0030** | Prepare submission after 0030 | No |
@@ -308,10 +363,21 @@ See [reconciliation strategy](415-snes-target-reconciliation.md) and the
 | Clang prefetch operand types (`0035`) | Casts fix narrower and wider integer options; committed test covers both | **Fix PR prepared, unposted** | Submit to llvm/llvm-project | No |
 | GlobalISel indirect inline-asm outputs (`0037`) | Indirect register defs stored through their pointer; 10 compilations repaired, corpus otherwise identical | **Audited, unposted** | Check and validate extracted submission against current llvm/llvm-project | No |
 | Zero-page indexed globals (`0036`) | Compact opcodes selected consistently; 132 suite passes and 45 upstream C round trips | **Review audited, unposted** | Check upstream applicability, prepare branch | No |
-| Explicit constant address width | `mos16(constant)` truncation reduced and diagnosed; no fix yet | **Investigation recorded** | Fix parser width matching and test affected addressing forms | No |
+| Explicit constant address width (`0039`) | Parser fix validated; matching-input evidence retained | **Fixed locally, unposted** | Complete the standalone submission checks in the [PR draft](upstream-asm-modifier-width-pr.md) | No |
+| Return/frame address (`0038`), spill coalescing (`0040`), multi-register inline asm (`0041`) | Fixes and regression validation exist | **PR drafts prepared, unposted** | Finish submission preparation and publish when requested | No |
+| MOS physical-register constraint width (`0043`), 24-bit assembly printing (`0044`), fixup metadata/directive output (`0046`, `0047`) | Fixes implemented; September 25 audit covers 0043/0046/0047 | **Fixed locally, unposted** | Refresh isolated checks and branches; prepare 0044's draft/bundle | No |
+| Floating vectors (`0050`, with `0049` prerequisites), byte index (`0051`), section-offset bank relaxation (`0052`) | Same-input evidence and relevant compile/runtime checks retained | **Fixed locally, unposted** | Extract applicable submissions and verify upstream scope; 0049 is a backport prerequisite | No |
+| Scavenger status-save range (`0054`) | Backend range contract repaired; original vector cases and focused MIR/runtime pass | **Fixed locally, unposted** | Prepare generic change with its target-hook trigger and regression evidence | No; captured native-width trigger must be explained |
+| GlobalISel / SelectionDAG physical-register bounds (`0056`, `0057`) | Independent AArch64 triggers, clean diagnostics, and cross-target tests pass | **Fixed locally, unposted** | Prepare separate generic submissions; baselines are patched builds with affected source matching saved upstream | No |
+| Narrow-count native s64 shifts (`0055`) | Exact recovered caller and backend input pass; SNES runtime checks pass | **Fixed locally, installed** | Carry the native-width legalization change with the #321 series | No SDK merge dependency; requires native compiler features |
+| AArch64 unknown inline-asm types (`0058`) | Same-input red/green evidence; 32 diagnostic cases and 277 suite passes | **Fixed locally, unposted** | Prepare target-specific submission; full `callbr` regression requires generic 0057 error recovery; [evidence](investigations/2026-09-25-aarch64-inlineasm-unknown-type.md) | No |
+| SelectionDAG vector parts (`0059`) | Same-input red/green evidence; supported vector conversions preserved | **Fixed locally, installed, unposted** | Prepare generic submission and independent review; original regression requires 0057 virtual allocation; [evidence](investigations/2026-09-25-selectiondag-vector-parts.md) | No |
 | #320 far-address-space series (`0001` and related content) | Substantial downstream implementation exists | **Series not posted** | Agree ABI, extract coherent compiler commits and validate standalone | No; SDK integration follows agreed compiler/runtime ABI |
 | #321 native-width series (`0002` and related content) | Substantial downstream implementation exists | **Series not posted** | Extract native-only commits from mixed aggregate, document ABI/interrupt contract, validate and post one complete draft PR | No; native runtime required to execute examples |
-| `0023` trunc-selection fallback | Downstream patch exists; includes fork-specific content | **Unassessed standalone candidate** | Prove a real upstream producer for the Imag8→i1 half; keep Imag32/a16 half with its feature | No; not ready for a standalone PR |
+| Far-global `long,X` byte accesses (`0061`) | [Separate patch](../patches/llvm-mos/0061-mos-far-global-long-x.patch) selects indexed absolute-long loads/stores for unsigned X8 or proven X16 offsets; far-index runtime and focused lit checks pass | **Implemented locally, unposted** | Validate an isolated submission on its #320 compiler prerequisites and prepare its own PR | Compiler #320 far address space; no SDK platform merge dependency |
+| Native 16-bit far accesses (`0062`) | [Separate patch](../patches/llvm-mos/0062-mos-native-far-word.patch) selects `M=0` long absolute and indirect loads/stores, including indexed forms; far-index/far-bank emulator gates and lit checks pass | **Implemented locally, unposted** | Validate an isolated submission after its #320/#321 compiler prerequisites and prepare its own PR | Compiler #320 far address space and #321 native accumulator; no SDK platform merge dependency |
+| Near-store value shared with unit arithmetic (`0063`) | [Separate patch](../patches/llvm-mos/0063-mos-near-shared-store.patch) keeps an ABI A:X value in byte stores before a local increment/decrement; A16 store emulator gate and lit checks pass | **Implemented locally, unposted** | Validate an isolated submission with the #321 native-width series and prepare its own PR; broader indirect/shared-value cases remain | Compiler #321 native-width support; no SDK platform merge dependency |
+| `0023` trunc-selection fallback | [Matcher-contract audit](investigations/2026-09-26-trunc-imag8-i1-contract.md) disproves Imag8-only rejection; 72 compiler runs and 48 selection checks pass | **Independent diagnosis invalid; historical far-pointer cause unknown** | Retain patch and tests with the feature series; historical recovery requires the original input and failing compiler | No independent fix PR; no red baseline or fix claimed |
 
 **Already merged upstream:** #562, #563, #577, #579, #587, #590 and #591.
 These need no new PR. Downstream housekeeping is separate: audit the vendor revision
@@ -325,6 +391,24 @@ win; BRL costs more cycles than the absolute JMP it replaces), `0012` LDCImm
 ## Flowchart
 
 Solid arrows show work/dependencies. The independent tracks can proceed in parallel.
+Green nodes are locally fixed work; red nodes still need a compiler repair.
+A local fix is not a published PR. The remote PR/CI state remains the dated
+snapshot in [the contribution tracker](upstream-contribution-status.md).
+
+[Open the zoomable flowchart](mos-upstream-flowchart.html). Its source is the
+Mermaid block below. Regenerate it after changing this block:
+
+```sh
+python3 dev/docs-deps.py --refresh
+python3 dev/docs-deps.py
+```
+
+This also refreshes the [status overview](mos-upstream-status-2026-09-21.html).
+The registered generator updates the two original `/tmp/llvm-mos-upstream-*.html`
+browser copies as well as the tracked pages. The repository-wide
+[document dependency inventory](document-dependencies.md) tracks affected
+documents; source/output fingerprints detect stale renderings. Synchronization and renderer: OpenAI Codex CLI
+0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
 
 ```mermaid
 flowchart TD
@@ -334,6 +418,7 @@ flowchart TD
     Z[Common SDK longjmp zero fix] --> ZT[Integrated SDK regression: 20 pass]
     ZT --> ZP[SDK PR 450 posted] --> ZM[Review and merge]
     OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589] --> REVIEW[Review / CI follow-up] --> MERGED[Merge]
+    COALESCE0015[0015 recovered witness: root repaired by 0028] --> UNDEF
     UNDEF[Undef-lane fix 0028 validated] --> HOLD[Wait until 320 and 321 are ready to open]
     HOLD --> FINAL[Choose implementation and review submission]
     FINAL --> UNDEFPR[Publish fix PR] --> MERGED
@@ -347,7 +432,20 @@ flowchart TD
     PREFETCH --> PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --> MERGED
     ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --> ASMGREVIEW[Audit complete; validate extracted upstream submission] --> ASMGPR[Submit to llvm/llvm-project] --> MERGED
     ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --> ZPREVIEW[Review audited; submission preparation] --> ZPPR[Publish fix PR] --> MERGED
-    TRIAGE[Remaining c-torture failures: return/frame address, tied asm operand, float vectors] --> NEXTFIX[Next fixes, ranked in TODO]
+    RETFRAME[Return and frame address 0038: fixed and validated] --> PREP[Prepare and validate standalone submissions]
+    COALESCE[Spill coalescing 0040: fixed and validated] --> PREP
+    ASMMULTI[Multi-register inline asm 0041: fixed and validated] --> PREP
+    MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: fixed locally] --> PREP
+    MOSFIX[Floating vectors 0050, byte index 0051, bank offset 0052: fixed locally] --> PREP
+    VECTORBASE[0049: vector prerequisite backport] --> MOSFIX
+    SAVERANGE[Status-save range 0054: fixed and validated] --> PREP
+    GISBOUNDS[GlobalISel register bounds 0056: fixed and installed] --> PREP
+    DAGBOUNDS[SelectionDAG register bounds 0057: fixed and installed] --> PREP
+    DAGBOUNDS -->|callbr recovery prerequisite| INTTYPE[AArch64 unknown asm types 0058: fixed and validated]
+    INTTYPE --> PREP
+    DAGBOUNDS -->|original vector regression prerequisite| VECTORPARTS[SelectionDAG vector parts 0059: fixed and installed]
+    VECTORPARTS --> PREP
+    PREP --> APPROVED[Publish when requested] --> MERGED
   end
   subgraph SNES[SNES platform — separate track]
     EXIST[Existing SDK PR 415 + our platform] --> RECON[Reconcile baseline target and CPU mode]
@@ -359,18 +457,27 @@ flowchart TD
     FARABI[Far ABI agreement] --> FAR[Prepare and post 320 series] --> FARDONE[Merge far support]
     ACCEPT[Agree proper 65816 support required by SDK 415] --> SDKMERGE
     WIDTHABI[Native-width ABI and clean extraction] --> WIDTH[Prepare and post 321 series] --> WIDTHDONE[Merge native-width support]
+    SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --> WIDTH
+    NATIVEPRINT[Native immediate printing 0045: fixed locally] --> WIDTH
     FARDONE --> FARSDK[Integrate far SDK support]
     SDKMERGE --> FARSDK
     WIDTHDONE --> WIDTHSDK[Integrate native-width SDK opt-ins]
     SDKMERGE --> WIDTHSDK
   end
+  subgraph Validation[Validation coverage]
+    OPCODEPLAN[65816 all-opcode roundtrip: plan written, implementation deferred] --> OPCODEORACLE[Review independent oracle and width context]
+    OPCODEORACLE --> OPCODEGATE[Implement and validate 256 opcodes in four M/X contexts]
+  end
   subgraph Reports[Reports needing decisions or development]
+    REDUCER[Fixed locally: llvm-reduce parallel MIR crash] --> REDUCEDIAG[Assess published-upstream applicability]
+    REDUCEDIAG --> FIX
     CONTRACT[Reentrant contract question] --> DECIDE[Agree semantics] --> FIX[Develop and test fix or documentation]
-    GUARDS[Coalescing / trunc candidates: 0015, 0023] --> REPRO[Establish valid stock-upstream reproducers]
-    REPRO --> FIX
-    ADDRWIDTH[Explicit constant address width: reduced and diagnosed] --> FIX
+    GUARDS[0023: independent Imag8 rejection cause disproved] --> TRUNCKEEP[Retain with feature series; historical far-pointer cause unknown]
     FIX --> REPORTPR[Post fix PR; link issue if one exists] --> REPORTMERGE[Review and merge]
   end
+  classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
+  classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT fixed
 ```
 
 ## Independent simulator discussion

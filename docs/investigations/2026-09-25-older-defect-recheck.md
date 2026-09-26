@@ -1,5 +1,14 @@
 # Fresh reproduction of three older compiler reports
 
+**Subsequent evidence:** the [historical baseline recovery](2026-09-25-historical-baseline-recovery.md)
+recovers the original source edits and diagnostics, confirms the full shift
+caller still fails in the fork's a16/xy16 modes, and isolates existing patch 0028
+as the inline-bitboard repair. Both recovered C inputs pass the saved unpatched
+upstream build in its supported configurations. The measurements below remain
+the earlier recheck's results; their missing-evidence assessment is superseded.
+Recovery attribution: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort.
+
 OpenAI Codex, 2026-09-25. Requested by the user after the near-store fixes.
 The shift and undefined-register reports no longer reproduce on the current
 compiler for the inputs exercised here. Their status is **not reproduced on this

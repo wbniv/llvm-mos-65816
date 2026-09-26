@@ -1,0 +1,14 @@
+[
+  {
+    "mode": "a16",
+    "expected": "0x479E",
+    "rom_sha256": "9eabe4c1a48d2c211c79891c7e5fb6cb00d6766fb5248bc822f655338f2fd35a",
+    "map_sha256": "f7a45b0be5034b6c43080124fef0380741bf0f12b2f0278c3eda062989a3e1ef"
+  },
+  {
+    "mode": "xy16",
+    "expected": "0x479E",
+    "rom_sha256": "9eabe4c1a48d2c211c79891c7e5fb6cb00d6766fb5248bc822f655338f2fd35a",
+    "map_sha256": "5e0acc713c946e50dcb74c689174688cf099ca43acf72c6f5b6ea412d72d31a0"
+  }
+]

@@ -1,0 +1,2050 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/original/rcundef.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  ; Function Attrs: noinline nounwind optnone
+  define dso_local void @newton_step(ptr noundef %0, ptr noundef %1) #0 {
+    %3 = alloca ptr, align 1
+    %4 = alloca ptr, align 1
+    %5 = alloca i16, align 1
+    %6 = alloca i16, align 1
+    %7 = alloca i16, align 1
+    %8 = alloca i16, align 1
+    %9 = alloca i16, align 1
+    %10 = alloca i16, align 1
+    %11 = alloca i16, align 1
+    %12 = alloca i16, align 1
+    %13 = alloca i16, align 1
+    %14 = alloca i16, align 1
+    %15 = alloca i32, align 1
+    %16 = alloca i32, align 1
+    %17 = alloca i32, align 1
+    %18 = alloca i32, align 1
+    %19 = alloca i32, align 1
+    %20 = alloca i32, align 1
+    %21 = alloca i32, align 1
+    store ptr %0, ptr %3, align 1
+    store ptr %1, ptr %4, align 1
+    %22 = load ptr, ptr %3, align 1
+    %23 = load i16, ptr %22, align 1
+    store i16 %23, ptr %5, align 1
+    %24 = load ptr, ptr %4, align 1
+    %25 = load i16, ptr %24, align 1
+    store i16 %25, ptr %6, align 1
+    %26 = load i16, ptr %5, align 1
+    %27 = sext i16 %26 to i32
+    %28 = load i16, ptr %5, align 1
+    %29 = sext i16 %28 to i32
+    %30 = mul nsw i32 %27, %29
+    %31 = load i16, ptr %6, align 1
+    %32 = sext i16 %31 to i32
+    %33 = load i16, ptr %6, align 1
+    %34 = sext i16 %33 to i32
+    %35 = mul nsw i32 %32, %34
+    %36 = sub nsw i32 %30, %35
+    %37 = ashr i32 %36, 8
+    %38 = trunc i32 %37 to i16
+    store i16 %38, ptr %7, align 1
+    %39 = load i16, ptr %5, align 1
+    %40 = sext i16 %39 to i32
+    %41 = load i16, ptr %6, align 1
+    %42 = sext i16 %41 to i32
+    %43 = mul nsw i32 %40, %42
+    %44 = ashr i32 %43, 7
+    %45 = trunc i32 %44 to i16
+    store i16 %45, ptr %8, align 1
+    %46 = load i16, ptr %7, align 1
+    %47 = sext i16 %46 to i32
+    %48 = load i16, ptr %5, align 1
+    %49 = sext i16 %48 to i32
+    %50 = mul nsw i32 %47, %49
+    %51 = load i16, ptr %8, align 1
+    %52 = sext i16 %51 to i32
+    %53 = load i16, ptr %6, align 1
+    %54 = sext i16 %53 to i32
+    %55 = mul nsw i32 %52, %54
+    %56 = sub nsw i32 %50, %55
+    %57 = ashr i32 %56, 8
+    %58 = trunc i32 %57 to i16
+    store i16 %58, ptr %9, align 1
+    %59 = load i16, ptr %7, align 1
+    %60 = sext i16 %59 to i32
+    %61 = load i16, ptr %6, align 1
+    %62 = sext i16 %61 to i32
+    %63 = mul nsw i32 %60, %62
+    %64 = load i16, ptr %8, align 1
+    %65 = sext i16 %64 to i32
+    %66 = load i16, ptr %5, align 1
+    %67 = sext i16 %66 to i32
+    %68 = mul nsw i32 %65, %67
+    %69 = add nsw i32 %63, %68
+    %70 = ashr i32 %69, 8
+    %71 = trunc i32 %70 to i16
+    store i16 %71, ptr %10, align 1
+    %72 = load i16, ptr %9, align 1
+    %73 = sub nsw i16 %72, 256
+    store i16 %73, ptr %11, align 1
+    %74 = load i16, ptr %10, align 1
+    store i16 %74, ptr %12, align 1
+    %75 = load i16, ptr %7, align 1
+    %76 = sext i16 %75 to i32
+    %77 = mul nsw i32 3, %76
+    %78 = trunc i32 %77 to i16
+    store i16 %78, ptr %13, align 1
+    %79 = load i16, ptr %8, align 1
+    %80 = sext i16 %79 to i32
+    %81 = mul nsw i32 3, %80
+    %82 = trunc i32 %81 to i16
+    store i16 %82, ptr %14, align 1
+    %83 = load i16, ptr %11, align 1
+    %84 = sext i16 %83 to i32
+    %85 = ashr i32 %84, 1
+    store i32 %85, ptr %15, align 1
+    %86 = load i16, ptr %12, align 1
+    %87 = sext i16 %86 to i32
+    %88 = ashr i32 %87, 1
+    store i32 %88, ptr %16, align 1
+    %89 = load i16, ptr %13, align 1
+    %90 = sext i16 %89 to i32
+    %91 = ashr i32 %90, 1
+    store i32 %91, ptr %17, align 1
+    %92 = load i16, ptr %14, align 1
+    %93 = sext i16 %92 to i32
+    %94 = ashr i32 %93, 1
+    store i32 %94, ptr %18, align 1
+    %95 = load i32, ptr %17, align 1
+    %96 = load i32, ptr %17, align 1
+    %97 = mul nsw i32 %95, %96
+    %98 = load i32, ptr %18, align 1
+    %99 = load i32, ptr %18, align 1
+    %100 = mul nsw i32 %98, %99
+    %101 = add nsw i32 %97, %100
+    store i32 %101, ptr %19, align 1
+    %102 = load i32, ptr %19, align 1
+    %103 = icmp eq i32 %102, 0
+    br i1 %103, label %104, label %105
+  
+  104:                                              ; preds = %2
+    br label %152
+  
+  105:                                              ; preds = %2
+    %106 = load i32, ptr %15, align 1
+    %107 = load i32, ptr %17, align 1
+    %108 = mul nsw i32 %106, %107
+    %109 = load i32, ptr %16, align 1
+    %110 = load i32, ptr %18, align 1
+    %111 = mul nsw i32 %109, %110
+    %112 = add nsw i32 %108, %111
+    %113 = shl i32 %112, 8
+    %114 = load i32, ptr %19, align 1
+    %115 = sdiv i32 %113, %114
+    store i32 %115, ptr %20, align 1
+    %116 = load i32, ptr %16, align 1
+    %117 = load i32, ptr %17, align 1
+    %118 = mul nsw i32 %116, %117
+    %119 = load i32, ptr %15, align 1
+    %120 = load i32, ptr %18, align 1
+    %121 = mul nsw i32 %119, %120
+    %122 = sub nsw i32 %118, %121
+    %123 = shl i32 %122, 8
+    %124 = load i32, ptr %19, align 1
+    %125 = sdiv i32 %123, %124
+    store i32 %125, ptr %21, align 1
+    %126 = load i32, ptr %20, align 1
+    %127 = icmp sgt i32 %126, 512
+    br i1 %127, label %128, label %129
+  
+  128:                                              ; preds = %105
+    store i32 512, ptr %20, align 1
+    br label %129
+  
+  129:                                              ; preds = %128, %105
+    %130 = load i32, ptr %20, align 1
+    %131 = icmp slt i32 %130, -512
+    br i1 %131, label %132, label %133
+  
+  132:                                              ; preds = %129
+    store i32 -512, ptr %20, align 1
+    br label %133
+  
+  133:                                              ; preds = %132, %129
+    %134 = load i32, ptr %21, align 1
+    %135 = icmp sgt i32 %134, 512
+    br i1 %135, label %136, label %137
+  
+  136:                                              ; preds = %133
+    store i32 512, ptr %21, align 1
+    br label %137
+  
+  137:                                              ; preds = %136, %133
+    %138 = load i32, ptr %21, align 1
+    %139 = icmp slt i32 %138, -512
+    br i1 %139, label %140, label %141
+  
+  140:                                              ; preds = %137
+    store i32 -512, ptr %21, align 1
+    br label %141
+  
+  141:                                              ; preds = %140, %137
+    %142 = load i16, ptr %5, align 1
+    %143 = load i32, ptr %20, align 1
+    %144 = trunc i32 %143 to i16
+    %145 = sub nsw i16 %142, %144
+    %146 = load ptr, ptr %3, align 1
+    store i16 %145, ptr %146, align 1
+    %147 = load i16, ptr %6, align 1
+    %148 = load i32, ptr %21, align 1
+    %149 = trunc i32 %148 to i16
+    %150 = sub nsw i16 %147, %149
+    %151 = load ptr, ptr %4, align 1
+    store i16 %150, ptr %151, align 1
+    br label %152
+  
+  152:                                              ; preds = %141, %104
+    ret void
+  }
+  
+  attributes #0 = { noinline nounwind optnone "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 24.0.0git (/home/will/llvm-mos 742d554bf08042b8df93d791c335260fadd16643)"}
+...
+---
+name:            newton_step
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 17, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 18, name: '', type: default, offset: 0, size: 4, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.2):
+    successors: %bb.1(0x40000000), %bb.2(0x40000000)
+    liveins: $rs1, $rs2
+  
+    renamable $a = COPY renamable $rc2
+    renamable $rc6 = COPY killed renamable $rc3
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.0, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.0, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.3)
+    renamable $x = LDImm 0
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.3 + 1)
+    renamable $a = COPY renamable $rc4
+    renamable $rc7 = COPY killed renamable $rc5
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.1, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.1, 0, killed renamable $c
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs2, killed renamable $y :: (store (s8) into %ir.4)
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc7
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.4 + 1)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.3)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.3 + 1)
+    renamable $x = lr-split COPY killed renamable $rc7
+    renamable $rc2 = COPY killed renamable $rc8
+    renamable $rc3 = COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.22)
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY renamable $rc6
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.22 + 1)
+    renamable $x = lr-split COPY killed renamable $rc6
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc7
+    renamable $y = lr-split COPY killed renamable $rc8
+    STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.5)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $a = lr-split COPY killed renamable $rc6
+    renamable $y = lr-split COPY renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.5 + 1)
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs2, renamable $y :: (load (s8) from %ir.4)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $x
+    renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.4 + 1)
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $x = lr-split COPY killed renamable $rc4
+    renamable $rc4 = COPY killed renamable $rc6
+    renamable $rc5 = COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs2, renamable $y :: (load (s8) from %ir.24)
+    renamable $rc9 = lr-split COPY killed renamable $y
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $x
+    renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.24 + 1)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc8 = lr-split COPY killed renamable $x
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc7
+    renamable $y = lr-split COPY killed renamable $rc9
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.6)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $a = lr-split COPY killed renamable $rc6
+    renamable $y = lr-split COPY killed renamable $rc8
+    STIndirIdx killed renamable $a, killed renamable $rs2, killed renamable $y :: (store (s8) into %ir.6 + 1)
+    renamable $x = LDImm 1
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.1, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.2
+  
+  bb.1 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm -1
+    JMP %bb.3
+  
+  bb.2 (%ir-block.2):
+    successors: %bb.3(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm 0
+    JMP %bb.3
+  
+  bb.3 (%ir-block.2):
+    successors: %bb.4(0x40000000), %bb.5(0x40000000)
+    liveins: $x, $rc8, $rc9
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    CmpBrZero %bb.4, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.5
+  
+  bb.4 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm -1
+    JMP %bb.6
+  
+  bb.5 (%ir-block.2):
+    successors: %bb.6(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm 0
+    JMP %bb.6
+  
+  bb.6 (%ir-block.2):
+    successors: %bb.7(0x40000000), %bb.8(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc22 = COPY $a
+    renamable $rc21 = COPY $x
+    renamable $rc20 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.7, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.8
+  
+  bb.7 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm -1
+    JMP %bb.9
+  
+  bb.8 (%ir-block.2):
+    successors: %bb.9(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm 0
+    JMP %bb.9
+  
+  bb.9 (%ir-block.2):
+    successors: %bb.10(0x40000000), %bb.11(0x40000000)
+    liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+    CmpBrZero %bb.10, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.11
+  
+  bb.10 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm -1
+    JMP %bb.12
+  
+  bb.11 (%ir-block.2):
+    successors: %bb.12(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm 0
+    JMP %bb.12
+  
+  bb.12 (%ir-block.2):
+    successors: %bb.13(0x40000000), %bb.14(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = lr-split COPY killed renamable $rc22
+    renamable $c = CMPImag8 killed renamable $x, killed renamable $rc3
+    renamable $a = lr-split COPY killed renamable $rc21
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc20
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.4, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.4, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.7)
+    renamable $x = LDImm 0
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc4
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.7 + 1)
+    renamable $x = LDImm 1
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.13, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.14
+  
+  bb.13 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm -1
+    JMP %bb.15
+  
+  bb.14 (%ir-block.2):
+    successors: %bb.15(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm 0
+    JMP %bb.15
+  
+  bb.15 (%ir-block.2):
+    successors: %bb.16(0x40000000), %bb.17(0x40000000)
+    liveins: $x, $rc8, $rc9
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+    CmpBrZero %bb.16, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.17
+  
+  bb.16 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm -1
+    JMP %bb.18
+  
+  bb.17 (%ir-block.2):
+    successors: %bb.18(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm 0
+    JMP %bb.18
+  
+  bb.18 (%ir-block.2):
+    successors: %bb.19(0x40000000), %bb.20(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    dead renamable $a, renamable $c = ASL killed renamable $a
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc2
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.5, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.5, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = lr-split COPY killed renamable $rc4
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.8)
+    renamable $x = LDImm 0
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc5
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.8 + 1)
+    renamable $x = LDImm 1
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.4, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.4, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.19, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.20
+  
+  bb.19 (%ir-block.2):
+    successors: %bb.21(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm -1
+    JMP %bb.21
+  
+  bb.20 (%ir-block.2):
+    successors: %bb.21(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm 0
+    JMP %bb.21
+  
+  bb.21 (%ir-block.2):
+    successors: %bb.22(0x40000000), %bb.23(0x40000000)
+    liveins: $x, $rc8, $rc9
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    CmpBrZero %bb.22, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.23
+  
+  bb.22 (%ir-block.2):
+    successors: %bb.24(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm -1
+    JMP %bb.24
+  
+  bb.23 (%ir-block.2):
+    successors: %bb.24(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm 0
+    JMP %bb.24
+  
+  bb.24 (%ir-block.2):
+    successors: %bb.25(0x40000000), %bb.26(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc22 = COPY $a
+    renamable $rc21 = COPY $x
+    renamable $rc20 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.5, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.5, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.25, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.26
+  
+  bb.25 (%ir-block.2):
+    successors: %bb.27(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm -1
+    JMP %bb.27
+  
+  bb.26 (%ir-block.2):
+    successors: %bb.27(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm 0
+    JMP %bb.27
+  
+  bb.27 (%ir-block.2):
+    successors: %bb.28(0x40000000), %bb.29(0x40000000)
+    liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+    CmpBrZero %bb.28, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.29
+  
+  bb.28 (%ir-block.2):
+    successors: %bb.30(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm -1
+    JMP %bb.30
+  
+  bb.29 (%ir-block.2):
+    successors: %bb.30(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm 0
+    JMP %bb.30
+  
+  bb.30 (%ir-block.2):
+    successors: %bb.31(0x40000000), %bb.32(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = lr-split COPY killed renamable $rc22
+    renamable $c = CMPImag8 killed renamable $x, killed renamable $rc3
+    renamable $a = lr-split COPY killed renamable $rc21
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc20
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.6, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.6, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.9)
+    renamable $x = LDImm 0
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc4
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.9 + 1)
+    renamable $x = LDImm 1
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.4, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.4, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.31, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.32
+  
+  bb.31 (%ir-block.2):
+    successors: %bb.33(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm -1
+    JMP %bb.33
+  
+  bb.32 (%ir-block.2):
+    successors: %bb.33(0x80000000)
+    liveins: $rc8, $rc9
+  
+    renamable $x = LDImm 0
+    JMP %bb.33
+  
+  bb.33 (%ir-block.2):
+    successors: %bb.34(0x40000000), %bb.35(0x40000000)
+    liveins: $x, $rc8, $rc9
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.6)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.6 + 1)
+    CmpBrZero %bb.34, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.35
+  
+  bb.34 (%ir-block.2):
+    successors: %bb.36(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm -1
+    JMP %bb.36
+  
+  bb.35 (%ir-block.2):
+    successors: %bb.36(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9
+  
+    renamable $y = LDImm 0
+    JMP %bb.36
+  
+  bb.36 (%ir-block.2):
+    successors: %bb.37(0x40000000), %bb.38(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc22 = COPY $a
+    renamable $rc21 = COPY $x
+    renamable $rc20 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.5, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.5, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    CmpBrZero %bb.37, undef $n, 1, renamable $rc8, implicit-def dead $c
+    JMP %bb.38
+  
+  bb.37 (%ir-block.2):
+    successors: %bb.39(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm -1
+    JMP %bb.39
+  
+  bb.38 (%ir-block.2):
+    successors: %bb.39(0x80000000)
+    liveins: $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $x = LDImm 0
+    JMP %bb.39
+  
+  bb.39 (%ir-block.2):
+    successors: %bb.40(0x40000000), %bb.41(0x40000000)
+    liveins: $x, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    CmpBrZero %bb.40, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.41
+  
+  bb.40 (%ir-block.2):
+    successors: %bb.42(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm -1
+    JMP %bb.42
+  
+  bb.41 (%ir-block.2):
+    successors: %bb.42(0x80000000)
+    liveins: $a, $x, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    renamable $y = LDImm 0
+    JMP %bb.42
+  
+  bb.42 (%ir-block.2):
+    successors: %bb.43(0x40000000), %bb.44(0x40000000)
+    liveins: $a, $x, $y, $rc4, $rc8, $rc9, $rc20, $rc21, $rc22
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY killed renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = lr-split COPY killed renamable $rc22
+    dead renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc21
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc20
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.7, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.7, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.10)
+    renamable $x = LDImm 0
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $y = LDImm 1
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.10 + 1)
+    renamable $x = LDImm 1
+    renamable $rc7 = lr-split COPY killed renamable $x
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.6, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.6, 0, killed renamable $c
+    renamable $y = lr-split COPY renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs2, killed renamable $y :: (load (s8) from %ir.9)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.9 + 1)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc7 = lr-split COPY killed renamable $x
+    renamable $c = LDImm1 -1
+    renamable $a = lr-split COPY killed renamable $rc8
+    renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $a, dead renamable $c, dead renamable $v = SBCImm killed renamable $a, 1, killed renamable $c
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.8, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.8, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = lr-split COPY killed renamable $rc8
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.11)
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc7
+    renamable $a = lr-split COPY killed renamable $rc9
+    STIndirIdx killed renamable $a, killed renamable $rs2, killed renamable $y :: (store (s8) into %ir.11 + 1)
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.10)
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.9, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.9, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs1, renamable $y :: (load (s8) from %ir.10 + 1)
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $rc2 = lr-split COPY killed renamable $y
+    renamable $a = lr-split COPY killed renamable $rc6
+    renamable $y = lr-split COPY renamable $rc8
+    STIndirIdx killed renamable $a, renamable $rs2, killed renamable $y :: (store (s8) into %ir.12)
+    renamable $y = lr-split COPY killed renamable $rc2
+    renamable $a = lr-split COPY killed renamable $rc3
+    STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.12 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.4, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.4, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc8
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.7)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.7 + 1)
+    CmpBrZero %bb.43, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.44
+  
+  bb.43 (%ir-block.2):
+    successors: %bb.45(0x80000000)
+    liveins: $a, $rc4
+  
+    renamable $y = LDImm -1
+    JMP %bb.45
+  
+  bb.44 (%ir-block.2):
+    successors: %bb.45(0x80000000)
+    liveins: $a, $rc4
+  
+    renamable $y = LDImm 0
+    JMP %bb.45
+  
+  bb.45 (%ir-block.2):
+    successors: %bb.46(0x40000000), %bb.47(0x40000000)
+    liveins: $a, $y, $rc4
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = LDImm 0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    renamable $rc20 = lr-split COPY renamable $x
+    renamable $a = LDImm 3
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def dead $rc2, implicit-def dead $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.10, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.10, 0, killed renamable $c
+    renamable $y = lr-split COPY renamable $rc20
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.13)
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.13 + 1)
+    renamable $x = LDImm 1
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.5, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.5, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc20
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.8)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.8 + 1)
+    CmpBrZero %bb.46, undef $n, 1, renamable $a, implicit-def dead $c
+    JMP %bb.47
+  
+  bb.46 (%ir-block.2):
+    successors: %bb.48(0x80000000)
+    liveins: $a, $rc4
+  
+    renamable $y = LDImm -1
+    JMP %bb.48
+  
+  bb.47 (%ir-block.2):
+    successors: %bb.48(0x80000000)
+    liveins: $a, $rc4
+  
+    renamable $y = LDImm 0
+    JMP %bb.48
+  
+  bb.48 (%ir-block.2):
+    successors: %bb.49(0x40000000), %bb.50(0x40000000)
+    liveins: $a, $y, $rc4
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $x = LDImm 0
+    $rc2 = COPY renamable $x
+    $rc3 = COPY renamable $x
+    $rc5 = COPY killed renamable $a
+    $rc6 = COPY renamable $y
+    $rc7 = COPY killed renamable $y
+    renamable $rc20 = lr-split COPY renamable $x
+    renamable $a = LDImm 3
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def dead $rc2, implicit-def dead $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.11, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.11, 0, killed renamable $c
+    renamable $y = lr-split COPY renamable $rc20
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.14)
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.14 + 1)
+    renamable $x = LDImm 1
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.8, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.8, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc20
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.11)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.11 + 1)
+    renamable $x = lr-split COPY killed renamable $a
+    CmpBrZero %bb.49, undef $n, 1, renamable $x, implicit-def dead $c
+    JMP %bb.50
+  
+  bb.49 (%ir-block.2):
+    successors: %bb.51(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm -1
+    JMP %bb.51
+  
+  bb.50 (%ir-block.2):
+    successors: %bb.51(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm 0
+    JMP %bb.51
+  
+  bb.51 (%ir-block.2):
+    successors: %bb.52(0x40000000), %bb.53(0x40000000)
+    liveins: $a, $x, $rc4
+  
+    renamable $c = CMPImm renamable $a, 128
+    renamable $y = COPY renamable $a
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc5, renamable $c = ROR killed renamable $rc5, killed renamable $c
+    renamable $a, renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $rc6, renamable $c = ROR killed renamable $rc6, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $a, dead renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.12, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.12, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15)
+    renamable $y = LDImm 0
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 1)
+    renamable $y = LDImm 1
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 2)
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $rc5
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.15 + 3)
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.9, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.9, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.12)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.12 + 1)
+    renamable $x = lr-split COPY killed renamable $a
+    CmpBrZero %bb.52, undef $n, 1, renamable $x, implicit-def dead $c
+    JMP %bb.53
+  
+  bb.52 (%ir-block.2):
+    successors: %bb.54(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm -1
+    JMP %bb.54
+  
+  bb.53 (%ir-block.2):
+    successors: %bb.54(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm 0
+    JMP %bb.54
+  
+  bb.54 (%ir-block.2):
+    successors: %bb.55(0x40000000), %bb.56(0x40000000)
+    liveins: $a, $x, $rc4
+  
+    renamable $c = CMPImm renamable $a, 128
+    renamable $y = COPY renamable $a
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc5, renamable $c = ROR killed renamable $rc5, killed renamable $c
+    renamable $a, renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $rc6, renamable $c = ROR killed renamable $rc6, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $a, dead renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.13, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.13, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16)
+    renamable $y = LDImm 0
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 1)
+    renamable $y = LDImm 1
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 2)
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $rc5
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.16 + 3)
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.10, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.10, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.13)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.13 + 1)
+    renamable $x = lr-split COPY killed renamable $a
+    CmpBrZero %bb.55, undef $n, 1, renamable $x, implicit-def dead $c
+    JMP %bb.56
+  
+  bb.55 (%ir-block.2):
+    successors: %bb.57(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm -1
+    JMP %bb.57
+  
+  bb.56 (%ir-block.2):
+    successors: %bb.57(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm 0
+    JMP %bb.57
+  
+  bb.57 (%ir-block.2):
+    successors: %bb.58(0x40000000), %bb.59(0x40000000)
+    liveins: $a, $x, $rc4
+  
+    renamable $c = CMPImm renamable $a, 128
+    renamable $y = COPY renamable $a
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc5, renamable $c = ROR killed renamable $rc5, killed renamable $c
+    renamable $a, renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $rc6, renamable $c = ROR killed renamable $rc6, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $a, dead renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.14, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.14, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17)
+    renamable $y = LDImm 0
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 1)
+    renamable $y = LDImm 1
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 2)
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $rc5
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.17 + 3)
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.11, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.11, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.14)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.14 + 1)
+    renamable $x = lr-split COPY killed renamable $a
+    CmpBrZero %bb.58, undef $n, 1, renamable $x, implicit-def dead $c
+    JMP %bb.59
+  
+  bb.58 (%ir-block.2):
+    successors: %bb.60(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm -1
+    JMP %bb.60
+  
+  bb.59 (%ir-block.2):
+    successors: %bb.60(0x80000000)
+    liveins: $x, $rc4
+  
+    renamable $a = LDImm 0
+    JMP %bb.60
+  
+  bb.60 (%ir-block.2):
+    successors: %bb.61(0x40000000), %bb.62(0x40000000)
+    liveins: $a, $x, $rc4
+  
+    renamable $c = CMPImm renamable $a, 128
+    renamable $y = COPY renamable $a
+    renamable $rc2 = lr-split COPY killed renamable $y
+    renamable $rc2, renamable $c = ROR killed renamable $rc2, killed renamable $c
+    renamable $a, renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc3 = lr-split COPY killed renamable $x
+    renamable $rc3, renamable $c = ROR killed renamable $rc3, killed renamable $c
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $a, dead renamable $c = ROR killed renamable $a, killed renamable $c
+    renamable $rc20, renamable $c, dead renamable $v = AddrLostk %stack.15, 0
+    renamable $rc21, dead renamable $c, dead renamable $v = AddrHistk %stack.15, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18)
+    renamable $x = LDImm 0
+    renamable $rc4 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = lr-split COPY killed renamable $rc3
+    STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 1)
+    renamable $x = LDImm 1
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $rc5
+    STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 2)
+    renamable $y = LDImm 2
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $rc2
+    STIndirIdx killed renamable $a, renamable $rs10, killed renamable $y :: (store (s8) into %ir.18 + 3)
+    renamable $y = LDImm 3
+    renamable $rc9 = lr-split COPY killed renamable $y
+    renamable $rc10, renamable $c, dead renamable $v = AddrLostk %stack.14, 0
+    renamable $rc11, dead renamable $c, dead renamable $v = AddrHistk %stack.14, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17)
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $rc5 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 1)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 2)
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc9
+    renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 3)
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc26 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs5, renamable $y :: (load (s8) from %ir.17 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc27 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc9
+    renamable $a = LDIndirIdx killed renamable $rs5, killed renamable $y :: (load (s8) from %ir.17 + 3)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc25 = COPY $a
+    renamable $rc22 = COPY $x
+    renamable $rc23 = COPY $rc2
+    renamable $rc24 = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $y = lr-split COPY killed renamable $rc26
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18)
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc27
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 2)
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.18 + 3)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc26 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY killed renamable $rc27
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs10, killed renamable $y :: (load (s8) from %ir.18 + 3)
+    renamable $x = LDImm 3
+    renamable $rc20 = lr-split COPY killed renamable $x
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $x = COPY killed renamable $rc9
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc4 = COPY $a
+    renamable $rc5 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = lr-split COPY killed renamable $rc25
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc22
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc5, killed renamable $c
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc23
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc24
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.16, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.16, 0, killed renamable $c
+    renamable $y = LDImm 0
+    renamable $a = lr-split COPY killed renamable $rc7
+    STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.19)
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19)
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc5
+    renamable $rc5 = lr-split COPY killed renamable $rc26
+    renamable $y = lr-split COPY renamable $rc5
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.19 + 1)
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $rc4
+    STIndirIdx killed renamable $a, renamable $rs1, renamable $y :: (store (s8) into %ir.19 + 2)
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $a = lr-split COPY killed renamable $rc6
+    renamable $rc4 = lr-split COPY killed renamable $rc20
+    renamable $y = lr-split COPY renamable $rc4
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.19 + 3)
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc8
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.19 + 3)
+    CmpBrZeroMultiByte %bb.61, 1, killed renamable $rc7, killed renamable $rc5, killed renamable $rc6, killed renamable $a, implicit-def dead $c
+    JMP %bb.62
+  
+  bb.61 (%ir-block.104):
+    successors: %bb.83(0x80000000)
+  
+    JMP %bb.83
+  
+  bb.62 (%ir-block.105):
+    successors: %bb.63(0x40000000), %bb.64(0x40000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc20, renamable $c, dead renamable $v = AddrLostk %stack.12, 0
+    renamable $rc21, dead renamable $c, dead renamable $v = AddrHistk %stack.12, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 0
+    renamable $rc24 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 1)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc28 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 2
+    renamable $rc22, renamable $c, dead renamable $v = AddrLostk %stack.14, 0
+    renamable $rc23, dead renamable $c, dead renamable $v = AddrHistk %stack.14, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 2)
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 2
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx renamable $rs10, killed renamable $y :: (load (s8) from %ir.15 + 3)
+    renamable $x = LDImm 3
+    renamable $rc7 = lr-split COPY killed renamable $x
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc24
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc28
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 3)
+    renamable $x = LDImm 3
+    renamable $rc29 = lr-split COPY killed renamable $x
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $x = COPY killed renamable $rc9
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc25 = COPY $a
+    renamable $rc26 = COPY $x
+    renamable $rc27 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc30, renamable $c, dead renamable $v = AddrLostk %stack.13, 0
+    renamable $rc31, dead renamable $c, dead renamable $v = AddrHistk %stack.13, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc24
+    renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16)
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc28
+    renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $rc2 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc2
+    renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $rc2
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc29
+    renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 3)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $rc28, renamable $c, dead renamable $v = AddrLostk %stack.15, 0
+    renamable $rc29, dead renamable $c, dead renamable $v = AddrHistk %stack.15, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc24 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 3)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 0
+    renamable $a = lr-split COPY killed renamable $rc25
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc26
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc27
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $rc26, renamable $c, dead renamable $v = AddrLostk %stack.16, 0
+    renamable $rc27, dead renamable $c, dead renamable $v = AddrHistk %stack.16, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc24
+    renamable $a = LDIndirIdx renamable $rs13, renamable $y :: (load (s8) from %ir.19)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc9 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 3)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY killed renamable $x
+    $rc7 = COPY killed renamable $a
+    $x = COPY killed renamable $rc8
+    $a = COPY killed renamable $rc9
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc24, renamable $c, dead renamable $v = AddrLostk %stack.17, 0
+    renamable $rc25, dead renamable $c, dead renamable $v = AddrHistk %stack.17, 0, killed renamable $c
+    renamable $y = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20)
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $x = LDImm 1
+    renamable $y = lr-split COPY killed renamable $x
+    renamable $a = lr-split COPY killed renamable $rc4
+    STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 1)
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $rc2
+    STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $rc3
+    STIndirIdx killed renamable $a, renamable $rs12, renamable $y :: (store (s8) into %ir.20 + 3)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs15, renamable $y :: (load (s8) from %ir.16 + 1)
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $rc10 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 2)
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs15, killed renamable $y :: (load (s8) from %ir.16 + 3)
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc10
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs11, killed renamable $y :: (load (s8) from %ir.17 + 3)
+    renamable $x = LDImm 3
+    renamable $rc30 = lr-split COPY killed renamable $x
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $x = COPY killed renamable $rc9
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc23 = COPY $a
+    renamable $rc22 = COPY $x
+    renamable $rc31 = COPY $rc2
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $y = LDImm 0
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15)
+    renamable $rc8 = lr-split COPY killed renamable $a
+    renamable $rc4 = lr-split COPY killed renamable $y
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $y
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $a = LDIndirIdx renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $y
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc30
+    renamable $a = LDIndirIdx killed renamable $rs10, renamable $y :: (load (s8) from %ir.15 + 3)
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc4
+    renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc20 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs14, killed renamable $y :: (load (s8) from %ir.18 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc30 = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $a = LDIndirIdx renamable $rs14, renamable $y :: (load (s8) from %ir.18 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc21 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs14, renamable $y :: (load (s8) from %ir.18 + 3)
+    renamable $rc28 = lr-split COPY killed renamable $y
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc7 = COPY killed renamable $a
+    $x = COPY killed renamable $rc9
+    $a = COPY killed renamable $rc8
+    JSR &__mulsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def dead $rc3
+    renamable $rc3 = COPY $a
+    renamable $rc4 = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $c = LDImm1 -1
+    renamable $a = lr-split COPY killed renamable $rc23
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc22
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $rc9 = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc31
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc20
+    renamable $a = LDIndirIdx renamable $rs13, renamable $y :: (load (s8) from %ir.19)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY renamable $rc30
+    renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc21
+    renamable $a = LDIndirIdx renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 2)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc28
+    renamable $a = LDIndirIdx killed renamable $rs13, killed renamable $y :: (load (s8) from %ir.19 + 3)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    $rc2 = COPY killed renamable $rc9
+    $rc7 = COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc8
+    renamable $rc20 = lr-split COPY renamable $a
+    JSR &__divsi3, mos_csr, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7, implicit-def $a, implicit-def $x, implicit-def $rc2, implicit-def $rc3
+    renamable $rc6 = COPY $x
+    renamable $x = COPY $rc3
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc20
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21)
+    renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20)
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc30
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 1)
+    renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 1)
+    renamable $rc3 = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc21
+    renamable $a = lr-split COPY killed renamable $rc2
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 2)
+    renamable $a = LDIndirIdx renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 2)
+    renamable $rc2 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.21 + 3)
+    renamable $a = LDIndirIdx killed renamable $rs12, killed renamable $y :: (load (s8) from %ir.20 + 3)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $c = CMPImm killed renamable $y, 1
+    renamable $a = lr-split COPY killed renamable $rc3
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 2, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc2
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    GBR %bb.63, killed renamable $v, 1, implicit-def dead $c
+    JMP %bb.64
+  
+  bb.63 (%ir-block.105):
+    successors: %bb.65(0x80000000)
+    liveins: $a
+  
+    renamable $a = EORImm killed renamable $a, -128
+    JMP %bb.65
+  
+  bb.64 (%ir-block.105):
+    successors: %bb.65(0x80000000)
+    liveins: $a
+  
+    JMP %bb.65
+  
+  bb.65 (%ir-block.105):
+    successors: %bb.66(0x40000000), %bb.67(0x40000000)
+    liveins: $a
+  
+    CmpBrZero %bb.66, undef $n, 0, killed renamable $a, implicit-def dead $c
+    JMP %bb.67
+  
+  bb.66 (%ir-block.128):
+    successors: %bb.67(0x80000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.17, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.17, 0, killed renamable $c
+    renamable $a = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20)
+    renamable $x = LDImm 0
+    renamable $y = LDImm 1
+    renamable $a = LDImm 2
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 1)
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 2)
+    renamable $y = LDImm 3
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 3)
+    JMP %bb.67
+  
+  bb.67 (%ir-block.129):
+    successors: %bb.68(0x40000000), %bb.69(0x40000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.17, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.17, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 2)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.20 + 3)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $c = CMPImm killed renamable $y, 0
+    renamable $a = lr-split COPY killed renamable $rc5
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 254, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc4
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    GBR %bb.68, killed renamable $v, 1, implicit-def dead $c
+    JMP %bb.69
+  
+  bb.68 (%ir-block.129):
+    successors: %bb.70(0x80000000)
+    liveins: $a
+  
+    renamable $a = EORImm killed renamable $a, -128
+    JMP %bb.70
+  
+  bb.69 (%ir-block.129):
+    successors: %bb.70(0x80000000)
+    liveins: $a
+  
+    JMP %bb.70
+  
+  bb.70 (%ir-block.129):
+    successors: %bb.71(0x40000000), %bb.72(0x40000000)
+    liveins: $a
+  
+    CmpBrZero %bb.71, undef $n, 1, killed renamable $a, implicit-def dead $c
+    JMP %bb.72
+  
+  bb.71 (%ir-block.132):
+    successors: %bb.72(0x80000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.17, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.17, 0, killed renamable $c
+    renamable $a = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20)
+    renamable $y = LDImm 1
+    renamable $a = LDImm -2
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 1)
+    renamable $y = LDImm 2
+    renamable $a = LDImm -1
+    STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 2)
+    renamable $y = LDImm 3
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.20 + 3)
+    JMP %bb.72
+  
+  bb.72 (%ir-block.133):
+    successors: %bb.73(0x40000000), %bb.74(0x40000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 2)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 3)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $c = CMPImm killed renamable $y, 1
+    renamable $a = lr-split COPY killed renamable $rc5
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 2, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc4
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 0, killed renamable $c
+    GBR %bb.73, killed renamable $v, 1, implicit-def dead $c
+    JMP %bb.74
+  
+  bb.73 (%ir-block.133):
+    successors: %bb.75(0x80000000)
+    liveins: $a
+  
+    renamable $a = EORImm killed renamable $a, -128
+    JMP %bb.75
+  
+  bb.74 (%ir-block.133):
+    successors: %bb.75(0x80000000)
+    liveins: $a
+  
+    JMP %bb.75
+  
+  bb.75 (%ir-block.133):
+    successors: %bb.76(0x40000000), %bb.77(0x40000000)
+    liveins: $a
+  
+    CmpBrZero %bb.76, undef $n, 0, killed renamable $a, implicit-def dead $c
+    JMP %bb.77
+  
+  bb.76 (%ir-block.136):
+    successors: %bb.77(0x80000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $a = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21)
+    renamable $x = LDImm 0
+    renamable $y = LDImm 1
+    renamable $a = LDImm 2
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 1)
+    renamable $y = LDImm 2
+    renamable $a = lr-split COPY killed renamable $x
+    STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 2)
+    renamable $y = LDImm 3
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 3)
+    JMP %bb.77
+  
+  bb.77 (%ir-block.137):
+    successors: %bb.78(0x40000000), %bb.79(0x40000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21)
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 1)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 2
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 2)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $y = LDImm 3
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.21 + 3)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $c = CMPImm killed renamable $y, 0
+    renamable $a = lr-split COPY killed renamable $rc5
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 254, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $rc4
+    dead renamable $a, renamable $c, dead renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $a, dead renamable $c, renamable $v = SBCImm killed renamable $a, 255, killed renamable $c
+    GBR %bb.78, killed renamable $v, 1, implicit-def dead $c
+    JMP %bb.79
+  
+  bb.78 (%ir-block.137):
+    successors: %bb.80(0x80000000)
+    liveins: $a
+  
+    renamable $a = EORImm killed renamable $a, -128
+    JMP %bb.80
+  
+  bb.79 (%ir-block.137):
+    successors: %bb.80(0x80000000)
+    liveins: $a
+  
+    JMP %bb.80
+  
+  bb.80 (%ir-block.137):
+    successors: %bb.81(0x40000000), %bb.82(0x40000000)
+    liveins: $a
+  
+    CmpBrZero %bb.81, undef $n, 1, killed renamable $a, implicit-def dead $c
+    JMP %bb.82
+  
+  bb.81 (%ir-block.140):
+    successors: %bb.82(0x80000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $a = LDImm 0
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21)
+    renamable $y = LDImm 1
+    renamable $a = LDImm -2
+    STIndirIdx killed renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 1)
+    renamable $y = LDImm 2
+    renamable $a = LDImm -1
+    STIndirIdx renamable $a, renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 2)
+    renamable $y = LDImm 3
+    STIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y :: (store (s8) into %ir.21 + 3)
+    JMP %bb.82
+  
+  bb.82 (%ir-block.141):
+    successors: %bb.83(0x80000000)
+  
+    renamable $y = LDImm 0
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.2, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.2, 0, killed renamable $c
+    renamable $a = LDIndirIdx renamable $rs1, killed renamable $y :: (load (s8) from %ir.5)
+    renamable $rc5 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 0
+    renamable $rc7 = lr-split COPY killed renamable $x
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.5 + 1)
+    renamable $rc4 = lr-split COPY killed renamable $a
+    renamable $x = LDImm 1
+    renamable $rc6 = lr-split COPY killed renamable $x
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.17, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.17, 0, killed renamable $c
+    renamable $c = LDImm1 -1
+    renamable $a = lr-split COPY killed renamable $rc5
+    renamable $rc5 = lr-split COPY killed renamable $rc7
+    renamable $y = lr-split COPY renamable $rc5
+    renamable $a, renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a, renamable $rs1, killed renamable $y, killed renamable $c :: (load (s8) from %ir.20)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $rc4
+    renamable $y = lr-split COPY renamable $rc6
+    renamable $a, dead renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a, killed renamable $rs1, killed renamable $y, killed renamable $c :: (load (s8) from %ir.20 + 1)
+    renamable $y = lr-split COPY killed renamable $rc6
+    renamable $rc6 = lr-split COPY killed renamable $a
+    renamable $rc7 = lr-split COPY killed renamable $y
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.0, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.0, 0, killed renamable $c
+    renamable $y = lr-split COPY killed renamable $rc5
+    renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.3)
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $rc4 = COPY killed renamable $a
+    renamable $y = lr-split COPY renamable $rc7
+    renamable $a = LDIndirIdx killed renamable $rs1, killed renamable $y :: (load (s8) from %ir.3 + 1)
+    renamable $rc5 = COPY killed renamable $a
+    renamable $a = lr-split COPY killed renamable $x
+    renamable $y = lr-split COPY killed renamable $rc8
+    STIndirIdx killed renamable $a, renamable $rs2, renamable $y :: (store (s8) into %ir.146)
+    renamable $rc9 = lr-split COPY killed renamable $y
+    renamable $y = lr-split COPY killed renamable $rc7
+    renamable $a = lr-split COPY killed renamable $rc6
+    STIndirIdx killed renamable $a, killed renamable $rs2, renamable $y :: (store (s8) into %ir.146 + 1)
+    renamable $rc8 = lr-split COPY killed renamable $y
+    renamable $rc2, renamable $c, dead renamable $v = AddrLostk %stack.3, 0
+    renamable $rc3, dead renamable $c, dead renamable $v = AddrHistk %stack.3, 0, killed renamable $c
+    renamable $rc4, renamable $c, dead renamable $v = AddrLostk %stack.18, 0
+    renamable $rc5, dead renamable $c, dead renamable $v = AddrHistk %stack.18, 0, killed renamable $c
+    renamable $rc6, renamable $c, dead renamable $v = AddrLostk %stack.1, 0
+    renamable $rc7, dead renamable $c, dead renamable $v = AddrHistk %stack.1, 0, killed renamable $c
+    renamable $y = lr-split COPY renamable $rc9
+    renamable $a = LDIndirIdx renamable $rs3, killed renamable $y :: (load (s8) from %ir.4)
+    renamable $x = lr-split COPY killed renamable $a
+    renamable $y = lr-split COPY killed renamable $rc8
+    renamable $a = LDIndirIdx killed renamable $rs3, killed renamable $y :: (load (s8) from %ir.4 + 1)
+    renamable $rc7 = lr-split COPY killed renamable $a
+    renamable $rc6 = COPY killed renamable $x
+    renamable $y = lr-split COPY killed renamable $rc9
+    renamable $a = LDIndirIdx renamable $rs1, renamable $y :: (load (s8) from %ir.6)
+    renamable $c = LDImm1 -1
+    renamable $a, renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a, renamable $rs2, renamable $y, killed renamable $c :: (load (s8) from %ir.21)
+    STIndirIdx killed renamable $a, renamable $rs3, killed renamable $y :: (store (s8) into %ir.151)
+    renamable $y = LDImm 1
+    renamable $a = LDIndirIdx killed renamable $rs1, renamable $y :: (load (s8) from %ir.6 + 1)
+    renamable $a, dead renamable $c, dead renamable $v = SBCIndirIdx killed renamable $a, killed renamable $rs2, renamable $y, killed renamable $c :: (load (s8) from %ir.21 + 1)
+    STIndirIdx killed renamable $a, killed renamable $rs3, killed renamable $y :: (store (s8) into %ir.151 + 1)
+    JMP %bb.83
+  
+  bb.83 (%ir-block.152):
+    RTS
+...

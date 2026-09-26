@@ -1,0 +1,3 @@
+$ /tmp/claude-1000/-home-will-llvm-mos-65816/65695418-7e9b-45bd-92e3-2ecfd88ecf0b/scratchpad/tc/llvm-mos-install/bin/llc -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll -o /dev/null
+
+exit_code=0

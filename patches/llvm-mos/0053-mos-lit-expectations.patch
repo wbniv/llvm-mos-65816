@@ -1,0 +1,129 @@
+diff --git a/llvm/test/CodeGen/MOS/legalizer.mir b/llvm/test/CodeGen/MOS/legalizer.mir
+--- a/llvm/test/CodeGen/MOS/legalizer.mir
++++ b/llvm/test/CodeGen/MOS/legalizer.mir
+@@ -1351,12 +1351,13 @@
+     ; CHECK-NEXT: [[C:%[0-9]+]]:_(s8) = G_CONSTANT i8 0
+     ; CHECK-NEXT: [[C1:%[0-9]+]]:_(s1) = G_CONSTANT i1 true
+     ; CHECK-NEXT: [[SBC:%[0-9]+]]:_(s8), [[SBC1:%[0-9]+]]:_(s1), [[SBC2:%[0-9]+]]:_, [[SBC3:%[0-9]+]]:_, [[SBC4:%[0-9]+]]:_ = G_SBC [[COPY1]], [[C]], [[C1]]
+-    ; CHECK-NEXT: [[C2:%[0-9]+]]:_(s1) = G_CONSTANT i1 false
+-    ; CHECK-NEXT: [[SELECT:%[0-9]+]]:_(s1) = G_SELECT [[SBC2]](s1), [[C1]], [[C2]]
+-    ; CHECK-NEXT: [[COPY2:%[0-9]+]]:_(s1) = COPY [[SELECT]](s1)
+-    ; CHECK-NEXT: [[C3:%[0-9]+]]:_(s8) = G_CONSTANT i8 -1
+-    ; CHECK-NEXT: [[SELECT1:%[0-9]+]]:_(s8) = G_SELECT [[COPY2]](s1), [[C3]], [[C]]
+-    ; CHECK-NEXT: RTS implicit [[COPY]](s8), implicit [[COPY1]](s8), implicit [[SELECT1]](s8), implicit [[SELECT1]](s8)
++    ; CHECK-NEXT: [[COPY2:%[0-9]+]]:_(s1) = COPY [[SBC2]](s1)
++    ; CHECK-NEXT: [[C2:%[0-9]+]]:_(s8) = G_CONSTANT i8 -1
++    ; CHECK-NEXT: [[SELECT:%[0-9]+]]:_(s8) = G_SELECT [[COPY2]](s1), [[C2]], [[C]]
++    ; CHECK-NEXT: [[C3:%[0-9]+]]:_(s1) = G_CONSTANT i1 false
++    ; CHECK-NEXT: [[SHLE:%[0-9]+]]:_(s8), [[SHLE1:%[0-9]+]]:_(s1) = G_SHLE [[COPY1]], [[C3]]
++    ; CHECK-NEXT: [[SHLE2:%[0-9]+]]:_(s8), [[SHLE3:%[0-9]+]]:_(s1) = G_SHLE [[SELECT]], [[SHLE1]]
++    ; CHECK-NEXT: RTS implicit [[COPY]](s8), implicit [[COPY1]](s8), implicit [[SHLE2]](s8), implicit [[SHLE2]](s8)
+     %0:_(s8) = COPY $a
+     %1:_(s8) = COPY $x
+     %2:_(s8) = COPY $y
+diff --git a/llvm/test/CodeGen/MOS/shift-rotate.ll b/llvm/test/CodeGen/MOS/shift-rotate.ll
+--- a/llvm/test/CodeGen/MOS/shift-rotate.ll
++++ b/llvm/test/CodeGen/MOS/shift-rotate.ll
+@@ -346,13 +346,20 @@
+ define i16 @ashr_8(i16 %a) {
+ ; CHECK-LABEL: ashr_8:
+ ; CHECK:       ; %bb.0: ; %entry
++; CHECK-NEXT:    stx __rc2
+ ; CHECK-NEXT:    txa
+ ; CHECK-NEXT:    bpl .LBB20_2
+ ; CHECK-NEXT:  ; %bb.1: ; %entry
+-; CHECK-NEXT:    ldx #255
+-; CHECK-NEXT:    rts
++; CHECK-NEXT:    lda #255
++; CHECK-NEXT:    jmp .LBB20_3
+ ; CHECK-NEXT:  .LBB20_2: ; %entry
+-; CHECK-NEXT:    ldx #0
++; CHECK-NEXT:    lda #0
++; CHECK-NEXT:  .LBB20_3: ; %entry
++; CHECK-NEXT:    stx __rc3
++; CHECK-NEXT:    asl __rc3
++; CHECK-NEXT:    rol
++; CHECK-NEXT:    tax
++; CHECK-NEXT:    lda __rc2
+ ; CHECK-NEXT:    rts
+ entry:
+   %0 = ashr i16 %a, 8
+@@ -365,25 +372,28 @@
+ ; CHECK-NEXT:    txa
+ ; CHECK-NEXT:    bpl .LBB21_2
+ ; CHECK-NEXT:  ; %bb.1: ; %entry
+-; CHECK-NEXT:    sec
++; CHECK-NEXT:    lda #255
+ ; CHECK-NEXT:    jmp .LBB21_3
+ ; CHECK-NEXT:  .LBB21_2: ; %entry
+-; CHECK-NEXT:    clc
++; CHECK-NEXT:    lda #0
+ ; CHECK-NEXT:  .LBB21_3: ; %entry
+-; CHECK-NEXT:    ldx #255
+-; CHECK-NEXT:    txa
++; CHECK-NEXT:    asl __rc2
++; CHECK-NEXT:    ldx #1
+ ; CHECK-NEXT:    bcs .LBB21_5
+ ; CHECK-NEXT:  ; %bb.4: ; %entry
+-; CHECK-NEXT:    lda #0
++; CHECK-NEXT:    ldx #0
+ ; CHECK-NEXT:  .LBB21_5: ; %entry
+-; CHECK-NEXT:    tay
+-; CHECK-NEXT:    bmi .LBB21_7
++; CHECK-NEXT:    rol
++; CHECK-NEXT:    bpl .LBB21_7
+ ; CHECK-NEXT:  ; %bb.6: ; %entry
+-; CHECK-NEXT:    ldx #0
++; CHECK-NEXT:    ldy #255
++; CHECK-NEXT:    jmp .LBB21_8
+ ; CHECK-NEXT:  .LBB21_7: ; %entry
+-; CHECK-NEXT:    asl __rc2
+-; CHECK-NEXT:    rol
+-; CHECK-NEXT:    stx __rc2
++; CHECK-NEXT:    ldy #0
++; CHECK-NEXT:  .LBB21_8: ; %entry
++; CHECK-NEXT:    cpx #1
++; CHECK-NEXT:    rol
++; CHECK-NEXT:    sty __rc2
+ ; CHECK-NEXT:    rol __rc2
+ ; CHECK-NEXT:    ldx __rc2
+ ; CHECK-NEXT:    rts
+@@ -394,17 +404,24 @@
+ define i32 @ashr_16(i32 %a) {
+ ; CHECK-LABEL: ashr_16:
+ ; CHECK:       ; %bb.0: ; %entry
+-; CHECK-NEXT:    lda __rc2
++; CHECK-NEXT:    ldy __rc2
+ ; CHECK-NEXT:    ldx __rc3
++; CHECK-NEXT:    stx __rc4
+ ; CHECK-NEXT:    bpl .LBB22_2
+ ; CHECK-NEXT:  ; %bb.1: ; %entry
+-; CHECK-NEXT:    ldy #255
++; CHECK-NEXT:    lda #255
+ ; CHECK-NEXT:    jmp .LBB22_3
+ ; CHECK-NEXT:  .LBB22_2: ; %entry
+-; CHECK-NEXT:    ldy #0
++; CHECK-NEXT:    lda #0
+ ; CHECK-NEXT:  .LBB22_3: ; %entry
+-; CHECK-NEXT:    sty __rc2
+-; CHECK-NEXT:    sty __rc3
++; CHECK-NEXT:    ldx __rc3
++; CHECK-NEXT:    stx __rc2
++; CHECK-NEXT:    asl __rc2
++; CHECK-NEXT:    rol
++; CHECK-NEXT:    sta __rc2
++; CHECK-NEXT:    sta __rc3
++; CHECK-NEXT:    ldx __rc4
++; CHECK-NEXT:    tya
+ ; CHECK-NEXT:    rts
+ entry:
+   %0 = ashr i32 %a, 16
+diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
+--- a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
++++ b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
+@@ -1,4 +1,4 @@
+-; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prologepilog -verify-machineinstrs < %s | FileCheck %s
+
+ ; Stock 6502 at -O0 (reduced with llvm-reduce from gcc.c-torture/execute/strlen-4.c).
+ ; The frame is larger than 255 bytes, so a frame-index expansion is an

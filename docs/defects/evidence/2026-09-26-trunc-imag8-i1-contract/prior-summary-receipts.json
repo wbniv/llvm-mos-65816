@@ -1,0 +1,68 @@
+{
+  "TODO.md": {
+    "sources": {
+      "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
+      "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
+      "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+      "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+      "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+      "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+      "docs/defects/mos-trunc-imag8-i1.json": "7333f599fd750f07b46777fea02191fefbe97fbc3b920933d9b40b20164da648",
+      "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+      "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
+      "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
+      "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
+      "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
+      "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
+      "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+      "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a"
+    },
+    "reviewed_at": "2026-09-25T15:22:28.033397+00:00",
+    "note": "Reviewed the preserved reducer baseline, same-input fixed candidate, unchanged 0015 disposition, and upstream status. Updated the task ledger and both current summaries to fixed locally; published-upstream applicability remains open.",
+    "attribution": "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown"
+  },
+  "docs/upstream-pending-work.md": {
+    "sources": {
+      "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
+      "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
+      "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+      "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+      "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+      "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+      "docs/defects/mos-trunc-imag8-i1.json": "7333f599fd750f07b46777fea02191fefbe97fbc3b920933d9b40b20164da648",
+      "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+      "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
+      "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
+      "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
+      "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
+      "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
+      "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+      "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a"
+    },
+    "reviewed_at": "2026-09-25T15:22:28.707032+00:00",
+    "note": "Reviewed the preserved reducer baseline, same-input fixed candidate, unchanged 0015 disposition, and upstream status. Updated the task ledger and both current summaries to fixed locally; published-upstream applicability remains open.",
+    "attribution": "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown"
+  },
+  "docs/upstream-contribution-status.md": {
+    "sources": {
+      "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
+      "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
+      "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+      "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+      "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+      "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+      "docs/defects/mos-trunc-imag8-i1.json": "7333f599fd750f07b46777fea02191fefbe97fbc3b920933d9b40b20164da648",
+      "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+      "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
+      "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
+      "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
+      "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
+      "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
+      "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+      "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a"
+    },
+    "reviewed_at": "2026-09-25T15:22:28.997023+00:00",
+    "note": "Reviewed the preserved reducer baseline, same-input fixed candidate, unchanged 0015 disposition, and upstream status. Updated the task ledger and both current summaries to fixed locally; published-upstream applicability remains open.",
+    "attribution": "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown"
+  }
+}

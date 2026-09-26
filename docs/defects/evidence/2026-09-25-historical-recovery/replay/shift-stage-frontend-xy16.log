@@ -1,0 +1,47 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Os -fno-lto -mllvm -verify-machineinstrs -x cpp-output -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i -o /dev/null
+fatal error: error in backend: unable to legalize instruction: %2730:_(s64) = G_ANYEXT %1823:_(s8) (in function: bitboard64_step)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Os -fno-lto -mllvm -verify-machineinstrs -x cpp-output -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i -o /dev/null
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c'.
+4.	Running pass 'Legalizer' on function '@bitboard64_step'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  clang     0x00005d9503fc1f58 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  clang     0x00005d9503fbf235 llvm::sys::RunSignalHandlers() + 293
+2  clang     0x00005d9503f3539e
+3  clang     0x00005d9503f3535b
+4  clang     0x00005d9503fbbd37 llvm::sys::Process::Exit(int, bool) + 39
+5  clang     0x00005d95031fc476
+6  clang     0x00005d9503f3ade6 llvm::report_fatal_error(llvm::Twine const&, bool) + 262
+7  clang     0x00005d9503f3afc8
+8  clang     0x00005d950571aedc
+9  clang     0x00005d950571b228 llvm::reportGISelFailure(llvm::MachineFunction&, llvm::MachineOptimizationRemarkEmitter&, char const*, llvm::StringRef, llvm::MachineInstr const&) + 808
+10 clang     0x00005d95056b54e6 llvm::Legalizer::runOnMachineFunction(llvm::MachineFunction&) + 1126
+11 clang     0x00005d95035ccfe3 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+12 clang     0x00005d9503afec0a llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+13 clang     0x00005d9503b052ac llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+14 clang     0x00005d9503aff939 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+15 clang     0x00005d9504671385 clang::emitBackendOutput(clang::CompilerInstance&, clang::CodeGenOptions&, llvm::StringRef, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) + 8245
+16 clang     0x00005d9504686740 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) + 1792
+17 clang     0x00005d9505f86ec9 clang::ParseAST(clang::Sema&, bool, bool) + 617
+18 clang     0x00005d9504ba134d clang::FrontendAction::Execute() + 29
+19 clang     0x00005d9504b09beb clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) + 1435
+20 clang     0x00005d9504c7ad49 clang::ExecuteCompilerInvocation(clang::CompilerInstance*) + 729
+21 clang     0x00005d95031fbd7b cc1_main(llvm::ArrayRef<char const*>, char const*, void*) + 6987
+22 clang     0x00005d95031f8757
+23 clang     0x00005d95031fa18d
+24 clang     0x00005d95049535e9
+25 clang     0x00005d9503f35338 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) + 136
+26 clang     0x00005d9504952f95 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const + 325
+27 clang     0x00005d9504914fcf clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const + 479
+28 clang     0x00005d950491516e clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const + 126
+29 clang     0x00005d950493084d clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) + 333
+30 clang     0x00005d95031f81a4 clang_main(int, char**, llvm::ToolContext const&) + 6756
+31 clang     0x00005d950320688d main + 93
+32 libc.so.6 0x00007a2f20a2a601
+33 libc.so.6 0x00007a2f20a2a718 __libc_start_main + 136
+34 clang     0x00005d95031f6425 _start + 37
+
+exit_code=1

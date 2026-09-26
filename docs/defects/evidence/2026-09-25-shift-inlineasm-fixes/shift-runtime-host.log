@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-host
+0x6A2B
+
+exit_code=0

@@ -1,0 +1,29 @@
+*** Begin Patch
+*** Update File: /home/will/llvm-mos-65816/examples/65816/bitboard64.h
+@@
+ static volatile uint64_t bitboard64_opaque;
++
++__attribute__((noinline)) static uint8_t bitboard64_pop(uint64_t x) {
++    return (uint8_t)__builtin_popcountll(x);
++}
++
++__attribute__((noinline)) static uint8_t bitboard64_ctz(uint64_t x) {
++    return (uint8_t)__builtin_ctzll(x);
++}
++
++__attribute__((noinline)) static uint8_t bitboard64_clz(uint64_t x) {
++    return (uint8_t)__builtin_clzll(x);
++}
+@@
+-    uint8_t degree = (uint8_t)__builtin_popcountll(bitboard64_opaque);
++    uint8_t degree = bitboard64_pop(bitboard64_opaque);
+@@
+-        next = (uint8_t)__builtin_ctzll(bitboard64_opaque);
++        next = bitboard64_ctz(bitboard64_opaque);
+@@
+-        next = (uint8_t)__builtin_ctzll(bitboard64_opaque);
++        next = bitboard64_ctz(bitboard64_opaque);
+@@
+-    uint8_t leading = (uint8_t)__builtin_clzll(bitboard64_opaque);
++    uint8_t leading = bitboard64_clz(bitboard64_opaque);
+*** End Patch

@@ -1,5 +1,11 @@
 # 0043 validation — inline-asm physreg constraints refuse an operand wider than the register
 
+> **Worktree relocation, September 25:** this completed validation checkout was
+> retired to recover disk space. Its compiler snapshots, reproducers, logs, and
+> source changes remain under `build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/`.
+> Original paths below describe the captured run. See the
+> [retirement and hash-verification record](../../investigations/2026-09-25-worktree-retirement.md).
+
 > **September 25 independent revision:** the evidence below describes the initial
 > patch snapshot. The current artifact has additional review changes and validation
 > in [the batch review](claude-batch-review.md). Earlier binary hashes identify only

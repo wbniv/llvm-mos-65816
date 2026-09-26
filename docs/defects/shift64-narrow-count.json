@@ -1,17 +1,19 @@
 {
   "schema": 1,
-  "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+  "report": "docs/investigations/2026-09-25-shift-inlineasm-fixes.md",
   "attribution": [
     "Original discovery/demo/compiler-fix credits remain in the linked historical reports.",
-    "OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra), xhigh reasoning effort: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck."
+    "OpenAI Codex CLI 0.155.1 using GPT-6 Astra (gpt-6-astra), xhigh reasoning effort: current-build reproduction, evidence capture, and documentation; no compiler fix authored in this recheck.",
+    "OpenAI Codex CLI 0.146.0 (codex-tui), model gpt-5.6-sol, reasoning effort unknown (saved session setting is null): recovered historical discovery/source/diagnostics; other earlier credits remain preserved.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: source replay, preserved fork baseline, reconstructed patch-0028 comparison, upstream checks, runtime validation, regression runner, and documentation; no new compiler fix authored.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: diagnosis, patches 0055/0056, regression tests, preserved-baseline comparison, compile/runtime validation, installed compiler refresh, and documentation."
   ],
-  "current_toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
   "id": "shift64-narrow-count",
   "title": "Narrow-count 64-bit shift legalization",
-  "status": "not_reproduced",
-  "reproducer_origin": "original",
-  "summary": "The retained C input and additional byte-count probes pass on the identified current compiler. The historical failure is not disproved or causally fixed by this recheck.",
-  "unknowns": "The original failing compiler/toolchain and a discriminating red baseline were not recovered. No fixing change has been identified.",
+  "status": "fixed",
+  "reproducer_origin": "reconstructed",
+  "summary": "Patch 0055 legalizes native-width s8/s16/s32-to-s64 ANYEXT through the existing zero-extension path. The same recovered preprocessed input fails on the preserved baseline and passes on the rebuilt compiler; retained IR and a reduced valid IR input discriminate the backend repair. All 36 source configurations and six SNES runtime checks pass.",
+  "unknowns": "The original August compiler binary and crash-preprocessed TU remain unavailable. The recovered trigger is repaired with matching-input evidence against the immutable September 25 failing fork baseline; this does not claim to recover the exact August toolchain.",
   "observations": [
     {
       "path": "docs/investigations/2026-09-25-older-defect-recheck.tsv",
@@ -24,6 +26,282 @@
     {
       "path": "examples/65816/shift64seam-narrow.c",
       "sha256": "4ef2a8e93d7f9727ca738bd2255c461f5a6beda834ad1af72237d2a94f90c817"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/session-excerpts.jsonl",
+      "sha256": "6a6f51a0b886153e8e40c3a790d9d795b6aed3d8a4bda78285cae70da59d2f13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/provenance.json",
+      "sha256": "82b4c97b2696f85d2bc6feb176046726aad97d999cb78e680e8682c2f6e49a57"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/source-replay-validation.json",
+      "sha256": "182b9e26f213e9ef11522ff8c6a382a4e134589e5aba059b5ecb30769ade0848"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/captured-identity.json",
+      "sha256": "eab0a912e562d9a2cbfbeb4278cf3dd3975bc023a298b92d09bf3da11dad9f26"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/historical-shift-failure.log",
+      "sha256": "d74a1ada39ace0170640931204e93020e674d05676441df9e98884a309d41083"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/historical-bitboard-failure.log",
+      "sha256": "7e4a3db00133389f215218d3286e1ffeeec350914f541169e50f46879d1774f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-runs.json",
+      "sha256": "ca9274ce15a95c994f41d2948a78745b329e0b411a9b704360ea756183e70d8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-container-unavailable.json",
+      "sha256": "7b06c1bdd4c69ff41e4c9ed36f00bff00383c01dc64c46d1cf32fac96a83481e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-unsupported-features.log",
+      "sha256": "f4be7b19fb51d3b726898cd4f4426a3b85104d08a283a53e1a8062377915d7a3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mos6502-compile.log",
+      "sha256": "eb34b7667f036d9d8d092e9228f505d1a0dedc125ccb345470a43b892fa44ab1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-shift-mosw65816-compile.log",
+      "sha256": "22f67aae29842f2d72fc90ceb79802883f9dd2a35c7775ef134093adb39d55cd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mos6502-compile.log",
+      "sha256": "66ce97b7ae19bbad4b3e1521ece06f95113cec2177095978982635eb7a93154a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/upstream-host-inline-mosw65816-compile.log",
+      "sha256": "2af3df49d5fb8739873d1d3b5adbb8d693fad7e5cf0c3f7ab7782293ef92295e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "sha256": "57973e4105b4f9553ced26cd3cbda2f6301adc9a3b757139a4575c8b0d34d873"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64.h",
+      "sha256": "7bd8a5f8a4c5d973bc482ad43c012ba703a9aa45fee739301e37b8fe91ee1cbe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "sha256": "4a01b233775d2551ed15cf0d82b1d1be15eda97ea1e83c1dcb5748bf073ce6ac"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "sha256": "08a69977447b34a6f947b6ff3687a23855acbe76113db2ca4ee496af737eb240"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage-prelegalizer.mir",
+      "sha256": "51913ca88d80abe5d9a45b6c49fb3395bf9a55ac90cf275cb57747225d8efbe8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage-llc.log",
+      "sha256": "6b7aae9f96670811cb7c584fe9d3f11d514181e216c5c1d64ffe78062db37b70"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage-preprocessed-valid.log",
+      "sha256": "6cb5e8a17a930bc58a9f5f3f14b96308e4ffaba8802d8425cbd12a95d2ff56f0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/frontend-mode-matrix.json",
+      "sha256": "dfe7358869b23feb3af54e464babfa6e436da462cc3155f5eaba7815871ce1c0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/session-identity.json",
+      "sha256": "815cae91972589799590a90670f1c3bb1ed07e49c0b90d1898d3031f5f5294e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/compile-runs.json",
+      "sha256": "c3b70f1de4f67a7628c90b565799955b50c2151d93c8067ff20c108f69fef5da"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/runtime-runs.json",
+      "sha256": "245a239e5a312215111d68fd9e640fc2d9c05ac333c7c15a25bdb8123b63119b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/final-checks.json",
+      "sha256": "0807c3eab027849d321f640dfe1668495c3def6f7bf229066fc33b39fbcada08"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/patch-checks.json",
+      "sha256": "251b2e50f459b434909788cb65f6d77019835310e0fda188cab417d316c7fb1e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/mos-lit-final.log",
+      "sha256": "be3eb76ccd2c711b2035c5c79f871a173e00c142cf6efad06d31150b6c9f6868"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/cross-lit-final.log",
+      "sha256": "0dfb7879c8218cffffc57fead13f00e5c60a05cbf849e5105857ee95de402e0b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-baseline-replay.log",
+      "sha256": "abf4053ebef7852f94962fcac1a01f1642e94ce2d272ac28050bc4bdff21fe25"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-candidate-matching-input.log",
+      "sha256": "02b689d67808df4496ca56052bba7ed0c51da1a64e685babb7a93250e3c51553"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-retained-ir-candidate.log",
+      "sha256": "74790fbea4502fc4fb2d56fbc479067c8fd6e3ecf0736161d535f167a90cb60f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+      "sha256": "1b324275286694768015be6809a8d50e00d180299d1d497812ca061bdc7d58e1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/masked-extension-baseline.log",
+      "sha256": "be8cc7301905f409fe5638346137468934c5e704a545763efcbd8265e79b1381"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/masked-extension-candidate.log",
+      "sha256": "40f76919c9a15efd451c091ee07ad5022ebde7363e0dd47a450ff0269d87d9f4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/masked-extension-prelegalizer.mir",
+      "sha256": "fb140538ffcbb5ad4ee2398719689584d1b625933a43d73d6439f96c4be4c5f6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+      "sha256": "e539aa89e67d03d79bbd4d18a0b64617cda1013405b4e49352fdd03411b047d5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c",
+      "sha256": "dfdf3fdc03d9615412e85c861e701c291527e49b5c4017f101640f18f94d82df"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-narrow.h",
+      "sha256": "93fc2af2cf2e80e101e5cb2862e1dc8fd9f32314f513101e734574b87eb76675"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+      "sha256": "d73478ece8ed6d33ca6e5d1daa2b99791f3b47f238e6539ea3bf94faa3ad5e92"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/installed-check.log",
+      "sha256": "3ac1abe6cae8338f4e3a7766d63b57bde09de5d124b440e71e78cf22700ae725"
+    },
+    {
+      "path": "patches/llvm-mos/0055-mos-native-wide-anyext.patch",
+      "sha256": "d9195b63ff4dab33b7c7ba7550b5322b85de88234f1a0abd299e61ba4ee826f4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-runs.json",
+      "sha256": "345909be4405ee72e639a1a313fff2492c5be9817da434afd42d1239c282ee6c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-baseline-valid.log",
+      "sha256": "f57c10ff645dfd63087a9f379b708d402339957247d04d44368ac4876e045ce8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-candidate.log",
+      "sha256": "0a82e00f277cfe612c6efb0d35982aa811a2254ede05a5dc2085815bbe2fb17f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc",
+      "sha256": "b85c818058213e04691e64a9fe6fa1e0e08daf55ef60fcf98e5a7688f5bbeacc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc",
+      "sha256": "5891aa1f74774a305d8e89ea24fbeb6a58ef147c76af1f93387ab64e0734cc4b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-harness.bc",
+      "sha256": "66b1eb8a070e22120db099a335807abdd1e71a787848c575cdb5ba6e26183ba4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-default-probe.bc",
+      "sha256": "2720c4ac1603706f2f81061cf12a40fcf0be902953ee5f0123f650043735515d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-harness.bc",
+      "sha256": "0501eef3f31adc9f913f734a39faabbf4f5695462d6554ad038e9fff1dc5ed8a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-probe.bc",
+      "sha256": "75477348290a257b44961fe84a6eb8e4d648a9dace21c26282289ced0ae072eb"
     }
-  ]
+  ],
+  "previous_recheck": {
+    "report": "docs/investigations/2026-09-25-older-defect-recheck.md",
+    "status": "not_reproduced",
+    "toolchain_sha256": "5c1552885a1c273943ac3eb96c1e0778f96d010eca2f96f771e4a856fcacd0dc",
+    "summary": "The retained C input and additional byte-count probes pass on the identified current compiler. The historical failure is not disproved or causally fixed by this recheck.",
+    "unknowns": "The original failing compiler/toolchain and a discriminating red baseline were not recovered. No fixing change has been identified."
+  },
+  "current_toolchain_sha256": "660a187e4512ba62357c98bf4a65760b12f61fd12e2bf9cbe00b2d09aced9013",
+  "upstream_comparison": {
+    "revision": "742d554bf08042b8df93d791c335260fadd16643",
+    "unpatched": true,
+    "status": "not_reproduced",
+    "configuration": "-Os -fno-lto -mllvm -verify-machineinstrs; mos6502 and default mosw65816",
+    "feature_limit": "+mos-a16 and +mos-xy16 are unsupported and ignored upstream.",
+    "environment": "Saved, checksum-verified compiler executed on host; recorded Docker image unavailable."
+  },
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -fno-lto -x cpp-output -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "verify_machineinstrs": true,
+      "input_kind": "freshly preprocessed recovered C"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-historical-recovery/bin/clang",
+    "toolchain_sha256": "3be96813fae5e8ad61a8cdef78e56a7ca6aea21571d21dddc896fb707a6d0d75",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "sha256": "4a01b233775d2551ed15cf0d82b1d1be15eda97ea1e83c1dcb5748bf073ce6ac"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage-preprocessed-valid.log",
+      "sha256": "6cb5e8a17a930bc58a9f5f3f14b96308e4ffaba8802d8425cbd12a95d2ff56f0"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction: %2730:_(s64) = G_ANYEXT %1823:_(s8) (in function: bitboard64_step)"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0055-mos-native-wide-anyext.patch",
+    "causal_explanation": "The native-width ANYEXT legality table omitted s8/s16/s32-to-s64 cases. Route them through existing ZEXT lowering, choosing zero for unspecified high bits. The original preprocessed input and identical retained LLVM IR pass after this backend rule change; the reduced masked-byte store independently fails the captured baseline at G_ANYEXT and passes the candidate. Default-mode rules are unchanged.",
+    "trigger_check": "Retained prelegalizer MIR captures the backend input; the seven-line valid masked-byte IR reaches s8-to-s64 ANYEXT during legalization. The recovered C stages pass 36 verifier compilations across six optimization levels and three width modes. Host and bsnes-jg default/a16/xy16 agree for all-count shifts (0x6A2B) and the recovered variable-shift bitboard probe (0x479E). Identical retained LTO bitcode fails with the preserved pre-0055 LLD at G_ANYEXT, links with rebuilt LLD, and executes at 0x479E in all three modes. Installed LLD matches the rebuilt hash.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+      "sha256": "4a01b233775d2551ed15cf0d82b1d1be15eda97ea1e83c1dcb5748bf073ce6ac"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -fno-lto -x cpp-output -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16"
+        ],
+        "optimization": "Os",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "input_kind": "freshly preprocessed recovered C"
+      },
+      "toolchain_location": "build/llvm-mos/bin/clang",
+      "toolchain_sha256": "660a187e4512ba62357c98bf4a65760b12f61fd12e2bf9cbe00b2d09aced9013",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.i",
+        "sha256": "4a01b233775d2551ed15cf0d82b1d1be15eda97ea1e83c1dcb5748bf073ce6ac"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-candidate-matching-input.log",
+        "sha256": "02b689d67808df4496ca56052bba7ed0c51da1a64e685babb7a93250e3c51553"
+      },
+      "exit_code": 0
+    }
+  }
 }

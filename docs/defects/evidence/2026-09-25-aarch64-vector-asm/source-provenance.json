@@ -1,0 +1,15 @@
+{
+  "saved_published_upstream_revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "complete_source_before_0057_equals_saved_published_upstream": true,
+  "source_sha256": "03d5123a8ec017297b381782c2d943264df81dda85769a67707c270eb3b96bf4",
+  "recorded_baseline_includes": "Earlier patches through 0041 plus 0057; not an unpatched upstream binary. 0057 changes register allocation/error recovery, not these vector conversion helpers.",
+  "baseline_binary": {
+    "path": "build/selectiondag-inlineasm-fix/llc",
+    "sha256": "4aae5bcf39bdc8a1366a5aaa5bfb36ae6ea4cdad4268ad0a725dad2b865ff49e"
+  },
+  "predecessor_0058_binary": {
+    "path": "build/aarch64-asm-type-fix/llc",
+    "sha256": "f8e3d451516fb66dcdd6d171f8bf2b2bff792baed78afb8dd891ff2aa01c2383"
+  },
+  "latest_upstream_checked": false
+}

@@ -1,0 +1,699 @@
+{
+  "schema": 1,
+  "id": "selectiondag-inline-asm-nonstandard-integer",
+  "title": "SelectionDAG nonstandard integer inline-asm type abort",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: constructed probe, crash capture, and qualified open record.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: AArch64 type-query diagnosis, patch 0058, matching-input and cross-target validation, recovery-dependency isolation, documentation, and browser rendering.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: corrected the stale vector-defect cross-reference during opcode-test planning; original baseline and resolution evidence are unchanged."
+  ],
+  "reproducer_origin": "original",
+  "summary": "Patch 0058 rejects MVT::Other before AArch64 r/x register-class size queries. The original i4096 input aborts on both preserved builds and receives a clean allocation diagnostic with the guard. All 32 rejection configurations and supported controls pass; the full callbr regression depends on 0057 error recovery. The separate vector conversion assertion is fixed by patch 0059; its own record retains the evidence.",
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.mir",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "aarch64",
+      "optimization": "O0",
+      "global_isel": false,
+      "verify_machineinstrs": true,
+      "stop_after": "finalize-isel",
+      "lto": false
+    },
+    "toolchain_location": "build/0041-inlineasm-build/llc-0041",
+    "toolchain_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.log",
+      "sha256": "7dd7a6c5b91057a58a2b61b1c7fb98e5ed5e6e9e1de0b52ae7858e9f3da11f54"
+    },
+    "exit_code": -6,
+    "failure_signature": "Value type is non-standard value, Other."
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.log",
+      "sha256": "7dd7a6c5b91057a58a2b61b1c7fb98e5ed5e6e9e1de0b52ae7858e9f3da11f54"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-identity.json",
+      "sha256": "d2263e897fa5e33794b9a6d0bda7a91005823d59eccd41d233960fa58d5c93d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.candidate.cpp.gz",
+      "sha256": "97ed29ad3186455a4c7fe0a63e54934590236af9f1a28b061ae881d4107f7f6a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-identity.json",
+      "sha256": "0713c9039c549764cf68dd5035bdd8042f3b6a98f4e2289fafab59d5dc80a2fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.baseline.cpp.gz",
+      "sha256": "1e605ae1167b1837b3117d0db3352c6b2da09a4542331041177cf5c820167680"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/source-archives.json",
+      "sha256": "9bb96a3241ca2b67304104eefc814753b37513dedcddf282c1628c17b423d016"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/AArch64ISelLowering.baseline.cpp.gz",
+      "sha256": "a1db227812180fdffc0d3505a8cb4e105c1369dbf6d399a637344b22e3cf38ab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/AArch64ISelLowering.candidate.cpp.gz",
+      "sha256": "94a0299ed4e1870c58365554972580a87b68ad8cab2ae96e2581f1047399e1d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/AArch64ISelLowering.vendor-before.cpp.gz",
+      "sha256": "83ac9f4def29d9aaaf43a47a5c8b7615c951c3c5f3c02e16fdc960b4468f3f64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-callbr-input.log",
+      "sha256": "a4e67dba7c0ef636b2f2081936e06aedf9d4bde07e7d2d1a4298fb0f853b65fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-callbr.log",
+      "sha256": "503e58fe1f07dfcb9d2eac0ba93b8e9ac1462bb076db7c0d6034855113e4723f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-indirect.log",
+      "sha256": "2270d8adc7341c42c52089b193c606880bfc0e7980eabedbefdbf6798cb71999"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-input-r.log",
+      "sha256": "54f0ab9f327bda8bd973a39acb7e4a5ba36f7e0b5808f357567d48e57e7f9957"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-input-x.log",
+      "sha256": "9485029de98dfb93f624c9cf7ec980e58734fafcde9a8650f18b0b12c699c928"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-output-r.log",
+      "sha256": "e82a994647168402dd293f70965f293994c06e79c674e80b1dcb119cbd3760cb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-output-x.log",
+      "sha256": "64e3c541e2217b741da8fb25183035537178f11342ec59db9a65d6b92c1c35d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-supported.log",
+      "sha256": "563e2ee93857c3d078582c23d2c568a3220d6d2387c7f68867138e9faf12a9d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-default-tied.log",
+      "sha256": "2e0158e68ce55501a2292f9ce9a19906bbbc25ca7cd2bf167b27251f8e13bc24"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-callbr-input.log",
+      "sha256": "d6ebe495cfd9249bae7933e94d8faf488217d70a999180786765d2bcd5cfdda5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-callbr.log",
+      "sha256": "cdadc6e6221de7887c41d2453fcb946c946c0b62f520f472f1e536ff1bcd0b32"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-indirect.log",
+      "sha256": "ece568e5b3104127098b143eb2c55b13fbe1e74986c8d20799aa05f3988665d9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-input-r.log",
+      "sha256": "e051a86b9a7a01bd946d67dcb441669e11b750c96a00bfb340b8a1824d457b19"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-input-x.log",
+      "sha256": "fe03cc62846f327d5a7d1048abf7616dfb1b196b9ab8b9dfd292d8e6586660d8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-output-r.log",
+      "sha256": "db00e1b5e8f7ed2dd0a1efa39ddb78b4adc3823c7e6cac9bbf1b1fd2dff1070b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-output-x.log",
+      "sha256": "07ec9a1d308435b651c470bec3e7be5d33be87fadfa710bebcf42e450ba1d72d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-supported.log",
+      "sha256": "befa2e7217018be97a44e20aa510ec19a46dcc3a1c8850bc41345a12a24cb943"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O0-ls64-tied.log",
+      "sha256": "5fc10ad8a945541d82af208de8e3decb276fd700f7de093a6cfedad0f1af1609"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-callbr-input.log",
+      "sha256": "7eef10bd852807543613ea1840240b38690683254cf9f4d31b3070ebce3de85a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-callbr.log",
+      "sha256": "e0a6e353a994a3ded75e49a96c6b9c170e1c5ed36ab6fa33057e6835e022f016"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-indirect.log",
+      "sha256": "74a5f244a68e3242b535ad4dd2dc703b6aad8f6cfcdc371023dae9f9c07f3cf6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-input-r.log",
+      "sha256": "b48406eca6659c505e453676bea9bdaa21c4c3bbfd4f3794606a16291b063c47"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-input-x.log",
+      "sha256": "7d3c7fec7750809d20a972ff169dca5f8fc71982fc830ed2379bb057767149f9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-output-r.log",
+      "sha256": "aec0eda7acf3928ea9cb920292cdfcc261eefccc94217e702b6140b69ca39f9c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-output-x.log",
+      "sha256": "3aa0e0f6af19993df7b16e8f4b952a6d992934101a5b659a42542b9d6c796e83"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-supported.log",
+      "sha256": "416111316f03e750e4edf72f500ea9878df71827fc4a945469d925265ee79c5e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-default-tied.log",
+      "sha256": "1e2db335ba585a9959971ab3d5dc3cddc212644405d0b38ea8734a56fd121f31"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-callbr-input.log",
+      "sha256": "2ba066e88654fc38cd1351114028a3c8f655ffdd0652fd83ed4c8ef2d716c2f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-callbr.log",
+      "sha256": "1fcdf9fe3d923ad5ca62ba7d2048c00a2e0181fb63ab18b9fe8288be44eff6ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-indirect.log",
+      "sha256": "c62dd3dcc5227da8537674f595fa35dabf41794517763f73692b364db391cdf5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-input-r.log",
+      "sha256": "db30b7370611b55812fb3fa2fc0fd15f6302576f9168d568032c268446b4b0f1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-input-x.log",
+      "sha256": "db2e11795393421a8696cddbc164fcb1380a8bed61068e45bfe78bd41742976c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-output-r.log",
+      "sha256": "4b7747317d41aad8a874e5e72ab18157c8d5d1909195ae82519e4a3f34df889d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-output-x.log",
+      "sha256": "f030eb81441c101aa0fd31f399607f1872e4119203c08e35d9cf77d07609d761"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-supported.log",
+      "sha256": "92c6509894c369921a1d1c136aab9d1efd386326061af6523b1f104365c86803"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-O2-ls64-tied.log",
+      "sha256": "c622554cb585ea436610e989343798d2a7e266235474bc11d8ba0afec4cf6755"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-0057-runner.log",
+      "sha256": "5ff0d6a3341c49cbb96354222902ca9b3ca9f1486b194f37158ae67822818adf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-callbr-input.log",
+      "sha256": "1f64af35f8b28bdc5f533aece5409b1e0711c29161b64ad9c47fc209bd982b40"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-callbr.log",
+      "sha256": "66d71458abf14fa61a80e4229ffb5dd6d9ec5a1822d141d64ba58bad44eb510b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-indirect.log",
+      "sha256": "9361afa92b5ada0fc80428e468fc36e75b9d13515ad95b051a452268e5c007a9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-input-r.log",
+      "sha256": "5e08b5b149406f04879ab17ad59e5a4af5bd27dfbefebe98ca4e97224309b9e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-input-x.log",
+      "sha256": "90a82a40455a378c8857740756496f093d4b3b72cc942192648a3569aa1a6ca6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-output-r.log",
+      "sha256": "df09efb9086ad3b733c670b478a41913745087295a966e26ae943d8288ae1e33"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-output-x.log",
+      "sha256": "cef0049fcde0c0ceb9fd25cd9b9d1511c669bef6b03e9cedb9f8bbf39eafc15c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-supported.log",
+      "sha256": "c4204ca33f7542d28e0670219404ae257f6fb0a89d9a77faa5b7193e2ce170a2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-default-tied.log",
+      "sha256": "b48efbfd11fb5cbc464f804b25bd0d18e1425ad71252612233c8bb6aee3afa4d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-callbr-input.log",
+      "sha256": "7ed95bebb739c1b30ee4d7dbf6ea101d5ed392e6a1640c4ba03200ca30c3b612"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-callbr.log",
+      "sha256": "a47c5229f813c96c4becad764864c8f726b9e8dbb7f67e8202758fcc1e5217b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-indirect.log",
+      "sha256": "841c7ce050e8e952f793a48207c3bc0cffc29ebf940516b9375c74d06c6848a1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-input-r.log",
+      "sha256": "ee00ca27927dfeb9a9ef0d3990981014304181e21ba211540abf3005b78e8731"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-input-x.log",
+      "sha256": "cbf6affc123f27ea1414c835ea4df196f21c5bddc6748b3315ed161683d5444b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-output-r.log",
+      "sha256": "9065eeadb0bb5ae519ac575a07b0deff98f156b06135e0eee0dc1ff142a6009b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-output-x.log",
+      "sha256": "bd10a8e4fae0e1476e0ea17a9b6f1505428ee118fe200d79a4a705b53b6cc9e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-supported.log",
+      "sha256": "751e01aa3f0ee6f865785bdd2178e4b69496d3a05869aeed581b2fc46636e04c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O0-ls64-tied.log",
+      "sha256": "b31746a550bd52c091abda1f1a8f62f406a1cba672793a087d9ac22197e3971b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-callbr-input.log",
+      "sha256": "f9cc73189b78bf65876e817d1557c1b5daf47eaa515f5e103e0c6fe022e4f0c4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-callbr.log",
+      "sha256": "035e69abcaa9f2298ac1c530a5af66be04d79b681b9da5eeddd66e0bcd8c80d0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-indirect.log",
+      "sha256": "f3542ae7344fa38ef1307cfdd89d7b89a268c2da90a89dbf0bcca60d2c0d96ff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-input-r.log",
+      "sha256": "69b47a15c43a27b669919088e1966ea3cabe9f3a9377e2f140d8acbe7f4189b3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-input-x.log",
+      "sha256": "8d45a53a91d988bdcb8a926a872f4304a22a4311bef7aef2edb21e83e4bb8193"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-output-r.log",
+      "sha256": "a8600f24c46f30e3d7abc1cc303c441ac2da1907ad134b5cdcc2ca4693023598"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-output-x.log",
+      "sha256": "8e56c839f95b0a532fd73031aa7287e750cb51ae20e83fa961e959b0bc3479f4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-supported.log",
+      "sha256": "75929732e5846801f47b20260848ff1f9e611c5a4f387db2af011805b925e3ae"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-default-tied.log",
+      "sha256": "1c4876c05a107f863d4d80b5980e9d0ef5d2b12b75f1c8c7f9937bf34d3620e2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-callbr-input.log",
+      "sha256": "7812cdf09e82ef22a5acc8bbdd67b8c14135fe6bad4e886762795388d37a701f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-callbr.log",
+      "sha256": "907b6f58696551897e83f85a765827a7a89fce953f6a4099ebaa53ddd129556a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-indirect.log",
+      "sha256": "33e44d791aa223e7abccb1297d6c70b7a37adbf5a7866f584c375aa9c3597d6d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-input-r.log",
+      "sha256": "542de523e41fee03d2bf89b516b13aadaadc333a8971157a546764d50ccee4b3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-input-x.log",
+      "sha256": "b778069e50a9d3c75d1a0b46bafd16191e5abdfc0b4a76fb9dbf8fced7b3f947"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-output-r.log",
+      "sha256": "5b8e0957147fd0643b9e5a5984b50329498f6e977d53480283ecd37990f5bb9b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-output-x.log",
+      "sha256": "ffcdd55b52f2855b4b470f56d037c7f3f3125add9c95f633acc137bb074cacbc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-supported.log",
+      "sha256": "261886b200a37baa286b1b3a583de87cce9a99edbaf8f8b1f6db189fa78f19ef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-O2-ls64-tied.log",
+      "sha256": "a811495580a1c4914f30f3e054937a1ea15ba7cb63e40f193859fd80e2d952c0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-identity.json",
+      "sha256": "bc27a73b3339b061d151f27a2b574e921c78a07bff5d3fb01d014a2b1c19f6c4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-replay.log",
+      "sha256": "9660ee59e95d9e112779f616d024d0e54b6cdcf64f1c793cdaf1c396d1a8bff1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-runner.log",
+      "sha256": "558975b19a79ce475995502af016d2089101e8512f014d27b1f9d0ba4d04fb5d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/build-candidate.py",
+      "sha256": "7092b2a18dc47bca52d998270d126f4279e830e7b6d29a0a03206779ca16f94b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-callbr-input.log",
+      "sha256": "f5caee2fc6498532f70b3a7525d81bcfd0e80bd37e5aa8fece95c237ae7f8e15"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-callbr.log",
+      "sha256": "84d97a37ffd40cffe957f3649d8c138ae657822b3be1ab82dae6bcb4a9311246"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-indirect.log",
+      "sha256": "854716e28615a009a7e1b70d746e7dfd2c3429c2d7096dccdbd839f810d3eef3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-input-r.log",
+      "sha256": "3ba205c46b5f2ff65745d2e1793bdd2f601af06de09e42c83944658f20a839d2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-input-x.log",
+      "sha256": "cb8d94dfedd7b348e1a6aa72edfdde851214f93b031b40ba239c9be0498b2b27"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-output-r.log",
+      "sha256": "123040519136d277a670c951e9b62306e7ed9d93489d2918bd0b9dce1898609d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-output-x.log",
+      "sha256": "b934541aff0a0dc11b4ab0f49f44d1ddd699fe57dc342ddc1f75de1d9ba6ce22"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-supported.log",
+      "sha256": "37568c01183c95e862a5d4f45e444c9185f462b0c55046badf369e3632250a7c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-default-tied.log",
+      "sha256": "bb64b600033b75177b7d20d627a92bc4d34fab760000631289975df901f941e2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-callbr-input.log",
+      "sha256": "b1e9969e75c798bdf4cf965fb20b79b408fa74f7958725dffdc93e9fc8da1101"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-callbr.log",
+      "sha256": "998eb109a056c73ef0e584a1d923b026fa27a22d50d9a091894a945c98238f2e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-indirect.log",
+      "sha256": "8d27537b0fc48a627b9840be6aa93c64257c34f58e8c604c9baa9a3f06a3b207"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-input-r.log",
+      "sha256": "4f2472fab24b8bee121882feb5e672c7860c68091d11a7c61389a8d87277576d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-input-x.log",
+      "sha256": "53b074c17c68df89a830a7208a7a4bd2c48ce0e878eb868cfb4af29ed22b0976"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-output-r.log",
+      "sha256": "a24f99b018b63d1bedb400c3a93d137b1ae3996980e7e8f4b973d4f999137e78"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-output-x.log",
+      "sha256": "78d0c918625ce671fdf1000018d3beb200a6d9a61a2802a09f4a0848cd875c38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-supported.log",
+      "sha256": "6b99e41adafc52d6a0629103e58ddb6f3bd20b8f7cbadc4e294c697c0574cf20"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O0-ls64-tied.log",
+      "sha256": "a24095895b0198984513ec6e5a98065545457e0acadbd2523e13b219f7b95178"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-callbr-input.log",
+      "sha256": "8bff380a86eb475f92b809eab45c789c746b35aaec153042dbeb29e2bafd0e68"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-callbr.log",
+      "sha256": "6e225d97eba67b92e45c8245fcab22754f978a306be49115fb5769c2ecf5f7d9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-indirect.log",
+      "sha256": "d1fb926ad1fdc2718138b1accaf6af7e4b8ae45bda35005aac7e0ce0c298a795"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-input-r.log",
+      "sha256": "301be24d93ea5c3c5efd4c9fb099f2a1167f5a9223baeeb4c4abeeb7f4959124"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-input-x.log",
+      "sha256": "0916150bd9ce18a86e5e1064bd0ebd618312f73551c9a0e7dff80d6598729611"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-output-r.log",
+      "sha256": "5f8ba7dd348c43729009f29d63d18249c18cd9cb69b08f635868ea6f50064cf4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-output-x.log",
+      "sha256": "acae3459175c0127303175429c780dd40947c1f19bade5694c332aad849b29f0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-supported.log",
+      "sha256": "639de7c96791a4a874a977c7e9f3670e52d89e75d3cdccf36eeda030d6d90fd8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-default-tied.log",
+      "sha256": "fac4830f62e47e31df7e81be2c7779a697b3400382ff0b9ce8acc35f887a75f2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-callbr-input.log",
+      "sha256": "2168041aefe213904cf12a5da8229fe4c55089f70f0f4b1614da5ccab6429a39"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-callbr.log",
+      "sha256": "6db44ba58a6299a2db79e1388129fbdffa2d83dc8797f76c630370eede0b15bc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-indirect.log",
+      "sha256": "7a69057d509618d6cb6c975118ff243d2568306d11e0f00f2a177126ff0b1a71"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-input-r.log",
+      "sha256": "c656e0b042a1ab91d10d305ef230e605e0ec312576b5a8c7c304a4c55473c559"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-input-x.log",
+      "sha256": "704e1bfc2ae4e7cf63ebf87081b686742aa1fa1d9a534eeefe07637d849cee5e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-output-r.log",
+      "sha256": "e4d7adabb60ba5266c332faf289186145e794b6a15b6c1bb38c8764edebe11f1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-output-x.log",
+      "sha256": "47e542a5e5121126767b80b36036b6c1176a03468590dc8894f6fcc48d5e9650"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-supported.log",
+      "sha256": "41e59ca07f06f9a94da7acdcef57acc7298abb223b9f260b71a97f4dc8014a64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-O2-ls64-tied.log",
+      "sha256": "57ec060d070be9e872e17108176c07f10cc84dab5056622581c0f1672e696fe4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-build.log",
+      "sha256": "7bf790324d5d62f7424c00eee301e69d7e0535c193ee3724379b5af70493952a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-identity.json",
+      "sha256": "f599858f958d45383f2f5795fee04be681a38e4338c031d179c440033656e796"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-runner.log",
+      "sha256": "73c74d6058fd1d13412160c6df963efedb42a6c3ee758a9176f43566ba809a38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr-input.ll",
+      "sha256": "e0cbda512cca0cccc809be17876c1e2824e7ae5093d47cc2ccaceaba96e22be1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/callbr.ll",
+      "sha256": "95191ee3eac64787ec4ae772e0fa04735bf12c1fa7d562c854d30c696c46d517"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/indirect.ll",
+      "sha256": "579a22faad4f53cd0fca51e4e7b202d9c57bb12d31b9f2a2e7ff744182b121d3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/input-r.ll",
+      "sha256": "de88a02bd7ff190862f09a20d43bf5496a1cdf4b20331a2733f468c1dfc33d9f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/input-x.ll",
+      "sha256": "5936246f96513dbc75874fd2b87517b3d8993762d8e38292b364850f79337d25"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/output-r.ll",
+      "sha256": "d88da104702e2c9632036cd6618690cc8141b7cbf236a83cfecbea9dec0ca19c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/output-x.ll",
+      "sha256": "2703f76588ad02f5cb4047a0b041027e523f763a0d81e21ad0a0cc92bec2d74d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/supported.ll",
+      "sha256": "101019d1ae646a2b5c6352a25092d27425643175433b964e39cb65d57c02f84d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/tied.ll",
+      "sha256": "fd17effc47993153a67ba362cb0cfefe8cedd6da2e6d10ef597ace65c0743de1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cross-lit-results.json",
+      "sha256": "2e4b4eea165deba72399304a837a212d71fe1b0b18077afd64165d4a921684ee"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cross-lit-retry.log",
+      "sha256": "485995a0070f224fc73b188f6cd2f6545611fbea7f90eb6f6616e052b84b4224"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/cross-lit.log",
+      "sha256": "f08baa114eb562cb80e3c819116f2c52884801a621d7e48e5317afa75f4cc2f2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/guard-only-callbr.log",
+      "sha256": "c6a915926c9994b13bea324e72a33c8c7e9808650692e2dde4cb3c2f76cbba1c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/guard-only-link.log",
+      "sha256": "ba1d2732f76308fa25fe1d3ac56595b09feba9966e15a58d8e614b72b0d9d556"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/guard-only-original.log",
+      "sha256": "39b55972d4a571095f45efa919c3586533c5dbd821c66afb1f1024ec62f63576"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/inline-asm-unknown-type.ll",
+      "sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/link-guard-only.py",
+      "sha256": "5f0f4ab0cce4deb948c2581df3de367930402aafb6e4cd8bbc96c6fbb57ae4aa"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/operand-matrix-initial.json",
+      "sha256": "a45145c120080c520eff26f1a3ee9e0d6b4e6c777408c1d2bf824c05a39c7dad"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/operand-matrix.json",
+      "sha256": "933be1b8ed48434ecac1c87d7396825a298867aee2e9dc2d0d54a034930d6e94"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/patch-roundtrip.json",
+      "sha256": "c9b3b826b04b2b8af51e0f3bf384dd3de511d249fdf626c363b92d6826ba9de2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/record-before.json",
+      "sha256": "f7f8daac8ca1a4178901feebb89e8093710314e262f6a85fb5887204a0ae08a7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/recovery-dependency.json",
+      "sha256": "9340741b600a92566cdbfe53affed3b5e81cf75e3ba6ec9dc1885ad89e77be83"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/session-identity.json",
+      "sha256": "c93924b91596602ba48c769b0b2110f3bb68b9eef42203c665192aec9156ece5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/validation-summary.json",
+      "sha256": "5a230c7ba238486470bf643771c3bfcd469c9aebc97b6fda7e3d6f8dae55c95b"
+    },
+    {
+      "path": "dev/check-aarch64-asm-type-diagnostic.py",
+      "sha256": "081fc441af97b1961674d1c93597b89f52b36169ccc49e3c7d128843dafc4d72"
+    },
+    {
+      "path": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+      "sha256": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d"
+    }
+  ],
+  "historical_unknowns": [
+    "These are constructed LLVM IR inputs, with no C preprocessing stage or recovered application failure.",
+    "The crash is confirmed; root cause and target constraint/type support need investigation before selecting a repair."
+  ],
+  "resolution": {
+    "change": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "causal_explanation": "Non-simple operand types map to MVT::Other in ParseConstraints. AArch64 r/x handlers queried its undefined bit size; both now return no register class before that query. Existing SelectionDAG diagnostics reject the operand cleanly. The guard-only link repairs the original input with the original SelectionDAG object, while the 0057 baseline still aborts without the guard.",
+    "trigger_check": "The unchanged original load i4096 and r inline-asm call are passed directly to llc with the recorded AArch64/O0/SelectionDAG/verifier/finalize-isel settings. The runner requires compiler exit 1 and exactly the allocation diagnostic, rejecting aborts and other errors.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    "candidate": {
+      "command": "python3 dev/check-aarch64-asm-type-diagnostic.py --llc /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "target": "aarch64",
+        "optimization": "O0",
+        "global_isel": false,
+        "verify_machineinstrs": true,
+        "stop_after": "finalize-isel",
+        "lto": false
+      },
+      "toolchain_location": "build/aarch64-asm-type-fix/llc",
+      "toolchain_sha256": "f8e3d451516fb66dcdd6d171f8bf2b2bff792baed78afb8dd891ff2aa01c2383",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+        "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-runner.log",
+        "sha256": "73c74d6058fd1d13412160c6df963efedb42a6c3ee758a9176f43566ba809a38"
+      },
+      "exit_code": 0
+    },
+    "regression_tests": {
+      "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/inline-asm-unknown-type.ll",
+      "sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    "dependencies": [
+      {
+        "change": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+        "reason": "The full regression consumes callbr results on both edges; rejected operands need 0057 landing-pad recovery. Guard-only link diagnoses the original non-callbr input but crashes recovering callbr.",
+        "evidence": {
+          "path": "docs/defects/evidence/2026-09-25-aarch64-asm-type/recovery-dependency.json",
+          "sha256": "9340741b600a92566cdbfe53affed3b5e81cf75e3ba6ec9dc1885ad89e77be83"
+        }
+      }
+    ]
+  },
+  "upstream_scope": "Preserved compiler has patches through 0041, not a clean upstream binary. Its entire AArch64ISelLowering.cpp equals saved published upstream 742d554bf08042b8df93d791c335260fadd16643. Both vendor and saved upstream source accept the patch and reproduce the tested edits. No latest-upstream claim."
+}

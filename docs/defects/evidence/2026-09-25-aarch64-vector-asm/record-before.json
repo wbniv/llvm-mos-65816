@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "selectiondag-inline-asm-vector-parts",
+  "title": "SelectionDAG vector inline-asm part-type assertion",
+  "status": "confirmed",
+  "report": "docs/investigations/2026-09-25-selectiondag-inlineasm.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: constructed probe, crash capture, and qualified open record."
+  ],
+  "reproducer_origin": "original",
+  "summary": "A constructed <64 x i64> input with the r constraint reaches a vector part-type assertion after physical-class iteration is removed. Patch 0057 does not repair this separate lowering contract. Target constraint semantics and the appropriate rejection or conversion remain to be established.",
+  "unknowns": [
+    "These are constructed LLVM IR inputs, with no C preprocessing stage or recovered application failure.",
+    "The crash is confirmed; root cause and target constraint/type support need investigation before selecting a repair."
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/virtual-candidate.mir",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "aarch64",
+      "optimization": "O0",
+      "global_isel": false,
+      "verify_machineinstrs": true,
+      "stop_after": "finalize-isel",
+      "lto": false
+    },
+    "toolchain_location": "build/selectiondag-inlineasm-fix/llc",
+    "toolchain_sha256": "4aae5bcf39bdc8a1366a5aaa5bfb36ae6ea4cdad4268ad0a725dad2b865ff49e",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
+      "sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/virtual-candidate.log",
+      "sha256": "ada87d988459cab165b6d73d435848eab587300cc86d7ac80a74f75648cc8796"
+    },
+    "exit_code": -6,
+    "failure_signature": "Part type doesn't match vector breakdown!"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
+      "sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/virtual-candidate.log",
+      "sha256": "ada87d988459cab165b6d73d435848eab587300cc86d7ac80a74f75648cc8796"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-identity.json",
+      "sha256": "d2263e897fa5e33794b9a6d0bda7a91005823d59eccd41d233960fa58d5c93d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.candidate.cpp.gz",
+      "sha256": "97ed29ad3186455a4c7fe0a63e54934590236af9f1a28b061ae881d4107f7f6a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-identity.json",
+      "sha256": "0713c9039c549764cf68dd5035bdd8042f3b6a98f4e2289fafab59d5dc80a2fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.baseline.cpp.gz",
+      "sha256": "1e605ae1167b1837b3117d0db3352c6b2da09a4542331041177cf5c820167680"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/source-archives.json",
+      "sha256": "9bb96a3241ca2b67304104eefc814753b37513dedcddf282c1628c17b423d016"
+    }
+  ]
+}

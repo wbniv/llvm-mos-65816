@@ -1,5 +1,17 @@
 # Finding — the `a16-*-rc-undef` "undefined physical register" verifier failure is TWO distinct defects
 
+**Revalidation, 2026-09-25:** the retained 0015 `rcundef.c` witness fails in a
+reconstructed fork only when both the guard and 0028 are absent. Adding only
+0028 repairs its identity-copy lane definition; register assignments are unchanged.
+The original claim of a separate regmask-violating allocator defect is not
+supported for this witness. The existing stock-upstream MIR model reproduces,
+while ordinary stock C reachability remains unproven. [Evidence and limits](2026-09-25-coalescing-0015-revalidation.md).
+0015's standalone PR diagnosis is superseded for this recovered witness; retain
+the historical guard and evidence and route the root repair through 0028.
+Revalidation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; session metadata verified.
+
+The earlier analysis and validation claims below are retained as dated history.
+
 **Current reproduction note (2026-09-25, OpenAI Codex):** the current patched
 compiler verifies the nine pressure witnesses in the [fresh recheck](2026-09-25-older-defect-recheck.md),
 and a reconstructed fully inlined bitboard fixture passes compile/runtime checks.

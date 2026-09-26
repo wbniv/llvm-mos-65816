@@ -1,0 +1,9 @@
+{
+  "description": "Current fork libraries with only VirtRegMap.cpp replaced by pristine source at pinned 8be0546; this is a reconstructed comparison, not the original August compiler.",
+  "sha256": {
+    "build/historical-bitboard-reconstruction/VirtRegMap.cpp": "8bacf912bc897019b891563f453d2e8e8863840624be2b3e8dc33d605094c20e",
+    "build/historical-bitboard-reconstruction/VirtRegMap.cpp.o": "a76df8baa3732364abd85d5235571e74b50c4e88d9245408c6f7d2d4bff13933",
+    "build/historical-bitboard-reconstruction/libLLVMCodeGen.a": "ced0c1f5a19bcd622391684dd472a30a33b1a51020ba91db7e5c5d99633a3f1a",
+    "build/historical-bitboard-reconstruction/llc-pinned-vreg-rewriter": "6a3e0ee8a63d219c21c72de34d8721a240497be2772c939d908680a94a04153c"
+  }
+}

@@ -101,6 +101,13 @@ All four combinations verify, emit `0xBD` directly and `0xB5` through assembly,
 and use `R_MOS_ADDR8` in both objects. Determining the intended addressing
 contract and fixing this separate discrepancy remain future work.
 
+**Follow-up, September 23:** that investigation is complete in
+[patch 0036](0036-validation.md). The whole-object zero-page contract permits
+the compact form; section-aware opcode selection and the corrected store
+address check repair all 27 C-case mismatches. The fix is installed and awaits
+independent review. A separate numeric `mos16(constant)` parser-width defect
+remains open.
+
 ## Reproduction artifacts
 
 Audit scripts and outputs are under `build/0032-review-audit/`:

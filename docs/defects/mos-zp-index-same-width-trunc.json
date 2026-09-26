@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "id": "mos-zp-index-same-width-trunc",
+  "title": "Zero-page indexed addressing emits a same-width G_TRUNC",
+  "status": "fixed",
+  "reproducer_origin": "original",
+  "summary": "Fixed: byte-sized zero-page indices retain their existing width instead of producing G_TRUNC s8 to s8.",
+  "report": "docs/plans/2026-09-25-mos-correctness-queue.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified from session 01a0d7d4-5da2-7fe0-a88c-0137eaa043a7."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/identity.json",
+      "sha256": "faf164f3c59d23931326cd1b64fdcc2feafa81a5088b0c4587743e3789d0df86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/runs.json",
+      "sha256": "d94d5460c0ec8cc762277e7ed2559114079f056e5160dd4f0f3aad042c12aa5c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/lit.log",
+      "sha256": "947237df5bf0aac623d2e6420508c7ea76907a5b9950c80f6f807351553c371b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/zp-index.log",
+      "sha256": "4e9b8adc2363843a1505fdc4e1eb14f41133da7768e3a65293d16d7b3373affe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.c",
+      "sha256": "28d34e33a570b150eaa3faeb02bfa9c1489db92b9fe931d43648b89e6e820691"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.i",
+      "sha256": "27d5dd26c0676575dcffe14b2437b3dd1c65c3f895dd475c4c69918ae76afbdb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/identity.json",
+      "sha256": "575a4be0dc9e320e132fe243be9e9e7da4267725a51570ac1a9137f315df8fc9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/lit.log",
+      "sha256": "b35c02714a15759f544dc5faa0d7ba056e1c86a25784e7d29513a4a0be8a04d0"
+    }
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer-out.mir",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "triple": "mos",
+      "pass": "legalizer",
+      "verify_machineinstrs": true
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-mos-correctness/bin; source reconstruction snapshot alongside bin",
+    "toolchain_sha256": "ccc7e32369eb2983d3f66a31e4749a24ef4e1cfb7a69d1563c0cfa13ef42a58c",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+      "sha256": "83a56dd0e9c2655df6a64f1b87ac475caa1bd91c18ed99714788125f13145c32"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.log",
+      "sha256": "939a32c2d1abaf56aa583ab4f663428304e8fb202588e6508ef59262a46c106c"
+    },
+    "exit_code": 1,
+    "failure_signature": "G_TRUNC %1:_(s8)"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0051-mos-zp-byte-index.patch",
+    "causal_explanation": "The known-bits branch in tryAbsoluteIndexedAddressing could reach the wide-index truncation path with an already-byte-sized offset. Reuse that offset directly; do not insert a same-width truncation or widen all its uses.",
+    "trigger_check": "The unchanged full legalizer.mir reproduces the exact G_TRUNC failure on the baseline and passes verification on the candidate. The C zero-page-index entry point and direct load/store tests cover 6502, a16, and xy16.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+      "sha256": "83a56dd0e9c2655df6a64f1b87ac475caa1bd91c18ed99714788125f13145c32"
+    },
+    "candidate": {
+      "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "triple": "mos",
+        "pass": "legalizer",
+        "verify_machineinstrs": true
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "toolchain_sha256": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+        "sha256": "83a56dd0e9c2655df6a64f1b87ac475caa1bd91c18ed99714788125f13145c32"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/mos-zp-index-same-width-trunc.log",
+        "sha256": "e7c951687217037aa28aa60d963e365b2a71c58a63966186a9618ed468ab3f96"
+      },
+      "exit_code": 0
+    }
+  }
+}

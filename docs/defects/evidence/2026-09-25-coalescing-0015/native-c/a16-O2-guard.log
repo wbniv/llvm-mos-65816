@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-O2-guard.s
+exit_code=0

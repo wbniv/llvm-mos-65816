@@ -1,0 +1,4 @@
+$ /tmp/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/input-r.ll -o /dev/null
+error: could not allocate input reg for constraint 'r'
+
+exit_code=1

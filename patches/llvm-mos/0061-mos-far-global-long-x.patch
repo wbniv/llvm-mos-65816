@@ -1,0 +1,323 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -177,6 +177,34 @@
+   let Predicates = [HasW65816];
+   let OutOperandList = (outs);
+   let InOperandList = (ins type0:$src, unknown:$addr);
++  let mayStore = true;
++}
++
++// A far global plus an unsigned offset that fits X can use the 65816 absolute-long,X form.
++// The address remains 24-bit even when its numeric value fits in 16 bits.
++def G_LOAD_FAR_ABS_IDX : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$base, type1:$index);
++  let mayLoad = true;
++}
++def G_STORE_FAR_ABS_IDX : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$base, type1:$index);
++  let mayStore = true;
++}
++
++def G_LOAD_FAR_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$base, type1:$index);
++  let mayLoad = true;
++}
++def G_STORE_FAR_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasIndex16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$base, type1:$index);
+   let mayStore = true;
+ }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -594,6 +594,13 @@
+   dag InOperandList = (ins addr24:$src);
+ }
+ 
++def LDAbsLongIdx : MOSLoad,
++    PseudoInstExpansion<(LDA_AbsoluteXLong addr24:$src)> {
++  let Predicates = [HasW65816];
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins addr24:$src, Xc:$idx);
++}
++
+ class MOSStore : MOSLogicalInstr {
+   let mayStore = true;
+ }
+@@ -625,6 +632,24 @@
+ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+   let Predicates = [HasW65816];
+   dag InOperandList = (ins Ac:$src, addr24:$dst);
++}
++
++def STAbsLongIdx : MOSStore,
++    PseudoInstExpansion<(STA_AbsoluteXLong addr24:$dst)> {
++  let Predicates = [HasW65816];
++  dag InOperandList = (ins Ac:$src, addr24:$dst, Xc:$idx);
++}
++
++def LDAbsLongXIdx : MOSLoad,
++    PseudoInstExpansion<(LDA_AbsoluteXLong addr24:$src)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins addr24:$src, Xc16:$idx);
++}
++def STAbsLongXIdx : MOSStore,
++    PseudoInstExpansion<(STA_AbsoluteXLong addr24:$dst)> {
++  let Predicates = [HasIndex16]; let XLow = 1;
++  dag InOperandList = (ins Ac:$src, addr24:$dst, Xc16:$idx);
+ }
+ 
+ // #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -365,6 +365,10 @@
+   // must bypass selectStore's 16-bit RMW/STZ folds.
+   case MOS::G_LOAD_FAR_ABS:
+   case MOS::G_STORE_FAR_ABS:
++  case MOS::G_LOAD_FAR_ABS_IDX:
++  case MOS::G_STORE_FAR_ABS_IDX:
++  case MOS::G_LOAD_FAR_ABS_IDX16:
++  case MOS::G_STORE_FAR_ABS_IDX16:
+   case MOS::G_LOAD_FAR_INDIR:
+   case MOS::G_STORE_FAR_INDIR:
+   // #321 Phase 2 inc 1: the indexed indirect-long forms (`lda [dp],y` /
+@@ -3383,6 +3387,12 @@
+   case MOS::G_LOAD_FAR_ABS: // #320: 65816 far load -> LDA AbsoluteLong.
+     Opcode = MOS::LDAbsLong;
+     break;
++  case MOS::G_LOAD_FAR_ABS_IDX:
++    Opcode = MOS::LDAbsLongIdx;
++    break;
++  case MOS::G_LOAD_FAR_ABS_IDX16:
++    Opcode = MOS::LDAbsLongXIdx;
++    break;
+   case MOS::G_LOAD_FAR_INDIR: // #320 far runtime: runtime far load -> LDA [dp].
+     Opcode = MOS::LDIndirLong;
+     break;
+@@ -3409,6 +3419,12 @@
+     break;
+   case MOS::G_STORE_FAR_ABS: // #320: 65816 far store -> STA AbsoluteLong.
+     Opcode = MOS::STAbsLong;
++    break;
++  case MOS::G_STORE_FAR_ABS_IDX:
++    Opcode = MOS::STAbsLongIdx;
++    break;
++  case MOS::G_STORE_FAR_ABS_IDX16:
++    Opcode = MOS::STAbsLongXIdx;
+     break;
+   case MOS::G_STORE_FAR_INDIR: // #320 far runtime: runtime far store -> STA [dp].
+     Opcode = MOS::STIndirLong;
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -2369,6 +2369,13 @@
+   MI.setDesc(Builder.getTII().get(MOS::G_LOAD));
+   MI.getOperand(0).setReg(Tmp);
+   Helper.Observer.changedInstr(MI);
++  // Select a far byte address while its G_PTR_ADD and zero-extended index are
++  // still available; the new G_LOAD can otherwise outlive that address tree.
++  if (MMO.getType() == LLT::scalar(8) &&
++      MRI.getType(MI.getPointerReg()).getScalarSizeInBits() == 32) {
++    Builder.setInsertPt(*MI.getParent(), MI.getIterator());
++    return selectAddressingMode(Helper, MRI, cast<GLoad>(MI));
++  }
+   return true;
+ }
+ 
+@@ -2629,6 +2636,8 @@
+     // long (`lda [dp]`) through a ZP Imag32 quad.
+     if (tryFarAbsoluteAddressing(Helper, MRI, MI))
+       return true;
++    if (tryFarAbsoluteIndexedAddressing(Helper, MRI, MI))
++      return true;
+     // #321 Phase 2 inc 1: a small constant displacement off that runtime
+     // pointer folds into `lda [dp],y`/`sta [dp],y` instead of a 32-bit add.
+     if (tryFarIndirectIndexedAddressing(Helper, MRI, MI))
+@@ -2722,6 +2731,100 @@
+   MI.removeOperand(1);
+   MI.addOperand(*Operand);
+   Helper.Observer.changedInstr(MI);
++  return true;
++}
++
++bool MOSLegalizerInfo::tryFarAbsoluteIndexedAddressing(
++    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  Register Addr = MI.getPointerReg();
++  int64_t Displacement = 0;
++  Register Index;
++  bool WideIndex = false;
++  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++
++  while (const auto *Add =
++             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++    Addr = Add->getBaseReg();
++    Register Offset = Add->getOffsetReg();
++    if (auto C = getIConstantVRegValWithLookThrough(Offset, MRI)) {
++      Displacement += C->Value.getSExtValue();
++      continue;
++    }
++    if (Index)
++      return false;
++    if (const MachineInstr *Shift = getOpcodeDef(G_SHL, Offset, MRI)) {
++      auto Amount = getIConstantVRegValWithLookThrough(
++          Shift->getOperand(2).getReg(), MRI);
++      if (!STI.hasIndex16() || !Amount || !Amount->Value.isOne())
++        return false;
++      Register Unscaled = Shift->getOperand(1).getReg();
++      const MachineInstr *Ext = getOpcodeDef(G_ZEXT, Unscaled, MRI);
++      const MachineInstr *Load = getOpcodeDef(G_ZEXTLOAD, Unscaled, MRI);
++      if (Ext && MRI.getType(Ext->getOperand(1).getReg()) == LLT::scalar(8))
++        Unscaled = Ext->getOperand(1).getReg();
++      else if (Load && Load->memoperands().front()->getMemoryType() ==
++                           LLT::scalar(8))
++        Unscaled = Builder.buildZExtOrTrunc(LLT::scalar(8), Unscaled).getReg(0);
++      else
++        return false;
++      Register Wide = Builder.buildZExt(LLT::scalar(16), Unscaled).getReg(0);
++      Index = Builder.buildShl(LLT::scalar(16), Wide,
++                               Builder.buildConstant(LLT::scalar(16), 1))
++                  .getReg(0);
++      WideIndex = true;
++      continue;
++    }
++    const MachineInstr *ZExt = getOpcodeDef(G_ZEXT, Offset, MRI);
++    Register Source;
++    LLT SourceType;
++    if (ZExt) {
++      Source = ZExt->getOperand(1).getReg();
++      SourceType = MRI.getType(Source);
++    } else if (const MachineInstr *Load =
++                   getOpcodeDef(G_ZEXTLOAD, Offset, MRI)) {
++      SourceType = Load->memoperands().front()->getMemoryType();
++      if (SourceType != LLT::scalar(8) && SourceType != LLT::scalar(16))
++        return false;
++      Source = Builder.buildZExtOrTrunc(SourceType, Offset).getReg(0);
++    } else
++      return false;
++    // X contributes an unsigned 8-bit offset in the ambient mode. A full
++    // 16-bit offset requires the +mos-xy16 index-width bracket.
++    if (SourceType == LLT::scalar(8))
++      Index = Source;
++    else if (SourceType == LLT::scalar(16) && STI.hasIndex16()) {
++      Index = Source;
++      WideIndex = true;
++    } else
++      return false;
++  }
++
++  if (!Index)
++    return false;
++  auto Base = matchAbsoluteAddressing(MRI, Addr);
++  if (!Base)
++    return false;
++  if (Base->isImm())
++    Base->setImm(Base->getImm() + Displacement);
++  else if (Base->isGlobal())
++    Base->setOffset(Base->getOffset() + Displacement);
++  else
++    return false;
++
++  if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
++    return false;
++  unsigned Opcode = WideIndex
++                        ? (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX16
++                                          : MOS::G_STORE_FAR_ABS_IDX16)
++                        : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX
++                                          : MOS::G_STORE_FAR_ABS_IDX);
++  Builder.buildInstr(Opcode)
++      .add(MI.getOperand(0))
++      .add(*Base)
++      .addUse(Index)
++      .addMemOperand(*MI.memoperands_begin());
++  MI.eraseFromParent();
+   return true;
+ }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -110,6 +110,9 @@
+   // #320: 65816 far (24-bit) absolute-long addressing for 32-bit far pointers.
+   bool tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+                                 MachineRegisterInfo &MRI, GLoadStore &MI) const;
++  bool tryFarAbsoluteIndexedAddressing(LegalizerHelper &Helper,
++                                       MachineRegisterInfo &MRI,
++                                       GLoadStore &MI) const;
+   // #320 far runtime: 65816 indirect-long (`lda [dp]`) addressing for a runtime
+   // (non-constant) 32-bit far pointer.
+   bool tryFarIndirectAddressing(LegalizerHelper &Helper,
+diff --git a/llvm/test/CodeGen/MOS/far-global-long-x.ll b/llvm/test/CodeGen/MOS/far-global-long-x.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-global-long-x.ll
+@@ -0,0 +1,58 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,XY16
++
++@table = external addrspace(2) global [256 x i8]
++@output = external addrspace(2) global [256 x i8]
++@index8 = external global i8
++@sink16 = external global i16
++
++define i8 @load_byte(i8 %index) {
++; CHECK-LABEL: load_byte:
++; CHECK: lda mos24(table),x
++  %offset = zext i8 %index to i32
++  %ptr = getelementptr [256 x i8], ptr addrspace(2) @table, i32 0, i32 %offset
++  %value = load i8, ptr addrspace(2) %ptr
++  ret i8 %value
++}
++
++define void @store_byte(i8 %index, i8 %value) {
++; CHECK-LABEL: store_byte:
++; CHECK: sta mos24(output),x
++  %offset = zext i8 %index to i32
++  %ptr = getelementptr [256 x i8], ptr addrspace(2) @output, i32 0, i32 %offset
++  store i8 %value, ptr addrspace(2) %ptr
++  ret void
++}
++
++define i8 @load_byte_wide_index(i16 %index) {
++; XY16-LABEL: load_byte_wide_index:
++; XY16: rep #16
++; XY16: lda mos24(table),x
++; XY16: sep #16
++  %offset = zext i16 %index to i32
++  %ptr = getelementptr [256 x i8], ptr addrspace(2) @table, i32 0, i32 %offset
++  %value = load i8, ptr addrspace(2) %ptr
++  ret i8 %value
++}
++
++define void @load_memory_index() {
++; CHECK-LABEL: load_memory_index:
++; CHECK: lda mos24(table),x
++  %index = load volatile i8, ptr @index8
++  %offset = zext i8 %index to i32
++  %ptr = getelementptr [256 x i8], ptr addrspace(2) @table, i32 0, i32 %offset
++  %value = load i8, ptr addrspace(2) %ptr
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr @sink16
++  ret void
++}
++
++define void @store_memory_index(i8 %value) {
++; CHECK-LABEL: store_memory_index:
++; CHECK: sta mos24(output),x
++  %index = load volatile i8, ptr @index8
++  %offset = zext i8 %index to i32
++  %ptr = getelementptr [256 x i8], ptr addrspace(2) @output, i32 0, i32 %offset
++  store i8 %value, ptr addrspace(2) %ptr
++  ret void
++}

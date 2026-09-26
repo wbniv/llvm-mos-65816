@@ -1,0 +1,6 @@
+*** Begin Patch
+*** Update File: /home/will/llvm-mos-65816/examples/snes/bitboard64.c
+@@
+-        uint64_t bit=UINT64_C(1)<<sq;
++        uint64_t bit=bitboard64_onehot(sq);
+*** End Patch

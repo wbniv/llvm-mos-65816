@@ -1,0 +1,86 @@
+[
+  {
+    "file": "supported",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "features": "",
+    "exit": 0
+  },
+  {
+    "file": "supported",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "features": "",
+    "exit": 0
+  },
+  {
+    "file": "supported",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "features": "",
+    "exit": 0
+  },
+  {
+    "file": "supported",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "features": "",
+    "exit": 0
+  },
+  {
+    "file": "scalarized",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "features": "-neon",
+    "exit": 0
+  },
+  {
+    "file": "scalarized",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "features": "-neon",
+    "exit": 0
+  },
+  {
+    "file": "scalarized",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "features": "-neon",
+    "exit": 0
+  },
+  {
+    "file": "scalarized",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "features": "-neon",
+    "exit": 0
+  },
+  {
+    "file": "ls64",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "features": "+ls64",
+    "exit": 0
+  },
+  {
+    "file": "ls64",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "features": "+ls64",
+    "exit": 0
+  },
+  {
+    "file": "ls64",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "features": "+ls64",
+    "exit": 0
+  },
+  {
+    "file": "ls64",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "features": "+ls64",
+    "exit": 0
+  }
+]

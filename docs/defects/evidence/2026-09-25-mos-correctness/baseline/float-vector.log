@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll -o /dev/null
+exit_code=1
+LLVM ERROR: unable to legalize instruction: G_STORE %5:_(<4 x s32>), %0:_(p0) :: (store (<4 x s32>) into %ir.out, align 1) (in function: add_v4sf)

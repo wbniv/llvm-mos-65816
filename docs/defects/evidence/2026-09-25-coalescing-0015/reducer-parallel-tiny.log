@@ -1,0 +1,5 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/reducer-parallel-tiny-output.mir
+*** Reducing Instructions (instructions)...
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-moexit_code=-11

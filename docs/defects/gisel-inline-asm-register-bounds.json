@@ -1,0 +1,170 @@
+{
+  "schema": 1,
+  "id": "gisel-inline-asm-register-bounds",
+  "title": "GlobalISel physical-register inline-asm range exhaustion",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-25-shift-inlineasm-fixes.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: diagnosis, patches 0055/0056, regression tests, preserved-baseline comparison, compile/runtime validation, installed compiler refresh, and documentation.",
+    "The prior MOS finding and its existing contributors remain recorded in docs/plans/2026-09-24-gisel-tied-inline-asm.md; this work captures an independent AArch64 LLVM IR trigger."
+  ],
+  "reproducer_origin": "original",
+  "summary": "An i128 AArch64 inline-asm operand constrained to {cc} exhausts the one-register class and asserts. Patch 0056 validates the whole physical-register range, diagnoses invalid constraints, and defines error-recovery results without invoking fallback. The identical IR changes from an assertion to the expected clean diagnostic on the isolated candidate.",
+  "baseline": {
+    "command": "python3 /home/will/llvm-mos-65816/dev/check-inlineasm-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "aarch64",
+      "optimization": "O0",
+      "global_isel": true,
+      "global_isel_abort": 1,
+      "verify_machineinstrs": true,
+      "lto": false,
+      "expected_behavior": "Compiler exit 1 with exactly the insufficient-register diagnostic; runner exits 0 only for that result."
+    },
+    "toolchain_location": "build/0041-inlineasm-build/llc-0041",
+    "toolchain_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-runner.log",
+      "sha256": "3253179e73e65df4c624cce7da3e9ced5b22cf859cfb5ade3c590acb5c178d56"
+    },
+    "exit_code": 1,
+    "failure_signature": "Ran out of registers to allocate!"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "causal_explanation": "The register-assignment loop advanced through physical class members without validating the requested range, asserting or reading beyond the end. Validate the entire range before assignment and handle failure with DiagnosticInfoInlineAsm. Allocate unconstrained virtual registers independently of the finite physical iterator. Define unused recovery results when a diagnostic handler returns so invalid assembly cannot trigger fallback or undefined virtual-register uses. Only InlineAsmLowering.cpp differs in the isolated baseline/candidate link.",
+    "trigger_check": "The original constructed IR still asks for an i128 value in {cc}; its single physical member cannot supply two registers. The runner requires compiler exit 1 and exactly the intended diagnostic. Direct output, input, tied, and indirect-output forms pass all four O0/O2 and abort/fallback configurations, with three valid physical controls and the 1067-test AArch64/ARM/X86 GlobalISel suite.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    "candidate": {
+      "command": "python3 /home/will/llvm-mos-65816/dev/check-inlineasm-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "target": "aarch64",
+        "optimization": "O0",
+        "global_isel": true,
+        "global_isel_abort": 1,
+        "verify_machineinstrs": true,
+        "lto": false,
+        "expected_behavior": "Compiler exit 1 with exactly the insufficient-register diagnostic; runner exits 0 only for that result."
+      },
+      "toolchain_location": "build/inlineasm-bounds-fix/llc",
+      "toolchain_sha256": "301f6c7d313f116049197707b2f07ac9c21088c9e2441232bb023b2551ac4c2d",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+        "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-candidate-runner.log",
+        "sha256": "b273c4cca5f6a5ade53105ad64b35c0a0d59c5418c3b7b00af34a34abd7c145d"
+      },
+      "exit_code": 0
+    }
+  },
+  "upstream_scope": "The saved assertion-enabled baseline includes prior upstream-based patches through 0041, not an unpatched build. Its entire register-assignment helper is byte-identical to unpatched published revision 742d554bf08042b8df93d791c335260fadd16643. The reproducer is LLVM IR, with no C preprocessing stage. No claim about latest upstream or SelectionDAG closure.",
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/session-identity.json",
+      "sha256": "815cae91972589799590a90670f1c3bb1ed07e49c0b90d1898d3031f5f5294e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/compile-runs.json",
+      "sha256": "c3b70f1de4f67a7628c90b565799955b50c2151d93c8067ff20c108f69fef5da"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/runtime-runs.json",
+      "sha256": "245a239e5a312215111d68fd9e640fc2d9c05ac333c7c15a25bdb8123b63119b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/final-checks.json",
+      "sha256": "0807c3eab027849d321f640dfe1668495c3def6f7bf229066fc33b39fbcada08"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/patch-checks.json",
+      "sha256": "251b2e50f459b434909788cb65f6d77019835310e0fda188cab417d316c7fb1e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/mos-lit-final.log",
+      "sha256": "be3eb76ccd2c711b2035c5c79f871a173e00c142cf6efad06d31150b6c9f6868"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/cross-lit-final.log",
+      "sha256": "0dfb7879c8218cffffc57fead13f00e5c60a05cbf849e5105857ee95de402e0b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc-baseline.log",
+      "sha256": "ffa37b7254b65c957a34a74a8327b5bf9f5e413eb61dbaf59b62fe69ace46557"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-runner.log",
+      "sha256": "3253179e73e65df4c624cce7da3e9ced5b22cf859cfb5ade3c590acb5c178d56"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-candidate-runner.log",
+      "sha256": "b273c4cca5f6a5ade53105ad64b35c0a0d59c5418c3b7b00af34a34abd7c145d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-identity.json",
+      "sha256": "33bdd1ef38d6a7f141c2fb9f2906aa96f0fea78421408cd797ae51d6899464fc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-source.patch",
+      "sha256": "e9e1620ff4678b0e9ca48d276e5652cd2d151824e9fe193482ea7eea1a311690"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/InlineAsmLowering.baseline.cpp",
+      "sha256": "2d65e981fd7d053a0fc893bf9b9cf01d2c38fddb7fc48f39f5387468ed64819c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/InlineAsmLowering.candidate.cpp",
+      "sha256": "48b1b2d7f5dc8746990b810c93bb9e04ab935b23176b18c8ab23a38b6bfb236a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-candidate-build.log",
+      "sha256": "895a3b47ced23db554939878d7624bc4ffe53967fcba5c4fe1f74b43ec3b0ecc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/0056-upstream-based.patch",
+      "sha256": "bf24ab99f8d8bc68c7bb8ddef83235fee2e234ac54b123fe768ed86fa3b6575c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inline-asm-physreg-exhaustion.ll",
+      "sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-O0-abort0.log",
+      "sha256": "c6da9a84c02fcd613768ec64d72eaaf79662c2ae936cefe335f434e8aa873b56"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-O0-abort1.log",
+      "sha256": "b8cd1d428d5d7f6e34f493cb25d8eb6fc74c6588217589ce9262f005b22a97af"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-O2-abort0.log",
+      "sha256": "282d90e13772a909ac59e9a813215eb9df0b4a13eac809b547843f9669d0b4a5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-O2-abort1.log",
+      "sha256": "b208078bb2cc1478d1ad2f5808a4d6d2df47fc055787902e080cb83cf1451cc4"
+    },
+    {
+      "path": "dev/check-inlineasm-register-diagnostic.py",
+      "sha256": "93ea9eda9a969a328d2c6df3f828fcb5a2e0a10ff502983629cc8d41376b703e"
+    },
+    {
+      "path": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+      "sha256": "5e9371ff0b8657706cb84b4fcaff87ede306f2b7b974f5e661e7afba6ac8d132"
+    }
+  ]
+}

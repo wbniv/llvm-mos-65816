@@ -1,0 +1,14 @@
+---
+name: anyext_shift
+body: |
+  bb.0:
+    liveins: $a, $x
+    %0:_(s8) = COPY $a
+    %1:_(s8) = COPY $x
+    %2:_(s64) = G_ANYEXT %0
+    %3:_(s64) = G_CONSTANT i64 1
+    %4:_(s64) = G_SHL %3, %2
+    %5:_(p0) = G_CONSTANT i16 512
+    G_STORE %4, %5 :: (volatile store (s64))
+    RTS
+...

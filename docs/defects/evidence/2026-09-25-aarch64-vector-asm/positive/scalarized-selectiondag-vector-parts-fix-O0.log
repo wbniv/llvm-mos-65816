@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -mattr=-neon /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/positive/scalarized.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-vector-asm/positive/scalarized-selectiondag-vector-parts-fix-O0.s
+exit_code=0

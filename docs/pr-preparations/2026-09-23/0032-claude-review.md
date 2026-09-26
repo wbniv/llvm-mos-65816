@@ -74,6 +74,12 @@ is the object/assembly disagreement; the intended addressing contract still
 needs investigation. A [reduced non-register-name input](../../investigations/repro/upstream-issues-2026-09-23/zero-page-indexed-symbol.c)
 now preserves the finding outside the temporary scratchpad.
 
+**Follow-up, September 23:** [patch 0036](0036-validation.md) establishes that
+the compact zero-page form is intended, fixes indexed-opcode classification and
+the store address check, and makes direct/reassembled objects agree. It is
+validated and installed; independent review remains. The separate
+`mos16(constant)` parser defect found during that work is still pending.
+
 ## Notes on the draft
 
 Accurate. Two things worth adding, done: the full-corpus round-trip figures

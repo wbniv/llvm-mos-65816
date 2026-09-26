@@ -1,0 +1,40 @@
+$ python3 dev/check-aarch64-asm-type-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc
+$ /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null
+Value type is non-standard value, Other.
+UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/include/llvm/CodeGenTypes/MachineValueType.h:375!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@many_virtual'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005e73b169c00b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005e73b1698e91 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005e73b169ce1b
+3  libc.so.6 0x00007450df245cb0
+4  libc.so.6 0x00007450df2a61ac pthread_kill + 284
+5  libc.so.6 0x00007450df245b7e gsignal + 30
+6  libc.so.6 0x00007450df2288ec abort + 39
+7  llc       0x00005e73b15f77cf
+8  llc       0x00005e73af3adf6a
+9  llc       0x00005e73af9a9df3
+10 llc       0x00005e73b13ddfde
+11 llc       0x00005e73b13afc80 llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&, llvm::BasicBlock const*) + 5024
+12 llc       0x00005e73b1391226 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+13 llc       0x00005e73b1466a95 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+14 llc       0x00005e73b1465b8b llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 5675
+15 llc       0x00005e73b14632f1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+16 llc       0x00005e73b146098c llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+17 llc       0x00005e73b0336f99 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+18 llc       0x00005e73b08c9780 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+19 llc       0x00005e73b08d1882 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc       0x00005e73b08ca544 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+21 llc       0x00005e73af29974b
+22 llc       0x00005e73af296a13 main + 1443
+23 libc.so.6 0x00007450df22a601
+24 libc.so.6 0x00007450df22a718 __libc_start_main + 136
+25 llc       0x00005e73af295c25 _start + 37
+compiler_exit_code=-6
+Clean AArch64 type diagnostic: FAIL
+
+runner_exit_code=1

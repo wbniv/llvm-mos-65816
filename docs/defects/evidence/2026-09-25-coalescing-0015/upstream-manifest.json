@@ -1,0 +1,22 @@
+{
+  "revision": "742d554bf08042b8df93d791c335260fadd16643",
+  "upstream_url": "https://github.com/llvm-mos/llvm-mos",
+  "unpatched": true,
+  "tracked_source_diff": "empty",
+  "created_utc": "2026-09-22T00:29:30.934063+00:00",
+  "container_image_id": "sha256:a7e0e3ba90fd4eec56817fa9ea4aa2cebbafa0068c030736a469b98bb1d2ea46",
+  "container_image_tag": "llvm-mos-65816-dev",
+  "source_checkout": "build/0028-upstream-src",
+  "incremental_build": "build/upstream-llc",
+  "build_type": "Release",
+  "llvm_enable_assertions": false,
+  "targets": [
+    "MOS"
+  ],
+  "clang_version": "clang version 24.0.0git (/home/will/llvm-mos 742d554bf08042b8df93d791c335260fadd16643)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /work/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin\n",
+  "llc_version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n",
+  "untracked_source_files": [
+    "llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+    "llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir"
+  ]
+}

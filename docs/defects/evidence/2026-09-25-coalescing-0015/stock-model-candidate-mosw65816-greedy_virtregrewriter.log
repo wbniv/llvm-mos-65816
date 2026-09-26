@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc -mtriple=mos -mcpu=mosw65816 -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-model-candidate-mosw65816-greedy_virtregrewriter.out
+exit_code=0

@@ -1,0 +1,5 @@
+Continuation of candidate/patch-stack.log clean reconstruction through 0053.
+error: llvm/lib/CodeGen/RegisterScavenging.cpp: No such file or directory
+Added pristine pinned RegisterScavenging.cpp to minimal reconstruction (no earlier patch touches it).
+MATCH llvm/lib/CodeGen/RegisterScavenging.cpp
+MATCH llvm/test/CodeGen/MOS/scavenger-status-save-range.mir

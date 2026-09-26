@@ -1,0 +1,13 @@
+{
+  "session_file": "/home/will/.codex/sessions/2026/09/25/rollout-2026-09-25T16-10-14-01a0d7d4-5da2-7fe0-a88c-0137eaa043a7.jsonl",
+  "metadata": {
+    "id": "01a0d7d4-5da2-7fe0-a88c-0137eaa043a7",
+    "cli_version": "0.157.0",
+    "originator": "codex-tui",
+    "model_provider": "openai"
+  },
+  "turn": {
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  }
+}

@@ -1,0 +1,6 @@
+$ dev/probe-far-roundtrip.sh --all --cc /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --mc /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc --objdump /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump --flags '-Os -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16'
+
+cc=/home/will/llvm-mos-65816/build/llvm-mos/bin/clang
+mc=/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc
+round-trip: 120 identical, 0 divergent, 0 skipped
+exit_code=0

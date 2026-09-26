@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/focused-candidate-a16.mir
+
+exit_code=0

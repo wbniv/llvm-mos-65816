@@ -1,0 +1,594 @@
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -180,7 +180,7 @@
+   let mayStore = true;
+ }
+ 
+-// A far global plus an unsigned offset that fits X can use the 65816 absolute-long,X form.
++// A far global plus an unsigned offset that fits X can use absolute-long,X.
+ // The address remains 24-bit even when its numeric value fits in 16 bits.
+ def G_LOAD_FAR_ABS_IDX : MOSGenericInstruction {
+   let Predicates = [HasW65816];
+@@ -194,7 +194,6 @@
+   let InOperandList = (ins type0:$src, unknown:$base, type1:$index);
+   let mayStore = true;
+ }
+-
+ def G_LOAD_FAR_ABS_IDX16 : MOSGenericInstruction {
+   let Predicates = [HasIndex16];
+   let OutOperandList = (outs type0:$dst);
+@@ -205,6 +204,45 @@
+   let Predicates = [HasIndex16];
+   let OutOperandList = (outs);
+   let InOperandList = (ins type0:$src, unknown:$base, type1:$index);
++  let mayStore = true;
++}
++
++// Native 16-bit far accesses retain the far address or pointer operand so the
++// selector can choose an explicit long opcode in accumulator-wide mode.
++def G_LOAD16_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$addr);
++  let mayLoad = true;
++}
++def G_STORE16_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$addr);
++  let mayStore = true;
++}
++def G_LOAD16_FAR_ABS_IDX : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$addr, type1:$index);
++  let mayLoad = true;
++}
++def G_STORE16_FAR_ABS_IDX : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$addr, type1:$index);
++  let mayStore = true;
++}
++def G_LOAD16_FAR_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasAccum16, HasIndex16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$addr, type1:$index);
++  let mayLoad = true;
++}
++def G_STORE16_FAR_ABS_IDX16 : MOSGenericInstruction {
++  let Predicates = [HasAccum16, HasIndex16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$addr, type1:$index);
+   let mayStore = true;
+ }
+ 
+@@ -221,6 +259,18 @@
+ }
+ def G_STORE_FAR_INDIR : MOSGenericInstruction {
+   let Predicates = [HasW65816];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, ptype1:$addr);
++  let mayStore = true;
++}
++def G_LOAD16_FAR_INDIR : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins ptype1:$addr);
++  let mayLoad = true;
++}
++def G_STORE16_FAR_INDIR : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
+   let OutOperandList = (outs);
+   let InOperandList = (ins type0:$src, ptype1:$addr);
+   let mayStore = true;
+@@ -249,6 +299,18 @@
+   let InOperandList = (ins type0:$src, ptype1:$addr, type1:$index);
+   let mayStore = true;
+ }
++def G_LOAD16_FAR_INDIR_IDX : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins ptype1:$addr, type1:$index);
++  let mayLoad = true;
++}
++def G_STORE16_FAR_INDIR_IDX : MOSGenericInstruction {
++  let Predicates = [HasAccum16];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, ptype1:$addr, type1:$index);
++  let mayStore = true;
++}
+ 
+ // Generalized 8-bit store using the absolute indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or a 16-bit immediate.
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -640,6 +640,28 @@
+   dag InOperandList = (ins Ac:$src, addr24:$dst, Xc:$idx);
+ }
+ 
++def LDAbsLong16 : MOSLoad,
++    PseudoInstExpansion<(LDA_AbsoluteLong addr24:$src)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr24:$src);
++}
++def STAbsLong16 : MOSStore,
++    PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr24:$dst);
++}
++def LDAbsLongIdx16 : MOSLoad,
++    PseudoInstExpansion<(LDA_AbsoluteXLong addr24:$src)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr24:$src, Xc:$idx);
++}
++def STAbsLongIdx16 : MOSStore,
++    PseudoInstExpansion<(STA_AbsoluteXLong addr24:$dst)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr24:$dst, Xc:$idx);
++}
+ def LDAbsLongXIdx : MOSLoad,
+     PseudoInstExpansion<(LDA_AbsoluteXLong addr24:$src)> {
+   let Predicates = [HasIndex16]; let XLow = 1;
+@@ -650,6 +672,17 @@
+     PseudoInstExpansion<(STA_AbsoluteXLong addr24:$dst)> {
+   let Predicates = [HasIndex16]; let XLow = 1;
+   dag InOperandList = (ins Ac:$src, addr24:$dst, Xc16:$idx);
++}
++def LDAbsLongXIdx16 : MOSLoad,
++    PseudoInstExpansion<(LDA_AbsoluteXLong addr24:$src)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr24:$src, Xc16:$idx);
++}
++def STAbsLongXIdx16 : MOSStore,
++    PseudoInstExpansion<(STA_AbsoluteXLong addr24:$dst)> {
++  let Predicates = [HasAccum16, HasIndex16]; let MLow = 1; let XLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr24:$dst, Xc16:$idx);
+ }
+ 
+ // #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
+@@ -684,6 +717,29 @@
+     PseudoInstExpansion<(STA_IndirectIndexedLong addr8:$addr)> {
+   let Predicates = [HasW65816];
+   dag InOperandList = (ins Ac:$src, Imag32:$addr, Yc:$offset);
++}
++
++def LDIndirLong16 : MOSLoad,
++    PseudoInstExpansion<(LDA_IndirectLong addr8:$addr)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag32:$addr);
++}
++def STIndirLong16 : MOSStore,
++    PseudoInstExpansion<(STA_IndirectLong addr8:$addr)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag32:$addr);
++}
++def LDIndirLongIdx16 : MOSLoad,
++    PseudoInstExpansion<(LDA_IndirectIndexedLong addr8:$addr)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag32:$addr, Yc:$offset);
++}
++def STIndirLongIdx16 : MOSStore,
++    PseudoInstExpansion<(STA_IndirectIndexedLong addr8:$addr)> {
++  let Predicates = [HasAccum16]; let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag32:$addr, Yc:$offset);
+ }
+ 
+ //===---------------------------------------------------------------------===//
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -332,18 +332,28 @@
+ 
+   case MOS::G_LOAD16_INDIR:
+   case MOS::G_STORE16_INDIR:
++  case MOS::G_LOAD16_FAR_INDIR:
++  case MOS::G_STORE16_FAR_INDIR:
+     return selectMem16Indir(MI);
+ 
+   case MOS::G_LOAD16_ABS:
+   case MOS::G_STORE16_ABS:
++  case MOS::G_LOAD16_FAR_ABS:
++  case MOS::G_STORE16_FAR_ABS:
+     return selectMem16Abs(MI);
+ 
+   case MOS::G_LOAD16_ABS_IDX:
+   case MOS::G_STORE16_ABS_IDX:
++  case MOS::G_LOAD16_FAR_ABS_IDX:
++  case MOS::G_STORE16_FAR_ABS_IDX:
++  case MOS::G_LOAD16_FAR_ABS_IDX16:
++  case MOS::G_STORE16_FAR_ABS_IDX16:
+     return selectMem16AbsIdx(MI);
+ 
+   case MOS::G_LOAD16_INDIR_IDX:
+   case MOS::G_STORE16_INDIR_IDX:
++  case MOS::G_LOAD16_FAR_INDIR_IDX:
++  case MOS::G_STORE16_FAR_INDIR_IDX:
+     return selectMem16IndirIdx(MI);
+ 
+   // #321 xy16: indexed addressing with 16-bit X/Y index. selectXY16 handles
+@@ -3183,13 +3193,21 @@
+   MachineInstr *Def = MRI.getVRegDef(Value);
+   if (Def && MRI.hasOneNonDBGUse(Value) &&
+       (Def->getOpcode() == MOS::G_LOAD16_ABS ||
+-       Def->getOpcode() == MOS::G_LOAD16_INDIR) &&
++       Def->getOpcode() == MOS::G_LOAD16_INDIR ||
++       Def->getOpcode() == MOS::G_LOAD16_FAR_ABS ||
++       Def->getOpcode() == MOS::G_LOAD16_FAR_INDIR) &&
+       shouldFoldMemAccess(StoreMI, *Def, AA)) {
+     // Indirect/mixed copy: fold the load directly into A16 (no Imag16 temp). The
+     // load's operand 1 is its address (abs operand or pointer); operand 0 is the
+     // value vreg this store consumes.
+-    const bool LdAbs = Def->getOpcode() == MOS::G_LOAD16_ABS;
+-    auto Ld = Builder.buildInstr(LdAbs ? MOS::LDAbs16 : MOS::LDAIndir16)
++    unsigned LoadOpcode;
++    switch (Def->getOpcode()) {
++    case MOS::G_LOAD16_ABS: LoadOpcode = MOS::LDAbs16; break;
++    case MOS::G_LOAD16_INDIR: LoadOpcode = MOS::LDAIndir16; break;
++    case MOS::G_LOAD16_FAR_ABS: LoadOpcode = MOS::LDAbsLong16; break;
++    default: LoadOpcode = MOS::LDIndirLong16; break;
++    }
++    auto Ld = Builder.buildInstr(LoadOpcode)
+                   .addDef(A16)
+                   .add(Def->getOperand(1));
+     Ld.cloneMemRefs(*Def);
+@@ -3212,10 +3230,15 @@
+ bool MOSInstructionSelector::selectMem16Indir(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
+   MachineRegisterInfo &MRI = *Builder.getMRI();
+-  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_INDIR;
++  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_INDIR ||
++                      MI.getOpcode() == MOS::G_LOAD16_FAR_INDIR;
++  const bool Far = MI.getOpcode() == MOS::G_LOAD16_FAR_INDIR ||
++                   MI.getOpcode() == MOS::G_STORE16_FAR_INDIR;
+ 
+   Register ValOrDst = MI.getOperand(0).getReg();
+   Register Ptr = MI.getOperand(1).getReg();
++  if (Far && Ptr.isVirtual() && !MRI.getRegClassOrNull(Ptr))
++    MRI.setRegClass(Ptr, &MOS::Imag32RegClass);
+ 
+   // The user's memory access is the indirect op (LDAIndir16 / STAIndir16); carry
+   // the memref there. The Imag16 load/store that moves the value to/from A16 is an
+@@ -3224,13 +3247,15 @@
+   MachineInstr *FoldedLoad = nullptr;
+   if (IsLoad) {
+     Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
+-    auto Ld = Builder.buildInstr(MOS::LDAIndir16).addDef(A16).addUse(Ptr);
++    auto Ld = Builder.buildInstr(Far ? MOS::LDIndirLong16 : MOS::LDAIndir16)
++                  .addDef(A16).addUse(Ptr);
+     Ld.cloneMemRefs(MI);
+     New.push_back(Ld);
+     New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
+   } else {
+     Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
+-    auto St = Builder.buildInstr(MOS::STAIndir16).addUse(A16).addUse(Ptr);
++    auto St = Builder.buildInstr(Far ? MOS::STIndirLong16 : MOS::STAIndir16)
++                  .addUse(A16).addUse(Ptr);
+     St.cloneMemRefs(MI);
+     New.push_back(St);
+   }
+@@ -3252,7 +3277,10 @@
+ bool MOSInstructionSelector::selectMem16Abs(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
+   MachineRegisterInfo &MRI = *Builder.getMRI();
+-  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_ABS;
++  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_ABS ||
++                      MI.getOpcode() == MOS::G_LOAD16_FAR_ABS;
++  const bool Far = MI.getOpcode() == MOS::G_LOAD16_FAR_ABS ||
++                   MI.getOpcode() == MOS::G_STORE16_FAR_ABS;
+ 
+   Register ValOrDst = MI.getOperand(0).getReg();
+   const MachineOperand &AbsOp = MI.getOperand(1);
+@@ -3261,13 +3289,15 @@
+   MachineInstr *FoldedLoad = nullptr;
+   if (IsLoad) {
+     Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
+-    auto Ld = Builder.buildInstr(MOS::LDAbs16).addDef(A16).add(AbsOp);
++    auto Ld = Builder.buildInstr(Far ? MOS::LDAbsLong16 : MOS::LDAbs16)
++                  .addDef(A16).add(AbsOp);
+     Ld.cloneMemRefs(MI);
+     New.push_back(Ld);
+     New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
+   } else {
+     Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
+-    auto St = Builder.buildInstr(MOS::STAbs16).addUse(A16).add(AbsOp);
++    auto St = Builder.buildInstr(Far ? MOS::STAbsLong16 : MOS::STAbs16)
++                  .addUse(A16).add(AbsOp);
+     St.cloneMemRefs(MI);
+     New.push_back(St);
+   }
+@@ -3283,7 +3313,15 @@
+ bool MOSInstructionSelector::selectMem16AbsIdx(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
+   MachineRegisterInfo &MRI = *Builder.getMRI();
+-  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_ABS_IDX;
++  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_ABS_IDX ||
++                      MI.getOpcode() == MOS::G_LOAD16_FAR_ABS_IDX ||
++                      MI.getOpcode() == MOS::G_LOAD16_FAR_ABS_IDX16;
++  const bool Far = MI.getOpcode() == MOS::G_LOAD16_FAR_ABS_IDX ||
++                   MI.getOpcode() == MOS::G_STORE16_FAR_ABS_IDX ||
++                   MI.getOpcode() == MOS::G_LOAD16_FAR_ABS_IDX16 ||
++                   MI.getOpcode() == MOS::G_STORE16_FAR_ABS_IDX16;
++  const bool WideIndex = MI.getOpcode() == MOS::G_LOAD16_FAR_ABS_IDX16 ||
++                         MI.getOpcode() == MOS::G_STORE16_FAR_ABS_IDX16;
+ 
+   Register ValOrDst = MI.getOperand(0).getReg();
+   const MachineOperand &BaseOp = MI.getOperand(1);
+@@ -3293,13 +3331,19 @@
+   MachineInstr *FoldedLoad = nullptr;
+   if (IsLoad) {
+     Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
+-    auto Ld = Builder.buildInstr(MOS::LDAbsIdx16).addDef(A16).add(BaseOp).addUse(IdxReg);
++    auto Ld = Builder.buildInstr(Far ? (WideIndex ? MOS::LDAbsLongXIdx16
++                                                 : MOS::LDAbsLongIdx16)
++                                     : MOS::LDAbsIdx16)
++                  .addDef(A16).add(BaseOp).addUse(IdxReg);
+     Ld.cloneMemRefs(MI);
+     New.push_back(Ld);
+     New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
+   } else {
+     Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
+-    auto St = Builder.buildInstr(MOS::STAbsIdx16).addUse(A16).add(BaseOp).addUse(IdxReg);
++    auto St = Builder.buildInstr(Far ? (WideIndex ? MOS::STAbsLongXIdx16
++                                                 : MOS::STAbsLongIdx16)
++                                     : MOS::STAbsIdx16)
++                  .addUse(A16).add(BaseOp).addUse(IdxReg);
+     St.cloneMemRefs(MI);
+     New.push_back(St);
+   }
+@@ -3319,23 +3363,30 @@
+ bool MOSInstructionSelector::selectMem16IndirIdx(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
+   MachineRegisterInfo &MRI = *Builder.getMRI();
+-  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_INDIR_IDX;
++  const bool IsLoad = MI.getOpcode() == MOS::G_LOAD16_INDIR_IDX ||
++                      MI.getOpcode() == MOS::G_LOAD16_FAR_INDIR_IDX;
++  const bool Far = MI.getOpcode() == MOS::G_LOAD16_FAR_INDIR_IDX ||
++                   MI.getOpcode() == MOS::G_STORE16_FAR_INDIR_IDX;
+ 
+   Register ValOrDst = MI.getOperand(0).getReg();
+   Register BasePtr = MI.getOperand(1).getReg();
++  if (Far && BasePtr.isVirtual() && !MRI.getRegClassOrNull(BasePtr))
++    MRI.setRegClass(BasePtr, &MOS::Imag32RegClass);
+   Register IdxReg = MI.getOperand(2).getReg();
+ 
+   SmallVector<MachineInstrBuilder, 2> New;
+   MachineInstr *FoldedLoad = nullptr;
+   if (IsLoad) {
+     Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
+-    auto Ld = Builder.buildInstr(MOS::LDIndirIdx16).addDef(A16).addUse(BasePtr).addUse(IdxReg);
++    auto Ld = Builder.buildInstr(Far ? MOS::LDIndirLongIdx16 : MOS::LDIndirIdx16)
++                  .addDef(A16).addUse(BasePtr).addUse(IdxReg);
+     Ld.cloneMemRefs(MI);
+     New.push_back(Ld);
+     New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
+   } else {
+     Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
+-    auto St = Builder.buildInstr(MOS::STIndirIdx16).addUse(A16).addUse(BasePtr).addUse(IdxReg);
++    auto St = Builder.buildInstr(Far ? MOS::STIndirLongIdx16 : MOS::STIndirIdx16)
++                  .addUse(A16).addUse(BasePtr).addUse(IdxReg);
+     St.cloneMemRefs(MI);
+     New.push_back(St);
+   }
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -2261,7 +2261,7 @@
+   // Imag16 pair just to `lda zp; sta` is worse than the byte path — a store of zero
+   // wants the STZ-fusion peephole (`rep; stz; sep`), and a small immediate stays a
+   // cheap pair of 8-bit immediate stores. Only register-valued stores win here.
+-  if (!IsLoad &&
++  if (!IsLoad && !MI.isAtomic() &&
+       getIConstantVRegValWithLookThrough(cast<GStore>(MI).getValueReg(), MRI))
+     return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
+            LegalizerHelper::Legalized;
+@@ -2273,11 +2273,45 @@
+   // back is a wasteful round-trip (worse than the default byte loads). Narrow it
+   // instead. Indirect loads retain the native form.
+   const bool AllUsesUnmerge =
+-      IsLoad && !MRI.use_nodbg_empty(MI.getOperand(0).getReg()) &&
++      IsLoad && !MI.isAtomic() &&
++      !MRI.use_nodbg_empty(MI.getOperand(0).getReg()) &&
+       all_of(MRI.use_nodbg_instructions(MI.getOperand(0).getReg()),
+              [](const MachineInstr &U) {
+                return U.getOpcode() == TargetOpcode::G_UNMERGE_VALUES;
+              });
++
++  if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 32) {
++    // A byte-built ABI value can be stored as two direct byte writes. Native
++    // producers use one M=0 access, and a load split only into bytes gains no
++    // benefit from occupying the wide accumulator.
++    bool ByteStore = false;
++    if (!IsLoad && !MI.isAtomic()) {
++      Register Value = cast<GStore>(MI).getValueReg();
++      const MachineInstr *Def = getDefIgnoringCopies(Value, MRI);
++      ByteStore = Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES;
++    }
++    if (!AllUsesUnmerge && !ByteStore) {
++      if (auto Abs = matchAbsoluteAddressing(MRI, Ptr)) {
++        Builder.buildInstr(IsLoad ? MOS::G_LOAD16_FAR_ABS
++                                  : MOS::G_STORE16_FAR_ABS)
++            .add(MI.getOperand(0))
++            .add(*Abs)
++            .addMemOperand(*MI.memoperands_begin());
++        MI.eraseFromParent();
++        return true;
++      }
++      if (tryFarAbsoluteIndexedAddressing(Helper, MRI, MI) ||
++          tryFarIndirectIndexedAddressing(Helper, MRI, MI))
++        return true;
++      Builder.buildInstr(IsLoad ? MOS::G_LOAD16_FAR_INDIR
++                                : MOS::G_STORE16_FAR_INDIR)
++          .add(MI.getOperand(0))
++          .addUse(Ptr)
++          .addMemOperand(*MI.memoperands_begin());
++      MI.eraseFromParent();
++      return true;
++    }
++  }
+ 
+   if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 16) {
+     // Absolute address (global/static/const) -> native 16-bit `lda abs`/`sta abs`.
+@@ -2812,13 +2846,16 @@
+   else
+     return false;
+ 
+-  if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
+-    return false;
+-  unsigned Opcode = WideIndex
+-                        ? (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX16
+-                                          : MOS::G_STORE_FAR_ABS_IDX16)
++  bool Wide = MRI.getType(MI.getOperand(0).getReg()) == LLT::scalar(16);
++  unsigned Opcode =
++      Wide ? (WideIndex ? (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_ABS_IDX16
++                                           : MOS::G_STORE16_FAR_ABS_IDX16)
++                        : (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_ABS_IDX
++                                          : MOS::G_STORE16_FAR_ABS_IDX))
++           : (WideIndex ? (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX16
++                                           : MOS::G_STORE_FAR_ABS_IDX16)
+                         : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX
+-                                          : MOS::G_STORE_FAR_ABS_IDX);
++                                          : MOS::G_STORE_FAR_ABS_IDX));
+   Builder.buildInstr(Opcode)
+       .add(MI.getOperand(0))
+       .add(*Base)
+@@ -2892,8 +2929,11 @@
+   if (matchAbsoluteAddressing(MRI, Addr).has_value())
+     return false;
+ 
+-  unsigned Opcode =
+-      isa<GLoad>(MI) ? MOS::G_LOAD_FAR_INDIR_IDX : MOS::G_STORE_FAR_INDIR_IDX;
++  bool Wide = MRI.getType(MI.getOperand(0).getReg()) == LLT::scalar(16);
++  unsigned Opcode = Wide ? (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_INDIR_IDX
++                                         : MOS::G_STORE16_FAR_INDIR_IDX)
++                         : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_INDIR_IDX
++                                           : MOS::G_STORE_FAR_INDIR_IDX);
+   Register Idx = Builder.buildConstant(LLT::scalar(8), ConstOffset).getReg(0);
+   Builder.buildInstr(Opcode)
+       .add(MI.getOperand(0)) // dst (load) / value (store)
+diff --git a/llvm/test/CodeGen/MOS/far-native-word.ll b/llvm/test/CodeGen/MOS/far-native-word.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-native-word.ll
+@@ -0,0 +1,114 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,XY16
++
++@farword = external addrspace(2) global i16
++@nearword = external global i16
++@fararray = external addrspace(2) global [256 x i16]
++
++define void @far_global_copy() {
++; CHECK-LABEL: far_global_copy:
++; CHECK: rep #32
++; CHECK: lda mos24(farword)
++; CHECK: sta nearword
++; CHECK: sep #32
++  %value = load volatile i16, ptr addrspace(2) @farword
++  store volatile i16 %value, ptr @nearword
++  ret void
++}
++
++define void @far_global_store() {
++; CHECK-LABEL: far_global_store:
++; CHECK: rep #32
++; CHECK: sta mos24(farword)
++; CHECK: sep #32
++  %value = load volatile i16, ptr @nearword
++  %sum = add i16 %value, 1
++  store volatile i16 %sum, ptr addrspace(2) @farword
++  ret void
++}
++
++define void @far_runtime_load(ptr addrspace(2) %pointer) {
++; CHECK-LABEL: far_runtime_load:
++; CHECK: rep #32
++; CHECK: lda [__rc{{[0-9]+}}]
++; CHECK: sep #32
++  %value = load volatile i16, ptr addrspace(2) %pointer
++  %sum = add i16 %value, 1
++  store volatile i16 %sum, ptr @nearword
++  ret void
++}
++
++define void @far_runtime_store(ptr addrspace(2) %pointer) {
++; CHECK-LABEL: far_runtime_store:
++; CHECK: rep #32
++; CHECK: sta [__rc{{[0-9]+}}]
++; CHECK: sep #32
++  %value = load volatile i16, ptr @nearword
++  %sum = add i16 %value, 1
++  store volatile i16 %sum, ptr addrspace(2) %pointer
++  ret void
++}
++
++define void @far_global_word_indexed(i8 %index) {
++; CHECK-LABEL: far_global_word_indexed:
++; CHECK: rep #32
++; CHECK: lda mos24(farword),x
++; CHECK: sep #32
++  %offset = zext i8 %index to i32
++  %pointer = getelementptr i8, ptr addrspace(2) @farword, i32 %offset
++  %value = load volatile i16, ptr addrspace(2) %pointer, align 1
++  store volatile i16 %value, ptr @nearword
++  ret void
++}
++
++define void @far_runtime_word_indexed(ptr addrspace(2) %base) {
++; CHECK-LABEL: far_runtime_word_indexed:
++; CHECK: rep #32
++; CHECK: lda [__rc{{[0-9]+}}],y
++; CHECK: sep #32
++  %pointer = getelementptr i8, ptr addrspace(2) %base, i32 1
++  %value = load volatile i16, ptr addrspace(2) %pointer, align 1
++  store volatile i16 %value, ptr @nearword
++  ret void
++}
++
++define void @far_scaled_word(i8 %index) {
++; XY16-LABEL: far_scaled_word:
++; XY16: rep #{{(16|48)}}
++; XY16: lda mos24(fararray),x
++; XY16: sep #{{(16|48)}}
++  %offset = zext i8 %index to i32
++  %pointer = getelementptr [256 x i16], ptr addrspace(2) @fararray, i32 0, i32 %offset
++  %value = load volatile i16, ptr addrspace(2) %pointer
++  store volatile i16 %value, ptr @nearword
++  ret void
++}
++
++define void @far_scaled_word_wide(i16 %index) {
++; XY16-LABEL: far_scaled_word_wide:
++; XY16-NOT: mos24(fararray),x
++; XY16: lda [__rc{{[0-9]+}}]
++  %offset = zext i16 %index to i32
++  %pointer = getelementptr [256 x i16], ptr addrspace(2) @fararray, i32 0, i32 %offset
++  %value = load volatile i16, ptr addrspace(2) %pointer
++  store volatile i16 %value, ptr @nearword
++  ret void
++}
++
++define void @far_byte_argument(i16 %value) {
++; CHECK-LABEL: far_byte_argument:
++; CHECK-NOT: rep #32
++; CHECK: sta mos24(farword)
++; CHECK: st{{[axy]}} mos24(farword+1)
++  store i16 %value, ptr addrspace(2) @farword
++  ret void
++}
++
++define i16 @far_byte_return() {
++; CHECK-LABEL: far_byte_return:
++; CHECK-NOT: rep #32
++; CHECK: lda mos24(farword)
++; CHECK: lda mos24(farword+1)
++  %value = load i16, ptr addrspace(2) @farword
++  ret i16 %value
++}

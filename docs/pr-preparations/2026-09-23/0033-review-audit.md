@@ -6,25 +6,25 @@ September 23, 2026. Reviewed the Claude-authored
 [PR draft](../../upstream-spill-hoist-scratch-vregs-pr.md), source, saved binaries,
 and test artifacts. No separate 0033 review document was present.
 
-The underlying late-allocation defect is confirmed, and the guard repairs its
-reduced test on pristine upstream. The review found a small rollback-accounting
-defect and material errors in the validation and scope claims. The patch needs
-the accounting correction before submission; the audit does not change its
-implementation.
+**Follow-up complete September 23:** the revised per-group spill accounting is
+correct. The current patch passes a fresh standalone MOS suite run and its
+reduced regression. The original compiler-provenance finding below is withdrawn:
+Claude's container-mount explanation is confirmed by the original invocation.
+The test's reduction history has moved to the PR/validation record, following
+AGENTS.md. No further implementation change is requested.
 
 ## Findings
 
-1. **The claimed cross-target run used an unpatched compiler.**
-   `xtarget-hoist.sh` runs `build/0029-cross-target-build/bin/llc` through lit.
-   That binary predates the guard, lacks its diagnostic string, and its source
-   tree has no `HookMadeVRegs` implementation. The actual guarded binary is
-   `build/0030-claude-review/llc-hoist-fix`. Therefore the saved X86/ARM/AArch64
-   results do not establish 0033 coverage. The historical results also total
-   11,436 passes and 23 expected failures after the 75 helper-tool failures
-   were rerun, rather than 11,361 passes. Fresh validation uses a separate
-   build containing 0033 alone; its result is recorded below.
-2. **Rollback decrements `NumSpills` per instruction, but insertion increments
-   it per spill-hook call.** The added `--NumSpills` sits inside the loop over
+1. **Withdrawn — the cross-target run did use the guarded build.**
+   I compared a host path with a container path without checking its bind mount.
+   The original invocation at `2026-09-22T23:43:09.579Z` mounts
+   `build/newton-postra-build` onto `/work/build/0029-cross-target-build` before
+   running `xtarget-hoist.sh`. The guarded `llc-hoist-fix` came from that build.
+   Claude's response is correct; my earlier assertion was not. The historical
+   count still needed correction: 11,436 passes and 23 expected failures after
+   helper-tool reruns. The separately built 0033-only results below remain valid.
+2. **Resolved — rollback decremented `NumSpills` per instruction, but insertion
+   incremented it per spill-hook call.** The added `--NumSpills` sits inside the loop over
    mapped instructions. If an accepted hook emits two instructions and a later
    hook in the same group requires scratch registers, rollback subtracts two
    for the one accepted insertion. This can corrupt or underflow the statistic.
@@ -44,16 +44,44 @@ implementation.
    `-O2` and `-Os` then reaches the independent scavenger assertion
    `expected N to be free when saving scavenger register`. Sixteen finish
    successfully. These results must be stated separately.
-5. **The PR exposed downstream platform and feature details.** Those details
-   belong in the internal validation record. The reviewer-facing draft is
-   corrected to use upstream evidence. Broad claims that passing three target
-   suites proves every other target unchanged are also removed.
+5. **Submission scope was narrowed too broadly.** The initial audit removed
+   downstream details under the earlier presentation instruction. Will later
+   clarified that published ROM demos are encouraged as linked evidence; the
+   restriction is premature submission of SNES code/configs, not mentioning
+   demos. The [current scope rule](../../upstream-pending-work.md#snes--separate-platform-track)
+   supersedes the blanket internal-only interpretation. Broad claims that
+   passing three target suites proves every other target unchanged remain
+   removed because the tests do not establish that claim.
 
-The regression preamble's reduction history should also move out of the patch's
-test comments into the PR/validation record, as required by this repository's
-comment contract. Its explanation of the current soft-stack test input can stay.
+The revised implementation increments a local `NumHoisted` once per accepted
+hook call and commits it to `NumSpills` only after the whole group succeeds.
+Refused groups leave the statistic unchanged; instruction count no longer
+controls accounting. No real MOS trigger for mixed multi-instruction rollback
+has been established, so this part is verified by source inspection, not a
+claimed runtime witness.
 
-## Independent checks
+The test now explains the soft-stack scratch-register contract without narrating
+its reduction. Passing the comment-history hook did not override AGENTS.md's
+explicit prohibition on test-writing history.
+
+## Follow-up validation
+
+- Exact revised regression: pristine fails with hoisting enabled and passes with
+  it disabled; the revised compiler passes both RUN lines.
+- Fresh pinned source plus revised 0033 only: 84 MOS CodeGen and 46 MC tests
+  pass, one unsupported. The earlier complete cross-target run below covers the
+  initial accounting implementation; Claude's later stacked run covers the
+  revision. Replacing its failed new AArch64 CHECK with the passing rerun yields
+  **11,437 passes and 23 expected failures**, not 11,436 passes.
+- Original container invocation retained in
+  `build/review-followups-0033-0037/0033-mount-provenance.json`.
+- Current test replay, standalone suite, and saved-result accounting are in
+  that directory's `run-tests.json`, `0033-lit.json`, and `saved-evidence.json`.
+  `provenance.json` identifies the final patch and frozen standalone binaries.
+  Final patch SHA-256:
+  `354df5d23df68133ce5196fd9c1a5a49fbe986bce074c77585e6d3bb92a91c59`.
+
+## Initial independent checks (before the accounting revision)
 
 Base: `742d554bf08042b8df93d791c335260fadd16643`. Candidate source/build:
 `build/asm-symbol-work` / `build/asm-symbol-build`, with assertions enabled and
@@ -87,8 +115,9 @@ compiler diagnostics, assembled size-comparison objects, and `leaf.mir`.
 The cross-target helper tools were built/relinked in the isolated candidate
 build before running its suites. `lit.json` records all 11,590 tests: 11,566
 pass, 23 expected failures, one unsupported. `llc-0033-only` preserves the
-audited compiler. This fresh run closes the original cross-target validation
-gap; it does not cover the requested rollback-accounting revision.
+audited compiler. This independent run confirms the initial implementation; it does not cover
+the later rollback-accounting revision, whose checks are recorded above.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
-reasoning effort) for the independent audit, validation, and documentation.
+reasoning effort) for the initial audit, follow-up review, validation, comment
+cleanup, correction of the provenance finding, and documentation.

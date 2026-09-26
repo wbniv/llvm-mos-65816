@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-default.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x200 2 0x6A2B 480
+SMOKE: PASS off=0x200 len=2 got=0x6A2B (ran 480 frames, bsnes-jg)
+
+exit_code=0

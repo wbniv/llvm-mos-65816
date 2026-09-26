@@ -96,9 +96,10 @@ record. The active pre-commit hook validates staged evidence and rejects unsuppo
 fixed claims or changes to captured baselines. Passing current inputs means only
 **not reproduced on this build** unless a causal red/green repair is established.
 
-Current far-memset status: the [original wrong-bank report](defects/mos-far-memset-wrong-bank.json)
-is repaired by existing 0013, with identical-input backend comparison and
-all 4096 physical WRAM bytes checked. Use its canonical record for present work.
+Current follow-up status: [narrow shifts](defects/shift64-narrow-count.json) and
+[inline bitboard](defects/bitboard-inline-register-pressure.json) have causal
+repair evidence. The [far-memset report](defects/mos-far-memset-wrong-bank.json)
+is repaired by existing 0013. Use those canonical records for present work.
 
 **Historical initial recheck:** the [2026-09-25 older-report recheck](investigations/2026-09-25-older-defect-recheck.md)
 records 132 successful compiles and narrow-shift/inline-bitboard runtime checks.

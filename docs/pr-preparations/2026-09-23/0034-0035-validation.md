@@ -56,3 +56,13 @@ clang in `build/register-exhaustion-build` (`clang`).
 
 No emulator gate: neither change affects any program that does not use
 `__builtin_prefetch`, and the corpus contains none.
+
+**Follow-up audit complete:** both RUN lines of the revised 0035 test fail on the
+pinned frontend and pass on the fixed frontend; requested comments and cases are
+present. See [0035 follow-up](0035-review-audit.md#follow-up-validation).
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`,
+`high` reasoning effort) for diagnosis, implementation, initial validation, and the 0035 test/comment revision.
+
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
+reasoning effort) for independent validation and the follow-up audit.

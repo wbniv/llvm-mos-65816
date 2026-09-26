@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "nodes": {
+    "MC": { "workId": "sub:604", "label": "MVN/MVP bank order" },
+    "MCP": { "workId": "sub:604", "label": "Compiler PR #604" },
+    "Z": { "workId": "sub:sdk450", "label": "SDK longjmp zero return" },
+    "ZP": { "workId": "sub:sdk450", "label": "SDK PR #450" },
+    "COALESCE0015": { "workId": "defect:mos-coalescing-rc-undef", "label": "0015 coalescing witness" },
+    "UNDEF": { "workId": "sub:0028", "label": "0028 undefined register lane" },
+    "RA": { "workId": "sub:0029", "label": "0029 register exhaustion" },
+    "COPY": { "workId": "sub:0030", "label": "0030 physical-copy liveness" },
+    "SCAV": { "workId": "sub:0011", "label": "0011 scavenger live-P" },
+    "SYM": { "workId": "sub:0032", "label": "0032 register-named symbols" },
+    "HOIST": { "workId": "sub:0033", "label": "0033 spill-hoisting guard" },
+    "PREFETCHMOS": { "workId": "sub:0034", "label": "0034 MOS prefetch" },
+    "PREFETCHCLANG": { "workId": "sub:0035", "label": "0035 Clang prefetch" },
+    "ASMG": { "workId": "sub:0037", "label": "0037 indirect inline asm" },
+    "ZPIDX": { "workId": "sub:0036", "label": "0036 zero-page indexed globals" },
+    "RETFRAME": { "workId": "sub:0038", "label": "0038 return/frame address" },
+    "COALESCE": { "workId": "sub:0040", "label": "0040 spill coalescing" },
+    "ASMMULTI": { "workId": "sub:0041", "label": "0041 multi-register inline asm" },
+    "MOSFIX": { "workId": "sub:0049-0054", "label": "0049–0054 correctness batch" },
+    "SHIFTFIX": { "workId": "sub:0055", "label": "0055 narrow-count shifts" },
+    "EXIST": { "workId": "platform:snes415", "label": "SNES SDK #415" },
+    "FARABI": { "workId": "platform:320", "label": "#320 far ABI" },
+    "WIDTHABI": { "workId": "platform:321", "label": "#321 native-width ABI" },
+    "REDUCER": { "workId": "sub:0060", "label": "0060 parallel MIR reducer" },
+    "CONTRACT": { "workId": "defect:reentrant-attribute-contract", "label": "Reentrant attribute contract" },
+    "GUARDS": { "workId": "defect:mos-trunc-imag8-i1", "label": "0023 matcher contract audit" }
+  },
+  "tracks": [
+    { "id": "independent", "label": "Independent fixes", "description": "Compiler and SDK fixes that can proceed outside the SNES platform submission.", "workIds": ["sub:604", "sub:sdk450", "sub:0028", "sub:0029", "sub:0030", "sub:0031", "sub:0011", "sub:0032", "sub:0033", "sub:0034", "sub:0035", "sub:0036", "sub:0037", "sub:0038", "sub:0040", "sub:0041", "sub:0049-0054", "sub:0056-0059"] },
+    { "id": "far", "label": "Far ABI #320", "description": "Address-space and far-memory work; compiler dependencies precede the SDK integration.", "workIds": ["platform:320", "defect:mos-far-memset-wrong-bank", "opt:0061", "opt:0062", "sub:0028"] },
+    { "id": "native", "label": "Native widths #321", "description": "Native accumulator and index support, including dependent shifts and far-word accesses.", "workIds": ["platform:321", "sub:0055", "opt:0062", "opt:0063", "defect:shift64-narrow-count"] },
+    { "id": "snes", "label": "SNES SDK #415", "description": "A separate platform and runtime review track with its stated compiler merge prerequisites.", "workIds": ["platform:snes415", "platform:320", "platform:321", "sub:sdk450"] },
+    { "id": "reports", "label": "Reports and decisions", "description": "Qualified defects, contract questions, and local fixes still needing upstream assessment.", "workIds": ["defect:reentrant-attribute-contract", "defect:mos-trunc-imag8-i1", "sub:0060", "opt:carry-scheduler", "opt:dpy-runtime-index"] }
+  ]
+}

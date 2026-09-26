@@ -10,6 +10,11 @@ The complete stock-upstream C compilation matrix had **570 cases: 568 passed and
 two failed for a separate post-RA expansion problem unaffected by 0028**. The
 publication hold until #320/#321 are ready to open remains in place.
 
+The separate failure is now diagnosed and fixed by
+[patch 0030](../pr-preparations/2026-09-22/0030-validation.md): copy expansion
+reuses a physical value without clearing its earlier kill flag. The original
+input's assembly is unchanged by the repair at all six optimization levels.
+
 ## Compiler and inputs
 
 The frontend and backend were built from unpatched llvm-mos revision
@@ -70,9 +75,9 @@ dev/upstream-reference.sh clang --target=mos -mcpu=mos6502 -O0 \
 For each input, stock Clang emitted IR which was then passed to both saved
 upstream `llc` binaries at `-O=0`: one unpatched, one with precisely the 0028
 refactor. Both binaries failed at the same expansion stage and instruction.
-Thus these failures do not demonstrate 0028's identity-copy mechanism. Their root
-cause has not been diagnosed, and no runtime miscompile is claimed. They are an
-independent candidate for a feature-free upstream investigation.
+Thus these failures do not demonstrate 0028's identity-copy mechanism. The
+subsequent 0030 investigation identifies the stale kill and validates its repair;
+no runtime miscompile is claimed.
 
 ## MIR control and scope
 

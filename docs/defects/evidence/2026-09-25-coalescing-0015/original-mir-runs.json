@@ -1,0 +1,86 @@
+[
+  {
+    "compiler": "upstream",
+    "cpu": "mos6502",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mos6502",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream-assert",
+    "cpu": "mos6502",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream-assert",
+    "cpu": "mos6502",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream-assert",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "upstream-assert",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "fork",
+    "cpu": "mos6502",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "fork",
+    "cpu": "mos6502",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "fork",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer",
+    "exit": 0,
+    "first_diagnostic": ""
+  },
+  {
+    "compiler": "fork",
+    "cpu": "mosw65816",
+    "passes": "register-coalescer,greedy,virtregrewriter",
+    "exit": 0,
+    "first_diagnostic": ""
+  }
+]

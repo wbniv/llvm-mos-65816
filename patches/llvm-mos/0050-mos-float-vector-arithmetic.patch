@@ -1,0 +1,134 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -371,6 +371,7 @@
+                                G_INTRINSIC_TRUNC,
+                                G_INTRINSIC_ROUNDEVEN,
+                                G_FSINCOS})
++      .scalarize(0)
+       .libcallFor({S32, S64})
+       .unsupported();
+
+diff --git a/llvm/test/CodeGen/MOS/float-vector.ll b/llvm/test/CodeGen/MOS/float-vector.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/float-vector.ll
+@@ -0,0 +1,118 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++
++; Every vector lane must reach the corresponding scalar floating-point libcall.
++; Pointer arguments keep the vector arithmetic independent of vector ABI support.
++
++define void @add_v4sf(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: add_v4sf:
++; CHECK-COUNT-4: {{(jsr|jmp)}} __addsf3
++; CHECK-NOT: {{(jsr|jmp)}} __addsf3
++  %a = load <4 x float>, ptr %ap, align 1
++  %b = load <4 x float>, ptr %bp, align 1
++  %r = fadd <4 x float> %a, %b
++  store <4 x float> %r, ptr %out, align 1
++  ret void
++}
++
++define void @sub_v4sf(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: sub_v4sf:
++; CHECK-COUNT-4: {{(jsr|jmp)}} __subsf3
++; CHECK-NOT: {{(jsr|jmp)}} __subsf3
++  %a = load <4 x float>, ptr %ap, align 1
++  %b = load <4 x float>, ptr %bp, align 1
++  %r = fsub <4 x float> %a, %b
++  store <4 x float> %r, ptr %out, align 1
++  ret void
++}
++
++define void @mul_v4sf(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: mul_v4sf:
++; CHECK-COUNT-4: {{(jsr|jmp)}} __mulsf3
++; CHECK-NOT: {{(jsr|jmp)}} __mulsf3
++  %a = load <4 x float>, ptr %ap, align 1
++  %b = load <4 x float>, ptr %bp, align 1
++  %r = fmul <4 x float> %a, %b
++  store <4 x float> %r, ptr %out, align 1
++  ret void
++}
++
++define void @div_v4sf(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: div_v4sf:
++; CHECK-COUNT-4: {{(jsr|jmp)}} __divsf3
++; CHECK-NOT: {{(jsr|jmp)}} __divsf3
++  %a = load <4 x float>, ptr %ap, align 1
++  %b = load <4 x float>, ptr %bp, align 1
++  %r = fdiv <4 x float> %a, %b
++  store <4 x float> %r, ptr %out, align 1
++  ret void
++}
++
++define void @rem_v4sf(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: rem_v4sf:
++; CHECK-COUNT-4: {{(jsr|jmp)}} fmodf
++; CHECK-NOT: {{(jsr|jmp)}} fmodf
++  %a = load <4 x float>, ptr %ap, align 1
++  %b = load <4 x float>, ptr %bp, align 1
++  %r = frem <4 x float> %a, %b
++  store <4 x float> %r, ptr %out, align 1
++  ret void
++}
++
++define void @add_v2df(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: add_v2df:
++; CHECK-COUNT-2: {{(jsr|jmp)}} __adddf3
++; CHECK-NOT: {{(jsr|jmp)}} __adddf3
++  %a = load <2 x double>, ptr %ap, align 1
++  %b = load <2 x double>, ptr %bp, align 1
++  %r = fadd <2 x double> %a, %b
++  store <2 x double> %r, ptr %out, align 1
++  ret void
++}
++
++define void @sub_v2df(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: sub_v2df:
++; CHECK-COUNT-2: {{(jsr|jmp)}} __subdf3
++; CHECK-NOT: {{(jsr|jmp)}} __subdf3
++  %a = load <2 x double>, ptr %ap, align 1
++  %b = load <2 x double>, ptr %bp, align 1
++  %r = fsub <2 x double> %a, %b
++  store <2 x double> %r, ptr %out, align 1
++  ret void
++}
++
++define void @mul_v2df(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: mul_v2df:
++; CHECK-COUNT-2: {{(jsr|jmp)}} __muldf3
++; CHECK-NOT: {{(jsr|jmp)}} __muldf3
++  %a = load <2 x double>, ptr %ap, align 1
++  %b = load <2 x double>, ptr %bp, align 1
++  %r = fmul <2 x double> %a, %b
++  store <2 x double> %r, ptr %out, align 1
++  ret void
++}
++
++define void @div_v2df(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: div_v2df:
++; CHECK-COUNT-2: {{(jsr|jmp)}} __divdf3
++; CHECK-NOT: {{(jsr|jmp)}} __divdf3
++  %a = load <2 x double>, ptr %ap, align 1
++  %b = load <2 x double>, ptr %bp, align 1
++  %r = fdiv <2 x double> %a, %b
++  store <2 x double> %r, ptr %out, align 1
++  ret void
++}
++
++define void @rem_v2df(ptr %out, ptr %ap, ptr %bp) {
++; CHECK-LABEL: rem_v2df:
++; CHECK-COUNT-2: {{(jsr|jmp)}} fmod
++; CHECK-NOT: {{(jsr|jmp)}} fmod
++  %a = load <2 x double>, ptr %ap, align 1
++  %b = load <2 x double>, ptr %bp, align 1
++  %r = frem <2 x double> %a, %b
++  store <2 x double> %r, ptr %out, align 1
++  ret void
++}
++
++

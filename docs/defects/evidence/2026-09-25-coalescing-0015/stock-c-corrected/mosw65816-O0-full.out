@@ -1,0 +1,1668 @@
+	.zeropage	__rc0
+	.zeropage	__rc1
+	.zeropage	__rc2
+	.zeropage	__rc3
+	.zeropage	__rc4
+	.zeropage	__rc5
+	.zeropage	__rc6
+	.zeropage	__rc7
+	.zeropage	__rc8
+	.zeropage	__rc9
+	.zeropage	__rc10
+	.zeropage	__rc11
+	.zeropage	__rc12
+	.zeropage	__rc13
+	.zeropage	__rc14
+	.zeropage	__rc15
+	.zeropage	__rc16
+	.zeropage	__rc17
+	.zeropage	__rc18
+	.zeropage	__rc19
+	.zeropage	__rc20
+	.zeropage	__rc21
+	.zeropage	__rc22
+	.zeropage	__rc23
+	.zeropage	__rc24
+	.zeropage	__rc25
+	.zeropage	__rc26
+	.zeropage	__rc27
+	.zeropage	__rc28
+	.zeropage	__rc29
+	.zeropage	__rc30
+	.zeropage	__rc31
+	.file	"rcundef.c"
+	.text
+	.globl	newton_step                     ; -- Begin function newton_step
+	.type	newton_step,@function
+newton_step:                            ; @newton_step
+; %bb.0:
+	clc
+	lda	__rc0
+	adc	#196
+	sta	__rc0
+	lda	__rc1
+	adc	#255
+	sta	__rc1
+	ldx	__rc20
+	phx
+	ldx	__rc21
+	phx
+	ldx	__rc22
+	phx
+	ldx	__rc23
+	phx
+	lda	__rc24
+	ldy	#7
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc25
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc26
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc27
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc28
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc29
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc30
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc31
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc2
+	ldx	__rc3
+	clc
+	pha
+	lda	__rc0
+	adc	#58
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	iny
+	txa
+	sta	(__rc2),y
+	lda	__rc4
+	ldx	__rc5
+	clc
+	pha
+	lda	__rc0
+	adc	#56
+	sta	__rc4
+	lda	__rc1
+	adc	#0
+	sta	__rc5
+	pla
+	sta	(__rc4)
+	txa
+	sta	(__rc4),y
+	lda	(__rc2)
+	tax
+	lda	(__rc2),y
+	stx	__rc2
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc7
+	lda	(__rc2),y
+	sta	__rc6
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	__rc7
+	sta	(__rc2)
+	lda	__rc6
+	sta	(__rc2),y
+	lda	(__rc4)
+	tax
+	lda	(__rc4),y
+	stx	__rc4
+	sta	__rc5
+	lda	(__rc4)
+	sta	__rc7
+	lda	(__rc4),y
+	sta	__rc6
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc4
+	lda	__rc1
+	adc	#0
+	sta	__rc5
+	lda	__rc7
+	sta	(__rc4)
+	lda	__rc6
+	sta	(__rc4),y
+	lda	(__rc2)
+	sta	__rc8
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_1
+	bra	.LBB0_2
+.LBB0_1:
+	ldx	#255
+	bra	.LBB0_3
+.LBB0_2:
+	ldx	#0
+	bra	.LBB0_3
+.LBB0_3:
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_4
+	bra	.LBB0_5
+.LBB0_4:
+	ldy	#255
+	bra	.LBB0_6
+.LBB0_5:
+	ldy	#0
+	bra	.LBB0_6
+.LBB0_6:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc22
+	stx	__rc21
+	ldx	__rc2
+	stx	__rc20
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_7
+	bra	.LBB0_8
+.LBB0_7:
+	ldx	#255
+	bra	.LBB0_9
+.LBB0_8:
+	ldx	#0
+	bra	.LBB0_9
+.LBB0_9:
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_10
+	bra	.LBB0_11
+.LBB0_10:
+	ldy	#255
+	bra	.LBB0_12
+.LBB0_11:
+	ldy	#0
+	bra	.LBB0_12
+.LBB0_12:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc3
+	stx	__rc4
+	ldx	__rc22
+	cpx	__rc3
+	lda	__rc21
+	sbc	__rc4
+	tax
+	lda	__rc20
+	sbc	__rc2
+	sta	__rc4
+	clc
+	lda	__rc0
+	adc	#50
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	txa
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc4
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_13
+	bra	.LBB0_14
+.LBB0_13:
+	ldx	#255
+	bra	.LBB0_15
+.LBB0_14:
+	ldx	#0
+	bra	.LBB0_15
+.LBB0_15:
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_16
+	bra	.LBB0_17
+.LBB0_16:
+	ldy	#255
+	bra	.LBB0_18
+.LBB0_17:
+	ldy	#0
+	bra	.LBB0_18
+.LBB0_18:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	asl
+	txa
+	rol
+	sta	__rc4
+	lda	__rc2
+	rol
+	sta	__rc5
+	clc
+	lda	__rc0
+	adc	#48
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	__rc4
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc5
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#50
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_19
+	bra	.LBB0_20
+.LBB0_19:
+	ldx	#255
+	bra	.LBB0_21
+.LBB0_20:
+	ldx	#0
+	bra	.LBB0_21
+.LBB0_21:
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_22
+	bra	.LBB0_23
+.LBB0_22:
+	ldy	#255
+	bra	.LBB0_24
+.LBB0_23:
+	ldy	#0
+	bra	.LBB0_24
+.LBB0_24:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc22
+	stx	__rc21
+	ldx	__rc2
+	stx	__rc20
+	clc
+	lda	__rc0
+	adc	#48
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_25
+	bra	.LBB0_26
+.LBB0_25:
+	ldx	#255
+	bra	.LBB0_27
+.LBB0_26:
+	ldx	#0
+	bra	.LBB0_27
+.LBB0_27:
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_28
+	bra	.LBB0_29
+.LBB0_28:
+	ldy	#255
+	bra	.LBB0_30
+.LBB0_29:
+	ldy	#0
+	bra	.LBB0_30
+.LBB0_30:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc3
+	stx	__rc4
+	ldx	__rc22
+	cpx	__rc3
+	lda	__rc21
+	sbc	__rc4
+	tax
+	lda	__rc20
+	sbc	__rc2
+	sta	__rc4
+	clc
+	lda	__rc0
+	adc	#46
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	txa
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc4
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#50
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_31
+	bra	.LBB0_32
+.LBB0_31:
+	ldx	#255
+	bra	.LBB0_33
+.LBB0_32:
+	ldx	#0
+	bra	.LBB0_33
+.LBB0_33:
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_34
+	bra	.LBB0_35
+.LBB0_34:
+	ldy	#255
+	bra	.LBB0_36
+.LBB0_35:
+	ldy	#0
+	bra	.LBB0_36
+.LBB0_36:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc22
+	stx	__rc21
+	ldx	__rc2
+	stx	__rc20
+	clc
+	lda	__rc0
+	adc	#48
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc9
+	lda	__rc9
+	bmi	.LBB0_37
+	bra	.LBB0_38
+.LBB0_37:
+	ldx	#255
+	bra	.LBB0_39
+.LBB0_38:
+	ldx	#0
+	bra	.LBB0_39
+.LBB0_39:
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	bmi	.LBB0_40
+	bra	.LBB0_41
+.LBB0_40:
+	ldy	#255
+	bra	.LBB0_42
+.LBB0_41:
+	ldy	#0
+	bra	.LBB0_42
+.LBB0_42:
+	stx	__rc2
+	stx	__rc3
+	sta	__rc5
+	sty	__rc6
+	sty	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc3
+	stx	__rc4
+	clc
+	lda	__rc22
+	adc	__rc3
+	lda	__rc21
+	adc	__rc4
+	tax
+	lda	__rc20
+	adc	__rc2
+	sta	__rc4
+	clc
+	lda	__rc0
+	adc	#44
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	txa
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc4
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#46
+	sta	__rc4
+	lda	__rc1
+	adc	#0
+	sta	__rc5
+	lda	(__rc4)
+	sta	__rc6
+	lda	(__rc4),y
+	sta	__rc4
+	sec
+	lda	__rc6
+	sbc	#0
+	sta	__rc6
+	lda	__rc4
+	sbc	#1
+	sta	__rc7
+	clc
+	lda	__rc0
+	adc	#42
+	sta	__rc4
+	lda	__rc1
+	adc	#0
+	sta	__rc5
+	lda	__rc6
+	sta	(__rc4)
+	lda	__rc7
+	sta	(__rc4),y
+	lda	(__rc2)
+	sta	__rc5
+	lda	(__rc2),y
+	sta	__rc4
+	clc
+	lda	__rc0
+	adc	#40
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	__rc5
+	sta	(__rc2)
+	lda	__rc4
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#50
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	lda	(__rc2),y
+	bmi	.LBB0_43
+	bra	.LBB0_44
+.LBB0_43:
+	ldx	#255
+	bra	.LBB0_45
+.LBB0_44:
+	ldx	#0
+	bra	.LBB0_45
+.LBB0_45:
+	stz	__rc2
+	stz	__rc3
+	sta	__rc5
+	stx	__rc6
+	stx	__rc7
+	ldx	#0
+	lda	#3
+	jsr	__mulsi3
+	clc
+	pha
+	lda	__rc0
+	adc	#38
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	ldy	#1
+	txa
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#48
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	lda	(__rc2),y
+	bmi	.LBB0_46
+	bra	.LBB0_47
+.LBB0_46:
+	ldx	#255
+	bra	.LBB0_48
+.LBB0_47:
+	ldx	#0
+	bra	.LBB0_48
+.LBB0_48:
+	stz	__rc2
+	stz	__rc3
+	sta	__rc5
+	stx	__rc6
+	stx	__rc7
+	ldx	#0
+	lda	#3
+	jsr	__mulsi3
+	clc
+	pha
+	lda	__rc0
+	adc	#36
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	ldy	#1
+	txa
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#42
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	lda	(__rc2),y
+	tax
+	bmi	.LBB0_49
+	bra	.LBB0_50
+.LBB0_49:
+	lda	#255
+	bra	.LBB0_51
+.LBB0_50:
+	lda	#0
+	bra	.LBB0_51
+.LBB0_51:
+	cmp	#128
+	tay
+	sty	__rc5
+	ror	__rc5
+	ror
+	stx	__rc6
+	ror	__rc6
+	tax
+	lda	__rc4
+	ror
+	clc
+	pha
+	lda	__rc0
+	adc	#32
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc6
+	sta	(__rc2),y
+	ldy	#1
+	sty	__rc6
+	iny
+	txa
+	sta	(__rc2),y
+	iny
+	lda	__rc5
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#40
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	__rc6
+	lda	(__rc2),y
+	tax
+	bmi	.LBB0_52
+	bra	.LBB0_53
+.LBB0_52:
+	lda	#255
+	bra	.LBB0_54
+.LBB0_53:
+	lda	#0
+	bra	.LBB0_54
+.LBB0_54:
+	cmp	#128
+	tay
+	sty	__rc5
+	ror	__rc5
+	ror
+	stx	__rc6
+	ror	__rc6
+	tax
+	lda	__rc4
+	ror
+	clc
+	pha
+	lda	__rc0
+	adc	#28
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc6
+	sta	(__rc2),y
+	ldy	#1
+	sty	__rc6
+	iny
+	txa
+	sta	(__rc2),y
+	iny
+	lda	__rc5
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#38
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	__rc6
+	lda	(__rc2),y
+	tax
+	bmi	.LBB0_55
+	bra	.LBB0_56
+.LBB0_55:
+	lda	#255
+	bra	.LBB0_57
+.LBB0_56:
+	lda	#0
+	bra	.LBB0_57
+.LBB0_57:
+	cmp	#128
+	tay
+	sty	__rc5
+	ror	__rc5
+	ror
+	stx	__rc6
+	ror	__rc6
+	tax
+	lda	__rc4
+	ror
+	clc
+	pha
+	lda	__rc0
+	adc	#24
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	pla
+	sta	(__rc2)
+	ldy	#1
+	lda	__rc6
+	sta	(__rc2),y
+	ldy	#1
+	sty	__rc6
+	iny
+	txa
+	sta	(__rc2),y
+	iny
+	lda	__rc5
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#36
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	__rc6
+	lda	(__rc2),y
+	tax
+	bmi	.LBB0_58
+	bra	.LBB0_59
+.LBB0_58:
+	lda	#255
+	bra	.LBB0_60
+.LBB0_59:
+	lda	#0
+	bra	.LBB0_60
+.LBB0_60:
+	cmp	#128
+	tay
+	sty	__rc2
+	ror	__rc2
+	ror
+	stx	__rc3
+	ror	__rc3
+	sta	__rc5
+	lda	__rc4
+	ror
+	clc
+	pha
+	lda	__rc0
+	adc	#20
+	sta	__rc20
+	lda	__rc1
+	adc	#0
+	sta	__rc21
+	pla
+	sta	(__rc20)
+	ldy	#1
+	lda	__rc3
+	sta	(__rc20),y
+	tyx
+	iny
+	lda	__rc5
+	sta	(__rc20),y
+	ldy	#2
+	sty	__rc7
+	iny
+	lda	__rc2
+	sta	(__rc20),y
+	ldy	#3
+	sty	__rc9
+	clc
+	lda	__rc0
+	adc	#24
+	sta	__rc10
+	lda	__rc1
+	adc	#0
+	sta	__rc11
+	lda	(__rc10)
+	sta	__rc8
+	stx	__rc5
+	ldy	__rc5
+	lda	(__rc10),y
+	tax
+	ldy	__rc7
+	lda	(__rc10),y
+	sta	__rc2
+	ldy	__rc9
+	lda	(__rc10),y
+	sta	__rc3
+	lda	(__rc10)
+	sta	__rc4
+	ldy	__rc5
+	lda	(__rc10),y
+	sta	__rc5
+	ldy	__rc7
+	lda	(__rc10),y
+	sta	__rc6
+	sty	__rc26
+	ldy	__rc9
+	lda	(__rc10),y
+	sta	__rc7
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc22
+	stx	__rc23
+	ldx	__rc2
+	stx	__rc24
+	ldx	__rc3
+	stx	__rc25
+	lda	(__rc20)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc20),y
+	tyx
+	sta	__rc9
+	ldy	__rc26
+	sty	__rc6
+	ldy	__rc6
+	lda	(__rc20),y
+	sta	__rc2
+	ldy	#3
+	lda	(__rc20),y
+	sty	__rc7
+	sta	__rc3
+	lda	(__rc20)
+	sta	__rc4
+	txy
+	lda	(__rc20),y
+	sta	__rc5
+	ldx	#1
+	stx	__rc26
+	ldy	__rc6
+	lda	(__rc20),y
+	sta	__rc6
+	ldy	__rc7
+	lda	(__rc20),y
+	ldx	#3
+	stx	__rc20
+	sta	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc4
+	stx	__rc5
+	clc
+	lda	__rc22
+	adc	__rc4
+	sta	__rc6
+	lda	__rc23
+	adc	__rc5
+	sta	__rc4
+	lda	__rc24
+	adc	__rc2
+	sta	__rc5
+	lda	__rc25
+	adc	__rc3
+	sta	__rc7
+	clc
+	lda	__rc0
+	adc	#16
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	__rc6
+	sta	(__rc2)
+	lda	__rc4
+	ldx	__rc26
+	stx	__rc6
+	ldy	__rc6
+	sta	(__rc2),y
+	ldy	#2
+	lda	__rc5
+	sta	(__rc2),y
+	tyx
+	lda	__rc7
+	ldy	__rc20
+	sty	__rc4
+	ldy	__rc4
+	sta	(__rc2),y
+	lda	(__rc2)
+	sta	__rc5
+	ldy	__rc6
+	lda	(__rc2),y
+	sta	__rc6
+	txy
+	lda	(__rc2),y
+	sta	__rc7
+	ldy	__rc4
+	lda	(__rc2),y
+	bne	.LBB0_65
+	bra	.LBB0_61
+.LBB0_61:
+	lda	__rc7
+	bne	.LBB0_65
+	bra	.LBB0_62
+.LBB0_62:
+	lda	__rc6
+	bne	.LBB0_65
+	bra	.LBB0_63
+.LBB0_63:
+	lda	__rc5
+	beq	.LBB0_64
+	bra	.LBB0_65
+.LBB0_64:
+; %bb.87:
+	jmp	.LBB0_86
+.LBB0_65:
+	clc
+	lda	__rc0
+	adc	#32
+	sta	__rc20
+	lda	__rc1
+	adc	#0
+	sta	__rc21
+	lda	(__rc20)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc20),y
+	sta	__rc9
+	tyx
+	stx	__rc27
+	iny
+	lda	(__rc20),y
+	sta	__rc2
+	tyx
+	stx	__rc28
+	clc
+	lda	__rc0
+	adc	#24
+	sta	__rc22
+	lda	__rc1
+	adc	#0
+	sta	__rc23
+	iny
+	lda	(__rc20),y
+	tyx
+	stx	__rc7
+	sta	__rc3
+	lda	(__rc22)
+	sta	__rc4
+	ldy	__rc27
+	lda	(__rc22),y
+	sta	__rc5
+	ldy	__rc28
+	lda	(__rc22),y
+	sta	__rc6
+	ldy	__rc7
+	lda	(__rc22),y
+	ldx	#3
+	stx	__rc29
+	sta	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc24
+	stx	__rc25
+	ldx	__rc2
+	stx	__rc26
+	clc
+	lda	__rc0
+	adc	#28
+	sta	__rc30
+	lda	__rc1
+	adc	#0
+	sta	__rc31
+	lda	(__rc30)
+	sta	__rc8
+	ldy	__rc27
+	lda	(__rc30),y
+	sty	__rc5
+	tax
+	ldy	__rc28
+	lda	(__rc30),y
+	sty	__rc6
+	sta	__rc2
+	ldy	__rc29
+	lda	(__rc30),y
+	sty	__rc7
+	sta	__rc3
+	clc
+	lda	__rc0
+	adc	#20
+	sta	__rc28
+	lda	__rc1
+	adc	#0
+	sta	__rc29
+	lda	(__rc28)
+	sta	__rc4
+	ldy	__rc5
+	lda	(__rc28),y
+	sta	__rc5
+	ldy	__rc6
+	lda	(__rc28),y
+	sta	__rc6
+	ldy	__rc7
+	lda	(__rc28),y
+	sta	__rc7
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc3
+	stx	__rc4
+	clc
+	lda	__rc24
+	adc	__rc3
+	sta	__rc8
+	lda	__rc25
+	adc	__rc4
+	tax
+	lda	__rc26
+	adc	__rc2
+	sta	__rc3
+	clc
+	lda	__rc0
+	adc	#16
+	sta	__rc26
+	lda	__rc1
+	adc	#0
+	sta	__rc27
+	lda	(__rc26)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc26),y
+	sta	__rc5
+	iny
+	lda	(__rc26),y
+	sta	__rc6
+	iny
+	lda	(__rc26),y
+	stx	__rc2
+	sta	__rc7
+	ldx	__rc8
+	lda	#0
+	jsr	__divsi3
+	clc
+	pha
+	lda	__rc0
+	adc	#12
+	sta	__rc24
+	lda	__rc1
+	adc	#0
+	sta	__rc25
+	pla
+	sta	(__rc24)
+	ldy	#1
+	txa
+	sta	(__rc24),y
+	sty	__rc4
+	ldx	#2
+	txy
+	lda	__rc2
+	sta	(__rc24),y
+	sty	__rc2
+	ldy	#3
+	lda	__rc3
+	sta	(__rc24),y
+	sty	__rc7
+	lda	(__rc30)
+	sta	__rc8
+	ldx	__rc4
+	stx	__rc5
+	ldy	__rc5
+	lda	(__rc30),y
+	tax
+	ldy	__rc2
+	lda	(__rc30),y
+	sta	__rc2
+	sty	__rc6
+	ldy	__rc7
+	lda	(__rc30),y
+	sta	__rc3
+	lda	(__rc22)
+	sta	__rc4
+	ldy	__rc5
+	lda	(__rc22),y
+	sta	__rc5
+	ldy	__rc6
+	lda	(__rc22),y
+	sta	__rc6
+	ldy	__rc7
+	lda	(__rc22),y
+	sty	__rc22
+	sta	__rc7
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc23
+	stx	__rc31
+	ldx	__rc2
+	stx	__rc30
+	lda	(__rc20)
+	sta	__rc8
+	ldy	#1
+	lda	(__rc20),y
+	sty	__rc5
+	sta	__rc9
+	iny
+	lda	(__rc20),y
+	tyx
+	sta	__rc2
+	ldy	__rc22
+	lda	(__rc20),y
+	sty	__rc7
+	sta	__rc3
+	lda	(__rc28)
+	sta	__rc4
+	ldy	__rc5
+	lda	(__rc28),y
+	sta	__rc5
+	sty	__rc22
+	txy
+	lda	(__rc28),y
+	sta	__rc6
+	ldx	#2
+	stx	__rc21
+	ldy	__rc7
+	lda	(__rc28),y
+	sty	__rc20
+	sta	__rc7
+	ldx	__rc9
+	lda	__rc8
+	jsr	__mulsi3
+	sta	__rc3
+	stx	__rc4
+	sec
+	lda	__rc23
+	sbc	__rc3
+	tax
+	lda	__rc31
+	sbc	__rc4
+	sta	__rc8
+	lda	__rc30
+	sbc	__rc2
+	sta	__rc3
+	lda	(__rc26)
+	sta	__rc4
+	ldy	__rc22
+	lda	(__rc26),y
+	sta	__rc5
+	ldy	__rc21
+	lda	(__rc26),y
+	sta	__rc6
+	ldy	__rc20
+	lda	(__rc26),y
+	ldy	__rc8
+	sty	__rc2
+	sta	__rc7
+	lda	#0
+	jsr	__divsi3
+	clc
+	pha
+	lda	__rc0
+	adc	#8
+	sta	__rc4
+	lda	__rc1
+	adc	#0
+	sta	__rc5
+	pla
+	sta	(__rc4)
+	txa
+	ldy	__rc22
+	sta	(__rc4),y
+	lda	__rc2
+	ldy	__rc21
+	sta	(__rc4),y
+	ldy	__rc20
+	lda	__rc3
+	sta	(__rc4),y
+	tyx
+	lda	(__rc24)
+	sta	__rc4
+	ldy	__rc22
+	lda	(__rc24),y
+	sta	__rc3
+	ldy	__rc21
+	lda	(__rc24),y
+	sta	__rc2
+	txy
+	lda	(__rc24),y
+	tax
+	ldy	__rc4
+	cpy	#1
+	lda	__rc3
+	sbc	#2
+	lda	__rc2
+	sbc	#0
+	txa
+	sbc	#0
+	bvs	.LBB0_66
+	bra	.LBB0_67
+.LBB0_66:
+	eor	#128
+	bra	.LBB0_68
+.LBB0_67:
+	bra	.LBB0_68
+.LBB0_68:
+	tax
+	bpl	.LBB0_69
+	bra	.LBB0_70
+.LBB0_69:
+	clc
+	lda	__rc0
+	adc	#12
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	#0
+	sta	(__rc2)
+	ldy	#1
+	lda	#2
+	sta	(__rc2),y
+	tay
+	lda	#0
+	sta	(__rc2),y
+	iny
+	sta	(__rc2),y
+	bra	.LBB0_70
+.LBB0_70:
+	clc
+	lda	__rc0
+	adc	#12
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc6
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc5
+	iny
+	lda	(__rc2),y
+	sta	__rc4
+	iny
+	lda	(__rc2),y
+	tax
+	ldy	__rc6
+	cpy	#0
+	lda	__rc5
+	sbc	#254
+	lda	__rc4
+	sbc	#255
+	txa
+	sbc	#255
+	bvs	.LBB0_71
+	bra	.LBB0_72
+.LBB0_71:
+	eor	#128
+	bra	.LBB0_73
+.LBB0_72:
+	bra	.LBB0_73
+.LBB0_73:
+	tax
+	bmi	.LBB0_74
+	bra	.LBB0_75
+.LBB0_74:
+	clc
+	lda	__rc0
+	adc	#12
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	#0
+	sta	(__rc2)
+	ldy	#1
+	lda	#254
+	sta	(__rc2),y
+	iny
+	inc
+	sta	(__rc2),y
+	iny
+	sta	(__rc2),y
+	bra	.LBB0_75
+.LBB0_75:
+	clc
+	lda	__rc0
+	adc	#8
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc6
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc5
+	iny
+	lda	(__rc2),y
+	sta	__rc4
+	iny
+	lda	(__rc2),y
+	tax
+	ldy	__rc6
+	cpy	#1
+	lda	__rc5
+	sbc	#2
+	lda	__rc4
+	sbc	#0
+	txa
+	sbc	#0
+	bvs	.LBB0_76
+	bra	.LBB0_77
+.LBB0_76:
+	eor	#128
+	bra	.LBB0_78
+.LBB0_77:
+	bra	.LBB0_78
+.LBB0_78:
+	tax
+	bpl	.LBB0_79
+	bra	.LBB0_80
+.LBB0_79:
+	clc
+	lda	__rc0
+	adc	#8
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	#0
+	sta	(__rc2)
+	ldy	#1
+	lda	#2
+	sta	(__rc2),y
+	tay
+	lda	#0
+	sta	(__rc2),y
+	iny
+	sta	(__rc2),y
+	bra	.LBB0_80
+.LBB0_80:
+	clc
+	lda	__rc0
+	adc	#8
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc6
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc5
+	iny
+	lda	(__rc2),y
+	sta	__rc4
+	iny
+	lda	(__rc2),y
+	tax
+	ldy	__rc6
+	cpy	#0
+	lda	__rc5
+	sbc	#254
+	lda	__rc4
+	sbc	#255
+	txa
+	sbc	#255
+	bvs	.LBB0_81
+	bra	.LBB0_82
+.LBB0_81:
+	eor	#128
+	bra	.LBB0_83
+.LBB0_82:
+	bra	.LBB0_83
+.LBB0_83:
+	tax
+	bmi	.LBB0_84
+	bra	.LBB0_85
+.LBB0_84:
+	clc
+	lda	__rc0
+	adc	#8
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	#0
+	sta	(__rc2)
+	ldy	#1
+	lda	#254
+	sta	(__rc2),y
+	iny
+	inc
+	sta	(__rc2),y
+	iny
+	sta	(__rc2),y
+	bra	.LBB0_85
+.LBB0_85:
+	clc
+	lda	__rc0
+	adc	#54
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	ldy	#1
+	lda	(__rc2),y
+	sta	__rc5
+	clc
+	lda	__rc0
+	adc	#12
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	sec
+	lda	__rc4
+	sbc	(__rc2)
+	sta	__rc4
+	lda	__rc5
+	sbc	(__rc2),y
+	sta	__rc5
+	clc
+	lda	__rc0
+	adc	#58
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	tax
+	lda	(__rc2),y
+	stx	__rc2
+	sta	__rc3
+	lda	__rc4
+	sta	(__rc2)
+	lda	__rc5
+	sta	(__rc2),y
+	clc
+	lda	__rc0
+	adc	#52
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	sta	__rc4
+	lda	(__rc2),y
+	sta	__rc5
+	clc
+	lda	__rc0
+	adc	#8
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	sec
+	lda	__rc4
+	sbc	(__rc2)
+	sta	__rc4
+	lda	__rc5
+	sbc	(__rc2),y
+	sta	__rc5
+	clc
+	lda	__rc0
+	adc	#56
+	sta	__rc2
+	lda	__rc1
+	adc	#0
+	sta	__rc3
+	lda	(__rc2)
+	tax
+	lda	(__rc2),y
+	stx	__rc2
+	sta	__rc3
+	lda	__rc4
+	sta	(__rc2)
+	lda	__rc5
+	sta	(__rc2),y
+	bra	.LBB0_86
+.LBB0_86:
+	ldy	#0
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc31
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc30
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc29
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc28
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc27
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc26
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc25
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc24
+	plx
+	stx	__rc23
+	plx
+	stx	__rc22
+	plx
+	stx	__rc21
+	plx
+	stx	__rc20
+	clc
+	lda	__rc0
+	adc	#60
+	sta	__rc0
+	lda	__rc1
+	adc	#0
+	sta	__rc1
+	rts
+.Lfunc_end0:
+	.size	newton_step, .Lfunc_end0-newton_step
+                                        ; -- End function
+	.ident	"clang version 24.0.0git (/home/will/llvm-mos 742d554bf08042b8df93d791c335260fadd16643)"
+	.section	".note.GNU-stack","",@progbits
+	;Declaring this symbol tells the CRT that the stack pointer needs to be initialized.
+	.globl	__do_init_stack

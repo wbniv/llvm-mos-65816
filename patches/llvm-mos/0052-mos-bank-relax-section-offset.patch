@@ -1,0 +1,78 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
+@@ -174,21 +174,12 @@
+   if (Sec->getFlags() & ELF::SHF_MOS_ZEROPAGE)
+     return false;
+
+-  // #320 65816: bank relaxation (Absolute -> AbsoluteLong) grows a 16-bit
+-  // absolute access into a 24-bit absolute-long one. It is only ever needed when
+-  // the symbol lives in a non-zero bank. A NEAR (bank-0) symbol accessed via
+-  // plain absolute addressing must stay 16-bit: the compiler emits the explicit
+-  // long form (LDA/STA AbsoluteLong, for address_space(2) / .far_* data via
+-  // G_LOAD_FAR_ABS) whenever it genuinely needs a far access, so a plain-symbol
+-  // Absolute is by construction a near access — valid under the DBR=0 contract,
+-  // the same invariant the STX/STY near abs-stores already depend on (X/Y have
+-  // no long form to relax to, which is why only the A-register path bloats).
+-  // Only banked sections (.far*) need the abs->long growth (e.g. a hand-written
+-  // `lda farsym`, where relaxing to long is the safe/correct choice regardless
+-  // of bank). Gate conservatively: an unknown/non-ELF section already returned
+-  // true above, so a misclassification can only MISS the size win, never emit a
+-  // wrong-bank access.
+-  if (BankRelax && !Sec->getName().starts_with(".far"))
++  // Ordinary sections use the near-address contract when the symbol's section
++  // offset plus addend fits in 16 bits. A larger offset requires a long operand
++  // even in .text or .data. Value includes the assembler's current symbol
++  // offset although the final section address remains a linker relocation.
++  // Explicit width modifiers and zero-page contracts are handled above.
++  if (BankRelax && !Sec->getName().starts_with(".far") && Value <= UINT16_MAX)
+     return false;
+
+   return !MOS::isZeroPageSectionName(Sec->getName());
+diff --git a/llvm/test/MC/MOS/bank-relax-section-offset.s b/llvm/test/MC/MOS/bank-relax-section-offset.s
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/MC/MOS/bank-relax-section-offset.s
+@@ -0,0 +1,42 @@
++# RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %s -o %t
++# RUN: llvm-objdump -dr %t | FileCheck %s
++
++# A section-relative offset contributes to the required address width even
++# though the linker supplies the section's final address. Explicit modifiers
++# retain their requested width; small ordinary-section offsets stay near.
++.data
++base:
++.space 65535
++last16:
++.byte 0
++first24:
++.byte 0
++
++.text
++lda base
++# CHECK: ad 00 00
++# CHECK: R_MOS_ADDR16
++lda last16
++# CHECK: ad 00 00
++# CHECK: R_MOS_ADDR16
++lda first24
++# CHECK: af 00 00 00
++# CHECK: R_MOS_ADDR24
++lda base+65536
++# CHECK: af 00 00 00
++# CHECK: R_MOS_ADDR24
++lda first24-1
++# CHECK: ad 00 00
++# CHECK: R_MOS_ADDR16
++lda mos16(first24)
++# CHECK: ad 00 00
++# CHECK: R_MOS_ADDR16
++lda first24,x
++# CHECK: bf 00 00 00
++# CHECK: R_MOS_ADDR24
++sta first24
++# CHECK: 8f 00 00 00
++# CHECK: R_MOS_ADDR24
++lda external
++# CHECK: af 00 00 00
++# CHECK: R_MOS_ADDR24

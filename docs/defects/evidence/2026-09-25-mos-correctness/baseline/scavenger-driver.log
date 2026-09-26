@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/scavenger-p-undef-6502.ll -o /dev/null
+exit_code=1
+LLVM ERROR: "prolog-epilog" pass is not registered.

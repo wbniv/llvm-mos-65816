@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -filetype=obj -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/shift-baseline.o
+exit_code=0
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-sim.cfg -fno-lto -O2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/shift-runtime.c /home/will/llvm-mos-65816/build/mos-correctness-runtime/shift-baseline.o -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/shift-baseline
+exit_code=0

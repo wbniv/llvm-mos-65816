@@ -1,0 +1,9 @@
+{
+  "tool": "OpenAI Codex CLI",
+  "version": "0.157.0",
+  "originator": "codex-tui",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "session": "01a0d7d4-5da2-7fe0-a88c-0137eaa043a7",
+  "verification": "Read session_meta and latest turn_context from session JSONL for this turn."
+}

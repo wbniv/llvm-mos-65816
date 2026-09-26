@@ -1,0 +1,19 @@
+*** Begin Patch
+*** Update File: /home/will/llvm-mos-65816/dev/bitboard64.sh
+@@
+ echo "==> s64 bit-operation disassembly gate"
++"$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -S -emit-llvm \
++  "$ROOT/examples/65816/bitboard64-probe.c" -o "$BUILD/bitboard64-probe.ll"
++for intrinsic in llvm.ctpop.i64 llvm.cttz.i64 llvm.ctlz.i64; do
++  grep -q "$intrinsic" "$BUILD/bitboard64-probe.ll" || { echo "FAIL: missing $intrinsic"; exit 1; }
++done
+ "$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -fno-lto \
+@@
+ dis=$("$TOOL/llvm-objdump" -dr --mcpu=mosw65816 "$BUILD/bitboard64-probe.o")
+-for sym in __popcountdi2 __ctzdi2 __clzdi2; do
+-  printf '%s\n' "$dis" | grep -q "$sym" || { echo "FAIL: missing $sym call"; exit 1; }
+-done
+-echo "    PASS: popcountll/ctzll/clzll reach all three s64 runtime helpers"
++printf '%s\n' "$dis" | grep -q '<bitboard64_step>:' || { echo "FAIL: bitboard64_step not selected"; exit 1; }
++echo "    PASS: ctpop/cttz/ctlz i64 intrinsics form and lower to verified inline machine code"
+*** End Patch

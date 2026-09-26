@@ -1,0 +1,33 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc-callbr.ll -o /dev/null
+error: register 'NZCV' allocated for constraint '{cc}' does not match required type
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc-callbr.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc-callbr.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@bad_callbr'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005b238524813b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005b2385244fc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005b2385248f4b
+3  libc.so.6 0x000073f76ce45cb0
+4  llc       0x00005b2384fc3c77 llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::SDValue, llvm::SDNodeFlags) + 39
+5  llc       0x00005b2384fcc49e llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::EVT, llvm::ArrayRef<llvm::SDValue>, llvm::SDNodeFlags) + 270
+6  llc       0x00005b2384fedf99 llvm::SelectionDAG::getNode(unsigned int, llvm::SDLoc const&, llvm::SDVTList, llvm::ArrayRef<llvm::SDValue>, llvm::SDNodeFlags) + 73
+7  llc       0x00005b2384f7c444 llvm::SelectionDAGBuilder::visitCallBrLandingPad(llvm::CallInst const&) + 2532
+8  llc       0x00005b2384f6e8dd llvm::SelectionDAGBuilder::visitIntrinsicCall(llvm::CallInst const&, unsigned int) + 27373
+9  llc       0x00005b2384f3d226 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+10 llc       0x00005b2385012bc5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+11 llc       0x00005b238501215a llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 6858
+12 llc       0x00005b238500f421 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+13 llc       0x00005b238500cabc llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+14 llc       0x00005b2383ee2f99 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+15 llc       0x00005b2384475780 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+16 llc       0x00005b238447d882 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+17 llc       0x00005b2384476544 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+18 llc       0x00005b2382e4574b
+19 llc       0x00005b2382e42a13 main + 1443
+20 libc.so.6 0x000073f76ce2a601
+21 libc.so.6 0x000073f76ce2a718 __libc_start_main + 136
+22 llc       0x00005b2382e41c25 _start + 37
+
+exit_code=-11

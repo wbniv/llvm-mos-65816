@@ -1,0 +1,399 @@
+{
+  "schema": 1,
+  "id": "selectiondag-inline-asm-register-bounds",
+  "title": "SelectionDAG physical-register inline-asm range exhaustion",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-25-selectiondag-inlineasm.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: SelectionDAG reproduction, patch 0057, regression tests, preserved-baseline comparison, cross-target validation, installed compiler refresh, and documentation."
+  ],
+  "reproducer_origin": "original",
+  "summary": "Patch 0057 validates physical-register ranges before assignment and uses the existing register/type diagnostic. Callbr landing pads return undefined recovery values after lowering errors instead of walking absent output copy chains. Seven isolated operand forms abort on the preserved baseline and receive exactly one clean diagnostic on the candidate at O0 and O2.",
+  "baseline": {
+    "command": "python3 /home/will/llvm-mos-65816/dev/check-selectiondag-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "aarch64",
+      "optimization": "O0",
+      "global_isel": false,
+      "verify_machineinstrs": true,
+      "lto": false,
+      "expected_behavior": "Compiler exit 1 with exactly the register/type diagnostic; runner exits 0 only for that result."
+    },
+    "toolchain_location": "build/0041-inlineasm-build/llc-0041",
+    "toolchain_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-runner.log",
+      "sha256": "8528779cdf5f10d9677bc0c5058fbdbe6af13f3a000b72cfb474aa973f196671"
+    },
+    "exit_code": 1,
+    "failure_signature": "Ran out of registers to allocate!"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/0057-upstream-based.patch",
+      "sha256": "fcc8b2b037415ef1333654ce1171ed661d86136858cde35fef2337e09e7953fc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/O0-diagnostics.log",
+      "sha256": "8c24f92ad0b246e45c9583f8f9b63729b027b586bb5ed2fc92b7ade744017d7f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/O0-final-diagnostics.log",
+      "sha256": "799dc1281fa30da14a48e1f9c1e174067930e422aecb7a3bd80db33f2f9254d5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/O2-diagnostics.log",
+      "sha256": "7e4af87abc7971864a0db0939fda6e2d858c2fa7d8da5b158aa755a7fd5b738c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/O2-final-diagnostics.log",
+      "sha256": "30126b883efdadc0a84dd7a32aae9e1e333cb05e77af4c785f0605a17bd439f6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.baseline.cpp.gz",
+      "sha256": "1e605ae1167b1837b3117d0db3352c6b2da09a4542331041177cf5c820167680"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.candidate.cpp.gz",
+      "sha256": "97ed29ad3186455a4c7fe0a63e54934590236af9f1a28b061ae881d4107f7f6a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.initial-candidate.cpp.gz",
+      "sha256": "a5dd4c37efd4ddea02873258d57a5f3a0d079bb2473cf801c0a207546836dcd0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.vendor-baseline.cpp.gz",
+      "sha256": "03ddabfdcfeb80131ae97db2d109d762d0bf95ea117fba83f566bf81ce0fe561"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc-callbr.ll",
+      "sha256": "35e31222ab0bc08bc72b793a88a5ebcbd1bb613b9ae53af8c2955da67ae8372e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
+      "sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-baseline-O0.log",
+      "sha256": "c8a27a5ec021e32af2d3f195034209dc13bd11f1e2b516d758d64eb2e2357a7a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-baseline-O2.log",
+      "sha256": "b67959d53809413ec942e6600ea38ac28c2883f9c05b5f8133b0732655913611"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-candidate-O0.log",
+      "sha256": "0406772b7a81ec81d3986908b39dd72d5f9be6976b9ba3818b94f6c32ec9bdbf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr-candidate-O2.log",
+      "sha256": "4a4fcd2b9ea3e4b9c56f61c120fbcb393abaedbe17ec4d554abdaff9710e2fa4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr.ll",
+      "sha256": "35e31222ab0bc08bc72b793a88a5ebcbd1bb613b9ae53af8c2955da67ae8372e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-baseline-O0.log",
+      "sha256": "1cbe70460793899cc8b129e7dfc73e5e5b3cfcd42877e9c99137aeeaa25f1a35"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-baseline-O2.log",
+      "sha256": "7fe2b2b55e23aed24cf29aeb2e76eacea4a6da1e91d62aba4daf2021b5e5f867"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-candidate-O0.log",
+      "sha256": "4f9b63d899d5b8ac911ec00609916e688011510483a0a73436157f30da76742d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input-candidate-O2.log",
+      "sha256": "d24ce21e2da14fd669a200ad38e5fc2d375397a1b629753e790f37901b96e53e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_input.ll",
+      "sha256": "9fca4b3b90a7785436efc53e537beaa37c3ea53582728be85809b8888c68e242"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-baseline-O0.log",
+      "sha256": "96d8088c6dd7a50f1242eb8ef8d721fb2f7ca3f9b08460e978d743b3d2cb3b04"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-baseline-O2.log",
+      "sha256": "23fdc25cfdf63f2a01e11e32bec9bb05c0d18dbf59483356bcd580faa73aaeb3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-candidate-O0.log",
+      "sha256": "e025fbadd14435f7ebf90fe7b2dd165332768e995687e2fa01d6bc08fb806a3d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair-candidate-O2.log",
+      "sha256": "42ae0714a5f044353d6a55cde9347fe874fca92deb2d8f41eaa7de1efa2e9704"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_callbr_pair.ll",
+      "sha256": "013112d8cac67dcafe9bbd3a3eccbcda345b86305405a18d602e6a1f4e2e1b93"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-baseline-O0.log",
+      "sha256": "2b63467d8c4040d9aeecc422b19028e3efae33855cdcee617030e5b01511a7f9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-baseline-O2.log",
+      "sha256": "fd8a9a2ae0f7cd118a2fdba8020b5c3fa45425cdab66f3ba0b9f033b4df82ba9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-candidate-O0.log",
+      "sha256": "1b050df2ca92aaa6954cdf85da7de09d62d71066fc9cf98a807073f71309898d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect-candidate-O2.log",
+      "sha256": "baecef432e1bbfdf37d4e94fd986fd73bfa685f202b09cbc32274165220d7db1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_indirect.ll",
+      "sha256": "3d963f86c92d2e92058e4ff6b9cd3d2a36feddfaf5037156cfb795c68d319f33"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-baseline-O0.log",
+      "sha256": "6f74e9ef79b2460ac5c9b2686899a0291573f9100e373a022f92200ef5d04855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-baseline-O2.log",
+      "sha256": "10fbd821dfd08ab8faf34b6793f84af4ab5c19be69c62a6b551b0f432db2f184"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-candidate-O0.log",
+      "sha256": "ff038da37c41f59daa4dd51f04db887c60e2d273b045eac0aadbbb35d507f067"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input-candidate-O2.log",
+      "sha256": "62cad66aedcd25f14aac2a195c97f690444ceb657e66310e22a00f860bdcbcff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_input.ll",
+      "sha256": "8bfed4de34551858db96beacc3a5c4fcf899d715265aa3604e21b33e140838ef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-baseline-O0.log",
+      "sha256": "baa4bfd8a1b1488dc58b644547ac89eaad37f3baed004716e721ac143fac6519"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-baseline-O2.log",
+      "sha256": "bac670980d07cf4abddfa3a4b8dd2d5f46e5bf257655e8df539fc92406aed574"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-candidate-O0.log",
+      "sha256": "2e38b81a164a9da945847e09d88ce1b4527fe1b23370c7c88ade04c217f3f21a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output-candidate-O2.log",
+      "sha256": "34ec3090ccf3b31fddad72f7c96edbb1902b6c6c19ead552316e5efb03e78465"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_output.ll",
+      "sha256": "ddce8e1c040d822dfe1fe8bc573d5161203947186c475cc58e0ce8317608c128"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-baseline-O0.log",
+      "sha256": "a169061a2a59f73880764743dd3092742ce1dda68efad3ec8787833bef16b5f4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-baseline-O2.log",
+      "sha256": "d5b8af570497954fbcabad914d2fd872df341b4f837ade94e27ac62142938f88"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-candidate-O0.log",
+      "sha256": "63a0a3cb63f1981304a42580140e640055cd27c68ddfafe7f5fb9076d084ac78"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied-candidate-O2.log",
+      "sha256": "bf1714c237c69a37ad20c68c12fad96531727bfcb128b2e8504390cc4c785cd0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/bad_tied.ll",
+      "sha256": "63b321350ebbb888fd79e2ae7ca78594dbbe0e90c2964ba10846b9a4fd68fce8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-direct.log",
+      "sha256": "54711441364c85d8ee6bffba96b2e8b3dda464801adb3c6005b52afea08772a2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-identity.json",
+      "sha256": "0713c9039c549764cf68dd5035bdd8042f3b6a98f4e2289fafab59d5dc80a2fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-invocation.json",
+      "sha256": "de19ad66884b9c41f665af1edc3330a4eb72cdbce1ee137f052f799bb26d4360"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-runner.log",
+      "sha256": "8528779cdf5f10d9677bc0c5058fbdbe6af13f3a000b72cfb474aa973f196671"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/build-selectiondag-inlineasm.py",
+      "sha256": "8e74aca817ab26acdaae4c8e233cc0855c0b31e37cdf9953be9e8b05e7548aef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/callbr-baseline.log",
+      "sha256": "3212d3881fd3d24ccf8ef53b91366dae392bba8398bfb9c2b84742fa3dc535f6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/callbr-exploration.log",
+      "sha256": "dcbd5071fa685dc5fc83ff646815fa38689735988e3d6f3b67108f2e84a49aee"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-build.log",
+      "sha256": "17ce50fa379ee198a4de315bde3d94c93a9461e3d559fd71377bdcc42682b56b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-final-runner.log",
+      "sha256": "44ca8e337187befdde7d82eebc9bffd1005dc44b9ac8b5bf5a2851263bae804c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-identity.json",
+      "sha256": "d2263e897fa5e33794b9a6d0bda7a91005823d59eccd41d233960fa58d5c93d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-runner.log",
+      "sha256": "44ca8e337187befdde7d82eebc9bffd1005dc44b9ac8b5bf5a2851263bae804c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/cross-lit-results.json",
+      "sha256": "2da09b9ee3b4b1f72c58ec5ccbb982f1b48c7afcdcd8d6c32f70f3cadaad6214"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/diagnostic-runs.json",
+      "sha256": "15779c01c1ec98920e5660b09f85610d5a92be9c30c40dc32fe7acbac447ca75"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/initial-candidate-identity.json",
+      "sha256": "d0ed0b62ad31635d1483a9991cf85f068fd4cc749e7df1e6c8e5b4068dd2ad57"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/inline-asm-physreg-exhaustion.ll",
+      "sha256": "4336595497e98c7e6e8fbc88a06c4fbde89187b0d112a1808989bafb20ccc183"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/installed-tools.json",
+      "sha256": "ce2f223a8bddbc0b866be1b440e8b440714cd495b0581466ac1a26cfad9072bd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.log",
+      "sha256": "7dd7a6c5b91057a58a2b61b1c7fb98e5ed5e6e9e1de0b52ae7858e9f3da11f54"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-candidate.log",
+      "sha256": "8c34718e518464ee4160e6febda64c618613fdbe2ae670be3432bdb311a6bc2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/mos-lit-results.json",
+      "sha256": "5336c861979fa6e0cd5854a778b97dc2ad8354822576b1c15091b26c0a3bee2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/operand-matrix.json",
+      "sha256": "dc9d1677edc82d5adbfd9f5cde84a63e07f64311794dbff6256d18e11fd12d2c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/patch-checks.json",
+      "sha256": "3a16436ac2c78b6a60a495d48b7524b9145fb75c8d828eb1e8433987512d5cf1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/validation-summary.json",
+      "sha256": "635d91c63aacfb3865f3f4e392bc184e2d11329437cd463ce9b6f350cc680493"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/vector-baseline.log",
+      "sha256": "73d8bed0dd3047d5033a751f34c239e8a966504e41933daf5b980656293f39a3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/vector-candidate.log",
+      "sha256": "df28cbc7e6b48d14ce2725d3a7e56a3b0904bec463508e8f5211f7c697a0d20a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/vector-many-virtual.ll",
+      "sha256": "91ca29030c66e54f35520dd0ae9aaf5de2cf536772a2fac13d670afe8f7c960b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/virtual-baseline.log",
+      "sha256": "93f9215e1186672e28e9ff7f8feff458d35ff136a9a0771905398029e58381c5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/virtual-candidate.log",
+      "sha256": "ada87d988459cab165b6d73d435848eab587300cc86d7ac80a74f75648cc8796"
+    },
+    {
+      "path": "dev/check-selectiondag-register-diagnostic.py",
+      "sha256": "365c9ba8543600e7aaa41a5de4151ebeebeddffbe494ef7f840b8bffa6bd2733"
+    },
+    {
+      "path": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+      "sha256": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/session-identity.json",
+      "sha256": "815cae91972589799590a90670f1c3bb1ed07e49c0b90d1898d3031f5f5294e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/inlineasm-baseline-source.patch",
+      "sha256": "e9e1620ff4678b0e9ca48d276e5652cd2d151824e9fe193482ea7eea1a311690"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/source-archives.json",
+      "sha256": "9bb96a3241ca2b67304104eefc814753b37513dedcddf282c1628c17b423d016"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/repository-checks.log",
+      "sha256": "ae19335dc1a23f5d6811756d75d79197d04566791a36dd3777dc74732e40a4ca"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/repository-checks-initial.log",
+      "sha256": "4c24bd29f5226f8a86d87733f02470d2aa5afa6f7bd98a89c3d538c294b66228"
+    }
+  ],
+  "resolution": {
+    "change": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+    "causal_explanation": "The helper walks consecutive physical class members without checking that the entire value fits. Check the selected member and remaining range before assigning registers, and allocate virtual registers without walking physical members. Return the selected register through the existing type-mismatch diagnostic path. A returning error handler leaves no inline-asm output copy chain; callbr landing pads must supply undefined recovery values once the context has an error. The isolated candidate changes only SelectionDAGBuilder.cpp.o.",
+    "trigger_check": "Identical i128 {cc} LLVM IR fails at the register-class-end assertion on the preserved assertion-enabled baseline and passes the clean-diagnostic runner on the isolated candidate. Direct output, input, tied, indirect output, and three callbr variants with live results are separately checked at O0/O2: all 14 baseline cases assert, all 14 candidate cases emit exactly one expected error and exit 1. The 279-test inline-asm/callbr run has 275 passes and four expected failures; MOS has 173 passes and two unsupported tests.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+      "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+    },
+    "candidate": {
+      "command": "python3 /home/will/llvm-mos-65816/dev/check-selectiondag-register-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "target": "aarch64",
+        "optimization": "O0",
+        "global_isel": false,
+        "verify_machineinstrs": true,
+        "lto": false,
+        "expected_behavior": "Compiler exit 1 with exactly the register/type diagnostic; runner exits 0 only for that result."
+      },
+      "toolchain_location": "build/selectiondag-inlineasm-fix/llc",
+      "toolchain_sha256": "4aae5bcf39bdc8a1366a5aaa5bfb36ae6ea4cdad4268ad0a725dad2b865ff49e",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+        "sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-final-runner.log",
+        "sha256": "44ca8e337187befdde7d82eebc9bffd1005dc44b9ac8b5bf5a2851263bae804c"
+      },
+      "exit_code": 0
+    }
+  },
+  "upstream_scope": "The preserved multi-target binary includes prior patches through 0041, not a clean upstream build. Its entire SelectionDAGBuilder.cpp is byte-identical to saved published upstream revision 742d554bf08042b8df93d791c335260fadd16643. An upstream-based patch variant applies and produces the tested source. No latest-upstream claim."
+}

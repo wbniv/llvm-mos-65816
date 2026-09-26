@@ -1,0 +1,103 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -895,8 +895,54 @@
+   // hasAccum16 so default 8-bit codegen keeps narrowing (incl. the byte inc/dec path).
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+   const LLT Ty = MRI.getType(Dst);
+-  if (STI.hasAccum16() && Ty == LLT::scalar(16))
+-    return true; // legal as-is; selected natively (selectAlu16Native)
++  if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
++    // When an ABI byte pair is stored before a one-step arithmetic use, the
++    // byte increment/decrement can keep A:X live through the direct byte store.
++    // No wide value needs to be materialized for this local sequence.
++    auto RHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
++    const MachineInstr *Def = MRI.getVRegDef(Src);
++    bool ByteSequence = RHS && RHS->Value.isOne() && Def &&
++                        Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++                        Def->getParent() == MI.getParent() &&
++                        MRI.getType(Def->getOperand(1).getReg()) == S8;
++    if (ByteSequence) {
++      auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
++        const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
++        return ByteDef && ByteDef->isCopy() &&
++               ByteDef->getOperand(1).getReg() == PhysReg;
++      };
++      ByteSequence = isABIByte(Def->getOperand(1).getReg(), MOS::A) &&
++                     isABIByte(Def->getOperand(2).getReg(), MOS::X);
++    }
++    unsigned Stores = 0;
++    if (ByteSequence) {
++      for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
++        if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
++          continue;
++        if (Use.getOpcode() != TargetOpcode::G_STORE ||
++            Use.getParent() != MI.getParent() ||
++            Use.getIterator() == MI.getIterator()) {
++          ByteSequence = false;
++          break;
++        }
++        const auto &Store = cast<GStore>(Use);
++        if (Store.isAtomic() ||
++            !matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
++          ByteSequence = false;
++          break;
++        }
++        ++Stores;
++      }
++      if (Stores == 0)
++        ByteSequence = false;
++      for (auto I = std::next(Def->getIterator()); ByteSequence &&
++           I != MI.getIterator(); ++I)
++        if (I->isCall() || I->isInlineAsm())
++          ByteSequence = false;
++    }
++    if (!ByteSequence)
++      return true; // selected natively (selectAlu16Native)
++  }
+ 
+   auto RHSConst =
+       getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+@@ -2205,6 +2251,22 @@
+       switch (Use.getOpcode()) {
+       case TargetOpcode::G_UNMERGE_VALUES:
+         return true;
++      case TargetOpcode::G_ADD:
++      case TargetOpcode::G_SUB: {
++        if (Use.getOperand(1).getReg() != Value)
++          return false;
++        auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
++          const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
++          return ByteDef && ByteDef->isCopy() &&
++                 ByteDef->getOperand(1).getReg() == PhysReg;
++        };
++        if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
++            !isABIByte(Def->getOperand(2).getReg(), MOS::X))
++          return false;
++        auto Step = getIConstantVRegValWithLookThrough(
++            Use.getOperand(2).getReg(), MRI);
++        return Step && Step->Value.isOne();
++      }
+       case MOS::G_STORE16_ABS:
+         return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
+           return MMO->isAtomic();
+diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+--- a/llvm/test/CodeGen/MOS/a16-byte-store.ll
++++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+@@ -87,13 +87,13 @@
+   ret void
+ }
+ 
+-; A byte-built argument with a native arithmetic use already needs Imag16.
++; A byte-built argument stored before a unit increment can stay in A:X.
+ define i16 @store_mixed(i16 %value) {
+ ; NATIVE-LABEL: store_mixed:
+-; NATIVE: rep #32
++; NATIVE-NOT: rep #32
+ ; NATIVE: sta g
++; NATIVE: stx g+1
+ ; NATIVE: inc
+-; NATIVE: sep #32
+ ; NATIVE: rts
+ ; DEFAULT-LABEL: store_mixed:
+ ; DEFAULT-NOT: rep

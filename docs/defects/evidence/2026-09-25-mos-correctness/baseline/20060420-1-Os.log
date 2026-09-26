@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20060420-1-Os.ll -o /dev/null
+exit_code=1
+LLVM ERROR: unable to legalize instruction: G_STORE %104:_(<4 x s32>), %114:_(p0) :: (store (<4 x s32>) into %ir.86, !tbaa !14) (in function: foo)

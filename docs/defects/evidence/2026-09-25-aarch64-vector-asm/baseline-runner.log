@@ -1,0 +1,38 @@
+$ python3 dev/check-vector-asm-diagnostic.py --llc /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc
+$ /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && "Part type doesn't match vector breakdown!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll'.
+2.	Running pass 'AArch64 Instruction Selection' on function '@many_virtual'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000583fc615600b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x0000583fc6152e91 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x0000583fc6156e1b
+3  libc.so.6 0x0000734aadc45cb0
+4  libc.so.6 0x0000734aadca61ac pthread_kill + 284
+5  libc.so.6 0x0000734aadc45b7e gsignal + 30
+6  libc.so.6 0x0000734aadc288ec abort + 39
+7  libc.so.6 0x0000734aadc29979
+8  libc.so.6 0x0000734aadc3bf75 __assert_fail + 181
+9  llc       0x0000583fc5e47313
+10 llc       0x0000583fc5e44fe9 llvm::RegsForValue::getCopyToRegs(llvm::SDValue, llvm::SelectionDAG&, llvm::SDLoc const&, llvm::SDValue&, llvm::SDValue*, llvm::Value const*, llvm::ISD::NodeType) const + 617
+11 llc       0x0000583fc5e69f4b llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&, llvm::BasicBlock const*) + 5739
+12 llc       0x0000583fc5e4b226 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&) + 246
+13 llc       0x0000583fc5f20a95 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, llvm::ilist_iterator_w_bits<llvm::ilist_detail::node_options<llvm::Instruction, true, false, void, true, llvm::BasicBlock>, false, true>, bool&) + 261
+14 llc       0x0000583fc5f1fb8b llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&) + 5675
+15 llc       0x0000583fc5f1d2f1 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&) + 609
+16 llc       0x0000583fc5f1a98c llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&) + 140
+17 llc       0x0000583fc4df0f99 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+18 llc       0x0000583fc5383780 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+19 llc       0x0000583fc538b882 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc       0x0000583fc5384544 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+21 llc       0x0000583fc3d5374b
+22 llc       0x0000583fc3d50a13 main + 1443
+23 libc.so.6 0x0000734aadc2a601
+24 libc.so.6 0x0000734aadc2a718 __libc_start_main + 136
+25 llc       0x0000583fc3d4fc25 _start + 37
+compiler_exit_code=-6
+Vector constraint diagnostic: FAIL
+runner_exit_code=1

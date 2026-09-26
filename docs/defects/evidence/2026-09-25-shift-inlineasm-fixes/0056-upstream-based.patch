@@ -1,0 +1,137 @@
+diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+--- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
++++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+@@ -101,7 +101,7 @@
+ } // namespace
+
+ /// Assign virtual/physical registers for the specified register operand.
+-static void getRegistersForValue(MachineFunction &MF,
++static bool getRegistersForValue(MachineFunction &MF,
+                                  MachineIRBuilder &MIRBuilder,
+                                  GISelAsmOperandInfo &OpInfo,
+                                  GISelAsmOperandInfo &RefOpInfo) {
+@@ -111,7 +111,7 @@
+
+   // No work to do for memory operations.
+   if (OpInfo.ConstraintType == TargetLowering::C_Memory)
+-    return;
++    return true;
+
+   // If this is a constraint for a single physreg, or a constraint for a
+   // register class, find it.
+@@ -121,13 +121,14 @@
+       &TRI, RefOpInfo.ConstraintCode, RefOpInfo.ConstraintVT);
+   // RC is unset only on failure. Return immediately.
+   if (!RC)
+-    return;
++    return true;
++
+   OpInfo.RegClass = RC;
+
+   // No need to allocate a matching input constraint since the constraint it's
+   // matching to has already been allocated.
+   if (OpInfo.isMatchingInputConstraint())
+-    return;
++    return true;
+
+   // Initialize NumRegs.
+   unsigned NumRegs = 1;
+@@ -135,27 +136,24 @@
+     NumRegs = TLI.getNumRegistersForInlineAsm(MF.getFunction().getContext(),
+                                               OpInfo.ConstraintVT);
+
+-  // If this is a constraint for a specific physical register, but the type of
+-  // the operand requires more than one register to be passed, we allocate the
+-  // required amount of physical registers, starting from the selected physical
+-  // register.
+-  // For this, first retrieve a register iterator for the given register class
+-  TargetRegisterClass::iterator I = RC->begin();
+   MachineRegisterInfo &RegInfo = MF.getRegInfo();
+-
+-  // Advance the iterator to the assigned register (if set)
+-  if (AssignedReg) {
+-    for (; *I != AssignedReg; ++I)
+-      assert(I != RC->end() && "AssignedReg should be a member of provided RC");
+-  }
+-
+-  // Finally, assign the registers. If the AssignedReg isn't set, create virtual
+-  // registers with the provided register class
+-  for (; NumRegs; --NumRegs, ++I) {
+-    assert(I != RC->end() && "Ran out of registers to allocate!");
+-    Register R = AssignedReg ? Register(*I) : RegInfo.createVirtualRegister(RC);
+-    OpInfo.Regs.push_back(R);
+-  }
++  if (!AssignedReg) {
++    // Virtual registers are not limited by the number of class members.
++    for (unsigned I = 0; I != NumRegs; ++I)
++      OpInfo.Regs.push_back(RegInfo.createVirtualRegister(RC));
++    return true;
++  }
++
++  // A physical constraint consumes consecutive class members starting at the
++  // named register. Validate the entire range before assigning any operands.
++  auto I = RC->begin();
++  while (I != RC->end() && *I != AssignedReg)
++    ++I;
++  if (I == RC->end() || NumRegs > unsigned(RC->end() - I))
++    return false;
++  for (; NumRegs; --NumRegs, ++I)
++    OpInfo.Regs.push_back(Register(*I));
++  return true;
+ }
+
+ static void computeConstraintToUse(const TargetLowering *TLI,
+@@ -444,7 +442,17 @@
+             : OpInfo;
+
+     // Assign registers for register operands
+-    getRegistersForValue(MF, MIRBuilder, OpInfo, RefOpInfo);
++    if (!getRegistersForValue(MF, MIRBuilder, OpInfo, RefOpInfo)) {
++      MF.getFunction().getContext().diagnose(DiagnosticInfoInlineAsm(
++          Call, "not enough registers for inline asm constraint '" +
++                  RefOpInfo.ConstraintCode + "'"));
++      // Diagnostic handlers may return. Keep the result defined while omitting
++      // the invalid assembly; the error prevents successful code generation.
++      if (!Call.getType()->isVoidTy())
++        for (Register Reg : GetOrCreateVRegs(Call))
++          MIRBuilder.buildUndef(Reg);
++      return true;
++    }
+
+     switch (OpInfo.Type) {
+     case InlineAsm::isOutput:
+diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll
+@@ -0,0 +1,30 @@
++; RUN: not llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++; RUN: not llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++; RUN: not llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O0 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++; RUN: not llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O2 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++
++; An i128 operand requires two registers, but the condition-code class contains
++; only NZCV. Each operand form must diagnose the insufficient physical range.
++; The return values remain live so error recovery must define their registers.
++; CHECK-COUNT-4: error: not enough registers for inline asm constraint '{cc}'
++; CHECK-NOT: error:
++
++define i128 @bad_output() {
++  %v = call i128 asm sideeffect "", "={cc}"()
++  ret i128 %v
++}
++
++define void @bad_input(i128 %v) {
++  call void asm sideeffect "", "{cc}"(i128 %v)
++  ret void
++}
++
++define i128 @bad_tied(i128 %v) {
++  %r = call i128 asm sideeffect "", "={cc},0"(i128 %v)
++  ret i128 %r
++}
++
++define void @bad_indirect(ptr %p) {
++  call void asm sideeffect "", "=*{cc}"(ptr elementtype(i128) %p)
++  ret void
++}

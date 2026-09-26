@@ -1,0 +1,98 @@
+{
+  "date": "2026-09-25",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort",
+  "removed": [
+    {
+      "path": "/home/will/llvm-mos-65816-pr0043-pinval",
+      "branch": "refs/heads/throwaway/pr0043-pinval",
+      "head": "b8a67bfbf58efac0ba2f579dc215642554022869",
+      "allocated_bytes_before": 5147639808,
+      "branch_retained": true
+    },
+    {
+      "path": "/home/will/llvm-mos-65816-pr0044-pinval",
+      "branch": "refs/heads/throwaway/pr0044-pinval",
+      "head": "b8a67bfbf58efac0ba2f579dc215642554022869",
+      "allocated_bytes_before": 9524977664,
+      "branch_retained": true
+    },
+    {
+      "path": "/home/will/llvm-mos-65816-pr0046-pinval",
+      "branch": "refs/heads/throwaway/pr0046-pinval",
+      "head": "b8a67bfbf58efac0ba2f579dc215642554022869",
+      "allocated_bytes_before": 5166686208,
+      "branch_retained": true
+    },
+    {
+      "path": "/home/will/llvm-mos-65816-pr0047-pinval",
+      "branch": "refs/heads/throwaway/pr0047-pinval",
+      "head": "b8a67bfbf58efac0ba2f579dc215642554022869",
+      "allocated_bytes_before": 5281476608,
+      "branch_retained": true
+    },
+    {
+      "path": "/home/will/llvm-mos-65816/.claude/worktrees/agent-a6894f2e1ef68a174",
+      "branch": "refs/heads/worktree-agent-a6894f2e1ef68a174",
+      "head": "30091f1c6f2ac2ebe886120ca42be60d64fa700c",
+      "allocated_bytes_before": 216010752,
+      "branch_retained": true
+    }
+  ],
+  "archives": [
+    {
+      "original_worktree": "/home/will/llvm-mos-65816-pr0043-pinval",
+      "retained_at": "/home/will/llvm-mos-65816/build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval",
+      "manifest": "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/manifest.json",
+      "manifest_sha256": "0fb5e52efb2ba928ea1677741f0dfeb22c46d7b3949293e013924bffda51dad4",
+      "retained_files_verified": 301,
+      "llc_snapshots_runnable": [
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/after-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llc"
+      ],
+      "all_hashes_match": true
+    },
+    {
+      "original_worktree": "/home/will/llvm-mos-65816-pr0044-pinval",
+      "retained_at": "/home/will/llvm-mos-65816/build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval",
+      "manifest": "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/manifest.json",
+      "manifest_sha256": "6be8cd75c16fc18f2fb7b400d9e289a8f929a64283a035374f888e2607e7b36b",
+      "retained_files_verified": 548,
+      "llc_snapshots_runnable": [
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/w-before-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/stacked-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/true-before-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/after-alone-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/0044only-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0044-pinval/build/before-bin/llc"
+      ],
+      "all_hashes_match": true
+    },
+    {
+      "original_worktree": "/home/will/llvm-mos-65816-pr0046-pinval",
+      "retained_at": "/home/will/llvm-mos-65816/build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0046-pinval",
+      "manifest": "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0046-pinval/manifest.json",
+      "manifest_sha256": "a60622e69bb5dcee07b0444abdc592463ba53c92a4959971a1dbde858ce7cbd7",
+      "retained_files_verified": 294,
+      "llc_snapshots_runnable": [
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0046-pinval/build/after-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0046-pinval/build/before-bin/llc"
+      ],
+      "all_hashes_match": true
+    },
+    {
+      "original_worktree": "/home/will/llvm-mos-65816-pr0047-pinval",
+      "retained_at": "/home/will/llvm-mos-65816/build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0047-pinval",
+      "manifest": "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0047-pinval/manifest.json",
+      "manifest_sha256": "832a7467c894168f01ca9da77ae3fdc4fd1cc807eeceb02561a43b04f53d58c7",
+      "retained_files_verified": 303,
+      "llc_snapshots_runnable": [
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0047-pinval/build/w47-before-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0047-pinval/build/s017after-bin/llc",
+        "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0047-pinval/build/w47-after-bin/llc"
+      ],
+      "all_hashes_match": true
+    }
+  ],
+  "disk_after": "Filesystem        1B-blocks         Used   Available Use% Mounted on\n/dev/nvme0n1p2 502609965056 458295275520 18708238336  97% /home/will/llvm-mos-65816\n",
+  "retained_scope": "All 11 structured defect records and their baseline locations are unchanged. Four inactive validation trees archived before removal; dirty feature worktrees and unresolved/historical investigation builds retained."
+}

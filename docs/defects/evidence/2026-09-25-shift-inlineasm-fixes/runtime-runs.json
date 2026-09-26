@@ -1,0 +1,304 @@
+[
+  {
+    "name": "shift-runtime-host-build",
+    "command": [
+      "cc",
+      "-O2",
+      "-DHOST_MAIN",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-host"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-host-build.log"
+  },
+  {
+    "name": "shift-runtime-host",
+    "command": [
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-host"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-host.log"
+  },
+  {
+    "name": "shift-runtime-default-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-default.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-default.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-default-build.log"
+  },
+  {
+    "name": "shift-runtime-default-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-default.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x200",
+      "2",
+      "0x6A2B",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-default-runtime.log",
+    "expected_value": "0x6A2B",
+    "rom_sha256": "8f5a015d388de628dc38421a7644e2c5ab37e0547ae4a3903d8180ec233a7af4",
+    "map_sha256": "e64ee41d16944f42b512068cc55839c3a20af92d1bff2344c02b076882153ead"
+  },
+  {
+    "name": "shift-runtime-a16-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-a16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-a16.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-a16-build.log"
+  },
+  {
+    "name": "shift-runtime-a16-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x200",
+      "2",
+      "0x6A2B",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-a16-runtime.log",
+    "expected_value": "0x6A2B",
+    "rom_sha256": "6927b1ef46ad24655c876141330c7f169fce15e25087c40256ada7a0499b048b",
+    "map_sha256": "12c929da6d4179d9b4285c328379272c91f02081118c572850ab7e2bd9713a32"
+  },
+  {
+    "name": "shift-runtime-xy16-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-xy16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-xy16-build.log"
+  },
+  {
+    "name": "shift-runtime-xy16-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x200",
+      "2",
+      "0x6A2B",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime-xy16-runtime.log",
+    "expected_value": "0x6A2B",
+    "rom_sha256": "6927b1ef46ad24655c876141330c7f169fce15e25087c40256ada7a0499b048b",
+    "map_sha256": "e0f7c3aef703a3825b46de19dc36db8d6e89196c41248a9323361a74ca3480ee"
+  },
+  {
+    "name": "bitboard-probe-runtime-host-build",
+    "command": [
+      "cc",
+      "-O2",
+      "-DHOST_MAIN",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-host"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-host-build.log"
+  },
+  {
+    "name": "bitboard-probe-runtime-host",
+    "command": [
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-host"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-host.log"
+  },
+  {
+    "name": "bitboard-probe-runtime-default-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-default.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-default.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-default-build.log"
+  },
+  {
+    "name": "bitboard-probe-runtime-default-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-default.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x208",
+      "2",
+      "0x479E",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-default-runtime.log",
+    "expected_value": "0x479E",
+    "rom_sha256": "961bfa70598e749a7997a0f75b3b7a27e5d8ee5d04b113f84d9fc47e9985df86",
+    "map_sha256": "aa8f943839c024ffe4c078fda6b70eb7961ac55d3055181d0c53acdd9ce29215"
+  },
+  {
+    "name": "bitboard-probe-runtime-a16-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-a16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-a16.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-a16-build.log"
+  },
+  {
+    "name": "bitboard-probe-runtime-a16-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x208",
+      "2",
+      "0x479E",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-a16-runtime.log",
+    "expected_value": "0x479E",
+    "rom_sha256": "06eaedeb50cee91b19f33e24aa43bb8d515062ddd6a0b07f7fde3f0f52e1b777",
+    "map_sha256": "457df4c081f17d5e2c1bd91fc64bfad0e08780e41c11f2264ed789509ee81361"
+  },
+  {
+    "name": "bitboard-probe-runtime-xy16-build",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang",
+      "--config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-fuse-ld=/home/will/llvm-mos-65816/build/llvm-mos/bin/ld.lld",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-fno-lto",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-xy16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-xy16-build.log"
+  },
+  {
+    "name": "bitboard-probe-runtime-xy16-runtime",
+    "command": [
+      "/home/will/llvm-mos-65816/build/jgxcheck",
+      "/home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x208",
+      "2",
+      "0x479E",
+      "480"
+    ],
+    "exit_code": 0,
+    "expected": 0,
+    "log": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime-xy16-runtime.log",
+    "expected_value": "0x479E",
+    "rom_sha256": "f290ba3e89967193d67a72d2d844cb3fa93d77982e90c96b1e033e0765c66644",
+    "map_sha256": "acf81a41d4a2e664f69e33e73632cd698655c4f8e37ea2e1d59ac5ebede2d05c"
+  }
+]

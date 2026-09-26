@@ -1,0 +1,529 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1-O0.ll'
+  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/20050604-1.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  %union.anon = type { <4 x i16> }
+  %union.anon.0 = type { <4 x float> }
+  
+  @u = dso_local global %union.anon zeroinitializer, align 8
+  @v = dso_local global %union.anon.0 zeroinitializer, align 16
+  
+  ; Function Attrs: noinline nounwind optnone
+  define dso_local void @foo() #0 {
+    %1 = alloca i16, align 1
+    %2 = alloca <4 x i16>, align 8
+    %3 = alloca <4 x float>, align 16
+    store i16 0, ptr %1, align 1
+    br label %4
+  
+  4:                                                ; preds = %11, %0
+    %5 = load i16, ptr %1, align 1
+    %6 = icmp ult i16 %5, 2
+    br i1 %6, label %7, label %14
+  
+  7:                                                ; preds = %4
+    store <4 x i16> <i16 12, i16 -32768, i16 0, i16 0>, ptr %2, align 8
+    %8 = load <4 x i16>, ptr %2, align 8
+    %9 = load <4 x i16>, ptr @u, align 8
+    %10 = add <4 x i16> %9, %8
+    store <4 x i16> %10, ptr @u, align 8
+    br label %11
+  
+  11:                                               ; preds = %7
+    %12 = load i16, ptr %1, align 1
+    %13 = add i16 %12, 1
+    store i16 %13, ptr %1, align 1
+    br label %4, !llvm.loop !2
+  
+  14:                                               ; preds = %4
+    store i16 0, ptr %1, align 1
+    br label %15
+  
+  15:                                               ; preds = %22, %14
+    %16 = load i16, ptr %1, align 1
+    %17 = icmp ult i16 %16, 2
+    br i1 %17, label %18, label %25
+  
+  18:                                               ; preds = %15
+    store <4 x float> <float 1.800000e+01, float 2.000000e+01, float 2.200000e+01, float 0.000000e+00>, ptr %3, align 16
+    %19 = load <4 x float>, ptr %3, align 16
+    %20 = load <4 x float>, ptr @v, align 16
+    %21 = fadd <4 x float> %20, %19
+    store <4 x float> %21, ptr @v, align 16
+    br label %22
+  
+  22:                                               ; preds = %18
+    %23 = load i16, ptr %1, align 1
+    %24 = add i16 %23, 1
+    store i16 %24, ptr %1, align 1
+    br label %15, !llvm.loop !4
+  
+  25:                                               ; preds = %15
+    ret void
+  }
+  
+  ; Function Attrs: noinline nounwind optnone
+  define dso_local i16 @main() #0 {
+    %1 = alloca i16, align 1
+    store i16 0, ptr %1, align 1
+    call void @foo()
+    %2 = load i16, ptr @u, align 8
+    %3 = icmp ne i16 %2, 24
+    br i1 %3, label %13, label %4
+  
+  4:                                                ; preds = %0
+    %5 = load i16, ptr getelementptr inbounds nuw (i8, ptr @u, i16 2), align 2
+    %6 = icmp ne i16 %5, 0
+    br i1 %6, label %13, label %7
+  
+  7:                                                ; preds = %4
+    %8 = load i16, ptr getelementptr inbounds nuw (i8, ptr @u, i16 4), align 4
+    %9 = icmp ne i16 %8, 0
+    br i1 %9, label %13, label %10
+  
+  10:                                               ; preds = %7
+    %11 = load i16, ptr getelementptr inbounds nuw (i8, ptr @u, i16 6), align 2
+    %12 = icmp ne i16 %11, 0
+    br i1 %12, label %13, label %14
+  
+  13:                                               ; preds = %10, %7, %4, %0
+    call void @abort() #2
+    unreachable
+  
+  14:                                               ; preds = %10
+    %15 = load float, ptr @v, align 16
+    %16 = fpext float %15 to double
+    %17 = fcmp une double %16, 3.600000e+01
+    br i1 %17, label %30, label %18
+  
+  18:                                               ; preds = %14
+    %19 = load float, ptr getelementptr inbounds nuw (i8, ptr @v, i16 4), align 4
+    %20 = fpext float %19 to double
+    %21 = fcmp une double %20, 4.000000e+01
+    br i1 %21, label %30, label %22
+  
+  22:                                               ; preds = %18
+    %23 = load float, ptr getelementptr inbounds nuw (i8, ptr @v, i16 8), align 8
+    %24 = fpext float %23 to double
+    %25 = fcmp une double %24, 4.400000e+01
+    br i1 %25, label %30, label %26
+  
+  26:                                               ; preds = %22
+    %27 = load float, ptr getelementptr inbounds nuw (i8, ptr @v, i16 12), align 4
+    %28 = fpext float %27 to double
+    %29 = fcmp une double %28, 0.000000e+00
+    br i1 %29, label %30, label %31
+  
+  30:                                               ; preds = %26, %22, %18, %14
+    call void @abort() #2
+    unreachable
+  
+  31:                                               ; preds = %26
+    ret i16 0
+  }
+  
+  ; Function Attrs: noreturn nounwind
+  declare dso_local void @abort() #1
+  
+  attributes #0 = { noinline nounwind optnone "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+  attributes #1 = { noreturn nounwind "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mos6502" }
+  attributes #2 = { noreturn nounwind }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = distinct !{!2, !3}
+  !3 = !{!"llvm.loop.mustprogress"}
+  !4 = distinct !{!4, !3}
+...
+---
+name:            foo
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    16
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: default, offset: 0, size: 8, alignment: 8, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: default, offset: 0, size: 16, alignment: 16, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    successors: %bb.2(0x80000000)
+  
+    %3:_(s16) = G_CONSTANT i16 0
+    %5:_(s16) = G_CONSTANT i16 2
+    %10:_(s32) = G_FCONSTANT float 1.800000e+01
+    %11:_(s32) = G_FCONSTANT float 2.000000e+01
+    %12:_(s32) = G_FCONSTANT float 2.200000e+01
+    %13:_(s32) = G_FCONSTANT float 0.000000e+00
+    %9:_(<4 x s32>) = G_BUILD_VECTOR %10(s32), %11(s32), %12(s32), %13(s32)
+    %16:_(p0) = G_GLOBAL_VALUE @v
+    %19:_(s16) = G_CONSTANT i16 1
+    %22:_(s16) = G_CONSTANT i16 12
+    %23:_(s16) = G_CONSTANT i16 -32768
+    %21:_(<4 x s16>) = G_BUILD_VECTOR %22(s16), %23(s16), %3(s16), %3(s16)
+    %26:_(p0) = G_GLOBAL_VALUE @u
+    %0:_(p0) = G_FRAME_INDEX %stack.0
+    %1:_(p0) = G_FRAME_INDEX %stack.1
+    %2:_(p0) = G_FRAME_INDEX %stack.2
+    G_STORE %3(s16), %0(p0) :: (store (s16) into %ir.1, align 1)
+    G_BR %bb.2
+  
+  bb.2 (%ir-block.4):
+    successors: %bb.3(0x40000000), %bb.5(0x40000000)
+  
+    %4:_(s16) = G_LOAD %0(p0) :: (dereferenceable load (s16) from %ir.1, align 1)
+    %6:_(s1) = G_ICMP intpred(ult), %4(s16), %5
+    G_BRCOND %6(s1), %bb.3
+    G_BR %bb.5
+  
+  bb.3 (%ir-block.7):
+    successors: %bb.4(0x80000000)
+  
+    G_STORE %21(<4 x s16>), %1(p0) :: (store (<4 x s16>) into %ir.2)
+    %24:_(<4 x s16>) = G_LOAD %1(p0) :: (dereferenceable load (<4 x s16>) from %ir.2)
+    %25:_(<4 x s16>) = G_LOAD %26(p0) :: (dereferenceable load (<4 x s16>) from @u)
+    %27:_(<4 x s16>) = G_ADD %25, %24
+    G_STORE %27(<4 x s16>), %26(p0) :: (store (<4 x s16>) into @u)
+    G_BR %bb.4
+  
+  bb.4 (%ir-block.11):
+    successors: %bb.2(0x80000000)
+  
+    %28:_(s16) = G_LOAD %0(p0) :: (dereferenceable load (s16) from %ir.1, align 1)
+    %29:_(s16) = G_ADD %28, %19
+    G_STORE %29(s16), %0(p0) :: (store (s16) into %ir.1, align 1)
+    G_BR %bb.2
+  
+  bb.5 (%ir-block.14):
+    successors: %bb.6(0x80000000)
+  
+    G_STORE %3(s16), %0(p0) :: (store (s16) into %ir.1, align 1)
+    G_BR %bb.6
+  
+  bb.6 (%ir-block.15):
+    successors: %bb.7(0x40000000), %bb.9(0x40000000)
+  
+    %7:_(s16) = G_LOAD %0(p0) :: (dereferenceable load (s16) from %ir.1, align 1)
+    %8:_(s1) = G_ICMP intpred(ult), %7(s16), %5
+    G_BRCOND %8(s1), %bb.7
+    G_BR %bb.9
+  
+  bb.7 (%ir-block.18):
+    successors: %bb.8(0x80000000)
+  
+    G_STORE %9(<4 x s32>), %2(p0) :: (store (<4 x s32>) into %ir.3)
+    %14:_(<4 x s32>) = G_LOAD %2(p0) :: (dereferenceable load (<4 x s32>) from %ir.3)
+    %15:_(<4 x s32>) = G_LOAD %16(p0) :: (dereferenceable load (<4 x s32>) from @v)
+    %17:_(<4 x s32>) = G_FADD %15, %14
+    G_STORE %17(<4 x s32>), %16(p0) :: (store (<4 x s32>) into @v)
+    G_BR %bb.8
+  
+  bb.8 (%ir-block.22):
+    successors: %bb.6(0x80000000)
+  
+    %18:_(s16) = G_LOAD %0(p0) :: (dereferenceable load (s16) from %ir.1, align 1)
+    %20:_(s16) = G_ADD %18, %19
+    G_STORE %20(s16), %0(p0) :: (store (s16) into %ir.1, align 1)
+    G_BR %bb.6
+  
+  bb.9 (%ir-block.25):
+    RTS
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: default, offset: 0, size: 2, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    successors: %bb.5(0x40000000), %bb.2(0x40000000)
+  
+    %1:_(s16) = G_CONSTANT i16 0
+    %3:_(p0) = G_GLOBAL_VALUE @u
+    %4:_(s16) = G_CONSTANT i16 24
+    %8:_(s16) = G_CONSTANT i16 2
+    %7:_(p0) = G_PTR_ADD %3, %8(s16)
+    %12:_(s16) = G_CONSTANT i16 4
+    %11:_(p0) = G_PTR_ADD %3, %12(s16)
+    %16:_(s16) = G_CONSTANT i16 6
+    %15:_(p0) = G_PTR_ADD %3, %16(s16)
+    %19:_(p0) = G_GLOBAL_VALUE @v
+    %21:_(s64) = G_FCONSTANT double 3.600000e+01
+    %24:_(p0) = G_PTR_ADD %19, %12(s16)
+    %26:_(s64) = G_FCONSTANT double 4.000000e+01
+    %30:_(s16) = G_CONSTANT i16 8
+    %29:_(p0) = G_PTR_ADD %19, %30(s16)
+    %32:_(s64) = G_FCONSTANT double 4.400000e+01
+    %36:_(s16) = G_CONSTANT i16 12
+    %35:_(p0) = G_PTR_ADD %19, %36(s16)
+    %38:_(s64) = G_FCONSTANT double 0.000000e+00
+    %0:_(p0) = G_FRAME_INDEX %stack.0
+    G_STORE %1(s16), %0(p0) :: (store (s16) into %ir.1, align 1)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @foo, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    %2:_(s16) = G_LOAD %3(p0) :: (dereferenceable load (s16) from @u, align 8)
+    %5:_(s1) = G_ICMP intpred(ne), %2(s16), %4
+    G_BRCOND %5(s1), %bb.5
+    G_BR %bb.2
+  
+  bb.2 (%ir-block.4):
+    successors: %bb.5(0x40000000), %bb.3(0x40000000)
+  
+    %6:_(s16) = G_LOAD %7(p0) :: (dereferenceable load (s16) from `ptr getelementptr inbounds nuw (i8, ptr @u, i16 2)`)
+    %9:_(s1) = G_ICMP intpred(ne), %6(s16), %1
+    G_BRCOND %9(s1), %bb.5
+    G_BR %bb.3
+  
+  bb.3 (%ir-block.7):
+    successors: %bb.5(0x40000000), %bb.4(0x40000000)
+  
+    %10:_(s16) = G_LOAD %11(p0) :: (dereferenceable load (s16) from `ptr getelementptr inbounds nuw (i8, ptr @u, i16 4)`, align 4)
+    %13:_(s1) = G_ICMP intpred(ne), %10(s16), %1
+    G_BRCOND %13(s1), %bb.5
+    G_BR %bb.4
+  
+  bb.4 (%ir-block.10):
+    successors: %bb.5(0x40000000), %bb.6(0x40000000)
+  
+    %14:_(s16) = G_LOAD %15(p0) :: (dereferenceable load (s16) from `ptr getelementptr inbounds nuw (i8, ptr @u, i16 6)`)
+    %17:_(s1) = G_ICMP intpred(ne), %14(s16), %1
+    G_BRCOND %17(s1), %bb.5
+    G_BR %bb.6
+  
+  bb.5 (%ir-block.13):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.6 (%ir-block.14):
+    successors: %bb.10(0x40000000), %bb.7(0x40000000)
+  
+    %18:_(s32) = G_LOAD %19(p0) :: (dereferenceable load (s32) from @v, align 16)
+    %20:_(s64) = G_FPEXT %18(s32)
+    %22:_(s1) = G_FCMP floatpred(une), %20(s64), %21
+    G_BRCOND %22(s1), %bb.10
+    G_BR %bb.7
+  
+  bb.7 (%ir-block.18):
+    successors: %bb.10(0x40000000), %bb.8(0x40000000)
+  
+    %23:_(s32) = G_LOAD %24(p0) :: (dereferenceable load (s32) from `ptr getelementptr inbounds nuw (i8, ptr @v, i16 4)`)
+    %25:_(s64) = G_FPEXT %23(s32)
+    %27:_(s1) = G_FCMP floatpred(une), %25(s64), %26
+    G_BRCOND %27(s1), %bb.10
+    G_BR %bb.8
+  
+  bb.8 (%ir-block.22):
+    successors: %bb.10(0x40000000), %bb.9(0x40000000)
+  
+    %28:_(s32) = G_LOAD %29(p0) :: (dereferenceable load (s32) from `ptr getelementptr inbounds nuw (i8, ptr @v, i16 8)`, align 8)
+    %31:_(s64) = G_FPEXT %28(s32)
+    %33:_(s1) = G_FCMP floatpred(une), %31(s64), %32
+    G_BRCOND %33(s1), %bb.10
+    G_BR %bb.9
+  
+  bb.9 (%ir-block.26):
+    successors: %bb.10(0x40000000), %bb.11(0x40000000)
+  
+    %34:_(s32) = G_LOAD %35(p0) :: (dereferenceable load (s32) from `ptr getelementptr inbounds nuw (i8, ptr @v, i16 12)`)
+    %37:_(s64) = G_FPEXT %34(s32)
+    %39:_(s1) = G_FCMP floatpred(une), %37(s64), %38
+    G_BRCOND %39(s1), %bb.10
+    G_BR %bb.11
+  
+  bb.10 (%ir-block.30):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.11 (%ir-block.31):
+    %40:_(s8), %41:_(s8) = G_UNMERGE_VALUES %1(s16)
+    $a = COPY %40(s8)
+    $x = COPY %41(s8)
+    RTS implicit $a, implicit $x
+...

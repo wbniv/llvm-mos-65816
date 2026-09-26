@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "id": "selectiondag-inline-asm-nonstandard-integer",
+  "title": "SelectionDAG nonstandard integer inline-asm type abort",
+  "status": "confirmed",
+  "report": "docs/investigations/2026-09-25-selectiondag-inlineasm.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: constructed probe, crash capture, and qualified open record."
+  ],
+  "reproducer_origin": "original",
+  "summary": "A constructed i4096 inline-asm input with the r constraint aborts while querying a nonstandard machine value type. The same input also aborts on the 0057 candidate. The correct unsupported-type diagnostic or lowering policy remains to be established.",
+  "unknowns": [
+    "These are constructed LLVM IR inputs, with no C preprocessing stage or recovered application failure.",
+    "The crash is confirmed; root cause and target constraint/type support need investigation before selecting a repair."
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.mir",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "aarch64",
+      "optimization": "O0",
+      "global_isel": false,
+      "verify_machineinstrs": true,
+      "stop_after": "finalize-isel",
+      "lto": false
+    },
+    "toolchain_location": "build/0041-inlineasm-build/llc-0041",
+    "toolchain_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.log",
+      "sha256": "7dd7a6c5b91057a58a2b61b1c7fb98e5ed5e6e9e1de0b52ae7858e9f3da11f54"
+    },
+    "exit_code": -6,
+    "failure_signature": "Value type is non-standard value, Other."
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-baseline.log",
+      "sha256": "7dd7a6c5b91057a58a2b61b1c7fb98e5ed5e6e9e1de0b52ae7858e9f3da11f54"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/candidate-identity.json",
+      "sha256": "d2263e897fa5e33794b9a6d0bda7a91005823d59eccd41d233960fa58d5c93d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.candidate.cpp.gz",
+      "sha256": "97ed29ad3186455a4c7fe0a63e54934590236af9f1a28b061ae881d4107f7f6a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/baseline-identity.json",
+      "sha256": "0713c9039c549764cf68dd5035bdd8042f3b6a98f4e2289fafab59d5dc80a2fe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/SelectionDAGBuilder.baseline.cpp.gz",
+      "sha256": "1e605ae1167b1837b3117d0db3352c6b2da09a4542331041177cf5c820167680"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/source-archives.json",
+      "sha256": "9bb96a3241ca2b67304104eefc814753b37513dedcddf282c1628c17b423d016"
+    }
+  ]
+}

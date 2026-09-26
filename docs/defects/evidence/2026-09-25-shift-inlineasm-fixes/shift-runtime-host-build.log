@@ -1,0 +1,3 @@
+$ cc -O2 -DHOST_MAIN /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/shift-runtime.c -o /home/will/llvm-mos-65816/build/shift-inlineasm-validation/shift-runtime-host
+
+exit_code=0

@@ -1,0 +1,31 @@
+$ /home/will/llvm-mos-65816/build/defect-candidates/2026-09-25-llvm-reduce-parallel-mir/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+cwd=/home/will/llvm-mos-65816
+exit_code=0
+stdout:
+
+stderr:
+*** Reducing Instructions (instructions)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+--------------------------------------------------------------------------------
+*** Reducing IR references from instructions (ir-instruction-references)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+--------------------------------------------------------------------------------
+*** Reducing IR references from blocks (ir-block-references)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+--------------------------------------------------------------------------------
+*** Reducing IR references from functions (ir-function-references)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+--------------------------------------------------------------------------------
+*** Reducing Instruction Flags (instruction-flags)...
+--------------------------------------------------------------------------------
+*** Reducing register uses (register-uses)...
+--------------------------------------------------------------------------------
+*** Reducing register defs (register-defs)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+--------------------------------------------------------------------------------
+*** Reducing virtual register hints from functions (register-hints)...
+--------------------------------------------------------------------------------
+*** Reducing register masks (register-masks)...
+--------------------------------------------------------------------------------
+Done reducing! Reduced testcase: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/candidate-output.mir
+

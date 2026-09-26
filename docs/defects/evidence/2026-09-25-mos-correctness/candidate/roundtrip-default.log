@@ -1,0 +1,29 @@
+$ dev/probe-far-roundtrip.sh --all --cc /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --mc /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc --objdump /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump --flags -Os
+SKIP  far_arith.c  (does not compile: /home/will/llvm-mos-65816/examples/65816/far_arith.c:38:27: warning: cast to 'FAR uint8_t const *' (aka 'const __attribute__((address_space(2))) unsigned char *') from smaller integer type 'uintptr_t' (aka 'unsigned int') [-Wint-to-pointer-cast])
+SKIP  far_cast.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %11:_(s32) = G_MERGE_VALUES %20:_(s8), %21:_(s8), %22:_(s8), %22:_(s8) (in function: main))
+SKIP  far_fnptr.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %6:_(s8), %7:_(s8), %8:_(s8), %9:_(s8) = G_UNMERGE_VALUES %0:_(s32) (in function: main))
+SKIP  far_indir.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %12:_(s8), %15:_(s8), %18:_(s8), %21:_(s8) (in function: main))
+SKIP  far_indir_tail.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %5:_(s8), %6:_(s8), %7:_(s8), %8:_(s8) = G_UNMERGE_VALUES %1:_(s32) (in function: far_outer))
+SKIP  far_loop.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %30:_(s32) = G_MERGE_VALUES %31:_(s8), %155:_(s8), %156:_(s8), %31:_(s8) (in function: main))
+SKIP  far_memops.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %92:_(s32) = G_MERGE_VALUES %167:_(s8), %168:_(s8), %169:_(s8), %169:_(s8) (in function: main))
+SKIP  far_memset.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %1:_(s32) = G_MERGE_VALUES %91:_(s8), %93:_(s8), %94:_(s8), %91:_(s8) (in function: main))
+SKIP  far_sizeof.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %34:_(s32) = G_MERGE_VALUES %35:_(s8), %36:_(s8), %37:_(s8), %37:_(s8) (in function: main))
+SKIP  far_store.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %4:_(s32) = G_MERGE_VALUES %9:_(s8), %12:_(s8), %15:_(s8), %18:_(s8) (in function: main))
+SKIP  farbank.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %73:_(s8), %74:_(s8), %75:_(s8), %76:_(s8) = G_UNMERGE_VALUES %71:_(s32) (in function: main))
+SKIP  farcc_bench.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %0:_(s32) = G_MERGE_VALUES %1:_(s8), %2:_(s8), %3:_(s8), %4:_(s8) (in function: make_far_ptr))
+SKIP  farcc_imag32.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %0:_(s32) = G_MERGE_VALUES %1:_(s8), %2:_(s8), %3:_(s8), %4:_(s8) (in function: make_far_ptr))
+SKIP  farindex.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %207:_(s32) = G_MERGE_VALUES %216:_(s8), %218:_(s8), %220:_(s8), %222:_(s8) (in function: main))
+SKIP  farptrcmp-natural.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %9:_(s16) = G_TRUNC %117:_(s32) (in function: farptrcmp_natural))
+SKIP  farspill-probe.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %21:_(s32) = G_MERGE_VALUES %794:_(s8), %797:_(s8), %800:_(s8), %803:_(s8) (in function: farspill_round))
+SKIP  k_blossom_far.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear))
+SKIP  k_buddha_far.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear))
+SKIP  k_mandel_far.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %17:_(s32) = G_MERGE_VALUES %26:_(s8), %241:_(s8), %242:_(s8), %26:_(s8) (in function: main))
+SKIP  incB_use.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %11:_(s8), %12:_(s8), %13:_(s8), %14:_(s8) = G_UNMERGE_VALUES %10:_(s32) (in function: set_g))
+SKIP  packed24_e2e.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %13:_(s32) = G_MERGE_VALUES %14:_(s8), %17:_(s8), %20:_(s8), %12:_(s8) (in function: main))
+SKIP  packed24_table.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %28:_(s32) = G_MERGE_VALUES %29:_(s8), %32:_(s8), %35:_(s8), %27:_(s8) (in function: main))
+SKIP  zerobank_probe.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %4:_(s32) = G_MERGE_VALUES %5:_(s8), %6:_(s8), %7:_(s8), %7:_(s8) (in function: call_far_with_bank0))
+
+cc=/home/will/llvm-mos-65816/build/llvm-mos/bin/clang
+mc=/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc
+round-trip: 97 identical, 0 divergent, 23 skipped
+exit_code=0

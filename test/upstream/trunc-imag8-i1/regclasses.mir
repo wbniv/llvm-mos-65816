@@ -1,0 +1,91 @@
+# RUN: llc -mtriple=mos -run-pass=instruction-select -verify-machineinstrs -o - %s | FileCheck %s
+#
+# Imag8 and Ac belong to the Any bank. Selection must copy the byte into Ac
+# before masking bit zero, including when a consumer constrains the result.
+---
+name: trunc_to_any
+legalized: true
+regBankSelected: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: trunc_to_any
+    ; CHECK: [[SRC:%[0-9]+]]:imag8 = COPY $rc2
+    ; CHECK-NEXT: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+    ; CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+    ; CHECK-NEXT: {{%[0-9]+}}:gpr_lsb = COPY [[MASK]].sublsb
+    ; CHECK-NOT: G_TRUNC
+    ; CHECK: RTS
+    %0:imag8(s8) = COPY $rc2
+    %1:any(s1) = G_TRUNC %0
+    RTS implicit %1
+...
+---
+name: trunc_to_gpr_lsb
+legalized: true
+regBankSelected: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: trunc_to_gpr_lsb
+    ; CHECK: [[SRC:%[0-9]+]]:imag8 = COPY $rc2
+    ; CHECK-NEXT: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+    ; CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+    ; CHECK-NEXT: {{%[0-9]+}}:gpr_lsb = COPY [[MASK]].sublsb
+    ; CHECK-NOT: G_TRUNC
+    ; CHECK: RTS
+    %0:imag8(s8) = COPY $rc2
+    %1:gpr_lsb(s1) = G_TRUNC %0
+    RTS implicit %1
+...
+---
+name: trunc_to_cc
+legalized: true
+regBankSelected: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: trunc_to_cc
+    ; CHECK: [[SRC:%[0-9]+]]:imag8 = COPY $rc2
+    ; CHECK-NEXT: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+    ; CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+    ; CHECK-NEXT: [[BIT:%[0-9]+]]:gpr_lsb = COPY [[MASK]].sublsb
+    ; CHECK-NEXT: {{%[0-9]+}}:cc = COPY [[BIT]]
+    ; CHECK-NOT: G_TRUNC
+    ; CHECK: RTS
+    %0:imag8(s8) = COPY $rc2
+    %1:cc(s1) = G_TRUNC %0
+    RTS implicit %1
+...
+---
+name: trunc_to_vc
+legalized: true
+regBankSelected: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: trunc_to_vc
+    ; CHECK: [[SRC:%[0-9]+]]:imag8 = COPY $rc2
+    ; CHECK-NEXT: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+    ; CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+    ; CHECK-NEXT: [[BIT:%[0-9]+]]:gpr_lsb = COPY [[MASK]].sublsb
+    ; CHECK-NEXT: {{%[0-9]+}}:vc = COPY [[BIT]]
+    ; CHECK-NOT: G_TRUNC
+    ; CHECK: RTS
+    %0:imag8(s8) = COPY $rc2
+    %1:vc(s1) = G_TRUNC %0
+    RTS implicit %1
+...
+---
+name: trunc_to_anyi1
+legalized: true
+regBankSelected: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: trunc_to_anyi1
+    ; CHECK: [[SRC:%[0-9]+]]:imag8 = COPY $rc2
+    ; CHECK-NEXT: [[AC:%[0-9]+]]:ac = COPY [[SRC]]
+    ; CHECK-NEXT: [[MASK:%[0-9]+]]:ac = ANDImm [[AC]], 1
+    ; CHECK-NEXT: {{%[0-9]+}}:gpr_lsb = COPY [[MASK]].sublsb
+    ; CHECK-NOT: G_TRUNC
+    ; CHECK: RTS
+    %0:imag8(s8) = COPY $rc2
+    %1:anyi1(s1) = G_TRUNC %0
+    RTS implicit %1
+...

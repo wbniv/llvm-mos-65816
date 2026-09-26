@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Os -flto -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-xy16-probe.bc
+
+exit_code=0

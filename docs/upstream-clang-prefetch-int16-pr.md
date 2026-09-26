@@ -43,9 +43,9 @@ Validated against llvm-mos `742d554bf08042b8df93d791c335260fadd16643`:
   `Intrinsic called with incompatible signature`.
 
 Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`, `high`
-reasoning effort) for the diagnosis, implementation, test, validation, and PR
-drafting.
+reasoning effort) for the diagnosis, implementation, revised tests/comments,
+validation, and PR drafting.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
 reasoning effort) for independent review, wider-argument diagnosis, frontend
-validation, and corrections to the submission evidence.
+validation, final revision checks, and corrections to the submission evidence.

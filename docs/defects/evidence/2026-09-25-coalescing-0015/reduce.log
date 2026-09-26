@@ -1,0 +1,4 @@
+*** Reducing Instructions (instructions)...
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/llvm-mos/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=docs/defects

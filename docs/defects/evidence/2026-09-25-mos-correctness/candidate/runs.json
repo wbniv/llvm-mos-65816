@@ -1,0 +1,37 @@
+[
+  {
+    "name": "float-vector",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/float-vector.s",
+    "exit_code": 0
+  },
+  {
+    "name": "float-vector-check",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll --input-file=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/float-vector.s",
+    "exit_code": 0
+  },
+  {
+    "name": "legalizer",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/legalizer-out.mir",
+    "exit_code": 0
+  },
+  {
+    "name": "zp-index",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang --target=mos -mcpu=mos6502 -O2 -S -mllvm -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/zp-index.c -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/zp-index.s",
+    "exit_code": 0
+  },
+  {
+    "name": "addressing-assemble",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc -triple=mos -mcpu=mosw65816 -motorola-integers --filetype=obj /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.o",
+    "exit_code": 0
+  },
+  {
+    "name": "addressing-disasm",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump --all-headers --print-imm-hex -D /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.o",
+    "exit_code": 0
+  },
+  {
+    "name": "addressing-check",
+    "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s --input-file=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.dis",
+    "exit_code": 0
+  }
+]

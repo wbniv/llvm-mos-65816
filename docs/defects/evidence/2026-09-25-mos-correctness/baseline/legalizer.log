@@ -1,0 +1,3 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/llc -mtriple=mos -run-pass=legalizer -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer-out.mir
+exit_code=1
+LLVM ERROR: unable to legalize instruction: %4:_(s8) = G_TRUNC %1:_(s8) (in function: load_zp_constant_ptradd_8)

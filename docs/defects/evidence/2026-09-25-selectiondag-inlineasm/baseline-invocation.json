@@ -1,0 +1,16 @@
+{
+  "command": [
+    "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+    "-mtriple=aarch64",
+    "-global-isel=0",
+    "-O0",
+    "-verify-machineinstrs",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+    "-o",
+    "/dev/null"
+  ],
+  "cwd": "/home/will/llvm-mos-65816",
+  "exit_code": -6,
+  "binary_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+  "input_sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57"
+}

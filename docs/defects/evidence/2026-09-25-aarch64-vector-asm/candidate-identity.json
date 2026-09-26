@@ -1,0 +1,12 @@
+{
+  "path": "build/selectiondag-vector-parts-fix/llc",
+  "sha256": "ceb0414e89abd238b2fac34387c6c119a0cc54df32621f59eb56883ac638eedd",
+  "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+  "source": "docs/defects/evidence/2026-09-25-aarch64-vector-asm/SelectionDAGBuilder.cpp.candidate.gz",
+  "source_uncompressed_sha256": "372cf50152b64abd715adbac00a1479bfacaf2a0536a75e23ae5740a23e74bce",
+  "difference_from_predecessor_0058": "Only the SelectionDAGBuilder.cpp object changes; 0058 AArch64 archive and all other link inputs are unchanged.",
+  "difference_from_recorded_baseline_0057": "0058 AArch64 unknown-type guards plus 0059 generic vector conversion diagnostics. Both 0057 and 0058 independently reproduce the same vector assertion.",
+  "build_recipe": "docs/defects/evidence/2026-09-25-aarch64-vector-asm/build-candidate.py",
+  "assertions": true,
+  "container_image_id": "sha256:571e18a239454d9d97c4dbdab440e47b7ec325142a9418d607cb6e72434758b6"
+}

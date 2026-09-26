@@ -1,0 +1,170 @@
+[
+  {
+    "cpu": "mos6502",
+    "opt": "O0",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O0",
+    "stage": "full",
+    "exit": -6,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O0-full.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O1",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O1 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O1-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O1",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O1-full.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O2",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O2-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O2",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O2-full.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O3",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O3 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O3-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "O3",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-O3-full.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "Os",
+    "stage": "rewrite",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -Os -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Os-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "Os",
+    "stage": "full",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -Os -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Os-full.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "Oz",
+    "stage": "rewrite",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -Oz -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Oz-rewrite.out"
+  },
+  {
+    "cpu": "mos6502",
+    "opt": "Oz",
+    "stage": "full",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mos6502 -Oz -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mos6502-Oz-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O0",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O0-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O0",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O0.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O0-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O1",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O1-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O1",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O1 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O1.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O1-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O2",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O2-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O2",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O2.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O2-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O3",
+    "stage": "rewrite",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O3-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "O3",
+    "stage": "full",
+    "exit": 0,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O3.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-O3-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "Os",
+    "stage": "rewrite",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -Os -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Os-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "Os",
+    "stage": "full",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -Os -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Os-full.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "Oz",
+    "stage": "rewrite",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -Oz -verify-machineinstrs -stop-after=virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Oz-rewrite.out"
+  },
+  {
+    "cpu": "mosw65816",
+    "opt": "Oz",
+    "stage": "full",
+    "exit": 1,
+    "command": "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -Oz -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Oz.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-c/mosw65816-Oz-full.out"
+  }
+]

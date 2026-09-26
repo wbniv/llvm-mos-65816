@@ -1,0 +1,24 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -start-before=prologepilog -verify-machineinstrs -filetype=obj /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.o
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -fno-lto /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-runtime.c /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.o -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x204 2 0x600d 180 /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-default.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x204 len=2 got=0x600D (ran 180 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=prologepilog -verify-machineinstrs -filetype=obj /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.o
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -fno-lto /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-runtime.c /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.o -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x204 2 0x600d 180 /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-a16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x204 len=2 got=0x600D (ran 180 frames, bsnes-jg)
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -start-before=prologepilog -verify-machineinstrs -filetype=obj /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.o
+exit_code=0
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -fno-lto /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/scavenger-runtime.c /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.o -Wl,-Map=/home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.map -o /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.sfc
+exit_code=0
+$ /home/will/llvm-mos-65816/build/jgxcheck /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.sfc /home/will/llvm-mos-65816/vendor/bsnes-jg/Database 0x204 2 0x600d 180 /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.png
+jgxcheck: wrote /home/will/llvm-mos-65816/build/mos-correctness-runtime/status-range-xy16.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x204 len=2 got=0x600D (ran 180 frames, bsnes-jg)
+exit_code=0

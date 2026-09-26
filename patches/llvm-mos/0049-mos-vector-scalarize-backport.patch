@@ -1,0 +1,379 @@
+Subject: [PATCH] Backport MOS generic vector scalarization prerequisites
+
+Upstream author: Daniel Thornburgh.
+Source: llvm-mos/llvm-mos 77a0dd93c5e9cec324323ecf1ffe05b47809b1ad
+and the G_LOAD/G_STORE scalarization rules in 4b98e4726b3a.
+Adapted to this pin by OpenAI Codex CLI 0.157.0 (codex-tui),
+model gpt-6-astra, xhigh reasoning effort.
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -88,7 +88,7 @@
+       .maxScalar(0, S8)
+       .unsupported();
+
+-  getActionDefinitionsBuilder(G_IMPLICIT_DEF)
++  getActionDefinitionsBuilder(G_IMPLICIT_DEF).scalarize(0)
+       .legalFor({S1, S8, P, PZ})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+@@ -106,7 +106,7 @@
+   // default codegen is byte-for-byte untouched. (NB: G_ZEXT stays maxScalar(0, S8) — it
+   // narrows zext through bytes for BOTH widths; raising it to S16 broke plain s8->s16 zext.)
+   {
+-    auto &B = getActionDefinitionsBuilder(G_ANYEXT).legalFor({{S16, S8}});
++    auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor({{S16, S8}});
+     if (STI.hasAccum16())
+       B.legalFor({{S32, S16}, {S32, S8}});
+     // #321 a16: an odd source width (e.g. an s24 the combiner narrows a 20-bit AND to) has no
+@@ -118,18 +118,18 @@
+      }).unsupported();
+   }
+   {
+-    auto &B = getActionDefinitionsBuilder(G_TRUNC)
++    auto &B = getActionDefinitionsBuilder(G_TRUNC).scalarize(0)
+                   .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
+     if (STI.hasAccum16())
+       B.legalFor({{S16, S32}});
+     B.unsupported();
+   }
+
+-  getActionDefinitionsBuilder(G_SEXT).custom();
++  getActionDefinitionsBuilder(G_SEXT).scalarize(0).custom();
+
+   getActionDefinitionsBuilder(G_SEXT_INREG).lower();
+
+-  getActionDefinitionsBuilder(G_ZEXT)
++  getActionDefinitionsBuilder(G_ZEXT).scalarize(0)
+       .customIf(typeIs(1, S1))
+       .maxScalar(0, S8)
+       .unsupported();
+@@ -153,7 +153,18 @@
+       .customForCartesianProduct({P, PZ, PF, PFP})
+       .unsupported();
+
++  // Vector bitcasts lower through element extraction and scalar merge/unmerge.
++  getActionDefinitionsBuilder(G_BITCAST)
++      .lowerIf(LegalityPredicates::any(isVector(0), isVector(1)))
++      .unsupported();
++
+   // Scalar Operations
++
++  // Constant element indices lower to unmerges; variable indices use a stack
++  // temporary. Shuffles lower to constant-index extracts and inserts.
++  getActionDefinitionsBuilder({G_EXTRACT_VECTOR_ELT, G_INSERT_VECTOR_ELT})
++      .lower();
++  getActionDefinitionsBuilder(G_SHUFFLE_VECTOR).lower();
+
+   getActionDefinitionsBuilder({G_EXTRACT, G_INSERT}).lower();
+
+@@ -188,18 +199,18 @@
+     B.unsupported();
+   }
+
+-  getActionDefinitionsBuilder(G_BSWAP)
++  getActionDefinitionsBuilder(G_BSWAP).scalarize(0)
+       .customFor({S8})
+       .unsupportedIf(scalarNarrowerThan(0, 8))
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+
+-  getActionDefinitionsBuilder(G_BITREVERSE).lower();
++  getActionDefinitionsBuilder(G_BITREVERSE).scalarize(0).lower();
+
+   // Integer Operations
+
+-  getActionDefinitionsBuilder({G_ADD, G_SUB})
++  getActionDefinitionsBuilder({G_ADD, G_SUB}).scalarize(0)
+       .legalFor({S8})
+       .widenScalarToNextMultipleOf(0, 8)
+       .custom();
+@@ -210,20 +221,20 @@
+   // untouched. The 1b combiner still fast-paths all-global `g = a & b` shapes.
+   const LLT MaxBitwise = STI.hasAccum16() ? S16 : S8;
+   {
+-    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).legalFor({S8});
++    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).scalarize(0).legalFor({S8});
+     if (STI.hasAccum16())
+       B.legalFor({S16});
+     B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
+   }
+
+   {
+-    auto &B = getActionDefinitionsBuilder(G_XOR).legalFor({S8}).customFor({S1});
++    auto &B = getActionDefinitionsBuilder(G_XOR).scalarize(0).legalFor({S8}).customFor({S1});
+     if (STI.hasAccum16())
+       B.legalFor({S16});
+     B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
+   }
+
+-  getActionDefinitionsBuilder(G_MUL)
++  getActionDefinitionsBuilder(G_MUL).scalarize(0)
+       .libcallFor({S8, S16, S32, S64})
+       .widenScalarToNextPow2(0)
+       // Multiplications can only be narrowed to sizes where a multiplication of
+@@ -233,37 +244,37 @@
+       .clampScalar(0, S8, S32)
+       .unsupported();
+
+-  getActionDefinitionsBuilder({G_SDIV, G_SREM, G_UDIV, G_UREM})
++  getActionDefinitionsBuilder({G_SDIV, G_SREM, G_UDIV, G_UREM}).scalarize(0)
+       .clampScalar(0, S8, S64)
+       .widenScalarToNextPow2(0)
+       .libcall();
+
+-  getActionDefinitionsBuilder({G_SDIVREM, G_UDIVREM})
++  getActionDefinitionsBuilder({G_SDIVREM, G_UDIVREM}).scalarize(0)
+       .customFor({S8, S16, S32, S64})
+       .lower();
+
+   getActionDefinitionsBuilder(
+-      {G_SADDSAT, G_UADDSAT, G_SSUBSAT, G_USUBSAT, G_SSHLSAT, G_USHLSAT})
++      {G_SADDSAT, G_UADDSAT, G_SSUBSAT, G_USUBSAT, G_SSHLSAT, G_USHLSAT}).scalarize(0)
+       .lower();
+
+-  getActionDefinitionsBuilder({G_LSHR, G_SHL, G_ASHR})
++  getActionDefinitionsBuilder({G_LSHR, G_SHL, G_ASHR}).scalarize(0)
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(1, S8)
+       .custom();
+
+-  getActionDefinitionsBuilder({G_ROTL, G_ROTR})
++  getActionDefinitionsBuilder({G_ROTL, G_ROTR}).scalarize(0)
+       .lowerIf([](const LegalityQuery &Query) {
+         assert(Query.Types[0].isScalar());
+         return !Query.Types[0].isByteSized();
+       })
+       .custom();
+
+-  getActionDefinitionsBuilder(G_ICMP)
++  getActionDefinitionsBuilder(G_ICMP).scalarize(0)
+       .customFor({{S1, P}, {S1, S8}})
+       .widenScalarToNextMultipleOf(1, 8)
+       .custom();
+
+-  getActionDefinitionsBuilder(G_SELECT)
++  getActionDefinitionsBuilder(G_SELECT).scalarize(0)
+       .customFor({P, PZ})
+       .legalFor({S1, S8})
+       .widenScalarToNextMultipleOf(0, 8)
+@@ -281,7 +292,7 @@
+       .scalarSameSizeAs(1, 0)
+       .unsupported();
+
+-  getActionDefinitionsBuilder({G_SMIN, G_SMAX, G_UMIN, G_UMAX}).lower();
++  getActionDefinitionsBuilder({G_SMIN, G_SMAX, G_UMIN, G_UMAX}).scalarize(0).lower();
+
+   // Three-way compares (llvm.scmp/ucmp — the C `(a>b)-(a<b)` spaceship idiom and libc-style
+   // comparators) have no native form on the 6502/65816; lower them to icmp+select primitives the
+@@ -290,34 +301,34 @@
+   // it fires at every width and in default/+mos-a16/+mos-xy16 alike.
+   getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();
+
+-  getActionDefinitionsBuilder(G_ABS).custom();
++  getActionDefinitionsBuilder(G_ABS).scalarize(0).custom();
+
+   // Odd operations are handled via even ones: 6502 has only ADC/SBC.
+-  getActionDefinitionsBuilder({G_UADDO, G_SADDO, G_USUBO, G_SSUBO})
++  getActionDefinitionsBuilder({G_UADDO, G_SADDO, G_USUBO, G_SSUBO}).scalarize(0)
+       .customFor({S8})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+-  getActionDefinitionsBuilder({G_SMULO, G_UMULO}).lower();
+-  getActionDefinitionsBuilder({G_UADDE, G_SADDE})
++  getActionDefinitionsBuilder({G_SMULO, G_UMULO}).scalarize(0).lower();
++  getActionDefinitionsBuilder({G_UADDE, G_SADDE}).scalarize(0)
+       .legalFor({S8})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+-  getActionDefinitionsBuilder({G_USUBE, G_SSUBE})
++  getActionDefinitionsBuilder({G_USUBE, G_SSUBE}).scalarize(0)
+       .customFor({S8})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+-  getActionDefinitionsBuilder({G_UMULH, G_SMULH}).lower();
++  getActionDefinitionsBuilder({G_UMULH, G_SMULH}).scalarize(0).lower();
+
+   // WARNING: The default lowering of funnel shifts is terrible. Luckily, they
+   // appear to mostly be rotations, which are combined away and handled
+   // separately.
+-  getActionDefinitionsBuilder({G_FSHL, G_FSHR}).lower();
++  getActionDefinitionsBuilder({G_FSHL, G_FSHR}).scalarize(0).lower();
+
+   getActionDefinitionsBuilder(
+-      {G_CTLZ, G_CTTZ, G_CTPOP, G_CTLZ_ZERO_UNDEF, G_CTTZ_ZERO_UNDEF})
++      {G_CTLZ, G_CTTZ, G_CTPOP, G_CTLZ_ZERO_UNDEF, G_CTTZ_ZERO_UNDEF}).scalarize(0)
+       .lower();
+
+   // Floating Point Operations
+@@ -409,7 +420,7 @@
+     // / loaded from memory), never as the access pointer (it is cast to PF before any
+     // deref). A PFP value routes through legalizeLoad/legalizeStore, which accesses 3
+     // bytes and bridges to/from p3 via a 3x s8 merge/unmerge (see legalizePacked*).
+-    auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
++    auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE}).scalarize(0);
+     if (STI.hasAccum16())
+       B.customForCartesianProduct({S8, S16, PZ, P, PF, PFP}, {PZ, P, PF});
+     else
+@@ -424,7 +435,7 @@
+
+   // Control Flow
+
+-  getActionDefinitionsBuilder(G_PHI)
++  getActionDefinitionsBuilder(G_PHI).scalarize(0)
+       .legalFor({S1, S8, P, PZ})
+       // #321: a far pointer (PF, p2) carried across a loop back-edge forms a
+       // G_PHI(p2) that no scalar/widen action covers. Custom-legalize it to an
+@@ -460,7 +471,7 @@
+
+   getActionDefinitionsBuilder({G_STACKSAVE, G_STACKRESTORE}).lower();
+
+-  getActionDefinitionsBuilder(G_FREEZE)
++  getActionDefinitionsBuilder(G_FREEZE).scalarize(0)
+       .customFor({S1, S8, P, PZ})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+diff --git a/llvm/test/CodeGen/MOS/vector-scalarize.ll b/llvm/test/CodeGen/MOS/vector-scalarize.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/vector-scalarize.ll
+@@ -0,0 +1,134 @@
++; RUN: llc -mtriple=mos -verify-machineinstrs -o /dev/null %s
++; Vector operations reach the backend even though MOS has no vector
++; registers: SROA invents vector types for aggregates, and instcombine (in
++; particular during LTO) then forms vector operations over them. Every such
++; operation must legalize by scalarization. This test passes if llc does not
++; report "unable to legalize".
++
++target datalayout = "e-p:16:8:8-p1:8:8-i16:8:8-i32:8:8-i64:8:8-f32:8:8-f64:8:8-a:8:8-Fi8-n8"
++target triple = "mos"
++
++define void @load_store(ptr %p, ptr %q) {
++  %v = load volatile <5 x i16>, ptr %p
++  store volatile <5 x i16> %v, ptr %q
++  ret void
++}
++
++define void @store_constant(ptr %p) {
++  store <5 x i16> <i16 1, i16 2, i16 3, i16 4, i16 5>, ptr %p
++  ret void
++}
++
++define i16 @extract_const(ptr %p) {
++  %v = load <5 x i16>, ptr %p
++  %e = extractelement <5 x i16> %v, i64 1
++  ret i16 %e
++}
++
++define i16 @extract_var(ptr %p, i16 %i) {
++  %v = load <4 x i16>, ptr %p
++  %e = extractelement <4 x i16> %v, i16 %i
++  ret i16 %e
++}
++
++define void @insert_const(ptr %p, i16 %x) {
++  %v = load <4 x i16>, ptr %p
++  %v2 = insertelement <4 x i16> %v, i16 %x, i64 1
++  store <4 x i16> %v2, ptr %p
++  ret void
++}
++
++define void @insert_var_undef(ptr %p, i16 %x, i16 %i) {
++  %v = insertelement <4 x i16> undef, i16 %x, i16 %i
++  store <4 x i16> %v, ptr %p
++  ret void
++}
++
++define void @phi(i1 %c, ptr %p, ptr %q, ptr %r) {
++entry:
++  br i1 %c, label %a, label %b
++a:
++  %va = load <4 x i16>, ptr %p
++  br label %join
++b:
++  %vb = load <4 x i16>, ptr %q
++  br label %join
++join:
++  %v = phi <4 x i16> [ %va, %a ], [ %vb, %b ]
++  store <4 x i16> %v, ptr %r
++  ret void
++}
++
++define void @select(i1 %c, ptr %p, ptr %q, ptr %r) {
++  %va = load <4 x i16>, ptr %p
++  %vb = load <4 x i16>, ptr %q
++  %v = select i1 %c, <4 x i16> %va, <4 x i16> %vb
++  store <4 x i16> %v, ptr %r
++  ret void
++}
++
++define void @shuffle(ptr %p, ptr %q, ptr %r) {
++  %va = load <4 x i16>, ptr %p
++  %vb = load <4 x i16>, ptr %q
++  %v = shufflevector <4 x i16> %va, <4 x i16> %vb, <4 x i32> <i32 0, i32 5, i32 2, i32 7>
++  store <4 x i16> %v, ptr %r
++  ret void
++}
++
++define i16 @bitcast_scalar_to_vector(i64 %x) {
++  %v = bitcast i64 %x to <4 x i16>
++  %e = extractelement <4 x i16> %v, i64 2
++  ret i16 %e
++}
++
++define i64 @bitcast_vector_to_scalar(ptr %p) {
++  %v = load <4 x i16>, ptr %p
++  %x = bitcast <4 x i16> %v to i64
++  ret i64 %x
++}
++
++define void @add(ptr %p, ptr %q, ptr %r) {
++  %va = load <4 x i16>, ptr %p
++  %vb = load <4 x i16>, ptr %q
++  %v = add <4 x i16> %va, %vb
++  store <4 x i16> %v, ptr %r
++  ret void
++}
++
++define void @mul(ptr %p, ptr %q, ptr %r) {
++  %va = load <4 x i16>, ptr %p
++  %vb = load <4 x i16>, ptr %q
++  %v = mul <4 x i16> %va, %vb
++  store <4 x i16> %v, ptr %r
++  ret void
++}
++
++define void @shl(ptr %p, ptr %r) {
++  %v = load <4 x i16>, ptr %p
++  %t = shl <4 x i16> %v, <i16 1, i16 1, i16 1, i16 1>
++  store <4 x i16> %t, ptr %r
++  ret void
++}
++
++define void @icmp_zext(ptr %p, ptr %q, ptr %r) {
++  %va = load <4 x i16>, ptr %p
++  %vb = load <4 x i16>, ptr %q
++  %c = icmp eq <4 x i16> %va, %vb
++  %z = zext <4 x i1> %c to <4 x i16>
++  store <4 x i16> %z, ptr %r
++  ret void
++}
++
++define void @trunc(ptr %p, ptr %r) {
++  %v = load <4 x i16>, ptr %p
++  %t = trunc <4 x i16> %v to <4 x i8>
++  store <4 x i8> %t, ptr %r
++  ret void
++}
++
++define void @freeze(ptr %p, ptr %r) {
++  %v = load <4 x i16>, ptr %p
++  %fr = freeze <4 x i16> %v
++  store <4 x i16> %fr, ptr %r
++  ret void
++}

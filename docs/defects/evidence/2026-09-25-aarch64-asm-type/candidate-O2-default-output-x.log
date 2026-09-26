@@ -1,0 +1,4 @@
+$ /tmp/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-aarch64-asm-type/cases/output-x.ll -o /dev/null
+error: could not allocate output register for constraint 'x'
+
+exit_code=1

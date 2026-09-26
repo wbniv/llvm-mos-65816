@@ -1,0 +1,54 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-xy16 -run-pass=prologepilog -verify-machineinstrs %s -o - | FileCheck %s
+#
+# Both index registers and carry are live across the temporary carry value.
+# Extending its status save to the preceding virtual-register use would cross
+# PH $a without its matching PL. Keep PHP/PLP inside that balanced range so
+# neither index register is needed to preserve status. The final ADC consumes
+# the original carry; the stored bytes must be 6, 6, 7, 1.
+#
+# CHECK-LABEL: name: status_save_range
+# CHECK: bb.1:
+# CHECK: STAbs killed $y, @scavenged_values + 3
+# CHECK-NEXT: $y = PL
+# CHECK-NEXT: PH $a
+# CHECK-NEXT: PH $p
+# CHECK-NEXT: $c = LDImm1 0
+# CHECK-NEXT: $a, $c, $v = ADCImm $a, 0, $c
+# CHECK-NEXT: $p = PL
+# CHECK-NEXT: $a = PL
+# CHECK-NEXT: $a, dead $c, dead $v = ADCImm $a, 0, $c
+# CHECK-NEXT: STAbs $a, @scavenged_values
+
+--- |
+  target triple = "mos"
+  @scavenged_values = external global [4 x i8]
+  define void @status_save_range() { unreachable }
+...
+---
+name: status_save_range
+tracksRegLiveness: true
+body: |
+  bb.0:
+    successors: %bb.1
+    $a = LDImm 5
+    $x = LDImm 6
+    $y = LDImm 7
+    $c = LDImm1 1
+    BRA %bb.1
+
+  bb.1:
+    liveins: $a, $x, $y, $c
+
+    %0:gpr = LDImm 1
+    STAbs %0, @scavenged_values + 3
+    PH $a
+    undef %1.subcarry:pc = LDImm1 0
+    $a, dead %1.subcarry, dead %1.subv = ADCImm $a, 0, %1.subcarry
+    $a = PL
+    $a, dead $c, dead $v = ADCImm $a, 0, $c
+    STAbs $a, @scavenged_values
+    STAbs $x, @scavenged_values + 1
+    STAbs $y, @scavenged_values + 2
+    RTS
+...

@@ -1,0 +1,53 @@
+0001-320-far-addrspace.patch: 0
+0002-321-accum16.patch: 0
+0042-mos-scavenger-p-undef-a16-test.patch: 0
+0010-coalesce-rotate-ac.patch: 0
+0018-320-imag32-spill.patch: 0
+0019-mos-branch-range-diagnostic.patch: 0
+0020-mos-65816-block-move-bank-order.patch: 0
+0021-mos-zp-alloc-deterministic.patch: 0
+0006-320-packed24.patch: 0
+0028-llvm-virtregrewriter-undef-lane-identity-copy.patch: 0
+0029-llvm-twoaddr-physreg-reschedule.patch: 0
+0033-llvm-spill-hoist-no-new-vregs.patch: 0
+0035-clang-prefetch-int16-operands-vendor.patch: 0
+0037-llvm-gisel-inline-asm-indirect-output-vendor.patch: 0
+0040-llvm-inline-spiller-coalesce-scratch-vregs.patch: 0
+0041-llvm-gisel-inline-asm-multi-register-vendor.patch: 0
+0003-late-opt-nongpr-ldimm-dest.patch: 0
+0022-mos-late-opt-cmpzero-lowering.patch: 0
+0023-mos-trunc-selection-regclasses.patch: 0
+0024-mos-brk-signature-operand.patch: 0
+0025-llvm-mc-preserve-motorola-default.patch: 0
+0030-mos-copy-phys-reg-liveness.patch: 0
+0031-mos-copy-phys-reg-reuse-dst.patch: 0
+0032-mos-quote-register-named-symbols-vendor.patch: 0
+0034-mos-legalize-prefetch.patch: 0
+0039-mos-asm-modifier-width.patch: 0
+0036-mos-zero-page-indexed-globals.patch: 0
+0038-mos-return-frame-address.patch: 0
+Context reduced to (2/2) to apply fragment at 27
+Context reduced to (1/1) to apply fragment at 91
+Context reduced to (1/1) to apply fragment at 43
+Context reduced to (2/2) to apply fragment at 68
+0043-mos-inline-asm-physreg-width.patch: 0
+0044-mos-asm-print-long-address.patch: 0
+0045-mos-asm-print-a16-immediate.patch: 0
+0046-mos-fixupkinds-addrasciz-row.patch: 0
+0047-mos-mc-addr-asciz-symbolic-crash.patch: 0
+0048-mos-far-codegen-lit-tests.patch: 0
+0049-mos-vector-scalarize-backport.patch: 1
+error: dev/null: No such file or directory
+
+New-file patch headers corrected; retrying unapplied tail:
+0049-mos-vector-scalarize-backport: 0
+0050-mos-float-vector-arithmetic: 0
+/home/will/llvm-mos-65816/patches/llvm-mos/0050-mos-float-vector-arithmetic.patch:133: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+0051-mos-zp-byte-index: 0
+0052-mos-bank-relax-section-offset: 0
+0011-mos-scavenger-live-p-save: 0
+0053-mos-lit-expectations: 0
+Reconstruction differences:
+llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll

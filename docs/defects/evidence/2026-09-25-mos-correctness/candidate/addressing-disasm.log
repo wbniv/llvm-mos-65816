@@ -1,0 +1,848 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump --all-headers --print-imm-hex -D /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.o
+exit_code=0
+
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.o:	file format elf32-mos
+architecture: mos
+start address: 0x00000000
+
+Program Header:
+
+Dynamic Section:
+
+Sections:
+Idx Name          Size     VMA      Type
+  0               00000000 00000000 
+  1 .strtab       00000043 00000000 
+  2 .text         000303b4 00000000 TEXT
+  3 .rela.text    00000354 00000000 
+  4 .symtab       00000080 00000000 
+
+SYMBOL TABLE:
+00000000 l    d  .text	00000000 .text
+00000001 l       .text	00000000 0x20 addr8
+00000202 l       .text	00000000 addr16
+00030303 l       .text	00000000 addr24
+00030303 l       .text	00000000 _start
+00030303 l       .text	00000000 $mh.0
+0003035c l       .text	00000000 $xh.1
+
+Disassembly of section .strtab:
+
+00000000 <.strtab>:
+       0: 00           	brk
+       1: 2e 72 65     	rol	$6572                   ; 0x6572 <.strtab+0x6572>
+       4: 6c 61 2e     	jmp	($2e61)                 ; 0x2e61 <.strtab+0x2e61>
+       7: 74 65        	stz	$65,x                   ; 0x65 <.strtab+0x65>
+       9: 78           	sei
+       a: 74 00        	stz	$0,x                    ; 0x0 <.strtab>
+       c: 5f 73 74 61  	eor	$617473,x               ; 0x617473 <.strtab+0x617473>
+      10: 72 74        	adc	($74)                   ; 0x74 <.strtab+0x74>
+      12: 00           	brk
+      13: 2e 73 74     	rol	$7473                   ; 0x7473 <.strtab+0x7473>
+      16: 72 74        	adc	($74)                   ; 0x74 <.strtab+0x74>
+      18: 61 62        	adc	($62,x)                 ; 0x62 <.strtab+0x62>
+      1a: 00           	brk
+      1b: 2e 73 79     	rol	$7973                   ; 0x7973 <.strtab+0x7973>
+      1e: 6d 74 61     	adc	$6174                   ; 0x6174 <.strtab+0x6174>
+      21: 62 00 61     	per	$23
+      24: 64 64        	stz	$64                     ; 0x64 <.strtab+0x64>
+      26: 72 38        	adc	($38)                   ; 0x38 <.strtab+0x38>
+      28: 00           	brk
+      29: 61 64        	adc	($64,x)                 ; 0x64 <.strtab+0x64>
+      2b: 64 72        	stz	$72                     ; 0x72 <.strtab+0x72>
+      2d: 31 36        	and	($36),y                 ; 0x36 <.strtab+0x36>
+      2f: 00           	brk
+      30: 61 64        	adc	($64,x)                 ; 0x64 <.strtab+0x64>
+      32: 64 72        	stz	$72                     ; 0x72 <.strtab+0x72>
+      34: 32 34        	and	($34)                   ; 0x34 <.strtab+0x34>
+      36: 00           	brk
+      37: 24 78        	bit	$78                     ; 0x78 <.strtab+0x78>
+      39: 68           	pla
+      3a: 2e 31 00     	rol	$31                     ; 0x31 <.strtab+0x31>
+      3d: 24 6d        	bit	$6d                     ; 0x6d <.strtab+0x6d>
+      3f: 68           	pla
+      40: 2e 30 00     	rol	$30                     ; 0x30 <.strtab+0x30>
+
+Disassembly of section .text:
+
+00000000 <.text>:
+       0: 00           	brk
+
+00000001 <addr8>:
+		...
+     201: 00           	brk
+
+00000202 <addr16>:
+		...
+   30302: 00           	brk
+
+00030303 <addr24>:
+   30303: a9 00        	lda	#$0
+			00030304:  R_MOS_IMM8	.text+0x1
+   30305: a9 00        	lda	#$0
+			00030306:  R_MOS_IMM8	.text+0x202
+   30307: a9 00        	lda	#$0
+			00030308:  R_MOS_IMM8	.text+0x30303
+   30309: a9 00        	lda	#$0
+			0003030a:  R_MOS_ADDR16_LO	.text+0x1
+   3030b: a9 00        	lda	#$0
+			0003030c:  R_MOS_ADDR16_LO	.text+0x202
+   3030d: a9 00        	lda	#$0
+			0003030e:  R_MOS_ADDR16_LO	.text+0x30303
+   3030f: a9 00        	lda	#$0
+			00030310:  R_MOS_ADDR16_HI	.text+0x1
+   30311: a9 00        	lda	#$0
+			00030312:  R_MOS_ADDR16_HI	.text+0x202
+   30313: a9 00        	lda	#$0
+			00030314:  R_MOS_ADDR16_HI	.text+0x30303
+   30315: a9 00        	lda	#$0
+			00030316:  R_MOS_ADDR24_BANK	.text+0x1
+   30317: a9 00        	lda	#$0
+			00030318:  R_MOS_ADDR24_BANK	.text+0x202
+   30319: a9 00        	lda	#$0
+			0003031a:  R_MOS_ADDR24_BANK	.text+0x30303
+   3031b: ad 00 00     	lda	$0                      ; 0x0 <.text>
+			0003031c:  R_MOS_ADDR16	.text+0x1
+   3031e: ad 00 00     	lda	$0                      ; 0x0 <.text>
+			0003031f:  R_MOS_ADDR16	.text+0x202
+   30321: ad 00 00     	lda	$0                      ; 0x0 <.text>
+			00030322:  R_MOS_ADDR16	.text+0x30303
+   30324: af 00 00 00  	lda	mos24($0)               ; 0x0 <.text>
+			00030325:  R_MOS_ADDR24	.text+0x1
+   30328: af 00 00 00  	lda	mos24($0)               ; 0x0 <.text>
+			00030329:  R_MOS_ADDR24	.text+0x202
+   3032c: af 00 00 00  	lda	mos24($0)               ; 0x0 <.text>
+			0003032d:  R_MOS_ADDR24	.text+0x30303
+   30330: af 00 00 00  	lda	mos24($0)               ; 0x0 <.text>
+			00030331:  R_MOS_ADDR24	.text+0x30303
+   30334: a5 00        	lda	$0                      ; 0x0 <.text>
+			00030335:  R_MOS_ADDR8	.text+0x1
+   30336: a5 00        	lda	$0                      ; 0x0 <.text>
+			00030337:  R_MOS_ADDR8	.text+0x1
+   30338: a5 00        	lda	$0                      ; 0x0 <.text>
+			00030339:  R_MOS_ADDR8	.text+0x202
+   3033a: a5 00        	lda	$0                      ; 0x0 <.text>
+			0003033b:  R_MOS_ADDR8	.text+0x30303
+   3033c: b1 00        	lda	($0),y                  ; 0x0 <.text>
+			0003033d:  R_MOS_ADDR8	.text+0x1
+   3033e: b1 00        	lda	($0),y                  ; 0x0 <.text>
+			0003033f:  R_MOS_ADDR8	.text+0x1
+   30340: b1 00        	lda	($0),y                  ; 0x0 <.text>
+			00030341:  R_MOS_ADDR8	.text+0x202
+   30342: b1 00        	lda	($0),y                  ; 0x0 <.text>
+			00030343:  R_MOS_ADDR8	.text+0x30303
+   30344: b7 00        	lda	[$0],y                  ; 0x0 <.text>
+			00030345:  R_MOS_ADDR8	.text+0x1
+   30346: b7 00        	lda	[$0],y                  ; 0x0 <.text>
+			00030347:  R_MOS_ADDR8	.text+0x1
+   30348: b7 00        	lda	[$0],y                  ; 0x0 <.text>
+			00030349:  R_MOS_ADDR8	.text+0x202
+   3034a: b7 00        	lda	[$0],y                  ; 0x0 <.text>
+			0003034b:  R_MOS_ADDR8	.text+0x30303
+   3034c: a1 00        	lda	($0,x)                  ; 0x0 <.text>
+			0003034d:  R_MOS_ADDR8	.text+0x1
+   3034e: a1 00        	lda	($0,x)                  ; 0x0 <.text>
+			0003034f:  R_MOS_ADDR8	.text+0x1
+   30350: a1 00        	lda	($0,x)                  ; 0x0 <.text>
+			00030351:  R_MOS_ADDR8	.text+0x202
+   30352: a1 00        	lda	($0,x)                  ; 0x0 <.text>
+			00030353:  R_MOS_ADDR8	.text+0x30303
+   30354: b5 00        	lda	$0,x                    ; 0x0 <.text>
+			00030355:  R_MOS_ADDR8	.text+0x1
+   30356: b5 00        	lda	$0,x                    ; 0x0 <.text>
+			00030357:  R_MOS_ADDR8	.text+0x1
+   30358: b5 00        	lda	$0,x                    ; 0x0 <.text>
+			00030359:  R_MOS_ADDR8	.text+0x202
+   3035a: b5 00        	lda	$0,x                    ; 0x0 <.text>
+			0003035b:  R_MOS_ADDR8	.text+0x30303
+   3035c: b6 00        	ldx	$0,y                    ; 0x0 <.text>
+			0003035d:  R_MOS_ADDR8	.text+0x1
+   3035e: b6 00        	ldx	$0,y                    ; 0x0 <.text>
+			0003035f:  R_MOS_ADDR8	.text+0x1
+   30360: b6 00        	ldx	$0,y                    ; 0x0 <.text>
+			00030361:  R_MOS_ADDR8	.text+0x202
+   30362: b6 00        	ldx	$0,y                    ; 0x0 <.text>
+			00030363:  R_MOS_ADDR8	.text+0x30303
+   30364: bd 00 00     	lda	$0,x                    ; 0x0 <.text>
+			00030365:  R_MOS_ADDR16	.text+0x1
+   30367: bd 00 00     	lda	$0,x                    ; 0x0 <.text>
+			00030368:  R_MOS_ADDR16	.text+0x202
+   3036a: bd 00 00     	lda	$0,x                    ; 0x0 <.text>
+			0003036b:  R_MOS_ADDR16	.text+0x30303
+   3036d: b9 00 00     	lda	$0,y                    ; 0x0 <.text>
+			0003036e:  R_MOS_ADDR16	.text+0x1
+   30370: b9 00 00     	lda	$0,y                    ; 0x0 <.text>
+			00030371:  R_MOS_ADDR16	.text+0x202
+   30373: b9 00 00     	lda	$0,y                    ; 0x0 <.text>
+			00030374:  R_MOS_ADDR16	.text+0x30303
+   30376: bf 00 00 00  	lda	mos24($0),x             ; 0x0 <.text>
+			00030377:  R_MOS_ADDR24	.text+0x1
+   3037a: bf 00 00 00  	lda	mos24($0),x             ; 0x0 <.text>
+			0003037b:  R_MOS_ADDR24	.text+0x202
+   3037e: bf 00 00 00  	lda	mos24($0),x             ; 0x0 <.text>
+			0003037f:  R_MOS_ADDR24	.text+0x30303
+   30382: bf 00 00 00  	lda	mos24($0),x             ; 0x0 <.text>
+			00030383:  R_MOS_ADDR24	.text+0x30303
+   30386: 6c 00 00     	jmp	($0)                    ; 0x0 <.text>
+			00030387:  R_MOS_ADDR16	.text+0x1
+   30389: 6c 00 00     	jmp	($0)                    ; 0x0 <.text>
+			0003038a:  R_MOS_ADDR16	.text+0x1
+   3038c: 6c 00 00     	jmp	($0)                    ; 0x0 <.text>
+			0003038d:  R_MOS_ADDR16	.text+0x202
+   3038f: 6c 00 00     	jmp	($0)                    ; 0x0 <.text>
+			00030390:  R_MOS_ADDR16	.text+0x202
+   30392: 6c 00 00     	jmp	($0)                    ; 0x0 <.text>
+			00030393:  R_MOS_ADDR16	.text+0x30303
+   30395: b2 00        	lda	($0)                    ; 0x0 <.text>
+			00030396:  R_MOS_ADDR8	.text+0x1
+   30397: b2 00        	lda	($0)                    ; 0x0 <.text>
+			00030398:  R_MOS_ADDR8	.text+0x1
+   30399: b2 00        	lda	($0)                    ; 0x0 <.text>
+			0003039a:  R_MOS_ADDR8	.text+0x202
+   3039b: b2 00        	lda	($0)                    ; 0x0 <.text>
+			0003039c:  R_MOS_ADDR8	.text+0x30303
+   3039d: a7 00        	lda	[$0]                    ; 0x0 <.text>
+			0003039e:  R_MOS_ADDR8	.text+0x1
+   3039f: a7 00        	lda	[$0]                    ; 0x0 <.text>
+			000303a0:  R_MOS_ADDR8	.text+0x1
+   303a1: a7 00        	lda	[$0]                    ; 0x0 <.text>
+			000303a2:  R_MOS_ADDR8	.text+0x202
+   303a3: a7 00        	lda	[$0]                    ; 0x0 <.text>
+			000303a4:  R_MOS_ADDR8	.text+0x30303
+   303a5: 7c 00 00     	jmp	($0,x)                  ; 0x0 <.text>
+			000303a6:  R_MOS_ADDR16	.text+0x1
+   303a8: 7c 00 00     	jmp	($0,x)                  ; 0x0 <.text>
+			000303a9:  R_MOS_ADDR16	.text+0x1
+   303ab: 7c 00 00     	jmp	($0,x)                  ; 0x0 <.text>
+			000303ac:  R_MOS_ADDR16	.text+0x202
+   303ae: 7c 00 00     	jmp	($0,x)                  ; 0x0 <.text>
+			000303af:  R_MOS_ADDR16	.text+0x202
+   303b1: 7c 00 00     	jmp	($0,x)                  ; 0x0 <.text>
+			000303b2:  R_MOS_ADDR16	.text+0x30303
+
+Disassembly of section .rela.text:
+
+00000000 <.rela.text>:
+       0: 04 03        	tsb	$3                      ; 0x3 <.rela.text+0x3>
+       2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+       4: 01 01        	ora	($1,x)                  ; 0x1 <.rela.text+0x1>
+       6: 00           	brk
+       7: 00           	brk
+       8: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+       a: 00           	brk
+       b: 00           	brk
+       c: 06 03        	asl	$3                      ; 0x3 <.rela.text+0x3>
+       e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      10: 01 01        	ora	($1,x)                  ; 0x1 <.rela.text+0x1>
+      12: 00           	brk
+      13: 00           	brk
+      14: 02 02        	cop	#$2
+      16: 00           	brk
+      17: 00           	brk
+      18: 08           	php
+      19: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      1b: 00           	brk
+      1c: 01 01        	ora	($1,x)                  ; 0x1 <.rela.text+0x1>
+      1e: 00           	brk
+      1f: 00           	brk
+      20: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      22: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      24: 0a           	asl
+      25: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      27: 00           	brk
+      28: 04 01        	tsb	$1                      ; 0x1 <.rela.text+0x1>
+      2a: 00           	brk
+      2b: 00           	brk
+      2c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      2e: 00           	brk
+      2f: 00           	brk
+      30: 0c 03 03     	tsb	$303                    ; 0x303 <.rela.text+0x303>
+      33: 00           	brk
+      34: 04 01        	tsb	$1                      ; 0x1 <.rela.text+0x1>
+      36: 00           	brk
+      37: 00           	brk
+      38: 02 02        	cop	#$2
+      3a: 00           	brk
+      3b: 00           	brk
+      3c: 0e 03 03     	asl	$303                    ; 0x303 <.rela.text+0x303>
+      3f: 00           	brk
+      40: 04 01        	tsb	$1                      ; 0x1 <.rela.text+0x1>
+      42: 00           	brk
+      43: 00           	brk
+      44: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      46: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      48: 10 03        	bpl	$4d <.rela.text+0x4d>
+      4a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      4c: 05 01        	ora	$1                      ; 0x1 <.rela.text+0x1>
+      4e: 00           	brk
+      4f: 00           	brk
+      50: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      52: 00           	brk
+      53: 00           	brk
+      54: 12 03        	ora	($3)                    ; 0x3 <.rela.text+0x3>
+      56: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      58: 05 01        	ora	$1                      ; 0x1 <.rela.text+0x1>
+      5a: 00           	brk
+      5b: 00           	brk
+      5c: 02 02        	cop	#$2
+      5e: 00           	brk
+      5f: 00           	brk
+      60: 14 03        	trb	$3                      ; 0x3 <.rela.text+0x3>
+      62: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      64: 05 01        	ora	$1                      ; 0x1 <.rela.text+0x1>
+      66: 00           	brk
+      67: 00           	brk
+      68: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      6a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      6c: 16 03        	asl	$3,x                    ; 0x3 <.rela.text+0x3>
+      6e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      70: 08           	php
+      71: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      73: 00           	brk
+      74: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      76: 00           	brk
+      77: 00           	brk
+      78: 18           	clc
+      79: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      7b: 00           	brk
+      7c: 08           	php
+      7d: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      7f: 00           	brk
+      80: 02 02        	cop	#$2
+      82: 00           	brk
+      83: 00           	brk
+      84: 1a           	inc
+      85: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      87: 00           	brk
+      88: 08           	php
+      89: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      8b: 00           	brk
+      8c: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      8e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      90: 1c 03 03     	trb	$303                    ; 0x303 <.rela.text+0x303>
+      93: 00           	brk
+      94: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+      96: 00           	brk
+      97: 00           	brk
+      98: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      9a: 00           	brk
+      9b: 00           	brk
+      9c: 1f 03 03 00  	ora	mos24($303),x           ; 0x303 <.rela.text+0x303>
+      a0: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+      a2: 00           	brk
+      a3: 00           	brk
+      a4: 02 02        	cop	#$2
+      a6: 00           	brk
+      a7: 00           	brk
+      a8: 22 03 03 00  	jsl	mos24($303) <.rela.text+0x303>
+      ac: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+      ae: 00           	brk
+      af: 00           	brk
+      b0: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      b2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      b4: 25 03        	and	$3                      ; 0x3 <.rela.text+0x3>
+      b6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      b8: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+      ba: 00           	brk
+      bb: 00           	brk
+      bc: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      be: 00           	brk
+      bf: 00           	brk
+      c0: 29 03        	and	#$3
+      c2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      c4: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+      c6: 00           	brk
+      c7: 00           	brk
+      c8: 02 02        	cop	#$2
+      ca: 00           	brk
+      cb: 00           	brk
+      cc: 2d 03 03     	and	$303                    ; 0x303 <.rela.text+0x303>
+      cf: 00           	brk
+      d0: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+      d2: 00           	brk
+      d3: 00           	brk
+      d4: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      d6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      d8: 31 03        	and	($3),y                  ; 0x3 <.rela.text+0x3>
+      da: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      dc: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+      de: 00           	brk
+      df: 00           	brk
+      e0: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+      e2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      e4: 35 03        	and	$3,x                    ; 0x3 <.rela.text+0x3>
+      e6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      e8: 02 01        	cop	#$1
+      ea: 00           	brk
+      eb: 00           	brk
+      ec: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      ee: 00           	brk
+      ef: 00           	brk
+      f0: 37 03        	and	[$3],y                  ; 0x3 <.rela.text+0x3>
+      f2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+      f4: 02 01        	cop	#$1
+      f6: 00           	brk
+      f7: 00           	brk
+      f8: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+      fa: 00           	brk
+      fb: 00           	brk
+      fc: 39 03 03     	and	$303,y                  ; 0x303 <.rela.text+0x303>
+      ff: 00           	brk
+     100: 02 01        	cop	#$1
+     102: 00           	brk
+     103: 00           	brk
+     104: 02 02        	cop	#$2
+     106: 00           	brk
+     107: 00           	brk
+     108: 3b           	tsc
+     109: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     10b: 00           	brk
+     10c: 02 01        	cop	#$1
+     10e: 00           	brk
+     10f: 00           	brk
+     110: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     112: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     114: 3d 03 03     	and	$303,x                  ; 0x303 <.rela.text+0x303>
+     117: 00           	brk
+     118: 02 01        	cop	#$1
+     11a: 00           	brk
+     11b: 00           	brk
+     11c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     11e: 00           	brk
+     11f: 00           	brk
+     120: 3f 03 03 00  	and	mos24($303),x           ; 0x303 <.rela.text+0x303>
+     124: 02 01        	cop	#$1
+     126: 00           	brk
+     127: 00           	brk
+     128: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     12a: 00           	brk
+     12b: 00           	brk
+     12c: 41 03        	eor	($3,x)                  ; 0x3 <.rela.text+0x3>
+     12e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     130: 02 01        	cop	#$1
+     132: 00           	brk
+     133: 00           	brk
+     134: 02 02        	cop	#$2
+     136: 00           	brk
+     137: 00           	brk
+     138: 43 03        	eor	$3,s                    ; 0x3 <.rela.text+0x3>
+     13a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     13c: 02 01        	cop	#$1
+     13e: 00           	brk
+     13f: 00           	brk
+     140: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     142: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     144: 45 03        	eor	$3                      ; 0x3 <.rela.text+0x3>
+     146: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     148: 02 01        	cop	#$1
+     14a: 00           	brk
+     14b: 00           	brk
+     14c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     14e: 00           	brk
+     14f: 00           	brk
+     150: 47 03        	eor	[$3]                    ; 0x3 <.rela.text+0x3>
+     152: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     154: 02 01        	cop	#$1
+     156: 00           	brk
+     157: 00           	brk
+     158: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     15a: 00           	brk
+     15b: 00           	brk
+     15c: 49 03        	eor	#$3
+     15e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     160: 02 01        	cop	#$1
+     162: 00           	brk
+     163: 00           	brk
+     164: 02 02        	cop	#$2
+     166: 00           	brk
+     167: 00           	brk
+     168: 4b           	phk
+     169: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     16b: 00           	brk
+     16c: 02 01        	cop	#$1
+     16e: 00           	brk
+     16f: 00           	brk
+     170: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     172: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     174: 4d 03 03     	eor	$303                    ; 0x303 <.rela.text+0x303>
+     177: 00           	brk
+     178: 02 01        	cop	#$1
+     17a: 00           	brk
+     17b: 00           	brk
+     17c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     17e: 00           	brk
+     17f: 00           	brk
+     180: 4f 03 03 00  	eor	mos24($303)             ; 0x303 <.rela.text+0x303>
+     184: 02 01        	cop	#$1
+     186: 00           	brk
+     187: 00           	brk
+     188: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     18a: 00           	brk
+     18b: 00           	brk
+     18c: 51 03        	eor	($3),y                  ; 0x3 <.rela.text+0x3>
+     18e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     190: 02 01        	cop	#$1
+     192: 00           	brk
+     193: 00           	brk
+     194: 02 02        	cop	#$2
+     196: 00           	brk
+     197: 00           	brk
+     198: 53 03        	eor	($3,s),y                ; 0x3 <.rela.text+0x3>
+     19a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     19c: 02 01        	cop	#$1
+     19e: 00           	brk
+     19f: 00           	brk
+     1a0: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     1a2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1a4: 55 03        	eor	$3,x                    ; 0x3 <.rela.text+0x3>
+     1a6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1a8: 02 01        	cop	#$1
+     1aa: 00           	brk
+     1ab: 00           	brk
+     1ac: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     1ae: 00           	brk
+     1af: 00           	brk
+     1b0: 57 03        	eor	[$3],y                  ; 0x3 <.rela.text+0x3>
+     1b2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1b4: 02 01        	cop	#$1
+     1b6: 00           	brk
+     1b7: 00           	brk
+     1b8: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     1ba: 00           	brk
+     1bb: 00           	brk
+     1bc: 59 03 03     	eor	$303,y                  ; 0x303 <.rela.text+0x303>
+     1bf: 00           	brk
+     1c0: 02 01        	cop	#$1
+     1c2: 00           	brk
+     1c3: 00           	brk
+     1c4: 02 02        	cop	#$2
+     1c6: 00           	brk
+     1c7: 00           	brk
+     1c8: 5b           	tcd
+     1c9: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     1cb: 00           	brk
+     1cc: 02 01        	cop	#$1
+     1ce: 00           	brk
+     1cf: 00           	brk
+     1d0: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     1d2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1d4: 5d 03 03     	eor	$303,x                  ; 0x303 <.rela.text+0x303>
+     1d7: 00           	brk
+     1d8: 02 01        	cop	#$1
+     1da: 00           	brk
+     1db: 00           	brk
+     1dc: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     1de: 00           	brk
+     1df: 00           	brk
+     1e0: 5f 03 03 00  	eor	mos24($303),x           ; 0x303 <.rela.text+0x303>
+     1e4: 02 01        	cop	#$1
+     1e6: 00           	brk
+     1e7: 00           	brk
+     1e8: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     1ea: 00           	brk
+     1eb: 00           	brk
+     1ec: 61 03        	adc	($3,x)                  ; 0x3 <.rela.text+0x3>
+     1ee: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1f0: 02 01        	cop	#$1
+     1f2: 00           	brk
+     1f3: 00           	brk
+     1f4: 02 02        	cop	#$2
+     1f6: 00           	brk
+     1f7: 00           	brk
+     1f8: 63 03        	adc	$3,s                    ; 0x3 <.rela.text+0x3>
+     1fa: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     1fc: 02 01        	cop	#$1
+     1fe: 00           	brk
+     1ff: 00           	brk
+     200: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     202: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     204: 65 03        	adc	$3                      ; 0x3 <.rela.text+0x3>
+     206: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     208: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     20a: 00           	brk
+     20b: 00           	brk
+     20c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     20e: 00           	brk
+     20f: 00           	brk
+     210: 68           	pla
+     211: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     213: 00           	brk
+     214: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     216: 00           	brk
+     217: 00           	brk
+     218: 02 02        	cop	#$2
+     21a: 00           	brk
+     21b: 00           	brk
+     21c: 6b           	rtl
+     21d: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     21f: 00           	brk
+     220: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     222: 00           	brk
+     223: 00           	brk
+     224: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     226: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     228: 6e 03 03     	ror	$303                    ; 0x303 <.rela.text+0x303>
+     22b: 00           	brk
+     22c: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     22e: 00           	brk
+     22f: 00           	brk
+     230: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     232: 00           	brk
+     233: 00           	brk
+     234: 71 03        	adc	($3),y                  ; 0x3 <.rela.text+0x3>
+     236: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     238: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     23a: 00           	brk
+     23b: 00           	brk
+     23c: 02 02        	cop	#$2
+     23e: 00           	brk
+     23f: 00           	brk
+     240: 74 03        	stz	$3,x                    ; 0x3 <.rela.text+0x3>
+     242: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     244: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     246: 00           	brk
+     247: 00           	brk
+     248: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     24a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     24c: 77 03        	adc	[$3],y                  ; 0x3 <.rela.text+0x3>
+     24e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     250: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+     252: 00           	brk
+     253: 00           	brk
+     254: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     256: 00           	brk
+     257: 00           	brk
+     258: 7b           	tdc
+     259: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     25b: 00           	brk
+     25c: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+     25e: 00           	brk
+     25f: 00           	brk
+     260: 02 02        	cop	#$2
+     262: 00           	brk
+     263: 00           	brk
+     264: 7f 03 03 00  	adc	mos24($303),x           ; 0x303 <.rela.text+0x303>
+     268: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+     26a: 00           	brk
+     26b: 00           	brk
+     26c: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     26e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     270: 83 03        	sta	$3,s                    ; 0x3 <.rela.text+0x3>
+     272: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     274: 07 01        	ora	[$1]                    ; 0x1 <.rela.text+0x1>
+     276: 00           	brk
+     277: 00           	brk
+     278: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     27a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     27c: 87 03        	sta	[$3]                    ; 0x3 <.rela.text+0x3>
+     27e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     280: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     282: 00           	brk
+     283: 00           	brk
+     284: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     286: 00           	brk
+     287: 00           	brk
+     288: 8a           	txa
+     289: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     28b: 00           	brk
+     28c: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     28e: 00           	brk
+     28f: 00           	brk
+     290: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     292: 00           	brk
+     293: 00           	brk
+     294: 8d 03 03     	sta	$303                    ; 0x303 <.rela.text+0x303>
+     297: 00           	brk
+     298: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     29a: 00           	brk
+     29b: 00           	brk
+     29c: 02 02        	cop	#$2
+     29e: 00           	brk
+     29f: 00           	brk
+     2a0: 90 03        	bcc	$2a5 <.rela.text+0x2a5>
+     2a2: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2a4: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     2a6: 00           	brk
+     2a7: 00           	brk
+     2a8: 02 02        	cop	#$2
+     2aa: 00           	brk
+     2ab: 00           	brk
+     2ac: 93 03        	sta	($3,s),y                ; 0x3 <.rela.text+0x3>
+     2ae: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2b0: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     2b2: 00           	brk
+     2b3: 00           	brk
+     2b4: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     2b6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2b8: 96 03        	stx	$3,y                    ; 0x3 <.rela.text+0x3>
+     2ba: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2bc: 02 01        	cop	#$1
+     2be: 00           	brk
+     2bf: 00           	brk
+     2c0: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     2c2: 00           	brk
+     2c3: 00           	brk
+     2c4: 98           	tya
+     2c5: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     2c7: 00           	brk
+     2c8: 02 01        	cop	#$1
+     2ca: 00           	brk
+     2cb: 00           	brk
+     2cc: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     2ce: 00           	brk
+     2cf: 00           	brk
+     2d0: 9a           	txs
+     2d1: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     2d3: 00           	brk
+     2d4: 02 01        	cop	#$1
+     2d6: 00           	brk
+     2d7: 00           	brk
+     2d8: 02 02        	cop	#$2
+     2da: 00           	brk
+     2db: 00           	brk
+     2dc: 9c 03 03     	stz	$303                    ; 0x303 <.rela.text+0x303>
+     2df: 00           	brk
+     2e0: 02 01        	cop	#$1
+     2e2: 00           	brk
+     2e3: 00           	brk
+     2e4: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     2e6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2e8: 9e 03 03     	stz	$303,x                  ; 0x303 <.rela.text+0x303>
+     2eb: 00           	brk
+     2ec: 02 01        	cop	#$1
+     2ee: 00           	brk
+     2ef: 00           	brk
+     2f0: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     2f2: 00           	brk
+     2f3: 00           	brk
+     2f4: a0 03        	ldy	#$3
+     2f6: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     2f8: 02 01        	cop	#$1
+     2fa: 00           	brk
+     2fb: 00           	brk
+     2fc: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     2fe: 00           	brk
+     2ff: 00           	brk
+     300: a2 03        	ldx	#$3
+     302: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     304: 02 01        	cop	#$1
+     306: 00           	brk
+     307: 00           	brk
+     308: 02 02        	cop	#$2
+     30a: 00           	brk
+     30b: 00           	brk
+     30c: a4 03        	ldy	$3                      ; 0x3 <.rela.text+0x3>
+     30e: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     310: 02 01        	cop	#$1
+     312: 00           	brk
+     313: 00           	brk
+     314: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     316: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     318: a6 03        	ldx	$3                      ; 0x3 <.rela.text+0x3>
+     31a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     31c: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     31e: 00           	brk
+     31f: 00           	brk
+     320: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     322: 00           	brk
+     323: 00           	brk
+     324: a9 03        	lda	#$3
+     326: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     328: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     32a: 00           	brk
+     32b: 00           	brk
+     32c: 01 00        	ora	($0,x)                  ; 0x0 <.rela.text>
+     32e: 00           	brk
+     32f: 00           	brk
+     330: ac 03 03     	ldy	$303                    ; 0x303 <.rela.text+0x303>
+     333: 00           	brk
+     334: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     336: 00           	brk
+     337: 00           	brk
+     338: 02 02        	cop	#$2
+     33a: 00           	brk
+     33b: 00           	brk
+     33c: af 03 03 00  	lda	mos24($303)             ; 0x303 <.rela.text+0x303>
+     340: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     342: 00           	brk
+     343: 00           	brk
+     344: 02 02        	cop	#$2
+     346: 00           	brk
+     347: 00           	brk
+     348: b2 03        	lda	($3)                    ; 0x3 <.rela.text+0x3>
+     34a: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+     34c: 03 01        	ora	$1,s                    ; 0x1 <.rela.text+0x1>
+     34e: 00           	brk
+     34f: 00           	brk
+     350: 03 03        	ora	$3,s                    ; 0x3 <.rela.text+0x3>
+     352: 03 00        	ora	$0,s                    ; 0x0 <.rela.text>
+
+Disassembly of section .symtab:
+
+00000000 <.symtab>:
+		...
+      1c: 03 00        	ora	$0,s                    ; 0x0 <.symtab>
+      1e: 02 00        	cop	#$0
+      20: 23 00        	and	$0,s                    ; 0x0 <.symtab>
+      22: 00           	brk
+      23: 00           	brk
+      24: 01 00        	ora	($0,x)                  ; 0x0 <.symtab>
+      26: 00           	brk
+      27: 00           	brk
+      28: 00           	brk
+      29: 00           	brk
+      2a: 00           	brk
+      2b: 00           	brk
+      2c: 00           	brk
+      2d: 20 02 00     	jsr	$2 <.symtab+0x2>
+      30: 29 00        	and	#$0
+      32: 00           	brk
+      33: 00           	brk
+      34: 02 02        	cop	#$2
+		...
+      3e: 02 00        	cop	#$0
+      40: 30 00        	bmi	$42 <.symtab+0x42>
+      42: 00           	brk
+      43: 00           	brk
+      44: 03 03        	ora	$3,s                    ; 0x3 <.symtab+0x3>
+      46: 03 00        	ora	$0,s                    ; 0x0 <.symtab>
+      48: 00           	brk
+      49: 00           	brk
+      4a: 00           	brk
+      4b: 00           	brk
+      4c: 00           	brk
+      4d: 00           	brk
+      4e: 02 00        	cop	#$0
+      50: 0c 00 00     	tsb	$0                      ; 0x0 <.symtab>
+      53: 00           	brk
+      54: 03 03        	ora	$3,s                    ; 0x3 <.symtab+0x3>
+      56: 03 00        	ora	$0,s                    ; 0x0 <.symtab>
+      58: 00           	brk
+      59: 00           	brk
+      5a: 00           	brk
+      5b: 00           	brk
+      5c: 00           	brk
+      5d: 00           	brk
+      5e: 02 00        	cop	#$0
+      60: 3d 00 00     	and	$0,x                    ; 0x0 <.symtab>
+      63: 00           	brk
+      64: 03 03        	ora	$3,s                    ; 0x3 <.symtab+0x3>
+      66: 03 00        	ora	$0,s                    ; 0x0 <.symtab>
+      68: 00           	brk
+      69: 00           	brk
+      6a: 00           	brk
+      6b: 00           	brk
+      6c: 00           	brk
+      6d: 00           	brk
+      6e: 02 00        	cop	#$0
+      70: 37 00        	and	[$0],y                  ; 0x0 <.symtab>
+      72: 00           	brk
+      73: 00           	brk
+      74: 5c 03 03 00  	jmp	mos24($303) <.symtab+0x303>
+      78: 00           	brk
+      79: 00           	brk
+      7a: 00           	brk
+      7b: 00           	brk
+      7c: 00           	brk
+      7d: 00           	brk
+      7e: 02 00        	cop	#$0

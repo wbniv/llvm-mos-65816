@@ -1,0 +1,75 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-objcopy in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dis in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-objcopy in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /tmp/aarch64-asm-type-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /tmp/aarch64-asm-type-lit/bin
+-- Testing: 281 of 11463 tests, 2 workers --
+Testing:  0.. 10.. 20.. 30.. 40.. 50.. 60.. 70.. 80.. 90.. 
+
+Testing Time: 4.71s
+
+Total Discovered Tests: 11463
+  Excluded         : 11182 (97.55%)
+  Passed           :   277 (2.42%)
+  Expectedly Failed:     4 (0.03%)

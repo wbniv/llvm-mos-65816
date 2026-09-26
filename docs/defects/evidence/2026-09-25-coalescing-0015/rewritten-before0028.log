@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc-noguard-no0028 -mtriple=mos -mcpu=mosw65816 -run-pass=greedy,virtregrewriter /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/rcundef-a16-Os-before-greedy.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/rewritten-before0028.mir
+exit_code=0

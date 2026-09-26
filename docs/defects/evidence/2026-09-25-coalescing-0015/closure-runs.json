@@ -1,0 +1,24 @@
+[
+  {
+    "name": "baseline",
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-without-0015-or-0028 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /dev/null",
+    "exit_code": -6,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/baseline-closure.log",
+      "sha256": "06f2a8e95153d933e75c28577094ad79b57a4cf99b6df09cc64171475d96f4c4"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-without-0015-or-0028",
+    "toolchain_sha256": "66e65f403c904c116701c7f2f111fdcc275f3187830d10c2734e56dc1fa24462"
+  },
+  {
+    "name": "candidate",
+    "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-with-0028-without-0015 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /dev/null",
+    "exit_code": 0,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-coalescing-0015/candidate-closure.log",
+      "sha256": "dea601616330c3795e61dc3dd842b4213170807f2e7af652c47c6348488b0f77"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-with-0028-without-0015",
+    "toolchain_sha256": "78b6f42bf064d9515c4ab13a907ecede67d6e22d3c4424ac6eaf91f755eae424"
+  }
+]

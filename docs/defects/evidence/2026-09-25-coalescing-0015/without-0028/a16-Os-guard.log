@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/build/coalescing-0015-contrast/llc-guard-no0028 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/without-0028/a16-Os-guard.s
+exit_code=0

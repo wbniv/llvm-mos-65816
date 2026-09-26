@@ -1,0 +1,5 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -fno-lto -x c-cpp-output -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i -o /dev/null
+clang: error: language not recognized: 'c-cpp-output'
+clang: warning: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.i: 'linker' input unused [-Wunused-command-line-argument]
+
+exit_code=1

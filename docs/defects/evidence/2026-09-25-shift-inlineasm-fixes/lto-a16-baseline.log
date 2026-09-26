@@ -1,0 +1,6 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/clang --config=/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -flto /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-probe.bc /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/lto-a16-harness.bc -Wl,--mllvm=-verify-machineinstrs -fuse-ld=/home/will/llvm-mos-65816/build/inlineasm-bounds-fix/lld-before-0055 -o /home/will/llvm-mos-65816/build/shift-inlineasm-validation/lto-baseline.sfc
+lld is a generic driver.
+Invoke ld.lld (Unix), ld64.lld (macOS), lld-link (Windows), wasm-ld (WebAssembly) instead
+clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+
+exit_code=1

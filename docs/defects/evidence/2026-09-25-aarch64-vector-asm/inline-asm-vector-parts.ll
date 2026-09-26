@@ -1,0 +1,115 @@
+; RUN: split-file %s %t
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/input-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/input-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/output-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/output-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/indirect-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/indirect-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/tied-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/tied-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/callbr-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/callbr-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/callbr-input-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/callbr-input-8.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/input-2.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=LOSSY
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/input-2.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=LOSSY
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/callbr-input-2.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=LOSSY
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/callbr-input-2.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=LOSSY
+; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel %t/original.ll -o /dev/null 2>&1 | FileCheck %s --check-prefix=PARTS
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %t/supported.ll -o /dev/null
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O0 -mattr=-neon -verify-machineinstrs %t/scalarized.ll -o /dev/null
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O0 -mattr=+ls64 -verify-machineinstrs %t/ls64.ll -o /dev/null
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %t/supported.ll -o /dev/null
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O2 -mattr=-neon -verify-machineinstrs %t/scalarized.ll -o /dev/null
+; RUN: llc -mtriple=aarch64 -global-isel=0 -O2 -mattr=+ls64 -verify-machineinstrs %t/ls64.ll -o /dev/null
+
+; Generic vector splitting and joining require the constraint-selected parts
+; to match the vector breakdown. Each rejected form runs separately so its
+; diagnostic cannot be hidden by another operand. Callbr results are live on
+; both successors to exercise the value mappings used during error recovery.
+; PARTS: error: incompatible vector register parts, possible invalid constraint for vector type
+; LOSSY: error: lossy vector-to-scalar conversion, possible invalid constraint for vector type
+
+;--- input-8.ll
+define void @f(ptr %p) { %v = load <8 x i64>, ptr %p
+call void asm sideeffect "", "r"(<8 x i64> %v)
+ret void }
+
+;--- output-8.ll
+define void @f(ptr %p) { %v = call <8 x i64> asm sideeffect "", "=r"()
+store <8 x i64> %v, ptr %p
+ret void }
+
+;--- indirect-8.ll
+define void @f(ptr %p) { call void asm sideeffect "", "=*r"(ptr elementtype(<8 x i64>) %p)
+ret void }
+
+;--- tied-8.ll
+define void @f(ptr %p) { %v = load <8 x i64>, ptr %p
+%r = call <8 x i64> asm sideeffect "", "=r,0"(<8 x i64> %v)
+store <8 x i64> %r, ptr %p
+ret void }
+
+;--- callbr-8.ll
+define void @f(ptr %p) { %r = callbr <8 x i64> asm sideeffect "", "=r,!i"() to label %fallthrough [label %indirect]
+fallthrough: store <8 x i64> %r, ptr %p
+ret void
+indirect: store <8 x i64> %r, ptr %p
+ret void }
+
+;--- callbr-input-8.ll
+define i64 @f(ptr %p) { %v = load <8 x i64>, ptr %p
+%r = callbr i64 asm sideeffect "", "=r,r,!i"(<8 x i64> %v) to label %fallthrough [label %indirect]
+fallthrough: ret i64 %r
+indirect: ret i64 %r }
+
+;--- input-2.ll
+define void @f(ptr %p) { %v = load <2 x i64>, ptr %p
+call void asm sideeffect "", "r"(<2 x i64> %v)
+ret void }
+
+;--- callbr-input-2.ll
+define i64 @f(ptr %p) { %v = load <2 x i64>, ptr %p
+%r = callbr i64 asm sideeffect "", "=r,r,!i"(<2 x i64> %v) to label %fallthrough [label %indirect]
+fallthrough: ret i64 %r
+indirect: ret i64 %r }
+
+;--- original.ll
+define void @many_virtual(ptr %p) {
+  %v = load <64 x i64>, ptr %p
+  call void asm sideeffect "", "r"(<64 x i64> %v)
+  ret void
+}
+
+;--- supported.ll
+; Equal-width bitcasts and floating-point vectors can use scalar register parts.
+define void @small(ptr %p) {
+  %v = load <8 x i8>, ptr %p
+  %r = call <8 x i8> asm sideeffect "", "=r,0"(<8 x i8> %v)
+  store <8 x i8> %r, ptr %p
+  ret void
+}
+
+define void @floating(ptr %p) {
+  %v = load <4 x float>, ptr %p
+  call void asm sideeffect "", "r"(<4 x float> %v)
+  ret void
+}
+
+;--- scalarized.ll
+; With NEON disabled the integer vector breakdown uses matching scalar parts.
+define void @scalarized(ptr %p) {
+  %v = load <4 x i32>, ptr %p
+  %r = call <4 x i32> asm sideeffect "", "=r,0"(<4 x i32> %v)
+  store <4 x i32> %r, ptr %p
+  ret void
+}
+
+;--- ls64.ll
+; LS64 provides a register class for a 512-bit vector value.
+define void @ls64(ptr %p) {
+  %v = load <8 x i64>, ptr %p
+  %r = call <8 x i64> asm sideeffect "", "=r,0"(<8 x i64> %v)
+  store <8 x i64> %r, ptr %p
+  ret void
+}

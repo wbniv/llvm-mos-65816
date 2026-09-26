@@ -1,0 +1,3 @@
+$ cc -O2 -DHOST_MAIN /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/bitboard-probe-runtime.c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/shift-stage/examples/65816/bitboard64-probe.c -o /home/will/llvm-mos-65816/build/shift-inlineasm-validation/bitboard-probe-runtime-host
+
+exit_code=0

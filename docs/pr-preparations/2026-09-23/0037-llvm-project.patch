@@ -1,0 +1,154 @@
+diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+index 840cf5a269fe..de6d54dfd28b 100644
+--- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
++++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+@@ -14,7 +14,9 @@
+ 
+ #include "llvm/CodeGen/GlobalISel/InlineAsmLowering.h"
+ #include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
++#include "llvm/CodeGen/LowLevelTypeUtils.h"
+ #include "llvm/CodeGen/MachineFrameInfo.h"
++#include "llvm/CodeGen/MachineMemOperand.h"
+ #include "llvm/CodeGen/MachineOperand.h"
+ #include "llvm/CodeGen/MachineRegisterInfo.h"
+ #include "llvm/CodeGen/TargetLowering.h"
+@@ -47,6 +49,10 @@ public:
+   /// contains the set of assigned registers corresponding to the operand.
+   SmallVector<Register, 1> Regs;
+ 
++  /// For an indirect operand (=*r, *r), the type of the value the pointer
++  /// argument refers to (the elementtype attribute).
++  llvm::Type *IndirectTy = nullptr;
++
+   /// The register class selected for this operand's constraint.
+   const TargetRegisterClass *RegClass = nullptr;
+ 
+@@ -273,6 +279,7 @@ bool InlineAsmLowering::lowerInlineAsm(
+       if (OpInfo.isIndirect) {
+         OpTy = Call.getParamElementType(ArgNo);
+         assert(OpTy && "Indirect operand must have elementtype attribute");
++        OpInfo.IndirectTy = OpTy;
+       }
+ 
+       // FIXME: Support aggregate input operands
+@@ -325,6 +332,9 @@ bool InlineAsmLowering::lowerInlineAsm(
+ 
+   // Collects the output operands for later processing
+   GISelAsmOperandInfoVector OutputOperands;
++  // Indirect register outputs (=*r): written back through their pointer
++  // argument after the INLINEASM instead of producing a call result.
++  GISelAsmOperandInfoVector IndirectOutputs;
+ 
+   for (auto &OpInfo : ConstraintOperands) {
+     GISelAsmOperandInfo &RefOpInfo =
+@@ -395,7 +405,10 @@ bool InlineAsmLowering::lowerInlineAsm(
+         }
+ 
+         // Remember this output operand for later processing
+-        OutputOperands.push_back(OpInfo);
++        if (OpInfo.isIndirect)
++          IndirectOutputs.push_back(OpInfo);
++        else
++          OutputOperands.push_back(OpInfo);
+       }
+ 
+       break;
+@@ -634,15 +647,8 @@ bool InlineAsmLowering::lowerInlineAsm(
+ 
+   // Finally, copy the output operands into the output registers
+   ArrayRef<Register> ResRegs = GetOrCreateVRegs(Call);
+-  // FIXME: This check doesn't account for indirect output constraints (=*).
+-  // Indirect outputs write through a pointer argument and don't produce a
+-  // return value, so they shouldn't be counted in OutputOperands when
+-  // comparing against ResRegs. For example:
+-  //   call void asm "...", "=*X"(ptr %p)
+-  // has one output constraint (=*X) but returns void (ResRegs is empty).
+-  // This causes the check below to incorrectly fail. To fix this, we would
+-  // need to filter OutputOperands to only count direct outputs, or track
+-  // indirect vs direct outputs separately.
++  // OutputOperands holds the direct outputs only; indirect register outputs
++  // are stored through their pointer below and produce no call result.
+   if (ResRegs.size() != OutputOperands.size()) {
+     LLVM_DEBUG(dbgs() << "Expected the number of output registers to match the "
+                          "number of destination registers (ResRegs="
+@@ -704,6 +710,40 @@ bool InlineAsmLowering::lowerInlineAsm(
+     }
+   }
+ 
++  // Store each indirect register output through its pointer argument, as
++  // SelectionDAG does for "=*r"-style constraints.
++  for (GISelAsmOperandInfo &OpInfo : IndirectOutputs) {
++    if (OpInfo.Regs.size() != 1) {
++      LLVM_DEBUG(dbgs() << "Indirect output operands with multiple defining "
++                           "registers are not supported yet\n");
++      return false;
++    }
++    Register SrcReg = OpInfo.Regs[0];
++    unsigned SrcSize = TRI->getRegSizeInBits(SrcReg, *MRI);
++    LLT ValTy = getLLTForType(*OpInfo.IndirectTy, DL);
++    Register Val;
++    if (ValTy.isScalar() && ValTy.getSizeInBits() < SrcSize) {
++      auto Copy = MIRBuilder.buildCopy(LLT::integer(SrcSize), SrcReg);
++      Val = MIRBuilder.buildTrunc(ValTy, Copy).getReg(0);
++    } else if (ValTy.getSizeInBits() == SrcSize) {
++      Val = MIRBuilder.buildCopy(ValTy, SrcReg).getReg(0);
++    } else {
++      LLVM_DEBUG(dbgs() << "Unhandled indirect output operand with mismatched "
++                           "register size\n");
++      return false;
++    }
++    ArrayRef<Register> PtrRegs = GetOrCreateVRegs(*OpInfo.CallOperandVal);
++    if (PtrRegs.size() != 1) {
++      LLVM_DEBUG(dbgs() << "Expected the indirect output pointer to fit into a "
++                           "single virtual register\n");
++      return false;
++    }
++    MachineMemOperand *MMO = MF.getMachineMemOperand(
++        MachinePointerInfo(OpInfo.CallOperandVal), MachineMemOperand::MOStore,
++        ValTy, DL.getABITypeAlign(OpInfo.IndirectTy));
++    MIRBuilder.buildStore(Val, PtrRegs[0], *MMO);
++  }
++
+   return true;
+ }
+ 
+diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
+new file mode 100644
+index 000000000000..9523e25444d5
+--- /dev/null
++++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll
+@@ -0,0 +1,34 @@
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 < %s | FileCheck %s --check-prefix=ASM
++
++; An indirect register output ("=*r", what Clang emits for "+g") is stored
++; through its pointer argument after the asm instead of being a call result.
++
++define i32 @barrier(i32 %u) {
++; CHECK-LABEL: name: barrier
++; CHECK: [[P:%[0-9]+]]:_(p0) = G_FRAME_INDEX %stack.0.u.addr
++; CHECK: INLINEASM &"", {{.*}} regdef:GPR32common, def [[D:%[0-9]+]], reguse tiedto:$0, %{{[0-9]+}}(tied-def 3)
++; CHECK: [[V:%[0-9]+]]:_(i32) = COPY [[D]]
++; CHECK: G_STORE [[V]](i32), [[P]](p0) :: (store (i32) into %ir.u.addr)
++; ASM-LABEL: barrier:
++; ASM: ret
++  %u.addr = alloca i32, align 4
++  store i32 %u, ptr %u.addr, align 4
++  %v = load i32, ptr %u.addr, align 4
++  call void asm sideeffect "", "=*imr,0"(ptr nonnull elementtype(i32) %u.addr, i32 %v)
++  %r = load i32, ptr %u.addr, align 4
++  ret i32 %r
++}
++
++define void @indirect_narrow(ptr %p) {
++; CHECK-LABEL: name: indirect_narrow
++; CHECK: INLINEASM &"", {{.*}} regdef:GPR32common, def [[D:%[0-9]+]]
++; CHECK: [[W:%[0-9]+]]:_(i32) = COPY [[D]]
++; CHECK: [[V:%[0-9]+]]:_(i8) = G_TRUNC [[W]](i32)
++; CHECK: G_STORE [[V]](i8), %{{[0-9]+}}(p0) :: (store (i8) into %ir.p)
++; ASM-LABEL: indirect_narrow:
++; ASM: strb w{{[0-9]+}}, [x0]
++; ASM: ret
++  call void asm sideeffect "", "=*r"(ptr elementtype(i8) %p)
++  ret void
++}

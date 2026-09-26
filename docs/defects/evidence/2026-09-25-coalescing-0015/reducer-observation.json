@@ -1,0 +1,12 @@
+{
+  "command": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/reducer-parallel-tiny-output.mir",
+  "working_directory": "/home/will/llvm-mos-65816",
+  "exit_code": -11,
+  "toolchain_location": "build/llvm-mos/bin/llvm-reduce",
+  "toolchain_sha256": "993b1e90ac19b57723c03c9b6365c7864bdc1543b18bee508361a84c7f490db6",
+  "input": "docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+  "input_sha256": "d459f318ccfa8e11f96e8b9740a48781dbeb0c5a5b8a2897ac8daef877f0bbef",
+  "log": "docs/defects/evidence/2026-09-25-coalescing-0015/reducer-parallel-tiny.log",
+  "initial_full_input_exit_code": 139,
+  "serial_reduction_disposition": "Interrupted after several minutes; retained partial 86-KiB reduction rechecks as valid, failing without 0028 and passing with it. It still contains fork-specific instructions; the small stock reproducer is explicitly a constructed model."
+}

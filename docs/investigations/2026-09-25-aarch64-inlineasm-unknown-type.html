@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AArch64 inline-assembly unknown types — patch 0058</title>
+<style>
+:root{color-scheme:light dark;font-family:system-ui,sans-serif;line-height:1.6}
+body{max-width:1040px;margin:32px auto;padding:0 24px;background:#f8fafc;color:#202938}
+nav{font-size:.9rem;margin-bottom:24px}a{color:#1754b8}h1{line-height:1.2}
+h2{margin-top:2em}code{background:#e8edf5;padding:2px 5px;border-radius:4px}
+table{border-collapse:collapse;width:100%}th,td{border:1px solid #cdd7e5;padding:9px 12px;text-align:left}
+details{margin:24px 0;padding:16px 20px;border:1px solid #cdd7e5;border-radius:8px;background:#fff}
+summary{cursor:pointer;font-weight:650}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.85rem}
+@media(prefers-color-scheme:dark){body{background:#111722;color:#e1e8f2}a{color:#92bdff}
+code{background:#263347}details{background:#172130}th,td,details{border-color:#34445a}}
+</style></head><body>
+<nav><a href="../mos-upstream-status-2026-09-21.html">Upstream status</a> ·
+<a href="../mos-upstream-flowchart.html">Dependency flowchart</a> ·
+<a href="#transcript">Work-session transcript</a></nav>
+<h1 id="aarch64-inline-assembly-unknown-operand-types">AArch64 inline-assembly unknown operand types</h1>
+<p>Patch <a href="../../patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch">0058</a>
+repairs the <a href="../defects/selectiondag-inline-asm-nonstandard-integer.json">nonstandard integer type abort</a>.
+The original <code>i4096</code> input now receives a normal register-allocation diagnostic.
+The separate <a href="../defects/selectiondag-inline-asm-vector-parts.json">vector part-type assertion</a>
+was left open by 0058. <strong>Follow-up:</strong> <a href="2026-09-25-selectiondag-vector-parts.md">0059</a>
+repairs its generic conversion diagnostics with matching-input red/green evidence;
+the original failing baseline is retained.</p>
+<p>Diagnosis, implementation, regression coverage, and documentation: OpenAI Codex
+CLI 0.157.0 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort,
+verified from this turn's <a href="../defects/evidence/2026-09-25-aarch64-asm-type/session-identity.json">session metadata</a>.</p>
+<h2 id="failure-and-repair">Failure and repair</h2>
+<p>SelectionDAG's constraint parser represents operand types without a simple MVT
+as <code>MVT::Other</code>. AArch64's <code>r</code> and <code>x</code> handlers query the type's size to choose
+a register class. That query has no meaning for <code>Other</code> and aborts. The existing
+<code>w</code> handler already rejects this case. Both affected handlers now reject unknown
+types before asking for their size, allowing the existing inline-asm diagnostic
+and recovery paths to handle the unsupported constraint/type combination.</p>
+<p>This does not add support for arbitrary-width integer register operands. Memory
+operands can still carry those values; named clobbers still work without a value
+type. Supported general-purpose, SIMD, and LS64 register operands retain their
+existing lowering. The two-line target change leaves generic vector-part lowering
+untouched.</p>
+<h2 id="baseline-and-causality">Baseline and causality</h2>
+<p>The <a href="../defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll">original LLVM IR</a>,
+its initial log, command, and compiler identity are retained unchanged. This is a
+constructed LLVM IR probe, with no C source or preprocessing stage. No MIR is
+available before the DAG-building abort. The <a href="../defects/evidence/2026-09-25-aarch64-asm-type/baseline-replay.log">baseline replay</a>
+verifies the preserved binary hash and repeats <code>Value type is non-standard value, Other.</code></p>
+<p>The original compiler includes prior patches through 0041; it is not an
+unpatched upstream binary. Its complete AArch64ISelLowering.cpp is byte-identical
+to saved published upstream revision <code>742d554bf08042b8df93d791c335260fadd16643</code>.
+The older vendor file differs elsewhere, but the affected <code>r</code>/<code>x</code> handlers match.
+<a href="../defects/evidence/2026-09-25-aarch64-asm-type/baseline-identity.json">Identity and source archives</a>
+retain that distinction. No latest-upstream check is claimed.</p>
+<p>The preserved 0057 compiler also fails the same input for the same reason.
+The <a href="../defects/evidence/2026-09-25-aarch64-asm-type/candidate-identity.json">candidate</a>
+replaces only AArch64ISelLowering.cpp.o in that compiler's link. The
+<a href="../../dev/check-aarch64-asm-type-diagnostic.py">diagnostic runner</a> requires compiler
+exit 1 with exactly the expected diagnostic and returns zero only on success.
+Its target, optimization, verifier, and stop-after settings match the recorded
+baseline. The original input's bytes are identical in the red and green runs.</p>
+<h2 id="validation-and-dependencies">Validation and dependencies</h2>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Original input, both preserved compilers</td>
+<td>Same unknown-type abort</td>
+</tr>
+<tr>
+<td>Original input, 0058 candidate</td>
+<td>Clean allocation diagnostic; runner passes</td>
+</tr>
+<tr>
+<td>Eight rejected operand forms, O0/O2, default/+ls64</td>
+<td>32 aborts on each baseline; 32 clean diagnostics on candidate</td>
+</tr>
+<tr>
+<td>Supported register, memory, and named-clobber controls</td>
+<td>All four configurations pass on all three builds</td>
+</tr>
+<tr>
+<td>AArch64/ARM/X86 asm, callbr, and LS64 tests, plus new regression</td>
+<td>277 pass; four existing expected failures</td>
+</tr>
+<tr>
+<td>Patch application to vendor and saved upstream source</td>
+<td>Exact candidate source and regression reproduced</td>
+</tr>
+</tbody>
+</table>
+<p><a href="../defects/evidence/2026-09-25-aarch64-asm-type/operand-matrix.json">Individual runs</a>
+and <a href="../defects/evidence/2026-09-25-aarch64-asm-type/validation-summary.json">suite results</a>
+are retained. The first matrix expectation used the older vendor's diagnostic
+wording; the saved upstream compiler says <code>could not</code> instead of <code>couldn't</code>.
+The corrected expectations accept those two exact spellings without accepting
+an abort or an unrelated error. The initial results remain available. The first
+lit invocation could not start sandboxed multiprocessing workers; the permitted
+retry completed the suite.</p>
+<p>The <code>callbr</code> tests consume results on both edges. Their error recovery depends
+on the generic repair in <a href="2026-09-25-selectiondag-inlineasm.md">0057</a>, so an upstream
+submission with this full regression needs that recovery prerequisite. The
+AArch64 guard itself applies independently. Submission preparation and independent
+review remain; this patch has not been published.</p>
+<p>A <a href="../defects/evidence/2026-09-25-aarch64-asm-type/recovery-dependency.json">guard-only link</a>
+with the original SelectionDAG archive confirms this distinction: the original
+input receives a clean diagnostic, while the <code>callbr</code> output diagnoses and then
+segfaults during recovery. Including 0057 makes that same <code>callbr</code> case exit cleanly.</p>
+<p>The tested compiler is retained at <code>build/aarch64-asm-type-fix/llc</code> with its
+<a href="../defects/evidence/2026-09-25-aarch64-asm-type/build-candidate.py">build recipe</a>.
+The installed MOS compiler is configured with only the MOS backend; this
+AArch64-only source change does not require rebuilding that compiler. Runtime
+execution is not applicable to the rejected inputs.</p>
+<p>The document-impact review updated TODO, the pending-work tracker, contribution
+status, the earlier investigation's follow-up, and both generated browser views.
+Other transitive references describe earlier work or generic tracker navigation;
+they do not assert the disposition of this newly captured type failure. Their
+historical claims and attribution are preserved.</p>
+<details id="transcript"><summary>Work-session transcript</summary>
+<h1 id="work-session-transcript">Work-session transcript</h1>
+<p>User and assistant messages for the 0058 investigation, captured through the
+browser-rendering request. Compiler command transcripts are provided separately.</p>
+<p>Assistant: OpenAI Codex CLI 0.157.0 (<code>codex-tui</code>), model <code>gpt-6-astra</code>,
+<code>xhigh</code> reasoning effort; verified from this session metadata.</p>
+<p><strong>User</strong></p>
+<p>fix next defect</p>
+<p><strong>Assistant</strong></p>
+<p>I’ll check the remaining defect records, select the next reproducible failure, and preserve its failing baseline before changing the compiler.</p>
+<p><strong>Assistant</strong></p>
+<p>Two crashes remain confirmed. I’m examining the nonstandard-integer inline-assembly failure first: the preserved <code>i4096</code> input aborts during a type query, before register allocation. I’ll establish whether it should be lowered or rejected with a diagnostic.</p>
+<p><strong>Assistant</strong></p>
+<p>The cause is in AArch64’s <code>r</code> constraint handler: nonstandard types arrive as “unknown,” but it queries their bit width anyway. The <code>x</code> handler has the same unchecked query; <code>w</code> already rejects unknown types. I’ll add the missing guards and test ordinary register operands, memory operands, and clobbers.</p>
+<p><strong>Assistant</strong></p>
+<p>The guards stop the abort. All 32 failing configurations now exit with an allocation diagnostic, and the supported-operand controls pass. I found a diagnostic wording difference between the older vendor source and saved upstream source, so the tests will accept both exact forms. Cross-target regression testing is next.</p>
+<p><strong>Assistant</strong></p>
+<p>The focused LLVM suite passed: 277 tests, with four existing expected failures. The same inputs still abort on both preserved baselines and receive clean diagnostics with patch 0058. I’m updating the defect record, dependent summaries, and both browser views, including the 0057 prerequisite for <code>callbr</code> error recovery.</p>
+<p><strong>User</strong></p>
+<p>open in browser</p>
+<p><strong>User</strong></p>
+<p>put transcript in twisty</p>
+<p><strong>Assistant</strong></p>
+<p>I’ll open the rendered investigation in Chrome, with the work-session transcript collapsed in a disclosure triangle. I’ll also finish the evidence and document checks for the fix.</p>
+</details>
+<details><summary>Compiler diagnostic transcript — baseline and candidate</summary><pre>$ python3 dev/check-aarch64-asm-type-diagnostic.py --llc /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041
+$ /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null
+Value type is non-standard value, Other.
+UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/include/llvm/CodeGenTypes/MachineValueType.h:375!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null
+1.	Running pass &#x27;Function Pass Manager&#x27; on module &#x27;/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll&#x27;.
+2.	Running pass &#x27;AArch64 Instruction Selection&#x27; on function &#x27;@many_virtual&#x27;
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-0041  0x0000561e398b625b llvm::sys::PrintStackTrace(llvm::raw_ostream&amp;, int) + 43
+1  llc-0041  0x0000561e398b30e1 llvm::sys::RunSignalHandlers() + 369
+2  llc-0041  0x0000561e398b706b
+3  libc.so.6 0x0000795fb9c45cb0
+4  libc.so.6 0x0000795fb9ca61ac pthread_kill + 284
+5  libc.so.6 0x0000795fb9c45b7e gsignal + 30
+6  libc.so.6 0x0000795fb9c288ec abort + 39
+7  llc-0041  0x0000561e39811a1f
+8  llc-0041  0x0000561e375c802a
+9  llc-0041  0x0000561e37bc3eb3
+10 llc-0041  0x0000561e395f81cd
+11 llc-0041  0x0000561e395c9d40 llvm::SelectionDAGBuilder::visitInlineAsm(llvm::CallBase const&amp;, llvm::BasicBlock const*) + 5024
+12 llc-0041  0x0000561e395ab2e6 llvm::SelectionDAGBuilder::visit(llvm::Instruction const&amp;) + 246
+13 llc-0041  0x0000561e39680ce5 llvm::SelectionDAGISel::SelectBasicBlock(llvm::ilist_iterator_w_bits&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, true, false, void, true, llvm::BasicBlock&gt;, false, true&gt;, llvm::ilist_iterator_w_bits&lt;llvm::ilist_detail::node_options&lt;llvm::Instruction, true, false, void, true, llvm::BasicBlock&gt;, false, true&gt;, bool&amp;) + 261
+14 llc-0041  0x0000561e3967fddb llvm::SelectionDAGISel::SelectAllBasicBlocks(llvm::Function const&amp;) + 5675
+15 llc-0041  0x0000561e3967d541 llvm::SelectionDAGISel::runOnMachineFunction(llvm::MachineFunction&amp;) + 609
+16 llc-0041  0x0000561e3967abdc llvm::SelectionDAGISelLegacy::runOnMachineFunction(llvm::MachineFunction&amp;) + 140
+17 llc-0041  0x0000561e38551059 llvm::MachineFunctionPass::runOnFunction(llvm::Function&amp;) + 649
+18 llc-0041  0x0000561e38ae3840 llvm::FPPassManager::runOnFunction(llvm::Function&amp;) + 1120
+19 llc-0041  0x0000561e38aeb942 llvm::FPPassManager::runOnModule(llvm::Module&amp;) + 50
+20 llc-0041  0x0000561e38ae4604 llvm::legacy::PassManagerImpl::run(llvm::Module&amp;) + 2228
+21 llc-0041  0x0000561e374b380b
+22 llc-0041  0x0000561e374b0ad3 main + 1443
+23 libc.so.6 0x0000795fb9c2a601
+24 libc.so.6 0x0000795fb9c2a718 __libc_start_main + 136
+25 llc-0041  0x0000561e374afce5 _start + 37
+compiler_exit_code=-6
+Clean AArch64 type diagnostic: FAIL
+
+runner_exit_code=1
+
+$ python3 dev/check-aarch64-asm-type-diagnostic.py --llc /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc
+$ /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll -o /dev/null
+error: could not allocate input reg for constraint &#x27;r&#x27;
+compiler_exit_code=1
+Clean AArch64 type diagnostic: PASS
+
+runner_exit_code=0
+</pre></details>
+</body></html>

@@ -1,0 +1,84 @@
+[
+  {
+    "name": "shift-stage-default",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "shift-stage-a16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "shift-stage-xy16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/shift-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 1
+  },
+  {
+    "name": "inline-stage-default",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-a16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "inline-stage-xy16",
+    "command": [
+      "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "exit_code": 0
+  }
+]

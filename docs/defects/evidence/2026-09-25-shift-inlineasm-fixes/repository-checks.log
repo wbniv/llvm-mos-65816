@@ -1,0 +1,11 @@
+$ python3 dev/check-comment-history.py (temporary index; real index unchanged)
+Comment history: PASS
+exit_code=0
+$ python3 dev/check-defect-evidence.py --staged (temporary index; real index unchanged)
+Defect evidence: PASS (8 records, index)
+exit_code=0
+$ python3 dev/snes-display-quality.py --staged (temporary index; real index unchanged)
+SNESDQ: PASS (240 reviewed sensitive access sites; display order and upload budgets valid)
+exit_code=0
+$ git diff --cached --check -- . :(exclude)docs/defects/evidence (temporary index; real index unchanged)
+exit_code=0

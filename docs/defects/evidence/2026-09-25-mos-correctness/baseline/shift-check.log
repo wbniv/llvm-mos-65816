@@ -1,0 +1,114 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll --input-file=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s
+exit_code=1
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll:349:15: error: CHECK-NEXT: is not on the line after the previous match
+; CHECK-NEXT: txa
+              ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:373:2: note: 'next' match was here
+ txa
+ ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:371:18: note: previous match ended here
+; %bb.0: ; %entry
+                 ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:372:1: note: non-matching line after previous match is here
+ stx __rc2
+^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll:368:15: error: CHECK-NEXT: expected string not found in input
+; CHECK-NEXT: sec
+              ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:397:18: note: scanning from here
+; %bb.1: ; %entry
+                 ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:400:13: note: possible intended match here
+.LBB21_2: ; %entry
+            ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll:397:15: error: CHECK-NEXT: expected string not found in input
+; CHECK-NEXT: lda __rc2
+              ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:429:18: note: scanning from here
+; %bb.0: ; %entry
+                 ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s:430:2: note: possible intended match here
+ ldy __rc2
+ ^
+
+Input file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.s
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/shift-rotate.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+          368:  .globl ashr_8 ; -- Begin function ashr_8 
+          369:  .type ashr_8,@function 
+          370: ashr_8: ; @ashr_8 
+          371: ; %bb.0: ; %entry 
+          372:  stx __rc2 
+          373:  txa 
+next:349        !~~  error: match on wrong line
+          374:  bpl .LBB20_2 
+          375: ; %bb.1: ; %entry 
+          376:  lda #255 
+          377:  jmp .LBB20_3 
+          378: .LBB20_2: ; %entry 
+            .
+            .
+            .
+          392: ashr_15: ; @ashr_15 
+          393: ; %bb.0: ; %entry 
+          394:  stx __rc2 
+          395:  txa 
+          396:  bpl .LBB21_2 
+          397: ; %bb.1: ; %entry 
+next:368'0                      X error: no match found
+          398:  lda #255 
+next:368'0     ~~~~~~~~~~
+          399:  jmp .LBB21_3 
+next:368'0     ~~~~~~~~~~~~~~
+          400: .LBB21_2: ; %entry 
+next:368'0     ~~~~~~~~~~~~~~~~~~~
+next:368'1                 ?       possible intended match
+          401:  lda #0 
+next:368'0     ~~~~~~~~
+          402: .LBB21_3: ; %entry 
+next:368'0     ~~~~~~~~~~~~~~~~~~~
+          403:  asl __rc2 
+next:368'0     ~~~~~~~~~~~
+          404:  ldx #1 
+next:368'0     ~~~~~~~~
+          405:  bcs .LBB21_5 
+next:368'0     ~~~~~~~~~~~~~~
+            .
+            .
+            .
+          424:  .size ashr_15, .Lfunc_end21-ashr_15 
+next:368'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          425:  ; -- End function 
+next:368'0     ~~~~~~~~~~~~~~~~~~~
+          426:  .globl ashr_16 ; -- Begin function ashr_16 
+next:368'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          427:  .type ashr_16,@function 
+next:368'0     ~~~~~~~~~~~~~~~~~~~~~~~~~
+          428: ashr_16: ; @ashr_16 
+next:368'0     ~~~~~~~~
+          429: ; %bb.0: ; %entry 
+next:397'0                      X error: no match found
+          430:  ldy __rc2 
+next:397'0     ~~~~~~~~~~~
+next:397'1      ?          possible intended match
+          431:  ldx __rc3 
+next:397'0     ~~~~~~~~~~~
+          432:  stx __rc4 
+next:397'0     ~~~~~~~~~~~
+          433:  bpl .LBB22_2 
+next:397'0     ~~~~~~~~~~~~~~
+          434: ; %bb.1: ; %entry 
+next:397'0     ~~~~~~~~~~~~~~~~~~
+          435:  lda #255 
+next:397'0     ~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

@@ -1,0 +1,35 @@
+{
+  "llvm-mc": {
+    "sha256": "10d1d309f6ccdac91acbcefcf09fdc680512a3b709e613d9c80030ac68b11715",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+  },
+  "ld.lld": {
+    "sha256": "441d3812597166c73d9a23f33cc10f7904be34bace170402ed7278e69aaf61af",
+    "version": "LLD 23.0.0 (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36) (compatible with GNU linkers)\n"
+  },
+  "opt": {
+    "sha256": "97199a8e07f875b6ea5d7e60b65f7b6540bdb688cdc65cef43d20af8102ab116",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n"
+  },
+  "llc": {
+    "sha256": "ccc7e32369eb2983d3f66a31e4749a24ef4e1cfb7a69d1563c0cfa13ef42a58c",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+  },
+  "llvm-objdump": {
+    "sha256": "fa7717e3c7f55b95edb5f935586e1b7a441a2385ebb4ec94865041104abd4697",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+  },
+  "FileCheck": {
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n"
+  },
+  "clang": {
+    "sha256": "afc820130d054660c9fafcc2a3877ab07939a915a39f24e759d3e42d80e97d65",
+    "version": "clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)\nTarget: mos-unknown-unknown\nThread model: posix\nInstalledDir: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin\n"
+  },
+  "root_head": "0bf5b688fd2770c5fb1b582037028e5e79d647cf",
+  "vendor_head": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "source_identity_note": "Existing built tools preserved before changes. Source snapshot records checkout state; correspondence of every dirty source file to the existing binaries is not assumed.",
+  "container_image": "sha256:571e18a239454d9d97c4dbdab440e47b7ec325142a9418d607cb6e72434758b6",
+  "cwd": "/home/will/llvm-mos-65816"
+}

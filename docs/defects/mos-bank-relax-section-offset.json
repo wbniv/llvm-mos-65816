@@ -1,0 +1,104 @@
+{
+  "schema": 1,
+  "id": "mos-bank-relax-section-offset",
+  "title": "65816 bank relaxation ignores a section offset above 65535",
+  "status": "fixed",
+  "reproducer_origin": "original",
+  "summary": "Fixed: an out-of-bank section-relative symbol can relax to long addressing even when its section is not marked far.",
+  "report": "docs/plans/2026-09-25-mos-correctness-queue.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified from session 01a0d7d4-5da2-7fe0-a88c-0137eaa043a7."
+  ],
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/identity.json",
+      "sha256": "faf164f3c59d23931326cd1b64fdcc2feafa81a5088b0c4587743e3789d0df86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/runs.json",
+      "sha256": "d94d5460c0ec8cc762277e7ed2559114079f056e5160dd4f0f3aad042c12aa5c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/lit.log",
+      "sha256": "947237df5bf0aac623d2e6420508c7ea76907a5b9950c80f6f807351553c371b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing.dis",
+      "sha256": "5000221762e765fa960a6c3de8109e4de75e4ad12a57028336600310cd15c36f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/roundtrip-default.log",
+      "sha256": "b700c1dffcf70c2fff1ce62f813dd2958c975cbb61c2a0f7bd54c6a0b173f76d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/roundtrip-a16.log",
+      "sha256": "57aa4460ded32357ed5cc9053085dd4650964c57a709a04553dfdb638736b1be"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/roundtrip-xy16.log",
+      "sha256": "f34107a3fad1c7326f6e217562a46918326551cf449decc37b96870a14a0c792"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/identity.json",
+      "sha256": "575a4be0dc9e320e132fe243be9e9e7da4267725a51570ac1a9137f315df8fc9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/scavenger-candidate/lit.log",
+      "sha256": "b35c02714a15759f544dc5faa0d7ba056e1c86a25784e7d29513a4a0be8a04d0"
+    }
+  ],
+  "baseline": {
+    "command": "Run addressing-assemble, addressing-disasm, and addressing-check from baseline/runs.json; final runner: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-mos-correctness/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s --input-file=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing.dis",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "triple": "mos",
+      "cpu": "mosw65816",
+      "motorola_integers": true,
+      "filetype": "obj",
+      "check": "llvm-objdump then FileCheck"
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-25-mos-correctness/bin; source reconstruction snapshot alongside bin",
+    "toolchain_sha256": "10d1d309f6ccdac91acbcefcf09fdc680512a3b709e613d9c80030ac68b11715",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s",
+      "sha256": "46f0b0fbb1dc37c2526893bff691cb6cb4508dd411497579d85793d5fcbc450d"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-check.log",
+      "sha256": "514a140a4ed2a1d1f65d5cdbf8e163fb5f07f90a6f42fe89b15aa06dbbd0db00"
+    },
+    "exit_code": 1,
+    "failure_signature": "CHECK: expected string not found"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0052-mos-bank-relax-section-offset.patch",
+    "causal_explanation": "The downstream bank-relax suppression returned false for every non-far section. MCAssembler already supplies the section offset plus addend even when cross-section resolution is false. Suppress relaxation only if that value fits UINT16_MAX, retaining explicit-width handling and near section addresses.",
+    "trigger_check": "The unchanged addressing-modes-65816.s produces the wrong narrow opcode on the baseline and passes the original object/disassembly FileCheck on the candidate. New boundary tests cover 65535/65536, addends, near/far and explicit mos16; round trips show zero divergences in 337 compared objects.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s",
+      "sha256": "46f0b0fbb1dc37c2526893bff691cb6cb4508dd411497579d85793d5fcbc450d"
+    },
+    "candidate": {
+      "command": "Run addressing-assemble, addressing-disasm, and addressing-check from docs/defects/evidence/2026-09-25-mos-correctness/candidate/runs.json (same immutable original assembly input).",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "triple": "mos",
+        "cpu": "mosw65816",
+        "motorola_integers": true,
+        "filetype": "obj",
+        "check": "llvm-objdump then FileCheck"
+      },
+      "toolchain_location": "build/llvm-mos/bin/llvm-mc; identity retained in candidate/identity.json",
+      "toolchain_sha256": "8632833408c60eced7fec9725510ed657761ba3e467e4f8d560769ac61ee4934",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/addressing-modes-65816.s",
+        "sha256": "46f0b0fbb1dc37c2526893bff691cb6cb4508dd411497579d85793d5fcbc450d"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-25-mos-correctness/candidate/addressing-check.log",
+        "sha256": "4a4aee5bc112804c1b605e2876e1c9c5392b26c57944eeff876f855207b938b5"
+      },
+      "exit_code": 0
+    }
+  }
+}

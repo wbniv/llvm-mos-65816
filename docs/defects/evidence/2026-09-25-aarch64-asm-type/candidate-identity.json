@@ -1,0 +1,13 @@
+{
+  "path": "build/aarch64-asm-type-fix/llc",
+  "sha256": "f8e3d451516fb66dcdd6d171f8bf2b2bff792baed78afb8dd891ff2aa01c2383",
+  "compiled_path": "/tmp/aarch64-asm-type-fix/llc",
+  "source": "docs/defects/evidence/2026-09-25-aarch64-asm-type/AArch64ISelLowering.candidate.cpp.gz",
+  "source_uncompressed_sha256": "d39f9637855d50409a3f1259d97f7d7f057cb4609743527bcd06864a9b2774cc",
+  "difference_from_preserved_0057": "Only AArch64ISelLowering.cpp.o in libLLVMAArch64CodeGen.a changes; all other link inputs, including the preserved 0057 SelectionDAG archive, are unchanged.",
+  "difference_from_original_recorded_baseline": "0057 SelectionDAG changes plus this AArch64 change. The preserved 0057 binary separately reproduces the same unknown-type abort.",
+  "build_recipe": "docs/defects/evidence/2026-09-25-aarch64-asm-type/build-candidate.py",
+  "docker_command": "docker run --rm --user 1000:1000 -v /home/will/llvm-mos-65816:/work -v /tmp:/tmp -v /home/will/llvm-mos-65816/build/0041-inlineasm-src:/work/build/register-exhaustion-src:ro -v /home/will/llvm-mos-65816/build/0041-inlineasm-build:/work/build/newton-postra-build:ro -w /work llvm-mos-65816-dev python3 docs/defects/evidence/2026-09-25-aarch64-asm-type/build-candidate.py",
+  "container_image_id": "sha256:571e18a239454d9d97c4dbdab440e47b7ec325142a9418d607cb6e72434758b6",
+  "assertions": true
+}

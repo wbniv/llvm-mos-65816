@@ -1,0 +1,235 @@
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-as in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-sim in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/llvm-mos/bin
+-- Testing: 172 tests, 8 workers --
+PASS: LLVM :: MC/MOS/bank-relax-section-offset.s (1 of 172)
+PASS: LLVM :: CodeGen/MOS/zero-page-indexed.mir (2 of 172)
+PASS: LLVM :: CodeGen/MOS/spill-hoist-scratch-vreg.ll (3 of 172)
+PASS: LLVM :: CodeGen/MOS/jump-table-limit.ll (4 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector.mir (5 of 172)
+PASS: LLVM :: CodeGen/MOS/inline-asm-multi-register.ll (6 of 172)
+PASS: LLVM :: MC/MOS/eflags.s (7 of 172)
+PASS: LLVM :: CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.ll (8 of 172)
+PASS: LLVM :: CodeGen/MOS/far-indir-indexed.ll (9 of 172)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (10 of 172)
+PASS: LLVM :: CodeGen/MOS/a16-indirect-byte-store.ll (11 of 172)
+PASS: LLVM :: CodeGen/MOS/legalizer.mir (12 of 172)
+PASS: LLVM :: CodeGen/MOS/zero-page-indexed.ll (13 of 172)
+PASS: LLVM :: MC/MOS/brk-signature.s (14 of 172)
+PASS: LLVM :: CodeGen/MOS/a16-byte-store.ll (15 of 172)
+PASS: LLVM :: CodeGen/MOS/vector-scalarize.ll (16 of 172)
+PASS: LLVM :: CodeGen/MOS/return-frame-address.ll (17 of 172)
+PASS: LLVM :: CodeGen/MOS/scavenger-p-undef-6502.ll (18 of 172)
+PASS: LLVM :: CodeGen/MOS/char-stats-norecurse.ll (19 of 172)
+PASS: LLVM :: CodeGen/MOS/register-named-globals.ll (20 of 172)
+PASS: LLVM :: CodeGen/MOS/zp-byte-index.ll (21 of 172)
+PASS: LLVM :: CodeGen/MOS/inline-asm-physreg-width.ll (22 of 172)
+PASS: LLVM :: CodeGen/MOS/prologepilog-ir.mir (23 of 172)
+PASS: LLVM :: CodeGen/MOS/mixed-width-call.ll (24 of 172)
+PASS: LLVM :: CodeGen/MOS/shift-rotate.ll (25 of 172)
+PASS: LLVM :: CodeGen/MOS/far-call.ll (26 of 172)
+PASS: LLVM :: CodeGen/MOS/twoaddr-reschedule-physreg.mir (27 of 172)
+PASS: LLVM :: CodeGen/MOS/inline-asm-indirect-output.ll (28 of 172)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65ce02.ll (29 of 172)
+PASS: LLVM :: CodeGen/MOS/float-vector.ll (30 of 172)
+PASS: LLVM :: MC/MOS/addr-asciz-roundtrip.s (31 of 172)
+PASS: LLVM :: CodeGen/MOS/zero-page-indexed-stz.mir (32 of 172)
+PASS: LLVM :: CodeGen/MOS/far-addressing.ll (33 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir (34 of 172)
+PASS: LLVM :: CodeGen/MOS/far-phi.ll (35 of 172)
+PASS: LLVM :: MC/MOS/65816-block-move-bank-order.s (36 of 172)
+PASS: LLVM :: CodeGen/MOS/inc-dec.ll (37 of 172)
+PASS: LLVM :: CodeGen/MOS/print-int.ll (38 of 172)
+PASS: LLVM :: CodeGen/MOS/integer-compare.ll (39 of 172)
+PASS: LLVM :: CodeGen/MOS/immediate-remat.ll (40 of 172)
+PASS: LLVM :: CodeGen/MOS/zp-alloc.ll (41 of 172)
+PASS: LLVM :: CodeGen/MOS/char-stats.ll (42 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-opt-chain.mir (43 of 172)
+PASS: LLVM :: MC/MOS/asm-errors.s (44 of 172)
+PASS: LLVM :: CodeGen/MOS/hello-world.ll (45 of 172)
+PASS: LLVM :: CodeGen/MOS/prefetch.ll (46 of 172)
+PASS: LLVM :: CodeGen/MOS/legalizer-65c02.mir (47 of 172)
+PASS: LLVM :: CodeGen/MOS/cmp-select.ll (48 of 172)
+PASS: LLVM :: CodeGen/MOS/static-stack.ll (49 of 172)
+PASS: LLVM :: CodeGen/MOS/light-spill.ll (50 of 172)
+PASS: LLVM :: CodeGen/MOS/far-legalizer-bridges.ll (51 of 172)
+PASS: LLVM :: CodeGen/MOS/cmpzero-terminator-invalid.mir (52 of 172)
+PASS: LLVM :: CodeGen/MOS/return-address-spc700.ll (53 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir (54 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-spc700.mir (55 of 172)
+PASS: LLVM :: MC/MOS/register-named-symbols.s (56 of 172)
+PASS: LLVM :: CodeGen/MOS/postrapseudos.mir (57 of 172)
+PASS: LLVM :: CodeGen/MOS/legalizer-huc6280.mir (58 of 172)
+PASS: LLVM :: MC/MOS/register-named-symbols-65816.s (59 of 172)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65c02.ll (60 of 172)
+PASS: LLVM :: CodeGen/MOS/interrupt-width-65816.ll (61 of 172)
+PASS: LLVM :: CodeGen/MOS/scavenger-65c02.mir (62 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir (63 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg.mir (64 of 172)
+PASS: LLVM :: CodeGen/MOS/store-zero.ll (65 of 172)
+PASS: LLVM :: CodeGen/MOS/internalize.mir (66 of 172)
+PASS: LLVM :: CodeGen/MOS/shift-rotate-chain.mir (67 of 172)
+PASS: LLVM :: CodeGen/MOS/call-lowering.mir (68 of 172)
+PASS: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (69 of 172)
+PASS: LLVM :: CodeGen/MOS/add-sub.ll (70 of 172)
+PASS: LLVM :: CodeGen/MOS/inc-dec-6502x.ll (71 of 172)
+PASS: LLVM :: CodeGen/MOS/asm-printer-spc700.mir (72 of 172)
+PASS: LLVM :: CodeGen/MOS/a16-immediate-width.ll (73 of 172)
+PASS: LLVM :: CodeGen/MOS/combiner.mir (74 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir.mir (75 of 172)
+PASS: LLVM :: CodeGen/MOS/commute.mir (76 of 172)
+PASS: LLVM :: MC/MOS/addr-asciz.s (77 of 172)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation.mir (78 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir (79 of 172)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (80 of 172)
+PASS: LLVM :: CodeGen/MOS/late-opt.mir (81 of 172)
+PASS: LLVM :: CodeGen/MOS/dp-pointer-arg.ll (82 of 172)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (83 of 172)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-bra.mir (84 of 172)
+PASS: LLVM :: MC/MOS/long-address-roundtrip-65816.s (85 of 172)
+PASS: LLVM :: CodeGen/MOS/indexiv.ll (86 of 172)
+PASS: LLVM :: CodeGen/MOS/callee-saved-regs.ll (87 of 172)
+PASS: LLVM :: CodeGen/MOS/prologepilog.mir (88 of 172)
+PASS: LLVM :: CodeGen/MOS/asm-printer.mir (89 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-liveness.mir (90 of 172)
+PASS: LLVM :: CodeGen/MOS/legalizer-ir.mir (91 of 172)
+PASS: LLVM :: CodeGen/MOS/zeropage.ll (92 of 172)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (93 of 172)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir (94 of 172)
+PASS: LLVM :: CodeGen/MOS/finalize-isel.mir (95 of 172)
+PASS: LLVM :: CodeGen/MOS/ret-global-addr.ll (96 of 172)
+PASS: LLVM :: CodeGen/MOS/whole-program-zp.ll (97 of 172)
+PASS: LLVM :: CodeGen/MOS/coalesce-remat.ll (98 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir (99 of 172)
+PASS: LLVM :: CodeGen/MOS/inlineasm-constraint.mir (100 of 172)
+PASS: LLVM :: CodeGen/MOS/call-lowering-stack.mir (101 of 172)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir (102 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-opt-loop.mir (103 of 172)
+PASS: LLVM :: MC/MOS/addressing-modes-65816.s (104 of 172)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll (105 of 172)
+PASS: LLVM :: CodeGen/MOS/trivial.ll (106 of 172)
+PASS: LLVM :: MC/MOS/zp-regression.s (107 of 172)
+PASS: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (108 of 172)
+PASS: LLVM :: CodeGen/MOS/a16-trunc-i32.ll (109 of 172)
+PASS: LLVM :: CodeGen/MOS/insert-copies.mir (110 of 172)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-spc700.mir (111 of 172)
+PASS: LLVM :: CodeGen/MOS/scavenger.mir (112 of 172)
+PASS: LLVM :: CodeGen/MOS/leaf-20231021.ll (113 of 172)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (114 of 172)
+PASS: LLVM :: CodeGen/MOS/virtregrewriter-copy-liveness.mir (115 of 172)
+PASS: LLVM :: CodeGen/MOS/late-opt-spc700.mir (116 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-opt.mir (117 of 172)
+PASS: LLVM :: CodeGen/MOS/lower-select.mir (118 of 172)
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (119 of 172)
+PASS: LLVM :: CodeGen/MOS/no-csr.ll (120 of 172)
+PASS: LLVM :: CodeGen/MOS/nonreentrant.ll (121 of 172)
+PASS: LLVM :: MC/MOS/align-nop.s (122 of 172)
+PASS: LLVM :: CodeGen/MOS/scavenger-p-undef.mir (123 of 172)
+PASS: LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll (124 of 172)
+PASS: LLVM :: CodeGen/MOS/late-opt-65c02.mir (125 of 172)
+PASS: LLVM :: MC/MOS/modifiers.s (126 of 172)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (127 of 172)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir (128 of 172)
+PASS: LLVM :: CodeGen/MOS/asm-printer-ir.mir (129 of 172)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-deterministic.ll (130 of 172)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (131 of 172)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (132 of 172)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (133 of 172)
+PASS: LLVM :: CodeGen/MOS/late-opt-cmpzero.mir (134 of 172)
+PASS: LLVM :: CodeGen/MOS/regalloc.mir (135 of 172)
+PASS: LLVM :: CodeGen/MOS/call-lowering-spc700.mir (136 of 172)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (137 of 172)
+PASS: LLVM :: CodeGen/MOS/asm-printer-huc6280.mir (138 of 172)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (139 of 172)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (140 of 172)
+PASS: LLVM :: MC/MOS/modifier-width-errors.s (141 of 172)
+PASS: LLVM :: CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir (142 of 172)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (143 of 172)
+PASS: LLVM :: MC/MOS/zeropage.s (144 of 172)
+PASS: LLVM :: MC/MOS/addr-asciz-invalid-modifier.s (145 of 172)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (146 of 172)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (147 of 172)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (148 of 172)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (149 of 172)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (150 of 172)
+PASS: LLVM :: CodeGen/MOS/late-opt-65816.mir (151 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir (152 of 172)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (153 of 172)
+PASS: LLVM :: MC/MOS/modifier-width.s (154 of 172)
+PASS: LLVM :: MC/MOS/do-copy-data.s (155 of 172)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (156 of 172)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (157 of 172)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-reuse-dst.mir (158 of 172)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (159 of 172)
+PASS: LLVM :: MC/MOS/inst-lda.s (160 of 172)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (161 of 172)
+PASS: LLVM :: MC/MOS/do-init-array.s (162 of 172)
+PASS: LLVM :: MC/MOS/do-fini-array.s (163 of 172)
+UNSUPPORTED: LLVM :: CodeGen/MOS/legalizer-indexed-offset-observer.mir (164 of 172)
+UNSUPPORTED: LLVM :: CodeGen/MOS/getchar-regression.ll (165 of 172)
+PASS: LLVM :: MC/MOS/modifier-width-65816.s (166 of 172)
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (167 of 172)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (168 of 172)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (169 of 172)
+PASS: LLVM :: MC/MOS/trivial.s (170 of 172)
+PASS: LLVM :: MC/MOS/do-init-stack.s (171 of 172)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (172 of 172)
+
+Testing Time: 2.27s
+
+Total Discovered Tests: 172
+  Unsupported:   2 (1.16%)
+  Passed     : 170 (98.84%)

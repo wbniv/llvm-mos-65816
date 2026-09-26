@@ -1,0 +1,29 @@
+{
+  "build_command": "docker run --rm -v /home/will/llvm-mos-65816:/work -w /work llvm-mos-65816-dev ninja -C build/llvm-mos -j1 llc clang lld",
+  "build_exit_code": 0,
+  "install_command": "docker run --rm -v /home/will/llvm-mos-65816:/work -w /work llvm-mos-65816-dev ninja -C build/llvm-mos -j1 install-clang install-lld",
+  "install_exit_code": 0,
+  "configuration": "Release, MOS backend only; cross-target candidate has assertions enabled",
+  "binaries": [
+    {
+      "path": "build/llvm-mos/bin/llc",
+      "sha256": "51fabe3cb8e56d11cfb2e0833d772b04c865175ffd26ae3b94fc71ed62c107bb"
+    },
+    {
+      "path": "build/llvm-mos/bin/clang-23",
+      "sha256": "6d647cb405e6bacd1e7f842c2c0681107a27faff2ad7b813365638cc026eaa27"
+    },
+    {
+      "path": "build/llvm-mos/bin/lld",
+      "sha256": "4e424dd31d0936a7a12d6cebebfea1665ba4fe8b72d5f397ab5a5ca0794aba0e"
+    },
+    {
+      "path": "build/llvm-mos-install/bin/clang-23",
+      "sha256": "026581264b4657d27c2952d276768b0b60de296a2c9842e57f1c1605d911c45b"
+    },
+    {
+      "path": "build/llvm-mos-install/bin/lld",
+      "sha256": "6f4a97ef1bec437d06f160b88dd536cf05369f83f75c985655ace3586feedf03"
+    }
+  ]
+}

@@ -1,0 +1,798 @@
+[
+  {
+    "type": "<64 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: inline assembly requires more registers than available"
+    ]
+  },
+  {
+    "type": "<64 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type",
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:369: SDValue getCopyFromPartsVector(SelectionDAG &, const SDLoc &, const SDValue *, unsigned int, MVT, EVT, const Value *, SDValue, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<8 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: incompatible vector register parts, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "output",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "output",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "indirect",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "indirect",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "tied",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type",
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "tied",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type",
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: non-trivial scalar-to-vector conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O0",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr-input",
+    "compiler": "aarch64-asm-type-fix",
+    "opt": "O2",
+    "exit": -6,
+    "diagnostics": [
+      "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:745: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `PartVT.getFixedSizeInBits() > ValueSize && \"lossy conversion of vector to scalar type\"' failed.",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O0",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type"
+    ]
+  },
+  {
+    "type": "<2 x i64>",
+    "form": "callbr-input",
+    "compiler": "selectiondag-vector-parts-fix",
+    "opt": "O2",
+    "exit": 1,
+    "diagnostics": [
+      "error: lossy vector-to-scalar conversion, possible invalid constraint for vector type"
+    ]
+  }
+]

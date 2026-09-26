@@ -1,0 +1,74 @@
+[
+  {
+    "mode": "a16",
+    "opt": "O0",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "a16",
+    "opt": "O0",
+    "guard": "noguard",
+    "exit": 0
+  },
+  {
+    "mode": "a16",
+    "opt": "O1",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "a16",
+    "opt": "O1",
+    "guard": "noguard",
+    "exit": -6
+  },
+  {
+    "mode": "a16",
+    "opt": "Os",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "a16",
+    "opt": "Os",
+    "guard": "noguard",
+    "exit": -6
+  },
+  {
+    "mode": "xy16",
+    "opt": "O0",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "xy16",
+    "opt": "O0",
+    "guard": "noguard",
+    "exit": 0
+  },
+  {
+    "mode": "xy16",
+    "opt": "O1",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "xy16",
+    "opt": "O1",
+    "guard": "noguard",
+    "exit": -6
+  },
+  {
+    "mode": "xy16",
+    "opt": "Os",
+    "guard": "guard",
+    "exit": 0
+  },
+  {
+    "mode": "xy16",
+    "opt": "Os",
+    "guard": "noguard",
+    "exit": -6
+  }
+]

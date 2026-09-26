@@ -82,3 +82,18 @@ require matching-input red/green evidence, toolchain identities, retained logs,
 and a regression artifact. It verifies staged artifact hashes and protects
 captured baselines from editing or deletion. Do not bypass it. Its structural
 checks do not replace reviewing whether the test actually exercises the defect.
+
+# Upstream submissions and published demos
+
+Cite published SNES ROM demos as supporting evidence when relevant, and link to
+their actual published web pages. Mentioning SNES and citing those demos is
+encouraged; do not remove that evidence merely because the platform work has
+upstream dependencies.
+
+Do not prematurely submit SNES implementation code or target/platform configs.
+Follow the compiler, ABI, and platform/runtime prerequisites recorded in
+[the SNES submission tracker](docs/upstream-pending-work.md#snes--separate-platform-track)
+and [the reconciliation strategy](docs/415-snes-target-reconciliation.md).
+Distinguish readiness to open a PR from its merge prerequisites. Independent
+compiler fixes and citations of published demos do not have to wait for the
+SNES platform submission.

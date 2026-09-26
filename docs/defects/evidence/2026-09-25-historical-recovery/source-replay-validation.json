@@ -1,0 +1,6 @@
+{
+  "post_workaround_matches_first_commit": true,
+  "commit": "e8ccda890c972856cf68dfd01cb5a792c5106b9f",
+  "replayed_header_sha256": "42793d04e5af75a959fe2dd29b66aaee96fb08bf047791139bda02e2865dd255",
+  "committed_header_sha256": "42793d04e5af75a959fe2dd29b66aaee96fb08bf047791139bda02e2865dd255"
+}

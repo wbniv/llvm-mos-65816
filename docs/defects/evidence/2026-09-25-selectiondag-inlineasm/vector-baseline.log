@@ -1,0 +1,4 @@
+$ /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/vector-many-virtual.ll -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/vector-baseline.mir
+error: could not allocate input reg for constraint 'w'
+
+exit_code=1

@@ -1,0 +1,12 @@
+{
+  "preallocation_identical": true,
+  "preallocation_sha256": "c48261da48b379859d8f60e6a36535c5c7ea1613c58e1696ecf2d646fb7df8a5",
+  "added_after_virtregrewriter": [
+    "    renamable $rs6 = KILL renamable $rs6",
+    "    renamable $rs5 = KILL renamable $rs5",
+    "    renamable $rs1 = KILL renamable $rs1",
+    "    renamable $rs1 = KILL renamable $rs1",
+    "    renamable $rs3 = KILL renamable $rs3"
+  ],
+  "removed_after_virtregrewriter": []
+}

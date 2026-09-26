@@ -1,0 +1,75 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-objcopy in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dis in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-objcopy in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /tmp/vector-parts-lit/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /tmp/vector-parts-lit/bin
+-- Testing: 282 of 11464 tests, 2 workers --
+Testing:  0.. 10.. 20.. 30.. 40.. 50.. 60.. 70.. 80.. 90.. 
+
+Testing Time: 6.91s
+
+Total Discovered Tests: 11464
+  Excluded         : 11182 (97.54%)
+  Passed           :   278 (2.42%)
+  Expectedly Failed:     4 (0.03%)

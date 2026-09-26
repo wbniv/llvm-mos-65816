@@ -1,0 +1,493 @@
+diff --git a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+index de6d54dfd28b..9690832e6c60 100644
+--- a/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
++++ b/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp
+@@ -237,6 +237,107 @@ static bool buildAnyextOrCopy(Register Dst, Register Src,
+   return true;
+ }
+ 
++/// Return the common width in bits of the registers assigned to one inline asm
++/// operand, or 0 if the operand has no registers or mixes register widths.
++static unsigned getAsmRegPieceSize(ArrayRef<Register> Regs,
++                                   const TargetRegisterInfo &TRI,
++                                   const MachineRegisterInfo &MRI) {
++  if (Regs.empty())
++    return 0;
++  unsigned PieceSize = TRI.getRegSizeInBits(Regs[0], MRI);
++  for (Register Reg : Regs.drop_front())
++    if (TRI.getRegSizeInBits(Reg, MRI) != PieceSize)
++      return 0;
++  return PieceSize;
++}
++
++/// Check that an operand occupying several registers can be split or merged,
++/// and report the common register width. Such a value is laid out least
++/// significant piece first, so only little-endian data layouts are supported:
++/// SelectionDAG's getCopyToParts/getCopyFromParts swap the halves for big
++/// endian, and that path has no coverage here.
++static unsigned getSplittableAsmRegPieceSize(ArrayRef<Register> Regs,
++                                             MachineIRBuilder &MIRBuilder) {
++  const MachineFunction &MF = MIRBuilder.getMF();
++  if (!MF.getDataLayout().isLittleEndian()) {
++    LLVM_DEBUG(dbgs() << "Inline asm operands spanning several registers are "
++                         "only supported on little-endian targets\n");
++    return 0;
++  }
++  unsigned PieceSize = getAsmRegPieceSize(
++      Regs, *MF.getSubtarget().getRegisterInfo(), *MIRBuilder.getMRI());
++  if (!PieceSize)
++    LLVM_DEBUG(dbgs() << "Inline asm operand mixes register widths\n");
++  return PieceSize;
++}
++
++/// Split \p Src across the several registers \p Regs assigned to one inline
++/// asm operand, least significant piece first. This mirrors what SelectionDAG's
++/// RegsForValue::getCopyToRegs emits for the same asm: the value is truncated
++/// or extended to the registers' combined width and then chopped up with a
++/// shift and a truncate per piece, as getCopyToParts does. A G_UNMERGE_VALUES
++/// would be more compact, but some targets declare a scalar-to-scalar unmerge
++/// legal without being able to select it (see the TODO in
++/// AArch64InstructionSelector::selectUnmergeValues), so the shift form is used
++/// instead; it costs nothing after legalization.
++static bool buildSplitToAsmRegs(ArrayRef<Register> Regs, Register Src,
++                                MachineIRBuilder &MIRBuilder) {
++  MachineRegisterInfo &MRI = *MIRBuilder.getMRI();
++
++  unsigned PieceSize = getSplittableAsmRegPieceSize(Regs, MIRBuilder);
++  if (!PieceSize)
++    return false;
++
++  LLT SrcTy = MRI.getType(Src);
++  if (!SrcTy.isValid() || !SrcTy.isScalar()) {
++    LLVM_DEBUG(dbgs() << "Can't split a non-scalar input across several "
++                         "inline asm registers\n");
++    return false;
++  }
++
++  unsigned WideSize = PieceSize * Regs.size();
++  LLT WideTy = LLT::integer(WideSize);
++  LLT PieceTy = LLT::integer(PieceSize);
++
++  Register Wide = Src;
++  if (SrcTy.getSizeInBits() > WideSize)
++    Wide = MIRBuilder.buildTrunc(WideTy, Src).getReg(0);
++  else if (SrcTy.getSizeInBits() < WideSize)
++    Wide = MIRBuilder.buildAnyExt(WideTy, Src).getReg(0);
++
++  for (unsigned I = 0, E = Regs.size(); I != E; ++I) {
++    Register Piece = Wide;
++    if (I) {
++      auto Amt = MIRBuilder.buildConstant(WideTy, I * PieceSize);
++      Piece = MIRBuilder.buildLShr(WideTy, Wide, Amt).getReg(0);
++    }
++    if (WideSize != PieceSize)
++      Piece = MIRBuilder.buildTrunc(PieceTy, Piece).getReg(0);
++    MIRBuilder.buildCopy(Regs[I], Piece);
++  }
++  return true;
++}
++
++/// Merge the several registers \p Regs assigned to one inline asm output into
++/// a single generic register, least significant piece first -- the inverse of
++/// buildSplitToAsmRegs, and the equivalent of SelectionDAG's
++/// RegsForValue::getCopyFromRegs. Returns an invalid register on failure.
++static Register buildMergeFromAsmRegs(ArrayRef<Register> Regs,
++                                      MachineIRBuilder &MIRBuilder) {
++  unsigned PieceSize = getSplittableAsmRegPieceSize(Regs, MIRBuilder);
++  if (!PieceSize)
++    return Register();
++
++  LLT PieceTy = LLT::integer(PieceSize);
++  SmallVector<Register, 4> Parts;
++  for (Register Reg : Regs)
++    Parts.push_back(MIRBuilder.buildCopy(PieceTy, Reg).getReg(0));
++
++  return MIRBuilder
++      .buildMergeValues(LLT::integer(PieceSize * Regs.size()), Parts)
++      .getReg(0);
++}
++
+ bool InlineAsmLowering::lowerInlineAsm(
+     MachineIRBuilder &MIRBuilder, const CallBase &Call,
+     std::function<ArrayRef<Register>(const Value &Val)> GetOrCreateVRegs)
+@@ -421,25 +522,11 @@ bool InlineAsmLowering::lowerInlineAsm(
+         for (unsigned i = 0; i < DefIdx; ++i)
+           InstFlagIdx += getNumOpRegs(*Inst, InstFlagIdx) + 1;
+         unsigned NumOpRegs = getNumOpRegs(*Inst, InstFlagIdx);
+-        // FIXME: This assertion limits inline asm tied operands to single-
+-        // register values. Targets with narrow registers (e.g., MOS 6502 with
+-        // 8-bit registers) require multiple registers for larger types like
+-        // i16 or i32. For example, MOS needs 4 registers for an i32. When
+-        // this assertion fires, the tied operand constraint (e.g., "0" in
+-        // "=r,0") refers to a multi-register output, which this code cannot
+-        // handle. To support such targets, this code would need to be
+-        // generalized to tie multiple input registers to multiple output
+-        // registers. Until then, inline asm with tied constraints only works
+-        // for types that fit in a single register on the target.
+-        if (NumOpRegs != 1) {
++        if (!NumOpRegs) {
+           LLVM_DEBUG(dbgs() << "Matching input constraint: DefIdx=" << DefIdx
+-                            << " InstFlagIdx=" << InstFlagIdx
+-                            << " NumOpRegs=" << NumOpRegs
+-                            << " (expected 1)\n");
+-          LLVM_DEBUG(dbgs() << "Instruction: " << *Inst << "\n");
++                            << " has no registers\n");
++          return false;
+         }
+-        assert(NumOpRegs == 1 && "Wrong flag: multi-register tied operands "
+-                                 "not supported in GlobalISel inline asm");
+ 
+         const InlineAsm::Flag MatchedOperandFlag(Inst->getOperand(InstFlagIdx).getImm());
+         if (MatchedOperandFlag.isMemKind()) {
+@@ -452,7 +539,7 @@ bool InlineAsmLowering::lowerInlineAsm(
+           return false;
+         }
+ 
+-        // We want to tie input to register in next operand.
++        // We want to tie the input to the def registers that follow the flag.
+         unsigned DefRegIdx = InstFlagIdx + 1;
+         Register Def = Inst->getOperand(DefRegIdx).getReg();
+ 
+@@ -471,18 +558,30 @@ bool InlineAsmLowering::lowerInlineAsm(
+             Def.isVirtual() ? MRI->getRegClass(Def) : OpInfo.RegClass;
+         assert(RC && "Expected a register class for matching constraint");
+ 
+-        // Materialize `In` in a new vreg that has a register class that matches
+-        // the register class of `Def`.
+-        Register In = MRI->createVirtualRegister(RC);
+-        if (!buildAnyextOrCopy(In, SrcRegs[0], MIRBuilder))
++        // Materialize the input in NumOpRegs new vregs whose register class
++        // matches the register class of `Def`. A value that does not fit in a
++        // single register is spread over them least significant piece first,
++        // exactly as SelectionDAG lowers the same tied constraint.
++        SmallVector<Register, 4> In;
++        for (unsigned I = 0; I != NumOpRegs; ++I)
++          In.push_back(MRI->createVirtualRegister(RC));
++        if (NumOpRegs > 1) {
++          if (!buildSplitToAsmRegs(In, SrcRegs[0], MIRBuilder))
++            return false;
++        } else if (!buildAnyextOrCopy(In[0], SrcRegs[0], MIRBuilder)) {
+           return false;
++        }
+ 
+-        // Add Flag and input register operand (In) to Inst. Tie In to Def.
+-        InlineAsm::Flag UseFlag(InlineAsm::Kind::RegUse, 1);
++        // Add Flag and the input register operands to Inst, tying each of them
++        // to the def register it matches.
++        InlineAsm::Flag UseFlag(InlineAsm::Kind::RegUse, NumOpRegs);
+         UseFlag.setMatchingOp(DefIdx);
+         Inst.addImm(UseFlag);
+-        Inst.addReg(In);
+-        Inst->tieOperands(DefRegIdx, Inst->getNumOperands() - 1);
++        unsigned UseRegIdx = Inst->getNumOperands();
++        for (Register Reg : In)
++          Inst.addReg(Reg);
++        for (unsigned I = 0; I != NumOpRegs; ++I)
++          Inst->tieOperands(DefRegIdx + I, UseRegIdx + I);
+         break;
+       }
+ 
+@@ -588,9 +687,9 @@ bool InlineAsmLowering::lowerInlineAsm(
+ 
+       unsigned NumRegs = OpInfo.Regs.size();
+       ArrayRef<Register> SourceRegs = GetOrCreateVRegs(*OpInfo.CallOperandVal);
+-      if (NumRegs != 1 || SourceRegs.size() != 1) {
+-        LLVM_DEBUG(dbgs() << "Input operands with multiple input registers are "
+-                             "not supported yet\n");
++      if (SourceRegs.size() != 1) {
++        LLVM_DEBUG(dbgs() << "Expected the input value to fit into a single "
++                             "virtual register\n");
+         return false;
+       }
+ 
+@@ -601,9 +700,16 @@ bool InlineAsmLowering::lowerInlineAsm(
+         Flag.setRegClass(RC->getID());
+       }
+       Inst.addImm(Flag);
+-      if (!buildAnyextOrCopy(OpInfo.Regs[0], SourceRegs[0], MIRBuilder))
++      // A value too wide for one register is spread over NumRegs of them,
++      // least significant piece first, as SelectionDAG does.
++      if (NumRegs > 1) {
++        if (!buildSplitToAsmRegs(OpInfo.Regs, SourceRegs[0], MIRBuilder))
++          return false;
++      } else if (!buildAnyextOrCopy(OpInfo.Regs[0], SourceRegs[0], MIRBuilder)) {
+         return false;
+-      Inst.addReg(OpInfo.Regs[0]);
++      }
++      for (Register Reg : OpInfo.Regs)
++        Inst.addReg(Reg);
+       break;
+     }
+ 
+@@ -665,21 +771,26 @@ bool InlineAsmLowering::lowerInlineAsm(
+     switch (OpInfo.ConstraintType) {
+     case TargetLowering::C_Register:
+     case TargetLowering::C_RegisterClass: {
+-      if (OpInfo.Regs.size() > 1) {
+-        LLVM_DEBUG(dbgs() << "Output operands with multiple defining "
+-                             "registers are not supported yet\n");
+-        return false;
+-      }
+-
+       Register SrcReg = OpInfo.Regs[0];
+       unsigned SrcSize = TRI->getRegSizeInBits(SrcReg, *MRI);
++      if (OpInfo.Regs.size() > 1) {
++        // A result too wide for one register is returned in several of them,
++        // least significant piece first; put it back together before applying
++        // the size adjustment below.
++        SrcReg = buildMergeFromAsmRegs(OpInfo.Regs, MIRBuilder);
++        if (!SrcReg)
++          return false;
++        SrcSize = MRI->getType(SrcReg).getSizeInBits();
++      }
+       LLT ResTy = MRI->getType(ResRegs[i]);
+       if (ResTy.isScalar() && ResTy.getSizeInBits() < SrcSize) {
+         // First copy the non-typed virtual register into a generic virtual
+         // register
+-        auto Copy = MIRBuilder.buildCopy(LLT::integer(SrcSize), SrcReg);
++        Register Tmp = SrcReg;
++        if (!MRI->getType(SrcReg).isValid())
++          Tmp = MIRBuilder.buildCopy(LLT::integer(SrcSize), SrcReg).getReg(0);
+         // Need to truncate the result of the register
+-        MIRBuilder.buildTrunc(ResRegs[i], Copy);
++        MIRBuilder.buildTrunc(ResRegs[i], Tmp);
+       } else if (ResTy.isScalar() && ResTy.getSizeInBits() > SrcSize) {
+          Register Tmp = SrcReg;
+          if (!MRI->getType(SrcReg).isValid())
+diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/arm64-fallback.ll b/llvm/test/CodeGen/AArch64/GlobalISel/arm64-fallback.ll
+index 55755ff4ef1a..bffce0e5d016 100644
+--- a/llvm/test/CodeGen/AArch64/GlobalISel/arm64-fallback.ll
++++ b/llvm/test/CodeGen/AArch64/GlobalISel/arm64-fallback.ll
+@@ -143,14 +143,6 @@ entry:
+   ret i32 %asmresult1
+ }
+ 
+-; FALLBACK-WITH-REPORT-ERR: remark: <unknown>:0:0: unable to translate instruction: call{{.*}} (in function: inline_asm_multi_reg_input)
+-; FALLBACK-WITH-REPORT-ERR: warning: Instruction selection used fallback path for inline_asm_multi_reg_input
+-; FALLBACK-WITH-REPORT-OUT-LABEL: inline_asm_multi_reg_input
+-define i128 @inline_asm_multi_reg_input(i128 %x) {
+-  %r = call i128 asm sideeffect "/* $0 $1 */", "=&r,r"(i128 %x)
+-  ret i128 %r
+-}
+-
+ attributes #1 = { "target-features"="+sve" }
+ attributes #2 = { "target-features"="+ls64" }
+ 
+diff --git a/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
+new file mode 100644
+index 000000000000..5da63b13d1f5
+--- /dev/null
++++ b/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll
+@@ -0,0 +1,70 @@
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 < %s | FileCheck %s --check-prefix=ASM
++
++; AArch64 selects GPR32common for "r" whenever the type is not 64-bit, so an
++; i128 operand occupies two 32-bit registers and the value is narrowed to their
++; combined width -- exactly what SelectionDAG does for the same asm.
++
++define i128 @tied128(i128 %x) {
++; CHECK-LABEL: name: tied128
++; CHECK: [[W:%[0-9]+]]:_(i64) = G_TRUNC %{{[0-9]+}}(i128)
++; CHECK: [[P0:%[0-9]+]]:_(i32) = G_TRUNC [[W]](i64)
++; CHECK: [[R0:%[0-9]+]]:gpr32common = COPY [[P0]](i32)
++; CHECK: [[C32:%[0-9]+]]:_(i64) = G_CONSTANT i64 32
++; CHECK: [[S32:%[0-9]+]]:_(i64) = G_LSHR [[W]], [[C32]](i64)
++; CHECK: [[P1:%[0-9]+]]:_(i32) = G_TRUNC [[S32]](i64)
++; CHECK: [[R1:%[0-9]+]]:gpr32common = COPY [[P1]](i32)
++; CHECK: INLINEASM &"", {{.*}} regdef:GPR32common, def [[D0:%[0-9]+]], def [[D1:%[0-9]+]], reguse tiedto:$0, [[R0]](tied-def 3), [[R1]](tied-def 4)
++; CHECK: [[L0:%[0-9]+]]:_(i32) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(i32) = COPY [[D1]]
++; CHECK: %{{[0-9]+}}:_(i64) = G_MERGE_VALUES [[L0]](i32), [[L1]](i32)
++; ASM-LABEL: tied128:
++; ASM: lsr x{{[0-9]+}}, x{{[0-9]+}}, #32
++; ASM: bfi x0, x{{[0-9]+}}, #32, #32
++; ASM: ret
++  %r = call i128 asm "", "=r,0"(i128 %x)
++  ret i128 %r
++}
++
++define i128 @out128() {
++; CHECK-LABEL: name: out128
++; CHECK: INLINEASM &"", {{.*}} regdef:GPR32common, def [[D0:%[0-9]+]], def [[D1:%[0-9]+]]
++; CHECK: [[L0:%[0-9]+]]:_(i32) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(i32) = COPY [[D1]]
++; CHECK: %{{[0-9]+}}:_(i64) = G_MERGE_VALUES [[L0]](i32), [[L1]](i32)
++; ASM-LABEL: out128:
++; ASM: bfi x0, x{{[0-9]+}}, #32, #32
++; ASM: ret
++  %r = call i128 asm "", "=r"()
++  ret i128 %r
++}
++
++; An early-clobber multi-register output beside a multi-register input.
++define i128 @multi_reg_input(i128 %x) {
++; CHECK-LABEL: name: multi_reg_input
++; CHECK: [[R0:%[0-9]+]]:gpr32common = COPY %{{[0-9]+}}(i32)
++; CHECK: [[R1:%[0-9]+]]:gpr32common = COPY %{{[0-9]+}}(i32)
++; CHECK: INLINEASM &"/* $0 $1 */", {{.*}} regdef-ec:GPR32common, def early-clobber [[D0:%[0-9]+]], def early-clobber [[D1:%[0-9]+]], reguse:GPR32common, [[R0]], [[R1]]
++; CHECK: [[L0:%[0-9]+]]:_(i32) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(i32) = COPY [[D1]]
++; CHECK: %{{[0-9]+}}:_(i64) = G_MERGE_VALUES [[L0]](i32), [[L1]](i32)
++; ASM-LABEL: multi_reg_input:
++; ASM: lsr x{{[0-9]+}}, x0, #32
++; ASM: bfi x0, x{{[0-9]+}}, #32, #32
++; ASM: ret
++  %r = call i128 asm sideeffect "/* $0 $1 */", "=&r,r"(i128 %x)
++  ret i128 %r
++}
++
++define void @in128(i128 %x) {
++; CHECK-LABEL: name: in128
++; CHECK: [[W:%[0-9]+]]:_(i64) = G_TRUNC %{{[0-9]+}}(i128)
++; CHECK: [[P0:%[0-9]+]]:_(i32) = G_TRUNC [[W]](i64)
++; CHECK: [[R0:%[0-9]+]]:gpr32common = COPY [[P0]](i32)
++; CHECK: INLINEASM &"", {{.*}} reguse:GPR32common, [[R0]], %{{[0-9]+}}
++; ASM-LABEL: in128:
++; ASM: lsr x{{[0-9]+}}, x0, #32
++; ASM: ret
++  call void asm sideeffect "", "r"(i128 %x)
++  ret void
++}
+diff --git a/llvm/test/CodeGen/AArch64/build-pair-isel.ll b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
+index cd68bde0f8da..cc95d2bfbd4d 100644
+--- a/llvm/test/CodeGen/AArch64/build-pair-isel.ll
++++ b/llvm/test/CodeGen/AArch64/build-pair-isel.ll
+@@ -1,23 +1,40 @@
+ ; NOTE: Assertions have been autogenerated by utils/update_llc_test_checks.py
+-; RUN: llc -mtriple=aarch64 -o - -O0 %s | FileCheck %s
++; RUN: llc -mtriple=aarch64 -o - -O0 %s | FileCheck %s --check-prefix=GISEL
++; RUN: llc -mtriple=aarch64 -o - -O0 -global-isel=0 %s | FileCheck %s --check-prefix=SDAG
+ target datalayout = "e-m:o-i64:64-i128:128-n32:64-S128"
+ target triple = "arm64-apple-ios5.0.0"
+ 
+ ; This test checks we don't fail isel due to unhandled build_pair nodes.
+ define void @compare_and_swap128() {
+-; CHECK-LABEL: compare_and_swap128:
+-; CHECK:       // %bb.0:
+-; CHECK-NEXT:    //APP
+-; CHECK-NEXT:    nop
+-; CHECK-NEXT:    //NO_APP
+-; CHECK-NEXT:    // implicit-def: $x9
+-; CHECK-NEXT:    mov w9, w10
+-; CHECK-NEXT:    mov w8, w8
+-; CHECK-NEXT:    // kill: def $x8 killed $w8
+-; CHECK-NEXT:    orr x8, x8, x9, lsl #32
+-; CHECK-NEXT:    // implicit-def: $x9
+-; CHECK-NEXT:    str x8, [x9]
+-; CHECK-NEXT:    ret
++; GISEL-LABEL: compare_and_swap128:
++; GISEL:       // %bb.0:
++; GISEL-NEXT:    // implicit-def: $x8
++; GISEL-NEXT:    //APP
++; GISEL-NEXT:    nop
++; GISEL-NEXT:    //NO_APP
++; GISEL-NEXT:    mov w10, w1
++; GISEL-NEXT:    mov w9, w0
++; GISEL-NEXT:    bfi x10, x9, #32, #32
++; GISEL-NEXT:    mov x9, xzr
++; GISEL-NEXT:    // implicit-def: $q0
++; GISEL-NEXT:    mov v0.d[0], x10
++; GISEL-NEXT:    mov v0.d[1], x9
++; GISEL-NEXT:    str q0, [x8]
++; GISEL-NEXT:    ret
++;
++; SDAG-LABEL: compare_and_swap128:
++; SDAG:       // %bb.0:
++; SDAG-NEXT:    //APP
++; SDAG-NEXT:    nop
++; SDAG-NEXT:    //NO_APP
++; SDAG-NEXT:    // implicit-def: $x9
++; SDAG-NEXT:    mov w9, w10
++; SDAG-NEXT:    mov w8, w8
++; SDAG-NEXT:    // kill: def $x8 killed $w8
++; SDAG-NEXT:    orr x8, x8, x9, lsl #32
++; SDAG-NEXT:    // implicit-def: $x9
++; SDAG-NEXT:    str x8, [x9]
++; SDAG-NEXT:    ret
+   %1 = call i128 asm sideeffect "nop", "=r,~{memory}"()
+   store i128 %1, ptr undef, align 16
+   ret void
+diff --git a/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
+new file mode 100644
+index 000000000000..879899865631
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/inline-asm-multi-register.ll
+@@ -0,0 +1,77 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -stop-after=irtranslator < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
++
++; MOS maps "r" to one 16-bit Imag16 register for i16 and to 8-bit Imag8
++; registers for everything else, so any operand wider than an int occupies
++; several registers. Such an operand is laid out least significant piece
++; first, the same way SelectionDAG's RegsForValue does it.
++
++define i32 @tied_i32(i32 %x) {
++; The tied input is split across as many registers as the def has, in the same
++; order, and each use is tied to the def it matches.
++; CHECK-LABEL: name: tied_i32
++; CHECK: [[X:%[0-9]+]]:_(s32) = G_MERGE_VALUES
++; CHECK: [[P0:%[0-9]+]]:_(s8) = G_TRUNC [[X]](s32)
++; CHECK: [[R0:%[0-9]+]]:imag8 = COPY [[P0]](s8)
++; CHECK: [[C8:%[0-9]+]]:_(s32) = G_CONSTANT i32 8
++; CHECK: [[S8:%[0-9]+]]:_(s32) = G_LSHR [[X]], [[C8]](s32)
++; CHECK: [[P1:%[0-9]+]]:_(s8) = G_TRUNC [[S8]](s32)
++; CHECK: [[R1:%[0-9]+]]:imag8 = COPY [[P1]](s8)
++; CHECK: INLINEASM &"", {{.*}} regdef:Imag8, def [[D0:%[0-9]+]], def [[D1:%[0-9]+]], def %{{[0-9]+}}, def %{{[0-9]+}}, reguse tiedto:$0, [[R0]](tied-def 3), [[R1]](tied-def 4), %{{[0-9]+}}(tied-def 5), %{{[0-9]+}}(tied-def 6)
++; CHECK: [[L0:%[0-9]+]]:_(s8) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(s8) = COPY [[D1]]
++; CHECK: %{{[0-9]+}}:_(s32) = G_MERGE_VALUES [[L0]](s8), [[L1]](s8), %{{[0-9]+}}(s8), %{{[0-9]+}}(s8)
++; ASM-LABEL: tied_i32:
++; ASM: rts
++  %r = call i32 asm "", "=r,0"(i32 %x)
++  ret i32 %r
++}
++
++define i32 @out_i32() {
++; A multi-register result is reassembled from the defs, least significant first.
++; CHECK-LABEL: name: out_i32
++; CHECK: INLINEASM &"", {{.*}} regdef:Imag8, def [[D0:%[0-9]+]], def [[D1:%[0-9]+]], def [[D2:%[0-9]+]], def [[D3:%[0-9]+]]
++; CHECK: [[L0:%[0-9]+]]:_(s8) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(s8) = COPY [[D1]]
++; CHECK: [[L2:%[0-9]+]]:_(s8) = COPY [[D2]]
++; CHECK: [[L3:%[0-9]+]]:_(s8) = COPY [[D3]]
++; CHECK: %{{[0-9]+}}:_(s32) = G_MERGE_VALUES [[L0]](s8), [[L1]](s8), [[L2]](s8), [[L3]](s8)
++; ASM-LABEL: out_i32:
++; ASM: rts
++  %r = call i32 asm "", "=r"()
++  ret i32 %r
++}
++
++define void @in_i32(i32 %x) {
++; A plain (untied) multi-register input is split the same way.
++; CHECK-LABEL: name: in_i32
++; CHECK: [[X:%[0-9]+]]:_(s32) = G_MERGE_VALUES
++; CHECK: [[P0:%[0-9]+]]:_(s8) = G_TRUNC [[X]](s32)
++; CHECK: [[R0:%[0-9]+]]:imag8 = COPY [[P0]](s8)
++; CHECK: INLINEASM &"", {{.*}} reguse:Imag8, [[R0]], %{{[0-9]+}}, %{{[0-9]+}}, %{{[0-9]+}}
++; ASM-LABEL: in_i32:
++; ASM: rts
++  call void asm sideeffect "", "r"(i32 %x)
++  ret void
++}
++
++define void @ll_to_int(i64 %x, ptr %p) {
++; gcc torture 20030222-1.c: the asm is a no-op, the tied group is eight
++; registers wide, and the int that comes back out must be the LOW half of the
++; long long -- the asymmetric case that a reversed piece order would break.
++; CHECK-LABEL: name: ll_to_int
++; CHECK: INLINEASM &"", {{.*}} regdef:Imag8, def [[D0:%[0-9]+]], def [[D1:%[0-9]+]], def %{{[0-9]+}}, def %{{[0-9]+}}, def %{{[0-9]+}}, def %{{[0-9]+}}, def %{{[0-9]+}}, def %{{[0-9]+}}, reguse tiedto:$0, %{{[0-9]+}}(tied-def 3), %{{[0-9]+}}(tied-def 4), %{{[0-9]+}}(tied-def 5), %{{[0-9]+}}(tied-def 6), %{{[0-9]+}}(tied-def 7), %{{[0-9]+}}(tied-def 8), %{{[0-9]+}}(tied-def 9), %{{[0-9]+}}(tied-def 10)
++; CHECK: [[L0:%[0-9]+]]:_(s8) = COPY [[D0]]
++; CHECK: [[L1:%[0-9]+]]:_(s8) = COPY [[D1]]
++; CHECK: [[M:%[0-9]+]]:_(s64) = G_MERGE_VALUES [[L0]](s8), [[L1]](s8),
++; CHECK: [[C:%[0-9]+]]:_(s64) = COPY [[M]](s64)
++; CHECK: [[T:%[0-9]+]]:_(s16) = G_TRUNC [[C]](s64)
++; CHECK: G_STORE [[T]](s16)
++; ASM-LABEL: ll_to_int:
++; ASM: rts
++  %c = call i64 asm "", "=r,0"(i64 %x)
++  %t = trunc i64 %c to i16
++  store volatile i16 %t, ptr %p, align 1
++  ret void
++}

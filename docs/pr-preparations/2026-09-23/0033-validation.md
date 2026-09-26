@@ -31,11 +31,14 @@ checked against the artifacts:
 5. **Downstream detail in the PR draft — accepted.** Codex's rewrite of the
    draft is kept, with the accounting revision added.
 
-The test comment keeps its one-line provenance ("Reduced with llvm-reduce from
-gcc.c-torture/execute/950714-1.c"): upstream tests routinely record their
-origin, and the comment contract targets change narrative, which the rest of
-the comment does not contain. The revised patch applies to the newer
-`~/llvm-mos` clone and passes the comment-history check.
+**Follow-up audit:** the original container invocation confirms the mount alias;
+Codex has withdrawn the unpatched-compiler finding. The accounting revision is
+confirmed and passes fresh 0033-only MOS suites (130 pass, one unsupported).
+The regression comment now describes its current scratch-register contract.
+Its provenance remains here and in the PR: reduced with `llvm-reduce` from
+`gcc.c-torture/execute/950714-1.c`. AGENTS.md explicitly excludes test-writing
+history from test comments even when the heuristic hook accepts the wording.
+[Completed follow-up](0033-review-audit.md#follow-up-validation).
 
 Revalidation of the revision (assertion build `build/0030-claude-review/llc-final`, stacked
 with 0011/0030/0031/0032/0034/0036/0037):
@@ -59,7 +62,7 @@ in Machine Copy Propagation.
 - [x] Reduced regression test: `llvm/test/CodeGen/MOS/spill-hoist-scratch-vreg.ll` (49-line function from `950714-1.c` via `llvm-reduce`; two RUN lines, hoisting on and off).
 - [x] Stacked MOS suites (135/1/0), corpus differential hoisting-with-guard vs hoisting-disabled, project toolchain rebuilt; emulator gate 79/79.
 - [x] Initial patch committed.
-- [x] Rollback accounting corrected (per-group `NumHoisted`), revalidated; the test comment keeps its provenance line (see above).
+- [x] Rollback accounting corrected (per-group `NumHoisted`), revalidated; the test comment describes the current contract (see above).
 
 ## Why `clang` never showed it
 
@@ -106,3 +109,9 @@ Artifacts under `build/0030-claude-review/`: `diff5.py` / `diff5-results.json`
 `regalloc.log` is no longer present; the audit saves fresh reduced-input traces
 under `build/0033-review-audit/`. The revision's artifacts: `build-hoist2.log`,
 `suite-final.out`, `diff9.py` / `diff9-results.json`.
+
+Assisted-by: Claude Code CLI 2.1.278 using Claude Fable 5.1 (`claude-fable-5-1`,
+`high` reasoning effort) for diagnosis, implementation, initial validation, and the accounting revision.
+
+Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`, `xhigh`
+reasoning effort) for independent validation, the follow-up audit, comment cleanup, and evidence corrections.

@@ -1,0 +1,64 @@
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-as in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-sim in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /home/will/llvm-mos-65816/build/llvm-mos/bin
+llvm-lit: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /home/will/llvm-mos-65816/build/llvm-mos/bin
+-- Testing: 175 tests, 2 workers --
+Testing:  0.. 10.. 20.. 30.. 40.. 50.. 60.. 70.. 80.. 90.. 
+
+Testing Time: 4.19s
+
+Total Discovered Tests: 175
+  Unsupported:   2 (1.14%)
+  Passed     : 173 (98.86%)

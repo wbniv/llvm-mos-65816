@@ -13,17 +13,13 @@ diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSIns
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-@@ -2316,6 +2316,23 @@ bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
+@@ -2316,6 +2316,19 @@ bool MOSInstructionSelector::selectTrunc(MachineInstr &MI) {
  
    Register From = MI.getOperand(1).getReg();
  
-+  // The s8 -> s1 pattern requires its input in Ac so it can mask bit zero.
-+  // RegBankSelect can legitimately leave the input in Imag8 (for example, a
-+  // boolean materialized by the far-pointer comparison combiner).  In that
-+  // case selectImpl declines the pattern and reaches this fallback.  Do not
-+  // treat it as the s16 -> s1 case below: buildTrunc(s8, s8) is invalid and
-+  // used to crash MachineIRBuilder.  Constrain the operand through Ac and
-+  // retry the normal pattern instead.
++  // The generated s8 -> s1 pattern normally inserts any needed Ac copy.
++  // If this fallback receives an s8 source, retry through an explicit Ac
++  // copy. The s16 -> s1 path below requires a source wider than s8.
 +  if (Builder.getMRI()->getType(From) == S8) {
 +    auto &MRI = *Builder.getMRI();
 +    Register AcFrom = MRI.createGenericVirtualRegister(S8);
