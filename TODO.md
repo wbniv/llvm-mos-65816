@@ -2574,4 +2574,5 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-09-24: already closed — see Done [title-entropy-gate-wiring]. Not work.
      fp:26cd0e82ac7f98dd -->
 - [verify] **Live upstream dashboard follow-up** — Check keyboard-only navigation, a browser with JavaScript disabled, and a forced GitHub outage against the published page. The 2026-09-26 release checks are recorded in the [dashboard plan](docs/plans/2026-09-26-live-upstream-dashboard.md#release-checks-recorded-2026-09-26).
+- [verify] **2026-09-26-one-command-dashboard-publication** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-26-one-command-dashboard-publication.md](docs/plans/2026-09-26-one-command-dashboard-publication.md)_  <!-- fp:dbea867b3442be5b -->
 <!-- END auto-captured-deferrals -->
