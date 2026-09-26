@@ -251,23 +251,6 @@ un-landed (a)/(b) `0002` spike.
 
 ---
 
-## Computer-crash assessment
-
-Based on the commit history and plan records, **no work-in-progress was lost to a crash**:
-
-| Work item | State at time of crash | Outcome |
-|---|---|---|
-| Frame-ABI "build all three" | Census completed; A1–M correctly **not started** | Complete — NULL result is the answer |
-| xy16 Csmith seeds 247/445 | Checkpointed at debugging cap, **then resumed and fixed** (`2d8ab51`, 2026-06-20) | Complete — cvise-reduced, root-caused, 4-way verified |
-| Load-fold unification | Phase 1 PROCEED → Phase 2 built + byte-diffed → **landed (`6440db0`)** | Complete — AA-precision landed, volatile-drop closed net-negative |
-| c-torture -Os sweep + bsnes-jg 4-way | Both completed and recorded | Complete |
-
-Every item above ran to a clean conclusion — none was lost to a crash. The #320 far-pointer calling
-convention (`0004`) and the far-fn-pointer (a) line are now **landed on `main`** (2026-06-21); the open
-frontier is the #320 five-address-space model PR (design-note-gated), tracked in *What's next* and TODO.
-
----
-
 ## What's next (prioritized)
 
 1. **#320 far-pointer calling convention** — ✅ **DONE + LANDED (2026-06-21)** (`wt/320-far-cc`): all 4 ABI
