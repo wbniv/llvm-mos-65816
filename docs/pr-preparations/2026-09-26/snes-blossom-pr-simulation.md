@@ -1,11 +1,11 @@
-# Internal PR simulation — Blossom far memset
+# Simulated upstream PR — Route far memset to the far runtime
 
-**Status: not ready to submit.** This packet preserves the prospective submission boundary for the [Blossom ROM](https://biohack.net/snes/blossom/), which exposed far `memset` selecting the near runtime.
+**Internal only; do not submit yet.** The [Blossom ROM](https://biohack.net/snes/blossom/) exposed address-space-2 `memset` selecting the near runtime and losing the destination bank.
 
-## Proposed change
+## Proposed PR body
 
-Route address-space-2 `G_MEMSET` to the far runtime entry point with the far-pointer ABI. The preserved [defect record](../../defects/mos-far-memset-wrong-bank.json) contains the exact C, preprocessed input, MIR, baseline/candidate identities, and runtime red/green evidence.
+Route address-space-2 `G_MEMSET` to the far runtime entry point and preserve its far-pointer ABI. The [defect record](../../defects/mos-far-memset-wrong-bank.json) contains the exact C, preprocessed input, MIR, baseline/candidate identities, and physical-WRAM red/green evidence.
 
-## Submission gate
+## Acceptance before submission
 
-Do not submit until the exact destination revision, runtime ownership, and standalone regression placement are reconciled. This simulation is not an upstream PR and records no claimed upstream readiness.
+Reconcile the target revision, runtime ownership, and standalone regression location; then replay the preserved input and the Blossom runtime check. This is a complete review packet, not an assertion that the upstream destination is ready.

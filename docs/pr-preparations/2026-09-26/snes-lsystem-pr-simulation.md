@@ -1,11 +1,11 @@
-# Internal PR simulation — L-System xy16 memmove
+# Simulated upstream PR — Preserve X width in xy16 in-place memmove
 
-**Status: feature-series work; not ready to submit.** The [L-System ROM](https://biohack.net/snes/lsystem/) exposed an xy16 indexed in-place `memmove` width-state miscompile.
+**Internal only; feature-series scope.** The [L-System ROM](https://biohack.net/snes/lsystem/) exposed an xy16 indexed in-place `memmove` width-state miscompile.
 
-## Proposed change
+## Proposed PR body
 
-Ensure the indexed load/store sequence establishes the required X width around the in-place move. The [investigation](../../investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md) retains the trigger and regression evidence.
+Ensure the indexed load/store sequence establishes the required X width around the in-place move. The [investigation](../../investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md) retains the trigger, mechanism, and regression evidence.
 
-## Submission gate
+## Acceptance before submission
 
-This is part of the unfinished 65816 feature series, not an independent upstream patch. Reconcile it with the target submission prerequisites before preparing a standalone PR.
+Fold this packet into the reconciled 65816 target series, then run the minimal repro and the L-System ROM gate across its declared width configurations. It is an internal simulated PR, not a claim that a standalone upstream patch is appropriate.
