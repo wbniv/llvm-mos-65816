@@ -8,7 +8,7 @@ This publication contains the standalone 0064 preparation:
 - [Validation and retained evidence](0064-validation.md).
 
 Compiler commit `155e209c4cee` is based on llvm-mos main `7bd67c0ae4e8` and
-is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling). No PR has been opened.
+is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling). [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. The destination was rechecked at `26d7c2c1eebf`; the recorded tests remain on `7bd67c0ae4e8`.
 The exact patch passes ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build. The targeted MIR kernel
 shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.

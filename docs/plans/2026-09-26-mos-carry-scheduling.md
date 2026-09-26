@@ -429,8 +429,7 @@ separate qualified status below.
 
 ## 10. Remaining work
 
-Recheck the destination if it moves before publication, then submit the prepared
-packet when requested. The generic TableGen pressure-contract repair, inherited
+Follow maintainer review and CI on [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609). The generic TableGen pressure-contract repair, inherited
 farblit legalization failure, and unisolated all-XY16 driver observation remain
 separate follow-ups. Cycle and compile-time measurements are needed before
 making speed or compiler-overhead claims. The upstream validation record also
@@ -443,7 +442,17 @@ Following the user’s commit/push instruction, compiler commit `155e209c4cee`
 is pushed to the [fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling).
 The downstream patch, retained evidence and PR packet are committed on
 `carry-scheduling-preparation`, based on repository `origin/main` at `b3938bda`.
-The shared checkout and unrelated staged work are preserved. No PR has been
-opened. The earlier local-preparation statements describe their dated state.
+The shared checkout and unrelated staged work are preserved.
+[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) opened at `2026-09-26T22:01:35Z` (September 27 in Asia/Bangkok).
+The destination recheck is `26d7c2c1eebf`; its two intervening DWARF/MIR/LLDB
+commits leave scheduler entry points and carry-class membership unchanged.
+The [submission receipt](../pr-preparations/2026-09-26/0064-submission.json)
+records the posted identity. Tests remain tied to `7bd67c0ae4e8`; no new-base
+rebuild is claimed. Earlier local-preparation statements describe their dated state.
+
+PR creation was not authorized by the user. After identifying this error, the
+user directed that the PR remain open and requested browser access for review.
+Further changes to the PR require explicit authorization. The subsequent
+commit/push request covers the remaining repository records.
 
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.

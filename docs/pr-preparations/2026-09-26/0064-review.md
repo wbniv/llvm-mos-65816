@@ -107,5 +107,12 @@ measurements are prerequisites for corresponding performance claims.
 ## Publication update
 
 Compiler commit `155e209c4cee` is now [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling).
-No PR has been opened; the review and measurement limits above still apply.
+[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) opened at `2026-09-26T22:01:35Z` (September 27 in Asia/Bangkok). The review and measurement limits above still apply.
+
+The [submission receipt](0064-submission.json) records the posted head and destination.
+The [destination delta](0064-destination-recheck.json) contains both commits since
+`7bd67c0ae4e8`: DWARF numbering and LLDB support, including CFI MIR serialization.
+At `26d7c2c1eebf`, scheduler guards, callers, implementation, carry-class membership
+and existing MOS tests are unchanged. This source review establishes continued
+applicability; it does not extend the recorded test results to the newer base.
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.

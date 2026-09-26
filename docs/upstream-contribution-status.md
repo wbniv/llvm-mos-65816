@@ -3,7 +3,7 @@
 **Computed-carry scheduling (0064):** the [standalone PR packet](pr-preparations/2026-09-26/0064-pr-body.md)
 is author-reviewed and validated on llvm-mos `7bd67c0ae4e8`. Compiler commit
 `155e209c4cee` is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling);
-no PR has been opened. Ten focused commands, 132 MOS tests (one unsupported),
+[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. Ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
 shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.
 Downstream 1–41-byte losses remain documented. Independent review, cycles and
@@ -11,6 +11,9 @@ compiler overhead remain unclaimed. The [generic pressure contract](defects/mos-
 [farblit legalization](defects/mos-farblit-byte-load-legalization.json), and the
 unisolated all-XY16 driver observation remain separate follow-ups. Publication
 of this branch does not submit native-width or SNES platform code.
+The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
+scheduler entry points and carry-class membership are unchanged. Test results
+remain tied to `7bd67c0ae4e8`; no rebuild at the newer revision is claimed.
 
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
 

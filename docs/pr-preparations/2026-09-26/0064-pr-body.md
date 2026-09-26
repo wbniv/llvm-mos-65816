@@ -47,3 +47,7 @@ session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`. Original downstream sum/rotate
 inputs and measurements: Claude Code 2.1.278, model `claude-opus-5`, `high`
 reasoning effort; session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b`,
 agent `a35017d73ff4d881d`.
+
+Submission check: upstream main is now `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`. The two commits since the tested base add DWARF register definitions, CFI MIR serialization, and LLDB support; they leave the MOS scheduler, its entry-point guards/callers, and carry-class membership unchanged. The local test results above remain tied to `7bd67c0ae4e8`; they do not claim a rebuild at the newer revision.
+
+[Retained validation](https://github.com/wbniv/llvm-mos-65816/blob/cbd1cd5b75f767f8b1c4bd3b6571e237be83103d/docs/pr-preparations/2026-09-26/0064-validation.md) and [profitability review](https://github.com/wbniv/llvm-mos-65816/blob/cbd1cd5b75f767f8b1c4bd3b6571e237be83103d/docs/pr-preparations/2026-09-26/0064-review.md).

@@ -7,7 +7,11 @@ The [0064 packet](pr-preparations/2026-09-26/README.md) retains exact upstream
 validation, downstream costs and separate open follow-ups. The downstream
 publication branch is `carry-scheduling-preparation`, based on `b3938bda`, in
 `.scratch/carry-publish`. The shared checkout and installed compiler remain
-unchanged. No PR was opened. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+unchanged. [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open at compiler commit `155e209c4cee`. The destination recheck is `26d7c2c1eebf`; local validation remains on `7bd67c0ae4e8`. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+
+PR creation was not authorized. The user subsequently directed that it remain
+open for their review. Further changes to that PR require explicit authorization;
+the current commit/push instruction covers the remaining repository work.
 
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
 three governing lessons, and commit discipline are in the auto-loaded project
