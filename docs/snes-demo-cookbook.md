@@ -25,6 +25,16 @@ Taskfile.yml entry             ← `task <name>` = `dev/run.sh <name>`
 Publication is a seventh step: the `/snes-rom-page` skill scaffolds a playable emulator page at
 [biohack.net/snes/](https://biohack.net/snes/) and its own `/snes/<slug>` page.
 
+When a demo is the original discovery of a compiler defect, publication has an
+additional provenance step: first preserve the defect evidence, then add the
+demo to [`snes-demo-compiler-bug-pages.json`](snes-demo-compiler-bug-pages.json)
+and give its public page a detailed **Compiler defect this ROM exposed** section.
+That section explains the trigger, affected configuration, observed failure,
+mechanism, current status, repair (when established), regression check, and
+primary PR/issue or investigation links. The paired publisher enforces the
+page marker, which activates that required section, and the gallery derives a bug badge from it.
+Do not mark a later guard-only demo as an original discovery.
+
 The plan doc (`docs/plans/YYYY-MM-DD-7-snes-<name>.md`) precedes all of them — plan first,
 code second. Number the plan after its battery ID (`#7`, `#11`, `#19`, …).
 

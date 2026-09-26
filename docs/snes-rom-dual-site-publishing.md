@@ -10,6 +10,17 @@ binds the pass to the exact ROM bytes, natural source, declared evidence, and co
 source or contract, rebuilding different ROM bytes, or failing before the emulator differential
 therefore makes the artifact unpublishable.
 
+If a demo originally exposes a compiler defect, it also has a public-provenance
+contract. Register it in
+[`snes-demo-compiler-bug-pages.json`](snes-demo-compiler-bug-pages.json) and
+follow the detailed discovery-page requirements in
+[`investigations/2026-09-26-snes-demo-bug-page-audit.md`](investigations/2026-09-26-snes-demo-bug-page-audit.md).
+The paired-publication preflight rejects a registered demo unless the biohack
+page has its machine-readable `compilerBug` marker, which activates the required
+**Compiler defect this ROM exposed** section. The gallery's bug badge is derived
+from that same marker. A later regression-only demo is not registered merely
+because it exercises an earlier fix.
+
 For the compiler stress-test battery, passing the host/default/a16/xy16 gate is not the end of the
 per-ROM workflow. Unless the user explicitly says not to publish, “done” also requires this paired
 publication gate, both site builds, both manifest self-checks, and live page/ROM verification.

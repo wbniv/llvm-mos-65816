@@ -1,0 +1,19 @@
+{
+  "schema": 1,
+  "purpose": "Canonical registry of published SNES ROMs that originally exposed a compiler or compiler-runtime defect. Each record makes the public explanation a release requirement; later demos that only guard an earlier defect are intentionally absent.",
+  "records": [
+    {"slug":"blossom","page":"https://biohack.net/snes/blossom/","defect":"far memset selects the near runtime","evidence":"docs/defects/mos-far-memset-wrong-bank.json"},
+    {"slug":"lsystem","page":"https://biohack.net/snes/lsystem/","defect":"xy16 indexed in-place memmove width-state miscompile","evidence":"docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md"},
+    {"slug":"qsortviz","page":"https://biohack.net/snes/qsortviz/","defect":"G_SCMP/G_UCMP legalization abort","evidence":"docs/upstream-scmp-ucmp-pr.md"},
+    {"slug":"dhmix","page":"https://biohack.net/snes/dhmix/","defect":"native-width s64 unmerge and odd-width extension legalization gap","evidence":"docs/investigations/2026-06-30-a16-s64-unmerge-anyext-legalize-crash.md"},
+    {"slug":"crcwall","page":"https://biohack.net/snes/crcwall/","defect":"default-width rotate coalescing silent miscompile","evidence":"docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md"},
+    {"slug":"seamdemo","page":"https://biohack.net/snes/seamdemo/","defect":"status-register scavenging reads an unavailable physical value","evidence":"docs/investigations/2026-08-02-compiler-defects-found-by-demos.md"},
+    {"slug":"seqvm","page":"https://biohack.net/snes/seqvm/","defect":"undefined Imag16 high lane reaches a store after register allocation","evidence":"docs/upstream-rc-undef-ra-pure-virtual-issue.md"},
+    {"slug":"nmitally","page":"https://biohack.net/snes/nmitally/","defect":"interrupt prologue inherits unknown M/X widths","evidence":"docs/investigations/2026-08-03-65816-interrupt-width-prologue.md"},
+    {"slug":"brkcop","page":"https://biohack.net/snes/brkcop/","defect":"BRK/COP signature and native-vector support gap","evidence":"docs/upstream-cop-brk-signature-pr.md"},
+    {"slug":"lzss-gallery","page":"https://biohack.net/snes/lzss-gallery/","defect":"late-optimization crash and zero-page allocation nondeterminism","evidence":"docs/upstream-late-opt-nongpr-ldimm-pr.md"},
+    {"slug":"backtrack","page":"https://biohack.net/snes/backtrack/","defect":"native longjmp stack reconstruction immediate-width encoding","evidence":"docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md"},
+    {"slug":"retryjmp","page":"https://biohack.net/snes/retryjmp/","defect":"xy16 frame-index spill store clobbers its value","evidence":"docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md"},
+    {"slug":"byvaledge","page":"https://biohack.net/snes/byvaledge/","defect":"mixed-width pointer access across a call exhausts registers","evidence":"docs/upstream-mixed-width-call-regalloc-issue.md"}
+  ]
+}

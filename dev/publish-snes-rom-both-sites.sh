@@ -70,6 +70,7 @@ BIO_ROM="$BIOHACK/public/play/roms/$SLUG.sfc"
 BIO_PREVIEW="$BIOHACK/public/play/preview/$SLUG.png"
 BIO_MANIFEST="$BIOHACK/public/play/roms/manifest.json"
 BIO_META="$BIOHACK/src/content/snes/$SLUG.json"
+BUG_PAGES="$ROOT/docs/snes-demo-compiler-bug-pages.json"
 INDRI_ROM="$INDRI/public/apps/llvm-mos-65816/play/roms/$SLUG.sfc"
 INDRI_PREVIEW="$INDRI/public/apps/llvm-mos-65816/play/preview/$SLUG.png"
 INDRI_MANIFEST="$INDRI/public/apps/llvm-mos-65816/play/roms/manifest.json"
@@ -81,6 +82,12 @@ done
 for file in "$BIO_MANIFEST" "$BIO_META" "$INDRI_MANIFEST" "$INDRI_META"; do
   [ -f "$file" ] || { echo "FATAL: missing publication metadata: $file" >&2; exit 1; }
 done
+if [ -f "$BUG_PAGES" ] && jq -e --arg slug "$SLUG" '.records[] | select(.slug == $slug)' "$BUG_PAGES" >/dev/null; then
+  jq -e '.compilerBug == true' "$BIO_META" >/dev/null || {
+    echo "FATAL: $SLUG is a registered compiler-defect discovery but its biohack page lacks compilerBug metadata" >&2
+    exit 1
+  }
+fi
 jq -e --arg slug "$SLUG" '.roms[] | select(.id == $slug)' "$BIO_MANIFEST" >/dev/null || {
   echo "FATAL: biohack manifest has no $SLUG entry" >&2; exit 1;
 }
