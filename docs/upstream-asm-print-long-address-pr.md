@@ -97,5 +97,9 @@ full MOS lit suites, and the 0039 stacked-dependency check) is recorded in
 This is independent of the SNES platform and native-width (`+mos-a16`) compiler
 submissions; it is stock 65816 and does not touch any `+mos-a16` code.
 
-Assisted-by: Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high` reasoning
-effort), for pinned-base validation and this PR draft.
+Assisted-by: Claude Code 2.1.278 using Claude Opus 5 (`claude-opus-5`), `high`
+reasoning effort, as a subagent, for the fix (commit `5ea5006c`, whose trailer
+reads "Claude Opus 5 (1M context)"); Claude Code 2.1.280 using Claude Sonnet 5
+(`claude-sonnet-5`), `high` reasoning effort, as a subagent, for pinned-base
+validation and this PR draft (commit `f85f6295`, whose trailer reads "Claude
+Sonnet 5"). Verified from Claude Code session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata.

@@ -46,15 +46,17 @@ Validation and exact base/patch identities accompany the local
 preparation package; this file is an unposted draft.
 
 Original implementation: commit `5ea5006c`, credited there to Claude Opus 5
-(1M context); actual tool/version, exact model ID/version, and reasoning effort
-are unknown from the recovered record. That credit is retained, not reassigned.
+(1M context); Claude Code 2.1.278 using Claude Opus 5 (`claude-opus-5`), `high`
+reasoning effort, as a subagent, verified from Claude Code session
+`65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata. The credit is not reassigned.
 Submission preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
 `gpt-6-astra`, `xhigh` reasoning effort; verified session
 `01a0db16-f6a0-7e32-ada6-0c8098813933`.
 Pinned-base validation (0044 alone and 0039+0044 at `8be0546`) and the breaking
-commit: Claude Code 2.1.283, model `claude-sonnet-5`, `high` reasoning effort
-(subagent); merged into this draft by Claude Code 2.1.283, model
-`claude-opus-5-5`, reasoning effort unknown. Record:
+commit: Claude Code 2.1.280, model `claude-sonnet-5`, `high` reasoning effort
+(subagent); merged into this draft by Claude Code 2.1.280, model
+`claude-opus-5-5`, `medium` reasoning effort (main session; commit `b6a456ea`
+names 2.1.283 in error). Verified from session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata. Record:
 [`0044-validation.md`](0044-validation.md).
 
 Validation: an isolated Release build with assertions enabled on llvm-mos main

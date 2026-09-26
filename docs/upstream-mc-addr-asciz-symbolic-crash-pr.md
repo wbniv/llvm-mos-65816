@@ -36,8 +36,12 @@ The directive was introduced by
 [6cbcc49](https://github.com/llvm-mos/llvm-mos/commit/6cbcc49db9b2903bf78d78d207da150d53e8cf39).
 This compiler fix is independent of the SNES platform submission.
 
-Assisted-by: Claude Fable 5.1, credited in `6eced8e4`, for the initial fix;
-Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high` reasoning
-effort) for pinned-base validation and the initial PR draft; OpenAI Codex CLI
+Assisted-by: Claude Code 2.1.278 using Claude Sonnet 5 (`claude-sonnet-5`),
+`high` reasoning effort, for the initial fix (a subagent wrote it; the main
+session, on the same model and effort, finished and committed it as
+`6eced8e4`, whose trailer misnames the model as Claude Fable 5.1); Claude Code
+2.1.280 using Claude Sonnet 5 (`claude-sonnet-5`), `high` reasoning effort, as
+subagents, for pinned-base validation and the initial PR draft; OpenAI Codex CLI
 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning effort, for
 independent review, narrowing the patch, expanded tests, and this revision.
+Claude details verified from Claude Code session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata.

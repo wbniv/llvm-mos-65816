@@ -85,9 +85,12 @@ but touched only `MOSFixupKinds.h`, not `MOSFixupKinds.cpp` — the commit's
 file list has no `MOSFixupKinds.cpp` in it — so the `Infos[]` array was never
 updated to match the new enum member it introduced.
 
-Assisted-by: Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high`
-reasoning effort) for investigation, patch validation against the pinned
-upstream base, and PR drafting.
+Assisted-by: Claude Code 2.1.278 using Claude Sonnet 5 (`claude-sonnet-5`),
+`medium` reasoning effort, as a subagent, for the investigation and fix (commit
+`fe54d1b7`, whose trailer reads "Claude Sonnet 5"); Claude Code 2.1.280 using
+Claude Sonnet 5 (`claude-sonnet-5`), `high` reasoning effort, as a subagent, for
+patch validation against the pinned upstream base and PR drafting. Verified
+from Claude Code session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata.
 
 Assisted-by: OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh`
 reasoning effort, for independent review, the compile-time table-length

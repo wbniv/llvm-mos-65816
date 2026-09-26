@@ -156,3 +156,8 @@ the treatment `#mos16()` already received through the `Imm16` special case.
 
 MOS lit suites: 157 tests, 151 pass, 2 unsupported, 4 fail — the same four that
 fail without the change, with byte-identical output.
+
+Assisted-by: Claude Code 2.1.278 using Claude Opus 5 (`claude-opus-5`), `high`
+reasoning effort, as a subagent, for the fix, this draft, and its validation
+record; commit `48595d47` credits the same work as "Claude Opus 5 (1M context)".
+Verified from Claude Code session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata.

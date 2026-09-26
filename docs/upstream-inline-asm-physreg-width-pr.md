@@ -46,9 +46,12 @@ The two hooks' i16 convention originated in
 [f7593f2a15e20243244b2f7fb6b19cebeb717618](https://github.com/llvm-mos/llvm-mos/commit/f7593f2a15e20243244b2f7fb6b19cebeb717618).
 This is independent of native 65816 features and SNES platform submission.
 
-Assisted-by: Claude Opus 5 (1M context), credited in `84d87260`, for the initial
-implementation; Claude Code CLI using Claude Sonnet 5 (`claude-sonnet-5`, `high`
-reasoning effort) for pinned-base validation and the initial PR draft; OpenAI
+Assisted-by: Claude Code 2.1.278 using Claude Opus 5 (`claude-opus-5`), `medium`
+reasoning effort, as a subagent, for the initial implementation (commit
+`84d87260`, whose trailer reads "Claude Opus 5 (1M context)"); Claude Code
+2.1.280 using Claude Sonnet 5 (`claude-sonnet-5`), `high` reasoning effort, as
+subagents, for pinned-base validation and the initial PR draft; OpenAI
 Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning effort,
 for independent review, the named-register extension, regression coverage,
-and this revision.
+and this revision. Claude details verified from Claude Code session
+`65695418-7e9b-45bd-92e3-2ecfd88ecf0b` metadata.
