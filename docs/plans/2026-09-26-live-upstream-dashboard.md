@@ -38,6 +38,16 @@ Remaining follow-up: add automated candidate review and cache invalidation from 
 The site already refreshes GitHub state on requests after the cache interval;
 these follow-ups do not block the released dashboard.
 
+**2026-09-26 local update:** the compiler branch's reviewed export now has 50
+items: runtime far `[dp],Y` indexing is locally implemented, and the separate
+XY16 near-Y gallery defect is open. The export and dependency graph validate
+together (**PASS**, the site's `validateCompilerExports`, source hash
+`b4a51df558fc74c4e40e5be61788ead0416b9f38480a26856de23b0960f91513`).
+The live endpoint still serves the older 49-item manifest (source hash
+`14453e3f09c18870ef38567bac6986db2372f5cb099a23a35de3ce22deeea293`).
+The site publication command reads the compiler export from `origin/main`, so
+these branch changes will reach the website after the compiler publication step.
+
 ## Diagram release
 
 The page now offers a track-based dependency map and a

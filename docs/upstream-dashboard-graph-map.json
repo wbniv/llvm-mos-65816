@@ -24,6 +24,8 @@
     "EXIST": { "workId": "platform:snes415", "label": "SNES SDK #415" },
     "FARABI": { "workId": "platform:320", "label": "#320 far ABI" },
     "WIDTHABI": { "workId": "platform:321", "label": "#321 native-width ABI" },
+    "DPY": { "workId": "opt:dpy-runtime-index", "label": "Range-proven far [dp],Y" },
+    "NEARY": { "workId": "defect:mos-xy16-near-indirect-y-clobber", "label": "Open near Y16 clobber" },
     "REDUCER": { "workId": "sub:0060", "label": "0060 parallel MIR reducer" },
     "CONTRACT": { "workId": "defect:reentrant-attribute-contract", "label": "Reentrant attribute contract" },
     "GUARDS": { "workId": "defect:mos-trunc-imag8-i1", "label": "0023 matcher contract audit" }
@@ -31,8 +33,8 @@
   "tracks": [
     { "id": "independent", "label": "Independent fixes", "description": "Compiler and SDK fixes that can proceed outside the SNES platform submission.", "workIds": ["sub:604", "sub:sdk450", "sub:0028", "sub:0029", "sub:0030", "sub:0031", "sub:0011", "sub:0032", "sub:0033", "sub:0034", "sub:0035", "sub:0036", "sub:0037", "sub:0038", "sub:0040", "sub:0041", "sub:0049-0054", "sub:0056-0059"] },
     { "id": "far", "label": "Far ABI #320", "description": "Address-space and far-memory work; compiler dependencies precede the SDK integration.", "workIds": ["platform:320", "defect:mos-far-memset-wrong-bank", "opt:0061", "opt:0062", "sub:0028"] },
-    { "id": "native", "label": "Native widths #321", "description": "Native accumulator and index support, including dependent shifts and far-word accesses.", "workIds": ["platform:321", "sub:0055", "opt:0062", "opt:0063", "defect:shift64-narrow-count"] },
+    { "id": "native", "label": "Native widths #321", "description": "Native accumulator and index support, including dependent shifts and far-word accesses.", "workIds": ["platform:321", "sub:0055", "opt:0062", "opt:0063", "opt:dpy-runtime-index", "defect:mos-xy16-near-indirect-y-clobber", "defect:shift64-narrow-count"] },
     { "id": "snes", "label": "SNES SDK #415", "description": "A separate platform and runtime review track with its stated compiler merge prerequisites.", "workIds": ["platform:snes415", "platform:320", "platform:321", "sub:sdk450"] },
-    { "id": "reports", "label": "Reports and decisions", "description": "Qualified defects, contract questions, and local fixes still needing upstream assessment.", "workIds": ["defect:reentrant-attribute-contract", "defect:mos-trunc-imag8-i1", "sub:0060", "opt:carry-scheduler", "opt:dpy-runtime-index"] }
+    { "id": "reports", "label": "Reports and decisions", "description": "Qualified defects, contract questions, and local fixes still needing upstream assessment.", "workIds": ["defect:reentrant-attribute-contract", "defect:mos-trunc-imag8-i1", "sub:0060", "opt:carry-scheduler"] }
   ]
 }

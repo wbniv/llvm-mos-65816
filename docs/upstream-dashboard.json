@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-26",
-  "sourceHash": "5b0014504a687bd982c728bd50cfd1fbf39546799303a6b7e1f7af1ce1eed2c6",
+  "sourceHash": "b4a51df558fc74c4e40e5be61788ead0416b9f38480a26856de23b0960f91513",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -167,8 +167,10 @@
         "platform:321"
       ],
       "nextStep": "Isolate the near-Y contribution to the reproduced XY16 gallery failure and retain the failing baseline before attempting repair.",
-      "evidenceUrls": [],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-xy16-near-indirect-y-clobber.json"
+      ],
+      "evidenceNote": "",
       "upstreamUrl": null,
       "demoUrls": []
     },
@@ -330,16 +332,16 @@
       "id": "opt:dpy-runtime-index",
       "kind": "optimization",
       "title": "Runtime [dp],Y indexing",
-      "summary": "Select indirect indexed far accesses when the scaled runtime offset is proven to fit Y without changing narrow-add wrap semantics.",
-      "localStatus": "needs-work",
+      "summary": "Range-proven runtime offsets fold into far indirect indexed loads and stores; focused tests, the native corpus, and two-emulator gates pass. The separate near-Y gallery defect remains open.",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320",
-        "opt:carry-scheduler"
+        "platform:321"
       ],
-      "nextStep": "Prove the index range and measure the full corpus before widening selection.",
+      "nextStep": "Include the locally verified increment in the complete ABI-documented #321 feature series PR.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md"
       ],
       "evidenceNote": "",

@@ -472,6 +472,8 @@ flowchart TD
     WIDTHABI[Native-width ABI and clean extraction] --> WIDTH[Prepare and post 321 series] --> WIDTHDONE[Merge native-width support]
     SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --> WIDTH
     NATIVEPRINT[Native immediate printing 0045: fixed locally] --> WIDTH
+    DPY[Far DP Y runtime index: verified locally] --> WIDTH
+    NEARY[Near Y16 high-byte clobber: gallery fails] --> NEARREPAIR[Isolate LTO witness and fix near indexing]
     FARDONE --> FARSDK[Integrate far SDK support]
     SDKMERGE --> FARSDK
     WIDTHDONE --> WIDTHSDK[Integrate native-width SDK opt-ins]
@@ -490,7 +492,8 @@ flowchart TD
   end
   classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
   classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
-  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT fixed
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY fixed
+  class NEARY openDefect
 ```
 
 ## Independent simulator discussion

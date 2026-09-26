@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — zoomable flowchart</title><meta name="source-sha256" content="cd3a7cd5da6767343ef52487ed217317cc6e19d6ad8555c5af623998e3e613da"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — zoomable flowchart</title><meta name="source-sha256" content="cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b"><style>
 *{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#17233a;background:#f8fafc;height:100vh;display:flex;flex-direction:column}header{flex:none;padding:12px 22px;border-bottom:1px solid #ccd6e4;background:white}h1{font-size:21px;margin:0 0 10px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}button,a{font:inherit}button{padding:5px 13px;background:#edf2fa;border:1px solid #a7b7cc;border-radius:6px;cursor:pointer}a{color:#165ac4;margin-left:16px}.hint{color:#596579;margin-left:12px}#viewport{flex:1;min-height:0;overflow:auto;padding:32px;cursor:grab;touch-action:auto}#viewport.dragging{cursor:grabbing;user-select:none}#chart{width:max-content;background:white;border-radius:10px;padding:20px}#chart svg{max-width:none!important;display:block;height:auto}#fallback{white-space:pre-wrap;max-width:1100px}#zoom{min-width:54px;font-variant-numeric:tabular-nums}.status{font-size:13px;color:#596579;margin:8px 0 0}@media(max-width:750px){.hint{display:none}}
 </style></head><body><header><h1>Upstream work and dependencies</h1><div class="toolbar"><button id="minus" aria-label="Zoom out">−</button><span id="zoom">100%</span><button id="plus" aria-label="Zoom in">+</button><button id="actual">Readable size</button><button id="fit">Fit entire chart</button><button id="fullscreen">Full screen</button><a href="upstream-pending-work.md">Tracker and evidence</a><a href="mos-upstream-status-2026-09-21.html">Overview</a><span class="hint">Drag to pan · Ctrl + wheel to zoom</span></div><p class="status">Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25 · Fixed locally does not mean published</p></header><div id="viewport"><div id="chart"><pre id="fallback">flowchart TD
   subgraph Independent[Independent fixes]
@@ -48,6 +48,8 @@
     WIDTHABI[Native-width ABI and clean extraction] --&gt; WIDTH[Prepare and post 321 series] --&gt; WIDTHDONE[Merge native-width support]
     SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --&gt; WIDTH
     NATIVEPRINT[Native immediate printing 0045: fixed locally] --&gt; WIDTH
+    DPY[Far DP Y runtime index: verified locally] --&gt; WIDTH
+    NEARY[Near Y16 high-byte clobber: gallery fails] --&gt; NEARREPAIR[Isolate LTO witness and fix near indexing]
     FARDONE --&gt; FARSDK[Integrate far SDK support]
     SDKMERGE --&gt; FARSDK
     WIDTHDONE --&gt; WIDTHSDK[Integrate native-width SDK opt-ins]
@@ -66,7 +68,8 @@
   end
   classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
   classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
-  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT fixed</pre></div></div><script type="module">
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY fixed
+  class NEARY openDefect</pre></div></div><script type="module">
 const viewport=document.querySelector('#viewport'), chart=document.querySelector('#chart');
 let svg, baseWidth, baseHeight, zoom=1;
 function setZoom(value){if(!svg)return;zoom=Math.max(.02,Math.min(4,value));svg.style.width=`${baseWidth*zoom}px`;document.querySelector('#zoom').textContent=`${Math.round(zoom*100)}%`;}

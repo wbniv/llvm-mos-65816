@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "ed238497679dc78b67b3cecace6bf074cf7d241713c005e000d12872cf03b682",
+          "docs/upstream-dashboard-curation.json": "37219713269975685d23aa9e32ed4158ff3488eb95323b8be20a2a79deccdbe7",
           "docs/defects/bitboard-inline-register-pressure.json": "5216f32f376dd9106d7e2188b4b4e397f5be9f59117d0aec18fcb794ad873d73",
           "docs/defects/gisel-inline-asm-register-bounds.json": "2eaf09fa60696723a575db66b04fba7352cb7cbec94a67e4a13fe090220eda33",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "b446d5dcb2684b2c383ec23cb768268d6fc94c1b8553fff44d8f85db43d53109",
@@ -52,7 +52,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "c8decf01a9298114e33e88ca769bcad0ee02e94578073d3e7501e9d35c76db0d"
+          "docs/upstream-dashboard.json": "bb774d5f8fc6dbc8100838467acc092afe820b1e1f4b0f3b9a38bc7285cf2c6e"
         }
       }
     },
@@ -73,13 +73,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "cd3a7cd5da6767343ef52487ed217317cc6e19d6ad8555c5af623998e3e613da",
-          "docs/upstream-dashboard-graph-map.json": "db0f8060a08d065200c6d25816f80bd9614d1b74c4751b173bdcbc5fdb71fccf",
-          "docs/upstream-dashboard.json": "c8decf01a9298114e33e88ca769bcad0ee02e94578073d3e7501e9d35c76db0d",
+          "docs/upstream-pending-work.md": "cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b",
+          "docs/upstream-dashboard-graph-map.json": "b066069ce4ecbae5dd7effc1e95c4c115c9953fec290286e90ffc928f1b1f06a",
+          "docs/upstream-dashboard.json": "bb774d5f8fc6dbc8100838467acc092afe820b1e1f4b0f3b9a38bc7285cf2c6e",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "b1700a2f2d77543dbcf67849bf63d93c01c7754ba598aa2548e5af2b1ac23d3f"
+          "docs/upstream-dashboard-graph.json": "be7ff40d2eb2ebf1661cf7438b1e8852111ac1af7671d64b6c35db0541958406"
         }
       }
     },
@@ -108,7 +108,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "cd3a7cd5da6767343ef52487ed217317cc6e19d6ad8555c5af623998e3e613da",
+          "docs/upstream-pending-work.md": "cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b",
           "docs/upstream-contribution-status.md": "081e6a2a544e91979c4ca34288c948ec13657f47c510bcb8132a596a987789bd",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
@@ -116,8 +116,8 @@
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "cfac30ec1912aeb45f4d6199251a7c83c91e25c9b232188395e6dce109bcd65a",
-          "docs/mos-upstream-status-2026-09-21.html": "aaea0c84c946b6cf52114459ca0b642de69da2d844d94bc2d5d029792191d010"
+          "docs/mos-upstream-flowchart.html": "68f8cfb24132ad636c4b5fb982fe1e56b65e90f9a05e228f62ca2dd1d0b571a2",
+          "docs/mos-upstream-status-2026-09-21.html": "93e5b3a27f039ce742105b2d197f688c3e28da36b64e02b10f3aab18ccfa155a"
         }
       }
     },
@@ -251,8 +251,8 @@
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
         },
-        "reviewed_at": "2026-09-26T06:36:03.784788+00:00",
-        "note": "Reviewed the final commit status and current plan: increment 2 is locally verified and committed, while its upstream PR must be bundled with the full #321 ABI series; the near-Y bug remains separate.",
+        "reviewed_at": "2026-09-26T08:36:20.885727+00:00",
+        "note": "Checked the status of the locally completed runtime [dp],Y increment and the still-open near-Y defect against the revised dashboard and flowchart; both TODO entries remain accurate.",
         "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
@@ -293,8 +293,8 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
         },
-        "reviewed_at": "2026-09-26T06:28:49.393958+00:00",
-        "note": "Reviewed the updated near-Y defect and local completion of dpy increment 2; the baseline gallery failure remains separate and the full #321 ABI bundle is the PR unit.",
+        "reviewed_at": "2026-09-26T08:36:02.228493+00:00",
+        "note": "Reviewed the completed runtime [dp],Y optimization and the separate open near-Y defect; the flowchart now shows both with their current status and #321 submission relationship.",
         "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
@@ -335,8 +335,8 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
         },
-        "reviewed_at": "2026-09-26T06:29:14.968575+00:00",
-        "note": "Reviewed the local verification entry, matching baseline lit failures, separately open near-Y defect, and full-series PR prerequisite.",
+        "reviewed_at": "2026-09-26T08:36:36.796494+00:00",
+        "note": "Confirmed this summary already records the local increment verification and separate near-Y issue; the graph and curation correction do not change its PR state.",
         "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
