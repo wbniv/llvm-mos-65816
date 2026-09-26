@@ -66,6 +66,9 @@ source.
 
 ## Verification
 
+**PASS, 2026-09-26.** The checks below ran against the published compiler
+revision and the site's isolated publication checkout.
+
 - Site tests passed: 88/88. The tests cover unchanged snapshot preservation,
   mismatched compiler hashes, unresolved work IDs, duplicate tracks, missing
   Mermaid nodes, stale dependency receipts, and KV cache invalidation after
