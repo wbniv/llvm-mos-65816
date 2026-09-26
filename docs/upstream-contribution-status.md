@@ -1,5 +1,18 @@
 # Upstream contribution status — PR progress and submission queue
 
+The inherited [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json)
+is now recorded with a preserved failing committed-main baseline. The full
+benchmark returns `0xA50F` instead of `0x5CF0`; the precise LTO cause remains
+qualified. Existing X-index repairs do not repair the split near-Y sequence.
+This remains open within the downstream native-width series; increment 2's
+far-pointer fold does not fix or submit it.
+
+**Local verification (2026-09-26):** [`[dp],Y` increment 2](plans/2026-09-25-dpy-indexed-phase2-increment2.md)
+is complete on `8c19c703`; its three full-lit failures match the exact baseline,
+and focused tests, runtime gates, corpus and round trips pass. It belongs in the
+complete #321 native-width ABI feature series; prepare the series bundle before
+opening its upstream PR.
+
 The [live upstream dashboard](https://wald3n.com/open-source#compiler-upstream)
 shows current GitHub PR state alongside a separately dated, reviewed local-work
 manifest. The GitHub counts below are a 2026-09-25 snapshot; use the dashboard

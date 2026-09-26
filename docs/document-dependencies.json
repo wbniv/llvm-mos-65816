@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "ae4b6cf2263ba8a2fab3bd296dad9ec7152bd9c2657817f0eeb66e97090577a6",
+          "docs/upstream-dashboard-curation.json": "ed238497679dc78b67b3cecace6bf074cf7d241713c005e000d12872cf03b682",
           "docs/defects/bitboard-inline-register-pressure.json": "5216f32f376dd9106d7e2188b4b4e397f5be9f59117d0aec18fcb794ad873d73",
           "docs/defects/gisel-inline-asm-register-bounds.json": "2eaf09fa60696723a575db66b04fba7352cb7cbec94a67e4a13fe090220eda33",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "b446d5dcb2684b2c383ec23cb768268d6fc94c1b8553fff44d8f85db43d53109",
@@ -42,6 +42,7 @@
           "docs/defects/mos-float-vector-legalization.json": "8ae1b9696ceb1668d6041cde328820e7f071c0984be87d91ccb05381ae0da135",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "4e8068c1c3d4bc116e8c286c9567e3e797fe4ca52a61398ce95b9701e1b2af0b",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "8f26597892f57db4c7df8c4476f9c955c5fda4e31a1680c75e312b6b5d515ff8",
           "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
           "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "d85cf692cd15df8ace0c2e3dcd173bae0e9664e94bdef9ce5fd81a1bd22018da",
@@ -51,7 +52,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "9ae46fad1ac37c70ccd9bcd3078a60c7be18323153d4a154bf50e971ea11b5e2"
+          "docs/upstream-dashboard.json": "c8decf01a9298114e33e88ca769bcad0ee02e94578073d3e7501e9d35c76db0d"
         }
       }
     },
@@ -72,13 +73,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "103a1ba97ff1ba59b56a5f5b639d76a1a7fe4230c8ed4d67a96c254d8baf9ac3",
+          "docs/upstream-pending-work.md": "cd3a7cd5da6767343ef52487ed217317cc6e19d6ad8555c5af623998e3e613da",
           "docs/upstream-dashboard-graph-map.json": "db0f8060a08d065200c6d25816f80bd9614d1b74c4751b173bdcbc5fdb71fccf",
-          "docs/upstream-dashboard.json": "9ae46fad1ac37c70ccd9bcd3078a60c7be18323153d4a154bf50e971ea11b5e2",
+          "docs/upstream-dashboard.json": "c8decf01a9298114e33e88ca769bcad0ee02e94578073d3e7501e9d35c76db0d",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "10f9f91730601303af996605cec82b447e62a772eeaf18c417bd59ab97105b3c"
+          "docs/upstream-dashboard-graph.json": "b1700a2f2d77543dbcf67849bf63d93c01c7754ba598aa2548e5af2b1ac23d3f"
         }
       }
     },
@@ -107,16 +108,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "103a1ba97ff1ba59b56a5f5b639d76a1a7fe4230c8ed4d67a96c254d8baf9ac3",
-          "docs/upstream-contribution-status.md": "49f3019165336deff52c4b616b77721238c1e4767b4e4a50902641ca9ffb4b6a",
+          "docs/upstream-pending-work.md": "cd3a7cd5da6767343ef52487ed217317cc6e19d6ad8555c5af623998e3e613da",
+          "docs/upstream-contribution-status.md": "081e6a2a544e91979c4ca34288c948ec13657f47c510bcb8132a596a987789bd",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "9a38b8f47d1cc061e7f5ac2447cbd07f9f690c750f5de2da5422d06bf5cf8576",
-          "docs/mos-upstream-status-2026-09-21.html": "5ebee8daf7e9aef1bb99c08e8093b5f0da1d20634d96894b56e9d6307b36453d"
+          "docs/mos-upstream-flowchart.html": "cfac30ec1912aeb45f4d6199251a7c83c91e25c9b232188395e6dce109bcd65a",
+          "docs/mos-upstream-status-2026-09-21.html": "aaea0c84c946b6cf52114459ca0b642de69da2d844d94bc2d5d029792191d010"
         }
       }
     },
@@ -224,7 +225,8 @@
         },
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
-        "docs/howto-defect-evidence.md"
+        "docs/howto-defect-evidence.md",
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
       ],
       "receipt": {
         "sources": {
@@ -237,6 +239,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -245,11 +248,12 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958"
+          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
         },
-        "reviewed_at": "2026-09-26T02:10:13.768461+00:00",
-        "note": "Reviewed the dashboard plan after compiler export publication and site v0.0.435 verification; replaced duplicate unverified entries with one specific keyboard, no-JavaScript, and GitHub-outage follow-up. Other TODO status claims were not changed.",
-        "attribution": "OpenAI Codex (version unknown), exact model ID unknown, reasoning effort unknown"
+        "reviewed_at": "2026-09-26T06:36:03.784788+00:00",
+        "note": "Reviewed the final commit status and current plan: increment 2 is locally verified and committed, while its upstream PR must be bundled with the full #321 ABI series; the near-Y bug remains separate.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
     {
@@ -279,6 +283,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -288,9 +293,9 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
         },
-        "reviewed_at": "2026-09-26T01:56:52.128919+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T06:28:49.393958+00:00",
+        "note": "Reviewed the updated near-Y defect and local completion of dpy increment 2; the baseline gallery failure remains separate and the full #321 ABI bundle is the PR unit.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
     {
@@ -320,6 +325,7 @@
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -329,9 +335,9 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
         },
-        "reviewed_at": "2026-09-26T01:56:52.337672+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T06:29:14.968575+00:00",
+        "note": "Reviewed the local verification entry, matching baseline lit failures, separately open near-Y defect, and full-series PR prerequisite.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
     {
@@ -387,9 +393,9 @@
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
           "docs/howto-document-dependencies.md": "543649b41577a10e8976e58fd32cfeaa267e1d26bb9737ff01f5461e89132ef1"
         },
-        "reviewed_at": "2026-09-26T01:56:53.116379+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T06:29:30.576793+00:00",
+        "note": "Reviewed the defect triage and documentation workflow as affected by the new near-Y record and local increment status; no guidance change was needed.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
     {
@@ -421,9 +427,9 @@
           "AGENTS.md": "04c5873c9e12ceec38b5f103bda053db822e18906bbde3e12802a81734588d67",
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958"
         },
-        "reviewed_at": "2026-09-26T01:56:53.264666+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T06:29:45.997849+00:00",
+        "note": "Reviewed the feature series and local-vendor workflow references after completing the increment; the isolated worktree and PR bundling guidance remain accurate.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     },
     {
@@ -453,18 +459,20 @@
             "summary",
             "resolution.change"
           ]
-        }
+        },
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
       ],
       "receipt": {
         "sources": {
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
-          "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b"
+          "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
         },
-        "reviewed_at": "2026-09-26T01:56:53.559809+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T06:36:18.459162+00:00",
+        "note": "Recorded the new local commit and final gate status; this increment is complete, but the full #321 feature series remains the PR unit.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
       }
     }
   ]

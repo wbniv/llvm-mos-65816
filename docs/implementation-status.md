@@ -37,6 +37,10 @@ is either shipped, measured-and-rejected (WON'T-DO), or deferred with a concrete
 holistic implementation remains local in `0002-321-accum16.patch`: upstream #321 is an issue, not a
 pull request, and none of the current focused PRs carries this work. A future submission should be a
 reviewable commit series under one draft PR for the complete opt-in native-width implementation.
+The range-proven runtime far `[dp],Y` fold is now implemented and verified locally as one component
+of that series ([increment 2 plan](plans/2026-09-25-dpy-indexed-phase2-increment2.md)); its three
+full-lit failures reproduce on the exact committed baseline. The separate XY16 near-Y gallery
+failure remains open and is not fixed by this fold.
 **xy16 calling convention is now verified + formalized (`ebedd1c`)** — the last M2 codegen frontier,
 closed: the X/Y-8-bit-at-call boundary is correct by construction, and the two xy16-specific ABI levers
 were measured and shelved. The ABI comparison (three frame strategies) ran to completion — it was **not**

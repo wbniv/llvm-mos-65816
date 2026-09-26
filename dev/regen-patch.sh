@@ -140,6 +140,10 @@ git -C "$WT_GEN" diff --cached > "$P2"
 sed -i 's/^ $//' "$P2"
 echo "    wrote $P2 ($(wc -l < "$P2") lines, $(grep -c '^diff --git' "$P2") files)"
 
+# Only one full checkout is needed at a time; release the generation tree
+# before allocating the independent verification checkout.
+git -C "$VENDOR" worktree remove --force "$WT_GEN"
+
 echo "==> [verify] apply 0001 + new 0002 (+0003) to a fresh pristine worktree"
 git -C "$VENDOR" worktree add --detach "$WT_VFY" "$PRISTINE" >/dev/null
 git -C "$WT_VFY" apply "$P1"

@@ -286,7 +286,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [wip T4] <!-- agent:aabefe43f29486479 --> **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index.** Increment 1
+- [x] <!-- agent:aabefe43f29486479 --> **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index (implemented and verified locally; include in the complete #321 native-width series PR).** Increment 1
   (Done 2026-09-25) folds only a compile-time-constant displacement in `[1,3]`. The
   investigation's main target is still unselected: a *runtime* index provably within the Y width.
   Gate on the **scaled** byte offset (`index × sizeof(elem)`, unsigned) — `0..255` under
@@ -301,6 +301,14 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
   [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
   **Correctness flag (2026-09-25, [hoist investigation §5](docs/investigations/2026-09-25-farptr-hoist-measurement.md#5-the-dpy-interaction--flagged)):** `loop.c`'s `tab[o + j]` is `tab + zext(add i16 o, j)` with **no `nuw`** — it wraps at 16 bits, so folding it as `[tab+o],Y` with `Y=j` is a miscompile for `o ≥ 0xFFC1`; never reassociate a non-`nuw` narrow add. Legal fixtures: `tab[(uint32_t)o + j]` / `p = tab + base; p[j]` (72 B today → 32 B hand-built).
+  **Resume (2026‑09‑26):** rebased onto `8c19c703`; focused, emulator, corpus, fuzz,
+  round-trip and full-lit baseline-comparison results are in the
+  [increment 2 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md).
+  The full-lit suite retains the same three failures as exact committed main; no
+  increment-specific failure remains. Do not submit this patch alone: #321 review
+  requires the complete ABI-documented native-width feature series.
+- [ ] **XY16 gallery near decoder / split Y index.** The inherited failure is reproduced on committed main (`0xA50F` versus `0x5CF0`). Preserve the near-Y high-byte hazard and isolate its exact contribution to the LTO benchmark before fixing it. Existing X-index restoration does not cover Y. [Canonical evidence](docs/defects/mos-xy16-near-indirect-y-clobber.json).
+
 - [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing remains a separate open item above.
 - [x] **Native 16-bit far loads and stores — implemented locally in patch 0062.** `M=0` long absolute, long,X, `[dp]`, and `[dp],Y` accesses select native word operations when the value contract permits it; ABI byte-return and byte-argument paths retain their byte operations. The focused lit checks, `farindex`/`farbank` emulator gates, and machine verifier pass. [Patch](patches/llvm-mos/0062-mos-native-far-word.patch) · [measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
 ### M2 — Optimizing Payoff

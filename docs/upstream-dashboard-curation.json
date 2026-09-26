@@ -1,6 +1,7 @@
 {
   "reviewedAt": "2026-09-26",
   "defectOverrides": {
+    "mos-xy16-near-indirect-y-clobber": {"publicationStatus": "unposted", "dependsOn": ["platform:321"], "nextStep": "Isolate the near-Y contribution to the reproduced XY16 gallery failure and retain the failing baseline before attempting repair."},
     "mos-far-memset-wrong-bank": {"publicationStatus": "unposted", "dependsOn": ["platform:320", "platform:321"], "nextStep": "Existing a81874d / 0013 repair revalidated; carry far compiler/ABI and runtime integration with the feature series."},
     "bitboard-inline-register-pressure": {"publicationStatus": "unposted", "dependsOn": ["platform:320", "platform:321"], "demoUrls": ["https://biohack.net/snes/bitboard64/"], "nextStep": "Carry the 0028 root fix with the compiler feature series."},
     "shift64-narrow-count": {"publicationStatus": "unposted", "dependsOn": ["platform:321"], "demoUrls": ["https://biohack.net/snes/shift64seam/"], "nextStep": "Submit 0055 with the native-width compiler series."},

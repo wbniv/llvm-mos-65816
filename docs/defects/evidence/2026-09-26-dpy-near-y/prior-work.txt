@@ -1,0 +1,13 @@
+Prior-work audit for the inherited September 25 near-Y warning
+
+Canonical source entry: docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md, sections 5a.8c, 5a.11 and 5b. This is migration of an inherited report, not a new discovery.
+
+Search terms: LDYImag16, LDIndirYIdx, STIndirYIdx, Y16 high byte, sep #$10, LastX16Writer, MOSInsertREPSEP, decode_near, lzss-gallery. Structured defects have no existing record for the near indirect Y path.
+
+Related report: docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md. Existing e6433296 tracks/reloads the last X writer; source inspection confirms that implementation is present. It does not reload Y. The older docs/investigations/65816-xy16-index16-highbyte-clobber.md describes non-index values incorrectly kept in X16; index-role gating repairs that separate case. The gallery uses a genuine Y index. No existing repair for the split near-Y load sequence was found in standalone patches or 0002.
+
+Source: committed-main bootstrap at 8c19c703, vendor pin 8be0546128a55e78c63ca571d466aa72a782cd36, reconstructed independently from dev/toolchain.sh's committed list. Main's uncommitted later stack integration is excluded. Baseline compiler SHA-256 dc2ad46a1efe52c2d1feb3a91189997e3048f11210fc9c55f5e3e99030a5ef34; preserved at build/dpy-inc2-resume/baseline-install. Baseline source snapshot is in build/dpy-inc2-resume/baseline-src.
+
+The attached non-LTO decode_near assembly retains the wide LDY / SEP / indirect Y use hazard. Runtime confirmation and the far-only control use LTO benchmark builds; do not conflate these configurations or claim that the control alone proves a unique root cause. No fix to the near path is included in increment 2.
+
+Attribution: OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a. Original report's tool/version, model/version and effort remain unknown.

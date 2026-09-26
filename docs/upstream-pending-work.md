@@ -1,5 +1,18 @@
 # Pending upstream work and dependencies
 
+The inherited [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json)
+is now recorded with a preserved failing committed-main baseline. The full
+benchmark returns `0xA50F` instead of `0x5CF0`; the precise LTO cause remains
+qualified. Existing X-index repairs do not repair the split near-Y sequence.
+This remains open within the downstream native-width series; increment 2's
+far-pointer fold does not fix or submit it.
+
+The [runtime `[dp],Y` increment 2](plans/2026-09-25-dpy-indexed-phase2-increment2.md)
+is implemented and verified locally on top of `8c19c703`. Its new checks and
+runtime gates pass; the three full-lit failures reproduce on the exact baseline.
+It is a component of the complete #321 native-width ABI feature and should be
+prepared with that series, not sent as a standalone PR.
+
 The [live upstream dashboard](https://wald3n.com/open-source#compiler-upstream)
 combines current GitHub PR state with a separately dated local-work manifest.
 This tracker retains the detailed compiler, ABI, and SNES dependency rationale.

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-26",
-  "sourceHash": "14453e3f09c18870ef38567bac6986db2372f5cb099a23a35de3ce22deeea293",
+  "sourceHash": "5b0014504a687bd982c728bd50cfd1fbf39546799303a6b7e1f7af1ce1eed2c6",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -154,6 +154,22 @@
       "dependsOn": [],
       "upstreamUrl": null,
       "nextStep": "",
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-xy16-near-indirect-y-clobber",
+      "kind": "defect",
+      "title": "XY16 gallery near decoder fails with a split indirect Y index",
+      "summary": "The inherited XY16 gallery failure reproduces on reconstructed committed main: all-work benchmark returns 0xA50F instead of 0x5CF0. Non-LTO decode_near contains a wide LDY followed by SEP #$10 before its indirect Y use. Existing e6433296 restores X, not Y. The exact causal contribution of this sequence to the LTO benchmark still needs isolation; no near-path fix is included in increment 2.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Isolate the near-Y contribution to the reproduced XY16 gallery failure and retain the failing baseline before attempting repair.",
+      "evidenceUrls": [],
+      "evidenceNote": "Detailed evidence awaits publication.",
+      "upstreamUrl": null,
       "demoUrls": []
     },
     {

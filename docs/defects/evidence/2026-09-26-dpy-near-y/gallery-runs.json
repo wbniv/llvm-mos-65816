@@ -1,0 +1,39 @@
+[
+  {
+    "side": "baseline",
+    "kind": "full",
+    "command": [
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/build/dpy-inc2-resume/baseline-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/build/install/bin/mos-snes-gallery.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-DGALLERY_BENCH_ONLY=1",
+      "-I/home/will/llvm-mos-65816-dpy-phase2-inc2/examples/snes",
+      "-Wl,-Map=/home/will/llvm-mos-65816-dpy-phase2-inc2/build/dpy-inc2-resume/gallery-baseline-full.map",
+      "-o",
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/build/dpy-inc2-resume/gallery-baseline-full.sfc",
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/examples/snes/lzss-gallery.c"
+    ],
+    "runtime_command": [
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/build/jgxcheck",
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/build/dpy-inc2-resume/gallery-baseline-full.sfc",
+      "/home/will/llvm-mos-65816-dpy-phase2-inc2/vendor/bsnes-jg/Database",
+      "0x24",
+      "2",
+      "0x5CF0",
+      "30000"
+    ],
+    "exit": 1,
+    "input_sha256": "478523c3cc18a3d974869fb814f8807b0a1708e3bf048b4500fb78ad6966d827",
+    "rom_sha256": "87d85a193c7614ae6f7847417e3e2e9058a5d5c7cce4193f9c2f37914bb304df"
+  }
+]

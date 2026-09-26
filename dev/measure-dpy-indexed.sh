@@ -7,7 +7,7 @@
 # What it does:
 #   1. SNES-corpus census — scans every prebuilt *.sfc.elf under $BUILD for genuine
 #      b7/97/9f selections (the audit's open "does it fire outside examples/65816?" question).
-#   2. Compiles dev/dpy-shapes/{red.c,loop.c} with the real toolchain (+mos-a16, +mos-xy16)
+#   2. Compiles dev/dpy-shapes/{red.c,loop.c,loopp.c} with the real toolchain (+mos-a16, +mos-xy16)
 #      and prints the .text size of each function -> the "current codegen" column.
 #   3. Assembles the hand-built shapes dev/dpy-shapes/*.s with llvm-mc and prints their
 #      sizes -> the "[dp],Y" and "add hoisted, no index" columns.
@@ -84,6 +84,10 @@ echo "   red.c  (+mos-a16):"; fnsize "$TMP/red.o"
 echo "   loop.c (+mos-a16):"; fnsize "$TMP/loop.o"
 "$CLANG" --target=mos -mcpu=mosw65816 "${A16[@]}" "${XY16[@]}" -Os -c -o "$TMP/loopxy.o" "$SHAPES/loop.c"
 echo "   loop.c (+mos-a16 +mos-xy16):"; fnsize "$TMP/loopxy.o"
+# Increment 2's customers (docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md): the pointer
+# form of the blit (runtime far base + u8 index -> `lda [dp],y`) and the global-base form (declined).
+"$CLANG" --target=mos -mcpu=mosw65816 "${A16[@]}" -Os -c -o "$TMP/loopp.o" "$SHAPES/loopp.c"
+echo "   loopp.c (+mos-a16):"; fnsize "$TMP/loopp.o"
 
 # --- 3. hand-built shapes ---------------------------------------------------
 echo "==> 3) hand-built shape sizes (dev/dpy-shapes/*.s)"
