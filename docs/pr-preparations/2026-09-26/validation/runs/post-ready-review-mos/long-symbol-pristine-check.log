@@ -1,0 +1,46 @@
+/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir:12:11: error: CHECK: expected string not found in input
+ ; CHECK: lda mos24(long_data)
+          ^
+/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine.log:37:13: note: scanning from here
+long_symbol: ; @long_symbol
+            ^
+/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine.log:39:2: note: possible intended match here
+ lda long_data
+ ^
+
+Input file: /home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine.log
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           32:  .zeropage __rc31 
+           33:  .file "long-symbol.mir" 
+           34:  .text 
+           35:  .globl long_symbol ; -- Begin function long_symbol 
+           36:  .type long_symbol,@function 
+           37: long_symbol: ; @long_symbol 
+check:12'0                 X~~~~~~~~~~~~~~~ error: no match found
+           38: ; %bb.0: ; %entry 
+check:12'0     ~~~~~~~~~~~~~~~~~~
+           39:  lda long_data 
+check:12'0     ~~~~~~~~~~~~~~~
+check:12'1      ?              possible intended match
+           40:  sta long_data 
+check:12'0     ~~~~~~~~~~~~~~~
+           41:  lda long_data,x 
+check:12'0     ~~~~~~~~~~~~~~~~~
+           42:  jsl long_target 
+check:12'0     ~~~~~~~~~~~~~~~~~
+           43:  rts 
+check:12'0     ~~~~~
+           44: .Lfunc_end0: 
+check:12'0     ~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

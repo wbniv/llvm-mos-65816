@@ -68,8 +68,13 @@
       "exit_code": 0
     }
   },
-  "upstream_scope": "The saved assertion-enabled baseline includes prior upstream-based patches through 0041, not an unpatched build. Its entire register-assignment helper is byte-identical to unpatched published revision 742d554bf08042b8df93d791c335260fadd16643. The reproducer is LLVM IR, with no C preprocessing stage. No claim about latest upstream or SelectionDAG closure.",
+  "upstream_scope": "Dated September 25 baseline assessment: The saved assertion-enabled baseline includes prior upstream-based patches through 0041, not an unpatched build. Its entire register-assignment helper is byte-identical to unpatched published revision 742d554bf08042b8df93d791c335260fadd16643. The reproducer is LLVM IR, with no C preprocessing stage. No claim about latest upstream or SelectionDAG closure. September 26: the separately preserved exact-current LLVM packet, independent review, and matching-input red/green are linked in observations; the original baseline remains unchanged.",
   "observations": [
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0056/receipt.json",
+      "sha256": "bc58e2179356708d2e90dbeb49fcce904a8c2fb1cb704d66a7a26d62e7497a70",
+      "description": "September 26 exact-current LLVM submission red/green and cross-target suite validation; original baseline and repair evidence retained. Coordination: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
     {
       "path": "docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/session-identity.json",
       "sha256": "815cae91972589799590a90670f1c3bb1ed07e49c0b90d1898d3031f5f5294e7"

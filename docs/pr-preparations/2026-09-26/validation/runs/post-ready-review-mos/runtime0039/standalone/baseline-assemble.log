@@ -1,0 +1,5 @@
+$ /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-mc -triple=mos -mcpu=mos6502 -filetype=obj /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/modifier-width-runtime.s -o /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o
+exit=0
+stdout:
+
+stderr:

@@ -1,0 +1,27 @@
+LLVM ERROR: unable to translate instruction: call (in function: wide_in)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll -o -
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll'.
+2.	Running pass 'IRTranslator' on function '@wide_in'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000615e4ab9de3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x0000615e4ab9acc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x0000615e4ab9ec4b
+3  libc.so.6 0x00007484c2645cb0
+4  libc.so.6 0x00007484c26a61ac pthread_kill + 284
+5  libc.so.6 0x00007484c2645b7e gsignal + 30
+6  libc.so.6 0x00007484c26288ec abort + 39
+7  llc       0x0000615e4aaf91a5 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x0000615e4b2228e4
+9  llc       0x0000615e4b239c7c llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) + 5180
+10 llc       0x0000615e4b23a7ca llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) + 554
+11 llc       0x0000615e498390a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+12 llc       0x0000615e49dcb420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+13 llc       0x0000615e49dd3522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+14 llc       0x0000615e49dcc1e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+15 llc       0x0000615e4879d2cb
+16 llc       0x0000615e4879a593 main + 1443
+17 libc.so.6 0x00007484c262a601
+18 libc.so.6 0x00007484c262a718 __libc_start_main + 136
+19 llc       0x0000615e487997a5 _start + 37

@@ -1,0 +1,290 @@
+[
+  {
+    "name": "float-baseline",
+    "command": [
+      "build/defect-baselines/2026-09-25-mos-correctness/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-verify-machineinstrs",
+      "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "returncode": 1,
+    "sha256": "ccc7e32369eb2983d3f66a31e4749a24ef4e1cfb7a69d1563c0cfa13ef42a58c",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/float-baseline.log"
+  },
+  {
+    "name": "zp-baseline",
+    "command": [
+      "build/defect-baselines/2026-09-25-mos-correctness/bin/llc",
+      "-mtriple=mos",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+      "-o",
+      "/dev/null"
+    ],
+    "returncode": 1,
+    "sha256": "ccc7e32369eb2983d3f66a31e4749a24ef4e1cfb7a69d1563c0cfa13ef42a58c",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-baseline.log"
+  },
+  {
+    "name": "float-candidate",
+    "command": [
+      "build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-verify-machineinstrs",
+      "docs/defects/evidence/2026-09-25-mos-correctness/baseline/float-vector.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "returncode": 0,
+    "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/float-candidate.log"
+  },
+  {
+    "name": "zp-candidate",
+    "command": [
+      "build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "docs/defects/evidence/2026-09-25-mos-correctness/baseline/legalizer.mir",
+      "-o",
+      "/dev/null"
+    ],
+    "returncode": 0,
+    "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-candidate.log"
+  },
+  {
+    "name": "zp-pristine-pin",
+    "command": [
+      "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/zp-byte-index.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-pristine-pin.s"
+    ],
+    "returncode": 0,
+    "sha256": "3d6b3f91996fc4a7f82807d355c69316ab9c5d9d2b773b3217540360c499c5c3",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-pristine-pin.log"
+  },
+  {
+    "name": "zp-pristine-pin-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/zp-byte-index.ll",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-pristine-pin.s"
+    ],
+    "returncode": 0,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-pristine-pin-check.log"
+  },
+  {
+    "name": "zp-assertions-upstream",
+    "command": [
+      "build/0029-cross-target-build/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/zp-byte-index.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-assertions-upstream.s"
+    ],
+    "returncode": 0,
+    "sha256": "149af7e3d2547e574ac72e8ed80d75572d87dfef7fe921bc982960fe5acd3e95",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-assertions-upstream.log"
+  },
+  {
+    "name": "zp-assertions-upstream-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/zp-byte-index.ll",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-assertions-upstream.s"
+    ],
+    "returncode": 0,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/zp-assertions-upstream-check.log"
+  },
+  {
+    "name": "modifier-width.s-pristine",
+    "command": [
+      "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s"
+    ],
+    "returncode": 0,
+    "sha256": "a54056ed33e22fc883173f8c4c57eda9325d7b3bdb93e0f0fc6706f377480499",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine.log"
+  },
+  {
+    "name": "modifier-width.s-pristine-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine.log"
+    ],
+    "returncode": 1,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine-check.log"
+  },
+  {
+    "name": "modifier-width-65816.s-pristine",
+    "command": [
+      "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s"
+    ],
+    "returncode": 0,
+    "sha256": "a54056ed33e22fc883173f8c4c57eda9325d7b3bdb93e0f0fc6706f377480499",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-pristine.log"
+  },
+  {
+    "name": "modifier-width-65816.s-pristine-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-pristine.log"
+    ],
+    "returncode": 1,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-pristine-check.log"
+  },
+  {
+    "name": "asciz-pristine",
+    "command": [
+      "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llvm-mc",
+      "-triple=mos",
+      "-motorola-integers",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/addr-asciz.s"
+    ],
+    "returncode": -6,
+    "sha256": "a54056ed33e22fc883173f8c4c57eda9325d7b3bdb93e0f0fc6706f377480499",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/asciz-pristine.log"
+  },
+  {
+    "name": "long-symbol-pristine",
+    "command": [
+      "build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-start-after=machine-opt-remark-emitter",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir",
+      "-o",
+      "-"
+    ],
+    "returncode": 0,
+    "sha256": "3d6b3f91996fc4a7f82807d355c69316ab9c5d9d2b773b3217540360c499c5c3",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine.log"
+  },
+  {
+    "name": "long-symbol-pristine-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine.log"
+    ],
+    "returncode": 1,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-pristine-check.log"
+  },
+  {
+    "name": "modifier-width.s-candidate",
+    "command": [
+      "build/llvm-mos/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s"
+    ],
+    "returncode": 0,
+    "sha256": "743ba7d42e3537b7557677c3b02a4528edb20810b89360fecd93480d0f6c80e5",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-candidate.log"
+  },
+  {
+    "name": "modifier-width.s-candidate-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-candidate.log"
+    ],
+    "returncode": 0,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-candidate-check.log"
+  },
+  {
+    "name": "modifier-width-65816.s-candidate",
+    "command": [
+      "build/llvm-mos/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s"
+    ],
+    "returncode": 0,
+    "sha256": "743ba7d42e3537b7557677c3b02a4528edb20810b89360fecd93480d0f6c80e5",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-candidate.log"
+  },
+  {
+    "name": "modifier-width-65816.s-candidate-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-candidate.log"
+    ],
+    "returncode": 0,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-candidate-check.log"
+  },
+  {
+    "name": "asciz-candidate",
+    "command": [
+      "build/llvm-mos/bin/llvm-mc",
+      "-triple=mos",
+      "-motorola-integers",
+      "-show-encoding",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/addr-asciz.s"
+    ],
+    "returncode": 0,
+    "sha256": "743ba7d42e3537b7557677c3b02a4528edb20810b89360fecd93480d0f6c80e5",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/asciz-candidate.log"
+  },
+  {
+    "name": "long-symbol-candidate",
+    "command": [
+      "build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-start-after=machine-opt-remark-emitter",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir",
+      "-o",
+      "-"
+    ],
+    "returncode": 0,
+    "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-candidate.log"
+  },
+  {
+    "name": "long-symbol-candidate-check",
+    "command": [
+      "build/llvm-mos/bin/FileCheck",
+      "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol.mir",
+      "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-candidate.log"
+    ],
+    "returncode": 0,
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "log": "/home/will/llvm-mos-65816/build/post-ready-review-mos/long-symbol-candidate-check.log"
+  }
+]

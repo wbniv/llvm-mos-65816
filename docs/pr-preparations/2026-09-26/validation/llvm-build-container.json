@@ -1,0 +1,9 @@
+{
+  "container_id": "30b336eea6edf144d009cfec6d343d7ea8f884852ca69a079570b05f61c8c91c",
+  "image_id": "sha256:eeecfab76840167d9f16982b1efddae90d4969c5d7891ec16e87e46150ac94c1",
+  "started_at": "2026-09-26T06:25:56.178997604Z",
+  "capture_command": "docker inspect 30b336eea6edf144d009cfec6d343d7ea8f884852ca69a079570b05f61c8c91c --format '{{.Image}} {{.State.StartedAt}}'",
+  "scope": "Running pristine LLVM e59a0c6 build only; not retroactive identity for completed MOS or reviewer containers.",
+  "network": "none",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0db16-f6a0-7e32-ada6-0c8098813933"
+}

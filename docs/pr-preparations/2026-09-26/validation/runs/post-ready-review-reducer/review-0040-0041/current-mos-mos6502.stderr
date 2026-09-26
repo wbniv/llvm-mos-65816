@@ -1,0 +1,28 @@
+Remaining virtual register %1057...
+...in instruction: dead early-clobber %1057:imag16 = STStk killed renamable $a, %stack.0, 0 :: (store (s8) into %stack.0)
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc -O2 -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll'.
+2.	Running pass 'Virtual Register Rewriter' on function '@constant_shift'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x0000624db5e68e3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x0000624db5e65cc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x0000624db5e69c4b
+3  libc.so.6 0x00007a48fa245cb0
+4  libc.so.6 0x00007a48fa2a61ac pthread_kill + 284
+5  libc.so.6 0x00007a48fa245b7e gsignal + 30
+6  libc.so.6 0x00007a48fa2288ec abort + 39
+7  llc       0x0000624db4bbc51d llvm::MachineRegisterInfo::clearVirtRegs() + 349
+8  llc       0x0000624db4e8b1ce
+9  llc       0x0000624db4e8c55e
+10 llc       0x0000624db4b040a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+11 llc       0x0000624db5096420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+12 llc       0x0000624db509e522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+13 llc       0x0000624db50971e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+14 llc       0x0000624db3a682cb
+15 llc       0x0000624db3a65593 main + 1443
+16 libc.so.6 0x00007a48fa22a601
+17 libc.so.6 0x00007a48fa22a718 __libc_start_main + 136
+18 llc       0x0000624db3a647a5 _start + 37

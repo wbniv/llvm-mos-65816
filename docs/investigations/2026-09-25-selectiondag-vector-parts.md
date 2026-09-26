@@ -1,5 +1,16 @@
 # SelectionDAG inline-assembly vector parts
 
+**Submission follow-up — September 26:** [independent review](../pr-preparations/2026-09-26/inline-asm-review.md)
+is complete and the [exact posting draft and patch](../pr-preparations/2026-09-26/README.md)
+are ready: pinned LLVM main has matching-input red/green, 24 focused RUNs and
+169 filtered suite passes / three existing XFAILs. The full
+regression still requires 0057; the September 25 evidence and earlier pending
+review statements below are dated records. Nothing has been posted.
+
+Current preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 Patch [0059](../../patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch)
 repairs the [vector part-type assertion](../defects/selectiondag-inline-asm-vector-parts.json).
 Incompatible vector/register combinations now produce normal compiler diagnostics.

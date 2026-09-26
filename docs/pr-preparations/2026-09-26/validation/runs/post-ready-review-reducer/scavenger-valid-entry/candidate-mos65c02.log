@@ -1,0 +1,3 @@
+/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc: error: /home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc: /home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-tests/scavenger-status-save-range.mir/input.txt:1:1: error: expected top-level entity
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=prolog-epilog -verify-machineinstrs %s -o - | FileCheck %s
+^

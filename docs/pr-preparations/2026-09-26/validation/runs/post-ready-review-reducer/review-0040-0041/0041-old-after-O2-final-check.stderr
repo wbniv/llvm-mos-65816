@@ -1,0 +1,52 @@
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll:53:8: error: ASM: expected string not found in input
+; ASM: bfi x0, x{{[0-9]+}}, #32, #32
+       ^
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O2-final.stdout:42:17: note: scanning from here
+ lsr x9, x0, #32
+                ^
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O2-final.stdout:47:2: note: possible intended match here
+ bfi x8, x10, #32, #32
+ ^
+
+Input file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O2-final.stdout
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           37:  .p2align 2 
+           38:  .type multi_reg_input,@function 
+           39: multi_reg_input: // @multi_reg_input 
+           40:  .cfi_startproc 
+           41: // %bb.0: 
+           42:  lsr x9, x0, #32 
+check:53'0                     X error: no match found
+           43:  //APP 
+check:53'0     ~~~~~~~
+           44:  // x8 x0  
+check:53'0     ~~~~~~~~~~~
+           45:  //NO_APP 
+check:53'0     ~~~~~~~~~~
+           46:  mov x1, xzr 
+check:53'0     ~~~~~~~~~~~~~
+           47:  bfi x8, x10, #32, #32 
+check:53'0     ~~~~~~~~~~~~~~~~~~~~~~~
+check:53'1      ?                      possible intended match
+           48:  mov x0, x8 
+check:53'0     ~~~~~~~~~~~~
+           49:  ret 
+check:53'0     ~~~~~
+           50: .Lfunc_end2: 
+check:53'0     ~~~~~~~~~~~~~
+           51:  .size multi_reg_input, .Lfunc_end2-multi_reg_input 
+check:53'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           52:  .cfi_endproc 
+check:53'0     ~~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

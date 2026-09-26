@@ -1,0 +1,19 @@
+{
+  "date": "2026-09-26",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933",
+  "canonical_record": "docs/defects/llvm-reduce-parallel-mir-crash.json",
+  "searched": [
+    "Existing structured reducer record and September 25 coalescing/fix reports",
+    "Carried patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch and serial fallback preparation",
+    "Current MOS 7bd67c0 and LLVM e59a0c6 Delta.cpp, CLI llvm-reduce.cpp and MIR tests",
+    "Read-only upstream commit history/API for parallel MIR and -j guard; upstream metadata retained in 0060-upstream-guard.json"
+  ],
+  "finding": "Upstream b1ba3d515a0238adbfc6c349ed3b33f9060cea72 already rejects MIR -j > 1; September 24 publication predates local September 25 report. Its guard is absent from MOS 7bd67c0. Inspecting Delta.cpp alone missed the entry-point guard.",
+  "test_assessment": "Initial serial LLVM packet is rejected: focused runner could not resolve bare FileCheck; lit correctly reached pre-existing CLI guard. Corrected runner resolves FileCheck absolutely. Valid X86 MIR verifies and reduces serially on MOS baseline, crashes at -j2, then candidate rejects -j2/-j4 cleanly. Parallel IR still reduces. All nine candidate RUNs and 180 reducer tests pass; 27 unsupported unchanged.",
+  "decision": "Retain this canonical defect and historical local candidate evidence. Prepare exact existing upstream guard backport plus valid-input controls for MOS; no new LLVM bug or general parallel-MIR support claim. General context isolation of the original parallel candidate remains unestablished.",
+  "evidence": [
+    "docs/pr-preparations/2026-09-26/0060-upstream-guard.json",
+    "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0060/receipt.json",
+    "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json"
+  ]
+}

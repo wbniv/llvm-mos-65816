@@ -1,0 +1,103 @@
+{
+  "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+  "runs": [
+    {
+      "variant": "mos",
+      "command": "llc -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /dev/null",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "mos",
+      "command": "llvm-reduce -x=mir -j 1 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.serial",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-1.log",
+      "log_sha256": "7c566e73f72cc730a2f8062fb864428354a7feac8643687ded576360d37a9440"
+    },
+    {
+      "variant": "mos",
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --check-prefix=SERIAL /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir < /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.serial",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "mos",
+      "command": "not llvm-reduce -j 2 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir",
+      "returncode": 1,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-3.log",
+      "log_sha256": "3a997904851c5a2c59c67a4d4c3674e1f2a950795833cd20864a8f2fcd70757e"
+    },
+    {
+      "variant": "mos",
+      "command": "not llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir",
+      "returncode": 1,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-4.log",
+      "log_sha256": "94b31e176ddb6498f1bccdc4075f4a7d90705e37d3873a4e6c7b3f7331d39c14"
+    },
+    {
+      "variant": "mos",
+      "command": "llvm-reduce --abort-on-invalid-reduction -j 2 /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.ir --delta-passes=operands-skip --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck --test-arg /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll --test-arg --match-full-lines --test-arg --check-prefix=INTERESTING --test-arg --input-file",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-5.log",
+      "log_sha256": "dcbe7b4078c0726f382db98b4632c75c45c9169584b19cf5efe132817b81d9c2"
+    },
+    {
+      "variant": "mos",
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.ir --check-prefix=REDUCED",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/mos-6.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "llvm",
+      "command": "llc -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /dev/null",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "llvm",
+      "command": "llvm-reduce -x=mir -j 1 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.serial",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-1.log",
+      "log_sha256": "1ede7aab4629ab5a4a781051b4c64c6d10019110d474a1ff4d56a595e14f45b2"
+    },
+    {
+      "variant": "llvm",
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=SERIAL /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir < /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.serial",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "llvm",
+      "command": "not llvm-reduce -j 2 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "llvm",
+      "command": "not llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "variant": "llvm",
+      "command": "llvm-reduce --abort-on-invalid-reduction -j 2 /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.ir --delta-passes=operands-skip --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll --test-arg --match-full-lines --test-arg --check-prefix=INTERESTING --test-arg --input-file",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-5.log",
+      "log_sha256": "ceb9814805bdd313d97c83e91a30dbff4eb7058b479bf29560b4e5d89b7ebee5"
+    },
+    {
+      "variant": "llvm",
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll --input-file /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/llvm.ir --check-prefix=REDUCED",
+      "returncode": 0,
+      "log": "build/post-ready-review-reducer/0060-guard-packet-check/llvm-6.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

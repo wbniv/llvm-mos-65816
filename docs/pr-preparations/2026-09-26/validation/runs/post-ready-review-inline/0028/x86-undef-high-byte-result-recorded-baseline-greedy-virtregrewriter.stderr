@@ -1,0 +1,45 @@
+
+# After Virtual Register Rewriter
+********** INTERVALS **********
+RegMasks:
+********** MACHINEINSTRS **********
+# Machine code for function undef_high_byte_identity_copy: NoPHIs, TracksLiveness, NoVRegs, TracksDebugUserValues
+
+0B	bb.0:
+16B	  renamable $al = MOV8ri 1
+80B	  renamable $eax = MOVZX32rr8 killed renamable $ah
+112B	  RET64 implicit $eax
+
+# End machine code for function undef_high_byte_identity_copy.
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    undef_high_byte_identity_copy
+- basic block: %bb.0  (0x55886f5a1cd8) [0B;128B)
+- instruction: 80B	renamable $eax = MOVZX32rr8 killed renamable $ah
+- operand 1:   killed renamable $ah
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041 -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0028/x86-undef-high-byte-result.mir -o -
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/x86-undef-high-byte-result.mir'.
+2.	Running pass 'Verify generated machine code' on function '@undef_high_byte_identity_copy'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-0041  0x00005588306fc25b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-0041  0x00005588306f90e1 llvm::sys::RunSignalHandlers() + 369
+2  llc-0041  0x00005588306fd06b
+3  libc.so.6 0x000074f136a45cb0
+4  libc.so.6 0x000074f136aa61ac pthread_kill + 284
+5  libc.so.6 0x000074f136a45b7e gsignal + 30
+6  libc.so.6 0x000074f136a288ec abort + 39
+7  llc-0041  0x00005588306575c5 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc-0041  0x000055882f4b2512
+9  llc-0041  0x000055882f4b3b2a
+10 llc-0041  0x000055882f397059 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+11 llc-0041  0x000055882f929840 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+12 llc-0041  0x000055882f931942 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+13 llc-0041  0x000055882f92a604 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+14 llc-0041  0x000055882e2f980b
+15 llc-0041  0x000055882e2f6ad3 main + 1443
+16 libc.so.6 0x000074f136a2a601
+17 libc.so.6 0x000074f136a2a718 __libc_start_main + 136
+18 llc-0041  0x000055882e2f5ce5 _start + 37

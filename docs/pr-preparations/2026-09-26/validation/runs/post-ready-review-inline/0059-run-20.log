@@ -1,0 +1,1 @@
+$ /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -mattr=+ls64 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/ls64.ll -o /dev/null

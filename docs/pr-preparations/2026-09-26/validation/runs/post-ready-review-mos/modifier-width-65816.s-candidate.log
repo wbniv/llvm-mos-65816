@@ -1,0 +1,29 @@
+
+
+
+	lda	mos24(1193046)                  ; encoding: [0xaf,0x56,0x34,0x12]
+	lda	mos24(1193046),x                ; encoding: [0xbf,0x56,0x34,0x12]
+	lda	mos24(240)                      ; encoding: [0xaf,0xf0,0x00,0x00]
+	lda	mos24(240),x                    ; encoding: [0xbf,0xf0,0x00,0x00]
+	sta	mos24(1193046),x                ; encoding: [0x9f,0x56,0x34,0x12]
+	jmp	mos24(1193046)                  ; encoding: [0x5c,0x56,0x34,0x12]
+
+
+	lda	mos16(240),x                    ; encoding: [0xbd,0xf0,0x00]
+	lda	mos16(4660),x                   ; encoding: [0xbd,0x34,0x12]
+	jmp	mos16(240)                      ; encoding: [0x4c,0xf0,0x00]
+	lda	mos24segment(1193046)           ; encoding: [0xad,0x56,0x34]
+
+
+	lda	mos13(16)                       ; encoding: [0xad,0x10,0x00]
+
+
+	lda	mos8(16)                        ; encoding: [0xa5,0x10]
+	lda	[mos8(16)],y                    ; encoding: [0xb7,0x10]
+	lda	(mos8(16),x)                    ; encoding: [0xa1,0x10]
+
+
+	lda	16                              ; encoding: [0xa5,0x10]
+	lda	4660                            ; encoding: [0xad,0x34,0x12]
+	lda	1193046                         ; encoding: [0xaf,0x56,0x34,0x12]
+	lda	1193046,x                       ; encoding: [0xbf,0x56,0x34,0x12]

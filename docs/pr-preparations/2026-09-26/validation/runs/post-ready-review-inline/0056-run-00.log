@@ -1,0 +1,1 @@
+$ not /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll

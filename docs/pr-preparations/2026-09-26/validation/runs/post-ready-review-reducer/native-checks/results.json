@@ -1,0 +1,759 @@
+{
+  "working_directory": "/home/will/llvm-mos-65816",
+  "tools": {
+    "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc": "d7ecc0c644292f0ac657f1868a0b1756e44c715fbbe4a6761821bd94aab25915",
+    "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+    "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llvm-mc": "16dfaa40cd2c6b8b7824fd8507aee2b2eaddb8bd399d617bd5769ee7cded7683",
+    "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy": "6172d1940e2468d348605f5c129bb66b83fd7ab525de6e4c2bbf0575e4b0335c",
+    "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+    "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc": "743ba7d42e3537b7557677c3b02a4528edb20810b89360fecd93480d0f6c80e5",
+    "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc": "758f71c2eb2dd33052a641dac6a0d673e323a7645ebb2b3b202572f321293421",
+    "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013": "e39ec79bfa3c0fd76a6f99d65b8a1b7b79ba2ed3da7767220fdf7b695614aed8",
+    "/usr/bin/python3": "52e0a13e60a981d8c4b6478be2ba5176f69da07948a056bf49cf6f077e30cb41",
+    "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445"
+  },
+  "inputs": {
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll": "1b324275286694768015be6809a8d50e00d180299d1d497812ca061bdc7d58e1",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir": "e539aa89e67d03d79bbd4d18a0b64617cda1013405b4e49352fdd03411b047d5",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll": "58a83daa6827c2b026531127cbfd49f60fd1b315ba8b68951080964390ea5bd8"
+  },
+  "immediate_comparisons": [
+    {
+      "label": "stock",
+      "identical": false,
+      "direct_hex": "69420049ff00c90500a90001a20000a0ffff694260",
+      "reassembled_hex": "694249ffc905a90001a200a0ffff694260",
+      "direct_bytes": 21,
+      "reassembled_bytes": 17
+    },
+    {
+      "label": "fixed-fork",
+      "identical": true,
+      "direct_hex": "69420049ff00c90500a90001a20000a0ffff694260",
+      "reassembled_hex": "69420049ff00c90500a90001a20000a0ffff694260",
+      "direct_bytes": 21,
+      "reassembled_bytes": 21
+    }
+  ],
+  "runs": [
+    {
+      "name": "stock-asm",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-start-after=prolog-epilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-asm.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-asm-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-asm-check.log",
+      "log_sha256": "8f3a953e1bef6365356573ee73085dade51bee0bc5c714b29513e7981dd602d3"
+    },
+    {
+      "name": "stock-direct-object",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-start-after=prolog-epilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "-filetype=obj",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-direct.o"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-direct-object.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-reassemble",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llvm-mc",
+        "-triple=mos",
+        "-mcpu=mosw65816",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-reassembled.o"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-reassemble.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-extract-direct",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-direct.o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-direct.bin"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-extract-direct.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-extract-reassembled",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-reassembled.o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-reassembled.bin"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock-extract-reassembled.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-asm",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-start-after=prologepilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-asm.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-asm-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-asm-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-direct-object",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-start-after=prologepilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir",
+        "-filetype=obj",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-direct.o"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-direct-object.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-reassemble",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc",
+        "-triple=mos",
+        "-mcpu=mosw65816",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork.s",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-reassembled.o"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-reassemble.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-extract-direct",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-direct.o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-direct.bin"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-extract-direct.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "fixed-fork-extract-reassembled",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+        "-O",
+        "binary",
+        "--only-section=.text",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-reassembled.o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-reassembled.bin"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/fixed-fork-extract-reassembled.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-default-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-default-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-O2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-default-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-default-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-default-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-a16-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-a16-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-O2.log",
+      "log_sha256": "bd95f9c138dc21fb0f36f632b222fab7d25bf75c954b2bb7aa78c3e7cf17b14d"
+    },
+    {
+      "name": "0055-pre0055-a16-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-a16-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-a16-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-xy16-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-xy16-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-O2.log",
+      "log_sha256": "bd95f9c138dc21fb0f36f632b222fab7d25bf75c954b2bb7aa78c3e7cf17b14d"
+    },
+    {
+      "name": "0055-pre0055-xy16-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-pre0055-xy16-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-pre0055-xy16-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-default-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-default-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-O2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-default-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-default-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-default-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-a16-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-a16-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-O2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-a16-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-a16-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-a16-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-xy16-O0",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-O0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-xy16-O2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/extend-masked.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-O2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-xy16-wide",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-wide.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0055-current-xy16-wide-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/anyext-wide.mir",
+        "--implicit-check-not=G_ANYEXT",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-wide.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0055-current-xy16-wide-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-pre0013-a16",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-a16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-a16.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-pre0013-a16-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-a16.s"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-a16-check.log",
+      "log_sha256": "b343ead8baed5473f836276872cfa8ad43bf77cf10f32f880dd4edc49644c1d4"
+    },
+    {
+      "name": "0013-pre0013-xy16",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-xy16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-xy16.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-pre0013-xy16-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-xy16.s"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-xy16-check.log",
+      "log_sha256": "1c3ce6c63cdd83c06816a8903da4ed0962adbe3eedb12f43ef184a2adcdf8b16"
+    },
+    {
+      "name": "0013-pre0013-runtime",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/will/llvm-mos-65816/dev/check-far-memset.py",
+        "--input",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+        "--llc",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013",
+        "--clang",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/clang",
+        "--objdump",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump",
+        "--sdk",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/sdk",
+        "--emulator",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck",
+        "--database",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/Database",
+        "--output",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-runtime"
+      ],
+      "returncode": 1,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-pre0013-runtime.log",
+      "log_sha256": "323b0a817a2e8be8965e60ee94c9b2e1cd6ab613315dd18694a13b9d77cadf4c"
+    },
+    {
+      "name": "0013-with0013-a16",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-a16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-a16.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-with0013-a16-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-a16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-a16-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-with0013-xy16",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-xy16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-xy16.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-with0013-xy16-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-xy16.s"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-xy16-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0013-with0013-runtime",
+      "argv": [
+        "/usr/bin/python3",
+        "/home/will/llvm-mos-65816/dev/check-far-memset.py",
+        "--input",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+        "--llc",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "--clang",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/clang",
+        "--objdump",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump",
+        "--sdk",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/sdk",
+        "--emulator",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck",
+        "--database",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/Database",
+        "--output",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-runtime"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/0013-with0013-runtime.log",
+      "log_sha256": "290b940dd85a7f9ec58f5cedaf9cd5e2e35fe53705b31ac319c7154f6c50231a"
+    }
+  ]
+}

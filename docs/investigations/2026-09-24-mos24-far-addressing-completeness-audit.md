@@ -1,5 +1,15 @@
 # Is 24-bit / far addressing complete? — a per-layer audit (#320)
 
+**Current status, September 26:** the printer repairs below already exist as
+0044 (long addresses) and 0045 (16-bit immediates). The
+[current preparation packet](../pr-preparations/2026-09-26/README.md) extracts
+both for stock-MOS validation; 0044's round trip requires parser fix 0039,
+while 0045 has a stock-opcode regression with no native-feature dependency.
+These are revalidations of existing repairs, not new defect reports. The
+September 24 audit below is retained dated discovery evidence. Preparation:
+OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning
+effort; verified session `01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 **Asked:** after `mos24(1193046)` truncated to a one-byte direct-page operand (`a5 56`),
 "is this because 24-bit support is not complete? do an audit of what's still missing."
 

@@ -1,5 +1,13 @@
 # SelectionDAG inline-assembly register bounds
 
+**September 26 submission preparation:** independent review and exact-current
+LLVM validation are complete in the [posting packet](../pr-preparations/2026-09-26/0057-pr-body.md).
+Matching-input red/green, two focused RUNs and 168 filtered AArch64/X86 suite
+passes / three existing XFAILs establish readiness; nothing was posted. The
+preserved baseline and September 25 evidence below remain unchanged.
+Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`,
+`xhigh` reasoning effort; session `01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 Structured record: [selectiondag-inline-asm-register-bounds](../defects/selectiondag-inline-asm-register-bounds.json).
 
 Reproduction, patch 0057, validation, installation, and documentation: OpenAI Codex CLI 0.157.0

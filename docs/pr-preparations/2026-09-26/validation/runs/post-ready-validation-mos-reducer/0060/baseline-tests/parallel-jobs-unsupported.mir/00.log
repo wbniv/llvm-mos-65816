@@ -1,0 +1,25 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/tools/llvm-reduce/mir/parallel-jobs-unsupported.mir:4:8: error: ERR: expected string not found in input
+# ERR: {{.*}}llvm-reduce{{.*}}: -j is not supported for MIR reduction
+       ^
+<stdin>:1:1: note: scanning from here
+error: no check strings found with prefix 'CHECK:'
+^
+<stdin>:1:5: note: possible intended match here
+error: no check strings found with prefix 'CHECK:'
+    ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/tools/llvm-reduce/mir/parallel-jobs-unsupported.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: error: no check strings found with prefix 'CHECK:' 
+check:4'0    {                                                     search range start (exclusive)
+check:4'1                                                          error: no match found in search range
+check:4'2         ?                                                possible intended match
+           2:  
+           3: Input isn't interesting! Verify interesting-ness test 
+check:4'3                                                           } search range end (exclusive)
+>>>>>>

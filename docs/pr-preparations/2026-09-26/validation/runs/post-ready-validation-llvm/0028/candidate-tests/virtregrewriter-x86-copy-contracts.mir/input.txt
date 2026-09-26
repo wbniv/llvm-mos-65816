@@ -1,0 +1,95 @@
+# RUN: llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
+
+---
+# A defined physical identity copy contributes no new lane definition.
+name: defined_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $al
+    ; CHECK-LABEL: name: defined_identity
+    ; CHECK: liveins: $al
+    ; CHECK-NOT: COPY
+    ; CHECK-NOT: KILL
+    ; CHECK: RET64 implicit $al
+    $al = COPY $al
+    RET64 implicit $al
+...
+---
+# An explicitly undef source still defines its destination for later uses.
+name: explicitly_undef_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: explicitly_undef_identity
+    ; CHECK: $ah = KILL undef $ah
+    ; CHECK-NEXT: RET64 implicit $ah
+    $ah = COPY undef $ah
+    RET64 implicit $ah
+...
+---
+# An implicit super-register definition must survive identity-copy cleanup.
+name: implicit_definition_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $al
+    ; CHECK-LABEL: name: implicit_definition_identity
+    ; CHECK: $al = KILL $al, implicit-def $ax
+    ; CHECK-NEXT: RET64 implicit $ah
+    $al = COPY $al, implicit-def $ax
+    RET64 implicit $ah
+...
+---
+# A parallel copy must consume the incoming RAX before overwriting it.
+name: ordered_copy_bundle
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $rax, $rcx
+    ; CHECK-LABEL: name: ordered_copy_bundle
+    ; CHECK: $rdx = COPY $rax
+    ; CHECK-NEXT: $rax = COPY $rcx
+    ; CHECK-NEXT: RET64 implicit $rdx, implicit $rax
+    $rax = COPY $rcx {
+      $rdx = COPY $rax
+    }
+    RET64 implicit $rdx, implicit $rax
+...
+---
+# Only the defined low byte is copied; its undef sibling is not an operand.
+name: defined_source_subregister
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: defined_source_subregister
+    ; CHECK: renamable $al = MOV8ri 1
+    ; CHECK-NOT: COPY
+    ; CHECK-NOT: KILL
+    ; CHECK: RET64 implicit $al
+    %0:gr8_abcd_l = MOV8ri 1
+    undef %1.sub_8bit:gr16_abcd = COPY %0
+    %2:gr8_abcd_l = COPY %1.sub_8bit
+    $al = COPY %2
+    RET64 implicit $al
+...
+---
+# The source remains live across CX's clobber, requiring a non-identity copy.
+name: nonidentity_partial_undef
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: nonidentity_partial_undef
+    ; CHECK: $cx = COPY renamable $dx
+    ; CHECK-NEXT: $eax = MOVZX32rr8 $ch
+    ; CHECK-NEXT: $cx = IMPLICIT_DEF
+    ; CHECK-NEXT: RET64 implicit $eax, implicit $dl
+    %0:gr8_abcd_l = MOV8ri 1
+    undef %1.sub_8bit:gr16_abcd = COPY %0
+    $cx = COPY %1
+    $eax = MOVZX32rr8 $ch
+    $cx = IMPLICIT_DEF
+    %2:gr8_abcd_l = COPY %1.sub_8bit
+    $dl = COPY %2
+    RET64 implicit $eax, implicit $dl
+...

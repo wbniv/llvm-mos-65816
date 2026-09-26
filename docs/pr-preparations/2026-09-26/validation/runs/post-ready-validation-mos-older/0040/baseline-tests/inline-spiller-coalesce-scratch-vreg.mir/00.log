@@ -1,0 +1,35 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/CodeGen/SplitKit.cpp:743: SlotIndex llvm::SplitEditor::enterIntvAfter(SlotIndex): Assertion `MI && "enterIntvAfter called with invalid index"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llc -mtriple=mos -mcpu=mos65c02 -O2 -run-pass=greedy -disable-spill-hoist -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.mir -o /dev/null
+1.	Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-spiller-coalesce-scratch-vreg.mir'.
+2.	Running pass 'Greedy Register Allocator' on function '@constant_shift'
+ #0 0x000060ab487b0e3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x452ce3b)
+ #1 0x000060ab487adcc1 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x4529cc1)
+ #2 0x000060ab487b1c4b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007d830513bcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007d830519c1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007d830513bb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007d830511e8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00007d830511f979 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29979)
+ #8 0x00007d8305131f75 __assert_fail (/usr/lib/x86_64-linux-gnu/libc.so.6+0x3bf75)
+ #9 0x000060ab47749be1 llvm::SplitEditor::enterIntvAfter(llvm::SlotIndex) SplitKit.cpp:0:0
+#10 0x000060ab47754360 llvm::SplitEditor::splitRegOutBlock(llvm::SplitAnalysis::BlockInfo const&, unsigned int, llvm::SlotIndex) SplitKit.cpp:0:0
+#11 0x000060ab476922f4 llvm::RAGreedy::splitAroundRegion(llvm::LiveRangeEdit&, llvm::ArrayRef<unsigned int>) RegAllocGreedy.cpp:0:0
+#12 0x000060ab476935ab llvm::RAGreedy::doRegionSplit(llvm::LiveInterval const&, unsigned int, bool, llvm::SmallVectorImpl<llvm::Register>&) RegAllocGreedy.cpp:0:0
+#13 0x000060ab47692e56 llvm::RAGreedy::tryRegionSplit(llvm::LiveInterval const&, llvm::AllocationOrder&, llvm::SmallVectorImpl<llvm::Register>&) RegAllocGreedy.cpp:0:0
+#14 0x000060ab4769774d llvm::RAGreedy::trySplit(llvm::LiveInterval const&, llvm::AllocationOrder&, llvm::SmallVectorImpl<llvm::Register>&, llvm::SmallSet<llvm::Register, 16u, std::less<llvm::Register>> const&) RegAllocGreedy.cpp:0:0
+#15 0x000060ab47699c31 llvm::RAGreedy::selectOrSplitImpl(llvm::LiveInterval const&, llvm::SmallVectorImpl<llvm::Register>&, llvm::SmallSet<llvm::Register, 16u, std::less<llvm::Register>>&, llvm::SmallVector<std::pair<llvm::LiveInterval const*, llvm::MCRegister>, 8u>&, unsigned int) RegAllocGreedy.cpp:0:0
+#16 0x000060ab4769a287 llvm::RAGreedy::selectOrSplit(llvm::LiveInterval const&, llvm::SmallVectorImpl<llvm::Register>&) RegAllocGreedy.cpp:0:0
+#17 0x000060ab476636da llvm::RegAllocBase::allocatePhysRegs() (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x33df6da)
+#18 0x000060ab4768bf07 llvm::RAGreedy::run(llvm::MachineFunction&) RegAllocGreedy.cpp:0:0
+#19 0x000060ab4769efa9 (anonymous namespace)::RAGreedyLegacy::runOnMachineFunction(llvm::MachineFunction&) RegAllocGreedy.cpp:0:0
+#20 0x000060ab4744c0a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x31c80a9)
+#21 0x000060ab479de420 llvm::FPPassManager::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x375a420)
+#22 0x000060ab479e6522 llvm::FPPassManager::runOnModule(llvm::Module&) (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x3762522)
+#23 0x000060ab479df1e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x375b1e4)
+#24 0x000060ab463b02cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#25 0x000060ab463ad593 main (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x2129593)
+#26 0x00007d8305120601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#27 0x00007d8305120718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#28 0x000060ab463ac7a5 _start (/work/build/post-ready-validation-mos-older/0040/baseline-bin/llc+0x21287a5)

@@ -286,36 +286,15 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
   section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
   SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
-- [x] <!-- agent:aabefe43f29486479 --> **`[dp],Y` Phase 2 increment 2 — the general *range-gated* runtime index (implemented and verified locally; include in the complete #321 native-width series PR).** Increment 1
-  (Done 2026-09-25) folds only a compile-time-constant displacement in `[1,3]`. The
-  investigation's main target is still unselected: a *runtime* index provably within the Y width.
-  Gate on the **scaled** byte offset (`index × sizeof(elem)`, unsigned) — `0..255` under
-  `+mos-a16`, `0..65535` only under `+mos-xy16` (Y's width is governed by **X**, not M) — with Y
-  free or already index-resident, and the same may-fold discipline: failing the range proof must
-  fall back, never regress. Its customer is the blit shape (`dev/dpy-shapes/loop.c`), measured
-  −50 % loop bytes / −31 % cycles in
-  [Phase 1 §4](docs/investigations/2026-09-24-dpy-indexed-measurement.md) and **unchanged (86 B)**
-  by increment 1. Entry point: `MOSLegalizerInfo::tryFarIndirectIndexedAddressing`, which already
-  emits the opcode — increment 2 only widens what it accepts as the index. Reason for T4: a range
-  proof plus a gate whose misclassification would regress shipped codegen; land the scheduler item
-  below first or measure with `-enable-misched=false` as well, or the cliff will mask the win.
-  [increment 1 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
-  **Correctness flag (2026-09-25, [hoist investigation §5](docs/investigations/2026-09-25-farptr-hoist-measurement.md#5-the-dpy-interaction--flagged)):** `loop.c`'s `tab[o + j]` is `tab + zext(add i16 o, j)` with **no `nuw`** — it wraps at 16 bits, so folding it as `[tab+o],Y` with `Y=j` is a miscompile for `o ≥ 0xFFC1`; never reassociate a non-`nuw` narrow add. Legal fixtures: `tab[(uint32_t)o + j]` / `p = tab + base; p[j]` (72 B today → 32 B hand-built).
-  **Resume (2026‑09‑26):** rebased onto `8c19c703`; focused, emulator, corpus, fuzz,
-  round-trip and full-lit baseline-comparison results are in the
-  [increment 2 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md).
-  The full-lit suite retains the same three failures as exact committed main; no
-  increment-specific failure remains. Do not submit this patch alone: #321 review
-  requires the complete ABI-documented native-width feature series.
-- [ ] **XY16 gallery near decoder / split Y index.** The inherited failure is reproduced on committed main (`0xA50F` versus `0x5CF0`). Preserve the near-Y high-byte hazard and isolate its exact contribution to the LTO benchmark before fixing it. Existing X-index restoration does not cover Y. [Canonical evidence](docs/defects/mos-xy16-near-indirect-y-clobber.json).
-
-- [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing remains a separate open item above.
+- [x] **`[dp],Y` increment 2 published downstream in `a4eb416c` (2026-09-26).** The range-gated runtime index implementation and verification are retained in the [increment-2 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md). Preserve scaled-offset width checks and narrow-add wrapping.
+- [T4] **XY16 gallery near decoder / split Y index.** The inherited failure is reproduced on committed main (`0xA50F` versus `0x5CF0`). Preserve the near-Y high-byte hazard and isolate its exact contribution to the LTO benchmark before fixing it. Existing X-index restoration does not cover Y. [Canonical evidence](docs/defects/mos-xy16-near-indirect-y-clobber.json).
+- [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing is covered by the separate increment-2 item above.
 - [x] **Native 16-bit far loads and stores — implemented locally in patch 0062.** `M=0` long absolute, long,X, `[dp]`, and `[dp],Y` accesses select native word operations when the value contract permits it; ABI byte-return and byte-argument paths retain their byte operations. The focused lit checks, `farindex`/`farbank` emulator gates, and machine verifier pass. [Patch](patches/llvm-mos/0062-mos-native-far-word.patch) · [measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
 ### M2 — Optimizing Payoff
 
 - [x] **Independent Imag8→i1 rejection diagnosis resolved (2026-09-26).** The matcher checks the shared `Any` bank and inserts an `Ac` copy; its source contract disproves Imag8-only rejection. All 72 compiler runs and 48 selection checks pass. No fix or failing baseline is claimed. Keep 0023 and its tests with the feature series; the original far-pointer observation remains qualified. [Evidence and attribution](docs/investigations/2026-09-26-trunc-imag8-i1-contract.md) · [record](docs/defects/mos-trunc-imag8-i1.json).
 - [x] **Narrow-count s64 shift legalization repaired by 0055 (2026-09-25).** Native-width s8/s16/s32-to-s64 `G_ANYEXT` uses the existing zero-extension lowering. The original recovered preprocessed input and reduced masked-byte IR fail on the preserved baseline and pass on the candidate. All 36 recovered-source configurations and nine SNES runtime checks pass, including three LTO runs; installed Clang and LLD are refreshed. Existing patch 0028 repairs the inline-bitboard verifier failure. [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md) · [shift status](docs/defects/shift64-narrow-count.json) · [bitboard resolution](docs/defects/bitboard-inline-register-pressure.json). The reentrant attribute remains a separate [contract clarification](docs/defects/reentrant-attribute-contract.json).
-- [x] **Near store shared with unit arithmetic — implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1`/`-1` consumer can remain in byte operations. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch).
+- [x] **Near store shared with unit increment — implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1` consumer can remain in byte operations. The September 26 review confirms that ordinary decrement canonicalizes to `G_ADD -1` and retains correct native fallback, not this optimization. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch) · [review](docs/pr-preparations/2026-09-26/native-optimization-review.md).
 - [T3] **Broader near-store profitability remains open.** Indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths; measure each before widening the predicate. Values live across calls and atomic word stores retain their existing contracts.
 - [x] **Computed-carry scheduling submitted as 0064.** [Compiler branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling) pushed at `155e209c4cee`; [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) opened. [PR packet](docs/pr-preparations/2026-09-26/README.md) records author review on `7bd67c0ae4e8`, 132 MOS passes, 512 oracle vectors and 117 neutral ordinary-MOS comparisons. Targeted kernel 133 → 59 B; downstream 1–41 B costs retained. [Plan](docs/plans/2026-09-26-mos-carry-scheduling.md).
 - [T4] **Generic fine-grained pressure contract remains open.** 0064 is a [qualified workaround](docs/defects/mos-carry-scheduling-pressure.json). Measure cycles and compiler time before making corresponding performance claims.
@@ -1049,7 +1028,9 @@ contract of native mode, while independent fixes continue in parallel.
   pinned base and local clone revision `c44aaa95aa72`. Remaining: check current
   upstream when preparing the branch, then publish (user-triggered).
 - [T4] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
-  ready to open. Choose the implementation and revalidate the exact submission;
+  ready to open. The existing refactor is selected, independently reviewed, and
+  validated on current LLVM: two focused RUNs and 102 filtered X86 test passes,
+  one existing XFAIL. No implementation-choice or validation gate remains;
   [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.
 
 **Earlier progress snapshot, 2026-09-20, before #604 was posted:** 7 merged PRs (#562, #563, #577, #579, #587, #590,
@@ -1061,6 +1042,24 @@ cancellation during compilation before tests ran; it needs a completed run. See 
 
 _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
 — keep it in sync (drafted → ready-to-post → posted) with the items in this section._
+
+Current preparation: [September 26 posting packet](docs/pr-preparations/2026-09-26/README.md).
+It owns the exact-current artifact/review/validation gates; the
+[feature-held ledger](docs/pr-preparations/2026-09-26/feature-held-packages.md)
+separates real ABI/extraction holds from merge ordering. No posting or push is
+authorized by this pass. The ten [MOS packets](docs/pr-preparations/2026-09-26/mos-validation.md)
+and six [LLVM packets](docs/pr-preparations/2026-09-26/llvm-validation.md)
+(0037, 0041, 0056–0059) are ready to post; 0028 is validated but retains the
+presentation hold above. LLVM suite results are filtered AArch64/X86 checks,
+not full target suites. 0045 has a stock-MOS test and is not fork-only;
+0061's exact artifact needs both #320/#321, while 0063 is increment-only.
+The separate 0060 packet is also ready: a MOS backport of an already-published
+LLVM guard, not a new LLVM repair or parallel-MIR implementation.
+
+Current-status reconciliation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified reviewer session
+`01a0db96-e0ef-75e2-89ad-2939c4954446`. Earlier implementation and validation
+credits remain in their linked records.
 
 
 - [wip T5] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
@@ -1145,8 +1144,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   [validation](docs/pr-preparations/2026-09-23/0037-validation.md). Aimed at llvm/llvm-project.
   [Independent audit complete](docs/pr-preparations/2026-09-23/0037-review-audit.md):
   915 standalone suite passes, one unsupported; 12/12 focused corpus cases pass.
-  Generic/AArch64 submission variant prepared. Remaining: check and validate against
-  current llvm/llvm-project, prepare the branch, then publish (user-triggered).
+  September 26: the exact generic/AArch64 packet passes four focused RUNs and
+  168 filtered AArch64/X86 tests, three existing XFAILs, on current LLVM.
+  [Current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
+  Ready to post; remaining: publish when requested.
 - [T5] **`__builtin_return_address` / `__builtin_frame_address` on MOS (patch 0038).** Both
   intrinsics were unlegalized (15 c-torture compilations). Frame address = the incoming soft stack
   pointer (fixed frame object at offset 0, no frame pointer forced); return address = the word
@@ -1156,6 +1157,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   interrupt handlers return 0. [Plan](docs/plans/2026-09-23-return-frame-address.md) ·
   [PR draft](docs/upstream-return-frame-address-pr.md) ·
   [validation](docs/pr-preparations/2026-09-23/0038-validation.md). Aimed at llvm-mos.
+  September 26: independently reviewed current-main packet passes five focused
+  commands and 134 MOS suite tests; the additional stack-depth MIR and separate
+  SPC700 0003 limitation are recorded in the [posting packet](docs/pr-preparations/2026-09-26/README.md).
   Remaining: publish (user-triggered).
 - [T5] **Greedy RA segfault in `SplitEditor::enterIntvAfter` on `ashrdi-1.c` (patch 0040).**
   MOS's reload hook mints an `Imag16` scratch pointer as an extra virtual def, which
@@ -1170,6 +1174,10 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   1 changed (+1 byte), 0 broken. [Plan](docs/plans/2026-09-24-ashrdi1-greedy-ra-segfault.md) ·
   [PR draft](docs/upstream-inline-spiller-coalesce-scratch-vregs-pr.md) ·
   [validation](docs/pr-preparations/2026-09-24/0040-validation.md). Aimed at llvm-mos.
+  September 26: independently reviewed pre-greedy MIR reproduces on pristine
+  current MOS without native features; exact candidate passes both RUNs and
+  132 MOS suite tests. Spill hoisting is disabled on both sides to isolate this
+  contract; no 0033 submission prerequisite. [Posting packet](docs/pr-preparations/2026-09-26/README.md).
   Remaining: publish (user-triggered).
 <!-- triaged 2026-09-24: the "SPC700 -O2 crashes on any immediate load into an imaginary
      register" item added with 0038 was a re-discovery of patch 0003 (open upstream PR #584,
@@ -1185,15 +1193,20 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   to `Imag8` for everything but `i16`, so a `long` needs four: the tied form
   (`asm("" : "=r"(i) : "0"(x))`) asserted `NumOpRegs == 1`, and the plain input and the output were
   rejected outright — so relaxing the assertion alone would not have compiled either torture file.
-  All three now split/merge least significant piece first, as SelectionDAG's `RegsForValue` does,
-  and every shape still unsupported takes a soft bail instead of an assert. Reproduces on AArch64
+  The scoped scalar forms now split/merge least significant piece first, as SelectionDAG's
+  `RegsForValue` does; this does not promise clean rejection of every unsupported shape.
+  Reproduces on AArch64
   (`i128` with `"r"`) at plain `-O0`; two upstream AArch64 tests that encoded the limitation are
   updated. 6 c-torture compilations repaired (`20030222-1`, `pr52286`), corpus otherwise
   byte-identical. Aimed at `llvm/llvm-project`.
   [Plan](docs/plans/2026-09-24-gisel-tied-inline-asm.md) ·
   [PR draft](docs/upstream-gisel-inline-asm-multi-register-pr.md) ·
   [validation](docs/pr-preparations/2026-09-24/0041-validation.md).
-  Remaining: publish (user-triggered).
+  September 26: independent review exposes the older extraction's MOS-only
+  result-widening dependency. The standalone LLVM packet uses explicit
+  multi-register `G_ANYEXT`; ten focused RUNs and 168 filtered AArch64/X86
+  tests pass, with three existing XFAILs. Ready to post when requested.
+  [Posting packet](docs/pr-preparations/2026-09-26/README.md); no 0037 prerequisite.
 - [x] **GlobalISel physical-register inline-asm exhaustion repaired by 0056 (2026-09-25).**
   An independent AArch64 i128 `{cc}` input reproduces `Ran out of registers to allocate!`
   on the preserved assertion-enabled baseline. The generic helper validates the entire
@@ -1201,19 +1214,28 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   member count. Direct output, input, tied, and indirect-output checks pass at O0/O2 with
   fallback enabled/disabled, and the 1,067-test AArch64/ARM/X86 GlobalISel run succeeds.
   MOS's older `=a` witness remains intercepted by 0043. [Evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md)
-  · [structured record](docs/defects/gisel-inline-asm-register-bounds.json). Publication remains separate.
+  · [structured record](docs/defects/gisel-inline-asm-register-bounds.json).
+  September 26: exact current-LLVM packet independently reviewed and validated;
+  four focused RUNs and 168 filtered AArch64/X86 passes, three existing XFAILs.
+  Ready to post; [current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
 - [x] **SelectionDAG physical-register inline-asm exhaustion repaired by 0057 (2026-09-25).**
   Seven isolated operand forms fail on the preserved assertion-enabled baseline
   and receive clean diagnostics at O0/O2 with the fix, including live `callbr`
   results on both edges. Cross-target inline-asm/callbr and MOS suites pass;
   rebuilt Clang and LLD are installed. [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-inlineasm.md)
   · [structured record](docs/defects/selectiondag-inline-asm-register-bounds.json).
+  September 26: exact current-LLVM packet independently reviewed and validated;
+  two focused RUNs and 168 filtered AArch64/X86 passes, three existing XFAILs.
+  Ready to post; [current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
 - [x] **AArch64 unknown inline-asm operand type abort repaired by 0058 (2026-09-25).**
   The original `i4096` input aborts on both preserved baselines and receives a
   clean diagnostic with the `r`/`x` type guards. All 32 diagnostic cases pass;
   277 cross-target tests pass with four existing expected failures. The full
-  regression uses 0057's `callbr` error recovery. AArch64 candidate retained;
-  submission preparation remains. [Evidence and attribution](docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)
+  regression uses 0057's `callbr` error recovery. AArch64 candidate retained.
+  September 26: independently reviewed current-LLVM packet passes 19 focused
+  RUNs and 169 filtered AArch64/X86 tests, three existing XFAILs, with 0057
+  applied to both sides. Ready as a dependent submission.
+  [Evidence and attribution](docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)
   · [structured record](docs/defects/selectiondag-inline-asm-nonstandard-integer.json).
 - [x] **SelectionDAG vector conversion assertions repaired by 0059 (2026-09-25).**
   The unchanged `<64 x i64>` input fails on preserved 0057/0058 compilers and
@@ -1221,7 +1243,9 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   crashing configurations now diagnose; supported conversions still compile.
   Cross-target suites: 278 pass; MOS suites: 173 pass. Clang/LLD rebuilt and
   installed. The original regression requires 0057's virtual-allocation repair;
-  independent review and submission preparation remain.
+  September 26: independent review and exact-current LLVM validation complete;
+  24 focused RUNs and 169 filtered AArch64/X86 passes, three existing XFAILs,
+  with 0057 applied to both sides. Ready as a dependent submission.
   [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-vector-parts.md)
   · [record](docs/defects/selectiondag-inline-asm-vector-parts.json).
 - [x] **Revalidate coalescing guard 0015 (2026-09-25).**
@@ -1235,8 +1259,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   Patch `0060` keeps machine functions in parallel MIR workers. The retained
   eight-instruction input fails on the preserved reducer and reduces with the
   candidate at `-j 2`; the output remains interesting. The focused MIR test
-  and existing parallel IR test pass. Published-upstream applicability remains
-  to be assessed. [Fix](docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
+  and existing parallel IR test pass. This is retained September 25 evidence.
+  September 26 reconciliation found LLVM's existing guard commit `b1ba3d515a02`
+  predates the local report. The [ready MOS backport](docs/pr-preparations/2026-09-26/0060-pr-body.md)
+  rejects MIR `-j > 1` with a clean diagnostic, retaining serial MIR and parallel
+  IR; it does not silently fall back or claim general parallel-context safety.
+  Exact-current assertion-enabled validation passes all nine RUNs and 180
+  reducer-suite tests, 27 unsupported, with independent receipt review.
+  The rejected LLVM fallback attempt and original candidate remain dated
+  evidence; no duplicate LLVM submission is needed. Nothing posted.
+  [Fix](docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
   · [record](docs/defects/llvm-reduce-parallel-mir-crash.json).
 - [T2] **Plan exhaustive 65816 opcode roundtrip coverage (2026-09-25).**
   [Plan](docs/plans/2026-09-25-65816-all-opcode-roundtrip.md) written; implementation
@@ -1244,20 +1276,16 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   contexts, independent expected bytes, instruction boundaries, and reassembly.
   Resolve the BRK signature contract and add WDM to the 255-row oracle coverage.
   This is planned test coverage, not a newly confirmed compiler defect.
-- [T2] **Finish the `0043` submission preparation.** [PR draft](docs/upstream-inline-asm-physreg-width-pr.md)
-  and initial pinned-base validation exist. The [September 25 review](docs/pr-preparations/2026-09-25/claude-batch-review.md)
-  extends the check to named registers, including a C register-variable reproducer.
-  Updated integrated tests and pin applicability pass; refresh isolated revision
-  validation and prepare the upstream branch. Posting stays user-triggered.
-- [T2] **Finish the `0046` submission preparation.** [PR draft](docs/upstream-fixupkinds-addrasciz-row-pr.md)
-  and initial pinned-base validation exist. The September 25 review adds an inferred
-  array bound and compile-time row-count check. Refresh isolated revision validation
-  and prepare the upstream branch; posting stays user-triggered.
-- [T2] **Finish the `0047` submission preparation.** [PR draft](docs/upstream-mc-addr-asciz-symbolic-crash-pr.md)
-  and initial pinned-base validation exist. The September 25 revision retains directive
-  text emission, removes the unintended `addrasciz()` modifier, and tests all eight
-  widths with byte-for-byte object round trips. Refresh isolated revision validation
-  and prepare the upstream branch; posting stays user-triggered.
+- [x] **Prepare `0043` for posting (September 26).** Exact current-MOS patch,
+  copy-ready draft, twelve reviewed clean diagnostics, positive controls,
+  isolated assertion build and full MOS suites pass. [Packet](docs/pr-preparations/2026-09-26/README.md).
+- [x] **Prepare `0046` for posting (September 26).** Reviewed inferred table
+  bound and compile-time row-count guard; isolated assertion build and existing
+  positive suites pass. No runtime-red claim for this latent invariant repair.
+- [x] **Prepare `0047` for posting (September 26).** Current upstream's MCAsmInfo
+  reference API is accommodated; all eight field widths, object round trips,
+  and isolated MOS suites pass. [Validation](docs/pr-preparations/2026-09-26/mos-validation.md).
+  These are local preparations only; nothing is posted or pushed.
 - [x] **MOS correctness queue repaired (2026-09-25).** Patches `0049`–`0054` backport
   generic vector scalarization, scalarize float/double arithmetic, repair the byte-index
   `G_TRUNC`, preserve out-of-bank section-offset relaxation, correct two stale test

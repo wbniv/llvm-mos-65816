@@ -1,0 +1,472 @@
+*** Reducing Instructions (instructions)...
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-c16a57.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-c16a57.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-c16a57.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-dd9fe7.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-dd9fe7.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-dd9fe7.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-9c31ca.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-9c31ca.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-9c31ca.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-4891b9.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-4891b9.mir:76:2: note: possible intended match here
+ STAbs %5, 0
+ ^
+
+Input file: /tmp/llvm-reduce-4891b9.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          71: machineFunctionInfo: {} 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          72: body: | 
+check:5'0     ~~~~~~~~
+          73:  bb.0: 
+check:5'0     ~~~~~~~
+          74:  %5:gpr = IMPLICIT_DEF 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          75:  undef %6.sublo:imag16 = IMPLICIT_DEF 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          76:  STAbs %5, 0 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1      ?            possible intended match
+          77:  %4:gpr = COPY %6.subhi 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          78:  RTS 
+check:5'0     ~~~~~
+          79: ... 
+check:5'0     ~~~~
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-7e2cc0.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-7e2cc0.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-7e2cc0.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/build/post-ready-review-reducer/candidate-j4.mir
+--------------------------------------------------------------------------------
+*** Reducing Instructions (instructions)...
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-495c0a.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-495c0a.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-495c0a.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-6b1647.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-6b1647.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-6b1647.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-340e7c.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-340e7c.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-340e7c.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/build/post-ready-review-reducer/candidate-j4.mir
+--------------------------------------------------------------------------------
+Done reducing! Reduced testcase: /home/will/llvm-mos-65816/build/post-ready-review-reducer/candidate-j4.mir

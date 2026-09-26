@@ -866,9 +866,7 @@ def verify_machineinstrs(src, obj, flags=None, cflags=(), config=None, opt="-Os"
     """Compile with -verify-machineinstrs. `flags` defaults to A16. Returns (ok, log).
 
     `opt` (default "-Os", the level the whole battery builds at) selects the optimisation
-    level. Only the known-issues XPASS guard passes anything else: some XFAILs are
-    level-sensitive (a16-rc-undef-ra-pure-virtual reproduces in newton_sim.c at -O1 but not
-    at -Os), and a guard pinned to a single level silently loses them.
+    level. The known-issues XPASS guard may select another level for a level-sensitive row.
     `cflags` (default empty) threads extra front-end args through unchanged for callers
     that need an adapter header; the builtin path omits it.
 
@@ -1105,81 +1103,7 @@ KNOWN_ISSUES = [
     # gates: dev/run.sh rcundef (-verify) + dev/run.sh newton (0x4D8B, both emus). See
     # docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md.)
 
-    # a16-rc-undef-ra-pure-virtual — the SECOND, distinct root cause (CAUSE #2) of the same
-    # "Using an undefined physical register" symptom, NOT fixed by the cause-#1 coalescer guard. The
-    # register ALLOCATOR binds a PURE-VIRTUAL Imag16 value — one with no `$rcN` copy anywhere in its
-    # def/use chain during coalescing — to a call-clobbered `$rc` pair it is live across. With
-    # no copy-hint signal, MOSRegisterInfo::shouldCoalesce cannot target it; the only coalescer rule
-    # that masks it perturbs 22-25/34 corpus programs (forbidden blanket change). The genuine fix is
-    # RA-interference-level (greedy RA / LiveRegMatrix must treat the call's regmask clobber of the
-    # imaginary pair as interference). The code runs CORRECTLY (lsystem differential 0x79C3, both emus);
-    # this is a latent-hazard verify XFAIL pending the RA fix.
-    # See docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md (Cause #2).
-    #
-    # WITNESSES (re-surveyed 2026-09-15 — the hazard is UNCHANGED and live; only the repro set moved):
-    #   * examples/65816/rcundef2.c `main` $rc11  — the guard's repro, -O1..-Os, BOTH legs.
-    #   * examples/snes/corpus/newton_sim.c `newton_gate_crc` $rc2/$rc4/$rc5 — -O1 only, BOTH legs.
-    #   * examples/snes/seqvm.c `draw_frame` $rc3/$rc5 — the "second manifestation" (the undef lane
-    #     feeds a STORE, not a dead read) that the upstream issue body leads with; -O1/-O2/-Os, BOTH
-    #     legs. Not a KNOWN_ISSUE_REPROS row because it #includes SDK headers and so needs
-    #     --config mos-snes.cfg, which would cost this guard its "toolchain-only, no SDK" property
-    #     (it runs in CI *before* dev/run.sh build).
-    #   * examples/snes/corpus/trimerge_sim.c `main` $rs1 (`$x16 = LDXImag16 $rs1`) — the live
-    #     battery-level witness: +mos-xy16 at -O1 AND -Os. Not a KNOWN_ISSUE_REPROS row only
-    #     because it is clean under +mos-a16 and rows must fail on both legs (see b78a2d5).
-    #   * demo slices #33 mandel-double, #69 gouraud, #71 msquares, #123 nmitally (see TODO.md).
-    # The original primary witness, lsystem_sim.c `main`, stopped reproducing on 2026-08-01 — NOT
-    # from a compiler fix but from commit 903de3e, an idle-loop hygiene sweep that rewrote its
-    # `for (;;) {}` to `for (;;) __asm__ volatile("wai")`, reshaping `main`. The pre-903de3e source
-    # still reproduces byte-for-byte on today's compiler. That is why the guard's repro now lives in
-    # examples/65816/ (compiler test-suite, no idle loop to sweep) rather than in a runnable demo
-    # slice. See docs/plans/2026-09-15-a16-rc-undef-pure-virtual-drift.md.
-    #
-    # DISCRIMINATOR. The bare string "Using an undefined physical register" is NOT a safe
-    # signature for this entry on its own: a genuine +mos-xy16 MISCOMPILE emits the identical
-    # string (#118 retryjmp — an X16/Y16 soft-stack spill staged through A16 without telling
-    # the allocator; docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md),
-    # and matching on the text alone files such a slice as this benign XFAIL. Two rules keep
-    # a real defect from hiding here:
-    #   1. the predicate below, which requires EVERY undefined operand the verifier names to
-    #      be an IMAGINARY register ($rcN/$rsN/$rlN) — cause #2 is by construction about an
-    #      Imag16 value bound across a call's regmask. A real register ($a16/$a/$x16/$p/…)
-    #      is a different defect and must hard-FAIL.
-    #   2. evaluate(), which no longer short-circuits on a known-issue verify failure: the
-    #      program is still built and run 4-way, and a value disagreement is a FAIL no matter
-    #      which XFAIL the verify log matched. This entry's own claim is "the code runs
-    #      CORRECTLY" — so check it rather than assume it.
-    ("a16-rc-undef-ra-pure-virtual", lambda log: _is_rc_undef_pure_virtual(log)),
 ]
-
-# `- operand 3:   killed renamable $rc5` / `- operand 0:   killed renamable $a16`
-_VERIFY_OPERAND_RE = re.compile(r"^-\s*operand\s+\d+:\s+(.*)$", re.M)
-# An imaginary zero-page register: $rc12 (byte), $rs6 (pair), $rl1 (quad).
-_IMAG_REG_RE = re.compile(r"\$r[csl]\d+\b")
-_UNDEF_PHYSREG_HDR = "Using an undefined physical register"
-
-
-def _is_rc_undef_pure_virtual(log):
-    """True only when EVERY 'undefined physical register' the verifier reported names an
-    imaginary ($rcN/$rsN/$rlN) operand — the cause-#2 signature. One real-register operand
-    (e.g. $a16, the #118 retryjmp miscompile) disqualifies the whole log, so a new defect
-    can never hide behind this XFAIL."""
-    if _UNDEF_PHYSREG_HDR not in log:
-        return False
-    # Split into per-error blocks; only the undefined-physreg ones are ours to judge.
-    blocks = log.split("*** Bad machine code: ")
-    saw = False
-    for b in blocks[1:]:
-        if not b.startswith(_UNDEF_PHYSREG_HDR):
-            continue
-        operands = _VERIFY_OPERAND_RE.findall(b)
-        if not operands:
-            return False  # unparseable block — refuse to classify it as benign
-        for op in operands:
-            if not _IMAG_REG_RE.search(op):
-                return False
-        saw = True
-    return saw
 
 
 def classify_known(log):
@@ -1202,20 +1126,11 @@ def classify_known(log):
 # naming a retired kid can never be satisfied (classify_known cannot return it) and the guard
 # reports it as DRIFT.
 #
-# INVARIANT: each row states the -O level at which its repro reproduces. This XFAIL is
-# level-sensitive — newton_sim.c fires at -O1 and is clean at -Os — so a row is only meaningful
-# with its level, and the guard echoes that level so a level shift is visible rather than silent.
+# INVARIANT: each row states the -O level at which its repro reproduces, and the guard echoes
+# that level so a level shift is visible rather than silent.
 # (a16-zp-pressure-overflow is intentionally absent: its repro is a gitignored c-torture file and
 # a LINK error, not a verify crash — so it can't be a verify-only guard row.)
-KNOWN_ISSUE_REPROS = [
-    # Primary, durable repro: a pure-virtual Imag16 ($rc11) bound across a clobbering call in
-    # `main`. Lives in the compiler test-suite dir and carries NO idle loop, so no demo-hygiene
-    # sweep can reshape it the way 903de3e reshaped lsystem_sim.c. See the WITNESSES note above.
-    ("examples/65816/rcundef2.c", "a16-rc-undef-ra-pure-virtual", "-Os"),
-    # Second independent witness, different function (`newton_gate_crc`, $rc2/$rc4/$rc5), still in
-    # tree. -O1 ONLY: at -Os the cause-#1 coalescer fix (f1af264) makes this TU verify clean.
-    ("examples/snes/corpus/newton_sim.c", "a16-rc-undef-ra-pure-virtual", "-O1"),
-]
+KNOWN_ISSUE_REPROS = []
 
 
 def save_known(seed, csrc, kid):

@@ -1,0 +1,70 @@
+{
+  "scope": "Historical pristine and isolated 0037-only snapshots; not a current LLVM build",
+  "FileCheck_sha256": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+  "results": [
+    {
+      "name": "baseline-00",
+      "command": "/home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs -stop-after=irtranslator < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll",
+      "exit": 2,
+      "binary_sha256": "21f45c5b1cf7dbd82841995d370ce8b7511cca226c9abd21ea07b3ec934c77b3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "e0d02ac8cfe71c30d98058343c76a7a6374bbc85e9d8aec536aea9013bc2529a"
+    },
+    {
+      "name": "baseline-01",
+      "command": "/home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs -stop-after=irtranslator < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll",
+      "exit": 2,
+      "binary_sha256": "21f45c5b1cf7dbd82841995d370ce8b7511cca226c9abd21ea07b3ec934c77b3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "ef5da9ad2257651a63229e25afa1a2d67e3b18142776ff3e01d6678175785d78"
+    },
+    {
+      "name": "baseline-02",
+      "command": "/home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll --check-prefix=ASM",
+      "exit": 2,
+      "binary_sha256": "21f45c5b1cf7dbd82841995d370ce8b7511cca226c9abd21ea07b3ec934c77b3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "f687138ad4fd3f198cab7b997804fec35a0b73d932c03c5c0b8335acf246576b"
+    },
+    {
+      "name": "baseline-03",
+      "command": "/home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll --check-prefix=ASM",
+      "exit": 2,
+      "binary_sha256": "21f45c5b1cf7dbd82841995d370ce8b7511cca226c9abd21ea07b3ec934c77b3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "fa3af5e7264c746f634850649a86d88fea514b2a55abe209020078d7f75b8a3b"
+    },
+    {
+      "name": "0037-only-00",
+      "command": "/home/will/llvm-mos-65816/build/review-followups-0033-0037/llc-0037-only -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs -stop-after=irtranslator < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll",
+      "exit": 0,
+      "binary_sha256": "0d745b76dad60e0169624de81d8d755b2e9cf46ef3411d673c11157a6fa9ebc3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0037-only-01",
+      "command": "/home/will/llvm-mos-65816/build/review-followups-0033-0037/llc-0037-only -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs -stop-after=irtranslator < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll",
+      "exit": 0,
+      "binary_sha256": "0d745b76dad60e0169624de81d8d755b2e9cf46ef3411d673c11157a6fa9ebc3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0037-only-02",
+      "command": "/home/will/llvm-mos-65816/build/review-followups-0033-0037/llc-0037-only -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll --check-prefix=ASM",
+      "exit": 0,
+      "binary_sha256": "0d745b76dad60e0169624de81d8d755b2e9cf46ef3411d673c11157a6fa9ebc3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0037-only-03",
+      "command": "/home/will/llvm-mos-65816/build/review-followups-0033-0037/llc-0037-only -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll | /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll --check-prefix=ASM",
+      "exit": 0,
+      "binary_sha256": "0d745b76dad60e0169624de81d8d755b2e9cf46ef3411d673c11157a6fa9ebc3",
+      "input_sha256": "5f60dac0dbf63a707a77e7764fe0598e00ba05891f87ba3be59c60116b4b34c9",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

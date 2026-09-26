@@ -1,5 +1,16 @@
 # [CodeGen] Preserve undef-lane definitions in rewritten identity copies
 
+**Current draft — September 26:** use the [generic LLVM posting draft](pr-preparations/2026-09-26/0028-pr-body.md)
+and exact patch in the [current packet](pr-preparations/2026-09-26/README.md).
+They retain this refactor and use a reviewed X86 MIR regression. Exact-current
+LLVM validation passes (two focused RUNs; 102 filtered suite passes / one XFAIL),
+and the #320/#321 presentation hold remains. The
+original MOS-specific draft below is retained as dated evidence.
+
+Current preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 ## Summary
 
 Keep a rewritten identity `COPY` as a `KILL` when its virtual source has an

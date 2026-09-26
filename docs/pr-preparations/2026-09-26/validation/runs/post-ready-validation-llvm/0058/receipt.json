@@ -1,0 +1,500 @@
+{
+  "venue": "llvm",
+  "base": "e59a0c697552ae7d1c3aeed5774e829cdc5e16b5",
+  "patch": "0058",
+  "prerequisites": [
+    "0057"
+  ],
+  "runner_sha256": "17c99335cfd445fcfdb24c1e00ae2e96aedb19001a81ff144d634984668557b3",
+  "container_image": "sha256:eeecfab76840167d9f16982b1efddae90d4969c5d7891ec16e87e46150ac94c1",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/post-ready-2026-09-26-llvm-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 2.724,
+    "log": "build/post-ready-validation-llvm/0058/baseline-build.log",
+    "log_sha256": "40357752e1f4c90502da227d55407a6e1274ad358154e9f00da5f229b69a811b"
+  },
+  "baseline_tools": {
+    "llc": "8d358a8087e1fde481949a09022b399d52d34e1feed22fca9c1ae9b6fb4c3be6",
+    "opt": "54edd6d7a5584957333282a99916fcc78aab3d86bf1289416056c6ac785b0cf0",
+    "llvm-mc": "1181ae01b51112bf42daf035e352b30762d2b0db447e95325dc80142ee100e89",
+    "llvm-objdump": "45df648dd44033d34cc7c90cee84d52417cc45d2d30079fdf9f00fbd233230f4",
+    "llvm-objcopy": "bbc0b0c27aa90c94d96df1de7a5273313f6eb094bdbf3c23ef9bebf5dacd25d2",
+    "llvm-readobj": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "llvm-readelf": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "FileCheck": "825b64ce8cf637b09d531a1d3ebf9e3a153f648ea94a98abdbecf1a6d2ce23da",
+    "not": "11df371f7da20f711700fafddbbf7df6301b9157ec70d9bb3c726cd35225b2ad",
+    "split-file": "e7ac40df1a0634399a350d02c8594f3ccaba57be484933fa2aeb233e6b804c94",
+    "count": "abc2311cc7f89fe153d96be41f68a8be57dea38ddcb9c2ae172d6cc1bf80b02d",
+    "llvm-config": "7bb879bfa0e02af293a91748c983cf9eb8a3bea34379afdd54b336c6c036ba63",
+    "llvm-reduce": "30c05ac8ed081dc5a2f3163bc9df2fa3b3aa9deb54ccb933dd073d79bca154aa",
+    "llvm-as": "051e152164e84c6e095316924c6278f637d9fc9206bbb9c820f56789c0766888",
+    "llvm-link": "f01a215455ee01f4e941fb643f4ef0289adfa23e6658ed2bf23ad30bfa50aabd",
+    "yaml2obj": "ec78a6d55f7899d4a66e1837e7ff16611ed04dcc9870d678a3a956899b5c4421",
+    "llvm-nm": "1bbeac3f19d0ddaaa7389751cf8ff0c63a1d83db687857c01e3a6bb7c0474026",
+    "llvm-dis": "49656d0933418d80d5fac7db18657db5760faaebb0123765d41ed8f00a8ec9cc",
+    "verify-uselistorder": "15eebf03e7d0d027fd3ee6c051fffe256fe840a6e69f62e80e750ba0e807b229"
+  },
+  "baseline_suites": {
+    "command": [
+      "/work/build/post-ready-2026-09-26-llvm-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "--filter=(inline.?asm|asm-goto|callbr)",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/AArch64",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/X86"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 3.072,
+    "log": "build/post-ready-validation-llvm/0058/baseline-suites.log",
+    "log_sha256": "c4364e221aa152085e4da7547f33191526a7761ac7b78981fa87414cc84e209e"
+  },
+  "patch_sha256": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d",
+  "dependency_sha256": {
+    "0057-llvm-project.patch": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035"
+  },
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll /work/build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.008,
+      "log": "build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/tmp/input-r.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.265,
+      "log": "build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/01.log",
+      "log_sha256": "25e8618e6cca60c63847ab2a2115e19e403c21cd1387f48585db5d6739e79ff0",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/post-ready-2026-09-26-llvm-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 47.935,
+    "log": "build/post-ready-validation-llvm/0058/candidate-build.log",
+    "log_sha256": "b2dab38f9893483b066ed82dc1fabea1d0c9f364e98c8ff972117242636b1124"
+  },
+  "candidate_tools": {
+    "llc": "b53ec7a81a90a79000806e0706d9a6b5009c3e6bca0f874d7a04ce3f0f138dc6",
+    "opt": "490bf8465a172f913ecd8fb7858915be3b10d301ed47208cfee1210febab4891",
+    "llvm-mc": "1181ae01b51112bf42daf035e352b30762d2b0db447e95325dc80142ee100e89",
+    "llvm-objdump": "45df648dd44033d34cc7c90cee84d52417cc45d2d30079fdf9f00fbd233230f4",
+    "llvm-objcopy": "bbc0b0c27aa90c94d96df1de7a5273313f6eb094bdbf3c23ef9bebf5dacd25d2",
+    "llvm-readobj": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "llvm-readelf": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "FileCheck": "825b64ce8cf637b09d531a1d3ebf9e3a153f648ea94a98abdbecf1a6d2ce23da",
+    "not": "11df371f7da20f711700fafddbbf7df6301b9157ec70d9bb3c726cd35225b2ad",
+    "split-file": "e7ac40df1a0634399a350d02c8594f3ccaba57be484933fa2aeb233e6b804c94",
+    "count": "abc2311cc7f89fe153d96be41f68a8be57dea38ddcb9c2ae172d6cc1bf80b02d",
+    "llvm-config": "7bb879bfa0e02af293a91748c983cf9eb8a3bea34379afdd54b336c6c036ba63",
+    "llvm-reduce": "45e9536190e51a4ae4fdfc954e9dfcbba056563153f17d92654f628f63b1ef2f",
+    "llvm-as": "051e152164e84c6e095316924c6278f637d9fc9206bbb9c820f56789c0766888",
+    "llvm-link": "f01a215455ee01f4e941fb643f4ef0289adfa23e6658ed2bf23ad30bfa50aabd",
+    "yaml2obj": "ec78a6d55f7899d4a66e1837e7ff16611ed04dcc9870d678a3a956899b5c4421",
+    "llvm-nm": "1bbeac3f19d0ddaaa7389751cf8ff0c63a1d83db687857c01e3a6bb7c0474026",
+    "llvm-dis": "49656d0933418d80d5fac7db18657db5760faaebb0123765d41ed8f00a8ec9cc",
+    "verify-uselistorder": "15eebf03e7d0d027fd3ee6c051fffe256fe840a6e69f62e80e750ba0e807b229"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.008,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/input-r.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/input-r.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/input-x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/03.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/input-x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/04.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/output-r.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/05.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/output-r.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/06.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/output-x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/07.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/output-x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/08.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/tied.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/09.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/tied.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/10.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/indirect.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/11.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/indirect.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/12.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/callbr.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/13.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/callbr.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=OUTPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/14.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/callbr-input.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/15.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/callbr-input.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll --check-prefix=INPUT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/16.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/supported.ll -o /dev/null"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/17.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/tmp/supported.ll -o /dev/null"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.065,
+      "log": "build/post-ready-validation-llvm/0058/candidate-tests/inline-asm-unknown-type.ll/18.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll",
+      "input_sha256": "9f4a83ffd062d7b5d88d3a246c6e09e9155bfda10b36367966ff1373ea9620db"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "candidate_suites": {
+    "command": [
+      "/work/build/post-ready-2026-09-26-llvm-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "--filter=(inline.?asm|asm-goto|callbr)",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/AArch64",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/X86"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 3.323,
+    "log": "build/post-ready-validation-llvm/0058/candidate-suites.log",
+    "log_sha256": "9e21e9d5aeb10e2ca610b4cc1a30ce28b6270bca26063faefb3df030335c9a02"
+  },
+  "candidate_suites_passed": true,
+  "expected_baseline_observed": true,
+  "validation_gates_passed": true
+}

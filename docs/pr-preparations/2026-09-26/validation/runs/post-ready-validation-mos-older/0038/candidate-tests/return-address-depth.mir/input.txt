@@ -1,0 +1,37 @@
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=mos-lower-return-address -verify-machineinstrs %s -o - | FileCheck %s
+# A push in a predecessor contributes to both reads. The additional local
+# push contributes only to the second read; the balanced loop keeps its entry
+# depth unchanged on the back edge.
+---
+name: depth_across_blocks
+tracksRegLiveness: false
+frameInfo:
+  isReturnAddressTaken: true
+body: |
+  bb.0:
+    successors: %bb.1
+    PH undef $y
+    JMP %bb.1
+
+  bb.1:
+    successors: %bb.1, %bb.2
+    $a, dead $x = ReturnAddressByte 0
+    PH $a
+    $a, dead $x = ReturnAddressByte 1
+    $y = PL
+    $c = LDCImm 0
+    BR %bb.1, $c, 1
+    JMP %bb.2
+
+  bb.2:
+    $y = PL
+    RTS
+...
+# CHECK-LABEL: name: depth_across_blocks
+# CHECK: bb.1:
+# CHECK: TSX_Implied implicit-def $x
+# CHECK-NEXT: $a = LDAAbsIdx 258, $x
+# CHECK-NEXT: PH $a
+# CHECK-NEXT: TSX_Implied implicit-def $x
+# CHECK-NEXT: $a = LDAAbsIdx 260, $x
+# CHECK-NEXT: $y = PL

@@ -70,10 +70,20 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0045-mos-asm-print-a16-immediate.patch"   # a16 immediate width; downstream-only
   "$PATCHES/0046-mos-fixupkinds-addrasciz-row.patch"  # AddrAsciz Infos[] row; pristine-upstream
   "$PATCHES/0047-mos-mc-addr-asciz-symbolic-crash.patch"  # -show-encoding crash; pristine-upstream
+  "$PATCHES/0049-mos-vector-scalarize-backport.patch"
+  "$PATCHES/0050-mos-float-vector-arithmetic.patch"
+  "$PATCHES/0051-mos-zp-byte-index.patch"
+  "$PATCHES/0052-mos-bank-relax-section-offset.patch"
+  "$PATCHES/0055-mos-native-wide-anyext.patch"
+  "$PATCHES/0061-mos-far-global-long-x.patch"
+  "$PATCHES/0062-mos-native-far-word.patch"
+  "$PATCHES/0063-mos-near-shared-store.patch"
   "$PATCHES/0064-mos-computed-carry-scheduling.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
+  "llvm/test/CodeGen/MOS/anyext-wide.mir"
+  "llvm/test/CodeGen/MOS/anyext-masked-byte.ll"
   "llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll"
   "llvm/test/CodeGen/MOS/a16-byte-store.ll"
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
@@ -89,6 +99,8 @@ TESTRELS=(
   "llvm/test/MC/MOS/long-address-roundtrip-65816.s"    # created by 0044
   "llvm/test/CodeGen/MOS/a16-immediate-width.ll"       # created by 0045
   "llvm/test/CodeGen/MOS/far-indir-indexed.ll"         # #321 Ph2 inc 1: [dp],y (b7/97) selection + its negative gate cases
+  "llvm/test/CodeGen/MOS/far-global-long-x.ll"
+  "llvm/test/CodeGen/MOS/far-native-word.ll"
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

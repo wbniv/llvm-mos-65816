@@ -1,0 +1,37 @@
+/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll:120:14: error: REJECT-IN: expected string not found in input
+; REJECT-IN: error: could not allocate input reg for constraint 'a'
+             ^
+<stdin>:1:1: note: scanning from here
+LLVM ERROR: unable to translate instruction: call (in function: wide_in)
+^
+<stdin>:1:4: note: possible intended match here
+LLVM ERROR: unable to translate instruction: call (in function: wide_in)
+   ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+             1: LLVM ERROR: unable to translate instruction: call (in function: wide_in) 
+check:120'0    {                                                                           search range start (exclusive)
+check:120'1                                                                                error: no match found in search range
+check:120'2        ?                                                                       possible intended match
+             2: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+             3: Stack dump: 
+             4: 0. Program arguments: llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_in.ll -o /dev/null 
+             5: 1. Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_in.ll'. 
+             6: 2. Running pass 'IRTranslator' on function '@wide_in' 
+             .
+             .
+             .
+            23: 15 llc 0x000055ef510362cb 
+            24: 16 llc 0x000055ef51033593 main + 1443 
+            25: 17 libc.so.6 0x000073172f62a601 
+            26: 18 libc.so.6 0x000073172f62a718 __libc_start_main + 136 
+            27: 19 llc 0x000055ef510327a5 _start + 37 
+            28: error: Aborted 
+check:120'3                    } search range end (exclusive)
+>>>>>>

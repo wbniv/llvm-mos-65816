@@ -84,6 +84,11 @@
   },
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
+      "sha256": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
+      "description": "September 26: existing 0028 refactor passes constructed generic X86 MIR on exact LLVM main, with lane-verifier baseline failure, two focused RUNs and 102 filtered suite passes / one XFAIL. No stock-C reachability claim or removal of the #320/#321 presentation hold; original baseline unchanged. OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
+    {
       "path": "docs/defects/evidence/2026-09-25-coalescing-0015/0015-native-witness.py",
       "sha256": "f672e05ce9f283ef00771d7ea81f90038022a4743cecbdaf856932d60658f697"
     },

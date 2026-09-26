@@ -1,0 +1,25 @@
+/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s:11:26: error: CHECK: expected string not found in input
+ lda mos24(240) ; CHECK: encoding: [0xaf,0xf0,0x00,0x00]
+                         ^
+/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-pristine.log:29:49: note: scanning from here
+ lda 1193046,x ; encoding: [0xbf,0x56,0x34,0x12]
+                                                ^
+
+Input file: /home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width-65816.s-pristine.log
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width-65816.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          .
+          .
+          .
+         24:  
+         25:  
+         26:  lda 16 ; encoding: [0xa5,0x10] 
+         27:  lda 4660 ; encoding: [0xad,0x34,0x12] 
+         28:  lda 1193046 ; encoding: [0xaf,0x56,0x34,0x12] 
+         29:  lda 1193046,x ; encoding: [0xbf,0x56,0x34,0x12] 
+check:11                                                     X error: no match found
+>>>>>>

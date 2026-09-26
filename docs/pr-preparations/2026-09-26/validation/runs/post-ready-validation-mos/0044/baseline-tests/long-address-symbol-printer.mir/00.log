@@ -1,0 +1,43 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir:14:11: error: CHECK: expected string not found in input
+ ; CHECK: lda mos24(long_data)
+          ^
+<stdin>:37:13: note: scanning from here
+long_symbol: ; @long_symbol
+            ^
+<stdin>:39:2: note: possible intended match here
+ lda long_data
+ ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           32:  .zeropage __rc31 
+           33:  .file "long-address-symbol-printer.mir" 
+           34:  .text 
+           35:  .globl long_symbol ; -- Begin function long_symbol 
+           36:  .type long_symbol,@function 
+           37: long_symbol: ; @long_symbol 
+check:14'0                {                  search range start (exclusive)
+check:14'1                                   error: no match found in search range
+           38: ; %bb.0: ; %entry 
+           39:  lda long_data 
+check:14'2      ?               possible intended match
+           40:  sta long_data 
+           41:  lda long_data,x 
+           42:  jsl long_target 
+           43:  rts 
+           44: .Lfunc_end0: 
+           45:  .size long_symbol, .Lfunc_end0-long_symbol 
+           46:  ; -- End function 
+           47:  .section ".note.GNU-stack","",@progbits 
+           48:  ;Declaring this symbol tells the CRT that the stack pointer needs to be initialized. 
+           49:  .globl __do_init_stack 
+check:14'3                             } search range end (exclusive)
+>>>>>>

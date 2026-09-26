@@ -1,0 +1,251 @@
+{
+  "runs": [
+    {
+      "name": "matched-baseline-j1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-baseline",
+        "-x=mir",
+        "-j",
+        "1",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-baseline-j1.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-baseline-j1.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-baseline-j2",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-baseline",
+        "-x=mir",
+        "-j",
+        "2",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-baseline-j2.mir"
+      ],
+      "returncode": -11,
+      "expected": -11,
+      "matches_expectation": true
+    },
+    {
+      "name": "matched-serial-j1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-x=mir",
+        "-j",
+        "1",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j1.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j1.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-serial-j2",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-x=mir",
+        "-j",
+        "2",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j2.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j2.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-serial-j4",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-x=mir",
+        "-j",
+        "4",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j4.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j4.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-serial-j16",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-x=mir",
+        "-j",
+        "16",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j16.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-j16.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-serial-original",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-x=mir",
+        "-j",
+        "2",
+        "--max-pass-iterations=1",
+        "--test=/usr/bin/python3",
+        "--test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-original.mir"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/usr/bin/python3",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-original.mir"
+      ],
+      "check_returncode": 0
+    },
+    {
+      "name": "matched-serial-parallel-ir",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/llvm-reduce-serial",
+        "-j",
+        "4",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/tools/llvm-reduce/parallel-workitem-kill.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-parallel-ir.ll",
+        "--abort-on-invalid-reduction",
+        "--delta-passes=instructions",
+        "--test",
+        "/usr/bin/python3",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/tools/llvm-reduce/Inputs/sleep-and-check-stores.py",
+        "--test-arg",
+        "1",
+        "--test-arg",
+        "5"
+      ],
+      "returncode": 0,
+      "expected": 0,
+      "matches_expectation": true,
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/tools/llvm-reduce/parallel-workitem-kill.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-parallel-ir.ll"
+      ],
+      "check_returncode": 0
+    }
+  ],
+  "output_sha256": {
+    "matched-baseline-j1.mir": "bda5dcf80a53005e5dd1a5f252f59571cd179252d812b2c1541238814b1e76ec",
+    "matched-serial-original.mir": "5818c65ef6859f96e8b966ee402fae888a1d303eccfaf4a246ecd9d699f3acca",
+    "matched-serial-j16.mir": "bda5dcf80a53005e5dd1a5f252f59571cd179252d812b2c1541238814b1e76ec",
+    "matched-serial-j2.mir": "bda5dcf80a53005e5dd1a5f252f59571cd179252d812b2c1541238814b1e76ec",
+    "matched-serial-j1.mir": "bda5dcf80a53005e5dd1a5f252f59571cd179252d812b2c1541238814b1e76ec",
+    "matched-serial-j4.mir": "bda5dcf80a53005e5dd1a5f252f59571cd179252d812b2c1541238814b1e76ec"
+  }
+}

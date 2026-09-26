@@ -1,0 +1,127 @@
+{
+  "hashes": {
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir": "62c100687cf1d689614b21d384303153f1425baf738a0c0163fa919ec1fdecee",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc": "b4f1c266fb28d34e6eaddfc41b81f45c9fba27641207195f9c9c45eab7cf4096",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38"
+  },
+  "runs": [
+    {
+      "name": "baseline-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-version.log",
+      "log_sha256": "efce29912aa4e84b10b38790a6ac3d9f6dc473fb0b5c1264de7eb256a018bda7"
+    },
+    {
+      "name": "baseline-mosw65816",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mosw65816.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mosw65816.log",
+      "log_sha256": "73878217c50ff8f1e008fc7d79ef8a58b85d7b13e52c84f74f52f84d6da986b5"
+    },
+    {
+      "name": "baseline-mos65c02",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mos65c02.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mos65c02.log",
+      "log_sha256": "331e97a51f39d5e88ac194e2273faa1ee7b06898e227ca27a7bcece5e380f774"
+    },
+    {
+      "name": "baseline-mos6502",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mos6502.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/baseline-mos6502.log",
+      "log_sha256": "3edd24dcde9ddcf0bbf86ffc8b40d4b286a8dfc2e56427293be6b38da4079bda"
+    },
+    {
+      "name": "candidate-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-version.log",
+      "log_sha256": "efce29912aa4e84b10b38790a6ac3d9f6dc473fb0b5c1264de7eb256a018bda7"
+    },
+    {
+      "name": "candidate-mosw65816",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mosw65816.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mosw65816.log",
+      "log_sha256": "e4014da171ef81e731413770e7f624ddbca4445b4a55cd0c664064b721939d41"
+    },
+    {
+      "name": "candidate-mos65c02",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mos65c02.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mos65c02.log",
+      "log_sha256": "49caff7fdfc5917c9cc6dc4fcc896e271c60ed476f83aebd7106be1d765f182f"
+    },
+    {
+      "name": "candidate-mos6502",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mos6502.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v2/candidate-mos6502.log",
+      "log_sha256": "5b064e1392edc00eb44e3e84dbf3d4769e9c4151dacb8d0fb83372b660b1b650"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+; ModuleID = '<bc file>'
+source_filename = "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/../operands-skip.ll"
+
+@Global = global i32 42
+
+define void @func(ptr %arg1, ptr %arg2, i1 %arg) {
+entry:
+  %val = getelementptr i32, ptr getelementptr (i32, ptr @Global, i32 1), i32 2
+  br i1 %arg, label %branch, label %loop
+
+branch:                                           ; preds = %entry
+  %nondominating1 = getelementptr i32, ptr %val, i32 3
+  br label %loop
+
+loop:                                             ; preds = %loop, %branch, %entry
+  %phi = phi ptr [ null, %entry ], [ %arg1, %branch ], [ null, %loop ]
+  %imm = getelementptr i32, ptr %phi, i32 4
+  %indirect = getelementptr i32, ptr %imm, i32 5
+  store i32 43, ptr %imm, align 4
+  store i32 44, ptr %phi, align 4
+  store i32 45, ptr %val, align 4
+  store i32 46, ptr @Global, align 4
+  store i32 47, ptr %arg2, align 4
+  store i32 48, ptr %arg1, align 4
+  store i32 49, ptr null, align 4
+  %nondominating2 = getelementptr i32, ptr %indirect, i32 6
+  br i1 %arg, label %loop, label %exit
+
+exit:                                             ; preds = %loop
+  store i32 50, ptr %arg1, align 4
+  store i32 51, ptr %arg1, align 4
+  ret void
+
+; uselistorder directives
+  uselistorder ptr %arg1, { 3, 0, 1, 2 }
+}

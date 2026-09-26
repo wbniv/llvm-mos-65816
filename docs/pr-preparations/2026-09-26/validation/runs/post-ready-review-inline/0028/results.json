@@ -1,0 +1,293 @@
+{
+  "runs": [
+    {
+      "name": "mos-patch-check",
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "--directory=build/post-ready-review-inline/0028/mos-src",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-21/0028-upstream.patch"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mos-patch-apply",
+      "command": [
+        "git",
+        "apply",
+        "--directory=build/post-ready-review-inline/0028/mos-src",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-21/0028-upstream.patch"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-patch-check",
+      "command": [
+        "git",
+        "apply",
+        "--check",
+        "--directory=build/post-ready-review-inline/0028/llvm-src",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-21/0028-upstream.patch"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-patch-apply",
+      "command": [
+        "git",
+        "apply",
+        "--directory=build/post-ready-review-inline/0028/llvm-src",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-21/0028-upstream.patch"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unpatched-virtregrewriter-undef-lane-identity-copy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-6502/llc-unpatched",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir",
+        "-o",
+        "-"
+      ],
+      "exit": -6,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "c1bcd6caddb17e072939a622640919fad589969b7e539c744fadac0a994b0ad0"
+    },
+    {
+      "name": "unpatched-virtregrewriter-copy-liveness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-6502/llc-unpatched",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "-o",
+        "-"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "0b0be347eae025a21c243deb146ee59ec7db35ac01d14005d97a06da2425106a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "unpatched-virtregrewriter-copy-liveness-filecheck",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/unpatched-virtregrewriter-copy-liveness.stdout"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "refactor-virtregrewriter-undef-lane-identity-copy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-6502/llc-patched",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir",
+        "-o",
+        "-"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "32aad5ee92c94e1b2f84ad8cf0788bf86e4a63c48436fdf8c199db135ed4082a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "refactor-virtregrewriter-undef-lane-identity-copy-filecheck",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/refactor-virtregrewriter-undef-lane-identity-copy.stdout"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "refactor-virtregrewriter-copy-liveness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-6502/llc-patched",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "-o",
+        "-"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "0b0be347eae025a21c243deb146ee59ec7db35ac01d14005d97a06da2425106a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "refactor-virtregrewriter-copy-liveness-filecheck",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/refactor-virtregrewriter-copy-liveness.stdout"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boolean-virtregrewriter-undef-lane-identity-copy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-refactor/llc-bool",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir",
+        "-o",
+        "-"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "65033460dff6de5cb7518ac81eb5f9fcd3a36377f5f3b51da54aad031a8af487",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boolean-virtregrewriter-undef-lane-identity-copy-filecheck",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-undef-lane-identity-copy.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/boolean-virtregrewriter-undef-lane-identity-copy.stdout"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boolean-virtregrewriter-copy-liveness",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0028-refactor/llc-bool",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=greedy,virtregrewriter",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "-o",
+        "-"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "30ef6ed5fc60b4473d8bde1229a3b69b5302fa1a399c352a7bf558e46c2f431b",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "boolean-virtregrewriter-copy-liveness-filecheck",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/mos-src/llvm/test/CodeGen/MOS/virtregrewriter-copy-liveness.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-inline/0028/boolean-virtregrewriter-copy-liveness.stdout"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bitboard-inline-register-pressure-baseline",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc-without-0028",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit": -6,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3d6c1fbe3d710bea124cb12472f99a626839f86d1c9f12897addd61da985a54a"
+    },
+    {
+      "name": "bitboard-inline-register-pressure-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-historical-recovery/bin/llc",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-historical-recovery/replay/inline-stage.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mos-coalescing-rc-undef-baseline",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-without-0015-or-0028",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit": -6,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "86d383897d699db97db9ed6e898869c7f651dc0c585896b9058ac180858523a3"
+    },
+    {
+      "name": "mos-coalescing-rc-undef-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llc-with-0028-without-0015",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/native-c/a16-Os.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "exit": 0,
+      "expected_result": true,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "roundtrip_matches_saved_source": true,
+  "mir_equivalence": {
+    "virtregrewriter-undef-lane-identity-copy": false,
+    "virtregrewriter-copy-liveness": false
+  }
+}

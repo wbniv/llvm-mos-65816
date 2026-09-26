@@ -45,6 +45,10 @@ both the symptom and the responsible operation/pass/runtime symbol. A standalone
 patch may already be folded into `0002`; inspect its implementation and identify
 the tested binary instead of relying on patch names or an old "open" status.
 Record the reconciliation in `prior_work` as specified by the workflow below.
+For an upstream submission, also inspect the exact destination revision's
+entry-point guards, callers, existing tests, and history. An unchanged failing
+helper does not prove the path remains reachable; an existing upstream fix may
+need a backport rather than another report.
 
 Use one canonical defect record per causal defect. A repeat sighting, another
 input, or another build belongs in that record's observations/additional runs;

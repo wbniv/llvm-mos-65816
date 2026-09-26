@@ -1,5 +1,15 @@
 # [CodeGen][MOS] Don't coalesce a stack access that carries scratch virtual registers
 
+**Current preparation — September 26:** the [current packet](pr-preparations/2026-09-26/README.md)
+tracks 0040's exact submission artifact, independent review, and validation gates.
+Do not use an older dashboard readiness label in place of those gates. This
+original draft and its validation totals below remain dated evidence; nothing
+has been posted by the preparation pass.
+
+Preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 Greedy register allocation can crash on MOS in `SplitEditor::enterIntvAfter`
 with `Assertion 'MI && "enterIntvAfter called with invalid index"'` — or, in a
 build without assertions, a null dereference.

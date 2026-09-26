@@ -1,0 +1,29 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s:14:10: error: CHECK: expected string not found in input
+# CHECK: lda mos24(240)
+         ^
+<stdin>:1:1: note: scanning from here
+ lda 240
+^
+<stdin>:1:2: note: possible intended match here
+ lda 240
+ ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  lda 240 
+check:14'0    {           search range start (exclusive)
+check:14'1                error: no match found in search range
+check:14'2      ?         possible intended match
+            2:  sta 240 
+            3:  lda 43981,x 
+            4:  jmp 240 
+            5:  jsl 240 
+            6:  lda 15395562 
+            7:  jmp 15395562 
+check:14'3                   } search range end (exclusive)
+>>>>>>

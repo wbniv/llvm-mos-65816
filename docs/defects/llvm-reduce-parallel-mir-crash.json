@@ -7,11 +7,13 @@
   "reproducer_origin": "original",
   "attribution": [
     "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort: verified session metadata; witness recovery, isolated 0015/0028 comparison, stock-upstream replay, and documentation.",
-    "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown: parallel MIR reducer fix and matching-input validation."
+    "OpenAI Codex API (version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown: parallel MIR reducer fix and matching-input validation.",
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933: upstream reconciliation and current MOS backport validation; upstream authorship retained in 0060-upstream-guard.json."
   ],
-  "summary": "The retained MIR input crashes the preserved llvm-reduce with -j 2; keeping MachineModuleInfo in each parallel MIR work item lets the same input reduce successfully while preserving IR bitcode workers.",
+  "summary": "The retained MIR input crashes the preserved llvm-reduce with -j 2; keeping MachineModuleInfo in each parallel MIR work item lets the same input reduce successfully while preserving IR bitcode workers. This is the dated September 25 local candidate result, not an endorsement of general shared-context parallel safety. September 26 reconciliation finds an existing September 24 upstream CLI guard; the ready MOS packet backports that guard instead of proposing another LLVM repair.",
   "unknowns": [
-    "The exact September 20 source/build state is not recovered; the failing binary and exact input remain preserved."
+    "The exact September 20 source/build state is not recovered; the failing binary and exact input remain preserved.",
+    "General thread-safety of the original shared-context parallel MIR candidate is not established; the posting backport rejects parallel MIR instead."
   ],
   "baseline": {
     "command": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-25-coalescing-0015/bin/llvm-reduce -x=mir --test=/usr/bin/python3 --test-arg=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/interesting-rewriter.py --max-pass-iterations=1 -j 2 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-coalescing-0015/stock-identity-copy-model.mir -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/baseline-output.mir",
@@ -36,6 +38,11 @@
     "failure_signature": "exit_code=-11"
   },
   "observations": [
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json",
+      "sha256": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
+      "description": "Exact upstream guard backport validation; original baseline/resolution unchanged. OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933"
+    },
     {
       "path": "docs/defects/evidence/2026-09-25-coalescing-0015/reducer-parallel-tiny.log",
       "sha256": "4f0527bb3db4eabc819dfb7ea71d3f32e5df5cb85cd2d05dbdbeed4a1598b382"
@@ -121,6 +128,34 @@
         "sha256": "0dd9a1a36148510caa3c0319d483623aa92b5575c99f12eb88d21485007cf873"
       },
       "exit_code": 0
+    }
+  },
+  "upstream_scope": "LLVM e59a0c697552ae7d1c3aeed5774e829cdc5e16b5 contains b1ba3d515a0238adbfc6c349ed3b33f9060cea72, published September 24 before this report. Current LLVM is not affected through its CLI. MOS 7bd67c0ae4e8bb65a3f980912bf201df22131e34 lacks the guard; exact backport has valid-MIR crash/clean-diagnostic evidence, nine passing RUNs and 180 reducer-suite passes / 27 unsupported. No new upstream discovery.",
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "parallel MIR",
+      "-j is not supported for MIR reduction",
+      "getNumChunkProcessingJobs",
+      "MachineModuleInfo",
+      "readBitcode"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/investigations/2026-09-25-coalescing-0015-revalidation.md",
+      "docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md"
+    ],
+    "related_changes": [
+      "b1ba3d515a0238adbfc6c349ed3b33f9060cea72",
+      "patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch",
+      "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch"
+    ],
+    "source_assessment": "LLVM e59a0c697552ae7d1c3aeed5774e829cdc5e16b5 contains b1ba3d515a0238adbfc6c349ed3b33f9060cea72, published September 24 before this report. Current LLVM is not affected through its CLI. MOS 7bd67c0ae4e8bb65a3f980912bf201df22131e34 lacks the guard; exact backport has valid-MIR crash/clean-diagnostic evidence, nine passing RUNs and 180 reducer-suite passes / 27 unsupported. No new upstream discovery.",
+    "binary_assessment": "Preserved historical binary and resolution remain unchanged. New pinned MOS baseline and candidate binaries, configuration, exact patch and all commands/logs are identified by the attached immutable receipt.",
+    "decision": "Retrospective reconciliation of the existing historical canonical record, not creation of a new defect. The existing upstream guard predates the report; prepare its MOS backport, retain old parallel candidate only as dated evidence, and reject the duplicate serial LLVM preparation.",
+    "evidence": {
+      "path": "docs/pr-preparations/2026-09-26/0060-reconciliation.json",
+      "sha256": "6dad2fdfebef54b2478c2543f12e86fcb6aa4b2e2159f6d69ef38173ded8fac8"
     }
   }
 }

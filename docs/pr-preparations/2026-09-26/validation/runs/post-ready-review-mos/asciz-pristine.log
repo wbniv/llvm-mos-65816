@@ -1,0 +1,24 @@
+LLVM ERROR: Don't know how to emit this value.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/retired-worktrees/2026-09-25/llvm-mos-65816-pr0043-pinval/build/before-bin/llvm-mc -triple=mos -motorola-integers -show-encoding /home/will/llvm-mos-65816/build/post-ready-review-mos/tests/addr-asciz.s
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llvm-mc   0x0000642d0746d708
+1  llvm-mc   0x0000642d0746aa25
+2  llvm-mc   0x0000642d0746e491
+3  libc.so.6 0x00007fb9d1a45cb0
+4  libc.so.6 0x00007fb9d1aa61ac pthread_kill + 284
+5  libc.so.6 0x00007fb9d1a45b7e gsignal + 30
+6  libc.so.6 0x00007fb9d1a288ec abort + 39
+7  llvm-mc   0x0000642d0743b6b5
+8  llvm-mc   0x0000642d0743b4f6
+9  llvm-mc   0x0000642d073c6b57
+10 llvm-mc   0x0000642d0736056d
+11 llvm-mc   0x0000642d0741d1f5
+12 llvm-mc   0x0000642d073ffda7
+13 llvm-mc   0x0000642d073f3e27
+14 llvm-mc   0x0000642d07352c3b
+15 llvm-mc   0x0000642d07351e8a
+16 libc.so.6 0x00007fb9d1a2a601
+17 libc.so.6 0x00007fb9d1a2a718 __libc_start_main + 136
+18 llvm-mc   0x0000642d0734c835

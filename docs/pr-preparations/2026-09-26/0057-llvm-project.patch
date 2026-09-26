@@ -1,0 +1,122 @@
+diff --git a/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp b/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
+--- a/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
++++ b/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp
+@@ -10088,30 +10088,18 @@
+   if (OpInfo.ConstraintVT != MVT::Other)
+     NumRegs = TLI.getNumRegisters(Context, OpInfo.ConstraintVT, RegVT);
+
+-  // If this is a constraint for a specific physical register, like {r17},
+-  // assign it now.
+-
+-  // If this associated to a specific register, initialize iterator to correct
+-  // place. If virtual, make sure we have enough registers
+-
+-  // Initialize iterator if necessary
+-  TargetRegisterClass::iterator I = RC->begin();
+   MachineRegisterInfo &RegInfo = MF.getRegInfo();
+-
+-  // Do not check for single registers.
+-  if (AssignedReg) {
+-    I = std::find(I, RC->end(), AssignedReg);
+-    if (I == RC->end()) {
+-      // RC does not contain the selected register, which indicates a
+-      // mismatch between the register and the required type/bitwidth.
++  if (!AssignedReg) {
++    for (unsigned N = 0; N != NumRegs; ++N)
++      Regs.push_back(RegInfo.createVirtualRegister(RC));
++  } else {
++    // A physical constraint requires enough consecutive class members to hold
++    // the whole value. Virtual registers do not have this restriction.
++    auto I = std::find(RC->begin(), RC->end(), AssignedReg);
++    if (I == RC->end() || NumRegs > unsigned(RC->end() - I))
+       return {AssignedReg};
+-    }
+-  }
+-
+-  for (; NumRegs; --NumRegs, ++I) {
+-    assert(I != RC->end() && "Ran out of registers to allocate!");
+-    Register R = AssignedReg ? Register(*I) : RegInfo.createVirtualRegister(RC);
+-    Regs.push_back(R);
++    for (unsigned N = 0; N != NumRegs; ++N, ++I)
++      Regs.push_back(Register(*I));
+   }
+
+   OpInfo.AssignedRegs = RegsForValue(Regs, RegVT, ValueVT);
+@@ -13018,6 +13006,13 @@
+ // otherwise we will end up with copies of virtregs only valid along direct
+ // edges.
+ void SelectionDAGBuilder::visitCallBrLandingPad(const CallInst &I) {
++  // Rejected inline asm has no output copy chain. Keep its indirect-edge
++  // results defined if the diagnostic handler allows lowering to continue.
++  if (const auto *DH = Context->getDiagHandlerPtr(); DH && DH->HasErrors) {
++    setValue(&I, getValue(UndefValue::get(I.getType())));
++    return;
++  }
++
+   SmallVector<EVT, 8> ResultVTs;
+   SmallVector<SDValue, 8> ResultValues;
+   const auto *CBR =
+diff --git a/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll b/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll
+@@ -0,0 +1,59 @@
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++; RUN: not llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s
++
++; The condition-code class contains only NZCV, so it cannot hold an i128 value.
++; Check each operand form and keep results live to exercise error recovery.
++; CHECK-COUNT-7: error: register 'NZCV' allocated for constraint '{cc}' does not match required type
++; CHECK-NOT: error:
++
++define i128 @bad_output() {
++  %v = call i128 asm sideeffect "", "={cc}"()
++  ret i128 %v
++}
++
++define void @bad_input(i128 %v) {
++  call void asm sideeffect "", "{cc}"(i128 %v)
++  ret void
++}
++
++define i128 @bad_tied(i128 %v) {
++  %r = call i128 asm sideeffect "", "={cc},0"(i128 %v)
++  ret i128 %r
++}
++
++define void @bad_indirect(ptr %p) {
++  call void asm sideeffect "", "=*{cc}"(ptr elementtype(i128) %p)
++  ret void
++}
++
++; Callbr outputs must remain defined on both the direct and indirect edges
++; when the diagnostic handler returns, including aggregate results.
++define i128 @bad_callbr() {
++entry:
++  %r = callbr i128 asm sideeffect "", "={cc},!i"()
++          to label %direct [label %indirect]
++direct:
++  ret i128 %r
++indirect:
++  ret i128 %r
++}
++
++define i64 @bad_callbr_input(i128 %v) {
++entry:
++  %r = callbr i64 asm sideeffect "", "=r,{cc},!i"(i128 %v)
++          to label %direct [label %indirect]
++direct:
++  ret i64 %r
++indirect:
++  ret i64 %r
++}
++
++define { i64, i128 } @bad_callbr_pair() {
++entry:
++  %r = callbr { i64, i128 } asm sideeffect "", "=r,={cc},!i"()
++          to label %direct [label %indirect]
++direct:
++  ret { i64, i128 } %r
++indirect:
++  ret { i64, i128 } %r
++}

@@ -1,0 +1,271 @@
+*** Reducing Instructions (instructions)...
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-628887.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-628887.mir:72:12: note: possible intended match here
+ %2:gr32 = ADD32rr %3, %3, implicit-def dead $eflags
+           ^
+
+Input file: /tmp/llvm-reduce-628887.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            .
+            .
+            .
+           67: machineFunctionInfo: 
+           68:  amxProgModel: None 
+           69: body: | 
+           70:  bb.0: 
+           71:  %3:gr32 = IMPLICIT_DEF 
+           72:  %2:gr32 = ADD32rr %3, %3, implicit-def dead $eflags 
+check:14'2                ?                                           possible intended match
+           73:  $eax = COPY %2 
+           74:  RET 0, implicit $eax 
+           75: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-b4bcc5.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-b4bcc5.mir:70:12: note: possible intended match here
+ %0:gr32 = MOV32ri 1
+           ^
+
+Input file: /tmp/llvm-reduce-b4bcc5.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            .
+            .
+            .
+           65: constants: [] 
+           66: machineFunctionInfo: 
+           67:  amxProgModel: None 
+           68: body: | 
+           69:  bb.0: 
+           70:  %0:gr32 = MOV32ri 1 
+check:14'2                ?           possible intended match
+           71:  $eax = COPY %0 
+           72:  RET 0, implicit $eax 
+           73: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-a39cd9.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-a39cd9.mir:8:4: note: possible intended match here
+ ret i32 0
+   ^
+
+Input file: /tmp/llvm-reduce-a39cd9.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            7:  define i32 @parallel_instr_reduce() { 
+            8:  ret i32 0 
+check:14'2        ?         possible intended match
+            9:  } 
+           10: ... 
+           11: --- 
+           12: name: parallel_instr_reduce 
+           13: alignment: 1 
+            .
+            .
+            .
+           69: body: | 
+           70:  bb.0: 
+           71:  %3:gr32 = IMPLICIT_DEF 
+           72:  $eax = COPY %3 
+           73:  RET 0, implicit $eax 
+           74: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.serial
+--------------------------------------------------------------------------------
+*** Reducing Instructions (instructions)...
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-159a65.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-159a65.mir:8:4: note: possible intended match here
+ ret i32 0
+   ^
+
+Input file: /tmp/llvm-reduce-159a65.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            7:  define i32 @parallel_instr_reduce() { 
+            8:  ret i32 0 
+check:14'2        ?         possible intended match
+            9:  } 
+           10: ... 
+           11: --- 
+           12: name: parallel_instr_reduce 
+           13: alignment: 1 
+            .
+            .
+            .
+           70: body: | 
+           71:  bb.0: 
+           72:  %4:gr32 = IMPLICIT_DEF 
+           73:  $eax = COPY %4 
+           74:  RET 0, implicit $eax 
+           75: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-17147a.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-17147a.mir:8:4: note: possible intended match here
+ ret i32 0
+   ^
+
+Input file: /tmp/llvm-reduce-17147a.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            7:  define i32 @parallel_instr_reduce() { 
+            8:  ret i32 0 
+check:14'2        ?         possible intended match
+            9:  } 
+           10: ... 
+           11: --- 
+           12: name: parallel_instr_reduce 
+           13: alignment: 1 
+            .
+            .
+            .
+           69: body: | 
+           70:  bb.0: 
+           71:  %3:gr32 = IMPLICIT_DEF 
+           72:  $eax = COPY %3 
+           73:  RET 0, implicit $eax 
+           74: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:14:16: error: INTERESTING: expected string not found in input
+# INTERESTING: MOV32ri 2
+               ^
+/tmp/llvm-reduce-7f43bb.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-7f43bb.mir:8:4: note: possible intended match here
+ ret i32 0
+   ^
+
+Input file: /tmp/llvm-reduce-7f43bb.mir
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: --- | 
+check:14'0    {        search range start (exclusive)
+check:14'1             error: no match found in search range
+            2:  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir' 
+            3:  source_filename = "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir" 
+            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+            5:  target triple = "x86_64" 
+            6:   
+            7:  define i32 @parallel_instr_reduce() { 
+            8:  ret i32 0 
+check:14'2        ?         possible intended match
+            9:  } 
+           10: ... 
+           11: --- 
+           12: name: parallel_instr_reduce 
+           13: alignment: 1 
+            .
+            .
+            .
+           70: body: | 
+           71:  bb.0: 
+           72:  %4:gr32 = IMPLICIT_DEF 
+           73:  $eax = COPY %4 
+           74:  RET 0, implicit $eax 
+           75: ... 
+check:14'3         } search range end (exclusive)
+>>>>>>
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.serial
+--------------------------------------------------------------------------------
+Done reducing! Reduced testcase: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-guard-packet-check/mos.serial

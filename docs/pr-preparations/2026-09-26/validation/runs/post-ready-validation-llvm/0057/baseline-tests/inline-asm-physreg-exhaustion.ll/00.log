@@ -1,0 +1,33 @@
+/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll:6:18: error: CHECK-COUNT: expected string not found in input (1 out of 7)
+; CHECK-COUNT-7: error: register 'NZCV' allocated for constraint '{cc}' does not match required type
+                 ^
+<stdin>:1:1: note: scanning from here
+llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:10290: std::optional<unsigned int> getRegistersForValue(SelectionDAG &, const SDLoc &, SDISelAsmOperandInfo &, SDISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed.
+^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:10290: std::optional<unsigned int> getRegistersForValue(SelectionDAG &, const SDLoc &, SDISelAsmOperandInfo &, SDISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed. 
+count:6'0    {                                                                                                                                                                                                                                                                                                                          search range start (exclusive)
+count:6'1                                                                                                                                                                                                                                                                                                                               error: no match found in search range
+           2: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+           3: Stack dump: 
+           4: 0. Program arguments: llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll -o /dev/null 
+           5: 1. Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-physreg-exhaustion.ll'. 
+           6: 2. Running pass 'AArch64 Instruction Selection' on function '@bad_output' 
+           .
+           .
+           .
+          28: #21 0x00005f14223a3401 llcMain (/work/build/post-ready-validation-llvm/0057/baseline-bin/llc+0x1fd5401) 
+          29: #22 0x00005f14222e2b6f main (/work/build/post-ready-validation-llvm/0057/baseline-bin/llc+0x1f14b6f) 
+          30: #23 0x0000750eea3de601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601) 
+          31: #24 0x0000750eea3de718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718) 
+          32: #25 0x00005f14222e2a65 _start (/work/build/post-ready-validation-llvm/0057/baseline-bin/llc+0x1f14a65) 
+          33: error: Aborted 
+count:6'2                    } search range end (exclusive)
+>>>>>>

@@ -1,0 +1,23 @@
+LLVM ERROR: Don't know how to emit this value.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llvm-mc -triple mos -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s -o /work/build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-roundtrip.s/tmp.s
+ #0 0x00006303ed7076ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xee26ab)
+ #1 0x00006303ed704591 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xedf591)
+ #2 0x00006303ed7084ab SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007e91f87f7cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007e91f88581ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007e91f87f7b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007e91f87da8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00006303ed6cd9a5 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xea89a5)
+ #8 0x00006303ed6cd7e6 (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xea87e6)
+ #9 0x00006303ed6484d2 (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xe234d2)
+#10 0x00006303ed4ac474 llvm::MOSAsmParser::parseDirectiveAddrAsciz(llvm::SMLoc) MOSAsmParser.cpp:0:0
+#11 0x00006303ed6a43c5 llvm::MCTargetAsmParser::parseDirective(llvm::AsmToken) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xe7f3c5)
+#12 0x00006303ed682e5f (anonymous namespace)::AsmParser::parseStatement((anonymous namespace)::ParseStatementInfo&, llvm::MCAsmParserSemaCallback*) AsmParser.cpp:0:0
+#13 0x00006303ed67c421 (anonymous namespace)::AsmParser::Run(bool, bool) AsmParser.cpp:0:0
+#14 0x00006303ed404b85 AssembleInput(char const*, llvm::Target const*, llvm::SourceMgr&, llvm::MCContext&, llvm::MCStreamer&, llvm::MCAsmInfo&, llvm::MCSubtargetInfo&, llvm::MCInstrInfo&, llvm::MCTargetOptions const&) llvm-mc.cpp:0:0
+#15 0x00006303ed403932 main (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xbde932)
+#16 0x00007e91f87dc601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x00007e91f87dc718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x00006303ed400b45 _start (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xbdbb45)

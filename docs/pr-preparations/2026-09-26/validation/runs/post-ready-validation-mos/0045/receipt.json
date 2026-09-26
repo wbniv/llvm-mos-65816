@@ -1,0 +1,278 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0045",
+  "prerequisites": [],
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 43.887,
+    "log": "build/post-ready-validation-mos/0045/baseline-build.log",
+    "log_sha256": "f89baa3a9904f3740ecc5cfee114c4da3f5b2f002ca4128f2d3bcc7260b91524"
+  },
+  "baseline_tools": {
+    "llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "opt": "e986a0509e629ee4e7670305d17cbb6d070893e204555337a05b37bff6dac228",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "ce595a69e81c2ec6732bd4d9cf8a5bf01aaa3c7ff4d254228188a678a9f9559c",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir -o /work/build/post-ready-validation-mos/0045/baseline-tests/immediate-width-printer.mir/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-mos/0045/baseline-tests/immediate-width-printer.mir/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir < /work/build/post-ready-validation-mos/0045/baseline-tests/immediate-width-printer.mir/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos/0045/baseline-tests/immediate-width-printer.mir/01.log",
+      "log_sha256": "d91f863293896b8042bc06f1ce8cd7e6574dc06c90e71082aba3fc9577b239f3",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 42.846,
+    "log": "build/post-ready-validation-mos/0045/candidate-build.log",
+    "log_sha256": "0c95b5ec3815f2910b0a06f9b64581e4653e3f7619e82ba29d3dada0373d11db"
+  },
+  "candidate_tools": {
+    "llc": "a6e2910c4d6236e9a30b5322695962c48c4efc34b28e24f84b803505af695b50",
+    "opt": "ee13fa5b14a3f4ccaed3ad13a2f284599c3a227c5520e28caabd9a3581e57b07",
+    "llvm-mc": "5be6eedd046beb16250a6a5d1303edb2f9552f61ee950cce4c2a18346b60685c",
+    "llvm-objdump": "9c6586d5586b8634e5e165ca715a9f60fd56df065dfdeb668e40bd6557177b31",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "ddbe1d7fcb0db9c810f87bbd699743e25061cf21f6b2f241e308645c29dd6556",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "0873bab3bc69e3ae6b59c5ab8db2a45f05d07996ab0dab60813b18193a6a2a1a",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir -o /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir < /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.016,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs -filetype=obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir -o /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.direct.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.s -o /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.reassembled.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.016,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/03.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-objcopy -O binary --only-section=.text /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.direct.o /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.direct.bin"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.008,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/04.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-objcopy -O binary --only-section=.text /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.reassembled.o /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.reassembled.bin"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.016,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/05.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "cmp /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.direct.bin /work/build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/tmp.reassembled.bin"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.008,
+      "log": "build/post-ready-validation-mos/0045/candidate-tests/immediate-width-printer.mir/06.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/immediate-width-printer.mir",
+      "input_sha256": "75d60dd4aceca2d33ee8602813fa4f500eeb6b7608671a78f6d05dbfba710f3c"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 4.423,
+    "log": "build/post-ready-validation-mos/0045/mos-suites.log",
+    "log_sha256": "4cab551120f23f2bbef7f1af4c9d9270a06e9a43cc4c9a56afa3653f53e397ab"
+  }
+}

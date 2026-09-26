@@ -1,0 +1,43 @@
+/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll:162:20: error: REJECT-NAMED-CC: expected string not found in input
+; REJECT-NAMED-CC: error: could not allocate output register for constraint '{cc}'
+                   ^
+<stdin>:1:1: note: scanning from here
+Unexpected physical register copy.
+^
+<stdin>:7:18: note: possible intended match here
+2. Running pass 'Greedy Register Allocator' on function '@named_cc'
+                 ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+             1: Unexpected physical register copy. 
+check:162'0    {                                     search range start (exclusive)
+check:162'1                                          error: no match found in search range
+             2: UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1059! 
+             3: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+             4: Stack dump: 
+             5: 0. Program arguments: llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_cc.ll -o /dev/null 
+             6: 1. Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_cc.ll'. 
+             7: 2. Running pass 'Greedy Register Allocator' on function '@named_cc' 
+check:162'2                      ?                                                    possible intended match
+             8: Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it): 
+             9: 0 llc 0x000057cedb2bae3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43 
+            10: 1 llc 0x000057cedb2b7cc1 llvm::sys::RunSignalHandlers() + 369 
+            11: 2 llc 0x000057cedb2bbc4b 
+            12: 3 libc.so.6 0x0000790bff645cb0 
+             .
+             .
+             .
+            29: 20 llc 0x000057ced8eba2cb 
+            30: 21 llc 0x000057ced8eb7593 main + 1443 
+            31: 22 libc.so.6 0x0000790bff62a601 
+            32: 23 libc.so.6 0x0000790bff62a718 __libc_start_main + 136 
+            33: 24 llc 0x000057ced8eb67a5 _start + 37 
+            34: error: Aborted 
+check:162'3                    } search range end (exclusive)
+>>>>>>

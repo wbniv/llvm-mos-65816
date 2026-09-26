@@ -1,5 +1,16 @@
 # Patch 0028: keep identity-copy preservation state local
 
+**Current preparation — September 26:** the [posting packet](../pr-preparations/2026-09-26/README.md)
+selects the already-tested per-instruction refactor and adds a reviewed generic
+X86 MIR regression. Exact-current LLVM validation now passes (two focused RUNs,
+102 filtered suite passes / one existing XFAIL). The user's #320/#321
+presentation hold remains in force; the earlier implementation-choice discussion
+below is dated evidence, not a still-open selection for this preparation pass.
+
+Current preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 Status: implemented and validated, 2026-09-21. The PR remains unposted.
 
 ## Publication hold and implementation choice — 2026-09-22

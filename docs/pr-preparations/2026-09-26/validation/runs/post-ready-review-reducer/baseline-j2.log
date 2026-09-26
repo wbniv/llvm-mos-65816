@@ -1,0 +1,61 @@
+*** Reducing Instructions (instructions)...
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir:5:16: error: INTERESTING: expected string not found in input
+# INTERESTING: STAbs {{.*}}, 1
+               ^
+/tmp/llvm-reduce-63d014.mir:1:1: note: scanning from here
+--- |
+^
+/tmp/llvm-reduce-63d014.mir:23:3: note: possible intended match here
+isSSA: false
+  ^
+
+Input file: /tmp/llvm-reduce-63d014.mir
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: --- | 
+check:5'0     X~~~~~ error: no match found
+           2:  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir' 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           3:  source_filename = "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-llvm-reduce-parallel-mir/parallel-instr-reduce.mir" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           4:  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           5:  target triple = "mos-unknown-unknown" 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           6:   
+check:5'0     ~~
+           .
+           .
+           .
+          18: selected: false 
+check:5'0     ~~~~~~~~~~~~~~~~
+          19: failedISel: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~
+          20: tracksRegLiveness: true 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+          21: hasWinCFI: false 
+check:5'0     ~~~~~~~~~~~~~~~~~
+          22: noPhis: true 
+check:5'0     ~~~~~~~~~~~~~
+          23: isSSA: false 
+check:5'0     ~~~~~~~~~~~~~
+check:5'1       ?           possible intended match
+          24: noVRegs: false 
+check:5'0     ~~~~~~~~~~~~~~~
+          25: hasFakeUses: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~
+          26: callsEHReturn: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~
+          27: callsUnwindInit: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+          28: hasEHContTarget: false 
+check:5'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           .
+           .
+           .
+>>>>>>
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.

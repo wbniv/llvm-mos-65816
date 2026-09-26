@@ -1,0 +1,10 @@
+{
+  "baseline_source_sha256": "1ded7d97cb2d2936eb2a06472406e3fac966f0a1f9634a152d82b6608b3da48e",
+  "candidate_source_sha256": "6086afbeb17b6a8ffb6724644712aa77f279ef70b90d5c4555f9f817cb4cdd5c",
+  "baseline_archive_sha256": "efce19f9f2b77a5a49b4ef174ad40b4c714fac299e6c3f81b67acff004203bcb",
+  "candidate_archive_sha256": "5a43918315640285042ba7102d2c35d1ccfde400a306cc45610e6850338a54fe",
+  "baseline_binary_sha256": "ba8879650a4ecd92359195426ee1b272309a9b5d74005235ca3da5ae2aec4e94",
+  "candidate_binary_sha256": "af28e05daba4795dccef291d675b46eabe74c2294253e546e50d2094bf315fb8",
+  "only_changed_link_input": "libLLVMCodeGen.a:VirtRegMap.cpp.o",
+  "assertions": true
+}

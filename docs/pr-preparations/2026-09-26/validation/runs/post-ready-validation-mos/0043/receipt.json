@@ -1,0 +1,230 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0043",
+  "prerequisites": [],
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 20.142,
+    "log": "build/post-ready-validation-mos/0043/baseline-build.log",
+    "log_sha256": "793b703f132ee79b3d98ba0b56a2408a293374e6410de522a99c9d6e8a57ef21"
+  },
+  "baseline_tools": {
+    "llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "opt": "e986a0509e629ee4e7670305d17cbb6d070893e204555337a05b37bff6dac228",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "8ffad5b5b6ac9d94dfcf2953d79327b88cba130150350419e30f6f6d9ac0aef6",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll /work/build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.017,
+      "log": "build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /work/build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/tmp/ok.ll -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.123,
+      "log": "build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not --crash llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-A"
+      ],
+      "cwd": "/work",
+      "exit_code": 2,
+      "seconds": 0.037,
+      "log": "build/post-ready-validation-mos/0043/baseline-tests/inline-asm-physreg-width.ll/02.log",
+      "log_sha256": "40f94a6f3b788ad4108cbd70d61fdba672979bb3cab3f7c5bd03a6b33f32cc6a",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 18.208,
+    "log": "build/post-ready-validation-mos/0043/candidate-build.log",
+    "log_sha256": "a4479903fad4d6ac6c1259a0f0026e16a4b4560b30a82ca6e4d8c9ef7916abfb"
+  },
+  "candidate_tools": {
+    "llc": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "opt": "0d93770aba332a7de25aa43d43d601558d498088575065f72f1232845be091a6",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "f4bd96f35e4847756d092c0a4e0094fe3fa7d68b945cbca8312e07d2442072ca",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll /work/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /work/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log": "build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not --crash llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-A"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.034,
+      "log": "build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/02.log",
+      "log_sha256": "ca60bb41824e28a046af7e1e57abe365c7b595a8ba7fc7345082c1ade7335fe6",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "7eafbdce440140cd9e699a53c5c4a13b3a4c22dfb61948caed3272271b36f839"
+    }
+  ],
+  "candidate_passed": false,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 1,
+    "seconds": 6.203,
+    "log": "build/post-ready-validation-mos/0043/mos-suites.log",
+    "log_sha256": "7bd7ef98e3440eec2735e1033c5f2888d51f31ab2c39ffb4253a76992fabfdbd"
+  }
+}

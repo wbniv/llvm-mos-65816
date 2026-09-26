@@ -1,0 +1,44 @@
+/home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s:13:26: error: CHECK: expected string not found in input
+ lda mos16(240) ; CHECK: encoding: [0xad,0xf0,0x00]
+                         ^
+/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine.log:1:1: note: scanning from here
+
+^
+/home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine.log:6:19: note: possible intended match here
+ lda mos16(0),x ; encoding: [0xbd,0x00,0x00]
+                  ^
+
+Input file: /home/will/llvm-mos-65816/build/post-ready-review-mos/modifier-width.s-pristine.log
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-mos/tests/modifier-width.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  
+check:13'0     X error: no match found
+            2:  
+check:13'0     ~
+            3:  
+check:13'0     ~
+            4:  lda mos16(240) ; encoding: [0xa5,0xf0] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            5:  lda mos16(240),x ; encoding: [0xb5,0xf0] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            6:  lda mos16(0),x ; encoding: [0xbd,0x00,0x00] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check:13'1                       ?                           possible intended match
+            7:  lda mos16(4660),x ; encoding: [0xb5,0x34] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            8:  lda mos16(65535),x ; encoding: [0xb5,0xff] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            9:  lda mos16(-1),x ; encoding: [0xb5,0xff] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           10:  sta mos16(16),x ; encoding: [0x95,0x10] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           11:  sta mos16(16),y ; encoding: [0x99,0x10,0x00] 
+check:13'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

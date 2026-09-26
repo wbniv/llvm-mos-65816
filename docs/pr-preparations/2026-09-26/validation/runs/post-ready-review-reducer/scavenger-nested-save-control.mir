@@ -1,0 +1,50 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=scavenger-test -verify-machineinstrs %s -o - | FileCheck %s
+#
+# The status and accumulator values are preserved by explicit balanced pairs.
+# A separate block-local GPR scratch requires an index save before these pairs.
+# Only the carry flag has an incoming value consumed after the status restore.
+# CHECK-LABEL: name: nested_save_control
+# CHECK: STAbs killed $y, @scavenged_values + 3
+# CHECK-NEXT: $y = PL
+# CHECK-NEXT: PH $a
+# CHECK-NEXT: PH $p
+# CHECK-NEXT: $c = LDImm1 0
+# CHECK-NEXT: $a, $c, $v = ADCImm $a, 0, $c
+# CHECK-NEXT: $p = PL
+# CHECK-NEXT: $a = PL
+# CHECK-NEXT: $a, dead $c, dead $v = ADCImm $a, 0, $c
+# CHECK-NEXT: STAbs $a, @scavenged_values
+--- |
+  target triple = "mos"
+  @scavenged_values = external global [4 x i8]
+  define void @nested_save_control() { unreachable }
+...
+---
+name: nested_save_control
+tracksRegLiveness: true
+body: |
+  bb.0:
+    successors: %bb.1
+    $a = LDImm 5
+    $x = LDImm 6
+    $y = LDImm 7
+    $c = LDImm1 1
+    BRA %bb.1
+
+  bb.1:
+    liveins: $a, $x, $y, $c
+
+    %0:gpr = LDImm 1
+    STAbs %0, @scavenged_values + 3
+    PH $a
+    PH $p
+    $c = LDImm1 0
+    $a, $c, $v = ADCImm $a, 0, $c
+    $p = PL
+    $a = PL
+    $a, dead $c, dead $v = ADCImm $a, 0, $c
+    STAbs $a, @scavenged_values
+    STAbs $x, @scavenged_values + 1
+    STAbs $y, @scavenged_values + 2
+    RTS
+...

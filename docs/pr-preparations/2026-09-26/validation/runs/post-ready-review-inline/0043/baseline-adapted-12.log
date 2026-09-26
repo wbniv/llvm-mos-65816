@@ -1,0 +1,37 @@
+/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll:155:20: error: REJECT-NAMED-RS: expected string not found in input
+; REJECT-NAMED-RS: error: could not allocate output register for constraint '{rs0}'
+                   ^
+<stdin>:1:1: note: scanning from here
+LLVM ERROR: unable to translate instruction: call (in function: named_rs)
+^
+<stdin>:1:6: note: possible intended match here
+LLVM ERROR: unable to translate instruction: call (in function: named_rs)
+     ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+             1: LLVM ERROR: unable to translate instruction: call (in function: named_rs) 
+check:155'0    {                                                                            search range start (exclusive)
+check:155'1                                                                                 error: no match found in search range
+check:155'2          ?                                                                      possible intended match
+             2: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+             3: Stack dump: 
+             4: 0. Program arguments: llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_rs.ll -o /dev/null 
+             5: 1. Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_rs.ll'. 
+             6: 2. Running pass 'IRTranslator' on function '@named_rs' 
+             .
+             .
+             .
+            23: 15 llc 0x00005dfac57092cb 
+            24: 16 llc 0x00005dfac5706593 main + 1443 
+            25: 17 libc.so.6 0x000072a94702a601 
+            26: 18 libc.so.6 0x000072a94702a718 __libc_start_main + 136 
+            27: 19 llc 0x00005dfac57057a5 _start + 37 
+            28: error: Aborted 
+check:155'3                    } search range end (exclusive)
+>>>>>>

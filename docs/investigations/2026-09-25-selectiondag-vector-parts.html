@@ -17,6 +17,15 @@ code{background:#263347}details{background:#172130}th,td,details{border-color:#3
 <a href="../mos-upstream-flowchart.html">Dependency flowchart</a> ·
 <a href="#transcript">Work-session transcript</a></nav>
 <h1 id="selectiondag-inline-assembly-vector-parts">SelectionDAG inline-assembly vector parts</h1>
+<p><strong>Submission follow-up — September 26:</strong> <a href="../pr-preparations/2026-09-26/inline-asm-review.md">independent review</a>
+is complete and the <a href="../pr-preparations/2026-09-26/README.md">exact posting draft and patch</a>
+are ready: pinned LLVM main has matching-input red/green, 24 focused RUNs and
+169 filtered suite passes / three existing XFAILs. The full
+regression still requires 0057; the September 25 evidence and earlier pending
+review statements below are dated records. Nothing has been posted.</p>
+<p>Current preparation note: OpenAI Codex CLI 0.157.0 (<code>codex-tui</code>), model
+<code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session
+<code>01a0db16-f6a0-7e32-ada6-0c8098813933</code>.</p>
 <p>Patch <a href="../../patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch">0059</a>
 repairs the <a href="../defects/selectiondag-inline-asm-vector-parts.json">vector part-type assertion</a>.
 Incompatible vector/register combinations now produce normal compiler diagnostics.

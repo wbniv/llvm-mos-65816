@@ -1,0 +1,47 @@
+
+# After Virtual Register Rewriter
+********** INTERVALS **********
+RegMasks:
+********** MACHINEINSTRS **********
+# Machine code for function undef_high_byte_identity_copy: NoPHIs, TracksLiveness, NoVRegs, TracksDebugUserValues
+
+0B	bb.0:
+16B	  renamable $al = MOV8ri 1
+80B	  renamable $eax = MOVZX32rr8 killed renamable $ah
+112B	  RET64 implicit $eax
+
+# End machine code for function undef_high_byte_identity_copy.
+
+*** Bad machine code: Using an undefined physical register ***
+- function:    undef_high_byte_identity_copy
+- basic block: %bb.0  (0x6527a15000b0) [0B;128B)
+- instruction: 80B	renamable $eax = MOVZX32rr8 killed renamable $ah
+- operand 1:   killed renamable $ah
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir -o -
+1.	Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir'.
+2.	Running pass 'Verify generated machine code' on function '@undef_high_byte_identity_copy'
+ #0 0x000065277a8fc78b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1fd078b)
+ #1 0x000065277a8f94f1 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1fcd4f1)
+ #2 0x000065277a8fd1cb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x0000727c53cefcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x0000727c53d501ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x0000727c53cefb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x0000727c53cd28ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000065277a841115 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1f15115)
+ #8 0x000065277b0049a2 (anonymous namespace)::MachineVerifier::~MachineVerifier() MachineVerifier.cpp:0:0
+ #9 0x000065277b005f7a (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x000065277af65de9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x2639de9)
+#11 0x000065277ac095c2 llvm::FPPassManager::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x22dd5c2)
+#12 0x000065277ac119e2 llvm::FPPassManager::runOnModule(llvm::Module&) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x22e59e2)
+#13 0x000065277ac0a434 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x22de434)
+#14 0x000065277a904067 compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llcdriver.cpp:0:0
+#15 0x000065277a901401 llcMain (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1fd5401)
+#16 0x000065277a840b6f main (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1f14b6f)
+#17 0x0000727c53cd4601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#18 0x0000727c53cd4718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#19 0x000065277a840a65 _start (/work/build/post-ready-validation-llvm/0028/baseline-bin/llc+0x1f14a65)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir

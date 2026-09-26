@@ -1,4 +1,22 @@
-# Parallel MIR reduction preserves machine functions
+# Parallel MIR reducer: dated candidate and current upstream reconciliation
+
+**Posting follow-up — September 26:** [independent review](../pr-preparations/2026-09-26/reducer-feature-review.md)
+did not establish general thread-safety of the shared-context parallel MIR
+candidate. Current LLVM already rejects MIR `-j > 1` through
+[b1ba3d515a02](https://github.com/llvm/llvm-project/commit/b1ba3d515a0238adbfc6c349ed3b33f9060cea72),
+merged September 24, before this report. The initially prepared serial fallback
+is rejected and retained as preparation history, not a new LLVM submission.
+The [current packet](../pr-preparations/2026-09-26/0060-pr-body.md) backports that
+existing guard to MOS: valid-MIR crash/diagnostic comparison, serial MIR and
+parallel IR controls, and 180 reducer-suite passes / 27 unsupported all pass on
+the exact MOS base. No parallel-MIR support is claimed. The canonical baseline
+and parallel implementation below remain dated September 25 evidence.
+
+Current preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
+## Historical local candidate — September 25
 
 The [parallel MIR reducer defect](../defects/llvm-reduce-parallel-mir-crash.json)
 is fixed locally by [patch 0060](../../patches/llvm-mos/0060-llvm-reduce-parallel-mir.patch).

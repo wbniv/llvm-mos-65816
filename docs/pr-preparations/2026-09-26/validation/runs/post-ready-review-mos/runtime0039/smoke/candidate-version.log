@@ -1,0 +1,11 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc --version
+exit=0
+stdout:
+LLVM (http://llvm.org/):
+  LLVM version 23.0.0git
+  Optimized build.
+
+  Registered Targets:
+    mos - MOS Technologies 65xx and variants
+
+stderr:

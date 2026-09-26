@@ -1,0 +1,743 @@
+	.zeropage	__rc0
+	.zeropage	__rc1
+	.zeropage	__rc2
+	.zeropage	__rc3
+	.zeropage	__rc4
+	.zeropage	__rc5
+	.zeropage	__rc6
+	.zeropage	__rc7
+	.zeropage	__rc8
+	.zeropage	__rc9
+	.zeropage	__rc10
+	.zeropage	__rc11
+	.zeropage	__rc12
+	.zeropage	__rc13
+	.zeropage	__rc14
+	.zeropage	__rc15
+	.zeropage	__rc16
+	.zeropage	__rc17
+	.zeropage	__rc18
+	.zeropage	__rc19
+	.zeropage	__rc20
+	.zeropage	__rc21
+	.zeropage	__rc22
+	.zeropage	__rc23
+	.zeropage	__rc24
+	.zeropage	__rc25
+	.zeropage	__rc26
+	.zeropage	__rc27
+	.zeropage	__rc28
+	.zeropage	__rc29
+	.zeropage	__rc30
+	.zeropage	__rc31
+	.file	"scratch-vreg-coalesce"
+	.text
+	.globl	constant_shift                  ; -- Begin function constant_shift
+	.type	constant_shift,@function
+constant_shift:                         ; @constant_shift
+; %bb.0:
+	pha
+	clc
+	lda	__rc0
+	adc	#220
+	sta	__rc0
+	lda	__rc1
+	adc	#255
+	sta	__rc1
+	pla
+	ldy	__rc20
+	phy
+	ldy	__rc21
+	phy
+	ldy	__rc22
+	phy
+	ldy	__rc23
+	phy
+	pha
+	lda	__rc24
+	ldy	#7
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc25
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc26
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc27
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc28
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc29
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc30
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc31
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	stx	__rc30
+	ldx	__rc2
+	stx	__rc11
+	ldx	__rc7
+	stx	__rc10
+	ldy	__rc8
+	ldx	__rc9
+	bne	.LBB0_3
+; %bb.1:
+	sty	__rc19
+	cpy	#48
+	bcc	.LBB0_4
+.LBB0_2:
+	jsr	abort
+.LBB0_3:
+	ldx	__rc9
+	sty	__rc19
+	cpx	#0
+	bcs	.LBB0_2
+.LBB0_4:
+	ldx	__rc10
+	bpl	.LBB0_6
+; %bb.5:
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	#255
+	bra	.LBB0_7
+.LBB0_6:
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	#0
+.LBB0_7:
+	ldx	__rc7
+	stx	__rc2
+	asl	__rc2
+	rol
+	cmp	#128
+	ror
+	ldx	__rc7
+	stx	__rc26
+	ror	__rc26
+	ldx	__rc6
+	stx	__rc20
+	ror	__rc20
+	ldx	__rc5
+	stx	__rc21
+	ror	__rc21
+	ldx	__rc4
+	stx	__rc22
+	ror	__rc22
+	ldx	__rc3
+	stx	__rc23
+	ror	__rc23
+	ldx	__rc11
+	stx	__rc24
+	ror	__rc24
+	ldx	__rc30
+	stx	__rc18
+	ror	__rc18
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc20
+	ror	__rc21
+	ror	__rc22
+	ror	__rc23
+	ror	__rc24
+	ror	__rc18
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc20
+	ror	__rc21
+	ror	__rc22
+	ror	__rc23
+	ror	__rc24
+	ror	__rc18
+	cmp	#128
+	ldy	#26
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror
+	pha
+	lda	__rc26
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc26
+	lda	__rc20
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc20
+	lda	__rc21
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc21
+	lda	__rc22
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc22
+	lda	__rc23
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc23
+	lda	__rc24
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc24
+	lda	__rc18
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	ror	__rc18
+	cmp	#128
+	ldx	#1
+	bcs	.LBB0_9
+; %bb.8:
+	ldx	#0
+.LBB0_9:
+	asl	__rc19
+	pha
+	lda	__rc19
+	ldy	#28
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	ldy	#18
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	cpx	#1
+	ror
+	pha
+	lda	__rc26
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc26
+	lda	__rc20
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc20
+	lda	__rc21
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc21
+	lda	__rc3
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc22
+	ldy	#14
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc22
+	lda	__rc23
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc23
+	lda	__rc24
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc24
+	lda	__rc18
+	ldy	#10
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	ldx	__rc18
+	stx	__rc19
+	ror	__rc19
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc20
+	ror	__rc21
+	ror	__rc22
+	ror	__rc23
+	ror	__rc24
+	ror	__rc19
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc20
+	ror	__rc21
+	ror	__rc22
+	ror	__rc23
+	ror	__rc24
+	ror	__rc19
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc20
+	ror	__rc21
+	ror	__rc22
+	ror	__rc23
+	ror	__rc24
+	ror	__rc19
+	cmp	#128
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror
+	pha
+	lda	__rc26
+	ldy	#8
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	ror	__rc26
+	ldx	__rc20
+	stx	__rc27
+	ror	__rc27
+	ldx	__rc21
+	stx	__rc28
+	ror	__rc28
+	ldx	__rc22
+	stx	__rc2
+	ror	__rc2
+	ldx	__rc23
+	stx	__rc15
+	ror	__rc15
+	ldx	__rc24
+	stx	__rc25
+	ror	__rc25
+	ldx	__rc19
+	stx	__rc18
+	ror	__rc18
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc27
+	ror	__rc28
+	ror	__rc2
+	ror	__rc15
+	ror	__rc25
+	ror	__rc18
+	cmp	#128
+	ror
+	ror	__rc26
+	ror	__rc27
+	ror	__rc28
+	ror	__rc2
+	ror	__rc15
+	ror	__rc25
+	ror	__rc18
+	cmp	#128
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror
+	pha
+	lda	__rc6
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldx	__rc26
+	stx	__rc6
+	ror	__rc6
+	lda	__rc5
+	ldy	#35
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldx	__rc27
+	stx	__rc5
+	ror	__rc5
+	lda	__rc4
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldx	__rc28
+	stx	__rc4
+	ror	__rc4
+	ldx	__rc2
+	stx	__rc3
+	ror	__rc3
+	lda	__rc11
+	ldy	#30
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldx	__rc15
+	stx	__rc29
+	ror	__rc29
+	lda	__rc30
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+	ldx	__rc25
+	stx	__rc30
+	ror	__rc30
+	ldx	__rc18
+	stx	__rc31
+	ror	__rc31
+	cmp	#128
+	ror
+	ror	__rc6
+	ror	__rc5
+	ror	__rc4
+	ror	__rc3
+	ror	__rc29
+	ror	__rc30
+	ror	__rc31
+	cmp	#128
+	ror
+	ror	__rc6
+	ror	__rc5
+	ror	__rc4
+	ror	__rc3
+	ror	__rc29
+	ror	__rc30
+	ror	__rc31
+	cmp	#128
+	ror
+	ldy	#27
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ror	__rc6
+	ror	__rc5
+	ror	__rc4
+	ror	__rc3
+	ror	__rc29
+	ror	__rc30
+	ror	__rc31
+	ldy	__rc7
+	stz	__rc7
+	stz	__rc10
+	stz	__rc11
+	stz	__rc12
+	stz	__rc13
+	stz	__rc14
+	phy
+	ldy	#28
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	tax
+	ldy	#35
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	dey
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ply
+	stz	__rc8
+	lda	#0
+	jmp	(.LJTI0_0,x)
+.LBB0_10:
+	stz	__rc2
+	lda	#0
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+; %bb.21:
+	jmp	.LBB0_18
+.LBB0_11:
+	ldy	#19
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#20
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#21
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#30
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#22
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#23
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#24
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#35
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#25
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#26
+; %bb.23:
+	jmp	.LBB0_17
+.LBB0_12:
+	lda	__rc31
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc30
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc29
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc3
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc4
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc5
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc6
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#27
+; %bb.25:
+	jmp	.LBB0_17
+.LBB0_13:
+	ldy	#10
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#12
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#13
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#30
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#14
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#15
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#16
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#35
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#17
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#18
+; %bb.27:
+	jmp	.LBB0_17
+.LBB0_14:
+	ldy	#27
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	cmp	#128
+	ror
+	ror	__rc6
+	ror	__rc5
+	ror	__rc4
+	ror	__rc3
+	ror	__rc29
+	ror	__rc30
+	ror	__rc31
+	pha
+	lda	__rc31
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc30
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc29
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc3
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc4
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc5
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc6
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	pla
+; %bb.29:
+	jmp	.LBB0_18
+.LBB0_15:
+	lda	__rc19
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc24
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc23
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc22
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc21
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc20
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#8
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#11
+	bra	.LBB0_17
+.LBB0_16:
+	lda	__rc18
+	ldy	#33
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc25
+	ldy	#31
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc15
+	dey
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc2
+	ldy	#32
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc28
+	ldy	#34
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc27
+	iny
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	lda	__rc26
+	ldy	#29
+	sta	(__rc0),y                       ; 1-byte Folded Spill
+	ldy	#9
+.LBB0_17:
+	lda	(__rc0),y                       ; 5-byte Folded Reload
+.LBB0_18:
+	tay
+.LBB0_19:
+	sty	__rc17
+	ldy	#33
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	pha
+	ldy	#31
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc8
+	dey
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc7
+	ldy	#32
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc10
+	ldy	#34
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc11
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc12
+	ldy	#29
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	ldy	__rc17
+	sta	__rc13
+	pla
+	sty	__rc14
+.LBB0_20:                               ; %common.ret1
+	ldx	__rc7
+	stx	__rc2
+	ldx	__rc10
+	stx	__rc3
+	ldx	__rc11
+	stx	__rc4
+	ldx	__rc12
+	stx	__rc5
+	ldx	__rc13
+	stx	__rc6
+	ldx	__rc14
+	stx	__rc7
+	ldx	__rc8
+	sta	__rc16
+	ldy	#0
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc31
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc30
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc29
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc28
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc27
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc26
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc25
+	iny
+	lda	(__rc0),y                       ; 1-byte Folded Reload
+	sta	__rc24
+	ply
+	sty	__rc23
+	ply
+	sty	__rc22
+	ply
+	sty	__rc21
+	ply
+	sty	__rc20
+	clc
+	lda	__rc0
+	adc	#36
+	sta	__rc0
+	lda	__rc1
+	adc	#0
+	sta	__rc1
+	lda	__rc16
+	rts
+.Lfunc_end0:
+	.size	constant_shift, .Lfunc_end0-constant_shift
+	.section	.rodata,"a",@progbits
+.LJTI0_0:
+	.short	.LBB0_19
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_11
+	.short	.LBB0_13
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_15
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_16
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_12
+	.short	.LBB0_14
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_10
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_20
+	.short	.LBB0_10
+	.short	.LBB0_10
+                                        ; -- End function
+	.section	".note.GNU-stack","",@progbits
+	;Declaring this symbol tells the CRT that the stack pointer needs to be initialized.
+	.globl	__do_init_stack

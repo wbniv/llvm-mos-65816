@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/f7a1e06e) | Record carry-scheduling PR receipt and submission status |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cbd1cd5b) | Publish computed-carry scheduler implementation and upstream PR packet |
 
 <!--history-meta v1
+f7a1e06e	author	Will Norris
+f7a1e06e	added	1
+f7a1e06e	deleted	1
+f7a1e06e	files	1
+f7a1e06e	body	Commit the remaining 0064 publication records, exact destination delta,\nsubmitted description, plan and current trackers. Refresh generated views,\ndependency receipts and the document inventory. Preserve the tested\n7bd67c0ae4e8 baseline and identify 26d7c2c1eebf as a source recheck,\nwithout claiming a new-base rebuild or independent review.\n\nRecord that PR creation was unauthorized and that the user subsequently\ndirected leaving it open for review. This commit does not modify the PR.\nThe user has authorized committing and pushing these repository leftovers.\n\nDocumentation, receipt review and integration: OpenAI Codex CLI 0.157.1\n(codex-tui), model gpt-6-astra, xhigh reasoning effort; session metadata\nverified. Preserve the earlier recorded implementation and discovery credits.
 cbd1cd5b	author	Will Norris
 cbd1cd5b	added	23
 cbd1cd5b	deleted	0

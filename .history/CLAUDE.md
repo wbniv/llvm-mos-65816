@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/c858c675) | Require prior-work audits and revalidate the existing far-memset repair |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/0bf5b688) | docs: require and restore model, version, and effort attribution |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/6065ebec) | fix(mos): finish defect review, near-store fixes, and evidence enforcement |
 | [2026-07-19](https://github.com/wbniv/llvm-mos-65816/commit/da5409b2) | docs+dev: repoint ~/SRC references to the flat ~/ layout |
@@ -10,6 +11,11 @@
 | [2026-06-17](https://github.com/wbniv/llvm-mos-65816/commit/00833780) | #321 docs: add project CLAUDE.md + agent-handoff guide |
 
 <!--history-meta v1
+c858c675	author	Will Norris
+c858c675	added	7
+c858c675	deleted	0
+c858c675	files	1
+c858c675	body	Require reconciliation of canonical defects, original reports, Git history,\nstandalone/folded patches, live source, and tested binaries before opening a\nnew compiler defect or fix plan. Keep repeat sightings in the existing\nrecord. Enforce hashed prior_work audits in the evidence checker, add 13\ntests, and publish a lightweight GitHub Actions check. Preserve the explicit\nlegacy allowance for records already established when the rule was adopted.\n\nInclude the document-dependency checker and staged hook prerequisite, with\nreview receipts and an inventory for this scoped snapshot. Register the\noriginal far-memset report and current summaries so stale entry points are\npart of the closure workflow. Leave unrelated compiler fixes, dashboard\ngeneration, and their pending documentation outside this commit.\n\nRecover the exact June C source and identify a81874d/0013 as its existing\nrepair. The same far memset IR fails without that backend change and passes\nwith it: near versus far runtime routing, checksum 0 versus 0x2000, and\n4096 wrong versus 4096 correct physical WRAM bytes. Both compilers use the\nsame input and configuration; the baseline compiler is explicitly\nreconstructed, not represented as the missing original June binary.\n\nRetain the complete immutable evidence, tool identities, and prior-work\naudit. Add a physical-byte regression runner and a focused near/far IR test\nto patch 0013, importing only that test because the implementation is\nalready in 0002. No executable compiler or runtime changes are included.\n\nValidation:\n- 25 defect-evidence tests and 8 document-dependency tests pass.\n- Isolated staged snapshot: 25 tests and all 4 canonical records pass.\n- Staged evidence and comment-history checks pass.\n- Captured matching-input June regression is red/green; the current\n  a16/xy16 x Os/O2 non-LTO matrix passes all physical-byte checks.\n- Focused IR checks fail without 0013 and pass with it in both native modes;\n  patch/test imports and far-*.ll machine verification pass.\n- Authored-file diff whitespace checks pass; raw compiler evidence and the\n  generated inventory retain their exact output.\n\nAI implementation, investigation, and validation: OpenAI Codex CLI 0.157.0\n(codex-tui), model gpt-6-astra, xhigh reasoning effort. Verified from session\nmetadata 01a0db16-f6a0-7e32-ada6-0c8098813933; preserve earlier recorded credits.
 0bf5b688	author	Will Norris
 0bf5b688	added	5
 0bf5b688	deleted	1

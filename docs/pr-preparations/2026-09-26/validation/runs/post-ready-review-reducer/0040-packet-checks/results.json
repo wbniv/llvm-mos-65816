@@ -1,0 +1,178 @@
+{
+  "input": "build/post-ready-review-reducer/0040-packet.mir",
+  "input_sha256": "d13051e15e99d341525b6ca80778a9c8a930865c83f36491b80ce109ca8f3c7a",
+  "runs": [
+    {
+      "name": "old-before-input-verify",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "binary_sha256": "60968c143e75c4fe918d82ea7dc325c3d8af73fee9eb0e767218d98194092433",
+      "stdout_sha256": "d7f39d44de1a3960006e8f757a50aca6a4dd242adabbba376d7bd6f87e585558",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "old-before-greedy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "binary_sha256": "60968c143e75c4fe918d82ea7dc325c3d8af73fee9eb0e767218d98194092433",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "7251002be4dadd5d9287102fcd00ff62da58b15235809292ed5e036a866777f2"
+    },
+    {
+      "name": "old-before-full",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-start-before=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "binary_sha256": "60968c143e75c4fe918d82ea7dc325c3d8af73fee9eb0e767218d98194092433",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a6d7556110f28fbb16e9d5490d649174e31162b5a8c04b2757c2a8fde832421b"
+    },
+    {
+      "name": "old-after-input-verify",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "binary_sha256": "a1e807cb50a3b26af78545ed9bf9fe77a400ed80518c3802936f4863a1114f14",
+      "stdout_sha256": "d7f39d44de1a3960006e8f757a50aca6a4dd242adabbba376d7bd6f87e585558",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "old-after-greedy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "binary_sha256": "a1e807cb50a3b26af78545ed9bf9fe77a400ed80518c3802936f4863a1114f14",
+      "stdout_sha256": "e4c41d3f4d9f276047ef4ed1e3419d45a4e96cfe9b367473fd00fb52e6ee4bc6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "old-after-full",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-start-before=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "binary_sha256": "a1e807cb50a3b26af78545ed9bf9fe77a400ed80518c3802936f4863a1114f14",
+      "stdout_sha256": "7a1ac67a32d8d76ee7bacaa0114084448931d84d67257ee51e4c0500169acf69",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "filecheck_returncode": 0
+    },
+    {
+      "name": "current-base-input-verify",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "stdout_sha256": "7bee36aa2d49df7eb3ac5c64b679e4971a2aa2036e3ed7ee60e2a6feff268491",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "current-base-greedy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-run-pass=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d71d0f21b4c39064f4f6b35dba102037b8aedc5a2b93022466968054a05acf33"
+    },
+    {
+      "name": "current-base-full",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O2",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "-start-before=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ea744f35527427a395aa80eb4f3b253a90c8291fb37bff6d519468707ff54ed8"
+    }
+  ]
+}

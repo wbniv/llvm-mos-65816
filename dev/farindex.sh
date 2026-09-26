@@ -64,14 +64,16 @@ grep -q 'R_MOS_ADDR24_BANK.*tbl' <<< "$DIS" \
 grep -qiE '^\s*[0-9a-f]+:\s*a7\b' <<< "$DIS" \
   && echo "  PASS: far load (lda [dp], a7) present" \
   || { echo "  FAIL: no far load opcode"; rc=1; }
-# #321 Phase 2 inc 1: tbl is uint16_t, so each probe reads byte 0 with `lda [dp]`
-# (a7) and byte 1 with `lda [dp],y` (b7) off the SAME Imag32 quad, instead of a
-# 32-bit pointer advance (an inc/bne carry chain + a second quad) between them.
-# This asserts the fold actually fires on the real fixture, not just in lit.
-# Plan: docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md.
-grep -qiE '^\s*[0-9a-f]+:\s*b7\b' <<< "$DIS" \
-  && echo "  PASS: indexed far load (lda [dp],y, b7) present — adjacent byte folded, no pointer advance" \
-  || { echo "  FAIL: no lda [dp],y — the constant-displacement fold did not fire"; rc=1; }
+# Each word probe uses either one M=0 indirect-long load or two M=1 byte
+# accesses, with the second byte addressed through [dp],Y.
+if grep -qiE '^\s*[0-9a-f]+:\s*b7\b' <<< "$DIS"; then
+  echo "  PASS: indexed byte load (lda [dp],y, b7) present"
+elif grep -Pzqi '(?m)^[ \t]*[0-9a-f]+:[ \t]+c2 20[^\n]*\n[ \t]*[0-9a-f]+:[ \t]+a7\b' <<< "$DIS"; then
+  echo '  PASS: native word load (rep #$20; lda [dp]) present'
+else
+  echo "  FAIL: neither indexed byte nor native word far load present"
+  rc=1
+fi
 
 echo "==> 2) host oracle reproduces the golden ($WANT)"
 if command -v cc >/dev/null 2>&1; then

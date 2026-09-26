@@ -1,0 +1,22 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll:84:13: error: REJECT-A: expected string not found in input
+; REJECT-A: LLVM ERROR: unable to translate instruction: call{{.*}}wide_a
+            ^
+<stdin>:1:1: note: scanning from here
+error: could not allocate output register for constraint 'a'
+^
+<stdin>:1:9: note: possible intended match here
+error: could not allocate output register for constraint 'a'
+        ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: error: could not allocate output register for constraint 'a' 
+check:84'0    {                                                             } search range (exclusive bounds)
+check:84'1                                                                    error: no match found in search range
+check:84'2             ?                                                      possible intended match
+>>>>>>

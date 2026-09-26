@@ -1,0 +1,43 @@
+/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll:24:12: error: INPUT-R: expected string not found in input
+; INPUT-R: error: {{could not|couldn't}} allocate input reg for constraint 'r'
+           ^
+<stdin>:1:1: note: scanning from here
+Value type is non-standard value, Other.
+^
+<stdin>:7:17: note: possible intended match here
+2. Running pass 'AArch64 Instruction Selection' on function '@input_r'
+                ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-unknown-type.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: Value type is non-standard value, Other. 
+check:24'0    {                                           search range start (exclusive)
+check:24'1                                                error: no match found in search range
+            2: UNREACHABLE executed at /work/build/post-ready-2026-09-26-llvm-src/llvm/include/llvm/CodeGenTypes/MachineValueType.h:375! 
+            3: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+            4: Stack dump: 
+            5: 0. Program arguments: llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/tmp/input-r.ll -o /dev/null 
+            6: 1. Running pass 'Function Pass Manager' on module '/work/build/post-ready-validation-llvm/0058/baseline-tests/inline-asm-unknown-type.ll/tmp/input-r.ll'. 
+            7: 2. Running pass 'AArch64 Instruction Selection' on function '@input_r' 
+check:24'2                     ?                                                        possible intended match
+            8:  #0 0x000061e15ce2d70b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-llvm/0058/baseline-bin/llc+0x1fd070b) 
+            9:  #1 0x000061e15ce2a471 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-llvm/0058/baseline-bin/llc+0x1fcd471) 
+           10:  #2 0x000061e15ce2e14b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0 
+           11:  #3 0x0000784c86dcccb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0) 
+           12:  #4 0x0000784c86e2d1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac) 
+            .
+            .
+            .
+           30: #22 0x000061e15ce32381 llcMain (/work/build/post-ready-validation-llvm/0058/baseline-bin/llc+0x1fd5381) 
+           31: #23 0x000061e15cd71aef main (/work/build/post-ready-validation-llvm/0058/baseline-bin/llc+0x1f14aef) 
+           32: #24 0x0000784c86db1601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601) 
+           33: #25 0x0000784c86db1718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718) 
+           34: #26 0x000061e15cd719e5 _start (/work/build/post-ready-validation-llvm/0058/baseline-bin/llc+0x1f149e5) 
+           35: error: Aborted 
+check:24'3                    } search range end (exclusive)
+>>>>>>

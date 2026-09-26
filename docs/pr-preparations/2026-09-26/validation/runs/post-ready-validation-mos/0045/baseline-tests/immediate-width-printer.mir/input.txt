@@ -1,0 +1,37 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs %s -o %t.s
+# RUN: FileCheck %s < %t.s
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs -filetype=obj %s -o %t.direct.o
+# RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %t.s -o %t.reassembled.o
+# RUN: llvm-objcopy -O binary --only-section=.text %t.direct.o %t.direct.bin
+# RUN: llvm-objcopy -O binary --only-section=.text %t.reassembled.o %t.reassembled.bin
+# RUN: cmp %t.direct.bin %t.reassembled.bin
+#
+# Explicit machine opcodes determine immediate width without native IR lowering.
+# The printed operand must preserve that width when assembly is parsed again.
+# CHECK-LABEL: native_immediates:
+# CHECK: adc #mos16(66)
+# CHECK-NEXT: eor #mos16(255)
+# CHECK-NEXT: cmp #mos16(5)
+# CHECK-NEXT: lda #256
+# CHECK-NEXT: ldx #mos16(0)
+# CHECK-NEXT: ldy #65535
+# CHECK-NEXT: adc #66
+# CHECK-NEXT: rts
+--- |
+  target triple = "mos"
+  define void @native_immediates() { ret void }
+...
+---
+name: native_immediates
+tracksRegLiveness: false
+body: |
+  bb.0:
+    ADC_Immediate16 66
+    EOR_Immediate16 255
+    CMP_Immediate16 5
+    LDA_Immediate16 256
+    LDX_Immediate16 0
+    LDY_Immediate16 65535
+    ADC_Immediate 66
+    RTS_Implied
+...

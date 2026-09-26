@@ -1,0 +1,3 @@
+LLVM ERROR: unable to legalize instruction: %5:_(<4 x s32>) = G_FADD %3:_, %4:_ (in function: add_v4sf)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/float-vector.ll

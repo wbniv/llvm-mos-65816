@@ -1,0 +1,123 @@
+	.zeropage	__rc0
+	.zeropage	__rc1
+	.zeropage	__rc2
+	.zeropage	__rc3
+	.zeropage	__rc4
+	.zeropage	__rc5
+	.zeropage	__rc6
+	.zeropage	__rc7
+	.zeropage	__rc8
+	.zeropage	__rc9
+	.zeropage	__rc10
+	.zeropage	__rc11
+	.zeropage	__rc12
+	.zeropage	__rc13
+	.zeropage	__rc14
+	.zeropage	__rc15
+	.zeropage	__rc16
+	.zeropage	__rc17
+	.zeropage	__rc18
+	.zeropage	__rc19
+	.zeropage	__rc20
+	.zeropage	__rc21
+	.zeropage	__rc22
+	.zeropage	__rc23
+	.zeropage	__rc24
+	.zeropage	__rc25
+	.zeropage	__rc26
+	.zeropage	__rc27
+	.zeropage	__rc28
+	.zeropage	__rc29
+	.zeropage	__rc30
+	.zeropage	__rc31
+	.file	"ok.ll"
+	.text
+	.globl	narrow_a                        ; -- Begin function narrow_a
+	.type	narrow_a,@function
+narrow_a:                               ; @narrow_a
+; %bb.0:
+	;APP
+	lda	#42
+	;NO_APP
+	rts
+.Lfunc_end0:
+	.size	narrow_a, .Lfunc_end0-narrow_a
+                                        ; -- End function
+	.globl	wide_r                          ; -- Begin function wide_r
+	.type	wide_r,@function
+wide_r:                                 ; @wide_r
+; %bb.0:
+	;APP
+	;NO_APP
+	ldx	__rc3
+	lda	__rc2
+	rts
+.Lfunc_end1:
+	.size	wide_r, .Lfunc_end1-wide_r
+                                        ; -- End function
+	.globl	carry_to_byte                   ; -- Begin function carry_to_byte
+	.type	carry_to_byte,@function
+carry_to_byte:                          ; @carry_to_byte
+; %bb.0:
+	;APP
+	sec
+	;NO_APP
+	bcs	.LBB2_1
+	jmp	.LBB2_2
+.LBB2_1:
+	lda	#1
+	jmp	.LBB2_3
+.LBB2_2:
+	lda	#0
+	jmp	.LBB2_3
+.LBB2_3:
+	rts
+.Lfunc_end2:
+	.size	carry_to_byte, .Lfunc_end2-carry_to_byte
+                                        ; -- End function
+	.globl	named_byte                      ; -- Begin function named_byte
+	.type	named_byte,@function
+named_byte:                             ; @named_byte
+; %bb.0:
+	;APP
+	;NO_APP
+	lda	__rc0
+	rts
+.Lfunc_end3:
+	.size	named_byte, .Lfunc_end3-named_byte
+                                        ; -- End function
+	.globl	named_pair                      ; -- Begin function named_pair
+	.type	named_pair,@function
+named_pair:                             ; @named_pair
+; %bb.0:
+	;APP
+	;NO_APP
+	ldx	__rc1
+	lda	__rc0
+	rts
+.Lfunc_end4:
+	.size	named_pair, .Lfunc_end4-named_pair
+                                        ; -- End function
+	.globl	named_carry                     ; -- Begin function named_carry
+	.type	named_carry,@function
+named_carry:                            ; @named_carry
+; %bb.0:
+	;APP
+	sec
+	;NO_APP
+	bcs	.LBB5_1
+	jmp	.LBB5_2
+.LBB5_1:
+	lda	#1
+	jmp	.LBB5_3
+.LBB5_2:
+	lda	#0
+	jmp	.LBB5_3
+.LBB5_3:
+	rts
+.Lfunc_end5:
+	.size	named_carry, .Lfunc_end5-named_carry
+                                        ; -- End function
+	.section	".note.GNU-stack","",@progbits
+	;Declaring this symbol tells the CRT that the stack pointer needs to be initialized.
+	.globl	__do_init_stack

@@ -1,5 +1,16 @@
 # [GlobalISel] Support inline asm register operands that need several registers
 
+**Current preparation — September 26:** the [current packet](pr-preparations/2026-09-26/README.md)
+contains 0041's ready standalone LLVM extraction, including explicit multi-register
+output widening: review, ten focused RUNs and 168 filtered suite passes / three
+XFAILs complete. The packet qualifies the tested AArch64 i128 constraint; this
+original draft and its validation totals below remain dated evidence; nothing
+has been posted by the preparation pass.
+
+Preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 `InlineAsmLowering` assumes every register operand of an inline asm occupies
 exactly one register. A value that needs more than one — anything wider than an
 `int` on a target whose `"r"` class is narrow, or `i128` on AArch64, where `"r"`

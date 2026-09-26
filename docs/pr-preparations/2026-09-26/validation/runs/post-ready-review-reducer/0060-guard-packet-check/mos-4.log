@@ -1,0 +1,27 @@
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir:17:8: error: ERR: expected string not found in input
+# ERR: {{.*}}llvm-reduce{{.*}}: -j is not supported for MIR reduction
+       ^
+<stdin>:1:1: note: scanning from here
+*** Reducing Instructions (instructions)...
+^
+<stdin>:5:19: note: possible intended match here
+0. Program arguments: llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/00error: Segmentation fault
+                  ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-valid-mir-guard.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: *** Reducing Instructions (instructions)... 
+check:17'0    {                                              search range start (exclusive)
+check:17'1                                                   error: no match found in search range
+            2: warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors) 
+            3: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+            4: Stack dump: 
+            5: 0. Program arguments: llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/00error: Segmentation fault 
+check:17'2                       ?                                                                                                                                                      possible intended match
+check:17'3                                                                                                                                                                            } search range end (exclusive)
+>>>>>>

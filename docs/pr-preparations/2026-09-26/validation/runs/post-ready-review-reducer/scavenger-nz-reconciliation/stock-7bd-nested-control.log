@@ -1,0 +1,33 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:157: void assertNZDeadAt(MachineBasicBlock &, MachineBasicBlock::iterator): Assertion `!LiveRegs.contains(MOS::N) && "expected N to be free when saving scavenger register"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=scavenger-test -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-nested-control.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir'.
+2.	Running pass 'Scavenge virtual registers inside basic blocks' on function '@nested_save_control'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005bc1e965ae3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005bc1e9657cc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005bc1e965bc4b
+3  libc.so.6 0x00007ed3e9245cb0
+4  libc.so.6 0x00007ed3e92a61ac pthread_kill + 284
+5  libc.so.6 0x00007ed3e9245b7e gsignal + 30
+6  libc.so.6 0x00007ed3e92288ec abort + 39
+7  libc.so.6 0x00007ed3e9229979
+8  libc.so.6 0x00007ed3e923bf75 __assert_fail + 181
+9  llc       0x00005bc1e7c56893
+10 llc       0x00005bc1e7c561db
+11 llc       0x00005bc1e857fb88 llvm::RegScavenger::spill(llvm::Register, llvm::MCRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) + 520
+12 llc       0x00005bc1e858098c llvm::RegScavenger::scavengeRegisterBackwards(llvm::MCRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) + 2556
+13 llc       0x00005bc1e8581761
+14 llc       0x00005bc1e8581175
+15 llc       0x00005bc1e8580d2a llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) + 170
+16 llc       0x00005bc1e8581a1c
+17 llc       0x00005bc1e82f60a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+18 llc       0x00005bc1e8888420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+19 llc       0x00005bc1e8890522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+20 llc       0x00005bc1e88891e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+21 llc       0x00005bc1e725a2cb
+22 llc       0x00005bc1e7257593 main + 1443
+23 libc.so.6 0x00007ed3e922a601
+24 libc.so.6 0x00007ed3e922a718 __libc_start_main + 136
+25 llc       0x00005bc1e72567a5 _start + 37

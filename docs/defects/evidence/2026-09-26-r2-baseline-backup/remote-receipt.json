@@ -1,0 +1,65 @@
+{
+  "schema": 1,
+  "status": "verified_round_trip",
+  "verified_on": "2026-09-26",
+  "provider": "Cloudflare R2",
+  "account_id": "f7e1e6cd8b3414a6d2226152533c21f2",
+  "bucket": "llvm-mos-evidence",
+  "prefix": "defect-baselines/2026-09-26/03feae4f9611523d/",
+  "storage_class": "Standard",
+  "access": {
+    "r2_dev_enabled": false,
+    "custom_domains": [],
+    "authentication": "Existing Wrangler OAuth login; no new credentials created"
+  },
+  "retention": {
+    "object_expiration_rules": [],
+    "incomplete_multipart_abort_after_days": 7,
+    "retention_lock_configured": false,
+    "scheduled_backup_configured": false
+  },
+  "source": "build/defect-baselines/",
+  "archive": {
+    "name": "defect-baselines-2026-09-26.tar.zst",
+    "size": 410225620,
+    "sha256": "03feae4f9611523dc471f21003cbf33186f187a8e7944982d459359a7d585de7",
+    "encoding": "Concatenate part00 then part01 without recompression",
+    "parts": [
+      {
+        "name": "defect-baselines-2026-09-26.tar.zst.part00",
+        "size": 209715200,
+        "sha256": "62c49ec2fbbf4d265de354b2b8ff0e6683d4b56e56e0076bc4038a1c7588eed2"
+      },
+      {
+        "name": "defect-baselines-2026-09-26.tar.zst.part01",
+        "size": 200510420,
+        "sha256": "d12bc85485d5be4486e5477e02405984a92f04f26a8a4ac5e6fcfc11573ca8f4"
+      }
+    ]
+  },
+  "metadata": [
+    {"name": "README.md", "sha256": "9df9f41de7931973a4eee664c63f04e9ea620bc2bffd03627f57f4c018ef424d"},
+    {"name": "manifest.json", "sha256": "80e800987e696b44148529788f279e768404e0936fef9f2f400e7b4b3b62bc89"},
+    {"name": "ARCHIVE-SHA256SUMS", "sha256": "72a4aa1416d71e04cd0eb46420ce54d8e7bb3ada96b7678ff33b37549bb240db"},
+    {"name": "SHA256SUMS", "sha256": "dbb520301d966beaec73d37c0eeb55530161a558967b4ca49b19779ad7a1bea1"},
+    {"name": "verification.log", "sha256": "e88a007fc10a15f32355aa9318e94b148a3e3b150821bf0e94320f20dd3638f3"}
+  ],
+  "verification": {
+    "transfer_tool": "Wrangler 4.84.1, r2 object put/get --remote",
+    "download_directory": "/tmp/llvm-mos-r2-restore.a2KcKC",
+    "downloaded_package_sha256": "All five entries in downloaded SHA256SUMS passed; downloaded SHA256SUMS also compared byte-identically to the local copy",
+    "reassembled_archive_sha256": "Matched the original archive SHA-256",
+    "reassembled_archive_cmp_exit_code": 0,
+    "zstd_test_exit_code": 0,
+    "tar_compare_against_original_source_exit_code": 0,
+    "original_source_preserved": true
+  },
+  "scope": "Exact captured contents of build/defect-baselines: 1415 files, 141 symlinks, and 232 directories in five dated baselines. Other build directories, system shared libraries, and container images are not included.",
+  "qualifications": [
+    "The unchanged manifest.json records its original capture-time remote_backup status, pending destination; this receipt records the later transfer.",
+    "Captured symlinks are preserved, including SDK aliases to absent SDK-local clang names.",
+    "This one-time backup does not recover missing original evidence for the historical #320 failure behind patch 0023 and changes no defect status.",
+    "Dated content-hash naming does not prevent an administrator from deleting objects."
+  ],
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933. Original evidence retains its earlier attribution."
+}

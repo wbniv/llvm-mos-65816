@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="367afb11438c8d23223b378bdba27d9368ff11708be4dda178815a36da70445f"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="530c37cc944360d5207ecd0ca670929c166799a97cb4160736cf8d55ceb48761"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
@@ -32,12 +32,17 @@ prepared with that series, not sent as a standalone PR.</p>
 <p>The <a href="https://wald3n.com/open-source#compiler-upstream">live upstream dashboard</a>
 combines current GitHub PR state with a separately dated local-work manifest.
 This tracker retains the detailed compiler, ABI, and SNES dependency rationale.</p>
-<p><strong>Local preparation updated 2026-09-26.</strong> Independent reviews and validation
-for 0032–0037 remain linked below. The <code>mos16(constant)</code> parser-width defect is
-fixed in 0039. The <a href="pr-preparations/2026-09-25/claude-batch-review.md">September 25 batch review</a>
-revises 0043, 0046, and 0047 and updates their PR drafts; integrated tests and
-pinned-base applicability are checked, with isolated revision validation and
-submission branches still to prepare. Patch 0044 still needs its PR draft/bundle.
+<p><strong>Local preparation updated 2026-09-26.</strong> The
+<a href="pr-preparations/2026-09-26/README.md">posting preparation packet</a> identifies
+exact-current bases, reviewed patches, drafts, and per-package validation gates.
+The ten <a href="pr-preparations/2026-09-26/mos-validation.md">MOS compiler packets</a>
+and six <a href="pr-preparations/2026-09-26/llvm-validation.md">LLVM packets</a>
+(0037, 0041, 0056–0059) have completed independent review and exact-current
+assertion-enabled validation; they are ready to post. The selected 0028 packet
+is also validated but retains the user's #320/#321 presentation hold.
+0039 includes a stock-6502 wrong-address emulator differential; 0044 requires
+0039, while 0045 uses stock opcodes without #321. The separate 0060 MOS guard
+backport is ready, as detailed below. Nothing is posted or pushed by this pass.
 The <a href="#current-pr-progress">contribution tracker</a>
 retains its dated GitHub snapshot; this local review does not reverify remote
 PR or CI state. Status describes the work, not whether its GitHub container is
@@ -58,10 +63,12 @@ inline-bitboard verifier failure. Recovery and validation: OpenAI Codex CLI
 0.157.0 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort.</p>
 <p>The <a href="investigations/2026-09-25-shift-inlineasm-fixes.md">follow-up fixes</a> also
 repair generic GlobalISel physical-register inline-asm exhaustion (0056), using
-an independent AArch64 IR trigger. Both fixes are implemented and validated
-locally; submission preparation remains. The generic bounds helper matches
+an independent AArch64 IR trigger. Both fixes were implemented and validated
+locally in that dated investigation. The generic bounds helper matches
 unpatched upstream source, but the captured AArch64 baseline includes prior
-patches through 0041; it is not a clean upstream binary.</p>
+patches through 0041; it is not a clean upstream binary. The separate September
+26 current-LLVM 0056 packet is reviewed, validated, and ready to post; 0055
+remains with the native-width feature series.</p>
 <p>The <a href="investigations/2026-09-25-selectiondag-inlineasm.md">SelectionDAG follow-up</a>
 repairs the corresponding physical-register bounds and <code>callbr</code> error-recovery
 paths in 0057. It is validated and installed. Its complete affected source file
@@ -72,8 +79,12 @@ AArch64 unknown-type guards; its full regression uses 0057's <code>callbr</code>
 The <a href="investigations/2026-09-25-selectiondag-vector-parts.md">vector conversion assertions</a>
 are repaired by 0059's generic split/join diagnostics; supported conversions are
 preserved. The original input requires 0057's virtual-allocation repair. MOS
-Clang/LLD are rebuilt and installed. Independent review and submission preparation
-remain, with the failing baseline retained unchanged.</p>
+Clang/LLD were rebuilt and installed in that dated investigation. Independent
+review and exact-current submission validation are complete for 0057–0059;
+all are ready to post, with 0057 retained as the full-regression prerequisite
+for 0058 and 0059. The September 26 <a href="pr-preparations/2026-09-26/llvm-validation.md">LLVM validation</a>
+uses filtered AArch64/X86 suites, not full target suites. The historical
+failing baselines remain unchanged.</p>
 <p>The <a href="plans/2026-09-25-65816-all-opcode-roundtrip.md">exhaustive 65816 opcode roundtrip plan</a>
 is written. Implementation is deferred at the user's request. It requires all
 256 opcodes in four M/X contexts, independently checked bytes and instruction
@@ -81,11 +92,20 @@ boundaries, and an explicit assessment of the existing BRK signature contract.
 This is a coverage task; no new compiler failure has been captured by it.</p>
 <p>The <a href="investigations/2026-09-25-coalescing-0015-revalidation.md">0015 revalidation</a> identifies the
 recovered C failure as an identity-copy lane-definition defect already repaired
-by 0028. Its separate allocator diagnosis is superseded for this witness. A new
+by 0028. Its separate allocator diagnosis is superseded for this witness. A
 <a href="defects/llvm-reduce-parallel-mir-crash.json">parallel MIR reducer crash</a> was
 captured during reduction. <a href="investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md">Patch 0060</a>
-fixes it locally with matching-input red/green evidence; published-upstream
-applicability remains to be assessed.</p>
+fixes that witness locally with retained September 25 matching-input evidence.
+Current-upstream reconciliation found LLVM's guard commit <code>b1ba3d515a02</code>
+(September 24) predates that report. The <a href="pr-preparations/2026-09-26/0060-pr-body.md">ready MOS backport</a>
+rejects MIR <code>-j &gt; 1</code> explicitly, retaining serial MIR and parallel IR. Exact
+current-MOS validation passes nine RUNs and 180 reducer-suite tests, with 27
+unsupported, and independent receipt review is complete. No duplicate LLVM
+repair, silent serial fallback, or thread-safe parallel-MIR claim is prepared.</p>
+<p>Current-status reconciliation: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model
+<code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified reviewer session
+<code>01a0db96-e0ef-75e2-89ad-2939c4954446</code>. Earlier evidence and contributor credits
+remain in the linked records.</p>
 <h2 id="what-remains-to-post">What remains to post</h2>
 <p><strong>Feature-independent submissions prepared September 22–23:</strong></p>
 <ol>
@@ -160,7 +180,9 @@ patch 0037, generic <code>InlineAsmLowering</code> stores <code>&quot;=*r&quot;<
 otherwise identical; AArch64 GlobalISel test included. For llvm/llvm-project.
 <a href="pr-preparations/2026-09-23/0037-validation.md">Validation</a> ·
 <a href="pr-preparations/2026-09-23/0037-review-audit.md">audit</a>: no implementation defect;
-915 standalone suite passes, one unsupported. Submission variant prepared.</li>
+915 standalone suite passes, one unsupported (dated September 23).
+The September 26 exact-current LLVM packet is ready: four focused RUNs,
+168 filtered AArch64/X86 passes, three existing XFAILs; <a href="pr-preparations/2026-09-26/llvm-validation.md">current validation</a>.</li>
 </ol>
 <h2 id="backend-failure-triage-gcc-c-torture-2026-09-23">Backend failure triage (gcc c-torture, 2026-09-23)</h2>
 <p>Of 4,170 backend compilations of the 1,390 files the pinned Clang accepts
@@ -288,8 +310,13 @@ The stock-upstream reproducer, fix, regression, and
 Per the September 22 user decision, defer publication until we are ready to open
 the #320/#321 series. Its stock-MOS regression has no native-width dependency;
 the hold concerns presenting the downstream C triggers in context. The choice
-between the smaller boolean-parameter fix and the current refactor remains open:
+between the smaller boolean-parameter fix and the current refactor was left open
+in the September 22
 <a href="plans/2026-09-21-0028-local-identity-copy-state.md#publication-hold-and-implementation-choice--2026-09-22">comparison and recommendation</a>.
+The September 26 <a href="pr-preparations/2026-09-26/0028-review.md">independent review</a>
+selects the existing tested refactor; its generic X86 extraction now passes
+exact-current LLVM validation: two focused RUNs and 102 filtered X86 tests,
+with one existing XFAIL. The presentation hold remains.
 The refactor now keeps lane state inside <code>rewriteInstruction</code>, without a boolean
 parameter to a separate cleanup helper. <a href="pr-preparations/2026-09-21/0028-validation.md">Validation</a>:
 upstream CodeGen 85 pass / one unsupported, downstream verifier gate 34/34,
@@ -311,7 +338,7 @@ failure with the stock upstream frontend and backend.</p>
 <tbody>
 <tr>
 <td>Undef-lane identity-copy fix (<code>0028</code>)</td>
-<td>Validated; publication held until #320/#321 are ready to open; choose implementation and revalidate the exact submission</td>
+<td>Existing refactor selected; generic X86 MIR extracted, independently reviewed and validated on current LLVM. Publication remains held until #320/#321 are ready to open</td>
 </tr>
 <tr>
 <td>#320 far-pointer series</td>
@@ -363,7 +390,7 @@ failure with the stock upstream frontend and backend.</p>
 </tr>
 <tr>
 <td>GlobalISel indirect inline-asm outputs (<code>0037</code>)</td>
-<td><a href="upstream-gisel-inline-asm-indirect-output-pr.md">Fix prepared</a>: <code>&quot;=*r&quot;</code> defs stored through their pointer; 10 c-torture compilations repaired, MOS and AArch64 tests; <a href="pr-preparations/2026-09-23/0037-validation.md">validation</a>; <a href="pr-preparations/2026-09-23/0037-review-audit.md">review complete</a>; check and validate the extracted llvm/llvm-project submission against current upstream</td>
+<td><code>&quot;=*r&quot;</code> defs stored through their pointer; dated corpus/MOS evidence retained. <a href="pr-preparations/2026-09-26/llvm-validation.md">Exact-current LLVM packet</a> independently reviewed and validated: four focused RUNs, 168 filtered AArch64/X86 passes / three existing XFAILs. Ready to post</td>
 </tr>
 <tr>
 <td>Zero-page indexed globals (<code>0036</code>)</td>
@@ -371,7 +398,7 @@ failure with the stock upstream frontend and backend.</p>
 </tr>
 <tr>
 <td>Explicit constant address width</td>
-<td>Fixed locally by <code>0039</code>; the <a href="pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect">original diagnosis</a> is retained, with <a href="plans/2026-09-25-mos-correctness-queue.md">matching-input validation</a></td>
+<td>Ready to post as <code>0039</code>: exact-current assertion build, full MOS suites and stock-6502 emulator red/green pass. The <a href="pr-preparations/2026-09-23/0036-validation.md#separate-constant-modifier-defect">original diagnosis</a> and <a href="plans/2026-09-25-mos-correctness-queue.md">dated validation</a> are retained</td>
 </tr>
 <tr>
 <td>Scavenger live-P (<code>0011</code>)</td>
@@ -391,19 +418,23 @@ failure with the stock upstream frontend and backend.</p>
 </tr>
 <tr>
 <td>GlobalISel inline-asm register bounds (<code>0056</code>)</td>
-<td>Fixed and installed; independent AArch64 diagnostic regression and assertion-enabled cross-target suites pass; prepare the generic submission separately</td>
+<td>Ready to post: independent review and exact-current LLVM checks complete; four focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs</td>
 </tr>
 <tr>
 <td>SelectionDAG inline-asm register bounds (<code>0057</code>)</td>
-<td>Fixed and installed; 14 matching-input diagnostic checks and cross-target inline-asm/callbr suites pass; generic submission preparation remains</td>
+<td>Ready to post: independent review and exact-current LLVM checks complete; two focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs</td>
 </tr>
 <tr>
 <td>AArch64 unknown inline-asm types (<code>0058</code>)</td>
-<td><a href="defects/selectiondag-inline-asm-nonstandard-integer.json">Nonstandard integer abort</a> fixed; 32 clean diagnostic cases and 277 suite passes; retained AArch64 candidate; full regression requires 0057's <code>callbr</code> recovery; prepare llvm/llvm-project submission</td>
+<td><a href="defects/selectiondag-inline-asm-nonstandard-integer.json">Nonstandard integer abort</a> fixed; exact-current packet independently reviewed and validated with 0057's <code>callbr</code> recovery: 19 focused RUNs and 169 filtered AArch64/X86 passes / three existing XFAILs. Ready to post</td>
 </tr>
 <tr>
 <td>SelectionDAG vector inline-asm parts (<code>0059</code>)</td>
-<td><a href="defects/selectiondag-inline-asm-vector-parts.json">Vector conversion assertions</a> fixed; 30 crashing configurations now diagnose, 278 cross-target and 173 MOS passes; original regression requires 0057; installed locally, submission preparation remains</td>
+<td><a href="defects/selectiondag-inline-asm-vector-parts.json">Vector conversion assertions</a> fixed; exact-current packet independently reviewed and validated with 0057: 24 focused RUNs and 169 filtered AArch64/X86 passes / three existing XFAILs. Ready to post</td>
+</tr>
+<tr>
+<td>Parallel MIR reducer guard (<code>0060</code>)</td>
+<td>Ready to post as a MOS backport of existing LLVM commit <code>b1ba3d515a02</code>; independent audit and exact-current checks complete: nine focused RUNs and 180 reducer passes / 27 unsupported. LLVM already contains the guard; no duplicate LLVM repair</td>
 </tr>
 </tbody>
 </table>
@@ -427,8 +458,9 @@ upstream <code>main</code> is identical to the pinned base; it has no #320/#321 
 evidence have been reviewed. Patch 0031's
 <a href="pr-preparations/2026-09-22/0031-review-audit.md">separate review</a> is complete;
 prepare its submission after 0030.</li>
-<li>Prepare the #320/#321 presentation before publishing <code>0028</code>; retain both fix
-implementations for the submission decision.</li>
+<li>Prepare the #320/#321 presentation before publishing <code>0028</code>; use the selected,
+reviewed and validated refactor. The alternative remains comparison history,
+not an outstanding implementation-choice gate.</li>
 <li>Follow review/CI of the six posted compiler fixes and SDK #450; request re-review
 of the published #589 revision when following up with maintainers.</li>
 <li>In parallel, make <strong>SNES platform reconciliation with SDK #415</strong> the platform
@@ -575,10 +607,10 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 </tr>
 <tr>
 <td>Undef register-lane verifier failure</td>
-<td>Constructed stock-MOS MIR reproducer; generic fix and regression validated</td>
+<td>Existing refactor selected; generic X86 MIR and companion tests independently reviewed and validated on current LLVM</td>
 <td><strong>Held until #320/#321 are ready to open</strong></td>
-<td>Choose smaller fix or refactor; revalidate exact submission before publication</td>
-<td>No technical SDK dependency; publication timing tied to feature presentation</td>
+<td>Use the selected packet once the user-presentation hold clears; two focused RUNs and 102 filtered X86 passes / one existing XFAIL</td>
+<td>No technical SDK dependency; user presentation hold retained</td>
 </tr>
 <tr>
 <td>Scavenger live-P (<code>0011</code>)</td>
@@ -645,9 +677,9 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 </tr>
 <tr>
 <td>GlobalISel indirect inline-asm outputs (<code>0037</code>)</td>
-<td>Indirect register defs stored through their pointer; 10 compilations repaired, corpus otherwise identical</td>
-<td><strong>Audited, unposted</strong></td>
-<td>Check and validate extracted submission against current llvm/llvm-project</td>
+<td>Standalone generic/AArch64 extraction independently reviewed; four focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the <a href="pr-preparations/2026-09-26/llvm-validation.md">exact-current LLVM packet</a> when posting is requested</td>
 <td>No</td>
 </tr>
 <tr>
@@ -659,44 +691,58 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 </tr>
 <tr>
 <td>Explicit constant address width (<code>0039</code>)</td>
-<td>Parser fix validated; matching-input evidence retained</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Complete the standalone submission checks in the <a href="upstream-asm-modifier-width-pr.md">PR draft</a></td>
+<td>Isolated assertion build, full MOS suites and stock-6502 emulator differential pass</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the <a href="pr-preparations/2026-09-26/README.md">exact packet</a> when posting is requested</td>
 <td>No</td>
 </tr>
 <tr>
-<td>Return/frame address (<code>0038</code>), spill coalescing (<code>0040</code>), multi-register inline asm (<code>0041</code>)</td>
-<td>Fixes and regression validation exist</td>
-<td><strong>PR drafts prepared, unposted</strong></td>
-<td>Finish submission preparation and publish when requested</td>
+<td>Return/frame address (<code>0038</code>), spill coalescing (<code>0040</code>)</td>
+<td>Exact-current isolated red/green and independent reviews complete; 134 and 132 MOS suite passes</td>
+<td><strong>Ready locally, unposted</strong></td>
+<td>Use the current packet; separate SPC700 0003 limitation retained, 0040 needs no 0033 dependency</td>
 <td>No</td>
 </tr>
 <tr>
-<td>MOS physical-register constraint width (<code>0043</code>), 24-bit assembly printing (<code>0044</code>), fixup metadata/directive output (<code>0046</code>, <code>0047</code>)</td>
-<td>Fixes implemented; September 25 audit covers 0043/0046/0047</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Refresh isolated checks and branches; prepare 0044's draft/bundle</td>
+<td>Multi-register inline asm (<code>0041</code>)</td>
+<td>Independent review and standalone LLVM extraction complete, including explicit output widening; ten focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the exact-current LLVM packet; no 0037 prerequisite</td>
 <td>No</td>
 </tr>
 <tr>
-<td>Floating vectors (<code>0050</code>, with <code>0049</code> prerequisites), byte index (<code>0051</code>), section-offset bank relaxation (<code>0052</code>)</td>
-<td>Same-input evidence and relevant compile/runtime checks retained</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Extract applicable submissions and verify upstream scope; 0049 is a backport prerequisite</td>
+<td>MOS constraints/printers/metadata/directives (<code>0043</code>–<code>0047</code>)</td>
+<td>Exact-current isolated checks and independent reviews pass; 0045 uses stock opcodes</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td><a href="pr-preparations/2026-09-26/mos-validation.md">Patches, drafts and receipts</a>; 0044 depends on 0039, others standalone</td>
 <td>No</td>
+</tr>
+<tr>
+<td>Floating vectors (<code>0050</code>)</td>
+<td>Stock-MOS isolated red/green and suites pass; 0049 prerequisites already upstream</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the standalone scalarization packet; no new 0049 submission</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Downstream byte index (<code>0051</code>) and bank policy (<code>0052</code>)</td>
+<td>Existing local repairs independently reconciled; their defective paths are downstream-only</td>
+<td><strong>Feature extraction held</strong></td>
+<td>Carry 0051 with #321 and 0052 with #320; do not file duplicate stock-upstream bugs</td>
+<td>Compiler feature dependency, not SNES merge</td>
 </tr>
 <tr>
 <td>Scavenger status-save range (<code>0054</code>)</td>
-<td>Backend range contract repaired; original vector cases and focused MIR/runtime pass</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Prepare generic change with its target-hook trigger and regression evidence</td>
-<td>No; captured native-width trigger must be explained</td>
+<td>Valid stock scavenger-test MIR, assertion-enabled red/green, three-CPU checks and full MOS suites pass</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use llvm-mos packet; generic LLVM lacks the target hook</td>
+<td>No native-feature or SDK dependency</td>
 </tr>
 <tr>
 <td>GlobalISel / SelectionDAG physical-register bounds (<code>0056</code>, <code>0057</code>)</td>
-<td>Independent AArch64 triggers, clean diagnostics, and cross-target tests pass</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Prepare separate generic submissions; baselines are patched builds with affected source matching saved upstream</td>
+<td>Separate exact-current LLVM packets independently reviewed; four / two focused RUNs and 168 filtered AArch64/X86 passes / three existing XFAILs each</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the separate generic packets; 0057 is the full-regression prerequisite for 0058 and 0059</td>
 <td>No</td>
 </tr>
 <tr>
@@ -708,16 +754,23 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 </tr>
 <tr>
 <td>AArch64 unknown inline-asm types (<code>0058</code>)</td>
-<td>Same-input red/green evidence; 32 diagnostic cases and 277 suite passes</td>
-<td><strong>Fixed locally, unposted</strong></td>
-<td>Prepare target-specific submission; full <code>callbr</code> regression requires generic 0057 error recovery; <a href="investigations/2026-09-25-aarch64-inlineasm-unknown-type.md">evidence</a></td>
+<td>Independent review and exact-current matching-input red/green complete; 19 focused RUNs and 169 filtered AArch64/X86 passes / three existing XFAILs</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the target-specific packet with generic 0057 on both comparison builds for full <code>callbr</code> coverage; <a href="pr-preparations/2026-09-26/llvm-validation.md">evidence</a></td>
 <td>No</td>
 </tr>
 <tr>
 <td>SelectionDAG vector parts (<code>0059</code>)</td>
-<td>Same-input red/green evidence; supported vector conversions preserved</td>
-<td><strong>Fixed locally, installed, unposted</strong></td>
-<td>Prepare generic submission and independent review; original regression requires 0057 virtual allocation; <a href="investigations/2026-09-25-selectiondag-vector-parts.md">evidence</a></td>
+<td>Independent review and exact-current matching-input red/green complete; 24 focused RUNs and 169 filtered AArch64/X86 passes / three existing XFAILs</td>
+<td><strong>Ready to post; unposted</strong></td>
+<td>Use the generic packet with 0057 prerequisite; <a href="pr-preparations/2026-09-26/README.md">current packet</a></td>
+<td>No</td>
+</tr>
+<tr>
+<td>Parallel MIR reducer guard (<code>0060</code>)</td>
+<td>Backport of existing LLVM commit <code>b1ba3d515a02</code>, with valid-MIR companion regression; independent audit, nine focused RUNs and 180 reducer suite passes / 27 unsupported</td>
+<td><strong>Ready to post to llvm-mos; unposted</strong></td>
+<td>Use the existing-upstream backport packet; current LLVM already rejects MIR <code>-j &gt; 1</code>, so no duplicate LLVM repair or silent-serial-fallback submission</td>
 <td>No</td>
 </tr>
 <tr>
@@ -736,10 +789,10 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 </tr>
 <tr>
 <td>Far-global <code>long,X</code> byte accesses (<code>0061</code>)</td>
-<td><a href="../patches/llvm-mos/0061-mos-far-global-long-x.patch">Separate patch</a> selects indexed absolute-long loads/stores for unsigned X8 or proven X16 offsets; far-index runtime and focused lit checks pass</td>
-<td><strong>Implemented locally, unposted</strong></td>
-<td>Validate an isolated submission on its #320 compiler prerequisites and prepare its own PR</td>
-<td>Compiler #320 far address space; no SDK platform merge dependency</td>
+<td><a href="../patches/llvm-mos/0061-mos-far-global-long-x.patch">Separate patch</a> selects indexed absolute-long loads/stores for unsigned X8 or proven X16 offsets; implementation independently reviewed</td>
+<td><strong>Reviewed locally; feature extraction held</strong></td>
+<td>Complete isolated #320/#321 extraction; exact source references native index-width infrastructure</td>
+<td>Both #320 and #321; no SDK platform merge dependency</td>
 </tr>
 <tr>
 <td>Native 16-bit far accesses (<code>0062</code>)</td>
@@ -749,10 +802,10 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 <td>Compiler #320 far address space and #321 native accumulator; no SDK platform merge dependency</td>
 </tr>
 <tr>
-<td>Near-store value shared with unit arithmetic (<code>0063</code>)</td>
-<td><a href="../patches/llvm-mos/0063-mos-near-shared-store.patch">Separate patch</a> keeps an ABI A:X value in byte stores before a local increment/decrement; A16 store emulator gate and lit checks pass</td>
-<td><strong>Implemented locally, unposted</strong></td>
-<td>Validate an isolated submission with the #321 native-width series and prepare its own PR; broader indirect/shared-value cases remain</td>
+<td>Near-store value shared with unit increment (<code>0063</code>)</td>
+<td><a href="../patches/llvm-mos/0063-mos-near-shared-store.patch">Separate patch</a> keeps an ABI A:X value in byte stores before a local increment; decrement retains verified native fallback</td>
+<td><strong>Reviewed locally; feature extraction held</strong></td>
+<td>Complete isolated #321 extraction; broader decrement/indirect/shared-value profitability remains unimplemented</td>
 <td>Compiler #321 native-width support; no SDK platform merge dependency</td>
 </tr>
 <tr>
@@ -902,6 +955,23 @@ opening its upstream PR.</p>
 shows current GitHub PR state alongside a separately dated, reviewed local-work
 manifest. The GitHub counts below are a 2026-09-25 snapshot; use the dashboard
 for newer remote state and this tracker for submission evidence and history.</p>
+<p><strong>Current local posting preparation:</strong> the
+<a href="pr-preparations/2026-09-26/README.md">September 26 packet</a> owns the exact-current
+patches, copy-ready drafts, independent reviews, and validation gates. Ten MOS
+compiler packets and six LLVM packets (0037, 0041, 0056–0059) are ready locally
+after exact-current isolated checks. LLVM coverage is the recorded filtered
+AArch64/X86 suite, not the complete target suites. 0028's selected packet also
+passes its current X86 checks; the user-presentation hold for #320/#321 remains.
+0039's standalone emulator gate passes, 0044 is stacked on 0039, and 0045 uses
+stock machine opcodes without #321. The separate 0060 existing-upstream MOS
+reducer-guard backport is independently reviewed and ready as well. The
+<a href="pr-preparations/2026-09-26/feature-held-packages.md">feature-held ledger</a>
+preserves real ABI/extraction and user-presentation holds. These seventeen
+packets remain unposted; the separate 0064 packet is posted as
+<a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a>.</p>
+<p>September 26 status reconciliation: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>),
+model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort. Earlier review and build credits
+remain in their linked records.</p>
 <p><strong>September 26 local revalidation:</strong> the <a href="defects/mos-far-memset-wrong-bank.json">original far-memset report</a>
 is fixed by existing <code>a81874d</code> / 0013. Identical IR fails without its backend
 routing and passes with it, including all 4096 physical WRAM bytes. This updates
@@ -926,32 +996,36 @@ comment counts on the six open PRs are unchanged.
 <a href="upstream-spill-hoist-scratch-vregs-pr.md">0033</a> spill hoisting (generic LLVM + driver flag removal) ·
 <a href="upstream-prefetch-legalize-pr.md">0034</a> drop <code>G_PREFETCH</code> ·
 <a href="upstream-clang-prefetch-int16-pr.md">0035</a> clang prefetch operands as <code>i32</code> (for llvm/llvm-project) ·
-<a href="upstream-gisel-inline-asm-indirect-output-pr.md">0037</a> GlobalISel indirect inline-asm outputs, the <code>+g</code> idiom (for llvm/llvm-project) ·
-<a href="upstream-return-frame-address-pr.md">0038</a> <code>llvm.returnaddress</code> / <code>llvm.frameaddress</code> legalized ·
-<a href="upstream-inline-spiller-coalesce-scratch-vregs-pr.md">0040</a> <code>coalesceStackAccess</code> must not erase a
+<a href="pr-preparations/2026-09-26/0037-pr-body.md">0037</a> GlobalISel indirect inline-asm outputs, the <code>+g</code> idiom (for llvm/llvm-project) ·
+<a href="pr-preparations/2026-09-26/0038-pr-body.md">0038</a> <code>llvm.returnaddress</code> / <code>llvm.frameaddress</code> legalized ·
+<a href="pr-preparations/2026-09-26/0040-pr-body.md">0040</a> <code>coalesceStackAccess</code> must not erase a
 stack access carrying scratch vregs — the coalescing counterpart to 0033's hoisting guard, found as
 the <code>ashrdi-1</code> greedy-RA segfault
-(<a href="pr-preparations/2026-09-24/0040-validation.md">validation</a>) ·
-<a href="upstream-gisel-inline-asm-multi-register-pr.md">0041</a> GlobalISel inline-asm register operands that
+(<a href="pr-preparations/2026-09-26/mos-validation.md">current validation</a>) ·
+<a href="pr-preparations/2026-09-26/0041-pr-body.md">0041</a> GlobalISel inline-asm register operands that
 need more than one register (for llvm/llvm-project)
-(<a href="pr-preparations/2026-09-24/0041-validation.md">validation</a>).</p>
+(<a href="pr-preparations/2026-09-26/llvm-validation.md">current validation</a>); no 0037 prerequisite.</p>
 <p><strong>Prepared, independent review audited:</strong> <a href="upstream-zero-page-indexed-globals-pr.md">0036</a>
 zero-page indexed globals. Direct and reassembled objects now agree; standalone
 MOS suites pass (132 / one unsupported), and the local compiler is rebuilt and
 installed. <a href="pr-preparations/2026-09-23/0036-validation.md">Validation</a>.</p>
-<p><strong>Prepared, not yet reviewed:</strong> <a href="upstream-asm-modifier-width-pr.md">0039</a> — an explicit
+<p><strong>Reviewed; current isolated and emulator checks complete:</strong> <a href="upstream-asm-modifier-width-pr.md">0039</a> — an explicit
 width modifier on a constant operand (<code>mos16(240)</code>, <code>mos24($123456)</code>) no longer selects a
 narrower addressing mode with the address truncated to fit, which had made
 <code>MOSMCInstLower::wrapAbsoluteIdxBase</code> a no-op and made the <code>-S</code>-then-assemble path emit
 <code>zero page,X</code> where direct emission emits <code>absolute,X</code>. Strictly a narrowing, measured over
 12,045 probes; three new <code>MC/MOS</code> tests; MOS suites 151 pass / 2 unsupported / the 4
 pre-existing failures. <a href="pr-preparations/2026-09-24/0039-validation.md">Validation</a>.
-Remaining before posting: the emulator differential and a <code>742d554</code> assertions build.
+September 26 revalidation uses current MOS main <code>7bd67c0</code>, with assertions:
+134 suite passes / one unsupported, plus a matching-input wrong-address
+emulator differential. The older 151/2/4 suite result above remains dated
+evidence, not the new build's count.
 <strong>Post command</strong> (after <code>gh auth</code>, from a branch off pristine upstream carrying
-<code>patches/llvm-mos/0039-mos-asm-modifier-width.patch</code>):</p>
+the exact <code>docs/pr-preparations/2026-09-26/0039-llvm-mos.patch</code> on MOS main
+<code>7bd67c0ae4e8bb65a3f980912bf201df22131e34</code>; execute only when posting is requested):</p>
 <pre><code>gh pr create --repo llvm-mos/llvm-mos \
   --title &quot;[MOS] Honour an explicit width modifier on a constant operand&quot; \
-  --body-file docs/upstream-asm-modifier-width-pr.md
+  --body-file docs/pr-preparations/2026-09-26/0039-pr-body.md
 </code></pre>
 <p><strong>Pending work, SNES dependencies and issue readiness:</strong>
 <a href="#work">chart and flowchart</a>. This view supersedes historical
@@ -976,7 +1050,13 @@ are fixed by <code>0059</code>: 30 crashing configurations now diagnose, support
 conversions remain accepted, and the suites report 278 cross-target and 173 MOS
 passes. The original input requires 0057's virtual-allocation repair. MOS Clang
 and LLD are rebuilt and installed with the generic change. Patches 0058 and 0059
-still need submission preparation and independent review.</p>
+have completed independent review. The September 26 exact-current LLVM packets
+for 0056–0059 now pass matching-input red/green and their recorded filtered
+AArch64/X86 suites: 168 passes / three existing XFAILs for 0056 and 0057,
+169 passes / three existing XFAILs for 0058 and 0059. The latter two retain
+0057 on both comparison builds for their full regression inputs. All four
+are ready locally; the counts above remain dated September 25 evidence.
+See the <a href="pr-preparations/2026-09-26/llvm-validation.md">current receipts</a>.</p>
 <p>The <a href="plans/2026-09-25-65816-all-opcode-roundtrip.md">65816 exhaustive opcode roundtrip plan</a>
 is written; implementation is deferred at the user's request. It specifies
 1,024 opcode/context cases, independent expected bytes, and instruction-boundary
@@ -986,8 +1066,17 @@ validated compiler defect or a submitted contribution.</p>
 recovered coalescing witness to existing fix 0028. Its separate allocator diagnosis
 is superseded for that witness. The <a href="defects/llvm-reduce-parallel-mir-crash.json">parallel MIR reducer crash</a>
 captured during the investigation is <a href="investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md">fixed locally</a>
-by patch 0060 with matching-input evidence. Published-upstream applicability
-remains to be assessed.</p>
+by the original local patch 0060 with matching-input evidence. Subsequent
+reconciliation found existing LLVM commit <code>b1ba3d515a02</code> (September 24), which
+predates the report and already rejects MIR <code>-j &gt; 1</code>. Current LLVM contains
+that guard; current MOS does not. The September 26
+<a href="pr-preparations/2026-09-26/0060-pr-body.md">MOS backport packet</a> preserves
+the upstream guard and adds a valid-MIR companion test. Independent review,
+all nine focused RUNs, and 180 reducer suite passes / 27 unsupported establish
+local posting readiness. There is no duplicate LLVM repair to submit and no
+silent serial fallback. The original parallel candidate and superseded
+serial-fallback proposal remain dated evidence; general parallel-MIR context
+isolation is not approved.</p>
 <p>The <a href="investigations/2026-09-26-trunc-imag8-i1-contract.md">0023 contract audit</a>
 disproves the independent Imag8-only rejection diagnosis: the matcher accepts
 the shared register bank and inserts an Ac copy. All 72 compiler runs and 48
@@ -997,12 +1086,15 @@ the original far-pointer observation still lacks its failing input and compiler.
 <p>Three compiler optimizations now have separate local patches and tests:
 <a href="../patches/llvm-mos/0061-mos-far-global-long-x.patch">0061 far-global <code>long,X</code></a>,
 <a href="../patches/llvm-mos/0062-mos-native-far-word.patch">0062 native 16-bit far loads/stores</a>,
-and <a href="../patches/llvm-mos/0063-mos-near-shared-store.patch">0063 near stores shared with unit arithmetic</a>.
+and <a href="../patches/llvm-mos/0063-mos-near-shared-store.patch">0063 near stores shared with unit increment</a>.
 They apply in that order and reproduce the tested vendor source. The MOS lit suite
 reported 175 passes and two unsupported tests; far-index, far-bank, and A16-store
 gates passed on MAME and bsnes-jg. Each is implemented locally and unposted.
 The <a href="#chart--other-pending-work">pending-work chart</a>
-tracks its separate submission and compiler prerequisites.</p>
+tracks its separate submission and compiler prerequisites. The September 26
+review confirms that exact 0061 requires #321 index-width machinery as well as
+#320. It qualifies 0063 to increment-only; decrement uses the verified native
+fallback. Historical opportunity measurements are not fresh compiler savings.</p>
 <p>The <a href="mos-upstream-status-2026-09-21.html">HTML overview</a> keeps its original filename
 for existing bookmarks. Regenerate it and the <a href="mos-upstream-flowchart.html">zoomable flowchart</a>
 with <code>python3 dev/docs-deps.py --refresh</code>; run <code>python3 dev/docs-deps.py</code> to detect
@@ -1019,8 +1111,10 @@ finds no implementation defect. The <a href="pr-preparations/2026-09-23/0035-rev
 established that wider options also break x86-64; the test now covers <code>long</code>,
 <code>long long</code> and the two-argument form. Patch 0037 (indirect register outputs in
 GlobalISel inline asm) has a <a href="pr-preparations/2026-09-23/0037-review-audit.md">completed audit</a>:
-915 standalone suite passes, one unsupported; the generic/AArch64 submission
-variant is prepared, with current llvm/llvm-project applicability still to check.
+915 standalone suite passes, one unsupported. That September 23 assessment's
+remaining current-LLVM gate is now complete: the September 26 standalone
+generic/AArch64 packet passes all four focused RUNs and 168 filtered
+AArch64/X86 tests, with three existing XFAILs. It is ready locally and unposted.
 Patch 0036 is validated against the pinned upstream base, with 45 upstream and
 36 local C round trips passing; <a href="pr-preparations/2026-09-23/0036-review-audit.md">Claude's review is audited</a>. Its numeric
 controls exposed a separate <code>mos16(constant)</code> truncation defect; that parser
@@ -1034,33 +1128,32 @@ pinned-base validation records. The <a href="pr-preparations/2026-09-25/claude-b
 extends 0043 to explicit register names reachable from C, adds a compile-time
 fixup-table count check to 0046, and removes the unintended <code>addrasciz()</code> language
 extension from 0047. The revised artifacts apply to the pin and pass their
-integrated tests; refresh their isolated validation and prepare submission
-branches before posting. Earlier binary hashes apply only to earlier revisions.</p>
-<p><a href="upstream-asm-print-long-address-pr.md">0044</a>, the 24-bit address printer, has a PR
-draft and a pinned-base validation record. It applies standalone against the pin
-(<code>git apply --check</code> clean, either before or after <code>0039</code>), and its new test
-(<code>MC/MOS/long-address-roundtrip-65816.s</code>) fails before the fix and passes after. Applied
-<em>alone</em>, isolated-build evidence shows the printer half already works but the
-round-trip half does not — a small constant under <code>mos24(...)</code> still re-parses to
-<strong>zero page</strong> (worse than the original absolute-mode narrowing) without patch <code>0039</code>
-(the parser-side width-modifier fix) also applied; with both, every case round-trips
-byte-for-byte and the full MOS lit suites pass 121/122 (1 unsupported, 0 failed).
-<a href="pr-preparations/2026-09-26/0044-validation.md">Validation</a>. Breaking commit:
-<a href="https://github.com/llvm-mos/llvm-mos/commit/19ea9eab486f7bd784f2c4b80cba759044ca5740">19ea9eab4</a>
-(&quot;Add MC instructions, relocations, and disassembler support for 65816.&quot;, 2022-02-10),
-which added the long addressing modes without ever giving the <code>addr24</code> operand class a
-<code>PrintMethod</code>. <strong>This PR should be reviewed/merged alongside or after 0039</strong>, since its
-round-trip test needs 0039's fix to pass. <code>0045</code> (native-width immediates) and <code>0048</code>
-(far-codegen tests) remain fork-specific. Independent compiler submissions do not wait
-for SNES platform merge; the platform/runtime prerequisites remain in the
-<a href="#snes--separate-platform-track">separate tracker</a>.</p>
-<p>When the revised branches and standalone checks are ready, the posting commands
-are (posting remains user-triggered):</p>
-<pre><code class="language-sh">gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Reject inline-asm operands wider than a named data register&quot; --body-file docs/upstream-inline-asm-physreg-width-pr.md
-gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Complete and check the fixup information table&quot; --body-file docs/upstream-fixupkinds-addrasciz-row-pr.md
-gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Preserve symbolic .mos_addr_asciz directives in text output&quot; --body-file docs/upstream-mc-addr-asciz-symbolic-crash-pr.md
-gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Print an explicit width on 24-bit address operands&quot; --body-file docs/upstream-asm-print-long-address-pr.md
+integrated tests. That dated isolated-validation action is superseded by the
+September 26 packet: all three exact revised artifacts pass their fresh isolated
+checks. Earlier binary hashes apply only to earlier revisions. Branch publication
+remains user-triggered and has not been performed by this preparation pass.</p>
+<p><a href="plans/2026-09-24-asmprinter-long-address.md">0044</a>, the 24-bit address printer,
+now has a reviewed, validated posting packet and stock-symbol regression,
+stacked on 0039. 0045's printer repair has a reviewed, validated stock-opcode
+extraction; its older native-IR
+test is not a necessary submission dependency. 0048's far-codegen tests remain
+feature-specific. See the current packet for exact-artifact validation.
+Independent compiler submissions do not wait for SNES platform merge; the
+platform/runtime prerequisites remain in the <a href="#snes--separate-platform-track">separate tracker</a>.</p>
+<p>The revised packets and standalone checks are ready. Posting commands remain
+user-triggered and have not been run in this preparation pass:</p>
+<pre><code class="language-sh">gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Reject inline-asm operands wider than a named data register&quot; --body-file docs/pr-preparations/2026-09-26/0043-pr-body.md
+gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Complete and check the fixup information table&quot; --body-file docs/pr-preparations/2026-09-26/0046-pr-body.md
+gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Preserve symbolic .mos_addr_asciz directives in text output&quot; --body-file docs/pr-preparations/2026-09-26/0047-pr-body.md
+gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Print an explicit width on 24-bit address operands&quot; --body-file docs/pr-preparations/2026-09-26/0044-pr-body.md
 </code></pre>
+<p>Pin-level (<code>LLVM_MOS_PIN</code>) isolated evidence for 0044 — apply-check standalone and
+stacked with 0039, fail-before/pass-after on the new test, and the byte-level
+confirmation that 0044 alone still mis-narrows (down to zero page, worse than the
+original bug) without 0039 — is in
+<a href="pr-preparations/2026-09-26/0044-validation.md">docs/pr-preparations/2026-09-26/0044-validation.md</a>,
+a separate, older-base companion record to this packet's own exact-base 0044 receipt
+in <code>mos-validation.md</code>.</p>
 <h2 id="current-pr-progress">Current PR progress</h2>
 <table>
 <thead>

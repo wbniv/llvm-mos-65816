@@ -1,0 +1,16 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=machine-opt-remark-emitter -verify-machineinstrs %s -o - | FileCheck %s
+---
+name: long_symbol
+body: |
+  bb.0.entry:
+    LDA_AbsoluteLong &long_data
+    STA_AbsoluteLong &long_data
+    LDA_AbsoluteXLong &long_data
+    JSL_AbsoluteLong &long_target
+    RTS
+    ; CHECK-LABEL: long_symbol:
+    ; CHECK: lda mos24(long_data)
+    ; CHECK: sta mos24(long_data)
+    ; CHECK: lda mos24(long_data),x
+    ; CHECK: jsl mos24(long_target)
+...

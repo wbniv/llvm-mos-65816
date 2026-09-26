@@ -1,5 +1,16 @@
 # AsmPrinter does not mark 16-bit immediates under `+mos-a16` — print `#mos16(N)` so a16 code round-trips
 
+**Current submission status, September 26:** the existing 0045 repair now has
+a [stock-MOS posting extraction](../pr-preparations/2026-09-26/README.md),
+validated on current upstream with raw Immediate16 MIR and direct/reassembled
+byte comparison. Stock immediate parsing already honors `mos16`: 0039, 0044,
+and #321 are not semantic prerequisites. The "fork-only", "upstream target:
+none", and "no upstream follow-up" assessments below are dated September 24
+evidence based on the native-IR reproducer, not the current posting decision.
+The compiler implementation and earlier credits are unchanged. Preparation:
+OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning
+effort; verified session `01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 **TODO entry:** `- [wip T4] **AsmPrinter does not mark 16-bit immediates under `+mos-a16` — worse than the
 long-address gap above.**` (`TODO.md`, M2 / #320 section).
 **Diagnosis:** [audit §6.3](../investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#63-the-second-instance--16-bit-immediates-under-mos-a16).

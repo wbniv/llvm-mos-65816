@@ -1,5 +1,14 @@
 # [MOS] Reject inline-asm operands wider than a named data register
 
+**Current posting artifact (September 26):** use the
+[0043 copy-ready body](pr-preparations/2026-09-26/0043-pr-body.md) and
+[exact-current validation](pr-preparations/2026-09-26/mos-validation.md).
+The earlier draft and validation prose below are retained dated evidence;
+their old build counts, diagnostics, and pending steps are not current gates.
+Nothing has been posted. Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`),
+model `gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 MOS can silently discard the high byte of a 16-bit inline-asm output constrained
 to an 8-bit register. The IR spelling `"=a"` demonstrates the mismatch between
 `getNumRegistersForInlineAsm(i16) == 1` and the 8-bit register returned by

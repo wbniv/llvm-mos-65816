@@ -37,6 +37,11 @@
   },
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0058/receipt.json",
+      "sha256": "a3e941245400722d739dce0aa36c1640724afbd7170fd02f227a55681e5a6885",
+      "description": "September 26 exact-current LLVM submission red/green and cross-target suite validation; original baseline and repair evidence retained. Coordination: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
+    {
       "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
       "sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d"
     },
@@ -695,5 +700,5 @@
       }
     ]
   },
-  "upstream_scope": "Preserved compiler has patches through 0041, not a clean upstream binary. Its entire AArch64ISelLowering.cpp equals saved published upstream 742d554bf08042b8df93d791c335260fadd16643. Both vendor and saved upstream source accept the patch and reproduce the tested edits. No latest-upstream claim."
+  "upstream_scope": "Dated September 25 baseline assessment: Preserved compiler has patches through 0041, not a clean upstream binary. Its entire AArch64ISelLowering.cpp equals saved published upstream 742d554bf08042b8df93d791c335260fadd16643. Both vendor and saved upstream source accept the patch and reproduce the tested edits. No latest-upstream claim. September 26: the separately preserved exact-current LLVM packet, independent review, and matching-input red/green are linked in observations; the original baseline remains unchanged."
 }

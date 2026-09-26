@@ -1,0 +1,1 @@
+SMOKE: PASS off=0x200 len=2 got=0x2000 (ran 300 frames, bsnes-jg)

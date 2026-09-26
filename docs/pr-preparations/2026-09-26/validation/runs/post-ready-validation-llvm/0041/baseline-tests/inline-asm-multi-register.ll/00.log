@@ -1,0 +1,32 @@
+llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:409: bool llvm::InlineAsmLowering::lowerInlineAsm(MachineIRBuilder &, const CallBase &, std::function<ArrayRef<Register> (const Value &)>) const: Assertion `getNumOpRegs(*Inst, InstFlagIdx) == 1 && "Wrong flag"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llc -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs -stop-after=irtranslator
+1.	Running pass 'Function Pass Manager' on module '<stdin>'.
+2.	Running pass 'IRTranslator' on function '@tied128'
+ #0 0x00005f40d982178b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x1fd078b)
+ #1 0x00005f40d981e4f1 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x1fcd4f1)
+ #2 0x00005f40d98221cb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x000076e15f6c9cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000076e15f72a1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x000076e15f6c9b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x000076e15f6ac8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000076e15f6ad979 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29979)
+ #8 0x000076e15f6bff75 __assert_fail (/usr/lib/x86_64-linux-gnu/libc.so.6+0x3bf75)
+ #9 0x00005f40dbf9e472 llvm::InlineAsmLowering::lowerInlineAsm(llvm::MachineIRBuilder&, llvm::CallBase const&, std::function<llvm::ArrayRef<llvm::Register> (llvm::Value const&)>) const (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x474d472)
+#10 0x00005f40dbf8d5ae llvm::IRTranslatorImpl::translateInlineAsm(llvm::CallBase const&, llvm::MachineIRBuilder&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x473c5ae)
+#11 0x00005f40dbf8d81d llvm::IRTranslatorImpl::translateCall(llvm::User const&, llvm::MachineIRBuilder&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x473c81d)
+#12 0x00005f40dbf96299 llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x4745299)
+#13 0x00005f40dbf972cd llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x47462cd)
+#14 0x00005f40d9e8ade9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x2639de9)
+#15 0x00005f40d9b2e5c2 llvm::FPPassManager::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x22dd5c2)
+#16 0x00005f40d9b369e2 llvm::FPPassManager::runOnModule(llvm::Module&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x22e59e2)
+#17 0x00005f40d9b2f434 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x22de434)
+#18 0x00005f40d9829067 compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llcdriver.cpp:0:0
+#19 0x00005f40d9826401 llcMain (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x1fd5401)
+#20 0x00005f40d9765b6f main (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x1f14b6f)
+#21 0x000076e15f6ae601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#22 0x000076e15f6ae718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#23 0x00005f40d9765a65 _start (/work/build/post-ready-validation-llvm/0041/baseline-bin/llc+0x1f14a65)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-multi-register.ll

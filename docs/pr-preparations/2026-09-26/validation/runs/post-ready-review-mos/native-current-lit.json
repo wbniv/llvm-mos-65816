@@ -1,0 +1,40 @@
+{
+  "__version__": [
+    23,
+    0,
+    0
+  ],
+  "elapsed": 0.948932409286499,
+  "tests": [
+    {
+      "code": "PASS",
+      "elapsed": 0.195054292678833,
+      "name": "MOS-native-optimization-review :: review-controls.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o - | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o -\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o - | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll # RUN: at line 2\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o -\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.16738200187683105,
+      "name": "MOS-native-optimization-review :: a16-byte-store.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,DEFAULT # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,DEFAULT\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,NATIVE # RUN: at line 2\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,NATIVE\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,NATIVE # RUN: at line 3\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-byte-store.ll --check-prefixes=BYTE,NATIVE\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.3968074321746826,
+      "name": "MOS-native-optimization-review :: a16-indirect-byte-store.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,DEFAULT # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,DEFAULT\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,NATIVE # RUN: at line 2\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,NATIVE\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,NATIVE # RUN: at line 3\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/a16-indirect-byte-store.ll --check-prefixes=BYTE,NATIVE\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.23473381996154785,
+      "name": "MOS-native-optimization-review :: far-native-word.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll --check-prefixes=CHECK,XY16 # RUN: at line 2\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-native-word.ll --check-prefixes=CHECK,XY16\n\n--\n"
+    },
+    {
+      "code": "PASS",
+      "elapsed": 0.08831477165222168,
+      "name": "MOS-native-optimization-review :: far-global-long-x.ll",
+      "output": "Exit Code: 0\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll --check-prefixes=CHECK,XY16 # RUN: at line 2\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/far-global-long-x.ll --check-prefixes=CHECK,XY16\n\n--\n"
+    }
+  ]
+}

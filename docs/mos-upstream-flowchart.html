@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — zoomable flowchart</title><meta name="source-sha256" content="f4ebcf4f03762681d76011b21b11b047f36588d9f8fee1e5126330576df9794e"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — zoomable flowchart</title><meta name="source-sha256" content="cd58568df7661f9056ff45cb9618cd0413fefc26038d3e54de063d3b0a6f10e2"><style>
 *{box-sizing:border-box}body{margin:0;font:16px/1.5 system-ui,sans-serif;color:#17233a;background:#f8fafc;height:100vh;display:flex;flex-direction:column}header{flex:none;padding:12px 22px;border-bottom:1px solid #ccd6e4;background:white}h1{font-size:21px;margin:0 0 10px}.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}button,a{font:inherit}button{padding:5px 13px;background:#edf2fa;border:1px solid #a7b7cc;border-radius:6px;cursor:pointer}a{color:#165ac4;margin-left:16px}.hint{color:#596579;margin-left:12px}#viewport{flex:1;min-height:0;overflow:auto;padding:32px;cursor:grab;touch-action:auto}#viewport.dragging{cursor:grabbing;user-select:none}#chart{width:max-content;background:white;border-radius:10px;padding:20px}#chart svg{max-width:none!important;display:block;height:auto}#fallback{white-space:pre-wrap;max-width:1100px}#zoom{min-width:54px;font-variant-numeric:tabular-nums}.status{font-size:13px;color:#596579;margin:8px 0 0}@media(max-width:750px){.hint{display:none}}
 </style></head><body><header><h1>Upstream work and dependencies</h1><div class="toolbar"><button id="minus" aria-label="Zoom out">−</button><span id="zoom">100%</span><button id="plus" aria-label="Zoom in">+</button><button id="actual">Readable size</button><button id="fit">Fit entire chart</button><button id="fullscreen">Full screen</button><a href="upstream-pending-work.md">Tracker and evidence</a><a href="mos-upstream-status-2026-09-21.html">Overview</a><span class="hint">Drag to pan · Ctrl + wheel to zoom</span></div><p class="status">Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25 · Fixed locally does not mean published</p></header><div id="viewport"><div id="chart"><pre id="fallback">flowchart TD
   subgraph Independent[Independent fixes]
@@ -9,7 +9,7 @@
     OPEN[Compiler PRs 578 / 584 / 586 / 588 / 589] --&gt; REVIEW[Review / CI follow-up] --&gt; MERGED[Merge]
     COALESCE0015[0015 recovered witness: root repaired by 0028] --&gt; UNDEF
     UNDEF[Undef-lane fix 0028 validated] --&gt; HOLD[Wait until 320 and 321 are ready to open]
-    HOLD --&gt; FINAL[Choose implementation and review submission]
+    HOLD --&gt; FINAL[Use selected and validated submission]
     FINAL --&gt; UNDEFPR[Publish fix PR] --&gt; MERGED
     RA[Register-exhaustion fix 0029: reviewed, full suites] --&gt; RAPR[Publish fix PR] --&gt; MERGED
     COPY[Physical-copy liveness fix 0030: reviewed and audited] --&gt; COPYPR[Publish fix PR] --&gt; MERGED
@@ -19,21 +19,24 @@
     HOIST[Spill-hoist guard 0033: audited, accounting revised and revalidated] --&gt; HOISTPR[Publish fix PR, drops driver flag] --&gt; MERGED
     PREFETCH[Prefetch fixes validated: MOS 0034 and Clang 0035] --&gt; PREFETCHMOS[Submit 0034 to llvm-mos] --&gt; MERGED
     PREFETCH --&gt; PREFETCHCLANG[Submit 0035 to llvm/llvm-project] --&gt; MERGED
-    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --&gt; ASMGREVIEW[Audit complete; validate extracted upstream submission] --&gt; ASMGPR[Submit to llvm/llvm-project] --&gt; MERGED
+    ASMG[GlobalISel indirect asm outputs 0037: MOS and AArch64 tests, corpus differential] --&gt; ASMGREVIEW[Exact-current LLVM extraction reviewed and validated] --&gt; ASMGPR[Submit to llvm/llvm-project when requested] --&gt; MERGED
     ZPIDX[Zero-page indexed globals 0036: suites and round trips pass] --&gt; ZPREVIEW[Review audited; submission preparation] --&gt; ZPPR[Publish fix PR] --&gt; MERGED
-    RETFRAME[Return and frame address 0038: fixed and validated] --&gt; PREP[Prepare and validate standalone submissions]
-    COALESCE[Spill coalescing 0040: fixed and validated] --&gt; PREP
-    ASMMULTI[Multi-register inline asm 0041: fixed and validated] --&gt; PREP
-    MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: fixed locally] --&gt; PREP
-    MOSFIX[Floating vectors 0050, byte index 0051, bank offset 0052: fixed locally] --&gt; PREP
-    VECTORBASE[0049: vector prerequisite backport] --&gt; MOSFIX
-    SAVERANGE[Status-save range 0054: fixed and validated] --&gt; PREP
-    GISBOUNDS[GlobalISel register bounds 0056: fixed and installed] --&gt; PREP
-    DAGBOUNDS[SelectionDAG register bounds 0057: fixed and installed] --&gt; PREP
-    DAGBOUNDS --&gt;|callbr recovery prerequisite| INTTYPE[AArch64 unknown asm types 0058: fixed and validated]
+    RETFRAME[Return and frame address 0038: ready locally] --&gt; PREP[Reviewed and validated exact-current submissions]
+    COALESCE[Spill coalescing 0040: ready locally] --&gt; PREP
+    ASMMULTI[Multi-register inline asm 0041: ready locally] --&gt; PREP
+    MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: ready locally] --&gt; APPROVED
+    MOSFIX[Floating vectors 0050: ready locally] --&gt; APPROVED
+    VECTORBASE[0049: prerequisites already in current upstream] -.-&gt; MOSFIX
+    NATIVEPRINT[Immediate printing 0045: ready with stock-opcode test] --&gt; APPROVED
+    SAVERANGE[Status-save range 0054: ready with stock scavenger test] --&gt; APPROVED
+    GISBOUNDS[GlobalISel register bounds 0056: ready locally] --&gt; PREP
+    DAGBOUNDS[SelectionDAG register bounds 0057: ready locally] --&gt; PREP
+    DAGBOUNDS --&gt;|callbr recovery prerequisite| INTTYPE[AArch64 unknown asm types 0058: ready with 0057]
     INTTYPE --&gt; PREP
-    DAGBOUNDS --&gt;|original vector regression prerequisite| VECTORPARTS[SelectionDAG vector parts 0059: fixed and installed]
+    DAGBOUNDS --&gt;|original vector regression prerequisite| VECTORPARTS[SelectionDAG vector parts 0059: ready with 0057]
     VECTORPARTS --&gt; PREP
+    REDUCER[0060: existing LLVM parallel-MIR guard] --&gt; REDUCEDIAG[Exact-current MOS backport reviewed and validated]
+    REDUCEDIAG --&gt; PREP
     PREP --&gt; APPROVED[Publish when requested] --&gt; MERGED
   end
   subgraph SNES[SNES platform — separate track]
@@ -47,6 +50,8 @@
     ACCEPT[Agree proper 65816 support required by SDK 415] --&gt; SDKMERGE
     WIDTHABI[Native-width ABI and clean extraction] --&gt; WIDTH[Prepare and post 321 series] --&gt; WIDTHDONE[Merge native-width support]
     SHIFTFIX[Narrow-count shifts 0055: fixed and installed] --&gt; WIDTH
+    BYTEINDEX[0051: downstream decomposition repair] --&gt; WIDTH
+    BANKOFFSET[0052: downstream section policy repair] --&gt; FAR
     NATIVEPRINT[Native immediate printing 0045: fixed locally] --&gt; WIDTH
     DPY[Far DP Y runtime index: verified locally] --&gt; WIDTH
     NEARY[Near Y16 high-byte clobber: gallery fails] --&gt; NEARREPAIR[Isolate LTO witness and fix near indexing]
@@ -60,8 +65,6 @@
     OPCODEORACLE --&gt; OPCODEGATE[Implement and validate 256 opcodes in four M/X contexts]
   end
   subgraph Reports[Reports needing decisions or development]
-    REDUCER[Fixed locally: llvm-reduce parallel MIR crash] --&gt; REDUCEDIAG[Assess published-upstream applicability]
-    REDUCEDIAG --&gt; FIX
     CONTRACT[Reentrant contract question] --&gt; DECIDE[Agree semantics] --&gt; FIX[Develop and test fix or documentation]
     GUARDS[0023: independent Imag8 rejection cause disproved] --&gt; TRUNCKEEP[Retain with feature series; historical far-pointer cause unknown]
     FIX --&gt; REPORTPR[Post fix PR; link issue if one exists] --&gt; REPORTMERGE[Review and merge]

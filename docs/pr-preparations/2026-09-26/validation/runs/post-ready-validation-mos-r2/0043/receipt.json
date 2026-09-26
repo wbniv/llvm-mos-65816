@@ -1,0 +1,411 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0043",
+  "prerequisites": [],
+  "runner_sha256": "4332d260d68d68f2317150f007133dd042811d474c97c2d88406f6b92c73dcd4",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 9.632,
+    "log": "build/post-ready-validation-mos-r2/0043/baseline-build.log",
+    "log_sha256": "351abd431eb8de2f7f4c65d409590f35ff0856d9298117599d0f2efeb42b12c4"
+  },
+  "baseline_tools": {
+    "llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "opt": "e986a0509e629ee4e7670305d17cbb6d070893e204555337a05b37bff6dac228",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "6567f94b72a8677d00eb9a542914be0da446d036d77dddac588c6bfeb5ea8bb5",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll /work/build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.019,
+      "log": "build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /work/build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/tmp/ok.ll -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.119,
+      "log": "build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-A"
+      ],
+      "cwd": "/work",
+      "exit_code": 2,
+      "seconds": 0.065,
+      "log": "build/post-ready-validation-mos-r2/0043/baseline-tests/inline-asm-physreg-width.ll/02.log",
+      "log_sha256": "40f94a6f3b788ad4108cbd70d61fdba672979bb3cab3f7c5bd03a6b33f32cc6a",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 5.489,
+    "log": "build/post-ready-validation-mos-r2/0043/candidate-build.log",
+    "log_sha256": "a4479903fad4d6ac6c1259a0f0026e16a4b4560b30a82ca6e4d8c9ef7916abfb"
+  },
+  "candidate_tools": {
+    "llc": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "opt": "0d93770aba332a7de25aa43d43d601558d498088575065f72f1232845be091a6",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "f4bd96f35e4847756d092c0a4e0094fe3fa7d68b945cbca8312e07d2442072ca",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "split-file /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.01,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.069,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-A"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.068,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/03.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_y.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-Y"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.07,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/04.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_R.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-R"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.069,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/05.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_d.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-D"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.067,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/06.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-IN"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.067,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/07.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_a.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-A"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.068,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/08.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_x.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-X"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.066,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/09.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_y.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-Y"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.035,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/10.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rc.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RC"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.067,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/11.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RS"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.036,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/12.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=mos -mcpu=mos6502 /work/build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-CC"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.068,
+      "log": "build/post-ready-validation-mos-r2/0043/candidate-tests/inline-asm-physreg-width.ll/13.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll",
+      "input_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 6.8,
+    "log": "build/post-ready-validation-mos-r2/0043/mos-suites.log",
+    "log_sha256": "532e1b32f637673a65767b60a8840049ff3a7568367b3dabd20942b74e70d8de"
+  }
+}

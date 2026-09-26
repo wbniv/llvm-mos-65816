@@ -20,6 +20,12 @@ repair and passing results were recorded elsewhere the same day.
    Inspect the implementation in `vendor/llvm-mos/`, including the large 0002
    patch: standalone artifacts may already be folded into it. Patch numbering
    and document dates do not establish absence from the compiler.
+   For upstream preparation, repeat the reconciliation at the exact destination
+   revision, including entry-point guards, callers, and existing regression
+   tests—not only the function containing the local crash. Search upstream
+   history for the diagnostic and operation. An existing upstream rejection can
+   make a lower-level path unreachable even when that path still looks broken;
+   prepare a backport where appropriate, not a duplicate upstream repair.
 3. Identify the actual executable, source pin and dirty changes, and applicable
    patch contents. Distinguish "patch exists", "source contains it", "binary
    contains it", and "same input passes because of it". Keep uncertain links

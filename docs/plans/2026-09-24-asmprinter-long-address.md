@@ -1,5 +1,15 @@
 # AsmPrinter does not mark long (24-bit) addresses — print `mos24(...)` so far code round-trips
 
+**Current submission status, September 26:** the existing 0044 repair has an
+[isolated current-upstream packet](../pr-preparations/2026-09-26/README.md),
+PR draft, stock symbolic MIR test, and 136 MOS suite passes / one unsupported.
+Its round-trip regression requires 0039's address-parser width fix; neither
+SNES platform support nor native-width IR lowering is needed. The diagnosis
+and original execution history below are dated evidence, not outstanding fix
+work. Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`,
+`xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 **TODO entry:** `- [wip T4] **AsmPrinter does not mark long (24-bit) addresses — far load/store and `$5C` tail
 jumps print identically to their 16-bit siblings.**` (`TODO.md`, M2 / #320 section).
 **Diagnosis:** [`docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md` §6](../investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#6-disassembly--round-trip--the-genuine-functional-gap).

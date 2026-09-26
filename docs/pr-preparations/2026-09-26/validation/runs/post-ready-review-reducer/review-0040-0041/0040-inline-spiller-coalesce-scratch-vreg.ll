@@ -1,0 +1,104 @@
+; RUN: llc -O2 -mtriple=mos -mcpu=mos65c02 -verify-machineinstrs %s -o - | FileCheck %s
+; RUN: llc -O2 -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs %s -o - | FileCheck %s
+
+; A 64-bit variable shift behind a jump table creates spill pressure. MOS
+; reloads can define both the loaded value and an early-clobber scratch pointer.
+; A scratch register's live interval and allocator assignment require its
+; defining instruction to remain present. Coalescing must retain such a reload
+; even when the loaded value already occupies the spill slot.
+
+declare void @abort()
+
+define fastcc i64 @constant_shift(i64 %0, i16 %1) {
+  switch i16 %1, label %16 [
+    i16 0, label %17
+    i16 1, label %common.ret1
+    i16 2, label %3
+    i16 3, label %3
+    i16 4, label %common.ret1
+    i16 5, label %3
+    i16 6, label %3
+    i16 7, label %common.ret1
+    i16 8, label %3
+    i16 9, label %3
+    i16 10, label %3
+    i16 11, label %4
+    i16 12, label %6
+    i16 13, label %common.ret1
+    i16 14, label %common.ret1
+    i16 15, label %3
+    i16 16, label %8
+    i16 17, label %common.ret1
+    i16 18, label %common.ret1
+    i16 19, label %10
+    i16 20, label %common.ret1
+    i16 21, label %common.ret1
+    i16 22, label %3
+    i16 23, label %12
+    i16 24, label %14
+    i16 25, label %common.ret1
+    i16 26, label %3
+    i16 27, label %3
+    i16 28, label %3
+    i16 29, label %common.ret1
+    i16 30, label %3
+    i16 31, label %3
+    i16 32, label %3
+    i16 33, label %common.ret1
+    i16 34, label %common.ret1
+    i16 35, label %common.ret1
+    i16 36, label %common.ret1
+    i16 37, label %common.ret1
+    i16 38, label %common.ret1
+    i16 39, label %common.ret1
+    i16 40, label %common.ret1
+    i16 41, label %common.ret1
+    i16 42, label %3
+    i16 43, label %common.ret1
+    i16 44, label %common.ret1
+    i16 45, label %common.ret1
+    i16 46, label %3
+    i16 47, label %3
+  ]
+
+common.ret1:                                      ; preds = %17, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
+  %common.ret1.op = phi i64 [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ %18, %17 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ]
+  ret i64 %common.ret1.op
+
+3:                                                ; preds = %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
+  br label %17
+
+4:                                                ; preds = %2
+  %5 = ashr i64 %0, 11
+  br label %17
+
+6:                                                ; preds = %2
+  %7 = ashr i64 %0, 12
+  br label %17
+
+8:                                                ; preds = %2
+  %9 = ashr i64 %0, 16
+  br label %17
+
+10:                                               ; preds = %2
+  %11 = ashr i64 %0, 19
+  br label %17
+
+12:                                               ; preds = %2
+  %13 = ashr i64 %0, 23
+  br label %17
+
+14:                                               ; preds = %2
+  %15 = ashr i64 %0, 24
+  br label %17
+
+16:                                               ; preds = %2
+  tail call void @abort()
+  unreachable
+
+17:                                               ; preds = %14, %12, %10, %8, %6, %4, %3, %2
+  %18 = phi i64 [ %5, %4 ], [ %11, %10 ], [ 0, %3 ], [ %13, %12 ], [ %0, %2 ], [ %9, %8 ], [ %15, %14 ], [ %7, %6 ]
+  br label %common.ret1
+}
+
+; CHECK-LABEL: constant_shift:

@@ -1,0 +1,32 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:201: virtual bool llvm::MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &, MachineBasicBlock::iterator, MachineBasicBlock::iterator &, const TargetRegisterClass *, Register) const: Assertion `!(Reg == MOS::P && !UseHardStack) && "expected P live range to fully contain all overlapping vreg live " "ranges"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=scavenger-test -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range-isolated.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-valid-entry-v3/baseline-mosw65816.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range-isolated.mir'.
+2.	Running pass 'Scavenge virtual registers inside basic blocks' on function '@status_save_range'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005a241bb1be3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005a241bb18cc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005a241bb1cc4b
+3  libc.so.6 0x000076aec1c45cb0
+4  libc.so.6 0x000076aec1ca61ac pthread_kill + 284
+5  libc.so.6 0x000076aec1c45b7e gsignal + 30
+6  libc.so.6 0x000076aec1c288ec abort + 39
+7  libc.so.6 0x000076aec1c29979
+8  libc.so.6 0x000076aec1c3bf75 __assert_fail + 181
+9  llc       0x00005a241a117505
+10 llc       0x00005a241aa40b88 llvm::RegScavenger::spill(llvm::Register, llvm::MCRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) + 520
+11 llc       0x00005a241aa4198c llvm::RegScavenger::scavengeRegisterBackwards(llvm::MCRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) + 2556
+12 llc       0x00005a241aa42761
+13 llc       0x00005a241aa42288
+14 llc       0x00005a241aa41d2a llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) + 170
+15 llc       0x00005a241aa42a1c
+16 llc       0x00005a241a7b70a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+17 llc       0x00005a241ad49420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+18 llc       0x00005a241ad51522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc       0x00005a241ad4a1e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+20 llc       0x00005a241971b2cb
+21 llc       0x00005a2419718593 main + 1443
+22 libc.so.6 0x000076aec1c2a601
+23 libc.so.6 0x000076aec1c2a718 __libc_start_main + 136
+24 llc       0x00005a24197177a5 _start + 37

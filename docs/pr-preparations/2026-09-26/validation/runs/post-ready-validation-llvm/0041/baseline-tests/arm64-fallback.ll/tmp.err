@@ -1,0 +1,24 @@
+remark: <unknown>:0:0: unable to legalize instruction: G_WRITE_REGISTER !0, %0:_(i64) (in function: test_write_register_intrin)
+warning: Instruction selection used fallback path for test_write_register_intrin
+remark: <unknown>:0:0: cannot select: RET_ReallyLR implicit $x0 (in function: strict_align_feature)
+warning: Instruction selection used fallback path for strict_align_feature
+remark: <unknown>:0:0: unable to lower function: <vscale x 16 x i8> (<vscale x 16 x i1>, ptr) (in function: scalable_arg)
+warning: Instruction selection used fallback path for scalable_arg
+remark: <unknown>:0:0: unable to lower function: <vscale x 16 x i8> (ptr) (in function: scalable_ret)
+warning: Instruction selection used fallback path for scalable_ret
+remark: <unknown>:0:0: unable to translate instruction: call llvm.aarch64.sve.ptrue.nxv16i1: '  %pred = call <vscale x 16 x i1> @llvm.aarch64.sve.ptrue.nxv16i1(i32 0)' (in function: scalable_call)
+warning: Instruction selection used fallback path for scalable_call
+remark: <unknown>:0:0: unable to translate instruction: alloca: '  %local0 = alloca <vscale x 16 x i8>, align 16' (in function: scalable_alloca)
+warning: Instruction selection used fallback path for scalable_alloca
+remark: <unknown>:0:0: unable to translate instruction: call: '  call void asm sideeffect "", "=*r|m,0,~{memory}"(ptr elementtype(ptr) %ap, ptr %0)' (in function: asm_indirect_output)
+warning: Instruction selection used fallback path for asm_indirect_output
+remark: <unknown>:0:0: unable to translate instruction: call: '  %val = call i512 asm sideeffect "ld64b $0,[$1]", "=r,r,~{memory}"(ptr %addr)' (in function: asm_output_ls64)
+warning: Instruction selection used fallback path for asm_output_ls64
+remark: <unknown>:0:0: unable to translate instruction: call: '  call void asm sideeffect "st64b $0,[$1]", "r,r,~{memory}"(i512 %val, ptr %addr)' (in function: asm_input_ls64)
+warning: Instruction selection used fallback path for asm_input_ls64
+remark: <unknown>:0:0: unable to legalize instruction: %4:_(i128), %5:_(i1) = G_UMULO %0:_, %6:_ (in function: umul_s128)
+warning: Instruction selection used fallback path for umul_s128
+remark: <unknown>:0:0: unable to translate instruction: call llvm.experimental.gc.statepoint.p0: '  %statepoint_token = call token (i64, i32, ptr, i32, i32, ...) @llvm.experimental.gc.statepoint.p0(i64 2882400000, i32 0, ptr elementtype(i32 ()) @extern_returning_i32, i32 0, i32 0, i32 0, i32 0) [ "deopt"() ]' (in function: gc_intr)
+warning: Instruction selection used fallback path for gc_intr
+remark: <unknown>:0:0: unable to translate instruction: call: '  %0 = tail call { i64, i32 } asm "subs $0, $0, #3", "=r,={@cchi},0,~{dirflag},~{fpsr},~{flags}"(i64 %a)' (in function: inline_asm_with_output_constraint)
+warning: Instruction selection used fallback path for inline_asm_with_output_constraint

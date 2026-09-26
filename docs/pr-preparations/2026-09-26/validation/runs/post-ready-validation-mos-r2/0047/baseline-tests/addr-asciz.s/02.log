@@ -1,0 +1,25 @@
+LLVM ERROR: Don't know how to emit this value.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llvm-mc -triple mos -motorola-integers -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s
+ #0 0x00005a2fe7dc76ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xee26ab)
+ #1 0x00005a2fe7dc4591 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xedf591)
+ #2 0x00005a2fe7dc84ab SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007326af602cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007326af6631ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007326af602b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007326af5e58ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00005a2fe7d8d9a5 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xea89a5)
+ #8 0x00005a2fe7d8d7e6 (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xea87e6)
+ #9 0x00005a2fe7d084d2 (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xe234d2)
+#10 0x00005a2fe7b6c474 llvm::MOSAsmParser::parseDirectiveAddrAsciz(llvm::SMLoc) MOSAsmParser.cpp:0:0
+#11 0x00005a2fe7d643c5 llvm::MCTargetAsmParser::parseDirective(llvm::AsmToken) (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xe7f3c5)
+#12 0x00005a2fe7d42e5f (anonymous namespace)::AsmParser::parseStatement((anonymous namespace)::ParseStatementInfo&, llvm::MCAsmParserSemaCallback*) AsmParser.cpp:0:0
+#13 0x00005a2fe7d3c421 (anonymous namespace)::AsmParser::Run(bool, bool) AsmParser.cpp:0:0
+#14 0x00005a2fe7ac4b85 AssembleInput(char const*, llvm::Target const*, llvm::SourceMgr&, llvm::MCContext&, llvm::MCStreamer&, llvm::MCAsmInfo&, llvm::MCSubtargetInfo&, llvm::MCInstrInfo&, llvm::MCTargetOptions const&) llvm-mc.cpp:0:0
+#15 0x00005a2fe7ac3932 main (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xbde932)
+#16 0x00007326af5e7601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x00007326af5e7718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x00005a2fe7ac0b45 _start (/work/build/post-ready-validation-mos-r2/0047/baseline-bin/llvm-mc+0xbdbb45)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s --check-prefix=ASM

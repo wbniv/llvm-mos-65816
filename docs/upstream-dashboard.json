@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-26",
-  "sourceHash": "ddc033933b760dcac4ac81e5a86e1a63eae93c2b39c06cddcf00cbf3d8db9f0c",
+  "sourceHash": "123806428199dc9b34e5d10c92088d8b106758932393a230a2070ce416864c70",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -30,25 +30,25 @@
       "kind": "defect",
       "title": "GlobalISel physical-register inline-asm range exhaustion",
       "summary": "An i128 AArch64 inline-asm operand constrained to {cc} exhausts the one-register class and asserts. Patch 0056 validates the whole physical-register range, diagnoses invalid constraints, and defines error-recovery results without invoking fallback. The identical IR changes from an assertion to the expected clean diagnostic on the isolated candidate.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "nextStep": "Use independently reviewed 0056 exact-current LLVM packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/gisel-inline-asm-register-bounds.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
       "id": "defect:llvm-reduce-parallel-mir-crash",
       "kind": "defect",
       "title": "llvm-reduce crashes reducing MIR with two workers",
-      "summary": "The retained MIR input crashes the preserved llvm-reduce with -j 2; keeping MachineModuleInfo in each parallel MIR work item lets the same input reduce successfully while preserving IR bitcode workers.",
-      "localStatus": "fixed",
+      "summary": "The retained MIR input crashes the preserved llvm-reduce with -j 2; keeping MachineModuleInfo in each parallel MIR work item lets the same input reduce successfully while preserving IR bitcode workers. This is the dated September 25 local candidate result, not an endorsement of general shared-context parallel safety. September 26 reconciliation finds an existing September 24 upstream CLI guard; the ready MOS packet backports that guard instead of proposing another LLVM repair.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Check published-upstream applicability of patch 0060.",
+      "nextStep": "Use exact MOS backport packet, credit upstream b1ba3d515a02, and post only when requested; no new LLVM bug.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/llvm-reduce-parallel-mir-crash.json"
       ],
@@ -63,14 +63,16 @@
       "title": "65816 bank relaxation ignores a section offset above 65535",
       "summary": "Fixed: an out-of-bank section-relative symbol can relax to long addressing even when its section is not marked far.",
       "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Carry with downstream far-section policy; do not report a pristine-upstream defect.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-bank-relax-section-offset.json"
       ],
       "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -145,15 +147,15 @@
       "kind": "defect",
       "title": "MOS float-vector arithmetic and scalarization prerequisites",
       "summary": "Fixed: vector arithmetic reaches scalar float/double libcalls; generic vector prerequisites are backported at the pinned revision.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "nextStep": "Use the reviewed 0050 current-base submission packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-float-vector-legalization.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -177,15 +179,15 @@
       "kind": "defect",
       "title": "O0 65816 vector code exhausts status-register scavenging",
       "summary": "Fixed: backward scavenger search rechecks target save feasibility before extending the selected spill range. Both original vector tests compile at O0 in a16 and xy16.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "nextStep": "Use the reviewed 0054 current-base submission packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-vector-o0-status-scavenge.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -212,14 +214,16 @@
       "title": "Zero-page indexed addressing emits a same-width G_TRUNC",
       "summary": "Fixed: byte-sized zero-page indices retain their existing width instead of producing G_TRUNC s8 to s8.",
       "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Carry with the downstream decomposition feature; pristine upstream already passes this input.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-zp-index-same-width-trunc.json"
       ],
       "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -243,15 +247,17 @@
       "kind": "defect",
       "title": "SelectionDAG nonstandard integer inline-asm type abort",
       "summary": "Patch 0058 rejects MVT::Other before AArch64 r/x register-class size queries. The original i4096 input aborts on both preserved builds and receives a clean allocation diagnostic with the guard. All 32 rejection configurations and supported controls pass; the full callbr regression depends on 0057 error recovery. The separate vector conversion assertion is fixed by patch 0059; its own record retains the evidence.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "sub:0057"
+      ],
+      "nextStep": "Use independently reviewed 0058 exact-current LLVM packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/selectiondag-inline-asm-nonstandard-integer.json"
       ],
       "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -259,15 +265,15 @@
       "kind": "defect",
       "title": "SelectionDAG physical-register inline-asm range exhaustion",
       "summary": "Patch 0057 validates physical-register ranges before assignment and uses the existing register/type diagnostic. Callbr landing pads return undefined recovery values after lowering errors instead of walking absent output copy chains. Seven isolated operand forms abort on the preserved baseline and receive exactly one clean diagnostic on the candidate at O0 and O2.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "nextStep": "Use independently reviewed 0057 exact-current LLVM packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/selectiondag-inline-asm-register-bounds.json"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -275,15 +281,17 @@
       "kind": "defect",
       "title": "SelectionDAG vector inline-asm part-type assertion",
       "summary": "Patch 0059 diagnoses incompatible vector register parts and lossy vector-to-scalar conversion after target-specific conversion hooks. The unchanged <64 x i64> input aborts on preserved 0057 and 0058 compilers and receives the expected diagnostic on the identified candidate. Supported scalarized, bitcast, and LS64 cases remain accepted; MOS Clang/LLD are rebuilt and installed.",
-      "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "sub:0057"
+      ],
+      "nextStep": "Use independently reviewed 0059 exact-current LLVM packet; post only when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/selectiondag-inline-asm-vector-parts.json"
       ],
       "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -364,17 +372,16 @@
       "id": "opt:dpy-runtime-index",
       "kind": "optimization",
       "title": "Runtime [dp],Y indexing",
-      "summary": "Range-proven runtime offsets fold into far indirect indexed loads and stores; focused tests, the native corpus, and two-emulator gates pass. The separate near-Y gallery defect remains open.",
+      "summary": "Range-gated runtime [dp],Y indexing is published downstream in a4eb416c with scaled-offset and narrow-wrap guards.",
       "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320",
         "platform:321"
       ],
-      "nextStep": "Include the locally verified increment in the complete ABI-documented #321 feature series PR.",
+      "nextStep": "Carry with the far/native compiler feature series.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -428,11 +435,13 @@
       "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
-        "platform:320"
+        "platform:320",
+        "platform:321"
       ],
-      "nextStep": "Validate an isolated submission on the #320 compiler prerequisites.",
+      "nextStep": "Complete coherent #320/#321 extraction; exact patch requires native index-width infrastructure.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-longx-global-measurement.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-longx-global-measurement.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/native-optimization-review.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -447,11 +456,13 @@
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320",
-        "platform:321"
+        "platform:321",
+        "opt:0061"
       ],
       "nextStep": "Validate an isolated submission after #320 and #321 compiler prerequisites.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-far-scalar-split-measurement.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-far-scalar-split-measurement.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/native-optimization-review.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -460,8 +471,8 @@
     {
       "id": "opt:0063",
       "kind": "optimization",
-      "title": "0063 near store shared with unit arithmetic",
-      "summary": "Keep an ABI A:X value in byte stores before a local increment or decrement; emulator and lit checks pass.",
+      "title": "0063 near store shared with unit increment",
+      "summary": "Keep an ABI A:X value in byte stores before a local increment; decrement retains correct native fallback.",
       "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
@@ -469,7 +480,8 @@
       ],
       "nextStep": "Prepare its standalone native-width submission.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/native-optimization-review.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -495,16 +507,18 @@
       "id": "sub:0028",
       "kind": "submission",
       "title": "0028 undefined register-lane repair",
-      "summary": "The recovered bitboard and coalescing witnesses are repaired locally; the generic submission is held with the #320/#321 feature presentation.",
+      "summary": "Existing refactor selected and independently reviewed; exact-current LLVM generic MIR red/green and 102 filtered suite passes / one XFAIL complete.",
       "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:320",
         "platform:321"
       ],
-      "nextStep": "Choose the smaller submission or refactor, then revalidate.",
+      "nextStep": "Technical packet complete; retain the user's #320/#321 presentation hold until those series are ready to open.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-virtregrewriter-undef-lane-identity-copy-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-virtregrewriter-undef-lane-identity-copy-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0028-review.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -647,9 +661,10 @@
       "summary": "Store register outputs through their indirect pointers for the +g constraint idiom.",
       "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Validate the extracted generic submission against current LLVM.",
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-gisel-inline-asm-indirect-output-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-gisel-inline-asm-indirect-output-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -660,12 +675,13 @@
       "id": "sub:0038",
       "kind": "submission",
       "title": "0038 return and frame address",
-      "summary": "The MOS intrinsics are legalized and validated with a late return-address expansion.",
+      "summary": "Reviewed standalone intrinsics repair: five focused RUNs and 134 current-main MOS suite passes; separate SPC700 0003 limitation retained.",
       "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Post the prepared compiler PR.",
+      "nextStep": "Exact-current standalone packet and independent review complete. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-return-frame-address-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-return-frame-address-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -676,12 +692,13 @@
       "id": "sub:0039",
       "kind": "submission",
       "title": "0039 explicit constant address width",
-      "summary": "The local parser fix preserves an explicit mos16 or mos24 width instead of narrowing and truncating an address.",
-      "localStatus": "fixed",
+      "summary": "Exact-current isolated assertion build, 134 MOS suite passes, independent review, and wrong-address emulator differential complete.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Finish standalone emulator and assertion-build validation.",
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-asm-modifier-width-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-asm-modifier-width-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -692,12 +709,13 @@
       "id": "sub:0040",
       "kind": "submission",
       "title": "0040 spill coalescing scratch registers",
-      "summary": "Prevent coalescing a stack access whose extra scratch virtual defs would become orphaned.",
+      "summary": "Reviewed stock-MOS MIR isolates the coalescing lifetime defect; exact-main red/green, two focused RUNs and 132 MOS suite passes.",
       "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Post the prepared compiler PR.",
+      "nextStep": "Standalone llvm-mos packet and independent review complete; no 0033 prerequisite. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-inline-spiller-coalesce-scratch-vregs-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-inline-spiller-coalesce-scratch-vregs-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -711,9 +729,10 @@
       "summary": "Split and merge wide register operands and tied outputs across multiple registers.",
       "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Submit to llvm/llvm-project.",
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-gisel-inline-asm-multi-register-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-gisel-inline-asm-multi-register-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -724,12 +743,13 @@
       "id": "sub:0043",
       "kind": "submission",
       "title": "0043 physical-register constraint width",
-      "summary": "The reviewed draft handles named and explicit register constraints; isolated revision validation remains.",
-      "localStatus": "in-progress",
+      "summary": "Current-upstream clean diagnostics tested for all twelve invalid constraints; positives, exact-artifact regressions and MOS suites pass.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Refresh isolated validation and prepare the branch.",
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-inline-asm-physreg-width-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-inline-asm-physreg-width-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -740,15 +760,18 @@
       "id": "sub:0044",
       "kind": "submission",
       "title": "0044 explicit 24-bit AsmPrinter address",
-      "summary": "A local change preserves long-address bytes through printed assembly; its PR body and pinned-base validation remain.",
-      "localStatus": "in-progress",
+      "summary": "Long-address printer with stock symbolic MIR and MC roundtrip; isolated validated stack includes 0039.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Draft and validate the standalone PR bundle.",
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested; dependent on 0039.",
+      "dependsOn": [
+        "sub:0039"
+      ],
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-24-asmprinter-long-address.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-24-asmprinter-long-address.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
-      "dependsOn": [],
       "upstreamUrl": null,
       "demoUrls": []
     },
@@ -756,12 +779,13 @@
       "id": "sub:0046",
       "kind": "submission",
       "title": "0046 fixup metadata row",
-      "summary": "The reviewed fixup metadata draft needs refreshed isolated validation.",
-      "localStatus": "in-progress",
+      "summary": "Reviewed metadata-row and compile-time table-invariant repair; isolated assertion build and MOS suites pass.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Validate the isolated revision and prepare the branch.",
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-fixupkinds-addrasciz-row-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-fixupkinds-addrasciz-row-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -772,28 +796,13 @@
       "id": "sub:0047",
       "kind": "submission",
       "title": "0047 symbolic addrasciz output",
-      "summary": "Directive text output and symbolic fixup handling have a reviewed local revision.",
-      "localStatus": "in-progress",
+      "summary": "Symbolic directive text output adapted to current MCAsmInfo API; all exact-artifact roundtrips and MOS suites pass.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Refresh isolated validation and prepare the branch.",
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-mc-addr-asciz-symbolic-crash-pr.md"
-      ],
-      "evidenceNote": "",
-      "dependsOn": [],
-      "upstreamUrl": null,
-      "demoUrls": []
-    },
-    {
-      "id": "sub:0049-0054",
-      "kind": "submission",
-      "title": "0049–0054 MOS correctness batch",
-      "summary": "Floating vectors, byte-index truncation, bank relaxation, and scavenger status-save range are fixed locally with targeted evidence.",
-      "localStatus": "fixed",
-      "publicationStatus": "unposted",
-      "nextStep": "Extract applicable upstream submissions with their prerequisites.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-25-mos-correctness-queue.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-mc-addr-asciz-symbolic-crash-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -819,32 +828,16 @@
       "demoUrls": []
     },
     {
-      "id": "sub:0056-0059",
-      "kind": "submission",
-      "title": "0056–0059 inline-asm diagnostic repairs",
-      "summary": "GlobalISel and SelectionDAG register bounds, nonstandard integer types, and vector parts have local fixes and retained evidence.",
-      "localStatus": "fixed",
-      "publicationStatus": "unposted",
-      "nextStep": "Prepare separate generic and AArch64 submissions with independent review.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-selectiondag-inlineasm.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-selectiondag-vector-parts.md"
-      ],
-      "evidenceNote": "",
-      "dependsOn": [],
-      "upstreamUrl": null,
-      "demoUrls": []
-    },
-    {
       "id": "sub:0060",
       "kind": "submission",
-      "title": "0060 parallel MIR reducer crash",
-      "summary": "The retained input crashes the preserved llvm-reduce and succeeds with the local candidate.",
-      "localStatus": "fixed",
+      "title": "0060 MIR parallel-job guard backport",
+      "summary": "Existing upstream CLI guard backported to MOS; valid-MIR crash/diagnostic comparison, nine focused RUNs and 180 reducer-suite passes / 27 unsupported.",
+      "localStatus": "ready",
       "publicationStatus": "unposted",
-      "nextStep": "Assess published-upstream applicability.",
+      "nextStep": "Use exact MOS backport packet, credit upstream b1ba3d515a02, and post only when requested; no new LLVM bug.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -881,6 +874,194 @@
       ],
       "evidenceNote": "",
       "dependsOn": [],
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0045",
+      "kind": "submission",
+      "title": "0045 16-bit immediate printing",
+      "summary": "Existing printer repair extracted with stock machine opcodes; no native-width, 0039, or 0044 semantic dependency.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [],
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0049",
+      "kind": "submission",
+      "title": "0049 vector prerequisite backport",
+      "summary": "Existing upstream vector infrastructure backported for the downstream pin.",
+      "localStatus": "fixed",
+      "publicationStatus": "not-applicable",
+      "dependsOn": [],
+      "nextStep": "Retain downstream history; no new standalone upstream submission.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0050",
+      "kind": "submission",
+      "title": "0050 floating-vector scalarization",
+      "summary": "Stock MOS regression and reviewed scalarization repair extracted; current upstream already includes 0049.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [],
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0051",
+      "kind": "submission",
+      "title": "0051 downstream byte-index decomposition",
+      "summary": "Repairs downstream same-width truncation; pristine upstream already handles the input.",
+      "localStatus": "fixed",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Complete the feature prerequisites recorded in the reviewed held-work ledger.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0052",
+      "kind": "submission",
+      "title": "0052 downstream far-section relaxation",
+      "summary": "Repairs a bank-offset policy introduced by the downstream far-address-space implementation.",
+      "localStatus": "fixed",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Complete the feature prerequisites recorded in the reviewed held-work ledger.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0053",
+      "kind": "submission",
+      "title": "0053 MOS regression maintenance",
+      "summary": "Updates expectations for the local correctness stack; not a new compiler defect.",
+      "localStatus": "fixed",
+      "publicationStatus": "not-applicable",
+      "dependsOn": [],
+      "nextStep": "Retain downstream history; no new standalone upstream submission.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0054",
+      "kind": "submission",
+      "title": "0054 scavenger save-range validation",
+      "summary": "Valid stock scavenger-test trigger, assertion-enabled red/green, and MOS suites pass; independent checks cover three CPUs.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [],
+      "nextStep": "Exact current-base packet, independent review, and isolated checks complete. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0056",
+      "kind": "submission",
+      "title": "0056 GlobalISel inline-asm register bounds",
+      "summary": "Reviewed generic bounds repair, using current upstream register-count API.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [],
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0057",
+      "kind": "submission",
+      "title": "0057 SelectionDAG inline-asm register bounds",
+      "summary": "Reviewed physical range validation and diagnostic recovery.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [],
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0058",
+      "kind": "submission",
+      "title": "0058 AArch64 unknown inline-asm types",
+      "summary": "Reviewed unknown-type guards; full regression uses 0057 recovery.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "sub:0057"
+      ],
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass; apply 0057 first. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "sub:0059",
+      "kind": "submission",
+      "title": "0059 SelectionDAG vector inline-asm parts",
+      "summary": "Reviewed conversion diagnostics; full regression uses 0057 virtual allocation/recovery.",
+      "localStatus": "ready",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "sub:0057"
+      ],
+      "nextStep": "Exact-current LLVM patch, independent review, matching-input red/green and filtered suites pass; apply 0057 first. Post only when requested.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/llvm-validation.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
       "demoUrls": []
     }
   ]

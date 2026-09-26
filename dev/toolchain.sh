@@ -97,9 +97,8 @@ if [ ! -d "$SRC/.git" ]; then
   # are MOS-dir-only and were folded into 0002 by the 2026-07-26 regen; their
   # files remain on disk as standalone upstream-PR artifacts like 0004-0015.)
   #
-  # When adding a new patch: if it touches only llvm/lib/Target/MOS/, fold it
-  # into 0002 via dev/regen-patch.sh and leave this list alone; if it touches
-  # anything outside that dir, that portion must be added here.
+  # New optimization patches remain separate after 0002; regen-patch.sh
+  # reverse-applies them before rebuilding the 0002 mirror.
   # See docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md.
   apply_patch() {
     local p="$ROOT/patches/llvm-mos/$1.patch"; shift
@@ -171,8 +170,7 @@ if [ ! -d "$SRC/.git" ]; then
   # MOSLateOptimization.cpp + MOSInstrPseudos.td; reproduces on pristine
   # upstream. Listed in dev/regen-patch.sh's STANDALONE_MOSDIR. Drop on merge.
   apply_patch 0022-mos-late-opt-cmpzero-lowering
-  # Far-pointer-order demo finding: select legal truncations whose source bank
-  # is Imag8 (s8->s1) or Imag32 (s32->s16 under +mos-a16).
+  # Select native s32->s16 truncations and retain the s8->s1 selector fallback.
   apply_patch 0023-mos-trunc-selection-regclasses
   # Baseline MOS assembler: BRK carries its architectural signature byte.
   apply_patch 0024-mos-brk-signature-operand
@@ -245,11 +243,32 @@ if [ ! -d "$SRC/.git" ]; then
   # so 0002 can neither absorb nor drop it. Downstream-only — AS2 is not
   # upstream-standalone-testable until the far ABI is blessed.
   apply_patch 0048-mos-far-codegen-lit-tests
+  # Vector operations scalarize before entering the MOS scalar rules.
+  # 0049 carries the upstream integer/vector-memory prerequisites at this pin.
+  apply_patch 0049-mos-vector-scalarize-backport
+  apply_patch 0050-mos-float-vector-arithmetic
+  apply_patch 0051-mos-zp-byte-index
+  apply_patch 0052-mos-bank-relax-section-offset
+  # The 6502 scavenger regression is independent of the a16-only MIR witness.
+  # Its implementation is part of 0002; import only the standalone test here.
+  apply_patch 0011-mos-scavenger-live-p-save \
+    --include='llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll'
   # Keep the computed-carry scheduling optimization as a standalone patch.
   apply_patch 0064-mos-computed-carry-scheduling
   # Far memop lowering is in 0002; retain its independent runtime-ABI test.
   apply_patch 0013-320-far-memops \
     --include='llvm/test/CodeGen/MOS/far-memset.ll'
+  apply_patch 0053-mos-lit-expectations
+  apply_patch 0054-llvm-scavenger-save-range
+  apply_patch 0055-mos-native-wide-anyext
+  apply_patch 0056-llvm-gisel-inline-asm-register-bounds
+  apply_patch 0057-llvm-selectiondag-inline-asm-register-bounds
+  apply_patch 0058-aarch64-inline-asm-unknown-type
+  apply_patch 0059-llvm-selectiondag-vector-asm-parts
+  apply_patch 0060-llvm-reduce-parallel-mir
+  apply_patch 0061-mos-far-global-long-x
+  apply_patch 0062-mos-native-far-word
+  apply_patch 0063-mos-near-shared-store
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and

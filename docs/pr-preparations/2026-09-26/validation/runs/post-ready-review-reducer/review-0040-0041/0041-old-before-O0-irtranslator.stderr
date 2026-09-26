@@ -1,0 +1,30 @@
+llc-before-0041: /work/build/register-exhaustion-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:442: bool llvm::InlineAsmLowering::lowerInlineAsm(MachineIRBuilder &, const CallBase &, std::function<ArrayRef<Register> (const Value &)>) const: Assertion `NumOpRegs == 1 && "Wrong flag: multi-register tied operands " "not supported in GlobalISel inline asm"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-before-0041 -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll -o - -stop-after=irtranslator
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll'.
+2.	Running pass 'IRTranslator' on function '@tied128'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-before-0041 0x000061e2f5def1db llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-before-0041 0x000061e2f5dec061 llvm::sys::RunSignalHandlers() + 369
+2  llc-before-0041 0x000061e2f5deffeb
+3  libc.so.6       0x0000745ed0645cb0
+4  libc.so.6       0x0000745ed06a61ac pthread_kill + 284
+5  libc.so.6       0x0000745ed0645b7e gsignal + 30
+6  libc.so.6       0x0000745ed06288ec abort + 39
+7  libc.so.6       0x0000745ed0629979
+8  libc.so.6       0x0000745ed063bf75 __assert_fail + 181
+9  llc-before-0041 0x000061e2f6493aba llvm::InlineAsmLowering::lowerInlineAsm(llvm::MachineIRBuilder&, llvm::CallBase const&, std::function<llvm::ArrayRef<llvm::Register> (llvm::Value const&)>) const + 13882
+10 llc-before-0041 0x000061e2f64831ce llvm::IRTranslatorImpl::translateInlineAsm(llvm::CallBase const&, llvm::MachineIRBuilder&) + 110
+11 llc-before-0041 0x000061e2f648343d llvm::IRTranslatorImpl::translateCall(llvm::User const&, llvm::MachineIRBuilder&) + 445
+12 llc-before-0041 0x000061e2f648abfc llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) + 4124
+13 llc-before-0041 0x000061e2f648bb6a llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) + 554
+14 llc-before-0041 0x000061e2f4a89fd9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+15 llc-before-0041 0x000061e2f501c7c0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+16 llc-before-0041 0x000061e2f50248c2 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+17 llc-before-0041 0x000061e2f501d584 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+18 llc-before-0041 0x000061e2f39ec78b
+19 llc-before-0041 0x000061e2f39e9a53 main + 1443
+20 libc.so.6       0x0000745ed062a601
+21 libc.so.6       0x0000745ed062a718 __libc_start_main + 136
+22 llc-before-0041 0x000061e2f39e8c65 _start + 37

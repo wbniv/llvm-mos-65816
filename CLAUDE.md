@@ -39,6 +39,10 @@ check canonical records, follow-ups, Git history, folded/standalone patches,
 live source, and the tested binary. Extend the existing canonical record for
 repeat sightings; a new record needs the staged `prior_work` audit. Update the
 original report's visible status when an existing repair is established.
+Before upstream preparation, reconcile the exact destination's entry-point
+guards, callers, regression tests, and history too; an existing upstream guard
+may make the local failing path unreachable. Prefer its backport over a duplicate
+upstream repair when applicable.
 
 Follow [the defect evidence workflow](docs/howto-defect-evidence.md) and the
 closure rules in [AGENTS.md](AGENTS.md). Every new compiler defect or status

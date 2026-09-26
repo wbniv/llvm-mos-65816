@@ -1,0 +1,10 @@
+5.220366e-02 addr-asciz-invalid-modifier.s
+8.727074e-02 addr-asciz-roundtrip.s
+8.908176e-02 addr-asciz.s
+7.157218e-01 float-vector.ll
+5.389962e-01 inline-asm-physreg-width.ll
+6.395173e-02 long-address-roundtrip-65816.s
+2.450061e-02 modifier-width-65816.s
+3.385973e-02 modifier-width-errors.s
+1.889277e-02 modifier-width.s
+7.634783e-02 zp-byte-index.ll

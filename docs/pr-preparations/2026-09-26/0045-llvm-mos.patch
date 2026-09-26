@@ -1,0 +1,128 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+index ecfe05d..ee02dbf 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+@@ -78,6 +78,48 @@
+   }
+ }
+ 
++// A 16-bit immediate prints its width explicitly whenever the bare text could
++// be re-parsed as an 8-bit one. The assembler has no notion of the M/X flags,
++// so `adc #66` always matches the narrowest candidate and reassembles to two
++// bytes; with M=0 the processor then consumes the following opcode as the
++// immediate's high byte and the whole instruction stream desynchronises.
++// Values above 255 are unambiguous already, which is why only small constants
++// need an explicit width.
++//
++// This is the same rule MOSDisassembler::getInstruction applies when it
++// re-wraps a decoded 16-bit immediate, one layer over: here it covers every
++// MCInst that reaches the printer, including the ones built by codegen, which
++// is the only producer of a plain (unwrapped) small 16-bit immediate.
++void MOSInstPrinter::printImm16Operand(const MCInst *MI, unsigned OpNo,
++                                       raw_ostream &OS) {
++  const MCOperand &Op = MI->getOperand(OpNo);
++
++  // An expression that already carries a MOS modifier prints that modifier
++  // itself; wrapping it again would yield mos16(mos16(x)).
++  if (Op.isExpr())
++    if (const auto *MME = dyn_cast<MOSMCExpr>(Op.getExpr()))
++      if (MME->getKind() != MOSMCExpr::VK_NONE)
++        return printOperand(MI, OpNo, OS);
++
++  // A constant that cannot fit an 8-bit immediate already states its own
++  // width, so ordinary disassembly does not grow a wrapper. Anything else --
++  // a small constant, an out-of-range one (whose bare text matches no operand
++  // at all), or a symbolic expression (which always matches the narrowest
++  // candidate) -- has to say how wide it is.
++  int64_t Value;
++  bool IsConstant = Op.isImm();
++  if (IsConstant)
++    Value = Op.getImm();
++  else if (Op.isExpr())
++    IsConstant = Op.getExpr()->evaluateAsAbsolute(Value);
++  if (IsConstant && Value > 0xFF && Value <= 0xFFFF)
++    return printOperand(MI, OpNo, OS);
++
++  OS << "mos16(";
++  printOperand(MI, OpNo, OS);
++  OS << ')';
++}
++
+ void MOSInstPrinter::printBranchOperand(const MCInst *MI, uint64_t Address,
+                                         unsigned OpNo, raw_ostream &OS) {
+   const MCOperand &Op = MI->getOperand(OpNo);
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+index 8c61f60..c6795eb 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+@@ -40,6 +40,7 @@ public:
+   void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printBranchOperand(const MCInst *MI, uint64_t Address, unsigned OpNo,
+                           raw_ostream &OS);
++  void printImm16Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+                                unsigned OpIdx, unsigned PrintMethodIdx,
+                                raw_ostream &OS);
+diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+index ad9c595..e48d582 100644
+--- a/llvm/lib/Target/MOS/MOSInstrFormats.td
++++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
+@@ -225,7 +225,15 @@ class imm16at<int offset> : Operand<i32> {
+   let OperandNamespace = "MOSOp";
+   let Type = i16;
+ }
+-def imm16 : imm16at<1>;
++// The 16-bit immediate of an Immediate16 instruction must be printed with an
++// explicit mos16() width whenever it would fit an 8-bit one, or the assembly
++// does not round-trip: the assembler has no M/X state, so a bare `adc #66`
++// re-parses as the two-byte form and, with M=0, desynchronises the instruction
++// stream from that point on. imm16at5 (the HuC6280 tii/tdd block length) does
++// not share this: its operand slot has no narrower sibling to collapse into.
++def imm16 : imm16at<1> {
++  let PrintMethod = "printImm16Operand";
++}
+ def imm16at5 : imm16at<5>;
+ 
+ /// An 8-bit pc-relative reference, for branch instructions.
+diff --git a/llvm/test/CodeGen/MOS/immediate-width-printer.mir b/llvm/test/CodeGen/MOS/immediate-width-printer.mir
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/immediate-width-printer.mir
+@@ -0,0 +1,37 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs %s -o %t.s
++# RUN: FileCheck %s < %t.s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-after=prolog-epilog -verify-machineinstrs -filetype=obj %s -o %t.direct.o
++# RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %t.s -o %t.reassembled.o
++# RUN: llvm-objcopy -O binary --only-section=.text %t.direct.o %t.direct.bin
++# RUN: llvm-objcopy -O binary --only-section=.text %t.reassembled.o %t.reassembled.bin
++# RUN: cmp %t.direct.bin %t.reassembled.bin
++#
++# Explicit machine opcodes determine immediate width without native IR lowering.
++# The printed operand must preserve that width when assembly is parsed again.
++# CHECK-LABEL: native_immediates:
++# CHECK: adc #mos16(66)
++# CHECK-NEXT: eor #mos16(255)
++# CHECK-NEXT: cmp #mos16(5)
++# CHECK-NEXT: lda #256
++# CHECK-NEXT: ldx #mos16(0)
++# CHECK-NEXT: ldy #65535
++# CHECK-NEXT: adc #66
++# CHECK-NEXT: rts
++--- |
++  target triple = "mos"
++  define void @native_immediates() { ret void }
++...
++---
++name: native_immediates
++tracksRegLiveness: false
++body: |
++  bb.0:
++    ADC_Immediate16 66
++    EOR_Immediate16 255
++    CMP_Immediate16 5
++    LDA_Immediate16 256
++    LDX_Immediate16 0
++    LDY_Immediate16 65535
++    ADC_Immediate 66
++    RTS_Implied
++...

@@ -1,0 +1,90 @@
+--- |
+  ; ModuleID = 'build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-depth.mir'
+  source_filename = "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-depth.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @depth_across_blocks() #0 {
+  entry:
+    unreachable
+  }
+  
+  attributes #0 = { "target-cpu"="mos6502" }
+...
+---
+name:            depth_across_blocks
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: false
+hasWinCFI:       false
+noPhis:          true
+isSSA:           true
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: true
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    successors: %bb.1(0x80000000)
+  
+    PH undef $y
+    JMP %bb.1
+  
+  bb.1:
+    successors: %bb.1(0x40000000), %bb.2(0x40000000)
+  
+    TSX_Implied implicit-def $x
+    $a = LDAAbsIdx 258, $x
+    PH $a
+    TSX_Implied implicit-def $x
+    $a = LDAAbsIdx 260, $x
+    $y = PL
+    $c = LDCImm 0
+    BR %bb.1, $c, 1
+    JMP %bb.2
+  
+  bb.2:
+    $y = PL
+    RTS
+...

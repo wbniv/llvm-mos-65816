@@ -1,0 +1,33 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:201: virtual bool llvm::MOSRegisterInfo::saveScavengerRegister(MachineBasicBlock &, MachineBasicBlock::iterator, MachineBasicBlock::iterator &, const TargetRegisterClass *, Register) const: Assertion `!(Reg == MOS::P && !UseHardStack) && "expected P live range to fully contain all overlapping vreg live " "ranges"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llc -mtriple=mos -mcpu=mosw65816 -run-pass=scavenger-test -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir -o -
+1.	Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir'.
+2.	Running pass 'Scavenge virtual registers inside basic blocks' on function '@status_save_range'
+ #0 0x00005cc6c5204e3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x452ce3b)
+ #1 0x00005cc6c5201cc1 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x4529cc1)
+ #2 0x00005cc6c5205c4b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007b51ff451cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007b51ff4b21ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007b51ff451b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007b51ff4348ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00007b51ff435979 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29979)
+ #8 0x00007b51ff447f75 __assert_fail (/usr/lib/x86_64-linux-gnu/libc.so.6+0x3bf75)
+ #9 0x00005cc6c3800505 llvm::MOSRegisterInfo::saveScavengerRegister(llvm::MachineBasicBlock&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&, llvm::MCRegisterClass const*, llvm::Register) const MOSRegisterInfo.cpp:0:0
+#10 0x00005cc6c4129b88 llvm::RegScavenger::spill(llvm::Register, llvm::MCRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x3451b88)
+#11 0x00005cc6c412a98c llvm::RegScavenger::scavengeRegisterBackwards(llvm::MCRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x345298c)
+#12 0x00005cc6c412b761 scavengeVReg(llvm::MachineRegisterInfo&, llvm::RegScavenger&, llvm::Register, bool) RegisterScavenging.cpp:0:0
+#13 0x00005cc6c412b288 scavengeFrameVirtualRegsInBlock(llvm::MachineRegisterInfo&, llvm::RegScavenger&, llvm::MachineBasicBlock&) RegisterScavenging.cpp:0:0
+#14 0x00005cc6c412ad2a llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x3452d2a)
+#15 0x00005cc6c412ba1c (anonymous namespace)::ScavengerTest::runOnMachineFunction(llvm::MachineFunction&) RegisterScavenging.cpp:0:0
+#16 0x00005cc6c3ea00a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x31c80a9)
+#17 0x00005cc6c4432420 llvm::FPPassManager::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x375a420)
+#18 0x00005cc6c443a522 llvm::FPPassManager::runOnModule(llvm::Module&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x3762522)
+#19 0x00005cc6c44331e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x375b1e4)
+#20 0x00005cc6c2e042cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#21 0x00005cc6c2e01593 main (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x2129593)
+#22 0x00007b51ff436601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#23 0x00007b51ff436718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#24 0x00005cc6c2e007a5 _start (/work/build/post-ready-validation-mos-r3/0054/baseline-bin/llc+0x21287a5)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir

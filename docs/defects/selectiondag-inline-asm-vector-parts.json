@@ -36,6 +36,11 @@
   },
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0059/receipt.json",
+      "sha256": "f1cce16588b7ede579529c8a2b5a02cf44a2765e6607c042cb219a5b798f0fba",
+      "description": "September 26 exact-current LLVM submission red/green and cross-target suite validation; original baseline and repair evidence retained. Coordination: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
+    {
       "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
       "sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289"
     },
@@ -1007,5 +1012,5 @@
     ],
     "validation": "Thirty crashing form/configuration pairs now exit normally with diagnostics; six already-diagnosed controls remain rejected. Six supported configurations pass on both predecessor and candidate. Cross-target suite: 278 PASS/4 XFAIL. MOS suite: 173 PASS/2 UNSUPPORTED. Rejected inputs have no runtime semantics to validate."
   },
-  "upstream_scope": "Preserved baseline is patched through 0057, not a clean upstream binary. The complete pre-0057 SelectionDAGBuilder.cpp equals saved published upstream 742d554bf08042b8df93d791c335260fadd16643; the affected conversion helpers were unchanged by 0057. No latest-upstream claim. Independent review and generic submission preparation remain."
+  "upstream_scope": "Dated September 25 baseline assessment: Preserved baseline is patched through 0057, not a clean upstream binary. The complete pre-0057 SelectionDAGBuilder.cpp equals saved published upstream 742d554bf08042b8df93d791c335260fadd16643; the affected conversion helpers were unchanged by 0057. No latest-upstream claim. Independent review and generic submission preparation remain. September 26: the separately preserved exact-current LLVM packet, independent review, and matching-input red/green are linked in observations; the original baseline remains unchanged."
 }

@@ -1,0 +1,14 @@
+---
+name: nonidentity_partial_undef
+tracksRegLiveness: true
+body: |
+  bb.0:
+    %0:gr8_abcd_l = MOV8ri 1
+    undef %1.sub_8bit:gr16_abcd = COPY %0
+    $cx = COPY %1
+    $eax = MOVZX32rr8 $ch
+    $cx = IMPLICIT_DEF
+    %2:gr8_abcd_l = COPY %1.sub_8bit
+    $dl = COPY %2
+    RET64 implicit $eax, implicit $dl
+...

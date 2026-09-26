@@ -1,0 +1,28 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/CodeGen/PrologEpilogInserter.cpp:658: void (anonymous namespace)::PEIImpl::spillCalleeSavedRegs(MachineFunction &): Assertion `MF.getProperties().hasNoVRegs()' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: llc -mtriple=mos -mcpu=mosw65816 -run-pass=prolog-epilog -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir -o -
+1.	Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir'.
+2.	Running pass 'Prologue/Epilogue Insertion & Frame Finalization' on function '@status_save_range'
+ #0 0x0000564e7ce5cebb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x452cebb)
+ #1 0x0000564e7ce59d41 llvm::sys::RunSignalHandlers() (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x4529d41)
+ #2 0x0000564e7ce5dccb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x000076c5ca242cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000076c5ca2a31ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x000076c5ca242b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x000076c5ca2258ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x000076c5ca226979 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x29979)
+ #8 0x000076c5ca238f75 __assert_fail (/usr/lib/x86_64-linux-gnu/libc.so.6+0x3bf75)
+ #9 0x0000564e7bcd24ef (anonymous namespace)::PEIImpl::run(llvm::MachineFunction&) PrologEpilogInserter.cpp:0:0
+#10 0x0000564e7bcd27a7 (anonymous namespace)::PEILegacy::runOnMachineFunction(llvm::MachineFunction&) PrologEpilogInserter.cpp:0:0
+#11 0x0000564e7baf80a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x31c80a9)
+#12 0x0000564e7c08a4a0 llvm::FPPassManager::runOnFunction(llvm::Function&) (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x375a4a0)
+#13 0x0000564e7c0925a2 llvm::FPPassManager::runOnModule(llvm::Module&) (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x37625a2)
+#14 0x0000564e7c08b264 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x375b264)
+#15 0x0000564e7aa5c2cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#16 0x0000564e7aa59593 main (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x2129593)
+#17 0x000076c5ca227601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#18 0x000076c5ca227718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#19 0x0000564e7aa587a5 _start (/work/build/post-ready-validation-mos-r2/0054/candidate-bin/llc+0x21287a5)
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir

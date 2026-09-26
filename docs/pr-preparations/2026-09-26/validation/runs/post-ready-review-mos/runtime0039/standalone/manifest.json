@@ -1,0 +1,229 @@
+{
+  "purpose": "0039 stock-6502 explicit-address-width runtime differential",
+  "cwd": "/home/will/llvm-mos-65816",
+  "input": {
+    "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/modifier-width-runtime.s",
+    "sha256": "868699f0bca17c9dd1af7a11ed2a61c8fd1cd79c481d5ec19a2a7793b4ab0ceb"
+  },
+  "runner": {
+    "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/run.py",
+    "sha256": "cb137beb57a38d61d659b6750cf06716bbf0c6f47b0a5932fcbcd520760dad99"
+  },
+  "scope": "Assembler MC object text only; no C frontend, linker, SDK library, or SNES platform.",
+  "configuration": {
+    "triple": "mos",
+    "cpu": "mos6502",
+    "emulator_cmos": false,
+    "reset_pc": 512,
+    "timeout_seconds": 10
+  },
+  "packaging": "Each mos-sim block is little-endian address:u16,size:u16,data; code is at 0x0200 and the reset vector at 0xFFFC points to it.",
+  "tools": {
+    "objcopy": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+      "sha256": "6172d1940e2468d348605f5c129bb66b83fd7ab525de6e4c2bbf0575e4b0335c"
+    },
+    "readobj": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-readobj",
+      "sha256": "6958f18390b05c36508862f376e06debb4ca260dc7c1f46ed201ac2256c93630"
+    },
+    "sim": {
+      "path": "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+      "sha256": "e7bf3477fc14e12603bed35963fbcd38cfba8a50b8901529429f3f6eee441593"
+    }
+  },
+  "runs": {
+    "baseline": {
+      "assembler": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-mc",
+        "sha256": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3"
+      },
+      "version": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-mc",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline-version.log",
+          "sha256": "73461a1afc1c5bbeb3fc1daa7c0d91d64c6ad4a27a2a0b53703916cae220e739"
+        }
+      },
+      "assemble": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-mc",
+          "-triple=mos",
+          "-mcpu=mos6502",
+          "-filetype=obj",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/modifier-width-runtime.s",
+          "-o",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline-assemble.log",
+          "sha256": "1b2c8f596787fac7a4f243a1f5174acda91471983e90297d27152a24e8ef1a0c"
+        }
+      },
+      "relocations": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-readobj",
+          "--relocations",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o"
+        ],
+        "exit_code": 0,
+        "stdout": "\nFile: /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o\nFormat: elf32-mos\nArch: mos\nAddressSize: 32bit\nLoadName: <Not found>\nRelocations [\n]\n",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline-relocations.log",
+          "sha256": "7e9ebfced50b0efd81d3bce9a5afc7c7e7de81c903bcdc09d0641c7593a1fcd2"
+        }
+      },
+      "extract": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+          "--only-section=.text",
+          "-O",
+          "binary",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.bin"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline-extract.log",
+          "sha256": "f24f6cea4b09b46b97b5798ba68e3686cf8c13930d48f2ccb41c76a85e0afda4"
+        }
+      },
+      "execute": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+          "--trace",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.simg"
+        ],
+        "exit_code": 7,
+        "stdout": "W",
+        "stderr": "0200 a:00 x:00 y:00 s:fd st:20 (..1.....) insn:a9 57 85\n0202 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:85 00 a9\n0204 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:a9 50 8d\n0206 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:8d 00 01\n0209 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:a2 10 b5\n020b a:50 x:10 y:00 s:fd st:20 (..1.....) insn:b5 f0 8d\n020d a:57 x:10 y:00 s:fd st:20 (..1.....) insn:8d f9 ff\n0210 a:57 x:10 y:00 s:fd st:20 (..1.....) insn:49 50 8d\n0212 a:07 x:10 y:00 s:fd st:20 (..1.....) insn:8d f8 ff\n",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline-execute.log",
+          "sha256": "a98359fccd4cc34aaf798ff3057da8559cb336378770feff8adbcc79a915009c"
+        }
+      },
+      "object": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.o",
+        "sha256": "3611c7b5b82fb1cf332fd25d88cf6952bbf23a313862ee002d76a99157fa4483"
+      },
+      "code": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.bin",
+        "sha256": "a1b4791ccdd18f326c27fb40b83a02c9b41056ceb0b38625edb64965c30d7186"
+      },
+      "image": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/baseline.simg",
+        "sha256": "d03714a2fbbebeca260b096f3fb5c57c464906338fd2287f7ba9886062c2181e"
+      },
+      "code_hex": "a9578500a9508d0001a210b5f08df9ff49508df8ff",
+      "observed_byte": 87
+    },
+    "candidate": {
+      "assembler": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/candidate-bin/llvm-mc",
+        "sha256": "dd80b4ba2fddb42884864c57b412c20606f7d6278fdf3bb4a8372591942a04e6"
+      },
+      "version": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/candidate-bin/llvm-mc",
+          "--version"
+        ],
+        "exit_code": 0,
+        "stdout": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate-version.log",
+          "sha256": "cf9e151fdade3c473950574aab6ecec1a7bb1e5b6d15e6fd4d3cb9118c597c7f"
+        }
+      },
+      "assemble": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/candidate-bin/llvm-mc",
+          "-triple=mos",
+          "-mcpu=mos6502",
+          "-filetype=obj",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/modifier-width-runtime.s",
+          "-o",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate-assemble.log",
+          "sha256": "e6fdc909f5c9be2cf964dff9d7b640aac5126f008626aced07f6fe06fc3ccea9"
+        }
+      },
+      "relocations": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-readobj",
+          "--relocations",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o"
+        ],
+        "exit_code": 0,
+        "stdout": "\nFile: /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o\nFormat: elf32-mos\nArch: mos\nAddressSize: 32bit\nLoadName: <Not found>\nRelocations [\n]\n",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate-relocations.log",
+          "sha256": "95bf3b2bb7afa4f3c24130e1bc8fef90723463b21c27fe219466c53966ead6b9"
+        }
+      },
+      "extract": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy",
+          "--only-section=.text",
+          "-O",
+          "binary",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.bin"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate-extract.log",
+          "sha256": "768ba16097163641b56909d72a5dea28c3802112f61bbc1f91faa5e02a3eb084"
+        }
+      },
+      "execute": {
+        "command": [
+          "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+          "--trace",
+          "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.simg"
+        ],
+        "exit_code": 0,
+        "stdout": "P",
+        "stderr": "0200 a:00 x:00 y:00 s:fd st:20 (..1.....) insn:a9 57 85\n0202 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:85 00 a9\n0204 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:a9 50 8d\n0206 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:8d 00 01\n0209 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:a2 10 bd\n020b a:50 x:10 y:00 s:fd st:20 (..1.....) insn:bd f0 00\n020e a:50 x:10 y:00 s:fd st:20 (..1.....) insn:8d f9 ff\n0211 a:50 x:10 y:00 s:fd st:20 (..1.....) insn:49 50 8d\n0213 a:00 x:10 y:00 s:fd st:22 (..1...z.) insn:8d f8 ff\n",
+        "log": {
+          "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate-execute.log",
+          "sha256": "b8810fb9976bd9a76b1066347094b65cb1b85e26b1a1cf31310d6b666785eb51"
+        }
+      },
+      "object": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o",
+        "sha256": "571dd65c66f0123e8c01524e5574eb43eed387893add271315069f09cfa31108"
+      },
+      "code": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.bin",
+        "sha256": "f4b27943977ab7e3b54402a6b4b9c597bb62136a27c2a7ab4682008b64da98ed"
+      },
+      "image": {
+        "path": "/home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.simg",
+        "sha256": "a30cc5ba0a11a1fe629ab2046a2f789ed4812be0c5e3a5e83c2568bc40b19b50"
+      },
+      "code_hex": "a9578500a9508d0001a210bdf0008df9ff49508df8ff",
+      "observed_byte": 80
+    }
+  }
+}

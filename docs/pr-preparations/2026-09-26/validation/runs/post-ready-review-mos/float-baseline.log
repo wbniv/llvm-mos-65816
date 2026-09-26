@@ -1,0 +1,1 @@
+LLVM ERROR: unable to legalize instruction: G_STORE %5:_(<4 x s32>), %0:_(p0) :: (store (<4 x s32>) into %ir.out, align 1) (in function: add_v4sf)

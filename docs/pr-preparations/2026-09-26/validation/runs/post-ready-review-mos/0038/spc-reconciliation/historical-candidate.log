@@ -1,0 +1,19 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0030-claude-review/llc-0038 -mtriple=mos -mcpu=mosspc700 -run-pass=mos-late-opt -verify-machineinstrs /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/late-opt-spc700.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-reconciliation/historical-candidate.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/late-opt-spc700.mir'.
+2.	Running pass 'MOS Late Optimizations' on function '@ldimm_imag8_only'
+ #0 0x00005fb714f7c1db llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x452f1db)
+ #1 0x00005fb714f79061 llvm::sys::RunSignalHandlers() (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x452c061)
+ #2 0x00005fb714f7cfeb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007796fbe45cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00005fb71358160d (anonymous namespace)::MOSLateOptimization::runOnMachineFunction(llvm::MachineFunction&) MOSLateOptimization.cpp:0:0
+ #5 0x00005fb713c16fd9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x31c9fd9)
+ #6 0x00005fb7141a97c0 llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x375c7c0)
+ #7 0x00005fb7141b18c2 llvm::FPPassManager::runOnModule(llvm::Module&) (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x37648c2)
+ #8 0x00005fb7141aa584 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x375d584)
+ #9 0x00005fb712b7978b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#10 0x00005fb712b76a53 main (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x2129a53)
+#11 0x00007796fbe2a601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#12 0x00007796fbe2a718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#13 0x00005fb712b75c65 _start (/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038+0x2128c65)

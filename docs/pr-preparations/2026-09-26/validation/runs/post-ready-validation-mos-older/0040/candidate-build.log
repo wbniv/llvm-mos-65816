@@ -1,0 +1,6 @@
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/5] Building CXX object lib/CodeGen/CMakeFiles/LLVMCodeGen.dir/InlineSpiller.cpp.o
+[2/5] Linking CXX static library lib/libLLVMCodeGen.a
+[3/5] Linking CXX executable bin/opt
+[4/5] Linking CXX executable bin/llc
+[5/5] Linking CXX executable bin/llvm-reduce

@@ -1,0 +1,115 @@
+--- |
+  ; ModuleID = 'build/post-ready-review-mos/0038/flag-probe.ll'
+  source_filename = "build/post-ready-review-mos/0038/flag-probe.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  declare void @yes() #0
+  
+  declare void @no() #0
+  
+  define void @low_byte_branch() #0 {
+  entry:
+    %r = call ptr @llvm.returnaddress.p0(i32 0)
+    %c = icmp ult ptr %r, inttoptr (i16 256 to ptr)
+    br i1 %c, label %then, label %else
+  
+  then:                                             ; preds = %entry
+    call void @yes()
+    ret void
+  
+  else:                                             ; preds = %entry
+    call void @no()
+    ret void
+  }
+  
+  ; Function Attrs: nocallback nofree nosync nounwind willreturn memory(none)
+  declare ptr @llvm.returnaddress.p0(i32 immarg) #1
+  
+  attributes #0 = { "target-cpu"="mosspc700" }
+  attributes #1 = { nocallback nofree nosync nounwind willreturn memory(none) "target-cpu"="mosspc700" }
+...
+---
+name:            low_byte_branch
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: true
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0.entry:
+    successors: %bb.1(0x40000000), %bb.3(0x40000000)
+  
+    renamable $a, dead renamable $x = ReturnAddressByte 0
+    $rc2 = STImag8 $a
+    renamable $a, dead renamable $x = ReturnAddressByte 1
+    dead $c = CMPImm renamable $a, 1, implicit-def dead $c, implicit-def $z
+    BR %bb.3, killed $z, 0
+  
+  bb.1.entry:
+    successors: %bb.2(0x40000000), %bb.4(0x40000000)
+    liveins: $rc2
+  
+    $x = LDImag8 $rc2
+    renamable $c = CMPImm killed renamable $x, 0
+    BR %bb.4, killed renamable $c, 0, implicit-def dead $c
+  
+  bb.2.else:
+    TailJMP @no, mos_csr
+  
+  bb.3.entry:
+    successors: %bb.2(0x40000000), %bb.4(0x40000000)
+    liveins: $a
+  
+    renamable $c = CMPImm killed renamable $a, 1
+    BR %bb.2, killed renamable $c, 1, implicit-def dead $c
+  
+  bb.4.then:
+    TailJMP @yes, mos_csr
+...

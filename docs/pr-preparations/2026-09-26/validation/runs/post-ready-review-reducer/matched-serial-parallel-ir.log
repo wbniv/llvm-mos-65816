@@ -1,0 +1,59 @@
+Interesting stores  17  sleeping  1
+Interesting stores  17  sleeping  1
+Interesting stores  0  sleeping  1
+Interesting stores  9  sleeping  1
+Interesting stores  8  sleeping  1
+Interesting stores  0  sleeping  1
+Interesting stores  0  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  7  sleeping  1
+Interesting stores  7  sleeping  1
+Interesting stores  7  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  6  sleeping  1
+Interesting stores  0  sleeping  1
+Interesting stores  3  sleeping  1
+Interesting stores  3  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  4  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+Interesting stores  5  sleeping  1
+*** Reducing Instructions (instructions)...
+ **** SUCCESS | Saved new best reduction to /home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-parallel-ir.ll
+--------------------------------------------------------------------------------
+*** Reducing Instructions (instructions)...
+--------------------------------------------------------------------------------
+Done reducing! Reduced testcase: /home/will/llvm-mos-65816/build/post-ready-review-reducer/matched-serial-parallel-ir.ll

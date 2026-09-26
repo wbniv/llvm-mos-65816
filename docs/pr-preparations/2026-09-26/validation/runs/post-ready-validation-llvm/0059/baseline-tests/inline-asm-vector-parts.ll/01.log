@@ -1,0 +1,33 @@
+/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-vector-parts.ll:30:10: error: PARTS: expected string not found in input
+; PARTS: error: incompatible vector register parts, possible invalid constraint for vector type
+         ^
+<stdin>:1:1: note: scanning from here
+llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:775: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && "Part type doesn't match vector breakdown!"' failed.
+^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/inline-asm-vector-parts.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:775: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && "Part type doesn't match vector breakdown!"' failed. 
+check:30'0    {                                                                                                                                                                                                                                                                                                                                                     search range start (exclusive)
+check:30'1                                                                                                                                                                                                                                                                                                                                                          error: no match found in search range
+            2: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+            3: Stack dump: 
+            4: 0. Program arguments: llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /work/build/post-ready-validation-llvm/0059/baseline-tests/inline-asm-vector-parts.ll/tmp/input-8.ll -o /dev/null 
+            5: 1. Running pass 'Function Pass Manager' on module '/work/build/post-ready-validation-llvm/0059/baseline-tests/inline-asm-vector-parts.ll/tmp/input-8.ll'. 
+            6: 2. Running pass 'AArch64 Instruction Selection' on function '@f' 
+            .
+            .
+            .
+           29: #22 0x00005fed65914381 llcMain (/work/build/post-ready-validation-llvm/0059/baseline-bin/llc+0x1fd5381) 
+           30: #23 0x00005fed65853aef main (/work/build/post-ready-validation-llvm/0059/baseline-bin/llc+0x1f14aef) 
+           31: #24 0x00007fa3b2f25601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601) 
+           32: #25 0x00007fa3b2f25718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718) 
+           33: #26 0x00005fed658539e5 _start (/work/build/post-ready-validation-llvm/0059/baseline-bin/llc+0x1f149e5) 
+           34: error: Aborted 
+check:30'2                    } search range end (exclusive)
+>>>>>>

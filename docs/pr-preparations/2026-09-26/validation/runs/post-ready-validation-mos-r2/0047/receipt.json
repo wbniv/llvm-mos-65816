@@ -1,0 +1,379 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0047",
+  "prerequisites": [],
+  "runner_sha256": "4332d260d68d68f2317150f007133dd042811d474c97c2d88406f6b92c73dcd4",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 8.925,
+    "log": "build/post-ready-validation-mos-r2/0047/baseline-build.log",
+    "log_sha256": "a03c846bebc755d3e5930b00f0f0a208c783b96f81e234ed5574abb9c3be4af1"
+  },
+  "baseline_tools": {
+    "llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "opt": "e986a0509e629ee4e7670305d17cbb6d070893e204555337a05b37bff6dac228",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llvm-mc -triple mos -filetype=obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.033,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-invalid-modifier.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-invalid-modifier.s",
+      "input_sha256": "b786bfcc934c86dae9515c37e70f27a58ba6afa9f4f7c4b86161893604759129"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -filetype=obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s -o /work/build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-roundtrip.s/tmp.direct.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.022,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-roundtrip.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s -o /work/build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-roundtrip.s/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": -6,
+      "seconds": 0.115,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz-roundtrip.s/01.log",
+      "log_sha256": "71872b07ded8dd85cc57d6212dcc49ca54172b4fe716edfe3a9908816f4f4f26",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -motorola-integers --filetype=obj -o=/work/build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz.s/tmp.obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.017,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-readelf --relocs -x .header /work/build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz.s/tmp.obj | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.019,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz.s/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -motorola-integers -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s --check-prefix=ASM"
+      ],
+      "cwd": "/work",
+      "exit_code": 2,
+      "seconds": 0.118,
+      "log": "build/post-ready-validation-mos-r2/0047/baseline-tests/addr-asciz.s/02.log",
+      "log_sha256": "c49be8cbc77b9ea18557d64a7b8d58878de4e430427ac34c8e211ca462cef844",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 18.785,
+    "log": "build/post-ready-validation-mos-r2/0047/candidate-build.log",
+    "log_sha256": "793b703f132ee79b3d98ba0b56a2408a293374e6410de522a99c9d6e8a57ef21"
+  },
+  "candidate_tools": {
+    "llc": "fc3e06586cbcc014355977e9b1a666bcb5cfe2264caff0a495a15d021a8f784b",
+    "opt": "e27c709a15f5d1a4f5715d6a0f7b98645b166ef3146cec8c58cf9d16bb639d2e",
+    "llvm-mc": "2a466661f62df73243ccd15061e362fa64be90f55a7c9f7de83028ee5f1b1623",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "3971f1d3443c14d387981ecc2c415ceac2b2ef504837d3f127d0ac88c9dcf8d6",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "c93b8e73893aeac0bcd6a5df334cd177453443a35c09376c187e3b92c66fed28",
+    "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llvm-mc -triple mos -filetype=obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-invalid-modifier.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-invalid-modifier.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-invalid-modifier.s",
+      "input_sha256": "b786bfcc934c86dae9515c37e70f27a58ba6afa9f4f7c4b86161893604759129"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -filetype=obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s -o /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.direct.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.009,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s -o /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.01,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -filetype=obj /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.s -o /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.roundtrip.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.009,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "cmp /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.direct.o /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.roundtrip.o"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.007,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/03.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-readelf -x .resolved /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/tmp.direct.o | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz-roundtrip.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz-roundtrip.s/04.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz-roundtrip.s",
+      "input_sha256": "37aae7dec5d0c1a3ddfebe541c1fb034d1296153be4cee94803aab41eb33c13a"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -motorola-integers --filetype=obj -o=/work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz.s/tmp.obj /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.009,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-readelf --relocs -x .header /work/build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz.s/tmp.obj | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.019,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz.s/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -motorola-integers -show-encoding /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/addr-asciz.s --check-prefix=ASM"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.017,
+      "log": "build/post-ready-validation-mos-r2/0047/candidate-tests/addr-asciz.s/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/addr-asciz.s",
+      "input_sha256": "54dd491689dcc3dafff110c19074006b1dd241f636346bd482231ed81a4c971d"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 6.003,
+    "log": "build/post-ready-validation-mos-r2/0047/mos-suites.log",
+    "log_sha256": "431e74ed3c2887dd79db5957695526890ece5aa44b86d91109437a5983011093"
+  }
+}

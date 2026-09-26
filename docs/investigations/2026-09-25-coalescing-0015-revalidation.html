@@ -143,6 +143,14 @@ reducer is outside this 0015 revalidation.</p>
 replays the preserved crashing binary and input, identifies the missing
 <code>MachineModuleInfo</code> in parallel workers, and records same-input red/green
 evidence. The 0015 baseline and its original disposition above are unchanged.</p>
+<p><strong>September 26 upstream reconciliation:</strong> LLVM already rejected parallel MIR
+before this report, in upstream <code>b1ba3d515a02</code> (September 24). The
+<a href="../pr-preparations/2026-09-26/0060-pr-body.md">current MOS backport packet</a>
+uses that existing guard, with valid-MIR red/green and serial-MIR/parallel-IR
+controls; this is not a new LLVM bug. The original local parallel candidate's
+general thread-safety is unestablished. Earlier reduction evidence stays dated.
+Reconciliation: OpenAI Codex CLI 0.157.0 (<code>codex-tui</code>), model <code>gpt-6-astra</code>,
+<code>xhigh</code> reasoning effort; session <code>01a0db16-f6a0-7e32-ada6-0c8098813933</code>.</p>
 <p>The <a href="../plans/2026-09-25-65816-all-opcode-roundtrip.md">opcode roundtrip plan</a>
 remains written and unimplemented, as requested. Current summaries, earlier
 0015/0028 investigations, and the generated status/flowchart views are updated

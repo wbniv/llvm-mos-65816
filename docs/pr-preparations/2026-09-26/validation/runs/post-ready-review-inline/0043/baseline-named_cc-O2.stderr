@@ -1,0 +1,33 @@
+Unexpected physical register copy.
+UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1059!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll -o -
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll'.
+2.	Running pass 'Greedy Register Allocator' on function '@named_cc'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000058071b855e3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x000058071b852cc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x000058071b856c4b
+3  libc.so.6 0x00007e3a27e45cb0
+4  libc.so.6 0x00007e3a27ea61ac pthread_kill + 284
+5  libc.so.6 0x00007e3a27e45b7e gsignal + 30
+6  libc.so.6 0x00007e3a27e288ec abort + 39
+7  llc       0x000058071b7b15ff
+8  llc       0x0000580719e565a9
+9  llc       0x0000580719e549bf
+10 llc       0x000058071a70c9f6
+11 llc       0x000058071a73e9f6
+12 llc       0x000058071a73f287
+13 llc       0x000058071a7086da llvm::RegAllocBase::allocatePhysRegs() + 714
+14 llc       0x000058071a730f07
+15 llc       0x000058071a743fa9
+16 llc       0x000058071a4f10a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+17 llc       0x000058071aa83420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+18 llc       0x000058071aa8b522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc       0x000058071aa841e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+20 llc       0x00005807194552cb
+21 llc       0x0000580719452593 main + 1443
+22 libc.so.6 0x00007e3a27e2a601
+23 libc.so.6 0x00007e3a27e2a718 __libc_start_main + 136
+24 llc       0x00005807194517a5 _start + 37

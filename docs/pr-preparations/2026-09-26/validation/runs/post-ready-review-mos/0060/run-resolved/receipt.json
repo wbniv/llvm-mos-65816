@@ -1,0 +1,77 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), gpt-6-astra, xhigh",
+  "scope": "Preserved LLVM e59 baseline already containing upstream guard; not a new MOS backport build",
+  "packet_sha256": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
+  "upstream_metadata_sha256": "df30e3ec3f104e1b11041cfeb6bd07b39bdb81c4094fde46e29c9d64365317d0",
+  "exact_upstream_sections": 4,
+  "tools": {
+    "llvm-reduce": "857b5b41f3488f12135bb89a1cc34d9f0c25f8def0d84186833e71469deabfde",
+    "llc": "93b6a35c447f85042c65830e1daea85e0f6103c1fb380c3df78cec658009c81c",
+    "FileCheck": "825b64ce8cf637b09d531a1d3ebf9e3a153f648ea94a98abdbecf1a6d2ce23da"
+  },
+  "runs": [
+    {
+      "command": "not llvm-reduce -j 4 --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-unsupported.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-unsupported 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck -check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-unsupported.mir",
+      "exit_code": 0,
+      "input_sha256": "7e478b68341936d824f31ac202e3e1ab6e70311c07db4eb4b56abb9e4b3d63fb",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-unsupported-0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "not llvm-reduce -j 4 -x=mir --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-unsupported.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-unsupported 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck -check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-unsupported.mir",
+      "exit_code": 0,
+      "input_sha256": "7e478b68341936d824f31ac202e3e1ab6e70311c07db4eb4b56abb9e4b3d63fb",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-unsupported-1.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "llc -run-pass=none -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir -o /dev/null",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "llvm-reduce -x=mir -j 1 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.serial",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-1.log",
+      "log_sha256": "12577841791aad7471138c15d69887d1c59b72906d5a185bc6fd2e3c68a257a7"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=SERIAL /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir < /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.serial",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "not llvm-reduce -j 2 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "not llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir --test-arg --input-file /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.parallel 2>&1 | /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --check-prefix=ERR /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/parallel-jobs-valid-input.mir",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-4.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "llvm-reduce --abort-on-invalid-reduction -j 2 /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/../operands-skip.ll -o /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.ir --delta-passes=operands-skip --test /home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck --test-arg /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/../operands-skip.ll --test-arg --match-full-lines --test-arg --check-prefix=INTERESTING --test-arg --input-file",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-5.log",
+      "log_sha256": "ad07a7322f3d0dc35d583c2a4af09e47722579c9e02ac3b24b2677ee166d869a"
+    },
+    {
+      "command": "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/tests/mir/../operands-skip.ll --input-file /home/will/llvm-mos-65816/build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input.ir --check-prefix=REDUCED",
+      "exit_code": 0,
+      "input_sha256": "d2554ec26ed0c0fbd00efb8c4eda808b20caff776d5b8de26dc3cb5412cb63e5",
+      "log": "build/post-ready-review-mos/0060/run-resolved/parallel-jobs-valid-input-6.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

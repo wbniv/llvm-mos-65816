@@ -1,0 +1,46 @@
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir:12:10: error: CHECK: expected string not found in input
+# CHECK: adc #mos16(66)
+         ^
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s:37:19: note: scanning from here
+native_immediates: ; @native_immediates
+                  ^
+/home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s:39:2: note: possible intended match here
+ adc #66
+ ^
+
+Input file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/native-checks/stock.s
+Check file: /home/will/llvm-mos-65816/build/post-ready-review-reducer/native-immediates.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           32:  .zeropage __rc31 
+           33:  .file "native-immediates.mir" 
+           34:  .text 
+           35:  .globl native_immediates ; -- Begin function native_immediates 
+           36:  .type native_immediates,@function 
+           37: native_immediates: ; @native_immediates 
+check:12'0                       X~~~~~~~~~~~~~~~~~~~~~ error: no match found
+           38: ; %bb.0: 
+check:12'0     ~~~~~~~~~
+           39:  adc #66 
+check:12'0     ~~~~~~~~~
+check:12'1      ?        possible intended match
+           40:  eor #255 
+check:12'0     ~~~~~~~~~~
+           41:  cmp #5 
+check:12'0     ~~~~~~~~
+           42:  lda #256 
+check:12'0     ~~~~~~~~~~
+           43:  ldx #0 
+check:12'0     ~~~~~~~~
+           44:  ldy #65535 
+check:12'0     ~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

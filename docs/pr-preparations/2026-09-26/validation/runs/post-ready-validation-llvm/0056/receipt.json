@@ -1,0 +1,240 @@
+{
+  "venue": "llvm",
+  "base": "e59a0c697552ae7d1c3aeed5774e829cdc5e16b5",
+  "patch": "0056",
+  "prerequisites": [],
+  "runner_sha256": "17c99335cfd445fcfdb24c1e00ae2e96aedb19001a81ff144d634984668557b3",
+  "container_image": "sha256:eeecfab76840167d9f16982b1efddae90d4969c5d7891ec16e87e46150ac94c1",
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/post-ready-2026-09-26-llvm-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 16.47,
+    "log": "build/post-ready-validation-llvm/0056/baseline-build.log",
+    "log_sha256": "d6418ab7417fdb492b221adff9ce27549c091892ef89d221032758623025fddd"
+  },
+  "baseline_tools": {
+    "llc": "93b6a35c447f85042c65830e1daea85e0f6103c1fb380c3df78cec658009c81c",
+    "opt": "e4615b2d3e0259b7f9dc76cfdc0a70a57b9759d98ff84c710d4454aaf74a268f",
+    "llvm-mc": "1181ae01b51112bf42daf035e352b30762d2b0db447e95325dc80142ee100e89",
+    "llvm-objdump": "45df648dd44033d34cc7c90cee84d52417cc45d2d30079fdf9f00fbd233230f4",
+    "llvm-objcopy": "bbc0b0c27aa90c94d96df1de7a5273313f6eb094bdbf3c23ef9bebf5dacd25d2",
+    "llvm-readobj": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "llvm-readelf": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "FileCheck": "825b64ce8cf637b09d531a1d3ebf9e3a153f648ea94a98abdbecf1a6d2ce23da",
+    "not": "11df371f7da20f711700fafddbbf7df6301b9157ec70d9bb3c726cd35225b2ad",
+    "split-file": "e7ac40df1a0634399a350d02c8594f3ccaba57be484933fa2aeb233e6b804c94",
+    "count": "abc2311cc7f89fe153d96be41f68a8be57dea38ddcb9c2ae172d6cc1bf80b02d",
+    "llvm-config": "7bb879bfa0e02af293a91748c983cf9eb8a3bea34379afdd54b336c6c036ba63",
+    "llvm-reduce": "857b5b41f3488f12135bb89a1cc34d9f0c25f8def0d84186833e71469deabfde",
+    "llvm-as": "051e152164e84c6e095316924c6278f637d9fc9206bbb9c820f56789c0766888",
+    "llvm-link": "f01a215455ee01f4e941fb643f4ef0289adfa23e6658ed2bf23ad30bfa50aabd",
+    "yaml2obj": "ec78a6d55f7899d4a66e1837e7ff16611ed04dcc9870d678a3a956899b5c4421",
+    "llvm-nm": "1bbeac3f19d0ddaaa7389751cf8ff0c63a1d83db687857c01e3a6bb7c0474026",
+    "llvm-dis": "49656d0933418d80d5fac7db18657db5760faaebb0123765d41ed8f00a8ec9cc",
+    "verify-uselistorder": "15eebf03e7d0d027fd3ee6c051fffe256fe840a6e69f62e80e750ba0e807b229"
+  },
+  "baseline_suites": {
+    "command": [
+      "/work/build/post-ready-2026-09-26-llvm-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "--filter=(inline.?asm|asm-goto|callbr)",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/AArch64",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/X86"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 3.13,
+    "log": "build/post-ready-validation-llvm/0056/baseline-suites.log",
+    "log_sha256": "453de78cba2362c59e67c4c8af0a7aad7a2da990874045a7a9977a9578942204"
+  },
+  "patch_sha256": "2407d97531303a071e4e7df3a3b9a45a3200fbafe8dae0a7cc9f8683fc0b058b",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.265,
+      "log": "build/post-ready-validation-llvm/0056/baseline-tests/inline-asm-physreg-exhaustion.ll/00.log",
+      "log_sha256": "01a6a19c70ece746edfb1d79dc2692a2b78c7ff7f3798c899d05baeb0f9a2c8f",
+      "test": "llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll",
+      "input_sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/post-ready-2026-09-26-llvm-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "llvm-dis",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 5.29,
+    "log": "build/post-ready-validation-llvm/0056/candidate-build.log",
+    "log_sha256": "e8908f67ded23d2422f450ab041f4f591bc5a48262ff30e91e48d56ded43fed9"
+  },
+  "candidate_tools": {
+    "llc": "b60445abbcf251b70da43eada8f130344e921b9122902799a8e17b523e3b8bcd",
+    "opt": "e025e0616cfef17da11de1aa09c79b706b1128a1229afb4d6a83e588499a7a56",
+    "llvm-mc": "1181ae01b51112bf42daf035e352b30762d2b0db447e95325dc80142ee100e89",
+    "llvm-objdump": "45df648dd44033d34cc7c90cee84d52417cc45d2d30079fdf9f00fbd233230f4",
+    "llvm-objcopy": "bbc0b0c27aa90c94d96df1de7a5273313f6eb094bdbf3c23ef9bebf5dacd25d2",
+    "llvm-readobj": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "llvm-readelf": "0b94756ea238faa5781a6456b0307f6be16acc6c1f5b3c4c07e2c36f906fa8a7",
+    "FileCheck": "825b64ce8cf637b09d531a1d3ebf9e3a153f648ea94a98abdbecf1a6d2ce23da",
+    "not": "11df371f7da20f711700fafddbbf7df6301b9157ec70d9bb3c726cd35225b2ad",
+    "split-file": "e7ac40df1a0634399a350d02c8594f3ccaba57be484933fa2aeb233e6b804c94",
+    "count": "abc2311cc7f89fe153d96be41f68a8be57dea38ddcb9c2ae172d6cc1bf80b02d",
+    "llvm-config": "7bb879bfa0e02af293a91748c983cf9eb8a3bea34379afdd54b336c6c036ba63",
+    "llvm-reduce": "9e3c6ce730a60d86c6c056a0e0033f814e3cf3f2d0edc339035b150e0d148163",
+    "llvm-as": "051e152164e84c6e095316924c6278f637d9fc9206bbb9c820f56789c0766888",
+    "llvm-link": "f01a215455ee01f4e941fb643f4ef0289adfa23e6658ed2bf23ad30bfa50aabd",
+    "yaml2obj": "ec78a6d55f7899d4a66e1837e7ff16611ed04dcc9870d678a3a956899b5c4421",
+    "llvm-nm": "1bbeac3f19d0ddaaa7389751cf8ff0c63a1d83db687857c01e3a6bb7c0474026",
+    "llvm-dis": "49656d0933418d80d5fac7db18657db5760faaebb0123765d41ed8f00a8ec9cc",
+    "verify-uselistorder": "15eebf03e7d0d027fd3ee6c051fffe256fe840a6e69f62e80e750ba0e807b229"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.115,
+      "log": "build/post-ready-validation-llvm/0056/candidate-tests/inline-asm-physreg-exhaustion.ll/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll",
+      "input_sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0056/candidate-tests/inline-asm-physreg-exhaustion.ll/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll",
+      "input_sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O0 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0056/candidate-tests/inline-asm-physreg-exhaustion.ll/02.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll",
+      "input_sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O2 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 2>&1 | FileCheck /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-llvm/0056/candidate-tests/inline-asm-physreg-exhaustion.ll/03.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll",
+      "input_sha256": "2406e15c96c9ca2557123ae387e632e088b7f6e466d91d9730a11ec2b5ddcd64"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "candidate_suites": {
+    "command": [
+      "/work/build/post-ready-2026-09-26-llvm-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "--filter=(inline.?asm|asm-goto|callbr)",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/AArch64",
+      "/work/build/post-ready-2026-09-26-llvm-build/test/CodeGen/X86"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 3.122,
+    "log": "build/post-ready-validation-llvm/0056/candidate-suites.log",
+    "log_sha256": "957ac18fb7735965e2b8ada0e49dc00485dda520653f4e0e3fe7ff63f1bbf2ed"
+  },
+  "candidate_suites_passed": true,
+  "expected_baseline_observed": true,
+  "validation_gates_passed": true
+}

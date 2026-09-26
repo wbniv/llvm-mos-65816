@@ -1,0 +1,67 @@
+# [GlobalISel] Lower scalar inline-asm operands spanning multiple registers
+
+GlobalISel currently rejects register inputs and outputs spanning multiple
+registers and asserts when such an input is tied to an output. On AArch64,
+`i128` with constraint `r` reaches this at `-O0`: the target selects two
+32-bit registers, so the tied group has more than one definition and use.
+
+Split a scalar input into equally sized register pieces, least significant
+piece first, using shifts and truncations. Merge output pieces with
+`G_MERGE_VALUES`. Emit the register count in the operand-group flag and tie
+each input piece to its corresponding output definition. Register-class
+selection and the target's register-count API remain unchanged.
+
+As in SelectionDAG's `getCopyToParts`/`getCopyFromParts`, adjust scalar widths
+to the combined register width. In particular, an AArch64 `i128` result from
+two 32-bit pieces requires a 64-to-128-bit `G_ANYEXT`; only the low 64 bits are
+defined by that constraint. This extraction adds widening only for merged
+multi-register outputs. Existing single-register output rejection remains
+unchanged.
+
+The new helpers require a little-endian layout and uniformly sized register
+pieces. Splitting additionally requires a scalar input held in one generic
+register. This is not comprehensive inline-asm support or a blanket promise
+that malformed/unsupported constraints cannot assert: register-assignment
+bounds diagnostics remain a separate change (0056). Indirect outputs are
+outside this patch and do not require or include the separate 0037 repair.
+
+Tests cover tied, ordinary input, ordinary output, and early-clobber AArch64
+forms. The IRTranslator checks pin piece order, each tie, merge, and result
+widening at `-O0` and `-O2`; full codegen runs use MachineVerifier and require
+GlobalISel without fallback. The existing fallback test no longer expects
+these forms to fall back. `build-pair-isel.ll` keeps explicit SelectionDAG
+coverage and also checks successful GlobalISel codegen without constraining
+the arbitrary upper output bits.
+
+Destination: `llvm/llvm-project`, based on
+`e59a0c697552ae7d1c3aeed5774e829cdc5e16b5`, standalone. This extracts the existing
+0041 implementation from commit `4a532486f54d36061330e026a3d107bd0a9bf092`.
+It is not a new report of the same failure. The old generic variant implicitly
+relied on a MOS-only scalar-output `G_ZEXT` branch absent from LLVM; this
+package makes the required multi-register widening explicit and uses LLVM
+SelectionDAG's undefined-high-bits contract.
+
+The final package (`8819a60f6f7a51bfbc0a17609babc8c64db137e09ed28b8fa0f92f6a04014b7c`)
+passes a standalone Release/assertion-enabled build on that LLVM main pin.
+The baseline asserts on the new tied-register group and separately rejects
+the explicit GlobalISel build-pair call. All ten candidate focused RUNs pass,
+including the four new O0/O2 commands, existing fallback checks and both
+selector-specific build-pair commands. Filtered AArch64/X86 inline-asm suites
+pass 168 tests with three unchanged expected failures and zero unexpected
+failures; these are not full target suites. The
+local preparation receipt and final independent audit retain and verify artifact,
+input, compiler, configuration and log identities, including the final
+comment-only clarification. Historical MOS torture/runtime results remain
+separate supporting evidence. The package is ready to post, but unposted.
+
+Original diagnosis, implementation and validation credit: Claude Code CLI
+(version unknown), Claude Opus 5 (1M context), exact model ID
+`claude-opus-5[1m]`, `high` reasoning effort, as recorded in the original
+validation. Independent review and current-base extraction: OpenAI Codex CLI
+0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified
+session `01a0db97-39fe-7452-bbab-73d26f1d19a9`.
+Current LLVM build/test execution: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified coordinator session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`. Final independent source/receipt audit:
+OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning
+effort; verified session `01a0db96-a6cd-7800-82a5-6b871eb7e177`.

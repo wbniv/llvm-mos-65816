@@ -1,0 +1,1 @@
+$ /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/supported.ll -o /dev/null

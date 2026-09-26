@@ -1,0 +1,78 @@
+	.file	"0041-inline-asm-multi-register.ll"
+	.text
+	.globl	tied128                         // -- Begin function tied128
+	.p2align	2
+	.type	tied128,@function
+tied128:                                // @tied128
+	.cfi_startproc
+// %bb.0:
+	mov	x8, x0
+	mov	w0, w8
+	lsr	x8, x8, #32
+	mov	w1, w8
+	//APP
+	//NO_APP
+                                        // kill: def $x0 killed $w0
+	mov	w8, w1
+	bfi	x0, x8, #32, #32
+	mov	x1, xzr
+	ret
+.Lfunc_end0:
+	.size	tied128, .Lfunc_end0-tied128
+	.cfi_endproc
+                                        // -- End function
+	.globl	out128                          // -- Begin function out128
+	.p2align	2
+	.type	out128,@function
+out128:                                 // @out128
+	.cfi_startproc
+// %bb.0:
+	//APP
+	//NO_APP
+                                        // kill: def $x0 killed $w0
+	mov	w8, w1
+	bfi	x0, x8, #32, #32
+	mov	x1, xzr
+	ret
+.Lfunc_end1:
+	.size	out128, .Lfunc_end1-out128
+	.cfi_endproc
+                                        // -- End function
+	.globl	multi_reg_input                 // -- Begin function multi_reg_input
+	.p2align	2
+	.type	multi_reg_input,@function
+multi_reg_input:                        // @multi_reg_input
+	.cfi_startproc
+// %bb.0:
+	mov	w8, w0
+	lsr	x9, x0, #32
+                                        // kill: def $w9 killed $w9 killed $x9
+	//APP
+	// x0 x8 
+	//NO_APP
+                                        // kill: def $x0 killed $w0
+	mov	w8, w1
+	bfi	x0, x8, #32, #32
+	mov	x1, xzr
+	ret
+.Lfunc_end2:
+	.size	multi_reg_input, .Lfunc_end2-multi_reg_input
+	.cfi_endproc
+                                        // -- End function
+	.globl	in128                           // -- Begin function in128
+	.p2align	2
+	.type	in128,@function
+in128:                                  // @in128
+	.cfi_startproc
+// %bb.0:
+	mov	w8, w0
+	lsr	x9, x0, #32
+                                        // kill: def $w9 killed $w9 killed $x9
+	//APP
+	//NO_APP
+	ret
+.Lfunc_end3:
+	.size	in128, .Lfunc_end3-in128
+	.cfi_endproc
+                                        // -- End function
+	.section	".note.GNU-stack","",@progbits

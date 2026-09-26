@@ -1,0 +1,34 @@
+llc: /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:157: void assertNZDeadAt(MachineBasicBlock &, MachineBasicBlock::iterator): Assertion `!LiveRegs.contains(MOS::N) && "expected N to be free when saving scavenger register"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-known-0011.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll'.
+2.	Running pass 'Prologue/Epilogue Insertion & Frame Finalization' on function '@test_array_ptr'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005cbe91cc1e3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005cbe91cbecc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005cbe91cc2c4b
+3  libc.so.6 0x00007bff4f445cb0
+4  libc.so.6 0x00007bff4f4a61ac pthread_kill + 284
+5  libc.so.6 0x00007bff4f445b7e gsignal + 30
+6  libc.so.6 0x00007bff4f4288ec abort + 39
+7  libc.so.6 0x00007bff4f429979
+8  libc.so.6 0x00007bff4f43bf75 __assert_fail + 181
+9  llc       0x00005cbe902bd893
+10 llc       0x00005cbe902bd1db
+11 llc       0x00005cbe90be6b88 llvm::RegScavenger::spill(llvm::Register, llvm::MCRegisterClass const&, int, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>&) + 520
+12 llc       0x00005cbe90be798c llvm::RegScavenger::scavengeRegisterBackwards(llvm::MCRegisterClass const&, llvm::MachineInstrBundleIterator<llvm::MachineInstr, false>, bool, int, bool) + 2556
+13 llc       0x00005cbe90be8761
+14 llc       0x00005cbe90be8175
+15 llc       0x00005cbe90be7d2a llvm::scavengeFrameVirtualRegs(llvm::MachineFunction&, llvm::RegScavenger&) + 170
+16 llc       0x00005cbe90b35bbb
+17 llc       0x00005cbe90b377a7
+18 llc       0x00005cbe9095d0a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+19 llc       0x00005cbe90eef420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+20 llc       0x00005cbe90ef7522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+21 llc       0x00005cbe90ef01e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+22 llc       0x00005cbe8f8c12cb
+23 llc       0x00005cbe8f8be593 main + 1443
+24 libc.so.6 0x00007bff4f42a601
+25 libc.so.6 0x00007bff4f42a718 __libc_start_main + 136
+26 llc       0x00005cbe8f8bd7a5 _start + 37

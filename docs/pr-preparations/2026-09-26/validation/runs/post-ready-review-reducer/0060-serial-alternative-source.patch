@@ -1,0 +1,35 @@
+--- a/llvm/tools/llvm-reduce/deltas/Delta.cpp
++++ b/llvm/tools/llvm-reduce/deltas/Delta.cpp
+@@ -239,9 +239,13 @@
+     increaseGranularity(ChunksStillConsideredInteresting);
+   }
+ 
++  // The parallel path transports IR bitcode, which does not contain machine
++  // functions. MIR reductions use the serial cloning path to retain them.
++  const bool UseParallelism = NumJobs > 1 && !Test.getProgram().isMIR();
++
+   std::atomic<bool> AnyReduced;
+   std::unique_ptr<ThreadPoolInterface> ChunkThreadPoolPtr;
+-  if (NumJobs > 1)
++  if (UseParallelism)
+     ChunkThreadPoolPtr =
+         std::make_unique<DefaultThreadPool>(hardware_concurrency(NumJobs));
+ 
+@@ -257,7 +261,7 @@
+ 
+     // When running with more than one thread, serialize the original bitcode
+     // to OriginalBC.
+-    if (NumJobs > 1) {
++    if (UseParallelism) {
+       OriginalBC.clear();
+       raw_svector_ostream BCOS(OriginalBC);
+       Test.getProgram().writeBitcode(BCOS);
+@@ -272,7 +276,7 @@
+ 
+       // Run in parallel mode, if the user requested more than one thread and
+       // there are at least a few chunks to process.
+-      if (NumJobs > 1 && WorkLeft > 1) {
++      if (UseParallelism && WorkLeft > 1) {
+         unsigned NumInitialTasks = std::min(WorkLeft, unsigned(NumJobs));
+         unsigned NumChunksProcessed = 0;
+ 

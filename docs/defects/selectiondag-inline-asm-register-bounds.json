@@ -35,6 +35,11 @@
   },
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0057/receipt.json",
+      "sha256": "7303993c78b46b1d4a642f2345b722e57b775c3d70e79356bf931683950bfcbf",
+      "description": "September 26 exact-current LLVM submission red/green and cross-target suite validation; original baseline and repair evidence retained. Coordination: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
+    {
       "path": "docs/defects/evidence/2026-09-25-selectiondag-inlineasm/0057-upstream-based.patch",
       "sha256": "fcc8b2b037415ef1333654ce1171ed661d86136858cde35fef2337e09e7953fc"
     },
@@ -395,5 +400,5 @@
       "exit_code": 0
     }
   },
-  "upstream_scope": "The preserved multi-target binary includes prior patches through 0041, not a clean upstream build. Its entire SelectionDAGBuilder.cpp is byte-identical to saved published upstream revision 742d554bf08042b8df93d791c335260fadd16643. An upstream-based patch variant applies and produces the tested source. No latest-upstream claim."
+  "upstream_scope": "Dated September 25 baseline assessment: The preserved multi-target binary includes prior patches through 0041, not a clean upstream build. Its entire SelectionDAGBuilder.cpp is byte-identical to saved published upstream revision 742d554bf08042b8df93d791c335260fadd16643. An upstream-based patch variant applies and produces the tested source. No latest-upstream claim. September 26: the separately preserved exact-current LLVM packet, independent review, and matching-input red/green are linked in observations; the original baseline remains unchanged."
 }

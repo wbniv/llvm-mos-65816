@@ -1,0 +1,13 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-readobj --relocations /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o
+exit=0
+stdout:
+
+File: /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/standalone/candidate.o
+Format: elf32-mos
+Arch: mos
+AddressSize: 32bit
+LoadName: <Not found>
+Relocations [
+]
+
+stderr:

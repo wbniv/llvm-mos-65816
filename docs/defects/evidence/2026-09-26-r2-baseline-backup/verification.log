@@ -1,0 +1,8 @@
+2026-09-26T02:21:14Z
+README.md: OK
+manifest.json: OK
+ARCHIVE-SHA256SUMS: OK
+defect-baselines-2026-09-26.tar.zst.part00: OK
+defect-baselines-2026-09-26.tar.zst.part01: OK
+03feae4f9611523dc471f21003cbf33186f187a8e7944982d459359a7d585de7  -
+/*stdin*\           : 1237780480 bytes 

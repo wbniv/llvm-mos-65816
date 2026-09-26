@@ -1,0 +1,530 @@
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+-- Testing: 207 tests, 2 workers --
+PASS: LLVM :: tools/llvm-reduce/remove-instructions.ll (1 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-metadata.ll (2 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-to-return.ll (3 of 207)
+PASS: LLVM :: tools/llvm-reduce/thinlto-preserve-uselistorder.ll (4 of 207)
+PASS: LLVM :: tools/llvm-reduce/flaky-interestingness.ll (5 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-invoke.ll (6 of 207)
+PASS: LLVM :: tools/llvm-reduce/file-output-type.test (7 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-fp.ll (8 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip.ll (9 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip-parallel.ll (10 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-int.ll (11 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-sequence.ll (12 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-flags.ll (13 of 207)
+PASS: LLVM :: tools/llvm-reduce/temporary-files-as-bitcode-split.ll (14 of 207)
+PASS: LLVM :: tools/llvm-reduce/bitcode-uselistorder.ll (15 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands.ll (16 of 207)
+PASS: LLVM :: tools/llvm-reduce/uselistorder-invalid-ir-output.ll (17 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-multiple-use-of-global-vars-in-same-instruction.ll (18 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-cfg.ll (19 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-multiple-use-of-args-in-same-instruction.ll (20 of 207)
+PASS: LLVM :: tools/llvm-reduce/parallel-workitem-kill.ll (21 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-distinct-metadata.ll (22 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dp-values.ll (23 of 207)
+PASS: LLVM :: tools/llvm-reduce/temporary-files-as-bitcode.ll (24 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-operand-bundles.ll (25 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-illegal2.ll (26 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-from-declaration.ll (27 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-alias.ll (28 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-ptr.ll (29 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-from-intrinsic-like-functions.ll (30 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-attributes.ll (31 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-ifunc.ll (32 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-unused-declarations.ll (33 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies-comdat.ll (34 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies.ll (35 of 207)
+PASS: LLVM :: tools/llvm-reduce/initialize-asm-parsers.ll (36 of 207)
+PASS: LLVM :: tools/llvm-reduce/debug-metadata-verifier.ll (37 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-target-features-attr.ll (38 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-fn-passed-through-call.ll (39 of 207)
+PASS: LLVM :: tools/llvm-reduce/do-not-remove-terminator.ll (40 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args.ll (41 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-ifunc-program-addrspace.ll (42 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-from-intrinsics.ll (43 of 207)
+PASS: LLVM :: tools/llvm-reduce/disable-crash-reports.test (44 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-vars.ll (45 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-variable-attributes.ll (46 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-volatile.ll (47 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-module-data.ll (48 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-duplicate-switch-case.ll (49 of 207)
+PASS: LLVM :: tools/llvm-reduce/command-line-behavior.test (50 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-named-metadata.ll (51 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-argument-preserve-attributes.ll (52 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-illegal.ll (53 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-x86_intrcc.ll (54 of 207)
+PASS: LLVM :: tools/llvm-reduce/custom-delta-passes.ll (55 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-conditionals.ll (56 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-atomic-ordering.ll (57 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-opcodes-call.ll (58 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-metadata-args.ll (59 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-args.ll (60 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-repeated-phi-input.ll (61 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-replace-intrinsic-callee-with-undef.ll (62 of 207)
+PASS: LLVM :: tools/llvm-reduce/oracle-count.ll (63 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies-used-in-globals.ll (64 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-phi.ll (65 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-atomic-syncscope.ll (66 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-functions-used.ll (67 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-used.ll (68 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-merge-next-block-invalid-reduction.ll (69 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-unwinded-to.ll (70 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-module-flags.ll (71 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error1.ll (72 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-call-site-attributes.ll (73 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-attributes-optnone-noinline.ll (74 of 207)
+PASS: LLVM :: tools/llvm-reduce/ifunc-alias.ll (75 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bb-switch-default.ll (76 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error3.ll (77 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-prologue-data.ll (78 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args.ll (79 of 207)
+PASS: LLVM :: tools/llvm-reduce/issue111817-catchswitch-assert.ll (80 of 207)
+PASS: LLVM :: tools/llvm-reduce/run-ir-passes.ll (81 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-skip-repeated-phi-input.ll (82 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-prefix-data.ll (83 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-debug-info-nodes.ll (84 of 207)
+PASS: LLVM :: tools/llvm-reduce/108541-null-metadata-crash.ll (85 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/preserve-jump-table-info.mir (86 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-blocks-only-phi-nodes-may-reference-own-value.ll (87 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-alloca.ll (88 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-output-file.test (89 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-alloca.ll (90 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-callbr.ll (91 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-x86-amx.ll (92 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-code-model.ll (93 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-funcs.ll (94 of 207)
+PASS: LLVM :: tools/llvm-reduce/unconditional-br-phi.ll (95 of 207)
+PASS: LLVM :: tools/llvm-reduce/skip-delta-passes.ll (96 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-sink-defs-to-uses.ll (97 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-target-ext-ty.ll (98 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error2.ll (99 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-non-callee-use.ll (100 of 207)
+PASS: LLVM :: tools/llvm-reduce/invoke-with-missing-landingpad.ll (101 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/set-triple-on-module.mir (102 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-swifterror.ll (103 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-conditionals-already-constant-brcond.ll (104 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs.ll (105 of 207)
+PASS: LLVM :: tools/llvm-reduce/granularity-level.ll (106 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dimetadata.ll (107 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-ret-nonvoid.ll (108 of 207)
+PASS: LLVM :: tools/llvm-reduce/unconditional-br.ll (109 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-token.ll (110 of 207)
+PASS: LLVM :: tools/llvm-reduce/invalid-bitcode-error.ll (111 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-externally-initialized.ll (112 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-2.ll (113 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-unreachable.ll (114 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dso-local.ll (115 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-wrong-call-type-issue69312.ll (116 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-remove-ifunc-function.ll (117 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-invoked-functions.ll (118 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-token-preallocated.ll (119 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-global-variable-terminator-user.ll (120 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-function-personality.ll (121 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-funcs-inline-history.ll (122 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-callbr.ll (123 of 207)
+PASS: LLVM :: tools/llvm-reduce/inline-call-sites.ll (124 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-opcodes.ll (125 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-arguments-of-funcs-used-in-blockaddress.ll (126 of 207)
+PASS: LLVM :: tools/llvm-reduce/issue100880-mismatched-call-type.ll (127 of 207)
+PASS: LLVM :: tools/llvm-reduce/inline-call-sites-cost.ll (128 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-comdat.ll (129 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-new-return-type.ll (130 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-preserve-fmf.ll (131 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-x86-amx.ll (132 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-nocrash.ll (133 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-convergent.ll (134 of 207)
+PASS: LLVM :: tools/llvm-reduce/distinct-dimetadata-nullptr.ll (135 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-args-target-ext-ty.ll (136 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-functions-blockaddress.ll (137 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dll.ll (138 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-bundles.ll (139 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip-intrinsics.ll (140 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-strictfp.ll (141 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-lifetimes.ll (142 of 207)
+PASS: LLVM :: tools/llvm-reduce/strip-debug-info.ll (143 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-convergent-uncontrolled.ll (144 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-wrong-cc.ll (145 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-target-ext-type.ll (146 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-invoke.ll (147 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-instructions.ll (148 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-fmf.ll (149 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-preserve-attributes.ll (150 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-invoke.ll (151 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-token.ll (152 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-x86-amx.ll (153 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-functions-blockaddress-wrong-function.ll (154 of 207)
+PASS: LLVM :: tools/llvm-reduce/special-globals-missing-should-keep-assert.ll (155 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-metadata-to-attributes.ll (156 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-all-of-multiple-args.ll (157 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-used-by-ret.ll (158 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error0.ll (159 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/parallel-jobs-unsupported.mir (160 of 207)
+PASS: LLVM :: tools/llvm-reduce/ifunc-nonsense-resolvers.ll (161 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-to-return-nonvoid-noncallee-use.ll (162 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-linkage-intrinsic-global-variables.ll (163 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-thread-local.ll (164 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-section.ll (165 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-align.ll (166 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-single-arg.ll (167 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-linkage.ll (168 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-skip-token.ll (169 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-unnamed-addr.ll (170 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-entry.ll (171 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-metadata.ll (172 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-visibility.ll (173 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-operand-bundles-convergencectrl.ll (174 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/infer-triple-unknown-target.mir (175 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-file-open.test (176 of 207)
+PASS: LLVM :: tools/llvm-reduce/run-ir-passes-error.ll (177 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-execute-test.test (178 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/instr-reduce.mir (179 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/infer-triple.mir (180 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/instr-reduce-dead-def.mir (181 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/generic-vreg.mir (182 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/input-file-does-not-exist.mir (183 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-defs.mir (184 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-machine-function-info-amdgpu.mir (185 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-uses.mir (186 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-block-info.mir (187 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-machine-function-info-riscv.mir (188 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/subreg-def0.mir (189 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-masks.mir (190 of 207)
+PASS: LLVM :: tools/llvm-reduce/help.test (191 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/drop-ir-references.mir (192 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-frame-info.mir (193 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/subreg-def1.mir (194 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/multiple-functions.mir (195 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-mem-operands.mir (196 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-uses-generic.mir (197 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-hints.mir (198 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-instruction-flags.mir (199 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-max-call-frame-size.mir (200 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/remove-frame-destroy.mir (201 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-instruction-unreachable-block.mir (202 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-reg-hints.mir (203 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/undef-virt-reg.mir (204 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-func-info.mir (205 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/tracks-reg-liveness.mir (206 of 207)
+FAIL: LLVM :: tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir (207 of 207)
+******************** TEST 'LLVM :: tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 2
+llvm-reduce -x=mir -j 1 --delta-passes=instructions --test /work/build/post-ready-2026-09-26-llvm-build/bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir --test-arg --input-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir -o /work/build/post-ready-2026-09-26-llvm-build/test/tools/llvm-reduce/mir/Output/parallel-instr-reduce-x86.mir.tmp.serial
+# executed command: llvm-reduce -x=mir -j 1 --delta-passes=instructions --test /work/build/post-ready-2026-09-26-llvm-build/bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir --test-arg --input-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir -o /work/build/post-ready-2026-09-26-llvm-build/test/tools/llvm-reduce/mir/Output/parallel-instr-reduce-x86.mir.tmp.serial
+# .---command stderr------------
+# | *** Reducing Instructions (instructions)...
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir:9:16: error: INTERESTING: expected string not found in input
+# | # INTERESTING: MOV32ri 2
+# |                ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-8c5220.mir:1:1: note: scanning from here
+# | --- |
+# | ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-8c5220.mir:72:12: note: possible intended match here
+# |  %2:gr32 = ADD32rr %3, %3, implicit-def dead $eflags
+# |            ^
+# | 
+# | Input file: /tmp/lit-tmp-3ol1vz3t/llvm-reduce-8c5220.mir
+# | Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |            1: --- | 
+# | check:9'0    {        search range start (exclusive)
+# | check:9'1             error: no match found in search range
+# |            2:  ; ModuleID = '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' 
+# |            3:  source_filename = "/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir" 
+# |            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+# |            5:  target triple = "x86_64" 
+# |            6:   
+# |            .
+# |            .
+# |            .
+# |           67: machineFunctionInfo: 
+# |           68:  amxProgModel: None 
+# |           69: body: | 
+# |           70:  bb.0: 
+# |           71:  %3:gr32 = IMPLICIT_DEF 
+# |           72:  %2:gr32 = ADD32rr %3, %3, implicit-def dead $eflags 
+# | check:9'2                ?                                           possible intended match
+# |           73:  $eax = COPY %2 
+# |           74:  RET 0, implicit $eax 
+# |           75: ... 
+# | check:9'3         } search range end (exclusive)
+# | >>>>>>
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir:9:16: error: INTERESTING: expected string not found in input
+# | # INTERESTING: MOV32ri 2
+# |                ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-e29c23.mir:1:1: note: scanning from here
+# | --- |
+# | ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-e29c23.mir:70:12: note: possible intended match here
+# |  %0:gr32 = MOV32ri 1
+# |            ^
+# | 
+# | Input file: /tmp/lit-tmp-3ol1vz3t/llvm-reduce-e29c23.mir
+# | Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |            1: --- | 
+# | check:9'0    {        search range start (exclusive)
+# | check:9'1             error: no match found in search range
+# |            2:  ; ModuleID = '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' 
+# |            3:  source_filename = "/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir" 
+# |            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+# |            5:  target triple = "x86_64" 
+# |            6:   
+# |            .
+# |            .
+# |            .
+# |           65: constants: [] 
+# |           66: machineFunctionInfo: 
+# |           67:  amxProgModel: None 
+# |           68: body: | 
+# |           69:  bb.0: 
+# |           70:  %0:gr32 = MOV32ri 1 
+# | check:9'2                ?           possible intended match
+# |           71:  $eax = COPY %0 
+# |           72:  RET 0, implicit $eax 
+# |           73: ... 
+# | check:9'3         } search range end (exclusive)
+# | >>>>>>
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir:9:16: error: INTERESTING: expected string not found in input
+# | # INTERESTING: MOV32ri 2
+# |                ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-261138.mir:1:1: note: scanning from here
+# | --- |
+# | ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-261138.mir:8:4: note: possible intended match here
+# |  ret i32 0
+# |    ^
+# | 
+# | Input file: /tmp/lit-tmp-3ol1vz3t/llvm-reduce-261138.mir
+# | Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |            1: --- | 
+# | check:9'0    {        search range start (exclusive)
+# | check:9'1             error: no match found in search range
+# |            2:  ; ModuleID = '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' 
+# |            3:  source_filename = "/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir" 
+# |            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+# |            5:  target triple = "x86_64" 
+# |            6:   
+# |            7:  define i32 @parallel_instr_reduce() { 
+# |            8:  ret i32 0 
+# | check:9'2        ?         possible intended match
+# |            9:  } 
+# |           10: ... 
+# |           11: --- 
+# |           12: name: parallel_instr_reduce 
+# |           13: alignment: 1 
+# |            .
+# |            .
+# |            .
+# |           69: body: | 
+# |           70:  bb.0: 
+# |           71:  %3:gr32 = IMPLICIT_DEF 
+# |           72:  $eax = COPY %3 
+# |           73:  RET 0, implicit $eax 
+# |           74: ... 
+# | check:9'3         } search range end (exclusive)
+# | >>>>>>
+# |  **** SUCCESS | Saved new best reduction to /work/build/post-ready-2026-09-26-llvm-build/test/tools/llvm-reduce/mir/Output/parallel-instr-reduce-x86.mir.tmp.serial
+# | --------------------------------------------------------------------------------
+# | *** Reducing Instructions (instructions)...
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir:9:16: error: INTERESTING: expected string not found in input
+# | # INTERESTING: MOV32ri 2
+# |                ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-facc45.mir:1:1: note: scanning from here
+# | --- |
+# | ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-facc45.mir:8:4: note: possible intended match here
+# |  ret i32 0
+# |    ^
+# | 
+# | Input file: /tmp/lit-tmp-3ol1vz3t/llvm-reduce-facc45.mir
+# | Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |            1: --- | 
+# | check:9'0    {        search range start (exclusive)
+# | check:9'1             error: no match found in search range
+# |            2:  ; ModuleID = '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' 
+# |            3:  source_filename = "/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir" 
+# |            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+# |            5:  target triple = "x86_64" 
+# |            6:   
+# |            7:  define i32 @parallel_instr_reduce() { 
+# |            8:  ret i32 0 
+# | check:9'2        ?         possible intended match
+# |            9:  } 
+# |           10: ... 
+# |           11: --- 
+# |           12: name: parallel_instr_reduce 
+# |           13: alignment: 1 
+# |            .
+# |            .
+# |            .
+# |           70: body: | 
+# |           71:  bb.0: 
+# |           72:  %4:gr32 = IMPLICIT_DEF 
+# |           73:  $eax = COPY %4 
+# |           74:  RET 0, implicit $eax 
+# |           75: ... 
+# | check:9'3         } search range end (exclusive)
+# | >>>>>>
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir:9:16: error: INTERESTING: expected string not found in input
+# | # INTERESTING: MOV32ri 2
+# |                ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-f6cbbb.mir:1:1: note: scanning from here
+# | --- |
+# | ^
+# | /tmp/lit-tmp-3ol1vz3t/llvm-reduce-f6cbbb.mir:8:4: note: possible intended match here
+# |  ret i32 0
+# |    ^
+# | 
+# | Input file: /tmp/lit-tmp-3ol1vz3t/llvm-reduce-f6cbbb.mir
+# | Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |            1: --- | 
+# | check:9'0    {        search range start (exclusive)
+# | check:9'1             error: no match found in search range
+# |            2:  ; ModuleID = '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir' 
+# |            3:  source_filename = "/work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir" 
+# |            4:  target datalayout = "e-m:e-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128" 
+# |            5:  target triple = "x86_64" 
+# |            6:   
+# |            7:  define i32 @parallel_instr_reduce() { 
+# |            8:  ret i32 0 
+# | check:9'2        ?         possible intended match
+# |            9:  } 
+# |           10: ... 
+# |           11: --- 
+# |           12: name: parallel_instr_reduce 
+# |           13: alignment: 1 
+# |            .
+# |            .
+# |            .
+# |           69: body: | 
+# |           70:  bb.0: 
+# |           71:  %3:gr32 = IMPLICIT_DEF 
+# |           72:  $eax = COPY %3 
+# |           73:  RET 0, implicit $eax 
+# |           74: ... 
+# | check:9'3         } search range end (exclusive)
+# | >>>>>>
+# | warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+# | /work/build/post-re
+# | ...
+# `---data was truncated (10240/12369) (change limit with -D output_limit=N)
+# RUN: at line 3
+llvm-reduce -x=mir -j 2 --delta-passes=instructions --test /work/build/post-ready-2026-09-26-llvm-build/bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir --test-arg --input-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir -o /work/build/post-ready-2026-09-26-llvm-build/test/tools/llvm-reduce/mir/Output/parallel-instr-reduce-x86.mir.tmp.parallel
+# executed command: llvm-reduce -x=mir -j 2 --delta-passes=instructions --test /work/build/post-ready-2026-09-26-llvm-build/bin/FileCheck --test-arg --check-prefix=INTERESTING --test-arg /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir --test-arg --input-file /work/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir -o /work/build/post-ready-2026-09-26-llvm-build/test/tools/llvm-reduce/mir/Output/parallel-instr-reduce-x86.mir.tmp.parallel
+# .---command stderr------------
+# | llvm-reduce: error: -j is not supported for MIR reduction
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+********************
+Failed Tests (1):
+  LLVM :: tools/llvm-reduce/mir/parallel-instr-reduce-x86.mir
+
+
+Testing Time: 40.09s
+
+Total Discovered Tests: 207
+  Unsupported:  27 (13.04%)
+  Passed     : 179 (86.47%)
+  Failed     :   1 (0.48%)

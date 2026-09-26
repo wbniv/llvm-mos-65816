@@ -1,0 +1,11 @@
+---
+name: undef_lane_identity_copy
+tracksRegLiveness: true
+body: |
+  bb.0:
+    %0:gr8 = MOV8ri 1
+    undef %1.sub_8bit:gr64_with_sub_8bit = COPY %0
+    %2:gr64_with_sub_8bit = COPY %1
+    $rax = COPY %2
+    RET64 implicit $rax
+...

@@ -1,0 +1,230 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0039",
+  "prerequisites": [],
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 146.171,
+    "log": "build/post-ready-validation-mos/0039/baseline-build.log",
+    "log_sha256": "df0afa41301dc32d91a3ef2181c7ee1aab253fbb67ce8318d0609889cd39a35e"
+  },
+  "baseline_tools": {
+    "llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "opt": "e986a0509e629ee4e7670305d17cbb6d070893e204555337a05b37bff6dac228",
+    "llvm-mc": "ce6392596b1f8c65827b37fd5ff8ddb2b151b6e25e8422427526f4e8911a31d3",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "db78c562717c3891d509bb1cf4a8a9799ed28a178811de8aaf8214a794d004d9",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909",
+  "dependency_sha256": {},
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mosw65816 -show-encoding < /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-65816.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-65816.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos/0039/baseline-tests/modifier-width-65816.s/00.log",
+      "log_sha256": "c1a46f303e67eb6df8573b33d2debe355fc2ec8536c86fa5d886f69bee51b93a",
+      "test": "llvm/test/MC/MOS/modifier-width-65816.s",
+      "input_sha256": "a73ed68b84ce565d094b8ac814b54e301a0d7f67c7a42be459992b15398bc7ec"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llvm-mc -triple mos -mcpu=mos6502 /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.066,
+      "log": "build/post-ready-validation-mos/0039/baseline-tests/modifier-width-errors.s/00.log",
+      "log_sha256": "9c10fed8cfd01a4c21aa1f6c984ab864a4c9adbb2a77e74de8748123a0eb34a6",
+      "test": "llvm/test/MC/MOS/modifier-width-errors.s",
+      "input_sha256": "4190b34389f1f9957775c45fb9e3267b4b236204f9da342349d12cec3676e606"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mos6502 -show-encoding < /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.018,
+      "log": "build/post-ready-validation-mos/0039/baseline-tests/modifier-width.s/00.log",
+      "log_sha256": "f633fc0130e029ae54173cba4a3d417ac0b1ea4abbc5799fb15d410716333fb5",
+      "test": "llvm/test/MC/MOS/modifier-width.s",
+      "input_sha256": "adfb0b12d8010a2e4efb662943e338c13734b2cc30e049b8c4b9e0bb9c22987b"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 15.681,
+    "log": "build/post-ready-validation-mos/0039/candidate-build.log",
+    "log_sha256": "793b703f132ee79b3d98ba0b56a2408a293374e6410de522a99c9d6e8a57ef21"
+  },
+  "candidate_tools": {
+    "llc": "7b503e8e9cb48b75ca29d3ddf09391e7485f7419959bde01ca0653f368159398",
+    "opt": "bb57ff22966451ecbd74b8b3208ea516aa948adc71d566b53771b78509363e06",
+    "llvm-mc": "dd80b4ba2fddb42884864c57b412c20606f7d6278fdf3bb4a8372591942a04e6",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "d1f5025ed0d9b7165356bb1faa3d6dc2a270bbcbdd9a7d09629103361f642c7a",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "6ec33ae85e3439e2f032393da9e607fa1aa3833a703c1f748d9df285957dab05",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mosw65816 -show-encoding < /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-65816.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-65816.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.013,
+      "log": "build/post-ready-validation-mos/0039/candidate-tests/modifier-width-65816.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/modifier-width-65816.s",
+      "input_sha256": "a73ed68b84ce565d094b8ac814b54e301a0d7f67c7a42be459992b15398bc7ec"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "not llvm-mc -triple mos -mcpu=mos6502 /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s 2>&1 | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.022,
+      "log": "build/post-ready-validation-mos/0039/candidate-tests/modifier-width-errors.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/modifier-width-errors.s",
+      "input_sha256": "4190b34389f1f9957775c45fb9e3267b4b236204f9da342349d12cec3676e606"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mos6502 -show-encoding < /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.013,
+      "log": "build/post-ready-validation-mos/0039/candidate-tests/modifier-width.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/modifier-width.s",
+      "input_sha256": "adfb0b12d8010a2e4efb662943e338c13734b2cc30e049b8c4b9e0bb9c22987b"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 6.488,
+    "log": "build/post-ready-validation-mos/0039/mos-suites.log",
+    "log_sha256": "76c6326f30a205f79c534934a8d40df9a93057670e8ced87a19237fb439f4d9c"
+  }
+}

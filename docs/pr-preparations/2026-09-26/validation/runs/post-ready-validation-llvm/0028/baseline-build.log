@@ -1,0 +1,3 @@
+ninja: Entering directory `/work/build/post-ready-2026-09-26-llvm-build'
+[1/2] Building CXX object tools/llvm-reduce/CMakeFiles/llvm-reduce.dir/deltas/Delta.cpp.o
+[2/2] Linking CXX executable bin/llvm-reduce

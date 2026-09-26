@@ -1,0 +1,958 @@
+[
+  {
+    "name": "baseline-named_a-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "0e2efe25f31f6f4fe98da88df765acb7dd3cd98d97acd4f7470dfa8c29fd2776",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_a-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "0e2efe25f31f6f4fe98da88df765acb7dd3cd98d97acd4f7470dfa8c29fd2776",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_cc-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "c395eb528c50d221332dfd75b969b554406b14b234a653b74688f446b5078043",
+    "diagnostics": [
+      "Unexpected physical register copy.",
+      "UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1059!",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug."
+    ]
+  },
+  {
+    "name": "baseline-named_cc-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "c395eb528c50d221332dfd75b969b554406b14b234a653b74688f446b5078043",
+    "diagnostics": [
+      "Unexpected physical register copy.",
+      "UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1059!",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug."
+    ]
+  },
+  {
+    "name": "baseline-named_rc-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "9b3a7abda332de031911a0b32f22039e75b32e9f35d9ce5addaead5757607290",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_rc-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "9b3a7abda332de031911a0b32f22039e75b32e9f35d9ce5addaead5757607290",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_rs-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "8c6279219911c47ac1e80b89d45ea00ffae3f1dc3f1180342b625d3755efc6d8",
+    "diagnostics": [
+      "LLVM ERROR: unable to translate instruction: call (in function: named_rs)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "name": "baseline-named_rs-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "8c6279219911c47ac1e80b89d45ea00ffae3f1dc3f1180342b625d3755efc6d8",
+    "diagnostics": [
+      "LLVM ERROR: unable to translate instruction: call (in function: named_rs)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "name": "baseline-named_x-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "ad05f6f4fd9b328b585b2e6ad061cbf5f643766bd538ab0e4b078ecdba20d906",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_x-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "ad05f6f4fd9b328b585b2e6ad061cbf5f643766bd538ab0e4b078ecdba20d906",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_y-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "4b3d37d155bdde1dfee4e7c268b40e04bc3fbad1e00b96d70deace94c9d72f3b",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-named_y-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "4b3d37d155bdde1dfee4e7c268b40e04bc3fbad1e00b96d70deace94c9d72f3b",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-ok-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "795b592ca859702223e0dc6ddb0e2c869a1ffd9347404f102d4632f0901884bf",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-ok-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "795b592ca859702223e0dc6ddb0e2c869a1ffd9347404f102d4632f0901884bf",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_R-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_R.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "62b5bb27e8f9852114391a8abc59c7ae54218f05dbb96b9f6c02b2cb146d97c4",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_R-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_R.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "62b5bb27e8f9852114391a8abc59c7ae54218f05dbb96b9f6c02b2cb146d97c4",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_a-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "fd0b7a825ee028041e665e4c1db7f03c5d5605272fa9fe232f33db7304512314",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_a-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "fd0b7a825ee028041e665e4c1db7f03c5d5605272fa9fe232f33db7304512314",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_d-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_d.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "896185286e3e5b24ba50561cdeb520b9f57f0123613a7d9534b54af4b493ef17",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_d-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_d.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "896185286e3e5b24ba50561cdeb520b9f57f0123613a7d9534b54af4b493ef17",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_in-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "e76968af92fef611ebacd0ce7cacf4120990cc0df183bf72d775f9de697a507b",
+    "diagnostics": [
+      "LLVM ERROR: unable to translate instruction: call (in function: wide_in)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "name": "baseline-wide_in-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll",
+      "-o",
+      "-"
+    ],
+    "exit": -6,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "e76968af92fef611ebacd0ce7cacf4120990cc0df183bf72d775f9de697a507b",
+    "diagnostics": [
+      "LLVM ERROR: unable to translate instruction: call (in function: wide_in)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.",
+      "Stack dump:"
+    ]
+  },
+  {
+    "name": "baseline-wide_x-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "eafd4e0675d49e5a5731bbd6980635b3f21229bc732245f82a2dba75196f8d44",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_x-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "eafd4e0675d49e5a5731bbd6980635b3f21229bc732245f82a2dba75196f8d44",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_y-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "c06fd988688ea3987338b4ec7bb737ff5edf3e5112f2cb63683254079d3500c0",
+    "diagnostics": []
+  },
+  {
+    "name": "baseline-wide_y-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input_sha256": "c06fd988688ea3987338b4ec7bb737ff5edf3e5112f2cb63683254079d3500c0",
+    "diagnostics": []
+  },
+  {
+    "name": "candidate-named_a-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "0e2efe25f31f6f4fe98da88df765acb7dd3cd98d97acd4f7470dfa8c29fd2776",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{a}'"
+    ]
+  },
+  {
+    "name": "candidate-named_a-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "0e2efe25f31f6f4fe98da88df765acb7dd3cd98d97acd4f7470dfa8c29fd2776",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{a}'"
+    ]
+  },
+  {
+    "name": "candidate-named_cc-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "c395eb528c50d221332dfd75b969b554406b14b234a653b74688f446b5078043",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{cc}'"
+    ]
+  },
+  {
+    "name": "candidate-named_cc-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_cc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "c395eb528c50d221332dfd75b969b554406b14b234a653b74688f446b5078043",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{cc}'"
+    ]
+  },
+  {
+    "name": "candidate-named_rc-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "9b3a7abda332de031911a0b32f22039e75b32e9f35d9ce5addaead5757607290",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{rc0}'"
+    ]
+  },
+  {
+    "name": "candidate-named_rc-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rc.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "9b3a7abda332de031911a0b32f22039e75b32e9f35d9ce5addaead5757607290",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{rc0}'"
+    ]
+  },
+  {
+    "name": "candidate-named_rs-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "8c6279219911c47ac1e80b89d45ea00ffae3f1dc3f1180342b625d3755efc6d8",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{rs0}'"
+    ]
+  },
+  {
+    "name": "candidate-named_rs-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "8c6279219911c47ac1e80b89d45ea00ffae3f1dc3f1180342b625d3755efc6d8",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{rs0}'"
+    ]
+  },
+  {
+    "name": "candidate-named_x-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "ad05f6f4fd9b328b585b2e6ad061cbf5f643766bd538ab0e4b078ecdba20d906",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{x}'"
+    ]
+  },
+  {
+    "name": "candidate-named_x-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "ad05f6f4fd9b328b585b2e6ad061cbf5f643766bd538ab0e4b078ecdba20d906",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{x}'"
+    ]
+  },
+  {
+    "name": "candidate-named_y-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "4b3d37d155bdde1dfee4e7c268b40e04bc3fbad1e00b96d70deace94c9d72f3b",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{y}'"
+    ]
+  },
+  {
+    "name": "candidate-named_y-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "4b3d37d155bdde1dfee4e7c268b40e04bc3fbad1e00b96d70deace94c9d72f3b",
+    "diagnostics": [
+      "error: could not allocate output register for constraint '{y}'"
+    ]
+  },
+  {
+    "name": "candidate-ok-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "795b592ca859702223e0dc6ddb0e2c869a1ffd9347404f102d4632f0901884bf",
+    "diagnostics": []
+  },
+  {
+    "name": "candidate-ok-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/ok.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 0,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "795b592ca859702223e0dc6ddb0e2c869a1ffd9347404f102d4632f0901884bf",
+    "diagnostics": []
+  },
+  {
+    "name": "candidate-wide_R-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_R.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "62b5bb27e8f9852114391a8abc59c7ae54218f05dbb96b9f6c02b2cb146d97c4",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'R'"
+    ]
+  },
+  {
+    "name": "candidate-wide_R-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_R.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "62b5bb27e8f9852114391a8abc59c7ae54218f05dbb96b9f6c02b2cb146d97c4",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'R'"
+    ]
+  },
+  {
+    "name": "candidate-wide_a-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "fd0b7a825ee028041e665e4c1db7f03c5d5605272fa9fe232f33db7304512314",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'a'"
+    ]
+  },
+  {
+    "name": "candidate-wide_a-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_a.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "fd0b7a825ee028041e665e4c1db7f03c5d5605272fa9fe232f33db7304512314",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'a'"
+    ]
+  },
+  {
+    "name": "candidate-wide_d-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_d.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "896185286e3e5b24ba50561cdeb520b9f57f0123613a7d9534b54af4b493ef17",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'd'"
+    ]
+  },
+  {
+    "name": "candidate-wide_d-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_d.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "896185286e3e5b24ba50561cdeb520b9f57f0123613a7d9534b54af4b493ef17",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'd'"
+    ]
+  },
+  {
+    "name": "candidate-wide_in-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "e76968af92fef611ebacd0ce7cacf4120990cc0df183bf72d775f9de697a507b",
+    "diagnostics": [
+      "error: could not allocate input reg for constraint 'a'"
+    ]
+  },
+  {
+    "name": "candidate-wide_in-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_in.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "e76968af92fef611ebacd0ce7cacf4120990cc0df183bf72d775f9de697a507b",
+    "diagnostics": [
+      "error: could not allocate input reg for constraint 'a'"
+    ]
+  },
+  {
+    "name": "candidate-wide_x-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "eafd4e0675d49e5a5731bbd6980635b3f21229bc732245f82a2dba75196f8d44",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'x'"
+    ]
+  },
+  {
+    "name": "candidate-wide_x-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_x.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "eafd4e0675d49e5a5731bbd6980635b3f21229bc732245f82a2dba75196f8d44",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'x'"
+    ]
+  },
+  {
+    "name": "candidate-wide_y-O0",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "c06fd988688ea3987338b4ec7bb737ff5edf3e5112f2cb63683254079d3500c0",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'y'"
+    ]
+  },
+  {
+    "name": "candidate-wide_y-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mos6502",
+      "-O2",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/wide_y.ll",
+      "-o",
+      "-"
+    ],
+    "exit": 1,
+    "binary_sha256": "0366306de01dc188a4781da9a378360cbf48769fbb7d7ac169f1784169315a69",
+    "input_sha256": "c06fd988688ea3987338b4ec7bb737ff5edf3e5112f2cb63683254079d3500c0",
+    "diagnostics": [
+      "error: could not allocate output register for constraint 'y'"
+    ]
+  }
+]

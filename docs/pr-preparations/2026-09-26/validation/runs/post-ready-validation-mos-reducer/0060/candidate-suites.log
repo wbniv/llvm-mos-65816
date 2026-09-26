@@ -1,0 +1,274 @@
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/0029-cross-target-build/bin
+-- Testing: 207 tests, 2 workers --
+PASS: LLVM :: tools/llvm-reduce/remove-instructions.ll (1 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-metadata.ll (2 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-to-return.ll (3 of 207)
+PASS: LLVM :: tools/llvm-reduce/flaky-interestingness.ll (4 of 207)
+PASS: LLVM :: tools/llvm-reduce/thinlto-preserve-uselistorder.ll (5 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-invoke.ll (6 of 207)
+PASS: LLVM :: tools/llvm-reduce/file-output-type.test (7 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-fp.ll (8 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-int.ll (9 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip-parallel.ll (10 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip.ll (11 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-sequence.ll (12 of 207)
+PASS: LLVM :: tools/llvm-reduce/parallel-workitem-kill.ll (13 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-distinct-metadata.ll (14 of 207)
+PASS: LLVM :: tools/llvm-reduce/temporary-files-as-bitcode-split.ll (15 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-flags.ll (16 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands.ll (17 of 207)
+PASS: LLVM :: tools/llvm-reduce/uselistorder-invalid-ir-output.ll (18 of 207)
+PASS: LLVM :: tools/llvm-reduce/bitcode-uselistorder.ll (19 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-multiple-use-of-global-vars-in-same-instruction.ll (20 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-cfg.ll (21 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-operand-bundles.ll (22 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-multiple-use-of-args-in-same-instruction.ll (23 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-illegal2.ll (24 of 207)
+PASS: LLVM :: tools/llvm-reduce/temporary-files-as-bitcode.ll (25 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dp-values.ll (26 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-from-intrinsic-like-functions.ll (27 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-ptr.ll (28 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-from-declaration.ll (29 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-alias.ll (30 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-attributes.ll (31 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-ifunc.ll (32 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies-comdat.ll (33 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-unused-declarations.ll (34 of 207)
+PASS: LLVM :: tools/llvm-reduce/initialize-asm-parsers.ll (35 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies.ll (36 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args.ll (37 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-from-intrinsics.ll (38 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-target-features-attr.ll (39 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-ifunc-program-addrspace.ll (40 of 207)
+PASS: LLVM :: tools/llvm-reduce/do-not-remove-terminator.ll (41 of 207)
+PASS: LLVM :: tools/llvm-reduce/debug-metadata-verifier.ll (42 of 207)
+PASS: LLVM :: tools/llvm-reduce/disable-crash-reports.test (43 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-vars.ll (44 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-fn-passed-through-call.ll (45 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-variable-attributes.ll (46 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-volatile.ll (47 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-duplicate-switch-case.ll (48 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-illegal.ll (49 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-named-metadata.ll (50 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-x86_intrcc.ll (51 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-atomic-ordering.ll (52 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-argument-preserve-attributes.ll (53 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-conditionals.ll (54 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-args.ll (55 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-opcodes-call.ll (56 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-metadata-args.ll (57 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-replace-intrinsic-callee-with-undef.ll (58 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-module-data.ll (59 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-repeated-phi-input.ll (60 of 207)
+PASS: LLVM :: tools/llvm-reduce/oracle-count.ll (61 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-bodies-used-in-globals.ll (62 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-atomic-syncscope.ll (63 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-phi.ll (64 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-module-flags.ll (65 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-merge-next-block-invalid-reduction.ll (66 of 207)
+PASS: LLVM :: tools/llvm-reduce/ifunc-alias.ll (67 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-used.ll (68 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-functions-used.ll (69 of 207)
+PASS: LLVM :: tools/llvm-reduce/custom-delta-passes.ll (70 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-unwinded-to.ll (71 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-call-site-attributes.ll (72 of 207)
+PASS: LLVM :: tools/llvm-reduce/issue111817-catchswitch-assert.ll (73 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-attributes-optnone-noinline.ll (74 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error1.ll (75 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args.ll (76 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error3.ll (77 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bb-switch-default.ll (78 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-skip-repeated-phi-input.ll (79 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-prefix-data.ll (80 of 207)
+PASS: LLVM :: tools/llvm-reduce/run-ir-passes.ll (81 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-prologue-data.ll (82 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/preserve-jump-table-info.mir (83 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-debug-info-nodes.ll (84 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-output-file.test (85 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-alloca.ll (86 of 207)
+PASS: LLVM :: tools/llvm-reduce/command-line-behavior.test (87 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-alloca.ll (88 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-code-model.ll (89 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-target-ext-ty.ll (90 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-x86-amx.ll (91 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-blocks-only-phi-nodes-may-reference-own-value.ll (92 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-sink-defs-to-uses.ll (93 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-callbr.ll (94 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-funcs.ll (95 of 207)
+PASS: LLVM :: tools/llvm-reduce/skip-delta-passes.ll (96 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-non-callee-use.ll (97 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error2.ll (98 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-token.ll (99 of 207)
+PASS: LLVM :: tools/llvm-reduce/invoke-with-missing-landingpad.ll (100 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs.ll (101 of 207)
+PASS: LLVM :: tools/llvm-reduce/granularity-level.ll (102 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/set-triple-on-module.mir (103 of 207)
+PASS: LLVM :: tools/llvm-reduce/unconditional-br-phi.ll (104 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-conditionals-already-constant-brcond.ll (105 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-token-preallocated.ll (106 of 207)
+PASS: LLVM :: tools/llvm-reduce/108541-null-metadata-crash.ll (107 of 207)
+PASS: LLVM :: tools/llvm-reduce/invalid-bitcode-error.ll (108 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-swifterror.ll (109 of 207)
+PASS: LLVM :: tools/llvm-reduce/unconditional-br.ll (110 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-externally-initialized.ll (111 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-ret-nonvoid.ll (112 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dimetadata.ll (113 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-unreachable.ll (114 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-wrong-call-type-issue69312.ll (115 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-2.ll (116 of 207)
+PASS: LLVM :: tools/llvm-reduce/no-remove-ifunc-function.ll (117 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-invoked-functions.ll (118 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-callbr.ll (119 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-global-variable-terminator-user.ll (120 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-funcs-inline-history.ll (121 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-function-personality.ll (122 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-comdat.ll (123 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-function-arguments-of-funcs-used-in-blockaddress.ll (124 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dso-local.ll (125 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-x86-amx.ll (126 of 207)
+PASS: LLVM :: tools/llvm-reduce/simplify-instructions.ll (127 of 207)
+PASS: LLVM :: tools/llvm-reduce/ifunc-nonsense-resolvers.ll (128 of 207)
+PASS: LLVM :: tools/llvm-reduce/inline-call-sites.ll (129 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-opcodes.ll (130 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-new-return-type.ll (131 of 207)
+PASS: LLVM :: tools/llvm-reduce/strip-debug-info.ll (132 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-preserve-attributes.ll (133 of 207)
+PASS: LLVM :: tools/llvm-reduce/inline-call-sites-cost.ll (134 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-args-used-by-ret.ll (135 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-nocrash.ll (136 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-convergent-uncontrolled.ll (137 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-bundles.ll (138 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-wrong-cc.ll (139 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-strictfp.ll (140 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-attributes-convergent.ll (141 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-token.ll (142 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-arguments-preserve-fmf.ll (143 of 207)
+PASS: LLVM :: tools/llvm-reduce/issue100880-mismatched-call-type.ll (144 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-values-to-return-invoke.ll (145 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-functions-blockaddress.ll (146 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-x86-amx.ll (147 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-functions-blockaddress-wrong-function.ll (148 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-preserve-fmf.ll (149 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-args-target-ext-ty.ll (150 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-to-args-metadata-to-attributes.ll (151 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-all-of-multiple-args.ll (152 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-target-ext-type.ll (153 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-lifetimes.ll (154 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-skip-intrinsics.ll (155 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-dll.ll (156 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-linkage.ll (157 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-arguments-invoke.ll (158 of 207)
+PASS: LLVM :: tools/llvm-reduce/distinct-dimetadata-nullptr.ll (159 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-single-arg.ll (160 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-linkage-intrinsic-global-variables.ll (161 of 207)
+PASS: LLVM :: tools/llvm-reduce/special-globals-missing-should-keep-assert.ll (162 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-instructions-to-return-nonvoid-noncallee-use.ll (163 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-operands-skip-token.ll (164 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-unnamed-addr.ll (165 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-section.ll (166 of 207)
+PASS: LLVM :: tools/llvm-reduce/reduce-bb-unreachable-does-not-dominate-error0.ll (167 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-operand-bundles-convergencectrl.ll (168 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-thread-local.ll (169 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-global-align.ll (170 of 207)
+PASS: LLVM :: tools/llvm-reduce/operands-to-args-metadata.ll (171 of 207)
+PASS: LLVM :: tools/llvm-reduce/run-ir-passes-error.ll (172 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-visibility.ll (173 of 207)
+PASS: LLVM :: tools/llvm-reduce/remove-bbs-entry.ll (174 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-execute-test.test (175 of 207)
+PASS: LLVM :: tools/llvm-reduce/help.test (176 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/drop-ir-references.mir (177 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/instr-reduce.mir (178 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-machine-function-info-amdgpu.mir (179 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/infer-triple.mir (180 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/subreg-def0.mir (181 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-func-info.mir (182 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/infer-triple-unknown-target.mir (183 of 207)
+PASS: LLVM :: tools/llvm-reduce/fail-file-open.test (184 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-block-info.mir (185 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/input-file-does-not-exist.mir (186 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/instr-reduce-dead-def.mir (187 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/subreg-def1.mir (188 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-frame-info.mir (189 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/generic-vreg.mir (190 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-instruction-unreachable-block.mir (191 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-reg-hints.mir (192 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-defs.mir (193 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-max-call-frame-size.mir (194 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/tracks-reg-liveness.mir (195 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-uses-generic.mir (196 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-machine-function-info-riscv.mir (197 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-hints.mir (198 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/multiple-functions.mir (199 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/preserve-mem-operands.mir (200 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-instruction-flags.mir (201 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-uses.mir (202 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/undef-virt-reg.mir (203 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/reduce-register-masks.mir (204 of 207)
+UNSUPPORTED: LLVM :: tools/llvm-reduce/mir/remove-frame-destroy.mir (205 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/parallel-jobs-unsupported.mir (206 of 207)
+PASS: LLVM :: tools/llvm-reduce/mir/parallel-jobs-valid-input.mir (207 of 207)
+
+Testing Time: 44.48s
+
+Total Discovered Tests: 207
+  Unsupported:  27 (13.04%)
+  Passed     : 180 (86.96%)

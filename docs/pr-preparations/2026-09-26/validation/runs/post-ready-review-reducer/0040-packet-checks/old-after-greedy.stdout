@@ -1,0 +1,1705 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir'
+  source_filename = "scratch-vreg-coalesce"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  declare void @abort() #0
+  
+  define fastcc i64 @constant_shift(i64 %0, i16 %1) #0 {
+    switch i16 %1, label %16 [
+      i16 0, label %17
+      i16 1, label %common.ret1
+      i16 2, label %3
+      i16 3, label %3
+      i16 4, label %common.ret1
+      i16 5, label %3
+      i16 6, label %3
+      i16 7, label %common.ret1
+      i16 8, label %3
+      i16 9, label %3
+      i16 10, label %3
+      i16 11, label %4
+      i16 12, label %6
+      i16 13, label %common.ret1
+      i16 14, label %common.ret1
+      i16 15, label %3
+      i16 16, label %8
+      i16 17, label %common.ret1
+      i16 18, label %common.ret1
+      i16 19, label %10
+      i16 20, label %common.ret1
+      i16 21, label %common.ret1
+      i16 22, label %3
+      i16 23, label %12
+      i16 24, label %14
+      i16 25, label %common.ret1
+      i16 26, label %3
+      i16 27, label %3
+      i16 28, label %3
+      i16 29, label %common.ret1
+      i16 30, label %3
+      i16 31, label %3
+      i16 32, label %3
+      i16 33, label %common.ret1
+      i16 34, label %common.ret1
+      i16 35, label %common.ret1
+      i16 36, label %common.ret1
+      i16 37, label %common.ret1
+      i16 38, label %common.ret1
+      i16 39, label %common.ret1
+      i16 40, label %common.ret1
+      i16 41, label %common.ret1
+      i16 42, label %3
+      i16 43, label %common.ret1
+      i16 44, label %common.ret1
+      i16 45, label %common.ret1
+      i16 46, label %3
+      i16 47, label %3
+    ]
+  
+  common.ret1:                                      ; preds = %17, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
+    %common.ret1.op = phi i64 [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ %18, %17 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ], [ 0, %2 ]
+    ret i64 %common.ret1.op
+  
+  3:                                                ; preds = %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2, %2
+    br label %17
+  
+  4:                                                ; preds = %2
+    %5 = ashr i64 %0, 11
+    br label %17
+  
+  6:                                                ; preds = %2
+    %7 = ashr i64 %0, 12
+    br label %17
+  
+  8:                                                ; preds = %2
+    %9 = ashr i64 %0, 16
+    br label %17
+  
+  10:                                               ; preds = %2
+    %11 = ashr i64 %0, 19
+    br label %17
+  
+  12:                                               ; preds = %2
+    %13 = ashr i64 %0, 23
+    br label %17
+  
+  14:                                               ; preds = %2
+    %15 = ashr i64 %0, 24
+    br label %17
+  
+  16:                                               ; preds = %2
+    tail call void @abort()
+    unreachable
+  
+  17:                                               ; preds = %14, %12, %10, %8, %6, %4, %3, %2
+    %18 = phi i64 [ %5, %4 ], [ %11, %10 ], [ 0, %3 ], [ %13, %12 ], [ %0, %2 ], [ %9, %8 ], [ %15, %14 ], [ %7, %6 ]
+    br label %common.ret1
+  }
+  
+  attributes #0 = { "target-cpu"="mos65c02" }
+...
+---
+name:            constant_shift
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 3, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 4, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 5, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 6, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 7, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 8, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 9, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 10, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 11, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: _, preferred-register: '', flags: [  ] }
+  - { id: 47, class: _, preferred-register: '', flags: [  ] }
+  - { id: 48, class: _, preferred-register: '', flags: [  ] }
+  - { id: 49, class: _, preferred-register: '', flags: [  ] }
+  - { id: 50, class: _, preferred-register: '', flags: [  ] }
+  - { id: 51, class: _, preferred-register: '', flags: [  ] }
+  - { id: 52, class: _, preferred-register: '', flags: [  ] }
+  - { id: 53, class: _, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: _, preferred-register: '', flags: [  ] }
+  - { id: 57, class: _, preferred-register: '', flags: [  ] }
+  - { id: 58, class: _, preferred-register: '', flags: [  ] }
+  - { id: 59, class: _, preferred-register: '', flags: [  ] }
+  - { id: 60, class: _, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 64, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 65, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 66, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 67, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 68, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 69, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 70, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 71, class: _, preferred-register: '', flags: [  ] }
+  - { id: 72, class: _, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: _, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: _, preferred-register: '', flags: [  ] }
+  - { id: 78, class: _, preferred-register: '', flags: [  ] }
+  - { id: 79, class: _, preferred-register: '', flags: [  ] }
+  - { id: 80, class: _, preferred-register: '', flags: [  ] }
+  - { id: 81, class: _, preferred-register: '', flags: [  ] }
+  - { id: 82, class: _, preferred-register: '', flags: [  ] }
+  - { id: 83, class: _, preferred-register: '', flags: [  ] }
+  - { id: 84, class: _, preferred-register: '', flags: [  ] }
+  - { id: 85, class: _, preferred-register: '', flags: [  ] }
+  - { id: 86, class: _, preferred-register: '', flags: [  ] }
+  - { id: 87, class: _, preferred-register: '', flags: [  ] }
+  - { id: 88, class: _, preferred-register: '', flags: [  ] }
+  - { id: 89, class: _, preferred-register: '', flags: [  ] }
+  - { id: 90, class: _, preferred-register: '', flags: [  ] }
+  - { id: 91, class: _, preferred-register: '', flags: [  ] }
+  - { id: 92, class: _, preferred-register: '', flags: [  ] }
+  - { id: 93, class: _, preferred-register: '', flags: [  ] }
+  - { id: 94, class: _, preferred-register: '', flags: [  ] }
+  - { id: 95, class: _, preferred-register: '', flags: [  ] }
+  - { id: 96, class: _, preferred-register: '', flags: [  ] }
+  - { id: 97, class: _, preferred-register: '', flags: [  ] }
+  - { id: 98, class: _, preferred-register: '', flags: [  ] }
+  - { id: 99, class: _, preferred-register: '', flags: [  ] }
+  - { id: 100, class: _, preferred-register: '', flags: [  ] }
+  - { id: 101, class: _, preferred-register: '', flags: [  ] }
+  - { id: 102, class: _, preferred-register: '', flags: [  ] }
+  - { id: 103, class: _, preferred-register: '', flags: [  ] }
+  - { id: 104, class: _, preferred-register: '', flags: [  ] }
+  - { id: 105, class: _, preferred-register: '', flags: [  ] }
+  - { id: 106, class: _, preferred-register: '', flags: [  ] }
+  - { id: 107, class: _, preferred-register: '', flags: [  ] }
+  - { id: 108, class: _, preferred-register: '', flags: [  ] }
+  - { id: 109, class: _, preferred-register: '', flags: [  ] }
+  - { id: 110, class: _, preferred-register: '', flags: [  ] }
+  - { id: 111, class: _, preferred-register: '', flags: [  ] }
+  - { id: 112, class: _, preferred-register: '', flags: [  ] }
+  - { id: 113, class: _, preferred-register: '', flags: [  ] }
+  - { id: 114, class: _, preferred-register: '', flags: [  ] }
+  - { id: 115, class: _, preferred-register: '', flags: [  ] }
+  - { id: 116, class: _, preferred-register: '', flags: [  ] }
+  - { id: 117, class: _, preferred-register: '', flags: [  ] }
+  - { id: 118, class: _, preferred-register: '', flags: [  ] }
+  - { id: 119, class: _, preferred-register: '', flags: [  ] }
+  - { id: 120, class: _, preferred-register: '', flags: [  ] }
+  - { id: 121, class: _, preferred-register: '', flags: [  ] }
+  - { id: 122, class: _, preferred-register: '', flags: [  ] }
+  - { id: 123, class: _, preferred-register: '', flags: [  ] }
+  - { id: 124, class: _, preferred-register: '', flags: [  ] }
+  - { id: 125, class: _, preferred-register: '', flags: [  ] }
+  - { id: 126, class: _, preferred-register: '', flags: [  ] }
+  - { id: 127, class: _, preferred-register: '', flags: [  ] }
+  - { id: 128, class: _, preferred-register: '', flags: [  ] }
+  - { id: 129, class: _, preferred-register: '', flags: [  ] }
+  - { id: 130, class: _, preferred-register: '', flags: [  ] }
+  - { id: 131, class: _, preferred-register: '', flags: [  ] }
+  - { id: 132, class: _, preferred-register: '', flags: [  ] }
+  - { id: 133, class: _, preferred-register: '', flags: [  ] }
+  - { id: 134, class: _, preferred-register: '', flags: [  ] }
+  - { id: 135, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 136, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 137, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 138, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 139, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 140, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 141, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 142, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 143, class: _, preferred-register: '', flags: [  ] }
+  - { id: 144, class: _, preferred-register: '', flags: [  ] }
+  - { id: 145, class: _, preferred-register: '', flags: [  ] }
+  - { id: 146, class: _, preferred-register: '', flags: [  ] }
+  - { id: 147, class: _, preferred-register: '', flags: [  ] }
+  - { id: 148, class: _, preferred-register: '', flags: [  ] }
+  - { id: 149, class: _, preferred-register: '', flags: [  ] }
+  - { id: 150, class: _, preferred-register: '', flags: [  ] }
+  - { id: 151, class: _, preferred-register: '', flags: [  ] }
+  - { id: 152, class: any, preferred-register: '', flags: [  ] }
+  - { id: 153, class: _, preferred-register: '', flags: [  ] }
+  - { id: 154, class: _, preferred-register: '', flags: [  ] }
+  - { id: 155, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 156, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 157, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 158, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 159, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 160, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 161, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 162, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 163, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 164, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 165, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 166, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 167, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 168, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 169, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 170, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 171, class: _, preferred-register: '', flags: [  ] }
+  - { id: 172, class: any, preferred-register: '', flags: [  ] }
+  - { id: 173, class: any, preferred-register: '', flags: [  ] }
+  - { id: 174, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 175, class: any, preferred-register: '', flags: [  ] }
+  - { id: 176, class: any, preferred-register: '', flags: [  ] }
+  - { id: 177, class: any, preferred-register: '', flags: [  ] }
+  - { id: 178, class: _, preferred-register: '', flags: [  ] }
+  - { id: 179, class: _, preferred-register: '', flags: [  ] }
+  - { id: 180, class: _, preferred-register: '', flags: [  ] }
+  - { id: 181, class: _, preferred-register: '', flags: [  ] }
+  - { id: 182, class: _, preferred-register: '', flags: [  ] }
+  - { id: 183, class: any, preferred-register: '', flags: [  ] }
+  - { id: 184, class: xc, preferred-register: '%731', flags: [  ] }
+  - { id: 185, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 186, class: _, preferred-register: '', flags: [  ] }
+  - { id: 187, class: _, preferred-register: '', flags: [  ] }
+  - { id: 188, class: _, preferred-register: '', flags: [  ] }
+  - { id: 189, class: _, preferred-register: '', flags: [  ] }
+  - { id: 190, class: _, preferred-register: '', flags: [  ] }
+  - { id: 191, class: _, preferred-register: '', flags: [  ] }
+  - { id: 192, class: _, preferred-register: '', flags: [  ] }
+  - { id: 193, class: _, preferred-register: '', flags: [  ] }
+  - { id: 194, class: _, preferred-register: '', flags: [  ] }
+  - { id: 195, class: _, preferred-register: '', flags: [  ] }
+  - { id: 196, class: any, preferred-register: '', flags: [  ] }
+  - { id: 197, class: _, preferred-register: '', flags: [  ] }
+  - { id: 198, class: _, preferred-register: '', flags: [  ] }
+  - { id: 199, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 200, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 201, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 202, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 203, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 204, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 205, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 206, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 207, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 208, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 209, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 210, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 211, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 212, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 213, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 214, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 215, class: _, preferred-register: '', flags: [  ] }
+  - { id: 216, class: _, preferred-register: '', flags: [  ] }
+  - { id: 217, class: _, preferred-register: '', flags: [  ] }
+  - { id: 218, class: _, preferred-register: '', flags: [  ] }
+  - { id: 219, class: _, preferred-register: '', flags: [  ] }
+  - { id: 220, class: _, preferred-register: '', flags: [  ] }
+  - { id: 221, class: _, preferred-register: '', flags: [  ] }
+  - { id: 222, class: _, preferred-register: '', flags: [  ] }
+  - { id: 223, class: _, preferred-register: '', flags: [  ] }
+  - { id: 224, class: _, preferred-register: '', flags: [  ] }
+  - { id: 225, class: _, preferred-register: '', flags: [  ] }
+  - { id: 226, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 227, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 228, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 229, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 230, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 231, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 232, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 233, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 234, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 235, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 236, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 237, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 238, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 239, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 240, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 241, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 242, class: _, preferred-register: '', flags: [  ] }
+  - { id: 243, class: _, preferred-register: '', flags: [  ] }
+  - { id: 244, class: _, preferred-register: '', flags: [  ] }
+  - { id: 245, class: _, preferred-register: '', flags: [  ] }
+  - { id: 246, class: _, preferred-register: '', flags: [  ] }
+  - { id: 247, class: _, preferred-register: '', flags: [  ] }
+  - { id: 248, class: _, preferred-register: '', flags: [  ] }
+  - { id: 249, class: _, preferred-register: '', flags: [  ] }
+  - { id: 250, class: _, preferred-register: '', flags: [  ] }
+  - { id: 251, class: _, preferred-register: '', flags: [  ] }
+  - { id: 252, class: _, preferred-register: '', flags: [  ] }
+  - { id: 253, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 254, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 255, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 256, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 257, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 258, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 259, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 260, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 261, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 262, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 263, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 264, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 265, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 266, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 267, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 268, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 269, class: _, preferred-register: '', flags: [  ] }
+  - { id: 270, class: _, preferred-register: '', flags: [  ] }
+  - { id: 271, class: _, preferred-register: '', flags: [  ] }
+  - { id: 272, class: _, preferred-register: '', flags: [  ] }
+  - { id: 273, class: _, preferred-register: '', flags: [  ] }
+  - { id: 274, class: _, preferred-register: '', flags: [  ] }
+  - { id: 275, class: _, preferred-register: '', flags: [  ] }
+  - { id: 276, class: _, preferred-register: '', flags: [  ] }
+  - { id: 277, class: _, preferred-register: '', flags: [  ] }
+  - { id: 278, class: _, preferred-register: '', flags: [  ] }
+  - { id: 279, class: _, preferred-register: '', flags: [  ] }
+  - { id: 280, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 281, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 282, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 283, class: aimag8, preferred-register: '%388', flags: [  ] }
+  - { id: 284, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 285, class: aimag8, preferred-register: '%390', flags: [  ] }
+  - { id: 286, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 287, class: aimag8, preferred-register: '%392', flags: [  ] }
+  - { id: 288, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 289, class: aimag8, preferred-register: '%394', flags: [  ] }
+  - { id: 290, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 291, class: aimag8, preferred-register: '%396', flags: [  ] }
+  - { id: 292, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 293, class: aimag8, preferred-register: '%398', flags: [  ] }
+  - { id: 294, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 295, class: aimag8, preferred-register: '%400', flags: [  ] }
+  - { id: 296, class: _, preferred-register: '', flags: [  ] }
+  - { id: 297, class: any, preferred-register: '', flags: [  ] }
+  - { id: 298, class: any, preferred-register: '', flags: [  ] }
+  - { id: 299, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 300, class: any, preferred-register: '', flags: [  ] }
+  - { id: 301, class: any, preferred-register: '', flags: [  ] }
+  - { id: 302, class: any, preferred-register: '', flags: [  ] }
+  - { id: 303, class: any, preferred-register: '', flags: [  ] }
+  - { id: 304, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 305, class: any, preferred-register: '', flags: [  ] }
+  - { id: 306, class: any, preferred-register: '', flags: [  ] }
+  - { id: 307, class: any, preferred-register: '', flags: [  ] }
+  - { id: 308, class: any, preferred-register: '', flags: [  ] }
+  - { id: 309, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 310, class: any, preferred-register: '', flags: [  ] }
+  - { id: 311, class: any, preferred-register: '', flags: [  ] }
+  - { id: 312, class: any, preferred-register: '', flags: [  ] }
+  - { id: 313, class: any, preferred-register: '', flags: [  ] }
+  - { id: 314, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 315, class: any, preferred-register: '', flags: [  ] }
+  - { id: 316, class: any, preferred-register: '', flags: [  ] }
+  - { id: 317, class: any, preferred-register: '', flags: [  ] }
+  - { id: 318, class: _, preferred-register: '', flags: [  ] }
+  - { id: 319, class: _, preferred-register: '', flags: [  ] }
+  - { id: 320, class: _, preferred-register: '', flags: [  ] }
+  - { id: 321, class: _, preferred-register: '', flags: [  ] }
+  - { id: 322, class: _, preferred-register: '', flags: [  ] }
+  - { id: 323, class: _, preferred-register: '', flags: [  ] }
+  - { id: 324, class: _, preferred-register: '', flags: [  ] }
+  - { id: 325, class: _, preferred-register: '', flags: [  ] }
+  - { id: 326, class: _, preferred-register: '', flags: [  ] }
+  - { id: 327, class: _, preferred-register: '', flags: [  ] }
+  - { id: 328, class: _, preferred-register: '', flags: [  ] }
+  - { id: 329, class: _, preferred-register: '', flags: [  ] }
+  - { id: 330, class: _, preferred-register: '', flags: [  ] }
+  - { id: 331, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 332, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 333, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 334, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 335, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 336, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 337, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 338, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 339, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 340, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 341, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 342, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 343, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 344, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 345, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 346, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 347, class: _, preferred-register: '', flags: [  ] }
+  - { id: 348, class: _, preferred-register: '', flags: [  ] }
+  - { id: 349, class: _, preferred-register: '', flags: [  ] }
+  - { id: 350, class: _, preferred-register: '', flags: [  ] }
+  - { id: 351, class: _, preferred-register: '', flags: [  ] }
+  - { id: 352, class: _, preferred-register: '', flags: [  ] }
+  - { id: 353, class: _, preferred-register: '', flags: [  ] }
+  - { id: 354, class: _, preferred-register: '', flags: [  ] }
+  - { id: 355, class: _, preferred-register: '', flags: [  ] }
+  - { id: 356, class: _, preferred-register: '', flags: [  ] }
+  - { id: 357, class: _, preferred-register: '', flags: [  ] }
+  - { id: 358, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 359, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 360, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 361, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 362, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 363, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 364, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 365, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 366, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 367, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 368, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 369, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 370, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 371, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 372, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 373, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 374, class: _, preferred-register: '', flags: [  ] }
+  - { id: 375, class: _, preferred-register: '', flags: [  ] }
+  - { id: 376, class: _, preferred-register: '', flags: [  ] }
+  - { id: 377, class: _, preferred-register: '', flags: [  ] }
+  - { id: 378, class: _, preferred-register: '', flags: [  ] }
+  - { id: 379, class: _, preferred-register: '', flags: [  ] }
+  - { id: 380, class: _, preferred-register: '', flags: [  ] }
+  - { id: 381, class: _, preferred-register: '', flags: [  ] }
+  - { id: 382, class: _, preferred-register: '', flags: [  ] }
+  - { id: 383, class: _, preferred-register: '', flags: [  ] }
+  - { id: 384, class: _, preferred-register: '', flags: [  ] }
+  - { id: 385, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 386, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 387, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 388, class: aimag8, preferred-register: '%283', flags: [  ] }
+  - { id: 389, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 390, class: aimag8, preferred-register: '%285', flags: [  ] }
+  - { id: 391, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 392, class: aimag8, preferred-register: '%287', flags: [  ] }
+  - { id: 393, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 394, class: aimag8, preferred-register: '%289', flags: [  ] }
+  - { id: 395, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 396, class: aimag8, preferred-register: '%291', flags: [  ] }
+  - { id: 397, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 398, class: aimag8, preferred-register: '%293', flags: [  ] }
+  - { id: 399, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 400, class: aimag8, preferred-register: '%295', flags: [  ] }
+  - { id: 401, class: any, preferred-register: '', flags: [  ] }
+  - { id: 402, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 403, class: any, preferred-register: '', flags: [  ] }
+  - { id: 404, class: any, preferred-register: '', flags: [  ] }
+  - { id: 405, class: any, preferred-register: '', flags: [  ] }
+  - { id: 406, class: any, preferred-register: '', flags: [  ] }
+  - { id: 407, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 408, class: any, preferred-register: '', flags: [  ] }
+  - { id: 409, class: any, preferred-register: '', flags: [  ] }
+  - { id: 410, class: any, preferred-register: '', flags: [  ] }
+  - { id: 411, class: any, preferred-register: '', flags: [  ] }
+  - { id: 412, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 413, class: any, preferred-register: '', flags: [  ] }
+  - { id: 414, class: any, preferred-register: '', flags: [  ] }
+  - { id: 415, class: any, preferred-register: '', flags: [  ] }
+  - { id: 416, class: _, preferred-register: '', flags: [  ] }
+  - { id: 417, class: _, preferred-register: '', flags: [  ] }
+  - { id: 418, class: _, preferred-register: '', flags: [  ] }
+  - { id: 419, class: _, preferred-register: '', flags: [  ] }
+  - { id: 420, class: _, preferred-register: '', flags: [  ] }
+  - { id: 421, class: _, preferred-register: '', flags: [  ] }
+  - { id: 422, class: _, preferred-register: '', flags: [  ] }
+  - { id: 423, class: _, preferred-register: '', flags: [  ] }
+  - { id: 424, class: _, preferred-register: '', flags: [  ] }
+  - { id: 425, class: _, preferred-register: '', flags: [  ] }
+  - { id: 426, class: _, preferred-register: '', flags: [  ] }
+  - { id: 427, class: _, preferred-register: '', flags: [  ] }
+  - { id: 428, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 429, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 430, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 431, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 432, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 433, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 434, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 435, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 436, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 437, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 438, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 439, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 440, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 441, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 442, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 443, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 444, class: _, preferred-register: '', flags: [  ] }
+  - { id: 445, class: _, preferred-register: '', flags: [  ] }
+  - { id: 446, class: _, preferred-register: '', flags: [  ] }
+  - { id: 447, class: _, preferred-register: '', flags: [  ] }
+  - { id: 448, class: _, preferred-register: '', flags: [  ] }
+  - { id: 449, class: _, preferred-register: '', flags: [  ] }
+  - { id: 450, class: _, preferred-register: '', flags: [  ] }
+  - { id: 451, class: _, preferred-register: '', flags: [  ] }
+  - { id: 452, class: _, preferred-register: '', flags: [  ] }
+  - { id: 453, class: _, preferred-register: '', flags: [  ] }
+  - { id: 454, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 455, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 456, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 457, class: aimag8, preferred-register: '%388', flags: [  ] }
+  - { id: 458, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 459, class: aimag8, preferred-register: '%390', flags: [  ] }
+  - { id: 460, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 461, class: aimag8, preferred-register: '%392', flags: [  ] }
+  - { id: 462, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 463, class: aimag8, preferred-register: '%394', flags: [  ] }
+  - { id: 464, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 465, class: aimag8, preferred-register: '%396', flags: [  ] }
+  - { id: 466, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 467, class: aimag8, preferred-register: '%398', flags: [  ] }
+  - { id: 468, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 469, class: aimag8, preferred-register: '%400', flags: [  ] }
+  - { id: 470, class: _, preferred-register: '', flags: [  ] }
+  - { id: 471, class: _, preferred-register: '', flags: [  ] }
+  - { id: 472, class: _, preferred-register: '', flags: [  ] }
+  - { id: 473, class: _, preferred-register: '', flags: [  ] }
+  - { id: 474, class: _, preferred-register: '', flags: [  ] }
+  - { id: 475, class: _, preferred-register: '', flags: [  ] }
+  - { id: 476, class: _, preferred-register: '', flags: [  ] }
+  - { id: 477, class: _, preferred-register: '', flags: [  ] }
+  - { id: 478, class: _, preferred-register: '', flags: [  ] }
+  - { id: 479, class: _, preferred-register: '', flags: [  ] }
+  - { id: 480, class: _, preferred-register: '', flags: [  ] }
+  - { id: 481, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 482, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 483, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 484, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 485, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 486, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 487, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 488, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 489, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 490, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 491, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 492, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 493, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 494, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 495, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 496, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 497, class: _, preferred-register: '', flags: [  ] }
+  - { id: 498, class: _, preferred-register: '', flags: [  ] }
+  - { id: 499, class: _, preferred-register: '', flags: [  ] }
+  - { id: 500, class: _, preferred-register: '', flags: [  ] }
+  - { id: 501, class: _, preferred-register: '', flags: [  ] }
+  - { id: 502, class: _, preferred-register: '', flags: [  ] }
+  - { id: 503, class: _, preferred-register: '', flags: [  ] }
+  - { id: 504, class: _, preferred-register: '', flags: [  ] }
+  - { id: 505, class: _, preferred-register: '', flags: [  ] }
+  - { id: 506, class: _, preferred-register: '', flags: [  ] }
+  - { id: 507, class: _, preferred-register: '', flags: [  ] }
+  - { id: 508, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 509, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 510, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 511, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 512, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 513, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 514, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 515, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 516, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 517, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 518, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 519, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 520, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 521, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 522, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 523, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 524, class: any, preferred-register: '', flags: [  ] }
+  - { id: 525, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 526, class: any, preferred-register: '', flags: [  ] }
+  - { id: 527, class: any, preferred-register: '', flags: [  ] }
+  - { id: 528, class: any, preferred-register: '', flags: [  ] }
+  - { id: 529, class: any, preferred-register: '', flags: [  ] }
+  - { id: 530, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 531, class: any, preferred-register: '', flags: [  ] }
+  - { id: 532, class: any, preferred-register: '', flags: [  ] }
+  - { id: 533, class: any, preferred-register: '', flags: [  ] }
+  - { id: 534, class: any, preferred-register: '', flags: [  ] }
+  - { id: 535, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 536, class: any, preferred-register: '', flags: [  ] }
+  - { id: 537, class: any, preferred-register: '', flags: [  ] }
+  - { id: 538, class: any, preferred-register: '', flags: [  ] }
+  - { id: 539, class: any, preferred-register: '', flags: [  ] }
+  - { id: 540, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 541, class: any, preferred-register: '', flags: [  ] }
+  - { id: 542, class: any, preferred-register: '', flags: [  ] }
+  - { id: 543, class: any, preferred-register: '', flags: [  ] }
+  - { id: 544, class: _, preferred-register: '', flags: [  ] }
+  - { id: 545, class: _, preferred-register: '', flags: [  ] }
+  - { id: 546, class: _, preferred-register: '', flags: [  ] }
+  - { id: 547, class: _, preferred-register: '', flags: [  ] }
+  - { id: 548, class: _, preferred-register: '', flags: [  ] }
+  - { id: 549, class: _, preferred-register: '', flags: [  ] }
+  - { id: 550, class: _, preferred-register: '', flags: [  ] }
+  - { id: 551, class: _, preferred-register: '', flags: [  ] }
+  - { id: 552, class: _, preferred-register: '', flags: [  ] }
+  - { id: 553, class: _, preferred-register: '', flags: [  ] }
+  - { id: 554, class: _, preferred-register: '', flags: [  ] }
+  - { id: 555, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 556, class: ac, preferred-register: '%744', flags: [  ] }
+  - { id: 557, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 558, class: aimag8, preferred-register: '%457', flags: [  ] }
+  - { id: 559, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 560, class: aimag8, preferred-register: '%459', flags: [  ] }
+  - { id: 561, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 562, class: aimag8, preferred-register: '%461', flags: [  ] }
+  - { id: 563, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 564, class: aimag8, preferred-register: '%463', flags: [  ] }
+  - { id: 565, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 566, class: aimag8, preferred-register: '%465', flags: [  ] }
+  - { id: 567, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 568, class: aimag8, preferred-register: '%467', flags: [  ] }
+  - { id: 569, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 570, class: aimag8, preferred-register: '%469', flags: [  ] }
+  - { id: 571, class: any, preferred-register: '', flags: [  ] }
+  - { id: 572, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 573, class: any, preferred-register: '', flags: [  ] }
+  - { id: 574, class: any, preferred-register: '', flags: [  ] }
+  - { id: 575, class: any, preferred-register: '', flags: [  ] }
+  - { id: 576, class: _, preferred-register: '', flags: [  ] }
+  - { id: 577, class: _, preferred-register: '', flags: [  ] }
+  - { id: 578, class: _, preferred-register: '', flags: [  ] }
+  - { id: 579, class: _, preferred-register: '', flags: [  ] }
+  - { id: 580, class: _, preferred-register: '', flags: [  ] }
+  - { id: 581, class: _, preferred-register: '', flags: [  ] }
+  - { id: 582, class: _, preferred-register: '', flags: [  ] }
+  - { id: 583, class: _, preferred-register: '', flags: [  ] }
+  - { id: 584, class: _, preferred-register: '', flags: [  ] }
+  - { id: 585, class: _, preferred-register: '', flags: [  ] }
+  - { id: 586, class: _, preferred-register: '', flags: [  ] }
+  - { id: 587, class: _, preferred-register: '', flags: [  ] }
+  - { id: 588, class: _, preferred-register: '', flags: [  ] }
+  - { id: 589, class: _, preferred-register: '', flags: [  ] }
+  - { id: 590, class: _, preferred-register: '', flags: [  ] }
+  - { id: 591, class: _, preferred-register: '', flags: [  ] }
+  - { id: 592, class: _, preferred-register: '', flags: [  ] }
+  - { id: 593, class: _, preferred-register: '', flags: [  ] }
+  - { id: 594, class: _, preferred-register: '', flags: [  ] }
+  - { id: 595, class: _, preferred-register: '', flags: [  ] }
+  - { id: 596, class: _, preferred-register: '', flags: [  ] }
+  - { id: 597, class: _, preferred-register: '', flags: [  ] }
+  - { id: 598, class: _, preferred-register: '', flags: [  ] }
+  - { id: 599, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 600, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 601, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 602, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 603, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 604, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 605, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 606, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 607, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 608, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 609, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 610, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 611, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 612, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 613, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 614, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 615, class: _, preferred-register: '', flags: [  ] }
+  - { id: 616, class: _, preferred-register: '', flags: [  ] }
+  - { id: 617, class: _, preferred-register: '', flags: [  ] }
+  - { id: 618, class: _, preferred-register: '', flags: [  ] }
+  - { id: 619, class: _, preferred-register: '', flags: [  ] }
+  - { id: 620, class: _, preferred-register: '', flags: [  ] }
+  - { id: 621, class: _, preferred-register: '', flags: [  ] }
+  - { id: 622, class: _, preferred-register: '', flags: [  ] }
+  - { id: 623, class: _, preferred-register: '', flags: [  ] }
+  - { id: 624, class: _, preferred-register: '', flags: [  ] }
+  - { id: 625, class: _, preferred-register: '', flags: [  ] }
+  - { id: 626, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 627, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 628, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 629, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 630, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 631, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 632, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 633, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 634, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 635, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 636, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 637, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 638, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 639, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 640, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 641, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 642, class: _, preferred-register: '', flags: [  ] }
+  - { id: 643, class: _, preferred-register: '', flags: [  ] }
+  - { id: 644, class: _, preferred-register: '', flags: [  ] }
+  - { id: 645, class: _, preferred-register: '', flags: [  ] }
+  - { id: 646, class: _, preferred-register: '', flags: [  ] }
+  - { id: 647, class: _, preferred-register: '', flags: [  ] }
+  - { id: 648, class: _, preferred-register: '', flags: [  ] }
+  - { id: 649, class: _, preferred-register: '', flags: [  ] }
+  - { id: 650, class: _, preferred-register: '', flags: [  ] }
+  - { id: 651, class: _, preferred-register: '', flags: [  ] }
+  - { id: 652, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 653, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 654, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 655, class: aimag8, preferred-register: '%558', flags: [  ] }
+  - { id: 656, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 657, class: aimag8, preferred-register: '%560', flags: [  ] }
+  - { id: 658, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 659, class: aimag8, preferred-register: '%562', flags: [  ] }
+  - { id: 660, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 661, class: aimag8, preferred-register: '%564', flags: [  ] }
+  - { id: 662, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 663, class: aimag8, preferred-register: '%566', flags: [  ] }
+  - { id: 664, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 665, class: aimag8, preferred-register: '%568', flags: [  ] }
+  - { id: 666, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 667, class: aimag8, preferred-register: '%570', flags: [  ] }
+  - { id: 668, class: any, preferred-register: '', flags: [  ] }
+  - { id: 669, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 670, class: any, preferred-register: '', flags: [  ] }
+  - { id: 671, class: any, preferred-register: '', flags: [  ] }
+  - { id: 672, class: any, preferred-register: '', flags: [  ] }
+  - { id: 673, class: any, preferred-register: '', flags: [  ] }
+  - { id: 674, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 675, class: any, preferred-register: '', flags: [  ] }
+  - { id: 676, class: any, preferred-register: '', flags: [  ] }
+  - { id: 677, class: any, preferred-register: '', flags: [  ] }
+  - { id: 678, class: any, preferred-register: '', flags: [  ] }
+  - { id: 679, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 680, class: any, preferred-register: '', flags: [  ] }
+  - { id: 681, class: any, preferred-register: '', flags: [  ] }
+  - { id: 682, class: any, preferred-register: '', flags: [  ] }
+  - { id: 683, class: _, preferred-register: '', flags: [  ] }
+  - { id: 684, class: _, preferred-register: '', flags: [  ] }
+  - { id: 685, class: _, preferred-register: '', flags: [  ] }
+  - { id: 686, class: _, preferred-register: '', flags: [  ] }
+  - { id: 687, class: _, preferred-register: '', flags: [  ] }
+  - { id: 688, class: _, preferred-register: '', flags: [  ] }
+  - { id: 689, class: _, preferred-register: '', flags: [  ] }
+  - { id: 690, class: _, preferred-register: '', flags: [  ] }
+  - { id: 691, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 692, class: _, preferred-register: '', flags: [  ] }
+  - { id: 693, class: _, preferred-register: '', flags: [  ] }
+  - { id: 694, class: aimag8, preferred-register: '%781', flags: [  ] }
+  - { id: 695, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 696, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 697, class: _, preferred-register: '', flags: [  ] }
+  - { id: 698, class: _, preferred-register: '', flags: [  ] }
+  - { id: 699, class: _, preferred-register: '', flags: [  ] }
+  - { id: 700, class: _, preferred-register: '', flags: [  ] }
+  - { id: 701, class: _, preferred-register: '', flags: [  ] }
+  - { id: 702, class: _, preferred-register: '', flags: [  ] }
+  - { id: 703, class: _, preferred-register: '', flags: [  ] }
+  - { id: 704, class: _, preferred-register: '', flags: [  ] }
+  - { id: 705, class: any, preferred-register: '', flags: [  ] }
+  - { id: 706, class: any, preferred-register: '', flags: [  ] }
+  - { id: 707, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 708, class: any, preferred-register: '', flags: [  ] }
+  - { id: 709, class: any, preferred-register: '', flags: [  ] }
+  - { id: 710, class: any, preferred-register: '', flags: [  ] }
+  - { id: 711, class: any, preferred-register: '', flags: [  ] }
+  - { id: 712, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 713, class: any, preferred-register: '', flags: [  ] }
+  - { id: 714, class: any, preferred-register: '', flags: [  ] }
+  - { id: 715, class: any, preferred-register: '', flags: [  ] }
+  - { id: 716, class: any, preferred-register: '', flags: [  ] }
+  - { id: 717, class: any, preferred-register: '', flags: [  ] }
+  - { id: 718, class: _, preferred-register: '', flags: [  ] }
+  - { id: 719, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 720, class: _, preferred-register: '', flags: [  ] }
+  - { id: 721, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 722, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 723, class: any, preferred-register: '', flags: [  ] }
+  - { id: 724, class: any, preferred-register: '', flags: [  ] }
+  - { id: 725, class: any, preferred-register: '', flags: [  ] }
+  - { id: 726, class: any, preferred-register: '', flags: [  ] }
+  - { id: 727, class: any, preferred-register: '', flags: [  ] }
+  - { id: 728, class: any, preferred-register: '', flags: [  ] }
+  - { id: 729, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 730, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 731, class: ac, preferred-register: '%184', flags: [  ] }
+  - { id: 732, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 733, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 734, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 735, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 736, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 737, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 738, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 739, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 740, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 741, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 742, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 743, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 744, class: ac, preferred-register: '%556', flags: [  ] }
+  - { id: 745, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 746, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 747, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 748, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 749, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 750, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 751, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 752, class: ac, preferred-register: '%744', flags: [  ] }
+  - { id: 753, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 754, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 755, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 756, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 757, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 758, class: ac, preferred-register: '%752', flags: [  ] }
+  - { id: 759, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 760, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 761, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 762, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 763, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 764, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 765, class: ac, preferred-register: '%556', flags: [  ] }
+  - { id: 766, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 767, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 768, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 769, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 770, class: anyi8, preferred-register: '$rc4', flags: [  ] }
+  - { id: 771, class: anyi8, preferred-register: '$rc5', flags: [  ] }
+  - { id: 772, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 773, class: anyi8, preferred-register: '$rc7', flags: [  ] }
+  - { id: 774, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 775, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 776, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 777, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 778, class: anyi8, preferred-register: '$rc4', flags: [  ] }
+  - { id: 779, class: anyi8, preferred-register: '$rc5', flags: [  ] }
+  - { id: 780, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 781, class: anyi8, preferred-register: '$rc7', flags: [  ] }
+  - { id: 782, class: anyi8, preferred-register: '%783', flags: [  ] }
+  - { id: 783, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 784, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 785, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 786, class: anyi8, preferred-register: '%785', flags: [  ] }
+  - { id: 787, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 788, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 789, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 790, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 791, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 792, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 793, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 794, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 795, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 796, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 797, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 798, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 799, class: anyi8, preferred-register: '$rc2', flags: [  ] }
+  - { id: 800, class: anyi8, preferred-register: '%799', flags: [  ] }
+  - { id: 801, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 802, class: anyi8, preferred-register: '$rc3', flags: [  ] }
+  - { id: 803, class: anyi8, preferred-register: '%802', flags: [  ] }
+  - { id: 804, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 805, class: anyi8, preferred-register: '$rc4', flags: [  ] }
+  - { id: 806, class: anyi8, preferred-register: '%805', flags: [  ] }
+  - { id: 807, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 808, class: anyi8, preferred-register: '$rc5', flags: [  ] }
+  - { id: 809, class: anyi8, preferred-register: '%808', flags: [  ] }
+  - { id: 810, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 811, class: anyi8, preferred-register: '$rc6', flags: [  ] }
+  - { id: 812, class: anyi8, preferred-register: '%811', flags: [  ] }
+  - { id: 813, class: anyi8, preferred-register: '%814', flags: [  ] }
+  - { id: 814, class: ac, preferred-register: '%556', flags: [  ] }
+  - { id: 815, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 816, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 817, class: anyi8, preferred-register: '%818', flags: [  ] }
+  - { id: 818, class: aimag8, preferred-register: '%558', flags: [  ] }
+  - { id: 819, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 820, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 821, class: anyi8, preferred-register: '%822', flags: [  ] }
+  - { id: 822, class: aimag8, preferred-register: '%560', flags: [  ] }
+  - { id: 823, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 824, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 825, class: anyi8, preferred-register: '%826', flags: [  ] }
+  - { id: 826, class: aimag8, preferred-register: '%562', flags: [  ] }
+  - { id: 827, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 828, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 829, class: anyi8, preferred-register: '%830', flags: [  ] }
+  - { id: 830, class: aimag8, preferred-register: '%564', flags: [  ] }
+  - { id: 831, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 832, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 833, class: anyi8, preferred-register: '%834', flags: [  ] }
+  - { id: 834, class: aimag8, preferred-register: '%566', flags: [  ] }
+  - { id: 835, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 836, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 837, class: anyi8, preferred-register: '%838', flags: [  ] }
+  - { id: 838, class: aimag8, preferred-register: '%568', flags: [  ] }
+  - { id: 839, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 840, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 841, class: anyi8, preferred-register: '%842', flags: [  ] }
+  - { id: 842, class: aimag8, preferred-register: '%570', flags: [  ] }
+  - { id: 843, class: anyi8, preferred-register: '%841', flags: [  ] }
+  - { id: 844, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 845, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 846, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 847, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 848, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 849, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 850, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 851, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 852, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 853, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 854, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 855, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 856, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 857, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 858, class: anyi8, preferred-register: '%859', flags: [  ] }
+  - { id: 859, class: ac, preferred-register: '%744', flags: [  ] }
+  - { id: 860, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 861, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 862, class: anyi8, preferred-register: '%863', flags: [  ] }
+  - { id: 863, class: aimag8, preferred-register: '%457', flags: [  ] }
+  - { id: 864, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 865, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 866, class: anyi8, preferred-register: '%867', flags: [  ] }
+  - { id: 867, class: aimag8, preferred-register: '%459', flags: [  ] }
+  - { id: 868, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 869, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 870, class: anyi8, preferred-register: '%871', flags: [  ] }
+  - { id: 871, class: aimag8, preferred-register: '%461', flags: [  ] }
+  - { id: 872, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 873, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 874, class: anyi8, preferred-register: '%875', flags: [  ] }
+  - { id: 875, class: aimag8, preferred-register: '%463', flags: [  ] }
+  - { id: 876, class: anyi8, preferred-register: '%874', flags: [  ] }
+  - { id: 877, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 878, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 879, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 880, class: anyi8, preferred-register: '%881', flags: [  ] }
+  - { id: 881, class: aimag8, preferred-register: '%465', flags: [  ] }
+  - { id: 882, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 883, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 884, class: anyi8, preferred-register: '%885', flags: [  ] }
+  - { id: 885, class: aimag8, preferred-register: '%467', flags: [  ] }
+  - { id: 886, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 887, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 888, class: anyi8, preferred-register: '%889', flags: [  ] }
+  - { id: 889, class: ac, preferred-register: '%752', flags: [  ] }
+  - { id: 890, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 891, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 892, class: anyi8, preferred-register: '%893', flags: [  ] }
+  - { id: 893, class: aimag8, preferred-register: '%469', flags: [  ] }
+  - { id: 894, class: anyi8, preferred-register: '%892', flags: [  ] }
+  - { id: 895, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 896, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 897, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 898, class: anyi8, preferred-register: '%731', flags: [  ] }
+  - { id: 899, class: xc, preferred-register: '%898', flags: [  ] }
+  - { id: 900, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 901, class: xc, preferred-register: '', flags: [  ] }
+  - { id: 902, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 903, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 904, class: anyi8, preferred-register: '$rc7', flags: [  ] }
+  - { id: 905, class: anyi8, preferred-register: '%904', flags: [  ] }
+  - { id: 906, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 907, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 908, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 909, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 910, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 911, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 912, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 913, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 914, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 915, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 916, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 917, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 918, class: anyi8, preferred-register: '%919', flags: [  ] }
+  - { id: 919, class: ac, preferred-register: '%758', flags: [  ] }
+  - { id: 920, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 921, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 922, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 923, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 924, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 925, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 926, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 927, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 928, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 929, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 930, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 931, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 932, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 933, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 934, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 935, class: anyi8, preferred-register: '%936', flags: [  ] }
+  - { id: 936, class: anyi8, preferred-register: '%805', flags: [  ] }
+  - { id: 937, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 938, class: anyi8, preferred-register: '%939', flags: [  ] }
+  - { id: 939, class: anyi8, preferred-register: '%808', flags: [  ] }
+  - { id: 940, class: anyi8, preferred-register: '%941', flags: [  ] }
+  - { id: 941, class: gpr, preferred-register: '%940', flags: [  ] }
+  - { id: 942, class: aimag8, preferred-register: '%940', flags: [  ] }
+  - { id: 943, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 944, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 945, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 946, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 947, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 948, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 949, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 950, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 951, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 952, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 953, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 954, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 955, class: anyi8, preferred-register: '%956', flags: [  ] }
+  - { id: 956, class: ac, preferred-register: '%919', flags: [  ] }
+  - { id: 957, class: ac, preferred-register: '%905', flags: [  ] }
+  - { id: 958, class: anyi8, preferred-register: '%959', flags: [  ] }
+  - { id: 959, class: aimag8, preferred-register: '%388', flags: [  ] }
+  - { id: 960, class: anyi8, preferred-register: '%958', flags: [  ] }
+  - { id: 961, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 962, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 963, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 964, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 965, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 966, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 967, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 968, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 969, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 970, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 971, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 972, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 973, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 974, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 975, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 976, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 977, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 978, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 979, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 980, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 981, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 982, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 983, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 984, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 985, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 986, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 987, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 988, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 989, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 990, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 991, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 992, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 993, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 994, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 995, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 996, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 997, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 998, class: anyi8, preferred-register: '%999', flags: [  ] }
+  - { id: 999, class: anyi8, preferred-register: '%904', flags: [  ] }
+  - { id: 1000, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1001, class: anyi8, preferred-register: '$a', flags: [  ] }
+  - { id: 1002, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1003, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1004, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1005, class: anyi8, preferred-register: '$x', flags: [  ] }
+  - { id: 1006, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1007, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1008, class: cc, preferred-register: '%1009', flags: [  ] }
+  - { id: 1009, class: cc, preferred-register: '%1008', flags: [  ] }
+  - { id: 1010, class: cc, preferred-register: '%1009', flags: [  ] }
+  - { id: 1011, class: anyi1, preferred-register: '%1009', flags: [  ] }
+  - { id: 1012, class: cc, preferred-register: '%1011', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 17, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 18, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 19, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 20, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 21, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 22, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 23, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 24, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 25, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 26, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 27, name: '', type: spill-slot, offset: 0, size: 1, alignment: 1, 
+      stack-id: default, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+jumpTable:
+  kind:            block-address
+  entries:
+    - id:              0
+      blocks:          [ '%bb.17', '%bb.8', '%bb.9', '%bb.9', '%bb.8', 
+                         '%bb.9', '%bb.9', '%bb.8', '%bb.9', '%bb.9', '%bb.9', 
+                         '%bb.10', '%bb.11', '%bb.8', '%bb.8', '%bb.9', 
+                         '%bb.12', '%bb.8', '%bb.8', '%bb.13', '%bb.8', 
+                         '%bb.8', '%bb.9', '%bb.14', '%bb.15', '%bb.8', 
+                         '%bb.9', '%bb.9', '%bb.9', '%bb.8', '%bb.9', '%bb.9', 
+                         '%bb.9', '%bb.8', '%bb.8', '%bb.8', '%bb.8', '%bb.8', 
+                         '%bb.8', '%bb.8', '%bb.8', '%bb.8', '%bb.9', '%bb.8', 
+                         '%bb.8', '%bb.8', '%bb.9', '%bb.9' ]
+body:             |
+  bb.0 (%ir-block.2):
+    successors: %bb.1(0x40000000), %bb.2(0x40000000)
+    liveins: $a, $x, $rc2, $rc3, $rc4, $rc5, $rc6, $rc7, $rc8, $rc9
+  
+    %783:anyi8 = COPY $a
+    %785:anyi8 = COPY $x
+    %799:anyi8 = COPY $rc2
+    %802:anyi8 = COPY $rc3
+    %805:anyi8 = COPY $rc4
+    %808:anyi8 = COPY $rc5
+    %811:anyi8 = COPY $rc6
+    %904:anyi8 = COPY $rc7
+    %941:gpr = COPY $rc8
+    %11:gpr = COPY $rc9
+    CmpBrZero %bb.1, undef $z, 1, %11, implicit-def dead $c
+    BRA %bb.2
+  
+  bb.1 (%ir-block.2):
+    successors: %bb.16(0x40000000), %bb.3(0x40000000)
+  
+    %940:anyi8 = COPY %941
+    %707:cc = CMPImm %941, 48
+    GBR %bb.16, %707, 1, implicit-def dead $c
+    BRA %bb.3
+  
+  bb.2 (%ir-block.2):
+    successors: %bb.16(0x40000000), %bb.3(0x40000000)
+  
+    %940:anyi8 = COPY %941
+    %712:cc = CMPImm %11, 0
+    GBR %bb.16, %712, 1, implicit-def dead $c
+    BRA %bb.3
+  
+  bb.3 (%ir-block.2):
+    successors: %bb.4(0x80000000)
+  
+  bb.4 (%ir-block.2):
+    successors: %bb.5(0x40000000), %bb.6(0x40000000)
+  
+    CmpBrZero %bb.5, undef $n, 1, %904, implicit-def dead $c
+    BRA %bb.6
+  
+  bb.5 (%ir-block.2):
+    successors: %bb.7(0x80000000)
+  
+    dead early-clobber %796:imag16 = STStk %783, %stack.0, 0 :: (store (s8) into %stack.0)
+    %814:ac = LDImm -1
+    BRA %bb.7
+  
+  bb.6 (%ir-block.2):
+    successors: %bb.7(0x80000000)
+  
+    dead early-clobber %795:imag16 = STStk %783, %stack.0, 0 :: (store (s8) into %stack.0)
+    %814:ac = LDZ
+    BRA %bb.7
+  
+  bb.7 (%ir-block.2):
+    successors: %bb.17(0x02aaaaab), %bb.8(0x3d555554), %bb.9(0x2fffffff), %bb.10(0x02aaaaab), %bb.11(0x02aaaaab), %bb.12(0x02aaaaab), %bb.13(0x02aaaaab), %bb.14(0x02aaaaab), %bb.15(0x02aaaaab)
+  
+    %694:aimag8 = COPY %904
+    dead %694:aimag8, %691:cc = ASL %694
+    %814:ac, dead %691:cc = ROL %814, %691
+    %603:cc = CMPImm %814, 128
+    %814:ac, %603:cc = ROR %814, %603
+    %818:aimag8 = COPY %904
+    %818:aimag8, %603:cc = ROR %818, %603
+    %822:aimag8 = COPY %811
+    %822:aimag8, %603:cc = ROR %822, %603
+    %826:aimag8 = COPY %808
+    %826:aimag8, %603:cc = ROR %826, %603
+    %830:aimag8 = COPY %805
+    %830:aimag8, %603:cc = ROR %830, %603
+    %834:aimag8 = COPY %802
+    %834:aimag8, %603:cc = ROR %834, %603
+    %838:aimag8 = COPY %799
+    %838:aimag8, %603:cc = ROR %838, %603
+    %842:aimag8 = COPY %785
+    %842:aimag8, dead %603:cc = ROR %842, %603
+    %630:cc = CMPImm %814, 128
+    %814:ac, %630:cc = ROR %814, %630
+    %818:aimag8, %630:cc = ROR %818, %630
+    %822:aimag8, %630:cc = ROR %822, %630
+    %826:aimag8, %630:cc = ROR %826, %630
+    %830:aimag8, %630:cc = ROR %830, %630
+    %834:aimag8, %630:cc = ROR %834, %630
+    %838:aimag8, %630:cc = ROR %838, %630
+    %842:aimag8, dead %630:cc = ROR %842, %630
+    %656:cc = CMPImm %814, 128
+    %814:ac, %656:cc = ROR %814, %656
+    %818:aimag8, %656:cc = ROR %818, %656
+    %822:aimag8, %656:cc = ROR %822, %656
+    %826:aimag8, %656:cc = ROR %826, %656
+    %830:aimag8, %656:cc = ROR %830, %656
+    %834:aimag8, %656:cc = ROR %834, %656
+    %838:aimag8, %656:cc = ROR %838, %656
+    %842:aimag8, dead %656:cc = ROR %842, %656
+    %559:cc = CMPImm %814, 128
+    dead early-clobber %815:imag16 = STStk %814, %stack.1, 0 :: (store (s8) into %stack.1)
+    %859:ac = COPY %814
+    %859:ac, %559:cc = ROR %859, %559
+    dead early-clobber %819:imag16 = STStk %818, %stack.2, 0 :: (store (s8) into %stack.2)
+    %863:aimag8 = COPY %818
+    %863:aimag8, %559:cc = ROR %863, %559
+    dead early-clobber %823:imag16 = STStk %822, %stack.3, 0 :: (store (s8) into %stack.3)
+    %867:aimag8 = COPY %822
+    %867:aimag8, %559:cc = ROR %867, %559
+    dead early-clobber %827:imag16 = STStk %826, %stack.4, 0 :: (store (s8) into %stack.4)
+    %871:aimag8 = COPY %826
+    %871:aimag8, %559:cc = ROR %871, %559
+    dead early-clobber %831:imag16 = STStk %830, %stack.5, 0 :: (store (s8) into %stack.5)
+    %875:aimag8 = COPY %830
+    %875:aimag8, %559:cc = ROR %875, %559
+    dead early-clobber %835:imag16 = STStk %834, %stack.6, 0 :: (store (s8) into %stack.6)
+    %881:aimag8 = COPY %834
+    %881:aimag8, %559:cc = ROR %881, %559
+    dead early-clobber %839:imag16 = STStk %838, %stack.7, 0 :: (store (s8) into %stack.7)
+    %885:aimag8 = COPY %838
+    %885:aimag8, %559:cc = ROR %885, %559
+    dead early-clobber %844:imag16 = STStk %842, %stack.8, 0 :: (store (s8) into %stack.8)
+    %893:aimag8 = COPY %842
+    %893:aimag8, dead %559:cc = ROR %893, %559
+    %1012:cc = CMPImm %859, 128
+    %1011:anyi1 = COPY %1012
+    %942:aimag8 = COPY %940
+    %942:aimag8, dead %185:cc = ASL %942
+    dead early-clobber %900:imag16 = STStk %942, %stack.19, 0 :: (store (s8) into %stack.19)
+    dead early-clobber %860:imag16 = STStk %859, %stack.10, 0 :: (store (s8) into %stack.10)
+    %889:ac = COPY %859
+    %1009:cc = COPY %1011
+    %889:ac, %1009:cc = ROR %889, %1009
+    dead early-clobber %864:imag16 = STStk %863, %stack.11, 0 :: (store (s8) into %stack.11)
+    %959:aimag8 = COPY %863
+    %959:aimag8, %1009:cc = ROR %959, %1009
+    dead early-clobber %868:imag16 = STStk %867, %stack.12, 0 :: (store (s8) into %stack.12)
+    %459:aimag8 = COPY %867
+    %459:aimag8, %1009:cc = ROR %459, %1009
+    dead early-clobber %872:imag16 = STStk %871, %stack.13, 0 :: (store (s8) into %stack.13)
+    %461:aimag8 = COPY %871
+    %461:aimag8, %1009:cc = ROR %461, %1009
+    dead early-clobber %856:imag16 = STStk %802, %stack.9, 0 :: (store (s8) into %stack.9)
+    dead early-clobber %877:imag16 = STStk %875, %stack.14, 0 :: (store (s8) into %stack.14)
+    %463:aimag8 = COPY %875
+    %463:aimag8, %1009:cc = ROR %463, %1009
+    dead early-clobber %882:imag16 = STStk %881, %stack.15, 0 :: (store (s8) into %stack.15)
+    %465:aimag8 = COPY %881
+    %465:aimag8, %1009:cc = ROR %465, %1009
+    dead early-clobber %886:imag16 = STStk %885, %stack.16, 0 :: (store (s8) into %stack.16)
+    %467:aimag8 = COPY %885
+    %467:aimag8, %1009:cc = ROR %467, %1009
+    %1010:cc = COPY %1009
+    dead early-clobber %895:imag16 = STStk %893, %stack.18, 0 :: (store (s8) into %stack.18)
+    %469:aimag8 = COPY %893
+    %469:aimag8, dead %1010:cc = ROR %469, %1010
+    %458:cc = CMPImm %889, 128
+    %889:ac, %458:cc = ROR %889, %458
+    %959:aimag8, %458:cc = ROR %959, %458
+    %459:aimag8, %458:cc = ROR %459, %458
+    %461:aimag8, %458:cc = ROR %461, %458
+    %463:aimag8, %458:cc = ROR %463, %458
+    %465:aimag8, %458:cc = ROR %465, %458
+    %467:aimag8, %458:cc = ROR %467, %458
+    %469:aimag8, dead %458:cc = ROR %469, %458
+    %485:cc = CMPImm %889, 128
+    %889:ac, %485:cc = ROR %889, %485
+    %959:aimag8, %485:cc = ROR %959, %485
+    %459:aimag8, %485:cc = ROR %459, %485
+    %461:aimag8, %485:cc = ROR %461, %485
+    %463:aimag8, %485:cc = ROR %463, %485
+    %465:aimag8, %485:cc = ROR %465, %485
+    %467:aimag8, %485:cc = ROR %467, %485
+    %469:aimag8, dead %485:cc = ROR %469, %485
+    %512:cc = CMPImm %889, 128
+    %889:ac, %512:cc = ROR %889, %512
+    %959:aimag8, %512:cc = ROR %959, %512
+    %459:aimag8, %512:cc = ROR %459, %512
+    %461:aimag8, %512:cc = ROR %461, %512
+    %463:aimag8, %512:cc = ROR %463, %512
+    %465:aimag8, %512:cc = ROR %465, %512
+    %467:aimag8, %512:cc = ROR %467, %512
+    %469:aimag8, dead %512:cc = ROR %469, %512
+    %335:cc = CMPImm %889, 128
+    dead early-clobber %890:imag16 = STStk %889, %stack.17, 0 :: (store (s8) into %stack.17)
+    %919:ac = COPY %889
+    %919:ac, %335:cc = ROR %919, %335
+    dead early-clobber %961:imag16 = STStk %959, %stack.24, 0 :: (store (s8) into %stack.24)
+    %388:aimag8 = COPY %959
+    %388:aimag8, %335:cc = ROR %388, %335
+    %390:aimag8 = COPY %459
+    %390:aimag8, %335:cc = ROR %390, %335
+    %392:aimag8 = COPY %461
+    %392:aimag8, %335:cc = ROR %392, %335
+    %394:aimag8 = COPY %463
+    %394:aimag8, %335:cc = ROR %394, %335
+    %396:aimag8 = COPY %465
+    %396:aimag8, %335:cc = ROR %396, %335
+    %398:aimag8 = COPY %467
+    %398:aimag8, %335:cc = ROR %398, %335
+    %400:aimag8 = COPY %469
+    %400:aimag8, dead %335:cc = ROR %400, %335
+    %362:cc = CMPImm %919, 128
+    %919:ac, %362:cc = ROR %919, %362
+    %388:aimag8, %362:cc = ROR %388, %362
+    %390:aimag8, %362:cc = ROR %390, %362
+    %392:aimag8, %362:cc = ROR %392, %362
+    %394:aimag8, %362:cc = ROR %394, %362
+    %396:aimag8, %362:cc = ROR %396, %362
+    %398:aimag8, %362:cc = ROR %398, %362
+    %400:aimag8, dead %362:cc = ROR %400, %362
+    %389:cc = CMPImm %919, 128
+    %919:ac, %389:cc = ROR %919, %389
+    %388:aimag8, %389:cc = ROR %388, %389
+    %390:aimag8, %389:cc = ROR %390, %389
+    %392:aimag8, %389:cc = ROR %392, %389
+    %394:aimag8, %389:cc = ROR %394, %389
+    %396:aimag8, %389:cc = ROR %396, %389
+    %398:aimag8, %389:cc = ROR %398, %389
+    %400:aimag8, dead %389:cc = ROR %400, %389
+    %203:cc = CMPImm %919, 128
+    dead early-clobber %920:imag16 = STStk %919, %stack.21, 0 :: (store (s8) into %stack.21)
+    %956:ac = COPY %919
+    %956:ac, %203:cc = ROR %956, %203
+    dead early-clobber %953:imag16 = STStk %811, %stack.23, 0 :: (store (s8) into %stack.23)
+    %283:aimag8 = COPY %388
+    %283:aimag8, %203:cc = ROR %283, %203
+    dead early-clobber %964:imag16 = STStk %808, %stack.25, 0 :: (store (s8) into %stack.25)
+    %285:aimag8 = COPY %390
+    %285:aimag8, %203:cc = ROR %285, %203
+    dead early-clobber %969:imag16 = STStk %805, %stack.27, 0 :: (store (s8) into %stack.27)
+    %287:aimag8 = COPY %392
+    %287:aimag8, %203:cc = ROR %287, %203
+    %289:aimag8 = COPY %394
+    %289:aimag8, %203:cc = ROR %289, %203
+    dead early-clobber %932:imag16 = STStk %799, %stack.22, 0 :: (store (s8) into %stack.22)
+    %291:aimag8 = COPY %396
+    %291:aimag8, %203:cc = ROR %291, %203
+    dead early-clobber %916:imag16 = STStk %785, %stack.20, 0 :: (store (s8) into %stack.20)
+    %293:aimag8 = COPY %398
+    %293:aimag8, %203:cc = ROR %293, %203
+    %295:aimag8 = COPY %400
+    %295:aimag8, dead %203:cc = ROR %295, %203
+    %230:cc = CMPImm %956, 128
+    %956:ac, %230:cc = ROR %956, %230
+    %283:aimag8, %230:cc = ROR %283, %230
+    %285:aimag8, %230:cc = ROR %285, %230
+    %287:aimag8, %230:cc = ROR %287, %230
+    %289:aimag8, %230:cc = ROR %289, %230
+    %291:aimag8, %230:cc = ROR %291, %230
+    %293:aimag8, %230:cc = ROR %293, %230
+    %295:aimag8, dead %230:cc = ROR %295, %230
+    %257:cc = CMPImm %956, 128
+    %956:ac, %257:cc = ROR %956, %257
+    %283:aimag8, %257:cc = ROR %283, %257
+    %285:aimag8, %257:cc = ROR %285, %257
+    %287:aimag8, %257:cc = ROR %287, %257
+    %289:aimag8, %257:cc = ROR %289, %257
+    %291:aimag8, %257:cc = ROR %291, %257
+    %293:aimag8, %257:cc = ROR %293, %257
+    %295:aimag8, dead %257:cc = ROR %295, %257
+    %284:cc = CMPImm %956, 128
+    %956:ac, %284:cc = ROR %956, %284
+    dead early-clobber %966:imag16 = STStk %956, %stack.26, 0 :: (store (s8) into %stack.26)
+    %283:aimag8, %284:cc = ROR %283, %284
+    %285:aimag8, %284:cc = ROR %285, %284
+    %287:aimag8, %284:cc = ROR %287, %284
+    %289:aimag8, %284:cc = ROR %289, %284
+    %291:aimag8, %284:cc = ROR %291, %284
+    %293:aimag8, %284:cc = ROR %293, %284
+    %295:aimag8, dead %284:cc = ROR %295, %284
+    %999:anyi8 = COPY %904
+    %768:anyi8 = LDZ
+    %769:anyi8 = LDZ
+    %770:anyi8 = LDZ
+    %771:anyi8 = LDZ
+    %772:anyi8 = LDZ
+    %773:anyi8 = LDZ
+    %901:xc, dead early-clobber %902:imag16 = LDStk %stack.19, 0 :: (load (s8) from %stack.19)
+    %984:anyi8, dead early-clobber %965:imag16 = LDStk %stack.25, 0 :: (load (s8) from %stack.25)
+    dead early-clobber %985:imag16 = STStk %984, %stack.25, 0 :: (store (s8) into %stack.25)
+    %971:anyi8, dead early-clobber %970:imag16 = LDStk %stack.27, 0 :: (load (s8) from %stack.27)
+    dead early-clobber %972:imag16 = STStk %971, %stack.27, 0 :: (store (s8) into %stack.27)
+    %1005:anyi8 = LDZ
+    %1001:anyi8 = LDZ
+    %998:anyi8 = COPY %999
+    JMPIdxIndir %jump-table.0, %901
+  
+  bb.8.common.ret1:
+    $rc2 = COPY %768
+    $rc3 = COPY %769
+    $rc4 = COPY %770
+    $rc5 = COPY %771
+    $rc6 = COPY %772
+    $rc7 = COPY %773
+    $x = COPY %1005
+    $a = COPY %1001
+    RTS implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc4, implicit $rc5, implicit $rc6, implicit $rc7
+  
+  bb.9 (%ir-block.3):
+    successors: %bb.17(0x80000000)
+  
+    %787:anyi8 = LDZ
+    dead early-clobber %788:imag16 = STStk %787, %stack.0, 0 :: (store (s8) into %stack.0)
+    %910:anyi8 = LDZ
+    dead early-clobber %911:imag16 = STStk %910, %stack.20, 0 :: (store (s8) into %stack.20)
+    %926:anyi8 = LDZ
+    dead early-clobber %927:imag16 = STStk %926, %stack.22, 0 :: (store (s8) into %stack.22)
+    %849:anyi8 = LDZ
+    dead early-clobber %850:imag16 = STStk %849, %stack.9, 0 :: (store (s8) into %stack.9)
+    %977:anyi8 = LDZ
+    dead early-clobber %978:imag16 = STStk %977, %stack.27, 0 :: (store (s8) into %stack.27)
+    %990:anyi8 = LDZ
+    dead early-clobber %991:imag16 = STStk %990, %stack.25, 0 :: (store (s8) into %stack.25)
+    %947:anyi8 = LDZ
+    dead early-clobber %948:imag16 = STStk %947, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8 = LDZ
+    BRA %bb.17
+  
+  bb.10 (%ir-block.4):
+    successors: %bb.17(0x80000000)
+  
+    %845:anyi8, dead early-clobber %846:imag16 = LDStk %stack.8, 0 :: (load (s8) from %stack.8)
+    dead early-clobber %789:imag16 = STStk %845, %stack.0, 0 :: (store (s8) into %stack.0)
+    %908:anyi8, dead early-clobber %840:imag16 = LDStk %stack.7, 0 :: (load (s8) from %stack.7)
+    dead early-clobber %909:imag16 = STStk %908, %stack.20, 0 :: (store (s8) into %stack.20)
+    %924:anyi8, dead early-clobber %836:imag16 = LDStk %stack.6, 0 :: (load (s8) from %stack.6)
+    dead early-clobber %925:imag16 = STStk %924, %stack.22, 0 :: (store (s8) into %stack.22)
+    %847:anyi8, dead early-clobber %832:imag16 = LDStk %stack.5, 0 :: (load (s8) from %stack.5)
+    dead early-clobber %848:imag16 = STStk %847, %stack.9, 0 :: (store (s8) into %stack.9)
+    %979:anyi8, dead early-clobber %828:imag16 = LDStk %stack.4, 0 :: (load (s8) from %stack.4)
+    dead early-clobber %980:imag16 = STStk %979, %stack.27, 0 :: (store (s8) into %stack.27)
+    %992:anyi8, dead early-clobber %824:imag16 = LDStk %stack.3, 0 :: (load (s8) from %stack.3)
+    dead early-clobber %993:imag16 = STStk %992, %stack.25, 0 :: (store (s8) into %stack.25)
+    %945:anyi8, dead early-clobber %820:imag16 = LDStk %stack.2, 0 :: (load (s8) from %stack.2)
+    dead early-clobber %946:imag16 = STStk %945, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8, dead early-clobber %816:imag16 = LDStk %stack.1, 0 :: (load (s8) from %stack.1)
+    BRA %bb.17
+  
+  bb.11 (%ir-block.6):
+    successors: %bb.17(0x80000000)
+  
+    %896:anyi8, dead early-clobber %897:imag16 = LDStk %stack.18, 0 :: (load (s8) from %stack.18)
+    dead early-clobber %790:imag16 = STStk %896, %stack.0, 0 :: (store (s8) into %stack.0)
+    %906:anyi8, dead early-clobber %887:imag16 = LDStk %stack.16, 0 :: (load (s8) from %stack.16)
+    dead early-clobber %907:imag16 = STStk %906, %stack.20, 0 :: (store (s8) into %stack.20)
+    %922:anyi8, dead early-clobber %883:imag16 = LDStk %stack.15, 0 :: (load (s8) from %stack.15)
+    dead early-clobber %923:imag16 = STStk %922, %stack.22, 0 :: (store (s8) into %stack.22)
+    %878:anyi8, dead early-clobber %879:imag16 = LDStk %stack.14, 0 :: (load (s8) from %stack.14)
+    dead early-clobber %851:imag16 = STStk %878, %stack.9, 0 :: (store (s8) into %stack.9)
+    %981:anyi8, dead early-clobber %873:imag16 = LDStk %stack.13, 0 :: (load (s8) from %stack.13)
+    dead early-clobber %982:imag16 = STStk %981, %stack.27, 0 :: (store (s8) into %stack.27)
+    %994:anyi8, dead early-clobber %869:imag16 = LDStk %stack.12, 0 :: (load (s8) from %stack.12)
+    dead early-clobber %995:imag16 = STStk %994, %stack.25, 0 :: (store (s8) into %stack.25)
+    %943:anyi8, dead early-clobber %865:imag16 = LDStk %stack.11, 0 :: (load (s8) from %stack.11)
+    dead early-clobber %944:imag16 = STStk %943, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8, dead early-clobber %861:imag16 = LDStk %stack.10, 0 :: (load (s8) from %stack.10)
+    BRA %bb.17
+  
+  bb.12 (%ir-block.8):
+    successors: %bb.17(0x80000000)
+  
+    dead early-clobber %791:imag16 = STStk %469, %stack.0, 0 :: (store (s8) into %stack.0)
+    dead early-clobber %912:imag16 = STStk %467, %stack.20, 0 :: (store (s8) into %stack.20)
+    dead early-clobber %928:imag16 = STStk %465, %stack.22, 0 :: (store (s8) into %stack.22)
+    dead early-clobber %852:imag16 = STStk %463, %stack.9, 0 :: (store (s8) into %stack.9)
+    dead early-clobber %976:imag16 = STStk %461, %stack.27, 0 :: (store (s8) into %stack.27)
+    dead early-clobber %989:imag16 = STStk %459, %stack.25, 0 :: (store (s8) into %stack.25)
+    %962:anyi8, dead early-clobber %963:imag16 = LDStk %stack.24, 0 :: (load (s8) from %stack.24)
+    dead early-clobber %949:imag16 = STStk %962, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8, dead early-clobber %891:imag16 = LDStk %stack.17, 0 :: (load (s8) from %stack.17)
+    BRA %bb.17
+  
+  bb.13 (%ir-block.10):
+    successors: %bb.17(0x80000000)
+  
+    dead early-clobber %792:imag16 = STStk %400, %stack.0, 0 :: (store (s8) into %stack.0)
+    dead early-clobber %913:imag16 = STStk %398, %stack.20, 0 :: (store (s8) into %stack.20)
+    dead early-clobber %929:imag16 = STStk %396, %stack.22, 0 :: (store (s8) into %stack.22)
+    dead early-clobber %853:imag16 = STStk %394, %stack.9, 0 :: (store (s8) into %stack.9)
+    dead early-clobber %975:imag16 = STStk %392, %stack.27, 0 :: (store (s8) into %stack.27)
+    dead early-clobber %988:imag16 = STStk %390, %stack.25, 0 :: (store (s8) into %stack.25)
+    dead early-clobber %950:imag16 = STStk %388, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8, dead early-clobber %921:imag16 = LDStk %stack.21, 0 :: (load (s8) from %stack.21)
+    BRA %bb.17
+  
+  bb.14 (%ir-block.12):
+    successors: %bb.17(0x80000000)
+  
+    dead early-clobber %793:imag16 = STStk %295, %stack.0, 0 :: (store (s8) into %stack.0)
+    dead early-clobber %914:imag16 = STStk %293, %stack.20, 0 :: (store (s8) into %stack.20)
+    dead early-clobber %930:imag16 = STStk %291, %stack.22, 0 :: (store (s8) into %stack.22)
+    dead early-clobber %854:imag16 = STStk %289, %stack.9, 0 :: (store (s8) into %stack.9)
+    dead early-clobber %974:imag16 = STStk %287, %stack.27, 0 :: (store (s8) into %stack.27)
+    dead early-clobber %987:imag16 = STStk %285, %stack.25, 0 :: (store (s8) into %stack.25)
+    dead early-clobber %951:imag16 = STStk %283, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8, dead early-clobber %967:imag16 = LDStk %stack.26, 0 :: (load (s8) from %stack.26)
+    BRA %bb.17
+  
+  bb.15 (%ir-block.14):
+    successors: %bb.17(0x80000000)
+  
+    %957:ac, dead early-clobber %968:imag16 = LDStk %stack.26, 0 :: (load (s8) from %stack.26)
+    %159:cc = CMPImm %957, 128
+    %957:ac, %159:cc = ROR %957, %159
+    %283:aimag8, %159:cc = ROR %283, %159
+    %285:aimag8, %159:cc = ROR %285, %159
+    %287:aimag8, %159:cc = ROR %287, %159
+    %289:aimag8, %159:cc = ROR %289, %159
+    %291:aimag8, %159:cc = ROR %291, %159
+    %293:aimag8, %159:cc = ROR %293, %159
+    %295:aimag8, dead %159:cc = ROR %295, %159
+    dead early-clobber %794:imag16 = STStk %295, %stack.0, 0 :: (store (s8) into %stack.0)
+    dead early-clobber %915:imag16 = STStk %293, %stack.20, 0 :: (store (s8) into %stack.20)
+    dead early-clobber %931:imag16 = STStk %291, %stack.22, 0 :: (store (s8) into %stack.22)
+    dead early-clobber %855:imag16 = STStk %289, %stack.9, 0 :: (store (s8) into %stack.9)
+    dead early-clobber %973:imag16 = STStk %287, %stack.27, 0 :: (store (s8) into %stack.27)
+    dead early-clobber %986:imag16 = STStk %285, %stack.25, 0 :: (store (s8) into %stack.25)
+    dead early-clobber %952:imag16 = STStk %283, %stack.23, 0 :: (store (s8) into %stack.23)
+    %998:anyi8 = COPY %957
+    BRA %bb.17
+  
+  bb.16 (%ir-block.16):
+    successors:
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @abort, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.17 (%ir-block.17):
+    successors: %bb.8(0x80000000)
+  
+    %1001:anyi8, dead early-clobber %797:imag16 = LDStk %stack.0, 0 :: (load (s8) from %stack.0)
+    %1005:anyi8, dead early-clobber %917:imag16 = LDStk %stack.20, 0 :: (load (s8) from %stack.20)
+    %768:anyi8, dead early-clobber %933:imag16 = LDStk %stack.22, 0 :: (load (s8) from %stack.22)
+    %769:anyi8, dead early-clobber %857:imag16 = LDStk %stack.9, 0 :: (load (s8) from %stack.9)
+    %770:anyi8, dead early-clobber %983:imag16 = LDStk %stack.27, 0 :: (load (s8) from %stack.27)
+    %771:anyi8, dead early-clobber %996:imag16 = LDStk %stack.25, 0 :: (load (s8) from %stack.25)
+    %772:anyi8, dead early-clobber %954:imag16 = LDStk %stack.23, 0 :: (load (s8) from %stack.23)
+    %773:anyi8 = COPY %998
+    BRA %bb.8
+...

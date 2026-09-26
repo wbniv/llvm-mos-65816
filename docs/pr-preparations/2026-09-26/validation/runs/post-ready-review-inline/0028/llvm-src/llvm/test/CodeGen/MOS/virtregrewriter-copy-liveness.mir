@@ -1,0 +1,103 @@
+# RUN: llc -mtriple=mos -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
+
+---
+# An identity copy of a defined value contributes no liveness information.
+name: defined_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $a
+    ; CHECK-LABEL: name: defined_identity
+    ; CHECK: liveins: $a
+    ; CHECK-NOT: COPY
+    ; CHECK-NOT: KILL
+    ; CHECK: STAbs $a, 0
+    $a = COPY $a
+    STAbs $a, 0
+    RTS
+...
+---
+# An undef source still defines the destination for subsequent physical uses.
+name: explicitly_undef_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: explicitly_undef_identity
+    ; CHECK: $a = KILL undef $a
+    ; CHECK-NEXT: STAbs $a, 0
+    $a = COPY undef $a
+    STAbs $a, 0
+    RTS
+...
+---
+# Keep the super-register definition when the explicit copy is an identity.
+name: implicit_definition_identity
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $rc2
+    ; CHECK-LABEL: name: implicit_definition_identity
+    ; CHECK: $rc2 = KILL $rc2, implicit-def $rs1
+    ; CHECK-NEXT: $a = COPY $rc3
+    $rc2 = COPY $rc2, implicit-def $rs1
+    $a = COPY $rc3
+    STAbs $a, 0
+    RTS
+...
+---
+# Save the incoming A value before the parallel copy overwrites A.
+name: ordered_copy_bundle
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $a, $x
+    ; CHECK-LABEL: name: ordered_copy_bundle
+    ; CHECK: $y = COPY $a
+    ; CHECK-NEXT: $a = COPY $x
+    ; CHECK-NEXT: STAbs $y, 0
+    $a = COPY $x {
+      $y = COPY $a
+    }
+    STAbs $y, 0
+    STAbs $a, 1
+    RTS
+...
+---
+# The low-lane source is defined even though its sibling lane is undef.
+name: defined_source_subregister
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: defined_source_subregister
+    ; CHECK: renamable $rc2 = COPY killed renamable $x
+    ; CHECK-NEXT: renamable $x = COPY killed renamable $rc2
+    ; CHECK-NEXT: STAbs killed renamable $x, 0
+    %0:gpr = LDImm 1
+    undef %1.sublo:imag16 = COPY %0
+    %2:imag8 = COPY %1.sublo
+    %3:gpr = COPY %2
+    STAbs %3, 0
+    RTS
+...
+---
+# The source outlives the fixed destination clobber, requiring a real copy.
+name: nonidentity_partial_undef
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: nonidentity_partial_undef
+    ; CHECK: $rs2 = COPY renamable $rs1
+    ; CHECK-NEXT: $a = COPY $rc5
+    ; CHECK-NEXT: STAbs $a, 0
+    ; CHECK-NEXT: $rs2 = IMPLICIT_DEF
+    ; CHECK-NEXT: renamable $x = COPY killed renamable $rc2
+    %0:gpr = LDImm 1
+    undef %1.sublo:imag16 = COPY %0
+    $rs2 = COPY %1
+    $a = COPY $rc5
+    STAbs $a, 0
+    $rs2 = IMPLICIT_DEF
+    %2:gpr = COPY %1.sublo
+    STAbs %2, 1
+    RTS
+...

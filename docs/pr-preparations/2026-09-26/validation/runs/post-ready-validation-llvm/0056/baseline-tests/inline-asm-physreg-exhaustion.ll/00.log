@@ -1,0 +1,37 @@
+/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll:9:18: error: CHECK-COUNT: expected string not found in input (1 out of 4)
+; CHECK-COUNT-4: error: not enough registers for inline asm constraint '{cc}'
+                 ^
+<stdin>:1:1: note: scanning from here
+llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:148: void getRegistersForValue(MachineFunction &, MachineIRBuilder &, GISelAsmOperandInfo &, GISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed.
+^
+<stdin>:1:243: note: possible intended match here
+llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:148: void getRegistersForValue(MachineFunction &, MachineIRBuilder &, GISelAsmOperandInfo &, GISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed.
+                                                                                                                                                                                                                                                  ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+           1: llc: /work/build/post-ready-2026-09-26-llvm-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:148: void getRegistersForValue(MachineFunction &, MachineIRBuilder &, GISelAsmOperandInfo &, GISelAsmOperandInfo &): Assertion `I != RC->end() && "Ran out of registers to allocate!"' failed. 
+count:9'0    {                                                                                                                                                                                                                                                                                                   search range start (exclusive)
+count:9'1                                                                                                                                                                                                                                                                                                        error: no match found in search range
+count:9'2                                                                                                                                                                                                                                                       ?                                                possible intended match
+           2: PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug. 
+           3: Stack dump: 
+           4: 0. Program arguments: llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll -o /dev/null 
+           5: 1. Running pass 'Function Pass Manager' on module '/work/build/post-ready-2026-09-26-llvm-src/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-physreg-exhaustion.ll'. 
+           6: 2. Running pass 'IRTranslator' on function '@bad_output' 
+           .
+           .
+           .
+          26: #19 0x00005ca323f4b401 llcMain (/work/build/post-ready-validation-llvm/0056/baseline-bin/llc+0x1fd5401) 
+          27: #20 0x00005ca323e8ab6f main (/work/build/post-ready-validation-llvm/0056/baseline-bin/llc+0x1f14b6f) 
+          28: #21 0x0000767f38a9e601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601) 
+          29: #22 0x0000767f38a9e718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718) 
+          30: #23 0x00005ca323e8aa65 _start (/work/build/post-ready-validation-llvm/0056/baseline-bin/llc+0x1f14a65) 
+          31: error: Aborted 
+count:9'3                    } search range end (exclusive)
+>>>>>>

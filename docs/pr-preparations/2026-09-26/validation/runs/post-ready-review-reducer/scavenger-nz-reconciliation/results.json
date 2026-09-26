@@ -1,0 +1,433 @@
+{
+  "hashes": {
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc": "b4f1c266fb28d34e6eaddfc41b81f45c9fba27641207195f9c9c45eab7cf4096",
+    "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011": "a1e94512271b745b9b2343def2bf03cce9ab8ed0bf1e9ca9d12cb193f93db320",
+    "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir": "62c100687cf1d689614b21d384303153f1425baf738a0c0163fa919ec1fdecee",
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir": "c2f78c93143c6c149f4f468f671a45ba9688ec6f0fb6567ea9a6a36b3eb42c39",
+    "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll": "1de8c3986b43fb7d7605aefc4fce8fafa2c5e396ff68dc1e5a7a4c31b528d108",
+    "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control.mir": "a355d97fdaeeea4165c61fd6ec13783517674cee1fad7824e0045efbc6d15cd9",
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2.mir": "9c3dd1dd7f6814284e6b5a28664c7af5140d6b18bec5576d7ec6180c0d51d5b9",
+    "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control.mir": "cb6b61fc476f07a9fa81572ae523d7a64cebfdad9068582aaeae006ad6f7e4aa"
+  },
+  "runs": [
+    {
+      "name": "stock-7bd-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-version.log",
+      "log_sha256": "efce29912aa4e84b10b38790a6ac3d9f6dc473fb0b5c1264de7eb256a018bda7"
+    },
+    {
+      "name": "stock-7bd-v2-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-v2-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-7bd-v2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-v2.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-v2.log",
+      "log_sha256": "2db88e0f84dc6e58b3a976dd5f37f9613578296aa04d2db69986fea68eae1051"
+    },
+    {
+      "name": "stock-7bd-nested-control-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-nested-control-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "stock-7bd-nested-control",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-nested-control.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-nested-control.log",
+      "log_sha256": "dd4a2cc19b84dcb2d0c3fbaabad48b1640e049d110bbb220cb7758af1d3fb4f2"
+    },
+    {
+      "name": "stock-7bd-known-0011",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-stop-after=prolog-epilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-known-0011.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/stock-7bd-known-0011.log",
+      "log_sha256": "975cb4796081dc9b9f8f199ec50b87febd59ccae188421e1fb669459ee26ca25"
+    },
+    {
+      "name": "0054-only-7bd-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-version.log",
+      "log_sha256": "efce29912aa4e84b10b38790a6ac3d9f6dc473fb0b5c1264de7eb256a018bda7"
+    },
+    {
+      "name": "0054-only-7bd-v2-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-v2-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0054-only-7bd-v2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-v2.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-v2.log",
+      "log_sha256": "1d0708eed166865150b9be87277ce6370bd2262659d299fa4a6185cc9eadb587"
+    },
+    {
+      "name": "0054-only-7bd-nested-control-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-nested-control-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0054-only-7bd-nested-control",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-nested-control.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-nested-control.log",
+      "log_sha256": "ba975dca89863d1bcbefd74592095d2ed2fa0973ef7fde68bdbddd246defcceb"
+    },
+    {
+      "name": "0054-only-7bd-known-0011",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-stop-after=prolog-epilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-known-0011.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/0054-only-7bd-known-0011.log",
+      "log_sha256": "26d8eb72fdef80b314ae21c5b166b9395c364fd12741595172ac756ee01d953f"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-version.log",
+      "log_sha256": "efce29912aa4e84b10b38790a6ac3d9f6dc473fb0b5c1264de7eb256a018bda7"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-v2-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-v2-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-v2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-v2.mir"
+      ],
+      "returncode": -6,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-v2.log",
+      "log_sha256": "610c8e77105736fae50fd7f92b7ca78c75abad7ddbab6454ab3f75f30524b663"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-nested-control-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-nested-control",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-nested-control-output-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-nested-control-output-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-known-0011",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0031-plus-0011",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-stop-after=prolog-epilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-known-0011.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-known-0011.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "retained-0011-plus0030-0031-known-0011-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-known-0011.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/retained-0011-plus0030-0031-known-0011-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-version",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "--version"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-version.log",
+      "log_sha256": "17cce28d20b3d6b536347d3749c299cde162da8fe635b95e0a395e8bca213c6e"
+    },
+    {
+      "name": "full-fork-v2-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-v2",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-v2-output-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-status-save-range.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-v2-output-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-nested-control-input-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=machineverifier",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control-input-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-nested-control",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-run-pass=scavenger-test",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-nested-control-output-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nested-save-control.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-nested-control-output-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-known-0011",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-stop-after=prologepilog",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-known-0011.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-known-0011.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "full-fork-known-0011-check",
+      "argv": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos-r2/0054/candidate-bin/FileCheck",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-known-0011.mir"
+      ],
+      "returncode": 0,
+      "log": "/home/will/llvm-mos-65816/build/post-ready-review-reducer/scavenger-nz-reconciliation/full-fork-known-0011-check.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

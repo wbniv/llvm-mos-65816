@@ -1,0 +1,124 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), gpt-6-astra, xhigh",
+  "runs": [
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional-controls.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/candidate-additional-controls-mos6502.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "input_sha256": "2c974904b81c105b90908d5185091eeeb6830650602dda799f083bff40b849ad",
+      "log": "build/post-ready-review-mos/0038/additional/candidate-additional-controls-mos6502.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional-controls.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/candidate-additional-controls-mosw65816.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "input_sha256": "2c974904b81c105b90908d5185091eeeb6830650602dda799f083bff40b849ad",
+      "log": "build/post-ready-review-mos/0038/additional/candidate-additional-controls-mosw65816.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional-controls.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/candidate-additional-controls-mosspc700.s"
+      ],
+      "exit_code": -11,
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "input_sha256": "2c974904b81c105b90908d5185091eeeb6830650602dda799f083bff40b849ad",
+      "log": "build/post-ready-review-mos/0038/additional/candidate-additional-controls-mosspc700.log",
+      "log_sha256": "553a5b673a8a0c498fac3099d3db4b04f4cb305cd015275402c3cd43ec7817fc"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-existing-control.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/baseline-spc-existing-control-mosspc700.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "input_sha256": "05dc99bf8018c5e3ccebb4f0d109fb9c719cde7b7b74d8d355507c4da530e8a8",
+      "log": "build/post-ready-review-mos/0038/additional/baseline-spc-existing-control-mosspc700.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-existing-control.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/candidate-spc-existing-control-mosspc700.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "input_sha256": "05dc99bf8018c5e3ccebb4f0d109fb9c719cde7b7b74d8d355507c4da530e8a8",
+      "log": "build/post-ready-review-mos/0038/additional/candidate-spc-existing-control-mosspc700.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-existing-control.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/integrated-spc-existing-control-mosspc700.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+      "input_sha256": "05dc99bf8018c5e3ccebb4f0d109fb9c719cde7b7b74d8d355507c4da530e8a8",
+      "log": "build/post-ready-review-mos/0038/additional/integrated-spc-existing-control-mosspc700.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional-controls.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/additional/integrated-additional-controls-mosspc700.s"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+      "input_sha256": "2c974904b81c105b90908d5185091eeeb6830650602dda799f083bff40b849ad",
+      "log": "build/post-ready-review-mos/0038/additional/integrated-additional-controls-mosspc700.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

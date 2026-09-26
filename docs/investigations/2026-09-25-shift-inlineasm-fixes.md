@@ -1,5 +1,13 @@
 # Native-width extension and inline-asm register bounds
 
+**September 26 submission preparation:** 0056 is independently reviewed and
+ready in the [exact LLVM packet](../pr-preparations/2026-09-26/0056-pr-body.md):
+matching-input red/green, four focused RUNs, 168 filtered AArch64/X86 suite
+passes / three existing XFAILs. 0055 remains held with #321; the older integrated
+validation below is separate dated evidence. Nothing was posted.
+Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`,
+`xhigh` reasoning effort; session `01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh`
 reasoning effort: diagnosis, implementation, regression tests, validation, and
 documentation. [Session identity](../defects/evidence/2026-09-25-shift-inlineasm-fixes/session-identity.json)

@@ -1,0 +1,27 @@
+LLVM ERROR: unable to translate instruction: call (in function: named_rs)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/baseline-bin/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll -o -
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-validation-mos/0043/candidate-tests/inline-asm-physreg-width.ll/tmp/named_rs.ll'.
+2.	Running pass 'IRTranslator' on function '@named_rs'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005f7ae406fe3b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005f7ae406ccc1 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00005f7ae4070c4b
+3  libc.so.6 0x00007eea08a45cb0
+4  libc.so.6 0x00007eea08aa61ac pthread_kill + 284
+5  libc.so.6 0x00007eea08a45b7e gsignal + 30
+6  libc.so.6 0x00007eea08a288ec abort + 39
+7  llc       0x00005f7ae3fcb1a5 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x00005f7ae46f48e4
+9  llc       0x00005f7ae470bc7c llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) + 5180
+10 llc       0x00005f7ae470c7ca llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) + 554
+11 llc       0x00005f7ae2d0b0a9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+12 llc       0x00005f7ae329d420 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+13 llc       0x00005f7ae32a5522 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+14 llc       0x00005f7ae329e1e4 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+15 llc       0x00005f7ae1c6f2cb
+16 llc       0x00005f7ae1c6c593 main + 1443
+17 libc.so.6 0x00007eea08a2a601
+18 libc.so.6 0x00007eea08a2a718 __libc_start_main + 136
+19 llc       0x00005f7ae1c6b7a5 _start + 37

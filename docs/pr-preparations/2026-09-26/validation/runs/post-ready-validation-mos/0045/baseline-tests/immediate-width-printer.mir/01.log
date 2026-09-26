@@ -1,0 +1,46 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir:12:10: error: CHECK: expected string not found in input
+# CHECK: adc #mos16(66)
+         ^
+<stdin>:37:19: note: scanning from here
+native_immediates: ; @native_immediates
+                  ^
+<stdin>:39:2: note: possible intended match here
+ adc #66
+ ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/immediate-width-printer.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           32:  .zeropage __rc31 
+           33:  .file "immediate-width-printer.mir" 
+           34:  .text 
+           35:  .globl native_immediates ; -- Begin function native_immediates 
+           36:  .type native_immediates,@function 
+           37: native_immediates: ; @native_immediates 
+check:12'0                      {                        search range start (exclusive)
+check:12'1                                               error: no match found in search range
+           38: ; %bb.0: 
+           39:  adc #66 
+check:12'2      ?         possible intended match
+           40:  eor #255 
+           41:  cmp #5 
+           42:  lda #256 
+           43:  ldx #0 
+           44:  ldy #65535 
+           45:  adc #66 
+           46:  rts 
+           47: .Lfunc_end0: 
+           48:  .size native_immediates, .Lfunc_end0-native_immediates 
+           49:  ; -- End function 
+           50:  .section ".note.GNU-stack","",@progbits 
+           51:  ;Declaring this symbol tells the CRT that the stack pointer needs to be initialized. 
+           52:  .globl __do_init_stack 
+check:12'3                             } search range end (exclusive)
+>>>>>>

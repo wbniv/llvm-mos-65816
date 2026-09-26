@@ -1,0 +1,377 @@
+{
+  "input": "build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+  "input_sha256": "1d01a1ab586789a133b44dd9880251b5798efc4c72dbcdd0a75c428c8ed60584",
+  "binaries": {
+    "mos-current": {
+      "path": "build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce",
+      "sha256": "92e017df99e79256919f4e88fce4086f3c2d91802ade48f0a313a5e80a5bfde1",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n"
+    },
+    "llvm-current": {
+      "path": "build/post-ready-validation-llvm/0060/baseline-bin/llvm-reduce",
+      "sha256": "857b5b41f3488f12135bb89a1cc34d9f0c25f8def0d84186833e71469deabfde",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n"
+    },
+    "llvm-delta-candidate": {
+      "path": "build/post-ready-validation-llvm/0060/candidate-bin/llvm-reduce",
+      "sha256": "a3b995967330c41ce17e264ee3bf0f6e1d66fb6bca73dfa610ebeee315adc55d",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n"
+    }
+  },
+  "runs": [
+    {
+      "name": "mos-current-j1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "1",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "4a7a0b6825d8aaeb4c2474d46a5945e7f321e39d16c995a44e05507e572c8a69"
+    },
+    {
+      "name": "mos-current-j1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "mos-current-j2",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "2",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-j2.mir"
+      ],
+      "returncode": -11,
+      "log_sha256": "b5d9099ba59f692bf1f39ddab9ff2f665de2fb91b48f49d243dbc4bd31623da0"
+    },
+    {
+      "name": "mos-current-j4",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "4",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-j4.mir"
+      ],
+      "returncode": -11,
+      "log_sha256": "8f25e9fa53a8f4baeb7ea1f1faec997869d8f7f5fa25c520e340dbb6dadbee75"
+    },
+    {
+      "name": "mos-current-parallel-ir",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce",
+        "-j",
+        "2",
+        "--abort-on-invalid-reduction",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-parallel-ir.ll",
+        "--delta-passes=operands-skip",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--test-arg",
+        "--match-full-lines",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "--input-file"
+      ],
+      "returncode": 0,
+      "log_sha256": "7f0393462c9bacb152d05995ca10ac80b0fbb43134e735f27d67ae6b2c58d0ba"
+    },
+    {
+      "name": "mos-current-parallel-ir-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/mos-current-parallel-ir.ll",
+        "--check-prefix=REDUCED"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-current-j1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "1",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "9eb1b712111c1c35c58da9329d0322d98343b75ab61027d36b9bead7ac9bd771"
+    },
+    {
+      "name": "llvm-current-j1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-current-j2",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "2",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-j2.mir"
+      ],
+      "returncode": 1,
+      "log_sha256": "eea6adb433b3ab680416981788957d051fe711709080e7d874a751c2b5ebd794"
+    },
+    {
+      "name": "llvm-current-j4",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "4",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-j4.mir"
+      ],
+      "returncode": 1,
+      "log_sha256": "eea6adb433b3ab680416981788957d051fe711709080e7d874a751c2b5ebd794"
+    },
+    {
+      "name": "llvm-current-parallel-ir",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/baseline-bin/llvm-reduce",
+        "-j",
+        "2",
+        "--abort-on-invalid-reduction",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-parallel-ir.ll",
+        "--delta-passes=operands-skip",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--test-arg",
+        "--match-full-lines",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "--input-file"
+      ],
+      "returncode": 0,
+      "log_sha256": "e1f6a0726128d70f064cba6d02d4977ed2433185c338e7c563198b8ef6e8c15f"
+    },
+    {
+      "name": "llvm-current-parallel-ir-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-current-parallel-ir.ll",
+        "--check-prefix=REDUCED"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-delta-candidate-j1",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/candidate-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "1",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "a54bf6753986f30a750d3473ed5bb9f67823338b4393c4a655bb4c50817c0c59"
+    },
+    {
+      "name": "llvm-delta-candidate-j1-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--check-prefix=CHECK",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-j1.mir"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "llvm-delta-candidate-j2",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/candidate-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "2",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-j2.mir"
+      ],
+      "returncode": 1,
+      "log_sha256": "bbd4d30086662cd47ed9890f4672e9e262a8d5bab36814f30573d2aaac548b04"
+    },
+    {
+      "name": "llvm-delta-candidate-j4",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/candidate-bin/llvm-reduce",
+        "-x=mir",
+        "-j",
+        "4",
+        "--delta-passes=instructions",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "--test-arg",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/parallel-instr-reduce-x86.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-j4.mir"
+      ],
+      "returncode": 1,
+      "log_sha256": "bbd4d30086662cd47ed9890f4672e9e262a8d5bab36814f30573d2aaac548b04"
+    },
+    {
+      "name": "llvm-delta-candidate-parallel-ir",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-llvm/0060/candidate-bin/llvm-reduce",
+        "-j",
+        "2",
+        "--abort-on-invalid-reduction",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-parallel-ir.ll",
+        "--delta-passes=operands-skip",
+        "--test",
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "--test-arg",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--test-arg",
+        "--match-full-lines",
+        "--test-arg",
+        "--check-prefix=INTERESTING",
+        "--test-arg",
+        "--input-file"
+      ],
+      "returncode": 0,
+      "log_sha256": "7bfc53009ac1616267ab03f1f1e0c0ba79cec84e769d840bdb2622605a8ca893"
+    },
+    {
+      "name": "llvm-delta-candidate-parallel-ir-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-2026-09-26-llvm-src/llvm/test/tools/llvm-reduce/operands-skip.ll",
+        "--input-file",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/0060-current-upstream-reconcile/llvm-delta-candidate-parallel-ir.ll",
+        "--check-prefix=REDUCED"
+      ],
+      "returncode": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

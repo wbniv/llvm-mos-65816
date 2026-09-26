@@ -1,0 +1,5 @@
+*** Reducing Instructions (instructions)...
+warning: reduction attempt on function 'parallel_instr_reduce' failed machine verifier (debug with -print-invalid-reduction-machine-verifier-errors)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llvm-reduce -x=mir -j 4 --delta-passes=instructions --test /home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baselin

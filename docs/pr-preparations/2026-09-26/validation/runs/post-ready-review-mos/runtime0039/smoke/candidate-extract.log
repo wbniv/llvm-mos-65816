@@ -1,0 +1,5 @@
+$ /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objcopy --only-section=.text -O binary /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/smoke/candidate.o /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/smoke/candidate.bin
+exit=0
+stdout:
+
+stderr:

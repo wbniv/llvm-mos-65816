@@ -1,0 +1,218 @@
+{
+  "venue": "mos",
+  "base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+  "patch": "0044",
+  "prerequisites": [
+    "0039"
+  ],
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), gpt-6-astra, xhigh",
+  "baseline_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 11.217,
+    "log": "build/post-ready-validation-mos/0044/baseline-build.log",
+    "log_sha256": "6c41034964a45ba9f486a52ad24eec474a5a9d012a24c39694b75482e84ab52f"
+  },
+  "baseline_tools": {
+    "llc": "7b503e8e9cb48b75ca29d3ddf09391e7485f7419959bde01ca0653f368159398",
+    "opt": "bb57ff22966451ecbd74b8b3208ea516aa948adc71d566b53771b78509363e06",
+    "llvm-mc": "dd80b4ba2fddb42884864c57b412c20606f7d6278fdf3bb4a8372591942a04e6",
+    "llvm-objdump": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "d1f5025ed0d9b7165356bb1faa3d6dc2a270bbcbdd9a7d09629103361f642c7a",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "6ec33ae85e3439e2f032393da9e607fa1aa3833a703c1f748d9df285957dab05",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "patch_sha256": "6b48a04ae47c924af4cc777454985a6e2489596047edc2e6253fd188a36f4de1",
+  "dependency_sha256": {
+    "0039-llvm-mos.patch": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909"
+  },
+  "baseline_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mosw65816 -disassemble /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.017,
+      "log": "build/post-ready-validation-mos/0044/baseline-tests/long-address-roundtrip-65816.s/00.log",
+      "log_sha256": "0df524a5eb6d0ee299230226ed36dedcf53a060131149cf10db069fcc6fdcf3a",
+      "test": "llvm/test/MC/MOS/long-address-roundtrip-65816.s",
+      "input_sha256": "89f3ff8b432a185c8a94732dfd98fa716efcc526ac883e2141fcb72907edb3c4"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mosw65816 -start-after=machine-opt-remark-emitter -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir"
+      ],
+      "cwd": "/work",
+      "exit_code": 1,
+      "seconds": 0.032,
+      "log": "build/post-ready-validation-mos/0044/baseline-tests/long-address-symbol-printer.mir/00.log",
+      "log_sha256": "9bbe7baa2dc13428103e17554223f5a4ebd50d2559d6661705d55e1c470ab1fb",
+      "test": "llvm/test/CodeGen/MOS/long-address-symbol-printer.mir",
+      "input_sha256": "d7a0e91b1451cc5f1990a22d5737205d6ed0a867be83770b30a6f79fbdf4be0e"
+    }
+  ],
+  "candidate_build": {
+    "command": [
+      "ninja",
+      "-C",
+      "/work/build/0029-cross-target-build",
+      "-j",
+      "2",
+      "llc",
+      "opt",
+      "llvm-mc",
+      "llvm-objdump",
+      "llvm-objcopy",
+      "llvm-readobj",
+      "llvm-readelf",
+      "FileCheck",
+      "not",
+      "split-file",
+      "count",
+      "llvm-config",
+      "llvm-reduce",
+      "llvm-as",
+      "llvm-link",
+      "yaml2obj",
+      "llvm-nm",
+      "verify-uselistorder"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 156.361,
+    "log": "build/post-ready-validation-mos/0044/candidate-build.log",
+    "log_sha256": "89a29f3c231e2800de4d6a1183263ec489bbcd662fc4d121a86bc261f57e323e"
+  },
+  "candidate_tools": {
+    "llc": "24beadac477582cdf794fad69cdcfdb14959f6ac77fa8f6eb3ec31c31d6a581d",
+    "opt": "d302ef25a739508f41e5e76bda72768790b805dbc457313cc574b25056bbac77",
+    "llvm-mc": "687cf7d7d43876883d10e92559df55cc23e0b6fd627e31c96f7de1b5e1518e74",
+    "llvm-objdump": "9d1566aac04c38eac354925121870b67d383835b684d86958acb202933e7646f",
+    "llvm-objcopy": "1c63fd86a014d9ca23b0fd525cc3a0751202d46a00cb18221447c1a63873f970",
+    "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "llvm-readelf": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+    "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+    "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+    "llvm-config": "1e24389f5ff7da2c0f52ad83cc0caa0b57af07531f73a2631879fc70b93c5474",
+    "llvm-reduce": "3535b7bc9392be6ec7147cceed4766440b989ba5fc5e7de86fc4b322dddbcd10",
+    "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+    "llvm-link": "1f65159259692158871c7c0a2970331518575cf6377a3e6dbbd000391eed3b13",
+    "yaml2obj": "b05acdac00ef0f888846eefeb03170af96542e9e05961cae5683cab262eaabac",
+    "llvm-nm": "81b5916f1f239e1f4cd1f54c2f454e9108645fede4993659be5475543728b189",
+    "verify-uselistorder": "3edc38f2ff7dec73f7c1fc1f7d3649d9161c8a64089d2a341938a4f3081075c3"
+  },
+  "candidate_tests": [
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mosw65816 -disassemble /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.016,
+      "log": "build/post-ready-validation-mos/0044/candidate-tests/long-address-roundtrip-65816.s/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/long-address-roundtrip-65816.s",
+      "input_sha256": "89f3ff8b432a185c8a94732dfd98fa716efcc526ac883e2141fcb72907edb3c4"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llvm-mc -triple mos -mcpu=mosw65816 -disassemble /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s  | llvm-mc -triple mos -mcpu=mosw65816 -show-encoding | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/long-address-roundtrip-65816.s --check-prefix=RT"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.012,
+      "log": "build/post-ready-validation-mos/0044/candidate-tests/long-address-roundtrip-65816.s/01.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/MC/MOS/long-address-roundtrip-65816.s",
+      "input_sha256": "89f3ff8b432a185c8a94732dfd98fa716efcc526ac883e2141fcb72907edb3c4"
+    },
+    {
+      "command": [
+        "bash",
+        "-o",
+        "pipefail",
+        "-c",
+        "llc -mtriple=mos -mcpu=mosw65816 -start-after=machine-opt-remark-emitter -verify-machineinstrs /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir -o - | FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/long-address-symbol-printer.mir"
+      ],
+      "cwd": "/work",
+      "exit_code": 0,
+      "seconds": 0.037,
+      "log": "build/post-ready-validation-mos/0044/candidate-tests/long-address-symbol-printer.mir/00.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "test": "llvm/test/CodeGen/MOS/long-address-symbol-printer.mir",
+      "input_sha256": "d7a0e91b1451cc5f1990a22d5737205d6ed0a867be83770b30a6f79fbdf4be0e"
+    }
+  ],
+  "candidate_passed": true,
+  "baseline_failed": true,
+  "mos_suites": {
+    "command": [
+      "/work/build/0029-cross-target-build/bin/llvm-lit",
+      "-j",
+      "2",
+      "-v",
+      "/work/build/0029-cross-target-build/test/MC/MOS",
+      "/work/build/0029-cross-target-build/test/CodeGen/MOS"
+    ],
+    "cwd": "/work",
+    "exit_code": 0,
+    "seconds": 4.873,
+    "log": "build/post-ready-validation-mos/0044/mos-suites.log",
+    "log_sha256": "dd20ae9472d7e91e9f032e47b8dd9a66bd2cdd6c72ad77d5f2bb63b8eeb8de4d"
+  }
+}

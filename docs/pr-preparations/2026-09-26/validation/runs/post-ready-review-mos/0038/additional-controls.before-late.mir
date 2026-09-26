@@ -1,0 +1,223 @@
+--- |
+  ; ModuleID = 'build/post-ready-review-mos/0038/additional-controls.ll'
+  source_filename = "build/post-ready-review-mos/0038/additional-controls.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  declare void @sink(ptr) #0
+  
+  declare void @yes() #0
+  
+  declare void @no() #0
+  
+  define ptr @dynamic_frame(i16 %n) #0 {
+    %a = alloca i8, i16 %n, align 1
+    call void @sink(ptr nonnull %a)
+    %f = call ptr @llvm.frameaddress.p0(i32 0)
+    ret ptr %f
+  }
+  
+  define void @return_address_sign_branch() #0 {
+    %r = call ptr @llvm.returnaddress.p0(i32 0)
+    %c = icmp slt ptr %r, null
+    br i1 %c, label %then, label %else
+  
+  then:                                             ; preds = %0
+    call void @yes()
+    ret void
+  
+  else:                                             ; preds = %0
+    call void @no()
+    ret void
+  }
+  
+  ; Function Attrs: nocallback nofree nosync nounwind willreturn memory(none)
+  declare ptr @llvm.returnaddress.p0(i32 immarg) #1
+  
+  ; Function Attrs: nocallback nofree nosync nounwind willreturn memory(none)
+  declare ptr @llvm.frameaddress.p0(i32 immarg) #1
+  
+  attributes #0 = { "target-cpu"="mosspc700" }
+  attributes #1 = { nocallback nofree nosync nounwind willreturn memory(none) "target-cpu"="mosspc700" }
+...
+---
+name:            dynamic_frame
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:
+  - { id: 0, type: default, offset: 0, size: 1, alignment: 1, stack-id: default, 
+      isImmutable: true, isAliased: false, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+stack:
+  - { id: 0, name: a, type: variable-sized, offset: 0, alignment: 1, stack-id: default, 
+      callee-saved-register: '', callee-saved-restored: true, debug-info-variable: '', 
+      debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a, $x
+  
+    $y = LDImag8 $rc30
+    frame-setup PH killed $y
+    $y = LDImag8 $rc31
+    frame-setup PH killed $y
+    $rc30 = MOVImag8 $rc0
+    $rc31 = MOVImag8 $rc1
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    $a = LDImag8 $rc0
+    $y = LDImag8 $rc1
+    renamable $c = LDCImm -1
+    renamable $a, renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    $rc2 = STImag8 $a
+    $a = T_A $y
+    renamable $a, dead renamable $c, dead renamable $v = SBCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    $rc3 = STImag8 $a
+    $rc0 = MOVImag8 $rc2
+    $rc1 = MOVImag8 $rc3
+    JSR @sink, mos_csr, implicit killed $rs1
+    dead renamable $c = LDCImm 0
+    $rc2 = MOVImag8 $rc30
+    $rc3 = MOVImag8 $rc31
+    $rc0 = MOVImag8 $rc30
+    $rc1 = MOVImag8 $rc31
+    $x = frame-destroy PL
+    $rc31 = STImag8 $x
+    $x = frame-destroy PL
+    $rc30 = STImag8 $x
+    RTS implicit killed $rs1, implicit $rc30, implicit $rc31
+...
+---
+name:            return_address_sign_branch
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: true
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x40000000), %bb.2(0x40000000)
+  
+    renamable $a, dead renamable $x = ReturnAddressByte 0
+    $rc4 = STImag8 $a
+    renamable $a, dead renamable $x = ReturnAddressByte 1
+    $rc2 = LDImm 0
+    $rc3 = LDImm 0
+    $x = LDImag8 $rc4
+    renamable $c = CMPImag8 killed renamable $x, killed renamable $rc2
+    renamable $a, dead renamable $c, renamable $v = SBCImag8 killed renamable $a, killed renamable $rc3, killed renamable $c
+    BR %bb.2, killed renamable $v, 0, implicit-def dead $c
+  
+  bb.1 (%ir-block.0):
+    successors: %bb.2(0x80000000)
+    liveins: $a
+  
+    renamable $a = EORImm killed renamable $a, -128
+  
+  bb.2 (%ir-block.0):
+    successors: %bb.3(0x40000000), %bb.4(0x40000000)
+    liveins: $a
+  
+    CmpZero killed renamable $a, implicit-def $c, implicit-def dead $c, implicit-def $n
+    BR %bb.4, killed $n, 0
+  
+  bb.3.then:
+    JSR @yes, mos_csr
+    RTS
+  
+  bb.4.else:
+    JSR @no, mos_csr
+    RTS
+...

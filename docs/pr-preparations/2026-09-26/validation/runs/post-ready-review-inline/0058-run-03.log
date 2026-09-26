@@ -1,0 +1,1 @@
+$ not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/input-x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-X

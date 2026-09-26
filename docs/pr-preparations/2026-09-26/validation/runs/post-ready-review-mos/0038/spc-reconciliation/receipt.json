@@ -1,0 +1,56 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), gpt-6-astra, xhigh",
+  "runs": [
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-run-pass=mos-late-opt",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/late-opt-spc700.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-reconciliation/historical-baseline.mir"
+      ],
+      "exit_code": -11,
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "input_sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d",
+      "log": "build/post-ready-review-mos/0038/spc-reconciliation/historical-baseline.log",
+      "log_sha256": "4905984ff82d56ed12ee62b6db32ef568a3e09f9d675c8bc366c382b118979c1"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-run-pass=mos-late-opt",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/late-opt-spc700.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-reconciliation/historical-candidate.mir"
+      ],
+      "exit_code": -11,
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "input_sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d",
+      "log": "build/post-ready-review-mos/0038/spc-reconciliation/historical-candidate.log",
+      "log_sha256": "bc0d45cb7eed32f670ef8d5f3467e3d16914b7bcfce1a0610291ca7a4df2a47f"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-run-pass=mos-late-opt",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/late-opt-spc700.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/spc-reconciliation/integrated.mir"
+      ],
+      "exit_code": 0,
+      "tool_sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+      "input_sha256": "ef861d68dd4b7b00df14626a916c4d4e1e29c97c850d6088f02bad732bfcd01d",
+      "log": "build/post-ready-review-mos/0038/spc-reconciliation/integrated.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

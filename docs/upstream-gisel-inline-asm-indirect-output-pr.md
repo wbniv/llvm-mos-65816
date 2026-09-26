@@ -1,5 +1,15 @@
 # [GlobalISel] Support indirect register outputs in inline asm
 
+**Current preparation — September 26:** the [current packet](pr-preparations/2026-09-26/README.md)
+contains 0037's ready exact LLVM artifact: independent review, matching-input
+red/green, four focused RUNs and 168 filtered suite passes / three XFAILs. This
+original draft and its validation totals below remain dated evidence; nothing
+has been posted by the preparation pass.
+
+Preparation note: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 `asm("" : "+g"(x))`, an optimization-barrier idiom, fails to compile on MOS
 and on AArch64 with GlobalISel fallback disabled:
 

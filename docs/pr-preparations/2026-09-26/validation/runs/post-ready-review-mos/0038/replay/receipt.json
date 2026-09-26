@@ -1,0 +1,296 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), gpt-6-astra, xhigh",
+  "scope": "Read-only retained executables; no new build or runtime execution",
+  "filecheck_sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+  "runs": [
+    {
+      "tool": "historical-baseline",
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-baseline-0.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/historical-baseline-0.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "historical-baseline",
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-baseline-1.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/historical-baseline-1.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "historical-baseline",
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-baseline-2.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/historical-baseline-2.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "historical-baseline",
+      "tool_sha256": "6b5cfbb41c42f201ca9cf6330d9b3dc25cddfef6b0cde0c4881f490ee76d5989",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-final",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-baseline-3.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+      "input_sha256": "bb20aba4fb189496ca03a1e7849d3dd72671f49a8ad4cdef856a5787f72c63bf",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/historical-baseline-3.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "historical-candidate",
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-0.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 0,
+      "log": "build/post-ready-review-mos/0038/replay/historical-candidate-0.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "--check-prefixes=CHECK,M6502",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-0.s"
+      ],
+      "check_exit": 0,
+      "assembly_sha256": "f1b9114273687b3295176a8b0719e12c2b4dc7859806cb592be3894791ca6bfc",
+      "check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tool": "historical-candidate",
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-1.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 0,
+      "log": "build/post-ready-review-mos/0038/replay/historical-candidate-1.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "--check-prefixes=CHECK,M6502",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-1.s"
+      ],
+      "check_exit": 0,
+      "assembly_sha256": "605a36cafddebe21c17c2548d642e60ff2116de695c20c966dd1c778aa28defa",
+      "check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tool": "historical-candidate",
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-2.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 0,
+      "log": "build/post-ready-review-mos/0038/replay/historical-candidate-2.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "--check-prefixes=CHECK,W65816",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-2.s"
+      ],
+      "check_exit": 0,
+      "assembly_sha256": "e8cde9037cb8c1eb1650eb9e8bcbeec75a605b6ec2eb8e4ce5293df9d0d899c5",
+      "check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tool": "historical-candidate",
+      "tool_sha256": "e849c7a80e79a81525a8d382788e19033ee4efe7a303b4df37351f62f6b0c3f5",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-3.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+      "input_sha256": "bb20aba4fb189496ca03a1e7849d3dd72671f49a8ad4cdef856a5787f72c63bf",
+      "exit_code": 0,
+      "log": "build/post-ready-review-mos/0038/replay/historical-candidate-3.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+        "--check-prefixes=CHECK",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/historical-candidate-3.s"
+      ],
+      "check_exit": 0,
+      "assembly_sha256": "72e4a44ba0a27b5d069f32ac8d885376e8a6f6bc9bad60f18b2cde2f7e317931",
+      "check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "tool": "current-main-baseline",
+      "tool_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/current-main-baseline-0.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/current-main-baseline-0.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "current-main-baseline",
+      "tool_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/current-main-baseline-1.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/current-main-baseline-1.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "current-main-baseline",
+      "tool_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/current-main-baseline-2.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-frame-address.ll",
+      "input_sha256": "3da13f9599c827b065c31bb0a18f0ab679fa7f9929ebbb1044577b6d1f740ebc",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/current-main-baseline-2.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "current-main-baseline",
+      "tool_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosspc700",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/current-main-baseline-3.s"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-spc700.ll",
+      "input_sha256": "bb20aba4fb189496ca03a1e7849d3dd72671f49a8ad4cdef856a5787f72c63bf",
+      "exit_code": 1,
+      "log": "build/post-ready-review-mos/0038/replay/current-main-baseline-3.log",
+      "log_sha256": "41a98a1397014ae13985eada98e2005f477ba3fd47c7cde520b783347304036f"
+    },
+    {
+      "tool": "historical-candidate",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0030-claude-review/llc-0038",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-run-pass=mos-lower-return-address",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-depth.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/depth.mir"
+      ],
+      "input": "build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-depth.mir",
+      "input_sha256": "2d0ef40714466de84aea51fb144444b08451ca0305837ce47c9e219452fb41ed",
+      "exit_code": 0,
+      "output_sha256": "64f2b2bd5ce271c5e996087e73a5b0a8f92cfd603d050a0e1524a03eb53dd1fc",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "check_command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/source/llvm/test/CodeGen/MOS/return-address-depth.mir",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-mos/0038/replay/depth.mir"
+      ],
+      "check_exit": 0,
+      "check_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ]
+}

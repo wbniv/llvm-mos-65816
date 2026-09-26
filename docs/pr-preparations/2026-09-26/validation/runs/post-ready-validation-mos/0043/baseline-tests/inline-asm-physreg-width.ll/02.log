@@ -1,0 +1,2 @@
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  FileCheck /work/build/post-ready-2026-09-26-isolated-src/llvm/test/CodeGen/MOS/inline-asm-physreg-width.ll --check-prefix=REJECT-A

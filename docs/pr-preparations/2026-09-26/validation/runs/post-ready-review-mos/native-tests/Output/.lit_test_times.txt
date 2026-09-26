@@ -1,0 +1,5 @@
+1.673820e-01 a16-byte-store.ll
+3.968074e-01 a16-indirect-byte-store.ll
+8.831477e-02 far-global-long-x.ll
+2.347338e-01 far-native-word.ll
+1.950543e-01 review-controls.ll

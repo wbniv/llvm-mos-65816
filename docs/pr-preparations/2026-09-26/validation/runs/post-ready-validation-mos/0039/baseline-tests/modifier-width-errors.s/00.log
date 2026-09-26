@@ -1,0 +1,41 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:10:10: error: CHECK: expected string not found in input
+; CHECK: [[#@LINE+3]]:1: error: invalid instruction, any one of the following would fix this:
+         ^
+<stdin>:1:1: note: scanning from here
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:32:1: error: invalid instruction, any one of the following would fix this:
+^
+<stdin>:1:1: note: with "@LINE+3" equal to "13"
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:32:1: error: invalid instruction, any one of the following would fix this:
+^
+<stdin>:1:91: note: possible intended match here
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:32:1: error: invalid instruction, any one of the following would fix this:
+                                                                                          ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:32:1: error: invalid instruction, any one of the following would fix this: 
+check:10'0    {                                                                                                                                                                     search range start (exclusive)
+check:10'1                                                                                                                                                                          error: no match found in search range
+check:10'2                                                                                                                                                                          with "@LINE+3" equal to "13"
+check:10'3                                                                                               ?                                                                          possible intended match
+            2: lda #mos16(5) 
+            3: ^ 
+            4: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width-errors.s:32:6: note: invalid operand for instruction 
+            5: lda #mos16(5) 
+            6:  ^ 
+            .
+            .
+            .
+           16:  jmp mos24(1193046) 
+           17:  
+           18:  lda (mos16(240)),y 
+           19:  
+           20:  lda (mos16(240),x) 
+           21:  
+check:10'4      } search range end (exclusive)
+>>>>>>

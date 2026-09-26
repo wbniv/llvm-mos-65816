@@ -1,0 +1,73 @@
+
+# After Prologue/Epilogue Insertion & Frame Finalization
+# Machine code for function status_save_range: NoPHIs, TracksLiveness, NoVRegs, TiedOpsRewritten
+
+bb.0:
+  successors: %bb.1(0x80000000); %bb.1(100.00%)
+
+  $a = LDImm 5
+  $x = LDImm 6
+  $y = LDImm 7
+  $c = LDImm1 1
+  BRA %bb.1
+
+bb.1:
+; predecessors: %bb.0
+  liveins: $a, $x, $y, $c
+  $rc17 = STImag8 $p
+  PH $y
+  $y = LDImm 1
+  STAbs killed $y, @scavenged_values + 3
+  $y = PL
+  PH $a
+  $c = LDImm1 0
+  $a, $c, $v = ADCImm $a(tied-def 0), 0, $c(tied-def 1)
+  $p = LDImag8 $rc17
+  $a = PL
+  $a, dead $c, dead $v = ADCImm $a(tied-def 0), 0, $c(tied-def 1)
+  STAbs $a, @scavenged_values
+  STAbs $x, @scavenged_values + 1
+  STAbs $y, @scavenged_values + 2
+  RTS
+
+# End machine code for function status_save_range.
+
+*** Bad machine code: Illegal physical register for instruction ***
+- function:    status_save_range
+- basic block: %bb.1  (0x5e60ec206a40)
+- instruction: $rc17 = STImag8 $p
+- operand 1:   $p
+$p is not a GPR register.
+
+*** Bad machine code: Illegal physical register for instruction ***
+- function:    status_save_range
+- basic block: %bb.1  (0x5e60ec206a40)
+- instruction: $p = LDImag8 $rc17
+- operand 0:   $p
+$p is not a GPR register.
+LLVM ERROR: Found 2 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/upstream-reference/742d554bf08042b8df93d791c335260fadd16643/bin/llc -mtriple=mos -mcpu=mosw65816 -run-pass=prolog-epilog -verify-machineinstrs /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir -o /home/will/llvm-mos-65816/build/post-ready-review-reducer/0054-stock-current-pass.mir
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/scavenger-status-save-range.mir'.
+2.	Running pass 'Verify generated machine code' on function '@status_save_range'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005e60e144c3cb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00005e60e1449625 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x00005e60e144d15b
+3  libc.so.6 0x00007a7c46e45cb0
+4  libc.so.6 0x00007a7c46ea61ac pthread_kill + 284
+5  libc.so.6 0x00007a7c46e45b7e gsignal + 30
+6  libc.so.6 0x00007a7c46e288ec abort + 39
+7  llc       0x00005e60e13b8f05 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x00005e60e057771d
+9  llc       0x00005e60e0578a19
+10 llc       0x00005e60e04a1b52 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 418
+11 llc       0x00005e60e08de3c0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1088
+12 llc       0x00005e60e08e448c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+13 llc       0x00005e60e08df034 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1972
+14 llc       0x00005e60dffb26ed
+15 llc       0x00005e60dffafbf3 main + 1331
+16 libc.so.6 0x00007a7c46e2a601
+17 libc.so.6 0x00007a7c46e2a718 __libc_start_main + 136
+18 llc       0x00005e60dffaefe5 _start + 37

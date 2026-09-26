@@ -1,0 +1,568 @@
+{
+  "binaries": {
+    "0040-old-before": {
+      "path": "build/0040-ra-build/llc-before-0040",
+      "sha256": "60968c143e75c4fe918d82ea7dc325c3d8af73fee9eb0e767218d98194092433",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos    - MOS Technologies 65xx and variants\n    x86    - 32-bit X86: Pentium-Pro and above\n    x86-64 - 64-bit X86: EM64T and AMD64\n"
+    },
+    "0040-old-after": {
+      "path": "build/0040-ra-build/llc-0040",
+      "sha256": "a1e807cb50a3b26af78545ed9bf9fe77a400ed80518c3802936f4863a1114f14",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos    - MOS Technologies 65xx and variants\n    x86    - 32-bit X86: Pentium-Pro and above\n    x86-64 - 64-bit X86: EM64T and AMD64\n"
+    },
+    "current-mos": {
+      "path": "build/post-ready-validation-mos/0039/baseline-bin/llc",
+      "sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+    },
+    "0041-old-before": {
+      "path": "build/0041-inlineasm-build/llc-before-0041",
+      "sha256": "9e9a103ec0874e40531e2e51a707a650a81d2b032d699b2afd3f7dd1a2245fcf",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+    },
+    "0041-old-after": {
+      "path": "build/0041-inlineasm-build/llc-0041",
+      "sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+    }
+  },
+  "inputs": {
+    "0040": {
+      "path": "build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+      "sha256": "6dc37eaddde09cf3652322948fba3e787849c1266fac20f92518c71552993398"
+    },
+    "0041": {
+      "path": "build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+      "sha256": "9d9f852d55328e23f235741b6d247a43c3bde0a4e3e060eb69539785074bdc71"
+    },
+    "0040-pre-greedy": {
+      "path": "build/post-ready-review-reducer/review-0040-0041/0040-pre-greedy.mir",
+      "sha256": "198b31cfcdf42765e655f257e81cb4619e1f6b73f5e84a48ba9dc89bdf53aa3f"
+    }
+  },
+  "runs": [
+    {
+      "name": "0040-old-before-mos6502",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0040-old-before-mos65c02",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "d7384f465d02108ef38c9e2676d2972540b6717f16790fbe21a2babcd50c5010"
+    },
+    {
+      "name": "0040-old-before-mosw65816",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4f106db8643d850fb7b363c0fb6f98370052db235a2ea8eab59e6034d5a680fd"
+    },
+    {
+      "name": "0040-old-after-mos6502",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0040-old-after-mos65c02",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0040-old-after-mosw65816",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "current-mos-mos6502",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "f03285f41e6d96201a700fa0532f86b6a301a8becaac5ef116f3e9fabadabc33"
+    },
+    {
+      "name": "current-mos-mos6502-no-hoist",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null",
+        "-disable-spill-hoist"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "current-mos-mos65c02",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "b8cc9056be43d3a51d8b837156dc8d47ec0c78286b1e222e9a4f6bee9ec80583"
+    },
+    {
+      "name": "current-mos-mos65c02-no-hoist",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null",
+        "-disable-spill-hoist"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "current-mos-mosw65816",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "44f868dae1965efc241deb9eec0b945fb079f75319898716b0ebd620420a24ff"
+    },
+    {
+      "name": "current-mos-mosw65816-no-hoist",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/dev/null",
+        "-disable-spill-hoist"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0040-old-pre-greedy",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-stop-before=greedy",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-inline-spiller-coalesce-scratch-vreg.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-pre-greedy.mir"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0040-old-before-mir-replay",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-start-before=greedy",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-pre-greedy.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "4acd3c2e8bc0f9bc2bd3d9250c7d581c22ecd0a4495e98f76e4a6471c1bdc303"
+    },
+    {
+      "name": "0040-old-after-mir-replay",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0040-ra-build/llc-0040",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-start-before=greedy",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-pre-greedy.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "current-mos-mir-replay",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-O2",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-start-before=greedy",
+        "-disable-spill-hoist",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0040-pre-greedy.mir",
+        "-o",
+        "/dev/null"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "88417f88edb758ad0d99c552f795446108a175ad8683f0b1797078c2cec769a4"
+    },
+    {
+      "name": "0041-old-before-O0-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-before-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "948f12784f35c52e585c18c5e63fbd3685268b8ac8a1a1e32d6b3fbb354e8b60"
+    },
+    {
+      "name": "0041-old-before-O0-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-before-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "8b7834207133b0983a24108645c9553d7d426089f4542ba67d4fae67050cb8d2"
+    },
+    {
+      "name": "0041-old-before-O2-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-before-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "a4414205bcb603b4c0f394bbefc410f1052ab6577f8dc7440824af3714b29687"
+    },
+    {
+      "name": "0041-old-before-O2-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-before-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "513fed068629c85d752f0f20cab6d10228a966009bb075d5471bb5613d750f98"
+    },
+    {
+      "name": "0041-old-after-O0-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "8d675f4fe0489671d11880f5788daeca3fc99cdbb3d8fab913e90d5aa8f0dd35",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O0-irtranslator-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "--check-prefix=CHECK",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O0-irtranslator.stdout"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O0-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "34f210093aa8ac94e7b69b4ab048cdab06072332814520a17230c72fd6fb6b61",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O0-final-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "--check-prefix=ASM",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O0-final.stdout"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O2-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "8d675f4fe0489671d11880f5788daeca3fc99cdbb3d8fab913e90d5aa8f0dd35",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O2-irtranslator-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "--check-prefix=CHECK",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O2-irtranslator.stdout"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O2-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": 0,
+      "stdout_sha256": "ed27d20d2149422988d9fe564ed6c41ba8b354e830188461968f3212e0a4358c",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "0041-old-after-O2-final-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "--check-prefix=ASM",
+        "--input-file=/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-old-after-O2-final.stdout"
+      ],
+      "returncode": 1,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "3766b6b33792dcfe331ff86040348803525b3211c429b6487b91f97e080c9ec2"
+    },
+    {
+      "name": "current-mos-O0-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "ea46b156cdcd6fa6eb8736a26bda505bd2a46499f68c32021ce0575e81072f93"
+    },
+    {
+      "name": "current-mos-O0-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O0",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "b5ebb426ad83ac8edea2c4d2bee0a60218c3428b43756486a5071ad77d3313b4"
+    },
+    {
+      "name": "current-mos-O2-irtranslator",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-",
+        "-stop-after=irtranslator"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "0aca6ac52a972d15b218b85711dee3cb60ffa6038f45b2ae461ea6412a84268f"
+    },
+    {
+      "name": "current-mos-O2-final",
+      "command": [
+        "/home/will/llvm-mos-65816/build/post-ready-validation-mos/0039/baseline-bin/llc",
+        "-mtriple=aarch64-linux-gnu",
+        "-global-isel",
+        "-global-isel-abort=1",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/build/post-ready-review-reducer/review-0040-0041/0041-inline-asm-multi-register.ll",
+        "-o",
+        "-"
+      ],
+      "returncode": -6,
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "cef88bdec520d5c45631afaad868a57bdfda1416b59e8f79e11885c2ed000dd8"
+    }
+  ]
+}

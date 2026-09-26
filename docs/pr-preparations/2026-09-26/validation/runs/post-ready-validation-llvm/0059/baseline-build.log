@@ -1,0 +1,8 @@
+ninja: Entering directory `/work/build/post-ready-2026-09-26-llvm-build'
+[1/7] Building CXX object lib/CodeGen/SelectionDAG/CMakeFiles/LLVMSelectionDAG.dir/SelectionDAGBuilder.cpp.o
+[2/7] Linking CXX static library lib/libLLVMSelectionDAG.a
+[3/7] Building CXX object lib/Target/AArch64/CMakeFiles/LLVMAArch64CodeGen.dir/AArch64ISelLowering.cpp.o
+[4/7] Linking CXX static library lib/libLLVMAArch64CodeGen.a
+[5/7] Linking CXX executable bin/llc
+[6/7] Linking CXX executable bin/llvm-reduce
+[7/7] Linking CXX executable bin/opt

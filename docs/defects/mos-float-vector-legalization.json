@@ -11,6 +11,11 @@
   ],
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0050/receipt.json",
+      "sha256": "1098f879e8807db7f6399d44d89da6fd44dc8707bd0f63b456b3fba826e48165",
+      "description": "September 26 exact-current standalone submission validation; original baseline and resolution retained. Coordination: OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+    },
+    {
       "path": "docs/defects/evidence/2026-09-25-mos-correctness/baseline/identity.json",
       "sha256": "faf164f3c59d23931326cd1b64fdcc2feafa81a5088b0c4587743e3789d0df86"
     },

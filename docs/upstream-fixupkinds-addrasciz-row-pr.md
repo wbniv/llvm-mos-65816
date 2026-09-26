@@ -1,5 +1,14 @@
 # [MOS] Add the missing `AddrAsciz` row to `MOSFixupKinds.cpp`'s `Infos[]`
 
+**Current posting artifact (September 26):** use the
+[0046 copy-ready body](pr-preparations/2026-09-26/0046-pr-body.md) and
+[exact-current validation](pr-preparations/2026-09-26/mos-validation.md).
+The earlier draft and validation prose below are retained dated evidence;
+their old build counts, diagnostics, and pending steps are not current gates.
+Nothing has been posted. Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`),
+model `gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 `MOSFixupKinds.h`'s `Fixups` enum declares 15 target fixup kinds (`Imm8` …
 `PCRel16`, then `AddrAsciz`). `MOSFixupKinds.cpp`'s `Infos[MOS::NumTargetFixupKinds]`
 array — documented immediately above as "must be in the same order as ...

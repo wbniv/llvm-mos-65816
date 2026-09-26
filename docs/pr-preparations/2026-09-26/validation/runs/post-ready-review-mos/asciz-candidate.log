@@ -1,0 +1,12 @@
+
+
+	.section	.header,"a",@progbits
+	.mos_addr_asciz	_start, 5
+
+	.ascii	"42"
+	.asciz	"\000\000\000"
+
+	.ascii	"99999999"
+	.byte	0
+
+

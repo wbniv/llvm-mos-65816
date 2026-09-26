@@ -1,5 +1,14 @@
 # [MOS] Honour an explicit width modifier on a constant operand
 
+**Current posting artifact (September 26):** use the
+[0039 copy-ready body](pr-preparations/2026-09-26/0039-pr-body.md) and
+[exact-current validation](pr-preparations/2026-09-26/mos-validation.md).
+The earlier draft and validation prose below are retained dated evidence;
+their old build counts, diagnostics, and pending steps are not current gates.
+Nothing has been posted. Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`),
+model `gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 `mos16(240)` selects `LDA zero page,X` (`B5 F0`), and `mos24($123456)` selects
 `LDA zero page` (`A5 56`) with the address truncated to its low byte. Both
 should select the encoding the modifier names:

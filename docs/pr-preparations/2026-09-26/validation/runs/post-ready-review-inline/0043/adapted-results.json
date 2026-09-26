@@ -1,0 +1,201 @@
+{
+  "test_sha256": "6e3b7549c293ba5229c1926fb9b5fb1e7c840b2b99cf07d3f0df6d2ee917a5b5",
+  "results": [
+    {
+      "name": "baseline-adapted-00",
+      "command": "split-file /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-01",
+      "command": "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/ok.ll -o - | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-02",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_a.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-A",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-03",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-X",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-04",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_y.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-Y",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-05",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_R.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-R",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-06",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_d.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-D",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-07",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/wide_in.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-IN",
+      "exit": 1,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-08",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_a.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-A",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-09",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-X",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-10",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_y.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-Y",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-11",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_rc.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RC",
+      "exit": 2,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-12",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_rs.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RS",
+      "exit": 1,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "baseline-adapted-13",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/baseline-adapted-splits/named_cc.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-CC",
+      "exit": 1,
+      "expected_pass": false,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-00",
+      "command": "split-file /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-01",
+      "command": "llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/ok.ll -o - | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-02",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_a.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-A",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-03",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-X",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-04",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_y.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-Y",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-05",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_R.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-R",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-06",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_d.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-D",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-07",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/wide_in.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-IN",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-08",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_a.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-A",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-09",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-X",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-10",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_y.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-Y",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-11",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_rc.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RC",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-12",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_rs.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-RS",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    },
+    {
+      "name": "candidate-adapted-13",
+      "command": "not llc -mtriple=mos -mcpu=mos6502 /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/candidate-adapted-splits/named_cc.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0043/inline-asm-physreg-width.ll --check-prefix=REJECT-NAMED-CC",
+      "exit": 0,
+      "expected_pass": true,
+      "as_expected": true
+    }
+  ]
+}

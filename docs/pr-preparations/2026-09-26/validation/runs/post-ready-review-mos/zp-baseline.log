@@ -1,0 +1,1 @@
+LLVM ERROR: unable to legalize instruction: %4:_(s8) = G_TRUNC %1:_(s8) (in function: load_zp_constant_ptradd_8)

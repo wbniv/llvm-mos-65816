@@ -1,0 +1,16 @@
+{
+  "__version__": [
+    23,
+    0,
+    0
+  ],
+  "elapsed": 0.4942450523376465,
+  "tests": [
+    {
+      "code": "FAIL",
+      "elapsed": 0.0999753475189209,
+      "name": "MOS-native-optimization-review :: review-controls.ll",
+      "output": "Exit Code: 1\n\nCommand Output (stderr):\n--\nllc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o - | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll # RUN: at line 1\n+ llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll -o -\n+ FileCheck /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll\n/home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll:71:14: error: CHECK-NOT: excluded string found in input\n; CHECK-NOT: rep #32\n             ^\n<stdin>:148:2: note: found here\n rep #32\n ^~~~~~~\n\nInput file: <stdin>\nCheck file: /home/will/llvm-mos-65816/build/post-ready-review-mos/native-tests/review-controls.ll\n\n-dump-input=help explains the following input dump.\n\nInput was:\n<<<<<<\n        .\n        .\n        .\n      143:  .type near_store_decrement,@function \n      144: near_store_decrement: ; @near_store_decrement \n      145: ; %bb.0: \n      146:  sta __rc2 \n      147:  stx __rc3 \n      148:  rep #32 \nnot:71      !~~~~~~  error: no match expected\n      149:  lda __rc2 \n      150:  sta nearword \n      151:  lda __rc2 \n      152:  dec \n      153:  sta __rc2 \n        .\n        .\n        .\n>>>>>>\n\n--\n"
+    }
+  ]
+}

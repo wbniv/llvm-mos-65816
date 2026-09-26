@@ -1,0 +1,23 @@
+# RUN: llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
+
+# The full virtual copy defines both byte lanes even though only its source's
+# low byte is live. An allocated identity copy must retain the high-byte
+# definition consumed by MOVZX32rr8.
+---
+name: undef_high_byte_identity_copy
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; CHECK-LABEL: name: undef_high_byte_identity_copy
+    ; CHECK: renamable $al = MOV8ri 1
+    ; CHECK-NEXT: renamable $ax = KILL renamable $ax
+    ; CHECK-NEXT: renamable $eax = MOVZX32rr8 killed renamable $ah
+    ; CHECK-NEXT: RET64 implicit $eax
+    %0:gr8_abcd_l = MOV8ri 1
+    undef %1.sub_8bit:gr16_abcd = COPY %0
+    %2:gr16_abcd = COPY %1
+    %3:gr8_abcd_h = COPY %2.sub_8bit_hi
+    %4:gr32 = MOVZX32rr8 %3
+    $eax = COPY %4
+    RET64 implicit $eax
+...

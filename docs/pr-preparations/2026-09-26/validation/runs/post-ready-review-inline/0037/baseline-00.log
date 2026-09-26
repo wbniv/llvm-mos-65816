@@ -1,0 +1,29 @@
+LLVM ERROR: unable to translate instruction: call (in function: barrier)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0030-claude-review/llc-pristine-assert -mtriple=aarch64-linux-gnu -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs -stop-after=irtranslator
+1.	Running pass 'Function Pass Manager' on module '<stdin>'.
+2.	Running pass 'IRTranslator' on function '@barrier'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-pristine-assert 0x000063fd0f14ecbb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc-pristine-assert 0x000063fd0f14bb41 llvm::sys::RunSignalHandlers() + 369
+2  llc-pristine-assert 0x000063fd0f14facb
+3  libc.so.6           0x00007247f0a45cb0
+4  libc.so.6           0x00007247f0aa61ac pthread_kill + 284
+5  libc.so.6           0x00007247f0a45b7e gsignal + 30
+6  libc.so.6           0x00007247f0a288ec abort + 39
+7  llc-pristine-assert 0x000063fd0f0aa025 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc-pristine-assert 0x000063fd0f7d3764
+9  llc-pristine-assert 0x000063fd0f7eaafc llvm::IRTranslatorImpl::runOnMachineFunction(llvm::MachineFunction&, llvm::function_ref<llvm::GISelCSEInfo* ()>, bool, llvm::function_ref<llvm::AAResults* ()>, llvm::function_ref<llvm::BranchProbabilityInfo* ()>, llvm::function_ref<llvm::AssumptionCache* ()>, llvm::TargetLibraryInfo*, llvm::LibcallLoweringInfo const*, llvm::SSPLayoutInfo*) + 5180
+10 llc-pristine-assert 0x000063fd0f7eb64a llvm::IRTranslatorLegacy::runOnMachineFunction(llvm::MachineFunction&) + 554
+11 llc-pristine-assert 0x000063fd0dde9f29 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+12 llc-pristine-assert 0x000063fd0e37c2a0 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+13 llc-pristine-assert 0x000063fd0e3843a2 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+14 llc-pristine-assert 0x000063fd0e37d064 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+15 llc-pristine-assert 0x000063fd0cd4e2cb
+16 llc-pristine-assert 0x000063fd0cd4b593 main + 1443
+17 libc.so.6           0x00007247f0a2a601
+18 libc.so.6           0x00007247f0a2a718 __libc_start_main + 136
+19 llc-pristine-assert 0x000063fd0cd4a7a5 _start + 37
+FileCheck error: '<stdin>' is empty.
+FileCheck command line:  /home/will/llvm-mos-65816/build/asm-symbol-build/bin/FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0037/llvm/test/CodeGen/AArch64/GlobalISel/inline-asm-indirect-output.ll

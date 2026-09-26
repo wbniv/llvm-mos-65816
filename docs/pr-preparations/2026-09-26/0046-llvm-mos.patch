@@ -1,0 +1,30 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
+index cebbb7b..7c5e356 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSFixupKinds.cpp
+@@ -17,7 +17,7 @@ namespace llvm {
+ MCFixupKindInfo
+ MOSFixupKinds::getFixupKindInfo(const MOS::Fixups Kind,
+                                 const MCAsmBackend *Alternative) {
+-  const static MCFixupKindInfo Infos[MOS::NumTargetFixupKinds] = {
++  const static MCFixupKindInfo Infos[] = {
+       // This table *must* be in same the order of fixup_* kinds in
+       // MOSFixupKinds.h.
+       //
+@@ -37,7 +37,15 @@ MOSFixupKinds::getFixupKindInfo(const MOS::Fixups Kind,
+        0},                  // The high byte of the segment of a 24-bit addr
+       {"Addr13", 0, 13, 0}, // A 13-bit address.
+       {"PCRel8", 0, 8, 0},
+-      {"PCRel16", 0, 16, 0}};
++      {"PCRel16", 0, 16, 0},
++      {"AddrAsciz", 0, 0,
++       0}, // Address encoded as a variable-width decimal ASCII string; the
++           // width is supplied per-call-site (emitMosAddrAsciz), so this
++           // fixup has no fixed TargetSize and must never be relaxed (see
++           // fixupNeedsRelaxationAdvanced's Info.TargetSize > N check).
++  };
++  static_assert(std::size(Infos) == MOS::NumTargetFixupKinds,
++                "Each MOS fixup kind needs an information entry");
+   if (Kind < static_cast<MOS::Fixups>(FirstTargetFixupKind)) {
+     assert(Alternative &&
+            "Alternative MOS backend expected, but none was given!");

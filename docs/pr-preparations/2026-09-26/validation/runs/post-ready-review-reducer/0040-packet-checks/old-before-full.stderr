@@ -1,0 +1,36 @@
+llc-before-0040: /work/build/0040-ra-src/llvm/lib/CodeGen/SplitKit.cpp:746: SlotIndex llvm::SplitEditor::enterIntvAfter(SlotIndex): Assertion `MI && "enterIntvAfter called with invalid index"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/0040-ra-build/llc-before-0040 -mtriple=mos -mcpu=mos65c02 -O2 -disable-spill-hoist -verify-machineinstrs -start-before=greedy /home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir -o -
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/post-ready-review-reducer/0040-packet.mir'.
+2.	Running pass 'Greedy Register Allocator' on function '@constant_shift'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc-before-0040 0x00005975e72e3628 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc-before-0040 0x00005975e72e0511 llvm::sys::RunSignalHandlers() + 369
+2  llc-before-0040 0x00005975e72e4421
+3  libc.so.6       0x00007cb05dc45cb0
+4  libc.so.6       0x00007cb05dca61ac pthread_kill + 284
+5  libc.so.6       0x00007cb05dc45b7e gsignal + 30
+6  libc.so.6       0x00007cb05dc288ec abort + 39
+7  libc.so.6       0x00007cb05dc29979
+8  libc.so.6       0x00007cb05dc3bf75 __assert_fail + 181
+9  llc-before-0040 0x00005975e625e8e1
+10 llc-before-0040 0x00005975e62692b9
+11 llc-before-0040 0x00005975e61a44e4
+12 llc-before-0040 0x00005975e61a5796
+13 llc-before-0040 0x00005975e61a5046
+14 llc-before-0040 0x00005975e61a994d
+15 llc-before-0040 0x00005975e61abf51
+16 llc-before-0040 0x00005975e61ac5b7
+17 llc-before-0040 0x00005975e61758fa llvm::RegAllocBase::allocatePhysRegs() + 714
+18 llc-before-0040 0x00005975e619e19d
+19 llc-before-0040 0x00005975e61b0e49
+20 llc-before-0040 0x00005975e5f5a593 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 1011
+21 llc-before-0040 0x00005975e64ef755 llvm::FPPassManager::runOnFunction(llvm::Function&) + 629
+22 llc-before-0040 0x00005975e64f7502 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+23 llc-before-0040 0x00005975e64f01cb llvm::legacy::PassManagerImpl::run(llvm::Module&) + 1867
+24 llc-before-0040 0x00005975e549c556
+25 llc-before-0040 0x00005975e5499a53 main + 1395
+26 libc.so.6       0x00007cb05dc2a601
+27 libc.so.6       0x00007cb05dc2a718 __libc_start_main + 136
+28 llc-before-0040 0x00005975e54955a5 _start + 37

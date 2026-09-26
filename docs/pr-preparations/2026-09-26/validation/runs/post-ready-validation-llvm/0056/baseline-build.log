@@ -1,0 +1,17 @@
+ninja: Entering directory `/work/build/post-ready-2026-09-26-llvm-build'
+[1/16] Building Opts.inc...
+[2/16] Building Opts.inc...
+[3/16] Building CXX object tools/llvm-as/CMakeFiles/llvm-as.dir/llvm-as.cpp.o
+[4/16] Building CXX object tools/llvm-nm/CMakeFiles/llvm-nm.dir/llvm-nm-driver.cpp.o
+[5/16] Building CXX object tools/llvm-dis/CMakeFiles/llvm-dis.dir/llvm-dis.cpp.o
+[6/16] Building CXX object tools/llvm-link/CMakeFiles/llvm-link.dir/llvm-link.cpp.o
+[7/16] Building CXX object tools/llvm-nm/CMakeFiles/llvm-nm.dir/llvm-nm.cpp.o
+[8/16] Building CXX object tools/verify-uselistorder/CMakeFiles/verify-uselistorder.dir/verify-uselistorder.cpp.o
+[9/16] Generating ../../bin/llvm-readelf
+[10/16] Linking CXX executable bin/llvm-as
+[11/16] Linking CXX executable bin/llvm-nm
+[12/16] Linking CXX executable bin/llvm-dis
+[13/16] Linking CXX executable bin/llvm-link
+[14/16] Linking CXX executable bin/verify-uselistorder
+[15/16] Building CXX object tools/yaml2obj/CMakeFiles/yaml2obj.dir/yaml2obj.cpp.o
+[16/16] Linking CXX executable bin/yaml2obj

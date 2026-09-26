@@ -15,6 +15,11 @@
   "unknowns": "The original August binary and crash-preprocessed TU remain unavailable. Closure applies to the recovered trigger and isolated patch-0028 backend mechanism, established with a reconstructed comparison, not a claim to have recovered the exact August toolchain or every register-pressure failure.",
   "observations": [
     {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
+      "sha256": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
+      "description": "Existing 0028 refactor validated with constructed generic X86 MIR on exact LLVM main: baseline lane-verifier failure, candidate success, two focused RUNs and 102 filtered suite passes / one XFAIL. This does not establish stock C reachability or lift the #320/#321 presentation hold; prior baseline unchanged. OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933"
+    },
+    {
       "path": "docs/investigations/2026-09-25-older-defect-recheck.tsv",
       "sha256": "71a459a9e4ffb98fc337e48061372c5b5274b240159ec301e26a686702824d2f"
     },

@@ -1,0 +1,49 @@
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/48] Building ObjcopyOpts.inc...
+[2/48] Building InstallNameToolOpts.inc...
+[3/48] Building BitcodeStripOpts.inc...
+[4/48] Building StripOpts.inc...
+[5/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/Archive.cpp.o
+[6/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/DXContainer/DXContainerObjcopy.cpp.o
+[7/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/DXContainer/DXContainerObject.cpp.o
+[8/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/DXContainer/DXContainerReader.cpp.o
+[9/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/DXContainer/DXContainerWriter.cpp.o
+[10/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/CommonConfig.cpp.o
+[11/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/ConfigManager.cpp.o
+[12/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/ObjCopy.cpp.o
+[13/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/COFF/COFFObjcopy.cpp.o
+[14/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/COFF/COFFObject.cpp.o
+[15/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/COFF/COFFReader.cpp.o
+[16/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/COFF/COFFWriter.cpp.o
+[17/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/ELF/ELFObjcopy.cpp.o
+[18/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/MachO/MachOObjcopy.cpp.o
+[19/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/MachO/MachOReader.cpp.o
+[20/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/MachO/MachOWriter.cpp.o
+[21/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/ELF/ELFObject.cpp.o
+[22/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/MachO/MachOLayoutBuilder.cpp.o
+[23/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/wasm/WasmObject.cpp.o
+[24/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/MachO/MachOObject.cpp.o
+[25/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/wasm/WasmReader.cpp.o
+[26/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/wasm/WasmWriter.cpp.o
+[27/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/XCOFF/XCOFFObjcopy.cpp.o
+[28/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/wasm/WasmObjcopy.cpp.o
+[29/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/XCOFF/XCOFFWriter.cpp.o
+[30/48] Building Opts.inc...
+[31/48] Building ExtractBundleEntryOpts.inc...
+[32/48] Building CXX object lib/ObjCopy/CMakeFiles/LLVMObjCopy.dir/XCOFF/XCOFFReader.cpp.o
+[33/48] Linking CXX static library lib/libLLVMObjCopy.a
+[34/48] Building CXX object tools/llvm-nm/CMakeFiles/llvm-nm.dir/llvm-nm-driver.cpp.o
+[35/48] Building CXX object tools/llvm-as/CMakeFiles/llvm-as.dir/llvm-as.cpp.o
+[36/48] Building CXX object tools/llvm-link/CMakeFiles/llvm-link.dir/llvm-link.cpp.o
+[37/48] Building CXX object tools/llvm-nm/CMakeFiles/llvm-nm.dir/llvm-nm.cpp.o
+[38/48] Building CXX object tools/llvm-objcopy/CMakeFiles/llvm-objcopy.dir/llvm-objcopy.cpp.o
+[39/48] Building CXX object tools/llvm-objcopy/CMakeFiles/llvm-objcopy.dir/llvm-objcopy-driver.cpp.o
+[40/48] Building CXX object tools/llvm-objcopy/CMakeFiles/llvm-objcopy.dir/ObjcopyOptions.cpp.o
+[41/48] Building CXX object tools/verify-uselistorder/CMakeFiles/verify-uselistorder.dir/verify-uselistorder.cpp.o
+[42/48] Linking CXX executable bin/llvm-as
+[43/48] Linking CXX executable bin/llvm-nm
+[44/48] Linking CXX executable bin/llvm-link
+[45/48] Linking CXX executable bin/llvm-objcopy
+[46/48] Linking CXX executable bin/verify-uselistorder
+[47/48] Building CXX object tools/yaml2obj/CMakeFiles/yaml2obj.dir/yaml2obj.cpp.o
+[48/48] Linking CXX executable bin/yaml2obj

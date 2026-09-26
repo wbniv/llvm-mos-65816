@@ -1,5 +1,14 @@
 # [MOS] Preserve symbolic .mos_addr_asciz directives in text output
 
+**Current posting artifact (September 26):** use the
+[0047 copy-ready body](pr-preparations/2026-09-26/0047-pr-body.md) and
+[exact-current validation](pr-preparations/2026-09-26/mos-validation.md).
+The earlier draft and validation prose below are retained dated evidence;
+their old build counts, diagnostics, and pending steps are not current gates.
+Nothing has been posted. Preparation: OpenAI Codex CLI 0.157.0 (`codex-tui`),
+model `gpt-6-astra`, `xhigh` reasoning effort; verified session
+`01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 `llvm-mc -show-encoding` aborts on `.mos_addr_asciz _start, 5` with
 `Don't know how to emit this value.` The generic text streamer's integer data
 directives cannot represent an unresolved decimal-ASCII field of arbitrary

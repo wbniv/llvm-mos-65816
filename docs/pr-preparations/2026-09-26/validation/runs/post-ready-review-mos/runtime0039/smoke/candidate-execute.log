@@ -1,0 +1,14 @@
+$ /home/will/llvm-mos-65816/build/utils/sim/mos-sim --trace /home/will/llvm-mos-65816/build/post-ready-review-mos/runtime0039/smoke/candidate.simg
+exit=0
+stdout:
+P
+stderr:
+0200 a:00 x:00 y:00 s:fd st:20 (..1.....) insn:a9 57 85
+0202 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:85 00 a9
+0204 a:57 x:00 y:00 s:fd st:20 (..1.....) insn:a9 50 8d
+0206 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:8d 00 01
+0209 a:50 x:00 y:00 s:fd st:20 (..1.....) insn:a2 10 bd
+020b a:50 x:10 y:00 s:fd st:20 (..1.....) insn:bd f0 00
+020e a:50 x:10 y:00 s:fd st:20 (..1.....) insn:8d f9 ff
+0211 a:50 x:10 y:00 s:fd st:20 (..1.....) insn:49 50 8d
+0213 a:00 x:10 y:00 s:fd st:22 (..1...z.) insn:8d f8 ff

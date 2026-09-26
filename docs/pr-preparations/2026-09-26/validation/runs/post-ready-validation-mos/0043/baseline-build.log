@@ -1,0 +1,8 @@
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/7] Building CXX object lib/Target/MOS/AsmParser/CMakeFiles/LLVMMOSAsmParser.dir/MOSAsmParser.cpp.o
+[2/7] Linking CXX static library lib/libLLVMMOSAsmParser.a
+[3/7] Linking CXX executable bin/llvm-nm
+[4/7] Linking CXX executable bin/llc
+[5/7] Linking CXX executable bin/llvm-mc
+[6/7] Linking CXX executable bin/llvm-reduce
+[7/7] Linking CXX executable bin/opt

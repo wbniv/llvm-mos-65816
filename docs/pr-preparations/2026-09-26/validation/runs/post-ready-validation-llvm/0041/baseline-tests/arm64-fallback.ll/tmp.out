@@ -1,0 +1,278 @@
+	.file	"arm64-fallback.ll"
+	.text
+	.globl	test_write_register_intrin      // -- Begin function test_write_register_intrin
+	.p2align	2
+	.type	test_write_register_intrin,@function
+test_write_register_intrin:             // @test_write_register_intrin
+	.cfi_startproc
+// %bb.0:
+	mov	x0, xzr
+	mov	sp, x0
+	ret
+.Lfunc_end0:
+	.size	test_write_register_intrin, .Lfunc_end0-test_write_register_intrin
+	.cfi_endproc
+                                        // -- End function
+	.globl	strict_align_feature            // -- Begin function strict_align_feature
+	.p2align	2
+	.type	strict_align_feature,@function
+strict_align_feature:                   // @strict_align_feature
+	.cfi_startproc
+// %bb.0:
+	ldrb	w8, [x0, #1]
+	mov	w9, w8
+	ldrb	w8, [x0]
+                                        // kill: def $x8 killed $w8
+	orr	x9, x8, x9, lsl #8
+	ldrb	w8, [x0, #3]
+	mov	w10, w8
+	ldrb	w8, [x0, #2]
+                                        // kill: def $x8 killed $w8
+	lsl	x8, x8, #16
+	orr	x8, x8, x10, lsl #24
+	orr	x8, x8, x9
+	ldrb	w10, [x0, #5]
+	ldrb	w9, [x0, #4]!
+	mov	w1, w9
+	mov	w9, w1
+	orr	w10, w9, w10, lsl #8
+	ldrb	w11, [x0, #3]
+	ldrb	w9, [x0, #2]
+	lsl	w9, w9, #16
+	orr	w9, w9, w11, lsl #24
+	orr	w10, w9, w10
+                                        // implicit-def: $x9
+	mov	w9, w10
+	orr	x0, x8, x9, lsl #32
+	ret
+.Lfunc_end1:
+	.size	strict_align_feature, .Lfunc_end1-strict_align_feature
+	.cfi_endproc
+                                        // -- End function
+	.globl	scalable_arg                    // -- Begin function scalable_arg
+	.p2align	2
+	.type	scalable_arg,@function
+	.variant_pcs	scalable_arg
+scalable_arg:                           // @scalable_arg
+	.cfi_startproc
+// %bb.0:
+	ld1b	{ z0.b }, p0/z, [x0]
+	ret
+.Lfunc_end2:
+	.size	scalable_arg, .Lfunc_end2-scalable_arg
+	.cfi_endproc
+                                        // -- End function
+	.globl	scalable_ret                    // -- Begin function scalable_ret
+	.p2align	2
+	.type	scalable_ret,@function
+	.variant_pcs	scalable_ret
+scalable_ret:                           // @scalable_ret
+	.cfi_startproc
+// %bb.0:
+	ptrue	p0.b, pow2
+	ld1b	{ z0.b }, p0/z, [x0]
+	ret
+.Lfunc_end3:
+	.size	scalable_ret, .Lfunc_end3-scalable_ret
+	.cfi_endproc
+                                        // -- End function
+	.globl	scalable_call                   // -- Begin function scalable_call
+	.p2align	2
+	.type	scalable_call,@function
+scalable_call:                          // @scalable_call
+	.cfi_startproc
+// %bb.0:
+	ptrue	p0.b, pow2
+	ld1b	{ z0.b }, p0/z, [x0]
+	fmov	w0, s0
+	ret
+.Lfunc_end4:
+	.size	scalable_call, .Lfunc_end4-scalable_call
+	.cfi_endproc
+                                        // -- End function
+	.globl	scalable_alloca                 // -- Begin function scalable_alloca
+	.p2align	2
+	.type	scalable_alloca,@function
+scalable_alloca:                        // @scalable_alloca
+	.cfi_startproc
+// %bb.0:
+	str	x29, [sp, #-16]!                // 8-byte Folded Spill
+	addvl	sp, sp, #-1
+	.cfi_escape 0x0f, 0x08, 0x8f, 0x10, 0x92, 0x2e, 0x00, 0x38, 0x1e, 0x22 // sp + 16 + 8 * VG
+	.cfi_offset w29, -16
+	ldr	z0, [sp]
+	addvl	sp, sp, #1
+	ldr	x29, [sp], #16                  // 8-byte Folded Reload
+	ret
+.Lfunc_end5:
+	.size	scalable_alloca, .Lfunc_end5-scalable_alloca
+	.cfi_endproc
+                                        // -- End function
+	.globl	asm_indirect_output             // -- Begin function asm_indirect_output
+	.p2align	2
+	.type	asm_indirect_output,@function
+asm_indirect_output:                    // @asm_indirect_output
+	.cfi_startproc
+// %bb.0:                               // %entry
+	sub	sp, sp, #16
+	.cfi_def_cfa_offset 16
+	add	x8, sp, #8
+	//APP
+	//NO_APP
+	add	sp, sp, #16
+	ret
+.Lfunc_end6:
+	.size	asm_indirect_output, .Lfunc_end6-asm_indirect_output
+	.cfi_endproc
+                                        // -- End function
+	.globl	asm_output_ls64                 // -- Begin function asm_output_ls64
+	.p2align	2
+	.type	asm_output_ls64,@function
+asm_output_ls64:                        // @asm_output_ls64
+	.cfi_startproc
+// %bb.0:                               // %entry
+	//APP
+	ld64b	x2, [x1]
+	//NO_APP
+	mov	x10, x2
+	str	x10, [x0]
+	mov	x10, x3
+	str	x10, [x0, #8]
+	mov	x10, x4
+	str	x10, [x0, #16]
+	mov	x10, x5
+	str	x10, [x0, #24]
+	mov	x10, x6
+	str	x10, [x0, #32]
+	mov	x10, x7
+	str	x10, [x0, #40]
+	mov	x10, x8
+	str	x10, [x0, #48]
+	mov	x8, x9
+	str	x8, [x0, #56]
+	ret
+.Lfunc_end7:
+	.size	asm_output_ls64, .Lfunc_end7-asm_output_ls64
+	.cfi_endproc
+                                        // -- End function
+	.globl	asm_input_ls64                  // -- Begin function asm_input_ls64
+	.p2align	2
+	.type	asm_input_ls64,@function
+asm_input_ls64:                         // @asm_input_ls64
+	.cfi_startproc
+// %bb.0:                               // %entry
+	mov	x8, x1
+	mov	x9, x0
+	ldr	x0, [x9]
+	ldr	x15, [x9, #8]
+	ldr	x14, [x9, #16]
+	ldr	x13, [x9, #24]
+	ldr	x12, [x9, #32]
+	ldr	x11, [x9, #40]
+	ldr	x10, [x9, #48]
+	ldr	x9, [x9, #56]
+                                        // kill: def $x0 killed $x0 def $x0_x1_x2_x3_x4_x5_x6_x7
+	mov	x1, x15
+	mov	x2, x14
+	mov	x3, x13
+	mov	x4, x12
+	mov	x5, x11
+	mov	x6, x10
+	mov	x7, x9
+	//APP
+	st64b	x0, [x8]
+	//NO_APP
+	ret
+.Lfunc_end8:
+	.size	asm_input_ls64, .Lfunc_end8-asm_input_ls64
+	.cfi_endproc
+                                        // -- End function
+	.globl	umul_s128                       // -- Begin function umul_s128
+	.p2align	2
+	.type	umul_s128,@function
+umul_s128:                              // @umul_s128
+	.cfi_startproc
+// %bb.0:                               // %entry
+	adds	x9, x0, x0
+	adcs	x8, x1, x1
+	mov	w10, wzr
+	csinc	w0, w10, wzr, lo
+	str	x9, [x2]
+	str	x8, [x2, #8]
+	ret
+.Lfunc_end9:
+	.size	umul_s128, .Lfunc_end9-umul_s128
+	.cfi_endproc
+                                        // -- End function
+	.globl	gc_intr                         // -- Begin function gc_intr
+	.p2align	2
+	.type	gc_intr,@function
+gc_intr:                                // @gc_intr
+	.cfi_startproc
+// %bb.0:
+	str	x30, [sp, #-16]!                // 8-byte Folded Spill
+	.cfi_def_cfa_offset 16
+	.cfi_offset w30, -16
+	bl	extern_returning_i32
+.Ltmp1:
+	ldr	x30, [sp], #16                  // 8-byte Folded Reload
+	ret
+.Lfunc_end10:
+	.size	gc_intr, .Lfunc_end10-gc_intr
+	.cfi_endproc
+                                        // -- End function
+	.globl	inline_asm_with_output_constraint // -- Begin function inline_asm_with_output_constraint
+	.p2align	2
+	.type	inline_asm_with_output_constraint,@function
+inline_asm_with_output_constraint:      // @inline_asm_with_output_constraint
+	.cfi_startproc
+// %bb.0:                               // %entry
+	//APP
+	subs	x0, x0, #3
+	//NO_APP
+	mov	w8, wzr
+	cinc	w0, w8, hi
+	ret
+.Lfunc_end11:
+	.size	inline_asm_with_output_constraint, .Lfunc_end11-inline_asm_with_output_constraint
+	.cfi_endproc
+                                        // -- End function
+	.section	.llvm_stackmaps,"a",@progbits
+__LLVM_StackMaps:
+	.byte	3
+	.byte	0
+	.hword	0
+	.word	1
+	.word	0
+	.word	1
+	.xword	gc_intr
+	.xword	16
+	.xword	1
+	.xword	2882400000
+	.word	.Ltmp1-gc_intr
+	.hword	0
+	.hword	3
+	.byte	4
+	.byte	0
+	.hword	8
+	.hword	0
+	.hword	0
+	.word	0
+	.byte	4
+	.byte	0
+	.hword	8
+	.hword	0
+	.hword	0
+	.word	0
+	.byte	4
+	.byte	0
+	.hword	8
+	.hword	0
+	.hword	0
+	.word	0
+	.p2align	3, 0x0
+	.hword	0
+	.hword	0
+	.p2align	3, 0x0
+
+	.section	".note.GNU-stack","",@progbits

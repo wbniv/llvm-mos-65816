@@ -1,0 +1,152 @@
+[
+  {
+    "name": "gisel-inline-asm-register-bounds-baseline",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=1",
+      "-O0",
+      "-verify-machineinstrs",
+      "-global-isel-abort=1",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input_sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57",
+    "exit": -6,
+    "expected_result": true,
+    "diagnostic": "llc-0041: /work/build/register-exhaustion-src/llvm/lib/CodeGen/GlobalISel/InlineAsmLowering.cpp:155: void getRegistersForValue(MachineFunction &, MachineIRBuilder &, GISelAsmOperandInfo &, GISelAsmOperandInfo &): Assertion `I != RC->end() && \"Ran out of registers to allocate!\"' failed."
+  },
+  {
+    "name": "gisel-inline-asm-register-bounds-candidate",
+    "command": [
+      "/home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=1",
+      "-O0",
+      "-verify-machineinstrs",
+      "-global-isel-abort=1",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-shift-inlineasm-fixes/asm-cc.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "301f6c7d313f116049197707b2f07ac9c21088c9e2441232bb023b2551ac4c2d",
+    "input_sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57",
+    "exit": 1,
+    "expected_result": true,
+    "diagnostic": "error: not enough registers for inline asm constraint '{cc}'"
+  },
+  {
+    "name": "selectiondag-inline-asm-register-bounds-baseline",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input_sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57",
+    "exit": -6,
+    "expected_result": true,
+    "diagnostic": "llc-0041: /work/build/register-exhaustion-src/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp:10149: std::optional<unsigned int> getRegistersForValue(SelectionDAG &, const SDLoc &, SDISelAsmOperandInfo &, SDISelAsmOperandInfo &): Assertion `I != RC->end() && \"Ran out of registers to allocate!\"' failed."
+  },
+  {
+    "name": "selectiondag-inline-asm-register-bounds-candidate",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-cc.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "4aae5bcf39bdc8a1366a5aaa5bfb36ae6ea4cdad4268ad0a725dad2b865ff49e",
+    "input_sha256": "4462ec9e9b4d980fedd00224915e461d128f6988c33775c2b40859e9d4f2fd57",
+    "exit": 1,
+    "expected_result": true,
+    "diagnostic": "error: register 'NZCV' allocated for constraint '{cc}' does not match required type"
+  },
+  {
+    "name": "selectiondag-inline-asm-nonstandard-integer-baseline",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0041-inlineasm-build/llc-0041",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "-stop-after=finalize-isel",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "38ae5c6aa8cc91e2fd61912cfae42252e68b1178afdcd4117489499d0d7d9660",
+    "input_sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d",
+    "exit": -6,
+    "expected_result": true,
+    "diagnostic": "Value type is non-standard value, Other."
+  },
+  {
+    "name": "selectiondag-inline-asm-nonstandard-integer-candidate",
+    "command": [
+      "/home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "-stop-after=finalize-isel",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/integer-many-virtual.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "f8e3d451516fb66dcdd6d171f8bf2b2bff792baed78afb8dd891ff2aa01c2383",
+    "input_sha256": "530467a0e45905dc3c9ab9a0b31bebc8630e8825dd89f12a45f7ebda4edea39d",
+    "exit": 1,
+    "expected_result": true,
+    "diagnostic": "error: could not allocate input reg for constraint 'r'"
+  },
+  {
+    "name": "selectiondag-inline-asm-vector-parts-baseline",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "-stop-after=finalize-isel",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "4aae5bcf39bdc8a1366a5aaa5bfb36ae6ea4cdad4268ad0a725dad2b865ff49e",
+    "input_sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289",
+    "exit": -6,
+    "expected_result": true,
+    "diagnostic": "llc: /work/build/selectiondag-inlineasm-fix/SelectionDAGBuilder.cpp:774: void getCopyToPartsVector(SelectionDAG &, const SDLoc &, SDValue, SDValue *, unsigned int, MVT, const Value *, std::optional<CallingConv::ID>): Assertion `RegisterVT == PartVT && \"Part type doesn't match vector breakdown!\"' failed."
+  },
+  {
+    "name": "selectiondag-inline-asm-vector-parts-candidate",
+    "command": [
+      "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc",
+      "-mtriple=aarch64",
+      "-global-isel=0",
+      "-O0",
+      "-verify-machineinstrs",
+      "-stop-after=finalize-isel",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-25-selectiondag-inlineasm/asm-many-virtual.ll",
+      "-o",
+      "/dev/null"
+    ],
+    "binary_sha256": "ceb0414e89abd238b2fac34387c6c119a0cc54df32621f59eb56883ac638eedd",
+    "input_sha256": "5e7baa16f8c428646e1f6984349a03aa63900a89970fa3880aec87a521377289",
+    "exit": 1,
+    "expected_result": true,
+    "diagnostic": "error: incompatible vector register parts, possible invalid constraint for vector type"
+  }
+]

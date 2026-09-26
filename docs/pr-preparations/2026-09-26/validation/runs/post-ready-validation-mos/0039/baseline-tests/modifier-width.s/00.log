@@ -1,0 +1,42 @@
+/work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s:13:26: error: CHECK: expected string not found in input
+ lda mos16(240) ; CHECK: encoding: [0xad,0xf0,0x00]
+                         ^
+<stdin>:1:1: note: scanning from here
+
+^
+<stdin>:6:19: note: possible intended match here
+ lda mos16(0),x ; encoding: [0xbd,0x00,0x00]
+                  ^
+
+Input file: <stdin>
+Check file: /work/build/post-ready-2026-09-26-isolated-src/llvm/test/MC/MOS/modifier-width.s
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            1:  
+check:13'0    {   search range start (exclusive)
+check:13'1        error: no match found in search range
+            2:  
+            3:  
+            4:  lda mos16(240) ; encoding: [0xa5,0xf0] 
+            5:  lda mos16(240),x ; encoding: [0xb5,0xf0] 
+            6:  lda mos16(0),x ; encoding: [0xbd,0x00,0x00] 
+check:13'2                       ?                            possible intended match
+            7:  lda mos16(4660),x ; encoding: [0xb5,0x34] 
+            8:  lda mos16(65535),x ; encoding: [0xb5,0xff] 
+            9:  lda mos16(-1),x ; encoding: [0xb5,0xff] 
+           10:  sta mos16(16),x ; encoding: [0x95,0x10] 
+           11:  sta mos16(16),y ; encoding: [0x99,0x10,0x00] 
+            .
+            .
+            .
+           32:  lda mos24bank(1193046) ; encoding: [0xa5,0x12] 
+           33:  
+           34:  
+           35:  lda 240 ; encoding: [0xa5,0xf0] 
+           36:  lda 240,x ; encoding: [0xb5,0xf0] 
+           37:  lda 4660,x ; encoding: [0xbd,0x34,0x12] 
+check:13'3                                              } search range end (exclusive)
+>>>>>>

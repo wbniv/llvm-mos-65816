@@ -1,0 +1,242 @@
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+-- Testing: 170 of 9956 tests, 2 workers --
+PASS: LLVM :: CodeGen/X86/inline-asm-error.ll (1 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx-v-constraint.ll (2 of 170)
+PASS: LLVM :: CodeGen/X86/2008-09-18-inline-asm-2.ll (3 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-x-i128.ll (4 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-flag-output.ll (5 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-named-z-reg-constraints.ll (6 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-fpstack.ll (7 of 170)
+PASS: LLVM :: CodeGen/X86/ipra-inline-asm.ll (8 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx512f-x-constraint.ll (9 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm.ll (10 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-kill.mir (11 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-different-indirect-target.mir (12 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs-regallocfast.mir (13 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx512vl-v-constraint.ll (14 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx-v-constraint-32bit.ll (15 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-assertion.ll (16 of 170)
+PASS: LLVM :: CodeGen/X86/regallocfast-callbr-asm-spills-after-reload.mir (17 of 170)
+PASS: LLVM :: CodeGen/AArch64/aarch64-inline-asm-bitcast-crash.ll (18 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/inline-asm.ll (19 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-Ws-constraint.ll (20 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-variables-x86-1-reg.ll (21 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx512vl-v-constraint-32bit.ll (22 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs.ll (23 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-flag-output.ll (24 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-globaladdress.ll (25 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-PR44272.ll (26 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-variables-x86-2-regs.ll (27 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-prepare.ll (28 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-A-constraint.ll (29 of 170)
+PASS: LLVM :: CodeGen/X86/2008-09-17-inline-asm-1.ll (30 of 170)
+PASS: LLVM :: CodeGen/AArch64/ls64-inline-asm.ll (31 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm.ll (32 of 170)
+PASS: LLVM :: CodeGen/X86/lvi-hardening-inline-asm.ll (33 of 170)
+PASS: LLVM :: CodeGen/X86/strictfp-inlineasm.ll (34 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-nop-reg.ll (35 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-blockplacement.ll (36 of 170)
+PASS: LLVM :: CodeGen/X86/bswap-inline-asm.ll (37 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-clobber-arm64ec.ll (38 of 170)
+PASS: LLVM :: CodeGen/AArch64/callbr-asm-obj-file.ll (39 of 170)
+PASS: LLVM :: CodeGen/AArch64/callbr-asm-label-bti.ll (40 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-avx512f-v-constraint.ll (41 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-clobber-x29-x30.ll (42 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-X-constraint.ll (43 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm.ll (44 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-instr-scheduling.ll (45 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-bb-exports.ll (46 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-S-constraint.ll (47 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-branch-folding.ll (48 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-Uc-constraint.ll (49 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm.ll (50 of 170)
+PASS: LLVM :: CodeGen/AArch64/callbr-asm-label.ll (51 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-constraints-bad-sve.ll (52 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-functions.ll (53 of 170)
+PASS: LLVM :: CodeGen/AArch64/callbr-asm-outputs-indirect-isel.ll (54 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-N.ll (55 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/irtranslator-inline-asm.ll (56 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-J.ll (57 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-M.ll (58 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-destinations.ll (59 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-out-regs.ll (60 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-I.ll (61 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-K.ll (62 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-output-template.ll (63 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-phi-placement.ll (64 of 170)
+PASS: LLVM :: CodeGen/AArch64/machine-latecleanup-inlineasm.mir (65 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-ldr-pseudo.ll (66 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-error-L.ll (67 of 170)
+PASS: LLVM :: CodeGen/AArch64/machine-outliner-inline-asm-adrp.mir (68 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-memop.ll (69 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-int-to-fp.ll (70 of 170)
+PASS: LLVM :: CodeGen/X86/sjlj-unwind-inline-asm-codegen.ll (71 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/regbank-inlineasm.mir (72 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-stack-realign3.ll (73 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-q-regs.ll (74 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-speculation.ll (75 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-illegal-type.ll (76 of 170)
+XFAIL: LLVM :: CodeGen/X86/inline-asm-stack-realign.ll (77 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs-indirect-isel.ll (78 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-variables-x64-nopic.ll (79 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-function-call-pic.ll (80 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-sp-clobber-memcpy.ll (81 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-x-scalar.ll (82 of 170)
+PASS: LLVM :: CodeGen/X86/shrinkwrap-callbr.ll (83 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-label-addr.ll (84 of 170)
+PASS: LLVM :: CodeGen/AArch64/neon-inline-asm-16-bit-fp.ll (85 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-flag-clobber.ll (86 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-redundant-clobber.ll (87 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/unwind-inline-asm.ll (88 of 170)
+PASS: LLVM :: CodeGen/AArch64/inlineasm-X-allocation.ll (89 of 170)
+PASS: LLVM :: CodeGen/X86/2011-06-14-mmx-inlineasm.ll (90 of 170)
+PASS: LLVM :: CodeGen/X86/tail-dup-asm-goto.ll (91 of 170)
+XFAIL: LLVM :: CodeGen/X86/inline-asm-stack-realign2.ll (92 of 170)
+PASS: LLVM :: CodeGen/X86/seh-unwind-inline-asm-codegen.ll (93 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-variables-x64-1-reg.ll (94 of 170)
+PASS: LLVM :: CodeGen/X86/2008-02-20-InlineAsmClobber.ll (95 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-avx512.ll (96 of 170)
+PASS: LLVM :: CodeGen/AArch64/strictfp-inlineasm.ll (97 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-mrv.ll (98 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-endbr.ll (99 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-obj-file.ll (100 of 170)
+PASS: LLVM :: CodeGen/X86/note-cet-property-inlineasm.ll (101 of 170)
+PASS: LLVM :: CodeGen/X86/2006-07-20-InlineAsm.ll (102 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-multilevel-gep.ll (103 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/combine-fdiv-inlineasm-operand.mir (104 of 170)
+PASS: LLVM :: CodeGen/X86/2009-05-08-InlineAsmIOffset.ll (105 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-clobber-base-frame-pointer.ll (106 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-pr76416.ll (107 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-pic.ll (108 of 170)
+PASS: LLVM :: CodeGen/X86/mmx-inlineasm.ll (109 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs-pred-succ.ll (110 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-i-constraint-i1.ll (111 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-bad-constraint-n.ll (112 of 170)
+PASS: LLVM :: CodeGen/X86/inlineasm-sched-bug.ll (113 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-pr149144.ll (114 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-tied.ll (115 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-p-constraint.ll (116 of 170)
+PASS: LLVM :: CodeGen/X86/unwind-inline-asm-codegen.ll (117 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-constraints-badK.ll (118 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-loop.ll (119 of 170)
+PASS: LLVM :: CodeGen/X86/2007-03-24-InlineAsmMultiRegConstraint.ll (120 of 170)
+PASS: LLVM :: CodeGen/AArch64/arm64-inline-asm-zero-reg-error.ll (121 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-h.ll (122 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-i-constraint-i1.ll (123 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-constraints-badL.ll (124 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-clobber.ll (125 of 170)
+PASS: LLVM :: CodeGen/X86/x86-inline-asm-validation.ll (126 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-constraints-badK2.ll (127 of 170)
+PASS: LLVM :: CodeGen/X86/2006-12-16-InlineAsmCrash.ll (128 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-2addr.ll (129 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-intel-negative-scale.ll (130 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-blockaddress.ll (131 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs-indirect-isel-m32.ll (132 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-movdir64b-x86_64.ll (133 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-ptr-cast.ll (134 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-different-indirect-target-end-to-end.ll (135 of 170)
+PASS: LLVM :: CodeGen/X86/2007-03-24-InlineAsmPModifier.ll (136 of 170)
+PASS: LLVM :: CodeGen/X86/2007-03-24-InlineAsmXConstraint.ll (137 of 170)
+PASS: LLVM :: CodeGen/X86/2012-02-23-mmx-inlineasm.ll (138 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-R-constraint.ll (139 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-variables-x64-2-regs.ll (140 of 170)
+PASS: LLVM :: CodeGen/X86/2010-05-06-LocalInlineAsmClobber.ll (141 of 170)
+PASS: LLVM :: CodeGen/X86/2008-11-13-inlineasm-3.ll (142 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-multilevel-gep.ll (143 of 170)
+PASS: LLVM :: CodeGen/AArch64/inline-asm-constraints-badI.ll (144 of 170)
+PASS: LLVM :: CodeGen/X86/2008-02-25-InlineAsmBug.ll (145 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-movdir64b.ll (146 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-asm-sink.ll (147 of 170)
+PASS: LLVM :: CodeGen/X86/2009-02-12-InlineAsm-nieZ-constraints.ll (148 of 170)
+PASS: LLVM :: CodeGen/X86/2007-04-11-InlineAsmVectorResult.ll (149 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-duplicated-constraint.ll (150 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-n-constraint.ll (151 of 170)
+PASS: LLVM :: CodeGen/X86/2007-03-16-InlineAsm.ll (152 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-e-constraint.ll (153 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-pr155807.ll (154 of 170)
+PASS: LLVM :: CodeGen/X86/ms-inline-asm-array.ll (155 of 170)
+PASS: LLVM :: CodeGen/X86/2006-07-12-InlineAsmQConstraint.ll (156 of 170)
+PASS: LLVM :: CodeGen/X86/2007-03-24-InlineAsmVectorOp.ll (157 of 170)
+PASS: LLVM :: CodeGen/X86/2007-04-08-InlineAsmCrash.ll (158 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-Ws-constraint-error.ll (159 of 170)
+PASS: LLVM :: CodeGen/X86/2007-01-29-InlineAsm-ir.ll (160 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-imm-out-of-range.ll (161 of 170)
+PASS: LLVM :: CodeGen/X86/2007-04-27-InlineAsm-IntMemInput.ll (162 of 170)
+PASS: LLVM :: CodeGen/X86/inline-asm-default-clobbers.ll (163 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/irtranslator-unwind-inline-asm.ll (164 of 170)
+PASS: LLVM :: CodeGen/AArch64/GlobalISel/irtranslator-no-unwind-inline-asm.ll (165 of 170)
+PASS: LLVM :: CodeGen/X86/2006-07-10-InlineAsmAConstraint.ll (166 of 170)
+PASS: LLVM :: CodeGen/X86/20210831-inlineasm.ll (167 of 170)
+XFAIL: LLVM :: CodeGen/X86/2009-08-06-inlineasm.ll (168 of 170)
+PASS: LLVM :: CodeGen/X86/invalid-operand-bundle-callbr.ll (169 of 170)
+PASS: LLVM :: CodeGen/X86/callbr-codegenprepare.ll (170 of 170)
+
+Testing Time: 2.39s
+
+Total Discovered Tests: 9956
+  Excluded         : 9786 (98.29%)
+  Passed           :  167 (1.68%)
+  Expectedly Failed:    3 (0.03%)

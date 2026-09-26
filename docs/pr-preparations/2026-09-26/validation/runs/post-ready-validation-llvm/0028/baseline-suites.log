@@ -1,0 +1,173 @@
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfdump in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-size in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/post-ready-2026-09-26-llvm-build/bin
+llvm-lit: /work/build/post-ready-2026-09-26-llvm-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/post-ready-2026-09-26-llvm-build/bin
+-- Testing: 101 of 9956 tests, 2 workers --
+PASS: LLVM :: CodeGen/X86/callbr-asm-outputs-regallocfast.mir (1 of 101)
+PASS: LLVM :: CodeGen/X86/regallocfast-callbr-asm-spills-after-reload.mir (2 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-neon-vector-list-spill.ll (3 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-spill-lr.ll (4 of 101)
+PASS: LLVM :: CodeGen/AArch64/aarch64-sve-fill-spill-pair.ll (5 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-2011-03-09-CPSRSpill.ll (6 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-spill.ll (7 of 101)
+PASS: LLVM :: CodeGen/AArch64/fast-regalloc-empty-bb-with-liveins.mir (8 of 101)
+PASS: LLVM :: CodeGen/AArch64/framelayout-fpr128-spill.mir (9 of 101)
+PASS: LLVM :: CodeGen/AArch64/machine-cp-spill-chain-across-call.mir (10 of 101)
+PASS: LLVM :: CodeGen/AArch64/nested-iv-regalloc.mir (11 of 101)
+PASS: LLVM :: CodeGen/AArch64/ptrauth-tail-call-regalloc.ll (12 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-spill-remarks-treshold-hotness.ll (13 of 101)
+PASS: LLVM :: CodeGen/AArch64/arm64-spill-remarks.ll (14 of 101)
+PASS: LLVM :: CodeGen/AArch64/regalloc-hint-movprfx-streaming.mir (15 of 101)
+PASS: LLVM :: CodeGen/AArch64/regalloc-hint-movprfx.mir (16 of 101)
+PASS: LLVM :: CodeGen/AArch64/regalloc-last-chance-recolor-with-split.mir (17 of 101)
+PASS: LLVM :: CodeGen/AArch64/regalloc-spill-weight-basic.ll (18 of 101)
+PASS: LLVM :: CodeGen/AArch64/reserveXreg-for-regalloc.ll (19 of 101)
+PASS: LLVM :: CodeGen/AArch64/seh-extended-spills.ll (20 of 101)
+PASS: LLVM :: CodeGen/AArch64/seqpairspill.mir (21 of 101)
+PASS: LLVM :: CodeGen/AArch64/sme2-multivec-regalloc.mir (22 of 101)
+PASS: LLVM :: CodeGen/AArch64/spill-reload-remarks.ll (23 of 101)
+PASS: LLVM :: CodeGen/AArch64/spill-stack-realignment.mir (24 of 101)
+PASS: LLVM :: CodeGen/AArch64/spill-fold.ll (25 of 101)
+PASS: LLVM :: CodeGen/AArch64/spill-fold.mir (26 of 101)
+PASS: LLVM :: CodeGen/AArch64/spill-undef.mir (27 of 101)
+PASS: LLVM :: CodeGen/AArch64/spillfill-sve.ll (28 of 101)
+PASS: LLVM :: CodeGen/AArch64/sve-regalloc-hint-unique-predicate-dst.mir (29 of 101)
+PASS: LLVM :: CodeGen/AArch64/unreachable-emergency-spill-slot.mir (30 of 101)
+PASS: LLVM :: CodeGen/AArch64/wrong_debug_loc_after_regalloc.ll (31 of 101)
+PASS: LLVM :: CodeGen/X86/2006-05-01-SchedCausingSpills.ll (32 of 101)
+PASS: LLVM :: CodeGen/AArch64/spillfill-sve.mir (33 of 101)
+PASS: LLVM :: CodeGen/AArch64/sve-pred-pair-spill-fill.ll (34 of 101)
+PASS: LLVM :: CodeGen/X86/2007-03-01-SpillerCrash.ll (35 of 101)
+PASS: LLVM :: CodeGen/X86/2007-10-12-SpillerUnfold1.ll (36 of 101)
+PASS: LLVM :: CodeGen/X86/2007-10-12-SpillerUnfold2.ll (37 of 101)
+PASS: LLVM :: CodeGen/X86/2007-10-19-SpillerUnfold.ll (38 of 101)
+PASS: LLVM :: CodeGen/X86/2008-02-22-LocalRegAllocBug.ll (39 of 101)
+PASS: LLVM :: CodeGen/X86/2008-03-10-RegAllocInfLoop.ll (40 of 101)
+PASS: LLVM :: CodeGen/X86/2008-03-14-SpillerCrash.ll (41 of 101)
+PASS: LLVM :: CodeGen/X86/2008-03-31-SpillerFoldingBug.ll (42 of 101)
+PASS: LLVM :: CodeGen/X86/2008-09-19-RegAllocBug.ll (43 of 101)
+PASS: LLVM :: CodeGen/X86/2008-12-01-SpillerAssert.ll (44 of 101)
+PASS: LLVM :: CodeGen/X86/2009-02-12-SpillerBug.ll (45 of 101)
+PASS: LLVM :: CodeGen/X86/2009-03-09-SpillerBug.ll (46 of 101)
+PASS: LLVM :: CodeGen/X86/2008-05-28-LocalRegAllocBug.ll (47 of 101)
+PASS: LLVM :: CodeGen/X86/2008-07-19-movups-spills.ll (48 of 101)
+XFAIL: LLVM :: CodeGen/X86/2009-04-16-SpillerUnfold.ll (49 of 101)
+PASS: LLVM :: CodeGen/X86/2009-04-29-RegAllocAssert.ll (50 of 101)
+PASS: LLVM :: CodeGen/X86/2009-06-03-Win64SpillXMM.ll (51 of 101)
+PASS: LLVM :: CodeGen/X86/2009-09-10-SpillComments.ll (52 of 101)
+PASS: LLVM :: CodeGen/X86/2009-09-21-NoSpillLoopCount.ll (53 of 101)
+PASS: LLVM :: CodeGen/X86/2009-10-19-EmergencySpill.ll (54 of 101)
+PASS: LLVM :: CodeGen/X86/2009-11-13-VirtRegRewriterBug.ll (55 of 101)
+PASS: LLVM :: CodeGen/X86/2011-02-04-FastRegallocNoFP.ll (56 of 101)
+PASS: LLVM :: CodeGen/X86/2011-02-21-VirtRegRewriter-KillSubReg.ll (57 of 101)
+PASS: LLVM :: CodeGen/X86/2011-06-12-FastAllocSpill.ll (58 of 101)
+PASS: LLVM :: CodeGen/X86/2011-10-11-SpillDead.ll (59 of 101)
+PASS: LLVM :: CodeGen/X86/AMX/amx-fastconfig-spill.mir (60 of 101)
+PASS: LLVM :: CodeGen/X86/AMX/amx-spill.ll (61 of 101)
+PASS: LLVM :: CodeGen/X86/avx512-mask-spills.ll (62 of 101)
+PASS: LLVM :: CodeGen/X86/AMX/amx-greedy-ra-spill-shape.ll (63 of 101)
+PASS: LLVM :: CodeGen/X86/AMX/amx-spill-merge.ll (64 of 101)
+PASS: LLVM :: CodeGen/X86/cmpxchg8b_alloca_regalloc_handling.ll (65 of 101)
+PASS: LLVM :: CodeGen/X86/debug-spilled-snippet.ll (66 of 101)
+PASS: LLVM :: CodeGen/X86/debug-spilled-snippet.mir (67 of 101)
+PASS: LLVM :: CodeGen/X86/fast-regalloc-live-out-debug-values.mir (68 of 101)
+PASS: LLVM :: CodeGen/X86/fastregalloc-selfloop.mir (69 of 101)
+PASS: LLVM :: CodeGen/X86/fastregalloc-tied-undef.mir (70 of 101)
+PASS: LLVM :: CodeGen/X86/fp16-spill.ll (71 of 101)
+PASS: LLVM :: CodeGen/X86/hoist-spill-lpad.ll (72 of 101)
+PASS: LLVM :: CodeGen/X86/hoist-spill.ll (73 of 101)
+PASS: LLVM :: CodeGen/X86/i386-tlscall-fastregalloc.ll (74 of 101)
+PASS: LLVM :: CodeGen/X86/implicit-use-spill.mir (75 of 101)
+PASS: LLVM :: CodeGen/X86/inline-spiller-impdef-on-implicit-def-regression.ll (76 of 101)
+PASS: LLVM :: CodeGen/X86/ins_split_regalloc.ll (77 of 101)
+PASS: LLVM :: CodeGen/X86/liveness-local-regalloc.ll (78 of 101)
+PASS: LLVM :: CodeGen/X86/phys-reg-local-regalloc.ll (79 of 101)
+PASS: LLVM :: CodeGen/X86/ragreedy-hoist-spill.ll (80 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-advanced-split-cost.ll (81 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-copy-hints.mir (82 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-fast-missing-live-out-spill.mir (83 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-fp.ll (84 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-reconcile-broken-hints.ll (85 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-spill-at-ehpad.ll (86 of 101)
+PASS: LLVM :: CodeGen/X86/regalloc-tight-invoke.ll (87 of 101)
+PASS: LLVM :: CodeGen/X86/regallocfast-implicit-def-live-out.mir (88 of 101)
+PASS: LLVM :: CodeGen/X86/speculative-load-hardening-no-spill.ll (89 of 101)
+PASS: LLVM :: CodeGen/X86/ssp-guard-spill.ll (90 of 101)
+PASS: LLVM :: CodeGen/X86/regallocfast-undef-tied-use.mir (91 of 101)
+PASS: LLVM :: CodeGen/X86/setjmp-spills.ll (92 of 101)
+PASS: LLVM :: CodeGen/X86/statepoint-spill-lowering.ll (93 of 101)
+PASS: LLVM :: CodeGen/X86/statepoint-spill-slot-size-promotion.ll (94 of 101)
+PASS: LLVM :: CodeGen/X86/statepoint-fastregalloc.mir (95 of 101)
+PASS: LLVM :: CodeGen/X86/statepoint-invoke-ra-inline-spiller.mir (96 of 101)
+PASS: LLVM :: CodeGen/X86/statepoint-vector-bad-spill.ll (97 of 101)
+PASS: LLVM :: CodeGen/X86/unaligned-spill-folding.ll (98 of 101)
+PASS: LLVM :: CodeGen/X86/virtreg-physreg-def-regallocfast.mir (99 of 101)
+PASS: LLVM :: CodeGen/X86/win32-spill-xmm.ll (100 of 101)
+PASS: LLVM :: CodeGen/X86/x86-64-xmm-spill-unaligned.ll (101 of 101)
+
+Testing Time: 1.96s
+
+Total Discovered Tests: 9956
+  Excluded         : 9855 (98.99%)
+  Passed           :  100 (1.00%)
+  Expectedly Failed:    1 (0.01%)

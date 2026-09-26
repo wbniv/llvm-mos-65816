@@ -1,0 +1,296 @@
+[
+  {
+    "patch": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "index": 0,
+    "command": "not /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "index": 1,
+    "command": "not /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=1 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "index": 2,
+    "command": "not /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0056-llvm-gisel-inline-asm-register-bounds.patch",
+    "index": 3,
+    "command": "not /home/will/llvm-mos-65816/build/inlineasm-bounds-fix/llc -mtriple=aarch64 -global-isel -global-isel-abort=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0056-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+    "index": 0,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0057-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0057-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0057-llvm-selectiondag-inline-asm-register-bounds.patch",
+    "index": 1,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-inlineasm-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0057-regression.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0057-regression.ll",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 0,
+    "command": "split-file /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 1,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/input-r.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 2,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/input-r.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 3,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/input-x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-X",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 4,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/input-x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-X",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 5,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/output-r.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 6,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/output-r.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 7,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/output-x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-X",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 8,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/output-x.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-X",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 9,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/tied.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 10,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/tied.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 11,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/indirect.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 12,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/indirect.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 13,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/callbr.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 14,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/callbr.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=OUTPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 15,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/callbr-input.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 16,
+    "command": "not /home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/callbr-input.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll --check-prefix=INPUT-R",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 17,
+    "command": "/home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/supported.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0058-aarch64-inline-asm-unknown-type.patch",
+    "index": 18,
+    "command": "/home/will/llvm-mos-65816/build/aarch64-asm-type-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0058-regression.ll.tmp/supported.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 0,
+    "command": "split-file /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 1,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/input-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 2,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/input-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 3,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/output-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 4,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/output-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 5,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/indirect-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 6,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/indirect-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 7,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/tied-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 8,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/tied-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 9,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 10,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 11,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-input-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 12,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-input-8.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 13,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/input-2.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=LOSSY",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 14,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/input-2.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=LOSSY",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 15,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-input-2.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=LOSSY",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 16,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/callbr-input-2.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=LOSSY",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 17,
+    "command": "not /home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs -stop-after=finalize-isel /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/original.ll -o /dev/null 2>&1 | FileCheck /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll --check-prefix=PARTS",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 18,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/supported.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 19,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -mattr=-neon -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/scalarized.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 20,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O0 -mattr=+ls64 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/ls64.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 21,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/supported.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 22,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -mattr=-neon -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/scalarized.ll -o /dev/null",
+    "exit": 0
+  },
+  {
+    "patch": "patches/llvm-mos/0059-llvm-selectiondag-vector-asm-parts.patch",
+    "index": 23,
+    "command": "/home/will/llvm-mos-65816/build/selectiondag-vector-parts-fix/llc -mtriple=aarch64 -global-isel=0 -O2 -mattr=+ls64 -verify-machineinstrs /home/will/llvm-mos-65816/build/post-ready-review-inline/0059-regression.ll.tmp/ls64.ll -o /dev/null",
+    "exit": 0
+  }
+]

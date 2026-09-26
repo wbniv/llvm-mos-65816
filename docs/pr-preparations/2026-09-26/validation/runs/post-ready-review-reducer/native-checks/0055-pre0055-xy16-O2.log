@@ -1,0 +1,1 @@
+LLVM ERROR: unable to legalize instruction: %55:_(s64) = G_ANYEXT %45:_(s8) (in function: extend_masked)

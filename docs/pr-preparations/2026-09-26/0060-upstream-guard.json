@@ -1,0 +1,39 @@
+{
+  "commit": {
+    "author": {
+      "date": "2026-09-24T17:24:49Z",
+      "email": "Matthew.Arsenault@amd.com",
+      "name": "Matt Arsenault"
+    },
+    "committer": {
+      "date": "2026-09-24T17:24:49Z",
+      "email": "noreply@github.com",
+      "name": "GitHub"
+    },
+    "message": "llvm-reduce: Error on -j with MIR inputs (#226225)\n\nParallel chunk processing distributes work by serializing the program to\nbitcode and reparsing it in each worker thread. Bitcode cannot represent\nMachineFunctions, so readBitcode leaves ReducerWorkItem::MMI null and\nthe reparsed item reports isMIR() == false. The delta pass list is still the\nMIR one, chosen from the original program, so the worker runs a MIR pass\nover an item with no MachineModuleInfo and dereferences null.\n\nThis broke every MIR reduction using -j > 1, though not immediately: the\nparallel path is only taken once there is more than one chunk left to\nprocess, so the crash appeared after the first granularity increase.\n\nReject the combination up front instead of crashing partway through a\nreduction. Supporting it would mean exchanging MIR text rather than\nbitcode, and giving each worker its own TargetMachine.\n\nCo-Authored-By: Claude Opus 5 <noreply@anthropic.com>"
+  },
+  "files": [
+    {
+      "filename": "llvm/test/tools/llvm-reduce/mir/parallel-jobs-unsupported.mir",
+      "patch": "@@ -0,0 +1,10 @@\n+# RUN: not llvm-reduce -j 4 --test FileCheck %s -o %t 2>&1 | FileCheck -check-prefix=ERR %s\n+# RUN: not llvm-reduce -j 4 -x=mir --test FileCheck %s -o %t 2>&1 | FileCheck -check-prefix=ERR %s\n+\n+# ERR: {{.*}}llvm-reduce{{.*}}: -j is not supported for MIR reduction\n+\n+---\n+name: f\n+body: |\n+  bb.0:\n+...",
+      "status": "added"
+    },
+    {
+      "filename": "llvm/tools/llvm-reduce/deltas/Delta.cpp",
+      "patch": "@@ -60,6 +60,8 @@ static cl::opt<unsigned> NumJobs(\n unsigned NumJobs = 1;\n #endif\n \n+unsigned llvm::getNumChunkProcessingJobs() { return NumJobs; }\n+\n static StringLiteral SeparatorLine =\n     \"--------------------------------------------------------------------------\"\n     \"------\\n\";",
+      "status": "modified"
+    },
+    {
+      "filename": "llvm/tools/llvm-reduce/deltas/Delta.h",
+      "patch": "@@ -124,6 +124,9 @@ using ReductionFunc = function_ref<void(Oracle &, ReducerWorkItem &)>;\n /// Other implementations of the Delta Debugging algorithm can also be found in\n /// the CReduce, Delta, and Lithium projects.\n void runDeltaPass(TestRunner &Test, const DeltaPass &Pass);\n+\n+/// Returns the number of threads requested with -j to process chunks with.\n+unsigned getNumChunkProcessingJobs();\n } // namespace llvm\n \n #endif",
+      "status": "modified"
+    },
+    {
+      "filename": "llvm/tools/llvm-reduce/llvm-reduce.cpp",
+      "patch": "@@ -15,6 +15,7 @@\n #include \"DeltaManager.h\"\n #include \"ReducerWorkItem.h\"\n #include \"TestRunner.h\"\n+#include \"deltas/Delta.h\"\n #include \"llvm/Bitcode/BitcodeReader.h\"\n #include \"llvm/CodeGen/CommandFlags.h\"\n #include \"llvm/Support/CommandLine.h\"\n@@ -176,6 +177,14 @@ int main(int Argc, char **Argv) {\n     return 1;\n   }\n \n+  // Chunks are handed to worker threads by round tripping the program through\n+  // bitcode, which cannot represent MachineFunctions.\n+  if (ReduceModeMIR && getNumChunkProcessingJobs() > 1) {\n+    WithColor::error(errs(), ToolName)\n+        << \"-j is not supported for MIR reduction\\n\";\n+    return 1;\n+  }\n+\n   if (!PreserveDebugEnvironment)\n     disableEnvironmentDebugFeatures();\n ",
+      "status": "modified"
+    }
+  ],
+  "html_url": "https://github.com/llvm/llvm-project/commit/b1ba3d515a0238adbfc6c349ed3b33f9060cea72",
+  "sha": "b1ba3d515a0238adbfc6c349ed3b33f9060cea72"
+}
