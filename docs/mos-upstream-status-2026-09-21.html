@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="201f4e0b01c7776977dde8499dd3737ba94aae25629273210a73fdef472c21f2"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="fd0558625e09c9578b57832f17dc8e8fa394e1f7e2210659d1080f44467466a6"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
@@ -1006,16 +1006,30 @@ fixup-table count check to 0046, and removes the unintended <code>addrasciz()</c
 extension from 0047. The revised artifacts apply to the pin and pass their
 integrated tests; refresh their isolated validation and prepare submission
 branches before posting. Earlier binary hashes apply only to earlier revisions.</p>
-<p><a href="plans/2026-09-24-asmprinter-long-address.md">0044</a>, the 24-bit address printer,
-still needs its standalone PR body and pinned-base validation bundle. <code>0045</code>
-(native-width immediates) and <code>0048</code> (far-codegen tests) remain fork-specific.
-Independent compiler submissions do not wait for SNES platform merge; the
-platform/runtime prerequisites remain in the <a href="#snes--separate-platform-track">separate tracker</a>.</p>
+<p><a href="upstream-asm-print-long-address-pr.md">0044</a>, the 24-bit address printer, has a PR
+draft and a pinned-base validation record. It applies standalone against the pin
+(<code>git apply --check</code> clean, either before or after <code>0039</code>), and its new test
+(<code>MC/MOS/long-address-roundtrip-65816.s</code>) fails before the fix and passes after. Applied
+<em>alone</em>, isolated-build evidence shows the printer half already works but the
+round-trip half does not — a small constant under <code>mos24(...)</code> still re-parses to
+<strong>zero page</strong> (worse than the original absolute-mode narrowing) without patch <code>0039</code>
+(the parser-side width-modifier fix) also applied; with both, every case round-trips
+byte-for-byte and the full MOS lit suites pass 121/122 (1 unsupported, 0 failed).
+<a href="pr-preparations/2026-09-26/0044-validation.md">Validation</a>. Breaking commit:
+<a href="https://github.com/llvm-mos/llvm-mos/commit/19ea9eab486f7bd784f2c4b80cba759044ca5740">19ea9eab4</a>
+(&quot;Add MC instructions, relocations, and disassembler support for 65816.&quot;, 2022-02-10),
+which added the long addressing modes without ever giving the <code>addr24</code> operand class a
+<code>PrintMethod</code>. <strong>This PR should be reviewed/merged alongside or after 0039</strong>, since its
+round-trip test needs 0039's fix to pass. <code>0045</code> (native-width immediates) and <code>0048</code>
+(far-codegen tests) remain fork-specific. Independent compiler submissions do not wait
+for SNES platform merge; the platform/runtime prerequisites remain in the
+<a href="#snes--separate-platform-track">separate tracker</a>.</p>
 <p>When the revised branches and standalone checks are ready, the posting commands
 are (posting remains user-triggered):</p>
 <pre><code class="language-sh">gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Reject inline-asm operands wider than a named data register&quot; --body-file docs/upstream-inline-asm-physreg-width-pr.md
 gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Complete and check the fixup information table&quot; --body-file docs/upstream-fixupkinds-addrasciz-row-pr.md
 gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Preserve symbolic .mos_addr_asciz directives in text output&quot; --body-file docs/upstream-mc-addr-asciz-symbolic-crash-pr.md
+gh pr create --repo llvm-mos/llvm-mos --title &quot;[MOS] Print an explicit width on 24-bit address operands&quot; --body-file docs/upstream-asm-print-long-address-pr.md
 </code></pre>
 <h2 id="current-pr-progress">Current PR progress</h2>
 <table>

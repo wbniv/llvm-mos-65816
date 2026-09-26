@@ -109,7 +109,7 @@
       "receipt": {
         "sources": {
           "docs/upstream-pending-work.md": "cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b",
-          "docs/upstream-contribution-status.md": "081e6a2a544e91979c4ca34288c948ec13657f47c510bcb8132a596a987789bd",
+          "docs/upstream-contribution-status.md": "d2e565d22814ae70ea96e84f21585cc2ee9c8cdeb303c3a6b5d3f2a815542062",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
@@ -117,7 +117,7 @@
         },
         "outputs": {
           "docs/mos-upstream-flowchart.html": "68f8cfb24132ad636c4b5fb982fe1e56b65e90f9a05e228f62ca2dd1d0b571a2",
-          "docs/mos-upstream-status-2026-09-21.html": "93e5b3a27f039ce742105b2d197f688c3e28da36b64e02b10f3aab18ccfa155a"
+          "docs/mos-upstream-status-2026-09-21.html": "aa7594f39700abdb5936efc5dd585047c2a8f1032f6e0004d80daf70b58acfc9"
         }
       }
     },

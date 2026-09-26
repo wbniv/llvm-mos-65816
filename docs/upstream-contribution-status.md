@@ -168,11 +168,24 @@ extension from 0047. The revised artifacts apply to the pin and pass their
 integrated tests; refresh their isolated validation and prepare submission
 branches before posting. Earlier binary hashes apply only to earlier revisions.
 
-[0044](plans/2026-09-24-asmprinter-long-address.md), the 24-bit address printer,
-still needs its standalone PR body and pinned-base validation bundle. `0045`
-(native-width immediates) and `0048` (far-codegen tests) remain fork-specific.
-Independent compiler submissions do not wait for SNES platform merge; the
-platform/runtime prerequisites remain in the [separate tracker](upstream-pending-work.md#snes--separate-platform-track).
+[0044](upstream-asm-print-long-address-pr.md), the 24-bit address printer, has a PR
+draft and a pinned-base validation record. It applies standalone against the pin
+(`git apply --check` clean, either before or after `0039`), and its new test
+(`MC/MOS/long-address-roundtrip-65816.s`) fails before the fix and passes after. Applied
+*alone*, isolated-build evidence shows the printer half already works but the
+round-trip half does not — a small constant under `mos24(...)` still re-parses to
+**zero page** (worse than the original absolute-mode narrowing) without patch `0039`
+(the parser-side width-modifier fix) also applied; with both, every case round-trips
+byte-for-byte and the full MOS lit suites pass 121/122 (1 unsupported, 0 failed).
+[Validation](pr-preparations/2026-09-26/0044-validation.md). Breaking commit:
+[19ea9eab4](https://github.com/llvm-mos/llvm-mos/commit/19ea9eab486f7bd784f2c4b80cba759044ca5740)
+("Add MC instructions, relocations, and disassembler support for 65816.", 2022-02-10),
+which added the long addressing modes without ever giving the `addr24` operand class a
+`PrintMethod`. **This PR should be reviewed/merged alongside or after 0039**, since its
+round-trip test needs 0039's fix to pass. `0045` (native-width immediates) and `0048`
+(far-codegen tests) remain fork-specific. Independent compiler submissions do not wait
+for SNES platform merge; the platform/runtime prerequisites remain in the
+[separate tracker](upstream-pending-work.md#snes--separate-platform-track).
 
 When the revised branches and standalone checks are ready, the posting commands
 are (posting remains user-triggered):
@@ -181,6 +194,7 @@ are (posting remains user-triggered):
 gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Reject inline-asm operands wider than a named data register" --body-file docs/upstream-inline-asm-physreg-width-pr.md
 gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Complete and check the fixup information table" --body-file docs/upstream-fixupkinds-addrasciz-row-pr.md
 gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Preserve symbolic .mos_addr_asciz directives in text output" --body-file docs/upstream-mc-addr-asciz-symbolic-crash-pr.md
+gh pr create --repo llvm-mos/llvm-mos --title "[MOS] Print an explicit width on 24-bit address operands" --body-file docs/upstream-asm-print-long-address-pr.md
 ```
 
 ## Current PR progress

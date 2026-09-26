@@ -1259,14 +1259,6 @@ _Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/u
   extends the check to named registers, including a C register-variable reproducer.
   Updated integrated tests and pin applicability pass; refresh isolated revision
   validation and prepare the upstream branch. Posting stays user-triggered.
-- [wip T2] <!-- agent:ab109ea0a2517440e --> **Draft the `0044` upstream PR** (AsmPrinter prints an explicit `mos24()` on 24-bit address
-  operands so `-S`/`-save-temps` output re-assembles to the same bytes; landed `5ea5006c`,
-  [plan](docs/plans/2026-09-24-asmprinter-long-address.md)). Upstream-clean — stock 65816, no `+mos-a16`
-  code, its lit test needs no fork patch — but has no PR body, no `docs/pr-preparations/` validation record
-  against the pinned base, and no `docs/upstream-contribution-status.md` entry. Pair it with `0043`'s draft
-  (same template, same session); cite `MC/MOS/long-address-roundtrip-65816.s` as the failing-before test and
-  the `af f0 00 00 → a5 f0` one-shot as the motivating bytes. Reason for T2: 0033/0036 docs are the template;
-  no design. Posting stays user-triggered.
 - [T2] **Finish the `0046` submission preparation.** [PR draft](docs/upstream-fixupkinds-addrasciz-row-pr.md)
   and initial pinned-base validation exist. The September 25 review adds an inferred
   array bound and compile-time row-count check. Refresh isolated revision validation
@@ -1447,6 +1439,11 @@ revisit) rather than active work._
 
 
 ## Done
+
+- ✅ 2026-09-26 — [asmprinter-long-address-pr] Drafted the `0044` upstream PR body +
+  pin-level isolated validation; confirmed by build (not inferred) that `0044` alone
+  still narrows to zero page without `0039`, passes fully once stacked. See
+  [validation](docs/pr-preparations/2026-09-26/0044-validation.md).
 
 - **2026-09-25 — Older-report reproduction and evidence enforcement (OpenAI Codex; original credits retained).** Rechecked narrow-count s64 shifts, reconstructed inline-bitboard pressure, nine existing pressure witnesses, and reentrant semantics. 132 non-LTO/verifier compiles pass; narrow-shift (`0x6A2B`) and inline-bitboard (`0xC074`) runtime probes agree across host/default/a16/xy16 on MAME and a16 on bsnes-jg. The two historical failure reports remain **not reproduced**, pending missing baseline evidence; no new compiler fix is claimed. Added mandatory [evidence/closure rules](docs/howto-defect-evidence.md), three structured status records, and a pre-commit checker with 12 tests. [Full results and limitations](docs/investigations/2026-09-25-older-defect-recheck.md).
 
