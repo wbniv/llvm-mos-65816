@@ -1,11 +1,12 @@
 # Live upstream dashboard on wald3n.com
 
-**Status:** dashboard released as site version `v0.0.432`; diagram and layout
-update released as `v0.0.434` on 2026-09-26.
+**Status:** dashboard released as site version `v0.0.432`; the compiler export
+and matching graph were published in compiler commit `f2be629f` and included in
+site version `v0.0.435` on 2026-09-26.
 The public home is [wald3n.com/open-source](https://wald3n.com/open-source#compiler-upstream).
-The reviewed compiler manifest remains a bundled site copy until the compiler
-repository's export is published; the page labels that source separately from
-its live GitHub check.
+The site refreshes the published compiler manifest from this repository and
+retains a matching bundled copy as a fallback. The page labels the manifest
+source separately from its live GitHub check.
 
 ## Release record
 
@@ -27,16 +28,13 @@ its live GitHub check.
   the Git index, including records staged in the same publication commit;
   unstaged new evidence remains labeled as awaiting publication. Stage the
   evidence before regenerating, and publish the source commit with the export.
-  The site bundles this reviewed export and will
-  use the remote copy after it is published on the compiler repository's main
-  branch.
-- The `v0.0.434` site checkout passed 82 tests, and its production build passed. Desktop
+  The source records and export were published together in `f2be629f`.
+- The `v0.0.435` site checkout passed 82 tests, and its production build passed. Desktop
   and narrow-screen browser previews showed the full page scrolling through the
   compiler section, contribution inventory, and packages. The live deployment
   and endpoint were checked after release.
 
-Remaining follow-up: publish the compiler export with its dependent records,
-then add automated candidate review and cache invalidation from GitHub events.
+Remaining follow-up: add automated candidate review and cache invalidation from GitHub events.
 The site already refreshes GitHub state on requests after the cache interval;
 these follow-ups do not block the released dashboard.
 
@@ -47,9 +45,9 @@ The page now offers a track-based dependency map and a
 graph comes from the Mermaid dependency structure maintained in this repository,
 with reviewed work-item IDs joined to the dashboard's live GitHub status. Its
 source date and the GitHub check time are shown separately. The site also links
-each graph work node to its evidence row. The compiler manifest and graph remain
-bundled site copies until the compiler exports are published together from the
-compiler repository's main branch.
+each graph work node to its evidence row. The compiler manifest is read from
+the published compiler repository, with a bundled fallback; the graph is
+bundled from the same reviewed compiler commit.
 
 The release uses these maintained diagrams and status records:
 
@@ -115,7 +113,7 @@ technical readiness to open a PR and the SDK maintainer's merge prerequisites.
    Remove outdated PR-state assertions from the live graph; preserve them only
    in the dated engineering view. Record any edge whose meaning is ambiguous
    for review rather than turning it into a new blocker.
-3. **Pending:** Publish the graph and manifest together from a reviewed compiler revision.
+3. **Implemented:** Publish the graph and manifest together from a reviewed compiler revision.
    The site must show the graph's source revision and review date separately
    from GitHub's checked time. The current bundled manifest remains the fallback
    if the remote export is unavailable.
@@ -402,3 +400,22 @@ committed-source refresh workflow.
 The first useful release can show a live PR table, explicit local statuses, and
 the accessible dependency list. The interactive chart and scheduled candidate
 review can follow without changing the data contract.
+
+### Release checks recorded 2026-09-26
+
+- **PASS:** The site ran 82 tests and completed its production build with the
+  published 49-item compiler export and matching graph hash.
+- **PASS:** The compiler export tests, graph freshness check, staged defect
+  evidence check, staged document dependency check, and comment-history check
+  passed for compiler commit `f2be629f`.
+- **PASS:** After site release `v0.0.435`, `/open-source`,
+  `/open-source/dependencies`, and `/api/open-source/status` returned HTTP 200.
+  The endpoint reported 49 items, `manifestSource: compiler-repository`,
+  `graph.manifestMatches: true`, and a GitHub REST check at
+  `2026-09-26T02:09:06Z`.
+- **PASS:** Local browser captures showed aligned collapsed and expanded work
+  rows, and the graph rendered with linked work nodes.
+
+Keyboard-only navigation, a browser run with JavaScript disabled, and a forced
+GitHub outage remain follow-up checks for the current release. They were not
+claimed by the completed checks above.

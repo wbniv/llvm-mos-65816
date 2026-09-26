@@ -247,9 +247,9 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958"
         },
-        "reviewed_at": "2026-09-26T01:56:51.918388+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-26T02:10:13.768461+00:00",
+        "note": "Reviewed the dashboard plan after compiler export publication and site v0.0.435 verification; replaced duplicate unverified entries with one specific keyboard, no-JavaScript, and GitHub-outage follow-up. Other TODO status claims were not changed.",
+        "attribution": "OpenAI Codex (version unknown), exact model ID unknown, reasoning effort unknown"
       }
     },
     {
