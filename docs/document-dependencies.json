@@ -207,6 +207,29 @@
           "docs/investigations/2026-09-25-coalescing-0015-revalidation.html": "e939a5595e96728f5318c1dd26925fb3efef8e80b6376d44e1b4b3c1cc8ea1eb"
         }
       }
+    },
+    {
+      "id": "snes-demo-compiler-bug-map",
+      "sources": [
+        "docs/snes-demo-compiler-bug-pages.json",
+        "dev/render-snes-demo-compiler-bug-map.py"
+      ],
+      "outputs": [
+        "docs/snes-demo-compiler-bug-map.md"
+      ],
+      "command": [
+        "python3",
+        "dev/render-snes-demo-compiler-bug-map.py"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/snes-demo-compiler-bug-pages.json": "6106f437ee91b2548f2e313fc7b70d23f94a8f8c330d125fdab4eb6cded210d2",
+          "dev/render-snes-demo-compiler-bug-map.py": "cb48122f019ba7841da974b371854d8cb7d101320c3b8c508ea01ed5c8b8d986"
+        },
+        "outputs": {
+          "docs/snes-demo-compiler-bug-map.md": "7071a599506d8da0a4ee727d34d8007299445730b8ae75892c61a1c1eb1ae398"
+        }
+      }
     }
   ],
   "maintained": [

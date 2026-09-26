@@ -21,6 +21,9 @@ page has its machine-readable `compilerBug` marker, which activates the required
 from that same marker. A later regression-only demo is not registered merely
 because it exercises an earlier fix.
 
+Before an upstream PR is recorded for a discovery, add its reviewed internal PR simulation to the
+registry. The generated discovery map fails if a `prs` entry lacks `pr_simulations`.
+
 For the compiler stress-test battery, passing the host/default/a16/xy16 gate is not the end of the
 per-ROM workflow. Unless the user explicitly says not to publish, “done” also requires this paired
 publication gate, both site builds, both manifest self-checks, and live page/ROM verification.

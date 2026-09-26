@@ -35,6 +35,10 @@ primary PR/issue or investigation links. The paired publisher enforces the
 page marker, which activates that required section, and the gallery derives a bug badge from it.
 Do not mark a later guard-only demo as an original discovery.
 
+Before recording an upstream PR URL for a discovery, create and review an internal PR simulation.
+Record that artifact in the registry's `pr_simulations`; the discovery-map renderer rejects a PR
+without one.
+
 The plan doc (`docs/plans/YYYY-MM-DD-7-snes-<name>.md`) precedes all of them — plan first,
 code second. Number the plan after its battery ID (`#7`, `#11`, `#19`, …).
 
