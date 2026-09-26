@@ -1,0 +1,43 @@
+fatal error: error in backend: unable to legalize instruction: %169:_(s32) = G_MERGE_VALUES %178:_(s8), %180:_(s8), %182:_(s8), %184:_(s8) (in function: f)
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Os -mllvm -verify-machineinstrs -x c /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt -c -o /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/normal.o
+1.	<eof> parser at end of file
+2.	Code generation
+3.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt'.
+4.	Running pass 'Legalizer' on function '@f'
+ #0 0x000062d8e8ed83a8 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x29e03a8)
+ #1 0x000062d8e8ed5685 llvm::sys::RunSignalHandlers() (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x29dd685)
+ #2 0x000062d8e8e4b7ee (anonymous namespace)::CrashRecoveryContextImpl::HandleCrash(int, unsigned long) CrashRecoveryContext.cpp:0:0
+ #3 0x000062d8e8e4b7ab (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x29537ab)
+ #4 0x000062d8e8ed2187 llvm::sys::Process::Exit(int, bool) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x29da187)
+ #5 0x000062d8e81103f6 (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1c183f6)
+ #6 0x000062d8e8e51236 llvm::report_fatal_error(llvm::Twine const&, bool) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x2959236)
+ #7 0x000062d8e8e51418 (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x2959418)
+ #8 0x000062d8ea6314bc (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x41394bc)
+ #9 0x000062d8ea631808 llvm::reportGISelFailure(llvm::MachineFunction&, llvm::MachineOptimizationRemarkEmitter&, char const*, llvm::StringRef, llvm::MachineInstr const&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x4139808)
+#10 0x000062d8ea5cbac6 llvm::Legalizer::runOnMachineFunction(llvm::MachineFunction&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x40d3ac6)
+#11 0x000062d8e84e3433 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1feb433)
+#12 0x000062d8e8a1505a llvm::FPPassManager::runOnFunction(llvm::Function&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x251d05a)
+#13 0x000062d8e8a1b6fc llvm::FPPassManager::runOnModule(llvm::Module&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x25236fc)
+#14 0x000062d8e8a15d89 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x251dd89)
+#15 0x000062d8e95876a5 clang::emitBackendOutput(clang::CompilerInstance&, clang::CodeGenOptions&, llvm::StringRef, llvm::Module*, clang::BackendAction, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>, std::unique_ptr<llvm::raw_pwrite_stream, std::default_delete<llvm::raw_pwrite_stream>>, clang::BackendConsumer*) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x308f6a5)
+#16 0x000062d8e959ca60 clang::BackendConsumer::HandleTranslationUnit(clang::ASTContext&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x30a4a60)
+#17 0x000062d8eae9d5d9 clang::ParseAST(clang::Sema&, bool, bool) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x49a55d9)
+#18 0x000062d8e9ab766d clang::FrontendAction::Execute() (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x35bf66d)
+#19 0x000062d8e9a1ff0b clang::CompilerInstance::ExecuteAction(clang::FrontendAction&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x3527f0b)
+#20 0x000062d8e9b91069 clang::ExecuteCompilerInvocation(clang::CompilerInstance*) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x3699069)
+#21 0x000062d8e810fcfb cc1_main(llvm::ArrayRef<char const*>, char const*, void*) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1c17cfb)
+#22 0x000062d8e810c6d7 ExecuteCC1Tool(llvm::SmallVectorImpl<char const*>&, llvm::ToolContext const&, llvm::IntrusiveRefCntPtr<llvm::vfs::FileSystem>) driver.cpp:0:0
+#23 0x000062d8e810e10d int llvm::function_ref<int (llvm::SmallVectorImpl<char const*>&)>::callback_fn<clang_main(int, char**, llvm::ToolContext const&)::$_0>(long, llvm::SmallVectorImpl<char const*>&) driver.cpp:0:0
+#24 0x000062d8e9869909 void llvm::function_ref<void ()>::callback_fn<clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const::$_0>(long) Job.cpp:0:0
+#25 0x000062d8e8e4b788 llvm::CrashRecoveryContext::RunSafely(llvm::function_ref<void ()>) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x2953788)
+#26 0x000062d8e98692b5 clang::driver::CC1Command::Execute(llvm::ArrayRef<std::optional<llvm::StringRef>>, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>*, bool*) const (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x33712b5)
+#27 0x000062d8e982b2ef clang::driver::Compilation::ExecuteCommand(clang::driver::Command const&, clang::driver::Command const*&, bool) const (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x33332ef)
+#28 0x000062d8e982b48e clang::driver::Compilation::ExecuteJobs(clang::driver::JobList const&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&, bool) const (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x333348e)
+#29 0x000062d8e9846b6d clang::driver::Driver::ExecuteCompilation(clang::driver::Compilation&, llvm::SmallVectorImpl<std::pair<int, clang::driver::Command const*>>&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x334eb6d)
+#30 0x000062d8e810c124 clang_main(int, char**, llvm::ToolContext const&) (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1c14124)
+#31 0x000062d8e811a80d main (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1c2280d)
+#32 0x00007f0d2aa2a601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#33 0x00007f0d2aa2a718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#34 0x000062d8e810a3a5 _start (/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang+0x1c123a5)

@@ -1,0 +1,96 @@
+{
+  "schema": 1,
+  "id": "mos-farblit-byte-load-legalization",
+  "title": "Combined native-width stack rejects a farblit absolute byte load",
+  "status": "confirmed",
+  "summary": "The preserved carry-scheduling baseline and all scheduling candidates reject farblit.c during legalization of an s8 G_LOAD_FAR_ABS at address 8355871. This blocks the farblit runtime gate before scheduling and is not introduced by the carry preference.",
+  "report": "docs/plans/2026-09-26-mos-carry-scheduling.md",
+  "reproducer_origin": "original",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994: observation during carry-scheduling validation and baseline capture. Original fixture attribution remains in the increment-2 plan."
+  ],
+  "unknowns": "The responsible patch interaction is not isolated. The September 25 increment-2 report used an earlier stack and passed; that historical result is retained. No runtime result or repair is claimed.",
+  "prior_work": {
+    "disposition": "distinct_from_related",
+    "search_terms": [
+      "G_LOAD_FAR_ABS",
+      "farblit failure",
+      "tryFarAbsoluteAddressing",
+      "legalizeLoadStore16"
+    ],
+    "related_records": [
+      "docs/defects/mos-carry-scheduling-pressure.json"
+    ],
+    "related_reports": [
+      "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+      "docs/investigations/2026-09-25-far-scalar-split-measurement.md"
+    ],
+    "related_changes": [
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0061-mos-far-global-long-x.patch",
+      "patches/llvm-mos/0062-mos-native-far-word.patch"
+    ],
+    "source_assessment": "Runtime indexed increment 2 and 0049-0063 are present in the captured baseline; far addressing and native word paths are implemented.",
+    "binary_assessment": "The independently preserved baseline compiler is the same rebuilt compiler identified by the carry-scheduling baseline manifest and source diff.",
+    "decision": "A legalization failure on a far byte load is distinct from carry live-range overlap during scheduling; it occurs before that pass. No matching canonical record was found. Keep the causal diagnosis qualified.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/prior-work.json",
+      "sha256": "9b2fc927aca9f111b73928df58f6d0f440bd8c4b96e557faddfb8592ecbe0c75"
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.log",
+      "sha256": "43ac8a275fc184016ca4599a7306372e0af9e24c4f09d429dc6148bf198f0af6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/input.ll",
+      "sha256": "d970ec5eff00a6258d11cc52b0c68b56fdc08e8f5758cdfa9cf6a46bea7a3188"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/pre-legalizer.mir",
+      "sha256": "90e9fb7d424502dab70b63779e179566886c04f1a6102e329c263e9b6455f288"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/prior-work.json",
+      "sha256": "9b2fc927aca9f111b73928df58f6d0f440bd8c4b96e557faddfb8592ecbe0c75"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/runs.json",
+      "sha256": "25c829be27d27ab13ae3849fb5ab06e2a14d8193d9b0d465b192ff7da4909154"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.c.txt",
+      "sha256": "85e06d857f328458d8cf32667a5c186e99e0d5419607b2aa3e5e9595d0569b79"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    }
+  ],
+  "baseline": {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.o",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.log",
+      "sha256": "43ac8a275fc184016ca4599a7306372e0af9e24c4f09d429dc6148bf198f0af6"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction:"
+  }
+}

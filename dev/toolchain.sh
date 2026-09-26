@@ -245,6 +245,8 @@ if [ ! -d "$SRC/.git" ]; then
   # so 0002 can neither absorb nor drop it. Downstream-only — AS2 is not
   # upstream-standalone-testable until the far ABI is blessed.
   apply_patch 0048-mos-far-codegen-lit-tests
+  # Keep the computed-carry scheduling optimization as a standalone patch.
+  apply_patch 0064-mos-computed-carry-scheduling
   # Far memop lowering is in 0002; retain its independent runtime-ABI test.
   apply_patch 0013-320-far-memops \
     --include='llvm/test/CodeGen/MOS/far-memset.ll'

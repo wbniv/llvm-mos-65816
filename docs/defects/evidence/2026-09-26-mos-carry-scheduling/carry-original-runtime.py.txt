@@ -1,0 +1,35 @@
+import sys, os, json, subprocess, hashlib
+from pathlib import Path
+R = Path('/work'); O = R / 'build/carry-original-runtime'; O.mkdir(exist_ok=True)
+sys.path.insert(0, str(R / 'tools'))
+import a16_fuzz as af
+af.SCRATCH = O / 'mame'; af.SCRATCH.mkdir(exist_ok=True)
+indices = [(100,50000,90000),(0,32767,32768),(65535,65536,98303),(32768,32767,1),(90000,90001,90002),(65534,65535,65536)]
+source = '#include <stdint.h>\nextern volatile int32_t i0, i1, i2;\nextern volatile uint32_t out;\nextern void f(void);\nvolatile uint32_t corpus_result;\nstatic const int32_t indices[][3] = {' + ','.join('{' + ','.join(map(str,row)) + '}' for row in indices) + '};\nint main(void) { uint32_t h = 0x93e7a521UL; for (unsigned k=0;k<24;++k) { unsigned j=k%6; i0=indices[j][0]; i1=indices[j][1]; i2=indices[j][2]; f(); h=(h<<1)|(h>>31); h^=out; } corpus_result=h; for (;;) __asm__ volatile("wai"); }\n'
+(O / 'driver.c').write_text(source)
+subprocess.run(['python3', str(R/'tools/gen-farindex-lut-asm.py'), str(O/'table.s')], check=True)
+results=[]
+for shape in ['sum', 'rot']:
+    h=0x93e7a521
+    for k in range(24):
+        a=0
+        for i in indices[k%6]:
+            v=(i+(i>>16))&65535
+            a=a+v if shape=='sum' else (((a<<1)|(a>>31))&0xffffffff)^v
+        h=(((h<<1)|(h>>31))&0xffffffff)^a
+    for label, tool in [('baseline','carry-baseline-install'),('candidate','llvm-mos-install')]:
+        b=R/'build'/tool/'bin'
+        for mode, fs in [('a16',['+mos-a16']),('xy16',['+mos-a16','+mos-xy16'])]:
+            stem=O/(shape+'-'+label+'-'+mode)
+            flags=[v for f in fs for v in ['-Xclang','-target-feature','-Xclang',f]]
+            common=[str(b/'mos-clang'),'--config',str(R/'build/install/bin/mos-snes-hirom.cfg'),'-mcpu=mosw65816','-Os','-fno-lto','-mllvm','-verify-machineinstrs',*flags]
+            src=R/('docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_'+shape+'.c.txt')
+            commands=[common+['-x','c','-c',str(src),'-o',str(stem)+'.o'],common+[str(O/'driver.c'),str(stem)+'.o',str(O/'table.s'),'-Wl,-Map='+str(stem)+'.map','-o',str(stem)+'.sfc'],['python3',str(R/'tools/snes-checksum.py'),'--hirom',str(stem)+'.sfc']]
+            logs=[]
+            for cmd in commands:
+                p=subprocess.run(cmd,capture_output=True,text=True);logs.append({'command':cmd,'exit_code':p.returncode,'stdout':p.stdout,'stderr':p.stderr})
+                if p.returncode: raise RuntimeError(p.stderr)
+            rom=Path(str(stem)+'.sfc');vma,size=af.map_lookup(Path(str(stem)+'.map'),'corpus_result')
+            m=af.run_mame(rom,0x7e0000+vma,h,4); j=af.run_bsnes(rom,vma,4,h)
+            result={'shape':shape,'toolchain':label,'mode':mode,'expected':h,'mame':m,'bsnes':j,'pass':m[0]==j[0]==h,'compiler_sha256':hashlib.sha256((b/'mos-clang').read_bytes()).hexdigest(),'rom_sha256':hashlib.sha256(rom.read_bytes()).hexdigest(),'runs':logs}
+            results.append(result);(O/'results.json').write_text(json.dumps(results,indent=2)+'\n'); print(shape,label,mode,result['pass'],hex(h),m,j,flush=True)

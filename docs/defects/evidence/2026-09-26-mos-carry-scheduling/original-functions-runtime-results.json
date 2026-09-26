@@ -1,0 +1,858 @@
+[
+  {
+    "shape": "sum",
+    "toolchain": "baseline",
+    "mode": "a16",
+    "expected": 2079515236,
+    "mame": [
+      2079515236,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0x7BF2E264 (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2079515236,
+      "SMOKE: PASS off=0x20C len=4 got=0x7BF2E264 (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "rom_sha256": "5474cfee65159eaca17801a5b275dbd06676a5a1b56a5daae75bf5ad23be8278",
+    "runs": [
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x41D3 complement=0xBE2C\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "sum",
+    "toolchain": "baseline",
+    "mode": "xy16",
+    "expected": 2079515236,
+    "mame": [
+      2079515236,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0x7BF2E264 (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2079515236,
+      "SMOKE: PASS off=0x20C len=4 got=0x7BF2E264 (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "rom_sha256": "5474cfee65159eaca17801a5b275dbd06676a5a1b56a5daae75bf5ad23be8278",
+    "runs": [
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-xy16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x41D3 complement=0xBE2C\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "sum",
+    "toolchain": "candidate",
+    "mode": "a16",
+    "expected": 2079515236,
+    "mame": [
+      2079515236,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0x7BF2E264 (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2079515236,
+      "SMOKE: PASS off=0x20C len=4 got=0x7BF2E264 (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc",
+    "rom_sha256": "21b366792bd84b055f73268afd03554438279cc10d574f1daaa85a440ce829fb",
+    "runs": [
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x0C2E complement=0xF3D1\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "sum",
+    "toolchain": "candidate",
+    "mode": "xy16",
+    "expected": 2079515236,
+    "mame": [
+      2079515236,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0x7BF2E264 (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2079515236,
+      "SMOKE: PASS off=0x20C len=4 got=0x7BF2E264 (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc",
+    "rom_sha256": "21b366792bd84b055f73268afd03554438279cc10d574f1daaa85a440ce829fb",
+    "runs": [
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-xy16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x0C2E complement=0xF3D1\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "rot",
+    "toolchain": "baseline",
+    "mode": "a16",
+    "expected": 2937940605,
+    "mame": [
+      2937940605,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0xAF1D6A7D (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2937940605,
+      "SMOKE: PASS off=0x20C len=4 got=0xAF1D6A7D (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "rom_sha256": "a620b95a24a8d7523cf384e465b49e4365790b177a6f65d4abb703ba54b48651",
+    "runs": [
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x31F3 complement=0xCE0C\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "rot",
+    "toolchain": "baseline",
+    "mode": "xy16",
+    "expected": 2937940605,
+    "mame": [
+      2937940605,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0xAF1D6A7D (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2937940605,
+      "SMOKE: PASS off=0x20C len=4 got=0xAF1D6A7D (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "rom_sha256": "a620b95a24a8d7523cf384e465b49e4365790b177a6f65d4abb703ba54b48651",
+    "runs": [
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/carry-baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-xy16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x31F3 complement=0xCE0C\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "rot",
+    "toolchain": "candidate",
+    "mode": "a16",
+    "expected": 2937940605,
+    "mame": [
+      2937940605,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0xAF1D6A7D (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2937940605,
+      "SMOKE: PASS off=0x20C len=4 got=0xAF1D6A7D (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc",
+    "rom_sha256": "41ca13b9515e886d72de86e7c71b3ca71c12a9f3f376bcf355907b69f354acd9",
+    "runs": [
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x086A complement=0xF795\n",
+        "stderr": ""
+      }
+    ]
+  },
+  {
+    "shape": "rot",
+    "toolchain": "candidate",
+    "mode": "xy16",
+    "expected": 2937940605,
+    "mame": [
+      2937940605,
+      "SMOKE: PASS addr=0x7E020C len=4 got=0xAF1D6A7D (ran 180 ticks)"
+    ],
+    "bsnes": [
+      2937940605,
+      "SMOKE: PASS off=0x20C len=4 got=0xAF1D6A7D (ran 240 frames, bsnes-jg)"
+    ],
+    "pass": true,
+    "compiler_sha256": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc",
+    "rom_sha256": "41ca13b9515e886d72de86e7c71b3ca71c12a9f3f376bcf355907b69f354acd9",
+    "runs": [
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-c",
+          "/work/build/carry-original-runtime-a16-driver/driver.c",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.driver.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-x",
+          "c",
+          "-c",
+          "/work/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.o"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/work/build/llvm-mos-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes-hirom.cfg",
+          "-mcpu=mosw65816",
+          "-Os",
+          "-fno-lto",
+          "-mllvm",
+          "-verify-machineinstrs",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-a16",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.driver.o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.o",
+          "/work/build/carry-original-runtime-a16-driver/table.s",
+          "-Wl,-Map=/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.map",
+          "-o",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": "mos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-a16' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang -target-feature' [-Wunused-command-line-argument]\nmos-clang: warning: argument unused during compilation: '-Xclang +mos-xy16' [-Wunused-command-line-argument]\n"
+      },
+      {
+        "command": [
+          "python3",
+          "/work/tools/snes-checksum.py",
+          "--hirom",
+          "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc: hirom size=512KiB devices=4096Kbit map_mode=0x21 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x086A complement=0xF795\n",
+        "stderr": ""
+      }
+    ]
+  }
+]

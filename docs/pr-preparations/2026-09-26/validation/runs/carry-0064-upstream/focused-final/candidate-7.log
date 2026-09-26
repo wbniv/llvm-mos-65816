@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc -mtriple=mos -mcpu=mos65c02 -start-before=machine-scheduler -verify-machineinstrs -o /dev/null /home/will/llvm-mos-65816/.scratch/carry-pr/source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+exit=0

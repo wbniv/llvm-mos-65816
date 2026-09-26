@@ -1,0 +1,58 @@
+[
+  {
+    "command": [
+      "bash",
+      "/work/dev/farindex.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/farbank.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/farblit.sh"
+    ],
+    "exit_code": 1
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/bankwalk.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/a16storebytes.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/a16indirectstore.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/a16shift.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "bash",
+      "/work/dev/a16ashift.sh"
+    ],
+    "exit_code": 0
+  }
+]

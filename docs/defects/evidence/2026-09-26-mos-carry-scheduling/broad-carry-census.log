@@ -1,0 +1,3 @@
+{"optimization": "Os", "mode": "default", "inputs": 409, "paired": 372, "smaller": 295, "larger": 36, "code_changes": 353, "delta": -53829, "unpaired": []}
+{"optimization": "Os", "mode": "a16", "inputs": 409, "paired": 408, "smaller": 73, "larger": 214, "code_changes": 314, "delta": 40483, "unpaired": []}
+{"optimization": "Os", "mode": "xy16", "inputs": 409, "paired": 402, "smaller": 86, "larger": 190, "code_changes": 307, "delta": 6736, "unpaired": ["examples/snes/burning-ship.c", "examples/snes/doom-fire.c", "examples/snes/hdr-bloom.c", "examples/snes/life.c", "examples/snes/newton.c", "examples/snes/rdiff.c"]}

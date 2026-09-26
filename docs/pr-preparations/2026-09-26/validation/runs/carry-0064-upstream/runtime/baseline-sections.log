@@ -1,0 +1,13 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llvm-objdump -h /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.o
+exit=0
+
+/home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.o:	file format elf32-mos
+
+Sections:
+Idx Name            Size     VMA      Type
+  0                 00000000 00000000 
+  1 .strtab         00000075 00000000 
+  2 .text           00000085 00000000 TEXT
+  3 .rela.text      00000108 00000000 
+  4 .note.GNU-stack 00000000 00000000 
+  5 .symtab         00000090 00000000 

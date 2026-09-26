@@ -1,0 +1,68 @@
+[
+  {
+    "optimization": "Os",
+    "mode": "a16",
+    "inputs": 409,
+    "paired": 408,
+    "smaller": 64,
+    "larger": 6,
+    "code_changes": 70,
+    "delta": -8088,
+    "unpaired": []
+  },
+  {
+    "optimization": "Os",
+    "mode": "xy16",
+    "inputs": 409,
+    "paired": 408,
+    "smaller": 62,
+    "larger": 6,
+    "code_changes": 69,
+    "delta": -8059,
+    "unpaired": []
+  },
+  {
+    "optimization": "Os",
+    "mode": "default",
+    "inputs": 409,
+    "paired": 372,
+    "smaller": 220,
+    "larger": 2,
+    "code_changes": 224,
+    "delta": -43332,
+    "unpaired": []
+  },
+  {
+    "optimization": "Oz",
+    "mode": "a16",
+    "inputs": 409,
+    "paired": 404,
+    "smaller": 66,
+    "larger": 2,
+    "code_changes": 69,
+    "delta": -7190,
+    "unpaired": []
+  },
+  {
+    "optimization": "Oz",
+    "mode": "xy16",
+    "inputs": 409,
+    "paired": 404,
+    "smaller": 63,
+    "larger": 4,
+    "code_changes": 68,
+    "delta": -7090,
+    "unpaired": []
+  },
+  {
+    "optimization": "Oz",
+    "mode": "default",
+    "inputs": 409,
+    "paired": 372,
+    "smaller": 226,
+    "larger": 3,
+    "code_changes": 230,
+    "delta": -46317,
+    "unpaired": []
+  }
+]

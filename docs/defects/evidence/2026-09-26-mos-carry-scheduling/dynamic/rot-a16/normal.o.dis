@@ -1,0 +1,264 @@
+
+/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/normal.o:	file format elf32-mos
+
+Disassembly of section .text.f:
+
+00000000 <f>:
+       0: ae 00 00     	ldx	$0                      ; 0x0 <f>
+			00000001:  R_MOS_ADDR16	i0
+       3: 86 00        	stx	$0                      ; 0x0 <f>
+			00000004:  R_MOS_ADDR8	__rc2
+       5: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000006:  R_MOS_ADDR16	i0+0x1
+       8: 06 00        	asl	$0                      ; 0x0 <f>
+			00000009:  R_MOS_ADDR8	__rc2
+       a: a6 00        	ldx	$0                      ; 0x0 <f>
+			0000000b:  R_MOS_ADDR8	__rc2
+       c: 86 00        	stx	$0                      ; 0x0 <f>
+			0000000d:  R_MOS_ADDR8	__rc3
+       e: 2a           	rol
+       f: a8           	tay
+      10: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000011:  R_MOS_ADDR16	i0+0x2
+      13: 2a           	rol
+      14: 85 00        	sta	$0                      ; 0x0 <f>
+			00000015:  R_MOS_ADDR8	__rc6
+      16: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000017:  R_MOS_ADDR16	i0+0x3
+      19: 2a           	rol
+      1a: 85 00        	sta	$0                      ; 0x0 <f>
+			0000001b:  R_MOS_ADDR8	__rc7
+      1c: a2 00        	ldx	#$0
+			0000001d:  R_MOS_ADDR24_SEGMENT_LO	tbl
+      1e: 86 00        	stx	$0                      ; 0x0 <f>
+			0000001f:  R_MOS_ADDR8	__rc2
+      20: 86 00        	stx	$0                      ; 0x0 <f>
+			00000021:  R_MOS_ADDR8	__rc8
+      22: 18           	clc
+      23: a5 00        	lda	$0                      ; 0x0 <f>
+			00000024:  R_MOS_ADDR8	__rc3
+      25: 65 00        	adc	$0                      ; 0x0 <f>
+			00000026:  R_MOS_ADDR8	__rc2
+      27: 85 00        	sta	$0                      ; 0x0 <f>
+			00000028:  R_MOS_ADDR8	__rc4
+      29: a2 00        	ldx	#$0
+			0000002a:  R_MOS_ADDR24_SEGMENT_HI	tbl
+      2b: 86 00        	stx	$0                      ; 0x0 <f>
+			0000002c:  R_MOS_ADDR8	__rc2
+      2d: 86 00        	stx	$0                      ; 0x0 <f>
+			0000002e:  R_MOS_ADDR8	__rc9
+      2f: 98           	tya
+      30: 65 00        	adc	$0                      ; 0x0 <f>
+			00000031:  R_MOS_ADDR8	__rc2
+      32: 85 00        	sta	$0                      ; 0x0 <f>
+			00000033:  R_MOS_ADDR8	__rc5
+      34: a0 00        	ldy	#$0
+			00000035:  R_MOS_ADDR24_BANK	tbl
+      36: 84 00        	sty	$0                      ; 0x0 <f>
+			00000037:  R_MOS_ADDR8	__rc2
+      38: a5 00        	lda	$0                      ; 0x0 <f>
+			00000039:  R_MOS_ADDR8	__rc6
+      3a: 65 00        	adc	$0                      ; 0x0 <f>
+			0000003b:  R_MOS_ADDR8	__rc2
+      3c: 85 00        	sta	$0                      ; 0x0 <f>
+			0000003d:  R_MOS_ADDR8	__rc6
+      3e: a2 00        	ldx	#$0
+      40: 86 00        	stx	$0                      ; 0x0 <f>
+			00000041:  R_MOS_ADDR8	__rc2
+      42: a5 00        	lda	$0                      ; 0x0 <f>
+			00000043:  R_MOS_ADDR8	__rc7
+      44: 65 00        	adc	$0                      ; 0x0 <f>
+			00000045:  R_MOS_ADDR8	__rc2
+      46: 85 00        	sta	$0                      ; 0x0 <f>
+			00000047:  R_MOS_ADDR8	__rc7
+      48: c2 20        	rep	#$20
+      4a: a7 00        	lda	[$0]                    ; 0x0 <f>
+			0000004b:  R_MOS_ADDR8	__rc4
+      4c: 85 00        	sta	$0                      ; 0x0 <f>
+			0000004d:  R_MOS_ADDR8	__rc2
+      4e: e2 20        	sep	#$20
+      50: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000051:  R_MOS_ADDR16	i1
+      53: 0a           	asl
+      54: 85 00        	sta	$0                      ; 0x0 <f>
+			00000055:  R_MOS_ADDR8	__rc5
+      56: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000057:  R_MOS_ADDR16	i1+0x1
+      59: 2a           	rol
+      5a: 85 00        	sta	$0                      ; 0x0 <f>
+			0000005b:  R_MOS_ADDR8	__rc6
+      5c: ad 00 00     	lda	$0                      ; 0x0 <f>
+			0000005d:  R_MOS_ADDR16	i1+0x2
+      5f: 2a           	rol
+      60: 85 00        	sta	$0                      ; 0x0 <f>
+			00000061:  R_MOS_ADDR8	__rc7
+      62: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000063:  R_MOS_ADDR16	i1+0x3
+      65: 2a           	rol
+      66: 85 00        	sta	$0                      ; 0x0 <f>
+			00000067:  R_MOS_ADDR8	__rc10
+      68: 18           	clc
+      69: a5 00        	lda	$0                      ; 0x0 <f>
+			0000006a:  R_MOS_ADDR8	__rc5
+      6b: 65 00        	adc	$0                      ; 0x0 <f>
+			0000006c:  R_MOS_ADDR8	__rc8
+      6d: 85 00        	sta	$0                      ; 0x0 <f>
+			0000006e:  R_MOS_ADDR8	__rc4
+      6f: a5 00        	lda	$0                      ; 0x0 <f>
+			00000070:  R_MOS_ADDR8	__rc6
+      71: 65 00        	adc	$0                      ; 0x0 <f>
+			00000072:  R_MOS_ADDR8	__rc9
+      73: 85 00        	sta	$0                      ; 0x0 <f>
+			00000074:  R_MOS_ADDR8	__rc5
+      75: 84 00        	sty	$0                      ; 0x0 <f>
+			00000076:  R_MOS_ADDR8	__rc6
+      77: a5 00        	lda	$0                      ; 0x0 <f>
+			00000078:  R_MOS_ADDR8	__rc7
+      79: 65 00        	adc	$0                      ; 0x0 <f>
+			0000007a:  R_MOS_ADDR8	__rc6
+      7b: 85 00        	sta	$0                      ; 0x0 <f>
+			0000007c:  R_MOS_ADDR8	__rc6
+      7d: 86 00        	stx	$0                      ; 0x0 <f>
+			0000007e:  R_MOS_ADDR8	__rc7
+      7f: a5 00        	lda	$0                      ; 0x0 <f>
+			00000080:  R_MOS_ADDR8	__rc10
+      81: 65 00        	adc	$0                      ; 0x0 <f>
+			00000082:  R_MOS_ADDR8	__rc7
+      83: 85 00        	sta	$0                      ; 0x0 <f>
+			00000084:  R_MOS_ADDR8	__rc7
+      85: c2 20        	rep	#$20
+      87: a7 00        	lda	[$0]                    ; 0x0 <f>
+			00000088:  R_MOS_ADDR8	__rc4
+      89: 85 00        	sta	$0                      ; 0x0 <f>
+			0000008a:  R_MOS_ADDR8	__rc4
+      8b: e2 20        	sep	#$20
+      8d: ad 00 00     	lda	$0                      ; 0x0 <f>
+			0000008e:  R_MOS_ADDR16	i2
+      90: 0a           	asl
+      91: 85 00        	sta	$0                      ; 0x0 <f>
+			00000092:  R_MOS_ADDR8	__rc6
+      93: ad 00 00     	lda	$0                      ; 0x0 <f>
+			00000094:  R_MOS_ADDR16	i2+0x1
+      96: 2a           	rol
+      97: 85 00        	sta	$0                      ; 0x0 <f>
+			00000098:  R_MOS_ADDR8	__rc7
+      99: ad 00 00     	lda	$0                      ; 0x0 <f>
+			0000009a:  R_MOS_ADDR16	i2+0x2
+      9c: 2a           	rol
+      9d: 85 00        	sta	$0                      ; 0x0 <f>
+			0000009e:  R_MOS_ADDR8	__rc8
+      9f: ad 00 00     	lda	$0                      ; 0x0 <f>
+			000000a0:  R_MOS_ADDR16	i2+0x3
+      a2: 2a           	rol
+      a3: 85 00        	sta	$0                      ; 0x0 <f>
+			000000a4:  R_MOS_ADDR8	__rc9
+      a5: 18           	clc
+      a6: a9 00        	lda	#$0
+			000000a7:  R_MOS_ADDR24_SEGMENT_LO	tbl
+      a8: 65 00        	adc	$0                      ; 0x0 <f>
+			000000a9:  R_MOS_ADDR8	__rc6
+      aa: 85 00        	sta	$0                      ; 0x0 <f>
+			000000ab:  R_MOS_ADDR8	__rc12
+      ac: a9 00        	lda	#$0
+			000000ad:  R_MOS_ADDR24_SEGMENT_HI	tbl
+      ae: 65 00        	adc	$0                      ; 0x0 <f>
+			000000af:  R_MOS_ADDR8	__rc7
+      b0: 85 00        	sta	$0                      ; 0x0 <f>
+			000000b1:  R_MOS_ADDR8	__rc13
+      b2: a9 00        	lda	#$0
+			000000b3:  R_MOS_ADDR24_BANK	tbl
+      b4: 65 00        	adc	$0                      ; 0x0 <f>
+			000000b5:  R_MOS_ADDR8	__rc8
+      b6: 85 00        	sta	$0                      ; 0x0 <f>
+			000000b7:  R_MOS_ADDR8	__rc14
+      b8: 8a           	txa
+      b9: 65 00        	adc	$0                      ; 0x0 <f>
+			000000ba:  R_MOS_ADDR8	__rc9
+      bb: 85 00        	sta	$0                      ; 0x0 <f>
+			000000bc:  R_MOS_ADDR8	__rc15
+      bd: c2 20        	rep	#$20
+      bf: a7 00        	lda	[$0]                    ; 0x0 <f>
+			000000c0:  R_MOS_ADDR8	__rc12
+      c1: 85 00        	sta	$0                      ; 0x0 <f>
+			000000c2:  R_MOS_ADDR8	__rc6
+      c3: e2 20        	sep	#$20
+      c5: a5 00        	lda	$0                      ; 0x0 <f>
+			000000c6:  R_MOS_ADDR8	__rc2
+      c7: 0a           	asl
+      c8: 26 00        	rol	$0                      ; 0x0 <f>
+			000000c9:  R_MOS_ADDR8	__rc3
+      ca: 64 00        	stz	$0                      ; 0x0 <f>
+			000000cb:  R_MOS_ADDR8	__rc2
+      cc: 64 00        	stz	$0                      ; 0x0 <f>
+			000000cd:  R_MOS_ADDR8	__rc8
+      ce: 26 00        	rol	$0                      ; 0x0 <f>
+			000000cf:  R_MOS_ADDR8	__rc8
+      d0: 64 00        	stz	$0                      ; 0x0 <f>
+			000000d1:  R_MOS_ADDR8	__rc9
+      d2: 26 00        	rol	$0                      ; 0x0 <f>
+			000000d3:  R_MOS_ADDR8	__rc9
+      d4: 0a           	asl
+      d5: 26 00        	rol	$0                      ; 0x0 <f>
+			000000d6:  R_MOS_ADDR8	__rc3
+      d7: 26 00        	rol	$0                      ; 0x0 <f>
+			000000d8:  R_MOS_ADDR8	__rc8
+      d9: 26 00        	rol	$0                      ; 0x0 <f>
+			000000da:  R_MOS_ADDR8	__rc9
+      db: 06 00        	asl	$0                      ; 0x0 <f>
+			000000dc:  R_MOS_ADDR8	__rc4
+      dd: 26 00        	rol	$0                      ; 0x0 <f>
+			000000de:  R_MOS_ADDR8	__rc5
+      df: 64 00        	stz	$0                      ; 0x0 <f>
+			000000e0:  R_MOS_ADDR8	__rc10
+      e1: 26 00        	rol	$0                      ; 0x0 <f>
+			000000e2:  R_MOS_ADDR8	__rc10
+      e3: 26 00        	rol	$0                      ; 0x0 <f>
+			000000e4:  R_MOS_ADDR8	__rc2
+      e5: a6 00        	ldx	$0                      ; 0x0 <f>
+			000000e6:  R_MOS_ADDR8	__rc2
+      e7: 86 00        	stx	$0                      ; 0x0 <f>
+			000000e8:  R_MOS_ADDR8	__rc11
+      e9: 85 00        	sta	$0                      ; 0x0 <f>
+			000000ea:  R_MOS_ADDR8	__rc2
+      eb: c2 20        	rep	#$20
+      ed: a5 00        	lda	$0                      ; 0x0 <f>
+			000000ee:  R_MOS_ADDR8	__rc4
+      ef: 45 00        	eor	$0                      ; 0x0 <f>
+			000000f0:  R_MOS_ADDR8	__rc2
+      f1: 85 00        	sta	$0                      ; 0x0 <f>
+			000000f2:  R_MOS_ADDR8	__rc2
+      f3: a5 00        	lda	$0                      ; 0x0 <f>
+			000000f4:  R_MOS_ADDR8	__rc10
+      f5: 45 00        	eor	$0                      ; 0x0 <f>
+			000000f6:  R_MOS_ADDR8	__rc8
+      f7: 85 00        	sta	$0                      ; 0x0 <f>
+			000000f8:  R_MOS_ADDR8	__rc4
+      f9: a5 00        	lda	$0                      ; 0x0 <f>
+			000000fa:  R_MOS_ADDR8	__rc2
+      fb: 45 00        	eor	$0                      ; 0x0 <f>
+			000000fc:  R_MOS_ADDR8	__rc6
+      fd: 85 00        	sta	$0                      ; 0x0 <f>
+			000000fe:  R_MOS_ADDR8	__rc2
+      ff: a5 00        	lda	$0                      ; 0x0 <f>
+			00000100:  R_MOS_ADDR8	__rc4
+     101: 49 00 00     	eor	#mos16($0)
+     104: 85 00        	sta	$0                      ; 0x0 <f>
+			00000105:  R_MOS_ADDR8	__rc4
+     106: e2 20        	sep	#$20
+     108: a6 00        	ldx	$0                      ; 0x0 <f>
+			00000109:  R_MOS_ADDR8	__rc2
+     10a: 8e 00 00     	stx	$0                      ; 0x0 <f>
+			0000010b:  R_MOS_ADDR16	out
+     10d: a6 00        	ldx	$0                      ; 0x0 <f>
+			0000010e:  R_MOS_ADDR8	__rc3
+     10f: 8e 00 00     	stx	$0                      ; 0x0 <f>
+			00000110:  R_MOS_ADDR16	out+0x1
+     112: a6 00        	ldx	$0                      ; 0x0 <f>
+			00000113:  R_MOS_ADDR8	__rc4
+     114: 8e 00 00     	stx	$0                      ; 0x0 <f>
+			00000115:  R_MOS_ADDR16	out+0x2
+     117: a6 00        	ldx	$0                      ; 0x0 <f>
+			00000118:  R_MOS_ADDR8	__rc5
+     119: 8e 00 00     	stx	$0                      ; 0x0 <f>
+			0000011a:  R_MOS_ADDR16	out+0x3
+     11c: 60           	rts

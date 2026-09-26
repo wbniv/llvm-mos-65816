@@ -1,0 +1,43 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc -mtriple=mos -mcpu=mos65ce02 -run-pass=machine-scheduler -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-pr/source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir | /home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-pr/source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+exit=1
+/home/will/llvm-mos-65816/.scratch/carry-pr/source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir:41:14: error: CHECK-NOT: excluded string found in input
+# CHECK-NOT: ADC
+             ^
+<stdin>:104:29: note: found here
+ %0:ac, %6:cc, dead %7:vc = ADCImm %0, 23, %4
+                            ^~~
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/.scratch/carry-pr/source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          .
+          .
+          .
+         98:  %0:ac = LDAbs 20480 
+         99:  %1:ac = LDAbs 20481 
+        100:  %2:ac = LDAbs 20482 
+        101:  %3:ac = LDAbs 20483 
+        102:  %4:cc = LDImm1 0 
+        103:  %0:ac, %5:cc = ASL %0 
+not:41'0                       {      search range start (exclusive)
+        104:  %0:ac, %6:cc, dead %7:vc = ADCImm %0, 23, %4 
+not:41'1                                 !~~                 error: no match expected
+        105:  %1:ac, %5:cc = ROL %1, %5 
+        106:  %1:ac, %8:cc, dead %9:vc = ADCImm %1, 45, %6 
+        107:  %2:ac, %5:cc = ROL %2, %5 
+        108:  %2:ac, %10:cc, dead %11:vc = ADCImm %2, 67, %8 
+        109:  %3:ac, dead %5:cc = ROL %3, %5 
+not:41'2             }                         search range end (exclusive)
+        110:  %3:ac, dead %12:cc, dead %13:vc = ADCImm %3, 0, %10 
+        111:  STAbs %0, 20736 
+        112:  STAbs %1, 20737 
+        113:  STAbs %2, 20738 
+        114:  STAbs %3, 20739 
+          .
+          .
+          .
+>>>>>>

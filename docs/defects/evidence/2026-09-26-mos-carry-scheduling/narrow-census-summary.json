@@ -1,0 +1,24 @@
+[
+  {
+    "optimization": "Os",
+    "mode": "a16",
+    "inputs": 409,
+    "paired": 408,
+    "smaller": 80,
+    "larger": 144,
+    "code_changes": 248,
+    "delta": -2400,
+    "unpaired": []
+  },
+  {
+    "optimization": "Os",
+    "mode": "xy16",
+    "inputs": 409,
+    "paired": 408,
+    "smaller": 82,
+    "larger": 142,
+    "code_changes": 248,
+    "delta": -2526,
+    "unpaired": []
+  }
+]

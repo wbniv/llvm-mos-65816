@@ -1,0 +1,67 @@
+[
+  {
+    "original": "examples/snes/corpus/arith.c",
+    "adapted": "build/carry-6502-src/arith.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/control.c",
+    "adapted": "build/carry-6502-src/control.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/arrays.c",
+    "adapted": "build/carry-6502-src/arrays.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/structs.c",
+    "adapted": "build/carry-6502-src/structs.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/funcs.c",
+    "adapted": "build/carry-6502-src/funcs.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/globals.c",
+    "adapted": "build/carry-6502-src/globals.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/bitweave_sim.c",
+    "adapted": "build/carry-6502-src/bitweave_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/uarteye_sim.c",
+    "adapted": "build/carry-6502-src/uarteye_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/cordic_sim.c",
+    "adapted": "build/carry-6502-src/cordic_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/lsystem_sim.c",
+    "adapted": "build/carry-6502-src/lsystem_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/rotkal_sim.c",
+    "adapted": "build/carry-6502-src/rotkal_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/ovmatrix_sim.c",
+    "adapted": "build/carry-6502-src/ovmatrix_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  },
+  {
+    "original": "examples/snes/corpus/bitshuffle_sim.c",
+    "adapted": "build/carry-6502-src/bitshuffle_sim.c",
+    "change": "Replace only the final WAI idle instruction with empty volatile inline assembly for NMOS 6502."
+  }
+]

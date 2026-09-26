@@ -1,8 +1,20 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="fd0558625e09c9578b57832f17dc8e8fa394e1f7e2210659d1080f44467466a6"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="95adb5090c7a4b7bf3fd831e2bcdc61e0daccab96961fad29307457449be8fa3"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
 <section id="work"><h1 id="pending-upstream-work-and-dependencies">Pending upstream work and dependencies</h1>
+<p><strong>Computed-carry scheduling (0064):</strong> the <a href="pr-preparations/2026-09-26/0064-pr-body.md">standalone PR packet</a>
+is author-reviewed and validated on llvm-mos <code>7bd67c0ae4e8</code>. Compiler commit
+<code>155e209c4cee</code> is <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">pushed to the fork branch</a>;
+no PR has been opened. Ten focused commands, 132 MOS tests (one unsupported),
+and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
+shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.
+Downstream 1–41-byte losses remain documented. Independent review, cycles and
+compiler overhead remain unclaimed. The <a href="defects/mos-carry-scheduling-pressure.json">generic pressure contract</a>,
+<a href="defects/mos-farblit-byte-load-legalization.json">farblit legalization</a>, and the
+unisolated all-XY16 driver observation remain separate follow-ups. Publication
+of this branch does not submit native-width or SNES platform code.</p>
+<p>Publication: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</p>
 <p>The inherited <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a>
 is now recorded with a preserved failing committed-main baseline. The full
 benchmark returns <code>0xA50F</code> instead of <code>0x5CF0</code>; the precise LTO cause remains
@@ -857,6 +869,18 @@ fixed 20 pass. The compiler remains the local installed MOS compiler.
 the submitted description and commit match the reviewed bundle. Earlier no-publication
 statements describe the research stage. MVN/MVP is now also published as <a href="https://github.com/llvm-mos/llvm-mos/pull/604">compiler #604</a>, head <code>ae3108c31890</code>.</p>
 </section><hr><section id="status"><h1 id="upstream-contribution-status--pr-progress-and-submission-queue">Upstream contribution status — PR progress and submission queue</h1>
+<p><strong>Computed-carry scheduling (0064):</strong> the <a href="pr-preparations/2026-09-26/0064-pr-body.md">standalone PR packet</a>
+is author-reviewed and validated on llvm-mos <code>7bd67c0ae4e8</code>. Compiler commit
+<code>155e209c4cee</code> is <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">pushed to the fork branch</a>;
+no PR has been opened. Ten focused commands, 132 MOS tests (one unsupported),
+and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
+shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.
+Downstream 1–41-byte losses remain documented. Independent review, cycles and
+compiler overhead remain unclaimed. The <a href="defects/mos-carry-scheduling-pressure.json">generic pressure contract</a>,
+<a href="defects/mos-farblit-byte-load-legalization.json">farblit legalization</a>, and the
+unisolated all-XY16 driver observation remain separate follow-ups. Publication
+of this branch does not submit native-width or SNES platform code.</p>
+<p>Publication: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</p>
 <p>The inherited <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a>
 is now recorded with a preserved failing committed-main baseline. The full
 benchmark returns <code>0xA50F</code> instead of <code>0x5CF0</code>; the precise LTO cause remains

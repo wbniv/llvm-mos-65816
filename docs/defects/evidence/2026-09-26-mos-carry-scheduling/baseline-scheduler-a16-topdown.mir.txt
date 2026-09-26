@@ -1,0 +1,256 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir'
+  source_filename = "/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  define void @scale_then_add() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @single_chain() #0 {
+  entry:
+    unreachable
+  }
+  
+  define void @necessary_overlap() #0 {
+  entry:
+    unreachable
+  }
+  
+  attributes #0 = { "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+...
+---
+name:            scale_then_add
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 4, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 5, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 6, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 7, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 8, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 9, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 10, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 11, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 12, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 13, class: vc, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %4:cc = LDImm1 0
+    %0:ac = LDAbs 1000
+    %0:ac, %5:cc = ASL %0
+    %0:ac, %6:cc, dead %7:vc = ADCImm %0, 23, %4
+    %1:ac = LDAbs 1001
+    %1:ac, %5:cc = ROL %1, %5
+    %1:ac, %8:cc, dead %9:vc = ADCImm %1, 45, %6
+    %2:ac = LDAbs 1002
+    %2:ac, %5:cc = ROL %2, %5
+    %2:ac, %10:cc, dead %11:vc = ADCImm %2, 67, %8
+    %3:ac = LDAbs 1003
+    %3:ac, dead %5:cc = ROL %3, %5
+    %3:ac, dead %12:cc, dead %13:vc = ADCImm %3, 0, %10
+    STAbs %0, 2000
+    STAbs %1, 2001
+    STAbs %2, 2002
+    STAbs %3, 2003
+    RTS
+...
+---
+name:            single_chain
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 2, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 3, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 4, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 5, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 6, class: vc, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:ac = LDAbs 1000
+    %1:ac = LDAbs 1001
+    %2:cc = LDImm1 0
+    %0:ac, %3:cc, dead %4:vc = ADCImm %0, 1, %2
+    %1:ac, dead %5:cc, dead %6:vc = ADCImm %1, 2, %3
+    STAbs %0, 2000
+    STAbs %1, 2001
+    RTS
+...
+---
+name:            necessary_overlap
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 2, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 3, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 4, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 5, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 6, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 7, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 8, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 9, class: vc, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0:
+    %0:ac = LDAbs 1000
+    %1:cc = LDImm1 0
+    %0:ac, %2:cc, dead %3:vc = ADCImm %0, 1, %1
+    %0:ac, %4:cc, dead %5:vc = ADCImm %0, 2, %1
+    %0:ac, dead %6:cc, dead %7:vc = ADCImm %0, 3, %2
+    %0:ac, dead %8:cc, dead %9:vc = ADCImm %0, 4, %4
+    STAbs %0, 2000
+    RTS
+...

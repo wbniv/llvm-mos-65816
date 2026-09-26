@@ -1,0 +1,13 @@
+import os, subprocess, json
+from pathlib import Path
+out = Path('/work/build/carry-dynamic-focused')
+out.mkdir(exist_ok=True)
+env = dict(os.environ, MOS_TOOLCHAIN='/work/build/llvm-mos-install')
+runs = []
+for name, args in [('farindex', []), ('farbank', []), ('farblit', []), ('bankwalk', []), ('a16storebytes', []), ('a16indirectstore', []), ('a16shift', []), ('a16ashift', [])]:
+    cmd = ['bash', '/work/dev/' + name + '.sh', *args]
+    with (out / (name + '.log')).open('w') as log:
+        p = subprocess.run(cmd, env=env, stdout=log, stderr=subprocess.STDOUT)
+    runs.append({'command': cmd, 'exit_code': p.returncode})
+    (out / 'results.json').write_text(json.dumps(runs, indent=2) + '\n')
+    print(name, p.returncode, flush=True)

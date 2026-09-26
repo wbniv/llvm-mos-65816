@@ -1,0 +1,152 @@
+{
+  "carry-dynamic-census": [
+    {
+      "optimization": "Os",
+      "mode": "a16",
+      "inputs": 409,
+      "paired": 408,
+      "smaller": 64,
+      "larger": 6,
+      "unchanged_size": 338,
+      "delta_bytes": -8088,
+      "worst_growth": 11,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Os",
+      "mode": "xy16",
+      "inputs": 409,
+      "paired": 408,
+      "smaller": 62,
+      "larger": 6,
+      "unchanged_size": 340,
+      "delta_bytes": -8059,
+      "worst_growth": 15,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Os",
+      "mode": "default",
+      "inputs": 409,
+      "paired": 372,
+      "smaller": 220,
+      "larger": 2,
+      "unchanged_size": 150,
+      "delta_bytes": -43332,
+      "worst_growth": 1,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Oz",
+      "mode": "a16",
+      "inputs": 409,
+      "paired": 404,
+      "smaller": 66,
+      "larger": 2,
+      "unchanged_size": 336,
+      "delta_bytes": -7190,
+      "worst_growth": 11,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Oz",
+      "mode": "xy16",
+      "inputs": 409,
+      "paired": 404,
+      "smaller": 63,
+      "larger": 4,
+      "unchanged_size": 337,
+      "delta_bytes": -7090,
+      "worst_growth": 41,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Oz",
+      "mode": "default",
+      "inputs": 409,
+      "paired": 372,
+      "smaller": 226,
+      "larger": 3,
+      "unchanged_size": 143,
+      "delta_bytes": -46317,
+      "worst_growth": 1,
+      "unpaired": 0
+    }
+  ],
+  "carry-O2-census": [
+    {
+      "optimization": "O2",
+      "mode": "default",
+      "inputs": 252,
+      "paired": 240,
+      "smaller": 218,
+      "larger": 1,
+      "unchanged_size": 21,
+      "delta_bytes": -50731,
+      "worst_growth": 1,
+      "unpaired": 0
+    },
+    {
+      "optimization": "O2",
+      "mode": "a16",
+      "inputs": 252,
+      "paired": 250,
+      "smaller": 72,
+      "larger": 3,
+      "unchanged_size": 175,
+      "delta_bytes": -14386,
+      "worst_growth": 5,
+      "unpaired": 0
+    },
+    {
+      "optimization": "O2",
+      "mode": "xy16",
+      "inputs": 252,
+      "paired": 248,
+      "smaller": 71,
+      "larger": 3,
+      "unchanged_size": 174,
+      "delta_bytes": -13921,
+      "worst_growth": 9,
+      "unpaired": 0
+    }
+  ],
+  "carry-6502-adapted-census": [
+    {
+      "optimization": "Os",
+      "mode": "6502",
+      "inputs": 13,
+      "paired": 13,
+      "smaller": 5,
+      "larger": 1,
+      "unchanged_size": 7,
+      "delta_bytes": -970,
+      "worst_growth": 1,
+      "unpaired": 0
+    },
+    {
+      "optimization": "Oz",
+      "mode": "6502",
+      "inputs": 13,
+      "paired": 13,
+      "smaller": 6,
+      "larger": 1,
+      "unchanged_size": 6,
+      "delta_bytes": -996,
+      "worst_growth": 1,
+      "unpaired": 0
+    },
+    {
+      "optimization": "O2",
+      "mode": "6502",
+      "inputs": 13,
+      "paired": 13,
+      "smaller": 5,
+      "larger": 0,
+      "unchanged_size": 8,
+      "delta_bytes": -941,
+      "worst_growth": 0,
+      "unpaired": 0
+    }
+  ]
+}

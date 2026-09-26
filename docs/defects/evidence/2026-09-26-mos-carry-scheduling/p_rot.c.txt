@@ -1,0 +1,7 @@
+#include <stdint.h>
+#define FAR __attribute__((address_space(2)))
+extern const FAR uint16_t tbl[];
+volatile int32_t i0=100,i1=50000,i2=90000;
+volatile uint32_t out;
+static inline uint32_t fold(uint32_t a,uint16_t v){a=(a<<1)|(a>>31);return a^(uint32_t)v;}
+void f(void){uint32_t a=0;a=fold(a,tbl[i0]);a=fold(a,tbl[i1]);a=fold(a,tbl[i2]);out=a;}

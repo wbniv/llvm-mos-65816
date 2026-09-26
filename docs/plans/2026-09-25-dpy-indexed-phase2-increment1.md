@@ -330,12 +330,19 @@ scheduler it causes real **13 / 8 byte regressions** on those same inputs.
 The scheduler already has a pressure weakness (397 versus 369 bytes before
 this change), but that does not make the new before/after regression unrelated.
 
-**Current disposition:** the fold is landed and its runtime checks pass. The
-scheduler follow-up remains open and must include these exact before/after
-size cases. No reliable profitability predicate has been demonstrated; do not
-claim that none can exist, or that the current gate guarantees a size win.
-A scheduler repair or a measured conservative gate must resolve the regression
-before describing the optimization as meeting the no-regression requirement.
+**Current disposition (2026-09-26):** [carry scheduling patch 0064](2026-09-26-mos-carry-scheduling.md#7-implementation-and-measured-outcome)
+removes the avoidable carry materializations on these recovered inputs. On the
+identified increment-2 plus 0049–0063 baseline, sum/rotate improve **409 → 248 B**
+and **385 → 285 B**, with scheduling enabled. The numbers above remain dated
+September 25 evidence. The [canonical record](../defects/mos-carry-scheduling-pressure.json)
+uses **workaround** because the generic TableGen pressure-set contract remains
+uncorrected. Corpus totals improve with small individual losses documented in
+the completion plan; this does not establish universal profitability or speed.
+Completion update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`,
+`xhigh` reasoning effort; original discovery attribution is retained.
+
+The [standalone 0064 packet](../pr-preparations/2026-09-26/README.md) is now
+published on its fork branch; no PR has been opened.
 
 **8a. Default-build isolation** (agent-handoff "Gating discipline — the fuzzer guards the DEFAULT
 build too"). Every `examples/65816/*.c` recompiled `-c -Os` with **no** `+mos-a16`, old vs new

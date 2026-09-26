@@ -1,0 +1,1322 @@
+{
+  "schema": 1,
+  "id": "mos-carry-scheduling-pressure",
+  "title": "Fine-grained carry pressure is lost before register pressure set pruning",
+  "status": "workaround",
+  "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation.",
+  "report": "docs/plans/2026-09-26-mos-carry-scheduling.md",
+  "reproducer_origin": "reduced",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994: reconciliation, baseline capture, diagnosis, implementation, and validation.",
+    "Claude Code 2.1.278, model claude-opus-5, high reasoning effort; session 65695418-7e9b-45bd-92e3-2ecfd88ecf0b, agent a35017d73ff4d881d: original sum/rotate inputs and September 25 scheduling measurements."
+  ],
+  "unknowns": "The original September 25 compiler was not recovered. Original C inputs were recovered byte-for-byte; preprocessing and pass captures are from the identified September 26 reconstruction. Default-mode far i32 input fails legalization before scheduling and is not treated as a scheduling regression. Individual corpus size losses are retained in growth-review.json; hot-loop cycles and compiler-time overhead were not measured. An all-XY16 runtime driver fails on baseline and candidate; the cause is unisolated. The original functions pass with a common a16 driver in both function modes. Farblit legalization is tracked separately.",
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "carry scheduling",
+      "IsPressureFineGrained",
+      "IsFineGrained",
+      "pruneUnitSets",
+      "MOSSchedStrategy"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+      "docs/pr-preparations/2026-09-26/0064-review.md"
+    ],
+    "related_changes": [
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch",
+      "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch"
+    ],
+    "source_assessment": "The preserved baseline includes runtime indexed increment 2 and 0049-0063. TableGen reads the register-class flag but does not transfer it to initial pressure sets; no local repair was found. Reference 742d554 also omits the assignment. September 26 upstream preparation: exact llvm-mos main 7bd67c0ae4e8 retains the scheduler entry guards and missing TableGen flag propagation. Standalone 0064 changes only MOS scheduling; the original grouped MIR passes this baseline, while a constructed interleaving yields matching-input scheduling red/green and 133 to 59 byte code. See the author review and additional receipt; no generic repair or new causal defect is claimed.",
+    "binary_assessment": "Freshly rebuilt baseline from captured dirty source; independently copied tools and resources with hashes in baseline-identity.json.",
+    "decision": "First canonical record for the historical carry-pressure performance report. Native shift clobber and two-address CSR dependencies are distinct correctness defects.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/prior-work-audit.json",
+      "sha256": "febc452013a7664ed09e1ecde04cc79e9c223331bc524b0b95725a5357b47067"
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/input.i",
+      "sha256": "641cd3a91c289dced281c1b708d47befc15a1cf7e69a9f8b4f3fd4bf0e15057d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/input.ll",
+      "sha256": "f28fbffc8b32fa56477c07c3a95a3bf3b9cdda597e24572b51d9c1bcd5f15364"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-post.o",
+      "sha256": "d8c9a7a2012e90f3b4d4b69ba21261cbf0eec77defcc77f4c4f22e6ae5172916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-post.o.dis",
+      "sha256": "92f826d4a528dce89c25fa134c7ee98729a6ee252f58b42de6d7aa4c78c7e2d8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-post.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-sched.o.dis",
+      "sha256": "8edcb3af0949ba4737c66b3e0efda92e5cceb9fd5bac7f2572c4ea3ee7f56167"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/normal.o",
+      "sha256": "d8c9a7a2012e90f3b4d4b69ba21261cbf0eec77defcc77f4c4f22e6ae5172916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/normal.o.dis",
+      "sha256": "033e676ec2715c15311cfbf410971c2c1e49a94973cf95e2e4a08dc585ce9b6b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/post-ra.mir",
+      "sha256": "07c396455bb86f263dd6e37bfc5b5d54e5b168ed2cccc61fb48522ab97dd12ce"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/post-sched.mir",
+      "sha256": "5429562ef8fac454f35c955b679c84ee5db8e324eefffd8073eeac28f637a2eb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/pre-sched.mir",
+      "sha256": "b42ed9c7d69a56f2c79e0dcf2dbf0fdf74c6247b9b6b28dcbd4ad3e467455d19"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/input.i",
+      "sha256": "641cd3a91c289dced281c1b708d47befc15a1cf7e69a9f8b4f3fd4bf0e15057d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/input.ll",
+      "sha256": "a62c2d8e56413f4c3b42a509e24dd8dfe4b0abf3d9c7d088f26cee0064e65e8b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/no-post.o.log",
+      "sha256": "1fdb085fdb9c46fb1dc392a0770693dde36d70df5c2ffe552e2b6cd286c4ba5c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/no-sched.o.log",
+      "sha256": "38cf239931d427a40260a95baa1ac2c9b3d4e73d49553da36e7bcb63513e151f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/normal.o.log",
+      "sha256": "f8d4d4508e410973778471a8435ea0db1cccc9eb60053a9170e7f60b0a00232f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/post-ra.mir.log",
+      "sha256": "b821e7b2bcbfc58770b37c73431395a9bf12030bf0a976d36cff7324b6cfa953"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/post-sched.mir.log",
+      "sha256": "355793e27a9a9dbd49d6f4622b86b62c8cc28ba3de34270814871c0aa7fa1851"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-default/pre-sched.mir.log",
+      "sha256": "66cbf9719b52734b3954fbca04b1564e069c0165bcaa99821fe38c74d9426788"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/input.i",
+      "sha256": "641cd3a91c289dced281c1b708d47befc15a1cf7e69a9f8b4f3fd4bf0e15057d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/input.ll",
+      "sha256": "970cf900617128b89af63b4110c887f83ba8b9aa05554b7340bf6f8e710b4cf8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-post.o",
+      "sha256": "d8c9a7a2012e90f3b4d4b69ba21261cbf0eec77defcc77f4c4f22e6ae5172916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-post.o.dis",
+      "sha256": "c5e7e2d2d670d6e70074809abb9f7fa7fed3249dd3c07dd0357ec4f6c0e266ab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-post.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-sched.o.dis",
+      "sha256": "1004788f3b34fdd6a2635809bb195fb56707ef1f83e12a79a3befc5aef3c74ec"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/normal.o",
+      "sha256": "d8c9a7a2012e90f3b4d4b69ba21261cbf0eec77defcc77f4c4f22e6ae5172916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/normal.o.dis",
+      "sha256": "a532ee06f8398c0a517b995236001b584208ebd31a7953e8adc795d5fba382e2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/post-ra.mir",
+      "sha256": "4efc05ecb43c3d4278de2b723670f18ccaa3bf922f41b5c7be5e03baaa8837a2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/post-sched.mir",
+      "sha256": "ecfc9f8e56785c269c5a3d139f1299c81309790e9fd7beb648b2caed62842558"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/pre-sched.mir",
+      "sha256": "613d3e2a6b1904d1f75026d80d301d5f02572650a6d831349661100fe927a4f8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/input.i",
+      "sha256": "881ea08ec64168045ecc1b22c6dd5360f6c620dbd8768508a98d0c7372810754"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/input.ll",
+      "sha256": "9e9e73acc455a7ac4115ad4efbddfc0c0fa7af9a8adf0d4abc1af3bef743bfe7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-post.o",
+      "sha256": "8148f70c01b788ca2220a60a513a5d811af6eec644c21990669096f61d59353d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-post.o.dis",
+      "sha256": "c8fa6ef0ba93a93658f4fdf0b79917ec33dd045f7b0acc786ea8b87f9a450b22"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-post.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-sched.o.dis",
+      "sha256": "b0b234d5cdefa2f10dd32eae409e8c99725415d0f430b419f4d732562a20c61f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/normal.o",
+      "sha256": "8148f70c01b788ca2220a60a513a5d811af6eec644c21990669096f61d59353d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/normal.o.dis",
+      "sha256": "217cb920d50460fe4c9a6ff75855e2e35a43db5d6d06c736dc04c13c01779af0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/post-ra.mir",
+      "sha256": "6a8fbc80f8552a16874f0c172390ed137da512a4e133eecb1e49132d4e303b4b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/post-sched.mir",
+      "sha256": "993021973d69f5cb71a9cbd6976ac41952165baaeca5c69568bcd8b3b6359c81"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/pre-sched.mir",
+      "sha256": "88dfa7bfd9c9a3c11d1736bbaa361506f9b93c7be3e05a057af9ce824e37bc65"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/input.i",
+      "sha256": "881ea08ec64168045ecc1b22c6dd5360f6c620dbd8768508a98d0c7372810754"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/input.ll",
+      "sha256": "4e0f8d923b1d476f5d84725dec57f2c9506515645643e722ea76cb898fc3448c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/no-post.o.log",
+      "sha256": "54047b65560bcd2651e30276d25da4a07aa91a30df427c55a0df6633dccdd811"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/no-sched.o.log",
+      "sha256": "ab08ce6a6a5c07d1be47fa44b6133b5d624710999a68cca001a657b9134176e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/normal.o.log",
+      "sha256": "7ca4e51fba7141f1cc3c4b864bbe1de026810744c0313b4c8288d0feb9a1e478"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/post-ra.mir.log",
+      "sha256": "9f995990644ce3b9f2f0eb42048a2f82f53a4364033d637b0e20c757bce8ed1d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/post-sched.mir.log",
+      "sha256": "27dd32ca1fa100f0abc9294b70149cbe0e18cb4a8c4e9c1c802be601d89cae1c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-default/pre-sched.mir.log",
+      "sha256": "c0e1ead67789dcb2d86bce0d96ab9360b02144b355009cfcfc189daee0600e9e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/input.i",
+      "sha256": "881ea08ec64168045ecc1b22c6dd5360f6c620dbd8768508a98d0c7372810754"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/input.i.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/input.ll",
+      "sha256": "6b94c3ad38d00797d17f0ac0c9be1717e2b3831c0d060cce312cee1cc488dc99"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/input.ll.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-post.o",
+      "sha256": "8148f70c01b788ca2220a60a513a5d811af6eec644c21990669096f61d59353d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-post.o.dis",
+      "sha256": "de02187ffffd46a543b159310d41684eecfccf23c5c191d616f1d9b2bd346e55"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-post.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-sched.o.dis",
+      "sha256": "750f8d9a8840efc636f302121ce78b7fb5a8e98104f6eee913e7cab371d24e97"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/normal.o",
+      "sha256": "8148f70c01b788ca2220a60a513a5d811af6eec644c21990669096f61d59353d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/normal.o.dis",
+      "sha256": "27060a917945f27d4ebba86b8597d621f251e5264fb7b3fd6621e54ae7d2baa5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/post-ra.mir",
+      "sha256": "1ec44be1ca9dce065b3deb4a908b535f59c95c7c9ee663a610ceb658824c323f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/post-sched.mir",
+      "sha256": "09299433b47c0f14b7cb952e9ed688164f116dd0965dfe54c5b15e4e2533f255"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/pre-sched.mir",
+      "sha256": "87f47bb8bcb1fa0c56473770b3a52093db007a0de4f2e80e891e4516701bb538"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-identity.json",
+      "sha256": "3acda1fd26223095330628e1c5c56339c069c832fc0cad123aa8bcf78ccf2678"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-pressure-contract.log",
+      "sha256": "059ff119040f943c36bf2de42a18946c56ee77bfd581edfc80ff9425f70c28d3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-register-info.inc.txt",
+      "sha256": "d5c3510de2b5f356358ccef945158873716c770d02208caa4176b5647ea1d1fa"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-regression.log",
+      "sha256": "059ff119040f943c36bf2de42a18946c56ee77bfd581edfc80ff9425f70c28d3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-runs.json",
+      "sha256": "5d1c0b9537a0c3a1976fc0e6a461562251e43bf54bab1a6a7ac26114ca9e9ac3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt",
+      "sha256": "3c2c99f5913f74f4a4751d4e135f0c12c32f350c511088b21a826a640e8f6272"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-test-generated.txt",
+      "sha256": "f08b0c0bb63a29124d34044d1a32675c7a97e38e7d75b7c0728903ddf574416e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/fine-grained-psets.td.txt",
+      "sha256": "a0a40025df97986648fa587c23ec1d4e6bf9baf8f8666710337652a92a0acdea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt",
+      "sha256": "aa7901314c8c34ff2b3099267369110cb0d5a963e8af2b1ecf70444bb096be93"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt",
+      "sha256": "853f4582175fcc425771ecfad503f6f9caa60b72da77c4d4be868092ffeb02b8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt",
+      "sha256": "83929aee43680775131b1643a81c0336c5bab3ab3e5e0ae95a4588edacceface"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/prior-work-audit.json",
+      "sha256": "febc452013a7664ed09e1ecde04cc79e9c223331bc524b0b95725a5357b47067"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-identity.json.gz",
+      "sha256": "00aa4edf2ec3ad1aa54adce9c266980a0823dc1c8642b8e0dbee402ba55e8e35"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/arith.c.txt",
+      "sha256": "15bed5db1d9c405fdb26bcfc198fdbdd63bd7ab4a0f75cb0e8193138777fa97f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/arrays.c.txt",
+      "sha256": "f8b2ed061fb9c04bd9342e9f96ee60cf48afcea55968e517f32f9e2ef8d6a95b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/bitshuffle_sim.c.txt",
+      "sha256": "55e3fbf5d6ad910a541603f9f2294fb1ad272838b66b83260e206b92f35e15c0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/bitweave_sim.c.txt",
+      "sha256": "161dc835b98b9a73609eeb3a675bf80d3b5b04d83bcbdd417451c7ce75e73cec"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/control.c.txt",
+      "sha256": "ea466c6f24d11e52dfbab99edbad907b62a60109f0e532cbbb23698c071f7eca"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/cordic_sim.c.txt",
+      "sha256": "5371985c8986fffd9550d7c6a44bc3ef98ce363638e0cbf4e9201cb46c96e388"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/funcs.c.txt",
+      "sha256": "3924f159a5dd4250d46ff234fcd7d6efe775ffe6bfe29b976d9bbf6b9034acd9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/globals.c.txt",
+      "sha256": "5ae830dcfa15a399f6570853da71921d02928ae89b4d28a0fd493a19ee1286f9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/lsystem_sim.c.txt",
+      "sha256": "5237b3bac927cf8cb7836c702d957cacca1abc71b691b1c418e4a2c32da4a33e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/manifest.json.txt",
+      "sha256": "6759f38e0b8e2efbb33e8440f0ac86c6cedb28fd64bbcb054dffc9965c62280f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/ovmatrix_sim.c.txt",
+      "sha256": "e05e02f5d894b606748a4af5afc61c187bde519f0a2e493448b2c0ee16eafe82"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/rotkal_sim.c.txt",
+      "sha256": "e802b59fd07d2a133c4e610ed603994a95f5e78b766407fc4cac0121d8bbda2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/structs.c.txt",
+      "sha256": "4e9aeb0a11a8588aded2f38c1a1818f9624d0dec2b5369b42b350877f0b0423c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-inputs/uarteye_sim.c.txt",
+      "sha256": "098a1cce1bdd567222ce299f815ed63c86802935fc5f9399aa9170368376499e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-report.json.gz",
+      "sha256": "75f0b065630f33df79ade3a61d7ae6ad1dd2ccae23f26f6c68b337afe17ac1ba"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/6502-summary.json",
+      "sha256": "fb900d62eed8dcc0b8c9bf7aafc290783dfba9e0ced3627f3ca9c61af93b48aa"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/O2-identity.json.gz",
+      "sha256": "ee51173fa5dc628b6585c00230c554426675f53855f235b5ba0213410e79f555"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/O2-report.json.gz",
+      "sha256": "4426037ae72eba388a84f0482b4fa71c681db7909a59b6c4f57bd37ff4f9062e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/all-xy16-driver-results.json",
+      "sha256": "3111a14c418281ec07ef98f518b818308dc938999fe7a3d5d9a0f6b49cb1c375"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-lit.json",
+      "sha256": "e62092843ba9cb1617fc0cab59a30a1f1804a422bafbe1d329380da038ba6890"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-overlay.txt",
+      "sha256": "bf9679d9aad1f7b562b8aa2eb82c580efe4d71a432da00bb140df336e3db4565"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-reduced-6502.log",
+      "sha256": "7f828b8c71a7035d9a462efbde7f0ba10329e95fdc64001fd19257fe602e2851"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-reduced-6502.mir.txt",
+      "sha256": "e40849394e050c081c3155906e255642e859f6762c4ed84c8cc56ddb8aedf008"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-reduced-a16.log",
+      "sha256": "0d3d7f136af8e395014f674deb2c80ff05ecb01511e834b6697da8c3e364b17b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-reduced-a16.mir.txt",
+      "sha256": "d0c85921b1b0717dd32e4ad13a7bf76862477622e87c5808b3b4ff4414404097"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bidirectional.mir.txt",
+      "sha256": "7081b234b354dbf9bb4ec3678a9ca587087bf906af160efe28cc719b6b6bf229"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bottomup.mir.txt",
+      "sha256": "7081b234b354dbf9bb4ec3678a9ca587087bf906af160efe28cc719b6b6bf229"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-topdown.mir.txt",
+      "sha256": "0da988edebf0e7cfcf3ae92760d059dd9b9b4aa7327a595c7457e1d32ccfacb5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bidirectional.mir.txt",
+      "sha256": "1035d891c1c569f27166a2ba6287a2917ea39cca8f45fa89e2e8ef29010ea3dc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bottomup.mir.txt",
+      "sha256": "1035d891c1c569f27166a2ba6287a2917ea39cca8f45fa89e2e8ef29010ea3dc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-topdown.mir.txt",
+      "sha256": "06e05e2f7b7e4610d5743d92a293a4e63f84a8802a9a69aa8147b4a0a1c9e13d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bidirectional.mir.txt",
+      "sha256": "576e35f9bffd6a6bd6f8de9ab3f717df855b7e4cef8437fc988f00bd54723036"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bottomup.mir.txt",
+      "sha256": "576e35f9bffd6a6bd6f8de9ab3f717df855b7e4cef8437fc988f00bd54723036"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-topdown.mir.txt",
+      "sha256": "e110cb9fdbefbf59056c9be10756f1005ca45230b2fe85880457a0d5dde689dc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-untracked-source.tar.gz",
+      "sha256": "6df4de8a4afd8a74d47de6e9f33e19aae134c7c36c82785182642bb50ee6e6f2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-carry-census.log",
+      "sha256": "f4985d1bc001acd8a5c1ec630cc0f0924ef1d69283f56bd8e8979cb19788d559"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-carry-lit-candidate.json",
+      "sha256": "80321fcd4dd2520c3505aed286ec3b979cd82eeaee38872d48ef0ee8021849ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-carry-lit-candidate.log",
+      "sha256": "ec30f2bf09e491b928fb5cc1a77ede0ab86513feae51f388d87534243aefa000"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-carry-runtime.log",
+      "sha256": "654e2535a16b3c6abb712087ac647e8870f715e64ad159616d1066ebbd2d154d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-census-summary.json",
+      "sha256": "803b259bd2e080e53078dc5fa1714f3cd264e5d8bf2613e864306fb3069c0a69"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/broad-census.json.gz",
+      "sha256": "3473557cebb3c292600216cdeda2a72adb2f24e0744e844565574bb78a4e5d9c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/no-sched.o.dis",
+      "sha256": "6844fb1ebc4bb801f7359fb54e63b353ebd0fb357fe87ae08394b716a9d7f127"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/normal.o",
+      "sha256": "f7b26c2d0945196e6b0c5bf91df529548d1b85c6dd43e9ea48f775166b8c6027"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/normal.o.dis",
+      "sha256": "81e32882554b3d52ff9bd72a07097bcea10532a43dd943c696b6309de460ffba"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/post-ra.mir",
+      "sha256": "3322b902d4a6413cf1199c9dbdefd406c829dcd59a49da27e2a16111673221b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/post-sched.mir",
+      "sha256": "a9b33eb8854b37947813c62dc185bddd3db6050d6874db25d3441d9c90eaec2e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/pre-sched.mir",
+      "sha256": "b42ed9c7d69a56f2c79e0dcf2dbf0fdf74c6247b9b6b28dcbd4ad3e467455d19"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/no-sched.o.dis",
+      "sha256": "0b23727295d8dc25207c7fd610545e6294c38c891fb215a577b1a022cbded772"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/normal.o",
+      "sha256": "f7b26c2d0945196e6b0c5bf91df529548d1b85c6dd43e9ea48f775166b8c6027"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/normal.o.dis",
+      "sha256": "0fa932d31983c1a475ee58e47af881e744651689fe6e3aa7fd8c7847919de308"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/post-ra.mir",
+      "sha256": "88ba17d14f7c73c45fc51c2d1c41804aca39931a6faddc3da4dc63a9bf98aa3b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/post-sched.mir",
+      "sha256": "3e44bb98434eee015e2a9416edcb0aecdbb0e9ed54593468e970776765b101af"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/pre-sched.mir",
+      "sha256": "613d3e2a6b1904d1f75026d80d301d5f02572650a6d831349661100fe927a4f8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/rot-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/no-sched.o.dis",
+      "sha256": "1bd2a962cd9c4d86966d7fcefe6235f17284a7b42f0cdf9ce2395d033e2bec85"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/normal.o",
+      "sha256": "f6f7db92eb6ce5848397d50ef3bde7e3d2bb2e1b15d5a1a4a7a02665a3599678"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/normal.o.dis",
+      "sha256": "f83584127cadbc0d281e7c1005a98f256ab5ac5c39ee1b173d372875bd8ab715"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/post-ra.mir",
+      "sha256": "e38fc6bb2efa843bb73e9eb7c677fedcc6ace2a2d592339401be86f3aeedac24"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/post-sched.mir",
+      "sha256": "1710eecd9e848a610a8fa8122dae41ba23eae06bac5ab5f6768f9fd6a9e3b5ee"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/pre-sched.mir",
+      "sha256": "88dfa7bfd9c9a3c11d1736bbaa361506f9b93c7be3e05a057af9ce824e37bc65"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/no-sched.o.dis",
+      "sha256": "62d970088914bd5c2bf2b89db1ae664d009b9e243ee95a0094dde6e78292a9d1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/normal.o",
+      "sha256": "f6f7db92eb6ce5848397d50ef3bde7e3d2bb2e1b15d5a1a4a7a02665a3599678"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/normal.o.dis",
+      "sha256": "88e23f92fa5e99ed3cc33502e24b137b828d3b819029146b46451171134528a0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/post-ra.mir",
+      "sha256": "0209995c453e000e8199525e6468b80331c5eea7b908a7b8e34cd57775c19eeb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/post-sched.mir",
+      "sha256": "0809f79afd73f78752cf38af5e7eb71d8146e7f9d5b60fcd2a0f7817c62d62ee"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/pre-sched.mir",
+      "sha256": "87f47bb8bcb1fa0c56473770b3a52093db007a0de4f2e80e891e4516701bb538"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate/sum-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json",
+      "sha256": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-pressure-contract.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-runs.json",
+      "sha256": "07ae020480dde0d1c2dd8732443ba11e276a8d5eb8f69bf1f4160eabe8a5357e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bidirectional.mir.txt",
+      "sha256": "3b003997370b5d766da848b03e8aaa604194b8084522d5eef5a5790b0f2d6a02"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bottomup.mir.txt",
+      "sha256": "3b003997370b5d766da848b03e8aaa604194b8084522d5eef5a5790b0f2d6a02"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-topdown.mir.txt",
+      "sha256": "9f0e3418b5f9c4a0e17dc180c206aecbbc8d807c66f039d7f2845d4d5db711a7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bidirectional.mir.txt",
+      "sha256": "8b2e45e9ed098aae3125646f390a75c952846532e3170f0cc7c30f64f415715e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bottomup.mir.txt",
+      "sha256": "8b2e45e9ed098aae3125646f390a75c952846532e3170f0cc7c30f64f415715e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-topdown.mir.txt",
+      "sha256": "25416fb9c6ee8c0cc4d4fab73beb3500d977bec64740f4329eecd22903cacb60"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bidirectional.mir.txt",
+      "sha256": "dd810fabdaafeb0545ab8be08ac5f912bb93dbaff88c1480abfe824d131112d4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bottomup.mir.txt",
+      "sha256": "dd810fabdaafeb0545ab8be08ac5f912bb93dbaff88c1480abfe824d131112d4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-topdown.mir.txt",
+      "sha256": "e8c754b21e2546ea473b98163d3b171a22d859dfb6cce30e493c0c7902e36b2f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-test-generated.txt",
+      "sha256": "6ed4249b0292e5c7aa7efc47211a1d985b7b0f1241f98fe273300002cd7ac330"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-dynamic-focused-logs.tar.gz",
+      "sha256": "5cedc8b64a89425558df3b5ba544dced9e41d20723678f3047e7933ef1f37b86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-dynamic-runtime-logs.tar.gz",
+      "sha256": "c29909ed24d3d52e7669ebb69d1884b0160644ce519ee42a62cd91b81413ca64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-build.log",
+      "sha256": "9b71160138467876ed9952561aa46e3ae5b383db07da09831c923013c45e2a43"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log",
+      "sha256": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip.log",
+      "sha256": "a02ab22f9b51731b0ce2fcf1f34c2888e03bf7caebafb7007aa757a7e66342bd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-focused.py.txt",
+      "sha256": "13b0b530be1d7e96c1d47f8363d9cb466674d51f91154bed19a4f7d371677085"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-original-runtime-a16-driver.py.txt",
+      "sha256": "220618f31403a9a1dc62bdb36847d9d2dbd67b7b12f5607fe52993c401e42fef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-original-runtime-a16-driver.tar.gz",
+      "sha256": "b083046ebc5baabc871209ab57f2f73fef70c83d1ee8be3489a652c422a41978"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-original-runtime.py.txt",
+      "sha256": "cf12d81568155868ec9c4474d3f257bad88e9280fcd899a67a9b3c9fa26b35cb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-original-runtime.tar.gz",
+      "sha256": "8b2d5b8b5ad378fd95135b6fea1169903ac50c0a3dcdea98c518c67e3e7808aa"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log",
+      "sha256": "b6f41458c3f1958994c1f5424573dc3cfb8165b75eb202620a23d982516e2e48"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip.log",
+      "sha256": "ee36cdd46de41b7aa3b3eead593ca5d59f8c0184a054640858608e1407c03253"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-pressure-schedule.mir.txt",
+      "sha256": "0b9b76b7d6b4734466464131103eb3bb69675680bf325c1e0ab37677c3469539"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-runtime-batch.py.txt",
+      "sha256": "56bea0b56e9cc45d715e17259df1a5d5b251e9bc504a57fe6d97ea08f725e6f2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-sequence-counts.json",
+      "sha256": "a20a37cf64bb305803640771ab01d3df9d30c6d347a70d864e66b3cb87228655"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json",
+      "sha256": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/no-sched.o.dis",
+      "sha256": "571f6537a5b7bdc5e7effbb42902fdde6743bf9bb90fbaab6a8d1e6b68bd7818"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/normal.o",
+      "sha256": "acb83520647d13c3d34cea116873d1b6b1d803b36a5c789bb28d1bea6638460c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/normal.o.dis",
+      "sha256": "c88a415cce29d91d9de5d7f32787cdc60376b476e33791217ed5684498c04e75"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/post-ra.mir",
+      "sha256": "b71b6513ac33177eecaa4bbfc2357aa6f3f95a520e1ad090efaefb76afb564f5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/post-sched.mir",
+      "sha256": "c47fcf4b84d2f1c4690e761995b9c9b91b598e0c008930e8e4c0f00265174f4b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/pre-sched.mir",
+      "sha256": "b42ed9c7d69a56f2c79e0dcf2dbf0fdf74c6247b9b6b28dcbd4ad3e467455d19"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/no-sched.o",
+      "sha256": "7597f08d940c7a554d27b3311b69c38ca289f437fa0a4c41adb01c041955cc38"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/no-sched.o.dis",
+      "sha256": "5ac988b1f853e32ec75c3d2a10c1ed84214e031fc8d68d6525c7b5562c9f0068"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/normal.o",
+      "sha256": "acb83520647d13c3d34cea116873d1b6b1d803b36a5c789bb28d1bea6638460c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/normal.o.dis",
+      "sha256": "52906ee90827385d17b6fc4bf6fe2cf1f4a24d239c09507d8ae64e8c9382cdad"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/post-ra.mir",
+      "sha256": "e7be908fae79bf22389834d001530d6cf790bd7ed4550a04055886cf90f353d8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/post-sched.mir",
+      "sha256": "4f815e5c8da65e0a2958eab5c463db09f83d6c18db727dc33ef4215b5e3eb4b9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/pre-sched.mir",
+      "sha256": "613d3e2a6b1904d1f75026d80d301d5f02572650a6d831349661100fe927a4f8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/no-sched.o.dis",
+      "sha256": "d7980ff4ce7b6abf2d3b9b7dafb8191a52286fe3f2b6910c0dd28fbfe002123e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/normal.o",
+      "sha256": "3e4e781aa9eff18701945f47073912860efe64ba65b7f891d28fb3299777dd5a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/normal.o.dis",
+      "sha256": "e67f4300080432d2004612f29aca4f2edff404df3871a998e6d1d6c421553fe8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/post-ra.mir",
+      "sha256": "fe5ca81c735fda6b8f22c87daf72b3ffbd772db50a52db811a66c08ccc50b547"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/post-sched.mir",
+      "sha256": "15fadd6321f1b2a97a788219a70653fa31e4a53ea902eb951930a64a714abc07"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/pre-sched.mir",
+      "sha256": "88dfa7bfd9c9a3c11d1736bbaa361506f9b93c7be3e05a057af9ce824e37bc65"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/no-sched.o",
+      "sha256": "d9059cc32e576f6e37a0c347c24d1c85836484859358da2260e5cef09872c6e9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/no-sched.o.dis",
+      "sha256": "e46bf86b393cdebe744fc17877fd20ad9d48553f6885ab6bec7531398e540960"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/no-sched.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/normal.o",
+      "sha256": "3e4e781aa9eff18701945f47073912860efe64ba65b7f891d28fb3299777dd5a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/normal.o.dis",
+      "sha256": "4ce23dbff4aaa230e7248d0b4a9823bd49830ab00b5ba7ee1a25ca9bf892dadf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/normal.o.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/post-ra.mir",
+      "sha256": "774f9b426d44612fef2e6106cfef749ec0d507fc1c5b0be43d56aa96c02f3f98"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/post-ra.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/post-sched.mir",
+      "sha256": "c5591f34ede3c155b6359683597bb13376bcf8cee2d64429752e45a3852b296a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/post-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/pre-sched.mir",
+      "sha256": "87f47bb8bcb1fa0c56473770b3a52093db007a0de4f2e80e891e4516701bb538"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-xy16/pre-sched.mir.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic-runs.json",
+      "sha256": "329fa11ac8b3e8260350a2a470752419b8ce9a475cc44c3369b07562eb38255a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-identity.json.gz",
+      "sha256": "458b8f8e196cae6ba2a362895557d1a179afb38964f8b32d0f9f7f0fb1f2bba1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-lit.json",
+      "sha256": "83c12b6f62683571a52c3a64628d151709307944d694add1b3e43728f096234d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-report.json.gz",
+      "sha256": "22fa3edf331a7b5a082bdf4d9cf44a2177e01f167b85d75ef9b720f340af7427"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-summary.json",
+      "sha256": "00d51ac001ae40f900292eb63794565ef1b0d6b647267949344015f94e499874"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/focused-runtime-results.json",
+      "sha256": "b05a63eb54af07d832beac57dd3e78bc7d3cfeb33d38808641e79e4a3c930f6e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-disassembly.tar.gz",
+      "sha256": "ec976a94852fee79889c12832a089c3029aceea540563c104addb545ee61e390"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json",
+      "sha256": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/narrow-census-summary.json",
+      "sha256": "69b13e9d96fbbb230743931936f0af01ebe5c9062a4c1c28fe9e0bac6ddfe395"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/narrow-census.json.gz",
+      "sha256": "234b52fea9ff75990c4fd5f19a2e55961eddcc59281a727258a5893523da35e1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/narrow-lit.json",
+      "sha256": "189d720f740a552df5b94729288a9d96408ca057d49016e5b1f1a7ff275e584a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/original-functions-runtime-results.json",
+      "sha256": "86d7d63b819b538402480df5d215673eb98bbc45287e5a44009360c09e2713e8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/physical-priority-trial.json.gz",
+      "sha256": "234eb96a089289a25eed6b5fcefeca8bd8af6eaec5e81b8e8cfa70fbb7848dd5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json",
+      "sha256": "2a14829303577c92512146e5d24ebea007d23c81e5c685cbeea315dd4e2eab0f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json",
+      "sha256": "43a9055b8e3731b7dca0ce17cf7bc3f12250a77bd087b7535d54154f651e7495"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-pressure-contract-generated.txt",
+      "sha256": "f08b0c0bb63a29124d34044d1a32675c7a97e38e7d75b7c0728903ddf574416e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-pressure-contract-run.json",
+      "sha256": "6f5fe03c03c927ea5cbfe28ae136ff8a72b7bcd9bcae208a1380e26707e7242f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-pressure-contract.log",
+      "sha256": "7777f18f93b19119194a3f43a659cbdea6ad4bb6a18fd8779efcbb8bd2597d59"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+      "sha256": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f"
+    }
+  ],
+  "baseline": {
+    "command": "['/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llvm-tblgen', '-gen-register-info', '-I', '/home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/include', '/home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/TableGen/fine-grained-psets.td'] | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/TableGen/fine-grained-psets.td",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "target": "TableGen synthetic C/V pressure model",
+      "generator": "gen-register-info",
+      "checks": "fine-grained subset retained with equal-unit alias; ordinary subset pruned"
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "aaddd47fd1dba6c147c246187e7b11f55c9d9f5fc672c6275f824bb84e4c14eb",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt",
+      "sha256": "83929aee43680775131b1643a81c0336c5bab3ab3e5e0ae95a4588edacceface"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-pressure-contract.log",
+      "sha256": "059ff119040f943c36bf2de42a18946c56ee77bfd581edfc80ff9425f70c28d3"
+    },
+    "exit_code": 1,
+    "failure_signature": "CHECK: expected string not found in input"
+  },
+  "mitigation": {
+    "change": "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+    "mechanism": "Count live computed virtual Cc values at each scheduling boundary using defining SUnits; prefer candidates reducing excess above one, exclude rematerializable LDImm1 carries, preserve all DAG dependencies.",
+    "evidence": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json",
+    "scope": "The retained TableGen baseline is still failing. This is a target scheduler mitigation, not closure of that pressure-set contract. Carry values crossing the region through physical registers are outside this additional model."
+  }
+}

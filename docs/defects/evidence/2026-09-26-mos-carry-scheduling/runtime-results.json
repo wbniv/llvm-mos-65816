@@ -1,0 +1,855 @@
+[
+  {
+    "name": "arith",
+    "source": "corpus/arith.c",
+    "expected": "0xA9E9",
+    "status": "PASS",
+    "message": "0xA9E9 (all agree)"
+  },
+  {
+    "name": "control",
+    "source": "corpus/control.c",
+    "expected": "0x1DFB",
+    "status": "PASS",
+    "message": "0x1DFB (all agree)"
+  },
+  {
+    "name": "arrays",
+    "source": "corpus/arrays.c",
+    "expected": "0x03E1",
+    "status": "PASS",
+    "message": "0x03E1 (all agree)"
+  },
+  {
+    "name": "structs",
+    "source": "corpus/structs.c",
+    "expected": "0x0340",
+    "status": "PASS",
+    "message": "0x0340 (all agree)"
+  },
+  {
+    "name": "funcs",
+    "source": "corpus/funcs.c",
+    "expected": "0x011E",
+    "status": "PASS",
+    "message": "0x011E (all agree)"
+  },
+  {
+    "name": "globals",
+    "source": "corpus/globals.c",
+    "expected": "0xAB55",
+    "status": "PASS",
+    "message": "0xAB55 (all agree)"
+  },
+  {
+    "name": "invaders_sim",
+    "source": "corpus/invaders_sim.c",
+    "expected": "0x9D57",
+    "status": "PASS",
+    "message": "0x9D57 (all agree)"
+  },
+  {
+    "name": "spiro_sim",
+    "source": "corpus/spiro_sim.c",
+    "expected": "0x32D4",
+    "status": "PASS",
+    "message": "0x32D4 (all agree)"
+  },
+  {
+    "name": "spiro_ctrl_sim",
+    "source": "corpus/spiro_ctrl_sim.c",
+    "expected": "0x6A26",
+    "status": "PASS",
+    "message": "0x6A26 (all agree)"
+  },
+  {
+    "name": "pi_sim",
+    "source": "corpus/pi_sim.c",
+    "expected": "0x7711",
+    "status": "PASS",
+    "message": "0x7711 (all agree)"
+  },
+  {
+    "name": "ca1d_sim",
+    "source": "corpus/ca1d_sim.c",
+    "expected": "0xAB2C",
+    "status": "PASS",
+    "message": "0xAB2C (all agree)"
+  },
+  {
+    "name": "rdiff_sim",
+    "source": "corpus/rdiff_sim.c",
+    "expected": "0x5555",
+    "status": "PASS",
+    "message": "0x5555 (all agree)"
+  },
+  {
+    "name": "nbody_sim",
+    "source": "corpus/nbody_sim.c",
+    "expected": "0xCC65",
+    "status": "PASS",
+    "message": "0xCC65 (all agree)"
+  },
+  {
+    "name": "factorial_sim",
+    "source": "corpus/factorial_sim.c",
+    "expected": "0x772F",
+    "status": "PASS",
+    "message": "0x772F (all agree)"
+  },
+  {
+    "name": "newton_sim",
+    "source": "corpus/newton_sim.c",
+    "expected": "0x4D8B",
+    "status": "PASS",
+    "message": "0x4D8B (all agree)"
+  },
+  {
+    "name": "cordic_sim",
+    "source": "corpus/cordic_sim.c",
+    "expected": "0x4D41",
+    "status": "PASS",
+    "message": "0x4D41 (all agree)"
+  },
+  {
+    "name": "maze_sim",
+    "source": "corpus/maze_sim.c",
+    "expected": "0x0749",
+    "status": "PASS",
+    "message": "0x0749 (all agree)"
+  },
+  {
+    "name": "doom-fire_sim",
+    "source": "corpus/doom-fire_sim.c",
+    "expected": "0x3C59",
+    "status": "PASS",
+    "message": "0x3C59 (all agree)"
+  },
+  {
+    "name": "life_sim",
+    "source": "corpus/life_sim.c",
+    "expected": "0xDDF1",
+    "status": "PASS",
+    "message": "0xDDF1 (all agree)"
+  },
+  {
+    "name": "epicycles_sim",
+    "source": "corpus/epicycles_sim.c",
+    "expected": "0x4F6C",
+    "status": "PASS",
+    "message": "0x4F6C (all agree)"
+  },
+  {
+    "name": "julia_sim",
+    "source": "corpus/julia_sim.c",
+    "expected": "0x3490",
+    "status": "PASS",
+    "message": "0x3490 (all agree)"
+  },
+  {
+    "name": "harmonograph_sim",
+    "source": "corpus/harmonograph_sim.c",
+    "expected": "0x0EBB",
+    "status": "PASS",
+    "message": "0x0EBB (all agree)"
+  },
+  {
+    "name": "raycaster_sim",
+    "source": "corpus/raycaster_sim.c",
+    "expected": "0xB200",
+    "status": "PASS",
+    "message": "0xB200 (all agree)"
+  },
+  {
+    "name": "burning-ship_sim",
+    "source": "corpus/burning-ship_sim.c",
+    "expected": "0x6F2D",
+    "status": "PASS",
+    "message": "0x6F2D (all agree)"
+  },
+  {
+    "name": "mandel-float_sim",
+    "source": "corpus/mandel-float_sim.c",
+    "expected": "0x4169",
+    "status": "PASS",
+    "message": "0x4169 (all agree)"
+  },
+  {
+    "name": "avalanche_sim",
+    "source": "corpus/avalanche_sim.c",
+    "expected": "0x27EA",
+    "status": "PASS",
+    "message": "0x27EA (all agree)"
+  },
+  {
+    "name": "boids_sim",
+    "source": "corpus/boids_sim.c",
+    "expected": "0xA8AB",
+    "status": "PASS",
+    "message": "0xA8AB (all agree)"
+  },
+  {
+    "name": "turtle-vm_sim",
+    "source": "corpus/turtle-vm_sim.c",
+    "expected": "0x4007",
+    "status": "PASS",
+    "message": "0x4007 (all agree)"
+  },
+  {
+    "name": "lsystem_sim",
+    "source": "corpus/lsystem_sim.c",
+    "expected": "0x8073",
+    "status": "PASS",
+    "message": "0x8073 (all agree)"
+  },
+  {
+    "name": "truchet_sim",
+    "source": "corpus/truchet_sim.c",
+    "expected": "0xB3E6",
+    "status": "PASS",
+    "message": "0xB3E6 (all agree)"
+  },
+  {
+    "name": "wire3d_sim",
+    "source": "corpus/wire3d_sim.c",
+    "expected": "0xE737",
+    "status": "PASS",
+    "message": "0xE737 (all agree)"
+  },
+  {
+    "name": "wire3d_ctrl_sim",
+    "source": "corpus/wire3d_ctrl_sim.c",
+    "expected": "0xE3CD",
+    "status": "PASS",
+    "message": "0xE3CD (all agree)"
+  },
+  {
+    "name": "fn_plot_sim",
+    "source": "corpus/fn_plot_sim.c",
+    "expected": "0x2EBE",
+    "status": "PASS",
+    "message": "0x2EBE (all agree)"
+  },
+  {
+    "name": "cardioid_sim",
+    "source": "corpus/cardioid_sim.c",
+    "expected": "0x523B",
+    "status": "PASS",
+    "message": "0x523B (all agree)"
+  },
+  {
+    "name": "tea_sim",
+    "source": "corpus/tea_sim.c",
+    "expected": "0xDF0E",
+    "status": "PASS",
+    "message": "0xDF0E (all agree)"
+  },
+  {
+    "name": "hilbert_sim",
+    "source": "corpus/hilbert_sim.c",
+    "expected": "0x5999",
+    "status": "PASS",
+    "message": "0x5999 (all agree)"
+  },
+  {
+    "name": "fft_sim",
+    "source": "corpus/fft_sim.c",
+    "expected": "0x6D7A",
+    "status": "PASS",
+    "message": "0x6D7A (all agree)"
+  },
+  {
+    "name": "vaprintf_sim",
+    "source": "corpus/vaprintf_sim.c",
+    "expected": "0xE1F3",
+    "status": "PASS",
+    "message": "0xE1F3 (all agree)"
+  },
+  {
+    "name": "bhut_sim",
+    "source": "corpus/bhut_sim.c",
+    "expected": "0xEF0B",
+    "status": "PASS",
+    "message": "0xEF0B (all agree)"
+  },
+  {
+    "name": "mandel-double_sim",
+    "source": "corpus/mandel-double_sim.c",
+    "expected": "0x0EDF",
+    "status": "PASS",
+    "message": "0x0EDF (all agree)"
+  },
+  {
+    "name": "bitcensus_sim",
+    "source": "corpus/bitcensus_sim.c",
+    "expected": "0x9516",
+    "status": "PASS",
+    "message": "0x9516 (all agree)"
+  },
+  {
+    "name": "bitshuffle_sim",
+    "source": "corpus/bitshuffle_sim.c",
+    "expected": "0x2A4A",
+    "status": "PASS",
+    "message": "0x2A4A (all agree)"
+  },
+  {
+    "name": "gf256_sim",
+    "source": "corpus/gf256_sim.c",
+    "expected": "0xC028",
+    "status": "PASS",
+    "message": "0xC028 (all agree)"
+  },
+  {
+    "name": "rotozoom_sim",
+    "source": "corpus/rotozoom_sim.c",
+    "expected": "0x391B",
+    "status": "PASS",
+    "message": "0x391B (all agree)"
+  },
+  {
+    "name": "medfilt_sim",
+    "source": "corpus/medfilt_sim.c",
+    "expected": "0x87FE",
+    "status": "PASS",
+    "message": "0x87FE (all agree)"
+  },
+  {
+    "name": "domcol_sim",
+    "source": "corpus/domcol_sim.c",
+    "expected": "0xF3FD",
+    "status": "PASS",
+    "message": "0xF3FD (all agree)"
+  },
+  {
+    "name": "cosmzoom_sim",
+    "source": "corpus/cosmzoom_sim.c",
+    "expected": "0x502F",
+    "status": "PASS",
+    "message": "0x502F (all agree)"
+  },
+  {
+    "name": "multibase_sim",
+    "source": "corpus/multibase_sim.c",
+    "expected": "0x371A",
+    "status": "PASS",
+    "message": "0x371A (all agree)"
+  },
+  {
+    "name": "dhmix_sim",
+    "source": "corpus/dhmix_sim.c",
+    "expected": "0x69AA",
+    "status": "PASS",
+    "message": "0x69AA (all agree)"
+  },
+  {
+    "name": "percol_sim",
+    "source": "corpus/percol_sim.c",
+    "expected": "0x025B",
+    "status": "PASS",
+    "message": "0x025B (all agree)"
+  },
+  {
+    "name": "fenwick_sim",
+    "source": "corpus/fenwick_sim.c",
+    "expected": "0x3454",
+    "status": "PASS",
+    "message": "0x3454 (all agree)"
+  },
+  {
+    "name": "radix_sim",
+    "source": "corpus/radix_sim.c",
+    "expected": "0x123E",
+    "status": "PASS",
+    "message": "0x123E (all agree)"
+  },
+  {
+    "name": "hull_sim",
+    "source": "corpus/hull_sim.c",
+    "expected": "0x84E3",
+    "status": "PASS",
+    "message": "0x84E3 (all agree)"
+  },
+  {
+    "name": "editdist_sim",
+    "source": "corpus/editdist_sim.c",
+    "expected": "0xFB59",
+    "status": "PASS",
+    "message": "0xFB59 (all agree)"
+  },
+  {
+    "name": "huffman_sim",
+    "source": "corpus/huffman_sim.c",
+    "expected": "0xE8E4",
+    "status": "PASS",
+    "message": "0xE8E4 (all agree)"
+  },
+  {
+    "name": "perlin_sim",
+    "source": "corpus/perlin_sim.c",
+    "expected": "0xA72D",
+    "status": "PASS",
+    "message": "0xA72D (all agree)"
+  },
+  {
+    "name": "gouraud_sim",
+    "source": "corpus/gouraud_sim.c",
+    "expected": "0xC5E9",
+    "status": "PASS",
+    "message": "0xC5E9 (all agree)"
+  },
+  {
+    "name": "dither_sim",
+    "source": "corpus/dither_sim.c",
+    "expected": "0x80C4",
+    "status": "PASS",
+    "message": "0x80C4 (all agree)"
+  },
+  {
+    "name": "msquares_sim",
+    "source": "corpus/msquares_sim.c",
+    "expected": "0x86A7",
+    "status": "PASS",
+    "message": "0x86A7 (all agree)"
+  },
+  {
+    "name": "grid3d_sim",
+    "source": "corpus/grid3d_sim.c",
+    "expected": "0xFCDE",
+    "status": "PASS",
+    "message": "0xFCDE (all agree)"
+  },
+  {
+    "name": "setjmp_sim",
+    "source": "corpus/setjmp_sim.c",
+    "expected": "0x2007",
+    "status": "PASS",
+    "message": "0x2007 (all agree)"
+  },
+  {
+    "name": "nmitally_sim",
+    "source": "corpus/nmitally_sim.c",
+    "expected": "0xBCE6",
+    "status": "PASS",
+    "message": "0xBCE6 (all agree)"
+  },
+  {
+    "name": "backtrack_sim",
+    "source": "corpus/backtrack_sim.c",
+    "expected": "0x7336",
+    "status": "PASS",
+    "message": "0x7336 (all agree)"
+  },
+  {
+    "name": "csrjmp_sim",
+    "source": "corpus/csrjmp_sim.c",
+    "expected": "0xADD8",
+    "status": "PASS",
+    "message": "0xADD8 (all agree)"
+  },
+  {
+    "name": "retryjmp_sim",
+    "source": "corpus/retryjmp_sim.c",
+    "expected": "0x3388",
+    "status": "PASS",
+    "message": "0x3388 (all agree)"
+  },
+  {
+    "name": "jt256_sim",
+    "source": "corpus/jt256_sim.c",
+    "expected": "0xB8CC",
+    "status": "PASS",
+    "message": "0xB8CC (all agree)"
+  },
+  {
+    "name": "vlastack_sim",
+    "source": "corpus/vlastack_sim.c",
+    "expected": "0xD77B",
+    "status": "PASS",
+    "message": "0xD77B (all agree)"
+  },
+  {
+    "name": "borrowov_sim",
+    "source": "corpus/borrowov_sim.c",
+    "expected": "0x81FB",
+    "status": "PASS",
+    "message": "0x81FB (all agree)"
+  },
+  {
+    "name": "bigbyval_sim",
+    "source": "corpus/bigbyval_sim.c",
+    "expected": "0xBD6B",
+    "status": "PASS",
+    "message": "0xBD6B (all agree)"
+  },
+  {
+    "name": "dblbridge_sim",
+    "source": "corpus/dblbridge_sim.c",
+    "expected": "0xF829",
+    "status": "PASS",
+    "message": "0xF829 (all agree)"
+  },
+  {
+    "name": "bsearchviz_sim",
+    "source": "corpus/bsearchviz_sim.c",
+    "expected": "0x7FF5",
+    "status": "PASS",
+    "message": "0x7FF5 (all agree)"
+  },
+  {
+    "name": "strcmprace_sim",
+    "source": "corpus/strcmprace_sim.c",
+    "expected": "0xF0BA",
+    "status": "PASS",
+    "message": "0xF0BA (all agree)"
+  },
+  {
+    "name": "packrec_sim",
+    "source": "corpus/packrec_sim.c",
+    "expected": "0x4676",
+    "status": "PASS",
+    "message": "0x4676 (all agree)"
+  },
+  {
+    "name": "trapguard_sim",
+    "source": "corpus/trapguard_sim.c",
+    "expected": "0x2C2D",
+    "status": "PASS",
+    "message": "0x2C2D (all agree)"
+  },
+  {
+    "name": "vlanest_sim",
+    "source": "corpus/vlanest_sim.c",
+    "expected": "0x153B",
+    "status": "PASS",
+    "message": "0x153B (all agree)"
+  },
+  {
+    "name": "jtedge_sim",
+    "source": "corpus/jtedge_sim.c",
+    "expected": "0xC199",
+    "status": "PASS",
+    "message": "0xC199 (all agree)"
+  },
+  {
+    "name": "jtsparse_sim",
+    "source": "corpus/jtsparse_sim.c",
+    "expected": "0xA131",
+    "status": "PASS",
+    "message": "0xA131 (all agree)"
+  },
+  {
+    "name": "byvaledge_sim",
+    "source": "corpus/byvaledge_sim.c",
+    "expected": "0x4FAB",
+    "status": "PASS",
+    "message": "0x4FAB (all agree)"
+  },
+  {
+    "name": "ovmatrix_sim",
+    "source": "corpus/ovmatrix_sim.c",
+    "expected": "0xD4D0",
+    "status": "PASS",
+    "message": "0xD4D0 (all agree)"
+  },
+  {
+    "name": "fuzz-1",
+    "seed": 1,
+    "status": "PASS",
+    "message": "0x604F (all agree)"
+  },
+  {
+    "name": "fuzz-2",
+    "seed": 2,
+    "status": "PASS",
+    "message": "0x06AC (all agree)"
+  },
+  {
+    "name": "fuzz-3",
+    "seed": 3,
+    "status": "PASS",
+    "message": "0x84F8 (all agree)"
+  },
+  {
+    "name": "fuzz-4",
+    "seed": 4,
+    "status": "PASS",
+    "message": "0x9C65 (all agree)"
+  },
+  {
+    "name": "fuzz-5",
+    "seed": 5,
+    "status": "PASS",
+    "message": "0xD392 (all agree)"
+  },
+  {
+    "name": "fuzz-6",
+    "seed": 6,
+    "status": "PASS",
+    "message": "0x8739 (all agree)"
+  },
+  {
+    "name": "fuzz-7",
+    "seed": 7,
+    "status": "PASS",
+    "message": "0xDBE2 (all agree)"
+  },
+  {
+    "name": "fuzz-8",
+    "seed": 8,
+    "status": "PASS",
+    "message": "0x97D7 (all agree)"
+  },
+  {
+    "name": "fuzz-9",
+    "seed": 9,
+    "status": "PASS",
+    "message": "0x781F (all agree)"
+  },
+  {
+    "name": "fuzz-10",
+    "seed": 10,
+    "status": "PASS",
+    "message": "0x162A (all agree)"
+  },
+  {
+    "name": "fuzz-11",
+    "seed": 11,
+    "status": "PASS",
+    "message": "0x71F9 (all agree)"
+  },
+  {
+    "name": "fuzz-12",
+    "seed": 12,
+    "status": "PASS",
+    "message": "0x98C3 (all agree)"
+  },
+  {
+    "name": "fuzz-13",
+    "seed": 13,
+    "status": "PASS",
+    "message": "0xC9F9 (all agree)"
+  },
+  {
+    "name": "fuzz-14",
+    "seed": 14,
+    "status": "PASS",
+    "message": "0xEDAB (all agree)"
+  },
+  {
+    "name": "fuzz-15",
+    "seed": 15,
+    "status": "PASS",
+    "message": "0x006B (all agree)"
+  },
+  {
+    "name": "fuzz-16",
+    "seed": 16,
+    "status": "PASS",
+    "message": "0x0001 (all agree)"
+  },
+  {
+    "name": "fuzz-17",
+    "seed": 17,
+    "status": "PASS",
+    "message": "0x537B (all agree)"
+  },
+  {
+    "name": "fuzz-18",
+    "seed": 18,
+    "status": "PASS",
+    "message": "0x0384 (all agree)"
+  },
+  {
+    "name": "fuzz-19",
+    "seed": 19,
+    "status": "PASS",
+    "message": "0x460E (all agree)"
+  },
+  {
+    "name": "fuzz-20",
+    "seed": 20,
+    "status": "PASS",
+    "message": "0x122E (all agree)"
+  },
+  {
+    "name": "fuzz-21",
+    "seed": 21,
+    "status": "PASS",
+    "message": "0x8058 (all agree)"
+  },
+  {
+    "name": "fuzz-22",
+    "seed": 22,
+    "status": "PASS",
+    "message": "0x9449 (all agree)"
+  },
+  {
+    "name": "fuzz-23",
+    "seed": 23,
+    "status": "PASS",
+    "message": "0xC5FB (all agree)"
+  },
+  {
+    "name": "fuzz-24",
+    "seed": 24,
+    "status": "PASS",
+    "message": "0x5881 (all agree)"
+  },
+  {
+    "name": "fuzz-25",
+    "seed": 25,
+    "status": "PASS",
+    "message": "0x0107 (all agree)"
+  },
+  {
+    "name": "fuzz-26",
+    "seed": 26,
+    "status": "PASS",
+    "message": "0xD956 (all agree)"
+  },
+  {
+    "name": "fuzz-27",
+    "seed": 27,
+    "status": "PASS",
+    "message": "0x873E (all agree)"
+  },
+  {
+    "name": "fuzz-28",
+    "seed": 28,
+    "status": "PASS",
+    "message": "0xC448 (all agree)"
+  },
+  {
+    "name": "fuzz-29",
+    "seed": 29,
+    "status": "PASS",
+    "message": "0x712D (all agree)"
+  },
+  {
+    "name": "fuzz-30",
+    "seed": 30,
+    "status": "PASS",
+    "message": "0xF3D9 (all agree)"
+  },
+  {
+    "name": "fuzz-31",
+    "seed": 31,
+    "status": "PASS",
+    "message": "0xD10C (all agree)"
+  },
+  {
+    "name": "fuzz-32",
+    "seed": 32,
+    "status": "PASS",
+    "message": "0xC455 (all agree)"
+  },
+  {
+    "name": "fuzz-33",
+    "seed": 33,
+    "status": "PASS",
+    "message": "0x030B (all agree)"
+  },
+  {
+    "name": "fuzz-34",
+    "seed": 34,
+    "status": "PASS",
+    "message": "0x0851 (all agree)"
+  },
+  {
+    "name": "fuzz-35",
+    "seed": 35,
+    "status": "PASS",
+    "message": "0x1C3C (all agree)"
+  },
+  {
+    "name": "fuzz-36",
+    "seed": 36,
+    "status": "PASS",
+    "message": "0x4B7D (all agree)"
+  },
+  {
+    "name": "fuzz-37",
+    "seed": 37,
+    "status": "PASS",
+    "message": "0x3E94 (all agree)"
+  },
+  {
+    "name": "fuzz-38",
+    "seed": 38,
+    "status": "PASS",
+    "message": "0x7F15 (all agree)"
+  },
+  {
+    "name": "fuzz-39",
+    "seed": 39,
+    "status": "PASS",
+    "message": "0x6117 (all agree)"
+  },
+  {
+    "name": "fuzz-40",
+    "seed": 40,
+    "status": "PASS",
+    "message": "0x7A58 (all agree)"
+  },
+  {
+    "name": "fuzz-41",
+    "seed": 41,
+    "status": "PASS",
+    "message": "0xAADD (all agree)"
+  },
+  {
+    "name": "fuzz-42",
+    "seed": 42,
+    "status": "PASS",
+    "message": "0x8BE3 (all agree)"
+  },
+  {
+    "name": "fuzz-43",
+    "seed": 43,
+    "status": "PASS",
+    "message": "0x6384 (all agree)"
+  },
+  {
+    "name": "fuzz-44",
+    "seed": 44,
+    "status": "PASS",
+    "message": "0xD810 (all agree)"
+  },
+  {
+    "name": "fuzz-45",
+    "seed": 45,
+    "status": "PASS",
+    "message": "0x751E (all agree)"
+  },
+  {
+    "name": "fuzz-46",
+    "seed": 46,
+    "status": "PASS",
+    "message": "0xE94B (all agree)"
+  },
+  {
+    "name": "fuzz-47",
+    "seed": 47,
+    "status": "PASS",
+    "message": "0x7384 (all agree)"
+  },
+  {
+    "name": "fuzz-48",
+    "seed": 48,
+    "status": "PASS",
+    "message": "0xF237 (all agree)"
+  },
+  {
+    "name": "fuzz-49",
+    "seed": 49,
+    "status": "PASS",
+    "message": "0x6AB8 (all agree)"
+  },
+  {
+    "name": "fuzz-50",
+    "seed": 50,
+    "status": "PASS",
+    "message": "0x6601 (all agree)"
+  }
+]

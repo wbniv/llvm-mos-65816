@@ -1,0 +1,35 @@
+[
+  {
+    "optimization": "Os",
+    "mode": "6502",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 5,
+    "larger": 1,
+    "code_changes": 7,
+    "delta": -970,
+    "unpaired": []
+  },
+  {
+    "optimization": "Oz",
+    "mode": "6502",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 6,
+    "larger": 1,
+    "code_changes": 8,
+    "delta": -996,
+    "unpaired": []
+  },
+  {
+    "optimization": "O2",
+    "mode": "6502",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 5,
+    "larger": 0,
+    "code_changes": 6,
+    "delta": -941,
+    "unpaired": []
+  }
+]

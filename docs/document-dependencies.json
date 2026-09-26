@@ -32,13 +32,15 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "37219713269975685d23aa9e32ed4158ff3488eb95323b8be20a2a79deccdbe7",
+          "docs/upstream-dashboard-curation.json": "d6dd6df1f05dee0fdc4bdcf9f509e57addf7800870feb3e5878784b449fea1e0",
           "docs/defects/bitboard-inline-register-pressure.json": "5216f32f376dd9106d7e2188b4b4e397f5be9f59117d0aec18fcb794ad873d73",
           "docs/defects/gisel-inline-asm-register-bounds.json": "2eaf09fa60696723a575db66b04fba7352cb7cbec94a67e4a13fe090220eda33",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "b446d5dcb2684b2c383ec23cb768268d6fc94c1b8553fff44d8f85db43d53109",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
+          "docs/defects/mos-carry-scheduling-pressure.json": "ad7c5d284066dd3a2213018e2709707dc8f93933532c66fa08b86c4cfc31800c",
           "docs/defects/mos-coalescing-rc-undef.json": "14a427f5b765eff0b1ea54de81e9862a57c91ecfc79c18a57543fd4c84ddebf1",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "5beedb323d372e49a354ea4aac3d8859860aeb3e4a0b2a022db0d6ac2fa905f1",
           "docs/defects/mos-float-vector-legalization.json": "8ae1b9696ceb1668d6041cde328820e7f071c0984be87d91ccb05381ae0da135",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "4e8068c1c3d4bc116e8c286c9567e3e797fe4ca52a61398ce95b9701e1b2af0b",
@@ -52,7 +54,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "bb774d5f8fc6dbc8100838467acc092afe820b1e1f4b0f3b9a38bc7285cf2c6e"
+          "docs/upstream-dashboard.json": "9c2476f960f0848dc9c1a8dd749aa0393a2deca752c953ba27f3f4fac85b9089"
         }
       }
     },
@@ -73,13 +75,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b",
+          "docs/upstream-pending-work.md": "2bf3a80983bbcbc59d5020a08cc32b9b1d375fc60ff81e1eb278be18f55dc9cc",
           "docs/upstream-dashboard-graph-map.json": "b066069ce4ecbae5dd7effc1e95c4c115c9953fec290286e90ffc928f1b1f06a",
-          "docs/upstream-dashboard.json": "bb774d5f8fc6dbc8100838467acc092afe820b1e1f4b0f3b9a38bc7285cf2c6e",
+          "docs/upstream-dashboard.json": "9c2476f960f0848dc9c1a8dd749aa0393a2deca752c953ba27f3f4fac85b9089",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "be7ff40d2eb2ebf1661cf7438b1e8852111ac1af7671d64b6c35db0541958406"
+          "docs/upstream-dashboard-graph.json": "9f43272de0302ded5d9a584e8f113338e5ec3ebb0f2a5fad68cc4fdf07f197b9"
         }
       }
     },
@@ -108,16 +110,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "cc61d2ee18758a3d9228410e788b8a435602f5f6295bfc50572330137c4b5b7b",
-          "docs/upstream-contribution-status.md": "d2e565d22814ae70ea96e84f21585cc2ee9c8cdeb303c3a6b5d3f2a815542062",
+          "docs/upstream-pending-work.md": "2bf3a80983bbcbc59d5020a08cc32b9b1d375fc60ff81e1eb278be18f55dc9cc",
+          "docs/upstream-contribution-status.md": "1ba1886ca40ba30fa69ac6ce81c8b5cbe3fdbe79443eaf0f3d43b4cf00927825",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "68f8cfb24132ad636c4b5fb982fe1e56b65e90f9a05e228f62ca2dd1d0b571a2",
-          "docs/mos-upstream-status-2026-09-21.html": "aa7594f39700abdb5936efc5dd585047c2a8f1032f6e0004d80daf70b58acfc9"
+          "docs/mos-upstream-flowchart.html": "fe14595bedd4d067ae701333c0ed94886c6b14c1ec50e50cf5b6239b4f351602",
+          "docs/mos-upstream-status-2026-09-21.html": "dffca8eeaf856363221d54048e4197a28b3e7b2aaad169e5ec29115fd65dc592"
         }
       }
     },
@@ -230,6 +232,29 @@
           "docs/snes-demo-compiler-bug-map.md": "7071a599506d8da0a4ee727d34d8007299445730b8ae75892c61a1c1eb1ae398"
         }
       }
+    },
+    {
+      "id": "carry-scheduling-plan-preview",
+      "sources": [
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "dev/render-carry-plan.py"
+      ],
+      "outputs": [
+        "docs/plans/2026-09-26-mos-carry-scheduling.html"
+      ],
+      "command": [
+        "python3",
+        "dev/render-carry-plan.py"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff",
+          "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
+        },
+        "outputs": {
+          "docs/plans/2026-09-26-mos-carry-scheduling.html": "9f5c856ed44e19a3425511458de46a6c3ab71368a870ce250f86010d6439471a"
+        }
+      }
     }
   ],
   "maintained": [
@@ -249,7 +274,9 @@
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/howto-defect-evidence.md",
-        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
@@ -257,8 +284,10 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -272,11 +301,13 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
+          "docs/pr-preparations/2026-09-26/README.md": "7ed772f4c725ba3620bddd2579410836220089c930833f8351adb3e8d6eded7c",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff"
         },
-        "reviewed_at": "2026-09-26T08:36:20.885727+00:00",
-        "note": "Checked the status of the locally completed runtime [dp],Y increment and the still-open near-Y defect against the revised dashboard and flowchart; both TODO entries remain accurate.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T12:31:13.241328+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
       }
     },
     {
@@ -293,7 +324,9 @@
           ]
         },
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
-        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md"
+        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
@@ -301,8 +334,10 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -314,11 +349,13 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
-          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
+          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
+          "docs/pr-preparations/2026-09-26/README.md": "7ed772f4c725ba3620bddd2579410836220089c930833f8351adb3e8d6eded7c",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff"
         },
-        "reviewed_at": "2026-09-26T08:36:02.228493+00:00",
-        "note": "Reviewed the completed runtime [dp],Y optimization and the separate open near-Y defect; the flowchart now shows both with their current status and #321 submission relationship.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T12:31:13.551440+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
       }
     },
     {
@@ -335,7 +372,9 @@
           ]
         },
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
-        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md"
+        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
@@ -343,8 +382,10 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -356,11 +397,13 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
-          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
+          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
+          "docs/pr-preparations/2026-09-26/README.md": "7ed772f4c725ba3620bddd2579410836220089c930833f8351adb3e8d6eded7c",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff"
         },
-        "reviewed_at": "2026-09-26T08:36:36.796494+00:00",
-        "note": "Confirmed this summary already records the local increment verification and separate near-Y issue; the graph and curation correction do not change its PR state.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T12:31:13.885001+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
       }
     },
     {
@@ -483,7 +526,9 @@
             "resolution.change"
           ]
         },
-        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
@@ -491,11 +536,203 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
+          "docs/pr-preparations/2026-09-26/README.md": "7ed772f4c725ba3620bddd2579410836220089c930833f8351adb3e8d6eded7c",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff"
         },
-        "reviewed_at": "2026-09-26T06:36:18.459162+00:00",
-        "note": "Recorded the new local commit and final gate status; this increment is complete, but the full #321 feature series remains the PR unit.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T12:31:14.305127+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-26-mos-carry-scheduling.md",
+      "sources": [
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+        "patches/llvm-mos/0002-321-accum16.patch",
+        "patches/llvm-mos/0061-mos-far-global-long-x.patch",
+        "patches/llvm-mos/0062-mos-native-far-word.patch",
+        "patches/llvm-mos/0063-mos-near-shared-store.patch",
+        "examples/65816/farindex.c",
+        "dev/measure-near-store.py",
+        "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+        "dev/measure-carry-scheduling.py",
+        "docs/defects/mos-carry-scheduling-pressure.json",
+        "docs/defects/mos-farblit-byte-load-legalization.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/focused-runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/original-functions-runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-lit.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log",
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "ce7aa51b32a7fdb11d213ad590b2ad1c6e19e2be1ed7f58f9c6632d072ec0999",
+          "patches/llvm-mos/0002-321-accum16.patch": "d384989ded4ef0541b4e190ea4cc2168dde97548cc0bdb7f25f58b1888ca2afb",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+          "examples/65816/farindex.c": "a30e67ce9c63b898b10eb891ecab30ebc36f455f55dd046be15f9da9caa6cd6d",
+          "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
+          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
+          "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
+          "docs/defects/mos-carry-scheduling-pressure.json": "ad7c5d284066dd3a2213018e2709707dc8f93933532c66fa08b86c4cfc31800c",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "5beedb323d372e49a354ea4aac3d8859860aeb3e4a0b2a022db0d6ac2fa905f1",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json": "43a9055b8e3731b7dca0ce17cf7bc3f12250a77bd087b7535d54154f651e7495",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json": "2a14829303577c92512146e5d24ebea007d23c81e5c685cbeea315dd4e2eab0f",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/focused-runtime-results.json": "b05a63eb54af07d832beac57dd3e78bc7d3cfeb33d38808641e79e4a3c930f6e",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/original-functions-runtime-results.json": "86d7d63b819b538402480df5d215673eb98bbc45287e5a44009360c09e2713e8",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-lit.json": "83c12b6f62683571a52c3a64628d151709307944d694add1b3e43728f096234d",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log": "b6f41458c3f1958994c1f5424573dc3cfb8165b75eb202620a23d982516e2e48",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "f161f44ae01c529eac3c65b4e1e632a20a96687f8f72aec6e4b84eb4fb9b75ed",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "3a04a443b0ca09b5324b1589e2fd5aee55f2d152b01219c27f81a83213cb4fdd"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.239104+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-carry-scheduling-pressure.json",
+          "fields": [
+            "status",
+            "summary",
+            "mitigation.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-carry-scheduling-pressure.json": "05912e89c4281a921d7b07436f3f2ef257a516a565395eb365c4406691176013"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.300931+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-farblit-byte-load-legalization.json",
+          "fields": [
+            "status",
+            "summary",
+            "mitigation.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-farblit-byte-load-legalization.json": "22cec3a47f473aab3c4559d8d30e48c3616e4e216bafd41c33c327a25af74d60"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.363834+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-review.md": "f161f44ae01c529eac3c65b4e1e632a20a96687f8f72aec6e4b84eb4fb9b75ed",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "3a04a443b0ca09b5324b1589e2fd5aee55f2d152b01219c27f81a83213cb4fdd"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.484510+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-review.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.656220+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-validation.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.771602+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/README.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-pr-body.md": "ab1ab2a9c2bdd8062de1f0e6d04ff9513546d52cf4b65e833e16e60f9ff0874f",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "f161f44ae01c529eac3c65b4e1e632a20a96687f8f72aec6e4b84eb4fb9b75ed",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "3a04a443b0ca09b5324b1589e2fd5aee55f2d152b01219c27f81a83213cb4fdd"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.954199+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/project-registry.md",
+      "sources": [
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip.log",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip.log": "ee36cdd46de41b7aa3b3eead593ca5d59f8c0184a054640858608e1407c03253",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log": "b6f41458c3f1958994c1f5424573dc3cfb8165b75eb202620a23d982516e2e48"
+        },
+        "reviewed_at": "2026-09-26T12:31:14.421691+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
       }
     }
   ]

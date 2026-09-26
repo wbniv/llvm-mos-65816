@@ -1,5 +1,15 @@
 # `[dp],Y` Phase 2 — increment 2: fold a **range-proven runtime index** into `b7`/`97`
 
+**Current build qualification (2026-09-26):** the runtime and code-generation
+results below describe the increment-2 build tested here. The later combined
+increment-2 plus 0049–0063 baseline rejects `farblit.c` before scheduling on an
+absolute byte load. [Retained failure](../defects/mos-farblit-byte-load-legalization.json)
+and [carry-validation context](2026-09-26-mos-carry-scheduling.md#8-completed-validation-and-packaging)
+identify that separate, unisolated patch interaction; this qualification does
+not replace the earlier passing evidence. Update: OpenAI Codex CLI 0.157.1
+(`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
+
+
 **Resume status (2026‑09‑26):** rebased onto committed main `8c19c703`, including
 `6065ebec` and the 0043/0046/0047 review revisions. Sections 1–5b below preserve
 the inherited design and September 25 evidence; their use of “landed” described

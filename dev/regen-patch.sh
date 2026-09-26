@@ -70,8 +70,10 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0045-mos-asm-print-a16-immediate.patch"   # a16 immediate width; downstream-only
   "$PATCHES/0046-mos-fixupkinds-addrasciz-row.patch"  # AddrAsciz Infos[] row; pristine-upstream
   "$PATCHES/0047-mos-mc-addr-asciz-symbolic-crash.patch"  # -show-encoding crash; pristine-upstream
+  "$PATCHES/0064-mos-computed-carry-scheduling.patch"
 )
 TESTRELS=(
+  "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
   "llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll"
   "llvm/test/CodeGen/MOS/a16-byte-store.ll"
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only

@@ -1,0 +1,61 @@
+import sys, os, json, subprocess
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+ROOT = Path('/work')
+OUT = ROOT / 'build/carry-dynamic-runtime'
+
+def worker(task):
+    sys.path.insert(0, str(ROOT / 'tools'))
+    import a16_fuzz as af
+    name = task['name']
+    directory = OUT / name
+    af.WORK = directory / 'work'
+    af.SCRATCH = directory / 'mame'
+    af.TRIAGE = directory / 'triage'
+    logs = []
+    for func in ['run_mame', 'run_bsnes']:
+        original = getattr(af, func)
+        def recorded(*args, _original=original, _func=func, **kwargs):
+            result = _original(*args, **kwargs)
+            logs.append({'function': _func, 'arguments': [str(v) for v in args], 'result': result})
+            (directory / 'emulators.json').write_text(json.dumps(logs, indent=2) + '\n')
+            return result
+        setattr(af, func, recorded)
+    if 'seed' in task:
+        status, message = af.run_one(task['seed'], s32=True)
+    else:
+        src = ROOT / 'examples/snes' / task['source']
+        status, message, expected = af.evaluate(src, int(task['expected'], 16), True,
+            lambda reason, extra: af.triage_file(name, src, reason, extra), verify_config=af.CFG)
+    result = dict(task, status=status, message=message)
+    (directory / 'result.json').write_text(json.dumps(result, indent=2) + '\n')
+    print(json.dumps(result), flush=True)
+    return 0 if status in ['PASS', 'XFAIL'] else 1
+
+def run(task):
+    directory = OUT / task['name']
+    directory.mkdir(parents=True, exist_ok=True)
+    with (directory / 'run.log').open('w') as log:
+        p = subprocess.run([sys.executable, __file__, '--worker', json.dumps(task)],
+                           stdout=log, stderr=subprocess.STDOUT)
+    result = directory / 'result.json'
+    return json.loads(result.read_text()) if result.exists() else dict(task, status='ERROR', exit_code=p.returncode)
+
+if __name__ == '__main__':
+    if len(sys.argv) > 1 and sys.argv[1] == '--worker':
+        sys.exit(worker(json.loads(sys.argv[2])))
+    tasks = []
+    for line in (ROOT / 'examples/snes/corpus/expected.tsv').read_text().splitlines():
+        parts = line.split()
+        if len(parts) > 2 and not parts[0].startswith('#') and parts[1] == 'corpus_result':
+            tasks.append({'name': Path(parts[0]).stem, 'source': parts[0], 'expected': parts[2]})
+    tasks += [{'name': 'fuzz-' + str(n), 'seed': n} for n in range(1, 51)]
+    if len(sys.argv) > 1:
+        selected = set(sys.argv[1:]); tasks = [t for t in tasks if t['name'] in selected]
+    OUT.mkdir(exist_ok=True)
+    results = []
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        for result in pool.map(run, tasks):
+            results.append(result)
+            print(json.dumps(result), flush=True)
+            (OUT / 'results.json').write_text(json.dumps(results, indent=2) + '\n')

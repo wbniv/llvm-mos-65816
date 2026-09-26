@@ -1,0 +1,25 @@
+// RUN: llvm-tblgen -gen-register-info -I %p/../../include %s | FileCheck %s
+
+include "llvm/Target/Target.td"
+
+def C : Register<"c">;
+def V : Register<"v">;
+
+// Equal unit sets share one pressure set. A fine-grained class must protect
+// that set even when the first class with those units permits pruning.
+def ACc : RegisterClass<"Test", [i1], 8, (add C)>;
+def ZCc : RegisterClass<"Test", [i8], 8, (add C)> {
+  let isPressureFineGrained = true;
+}
+// An ordinary single-register subset may still merge with its superset.
+def Vc : RegisterClass<"Test", [i8], 8, (add V)>;
+def CVc : RegisterClass<"Test", [i8], 8, (add C, V)>;
+def Test : Target;
+
+// CHECK-LABEL: getRegPressureSetName(unsigned Idx) const {
+// CHECK: "ACc",
+// CHECK-NEXT: "CVc",
+// CHECK-NEXT: };
+// CHECK-LABEL: getRegPressureSetLimit(const MachineFunction &MF, unsigned Idx) const {
+// CHECK: 1,{{ *}}// 0: ACc
+// CHECK-NEXT: 2,{{ *}}// 1: CVc

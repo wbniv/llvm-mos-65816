@@ -1,0 +1,2103 @@
+/*===- TableGen'erated file -------------------------------------*- C++ -*-===*\
+|*                                                                            *|
+|* Target Register and Register Classes Information                           *|
+|*                                                                            *|
+|* Automatically generated file, do not edit!                                 *|
+|*                                                                            *|
+\*===----------------------------------------------------------------------===*/
+
+namespace llvm {
+
+extern const MCRegisterClass MOSMCRegisterClasses[];
+
+static const MVT::SimpleValueType MOSVTLists[] = {
+  /* 0 */ MVT::i1, MVT::Other,
+  /* 2 */ MVT::i8, MVT::Other,
+  /* 4 */ MVT::i16, MVT::Other,
+  /* 6 */ MVT::i32, MVT::Other,
+  /* 8 */ MVT::i64, MVT::Other,
+};
+
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverlength-strings"
+#endif
+static constexpr char MOSSubRegIndexStrings[] = {
+  /* 0 */ "subhi16\000"
+  /* 8 */ "sublo16\000"
+  /* 16 */ "subhi16_then_sublsb\000"
+  /* 36 */ "subhi16_then_subhi_then_sublsb\000"
+  /* 67 */ "subhi16_then_subhi\000"
+  /* 86 */ "subn\000"
+  /* 91 */ "subhi16_then_sublo\000"
+  /* 110 */ "subv\000"
+  /* 115 */ "subcarry\000"
+  /* 124 */ "subz\000"
+  /* 129 */ "subnz\000"
+};
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif
+
+
+static constexpr uint32_t MOSSubRegIndexNameOffsets[] = {
+  115, 
+  80, 
+  0, 
+  104, 
+  8, 
+  29, 
+  86, 
+  129, 
+  110, 
+  124, 
+  49, 
+  67, 
+  91, 
+  16, 
+  36, 
+};
+
+static const TargetRegisterInfo::SubRegCoveredBits MOSSubRegIdxRangeTable[] = {
+  { 65535, 65535 },
+  { 0, 1 },	// subcarry
+  { 8, 8 },	// subhi
+  { 16, 16 },	// subhi16
+  { 0, 8 },	// sublo
+  { 0, 16 },	// sublo16
+  { 0, 1 },	// sublsb
+  { 0, 1 },	// subn
+  { 0, 2 },	// subnz
+  { 0, 1 },	// subv
+  { 0, 1 },	// subz
+  { 8, 1 },	// subhi_then_sublsb
+  { 24, 8 },	// subhi16_then_subhi
+  { 16, 8 },	// subhi16_then_sublo
+  { 16, 1 },	// subhi16_then_sublsb
+  { 24, 1 },	// subhi16_then_subhi_then_sublsb
+};
+
+
+static const LaneBitmask MOSSubRegIndexLaneMaskTable[] = {
+  LaneBitmask::getAll(),
+  LaneBitmask(0x0000000000000001), // subcarry
+  LaneBitmask(0x0000000000000020), // subhi
+  LaneBitmask(0x00000000000000C0), // subhi16
+  LaneBitmask(0x0000000000000002), // sublo
+  LaneBitmask(0x0000000000000022), // sublo16
+  LaneBitmask(0x0000000000000002), // sublsb
+  LaneBitmask(0x0000000000000004), // subn
+  LaneBitmask(0x0000000000000014), // subnz
+  LaneBitmask(0x0000000000000008), // subv
+  LaneBitmask(0x0000000000000010), // subz
+  LaneBitmask(0x0000000000000020), // subhi_then_sublsb
+  LaneBitmask(0x0000000000000080), // subhi16_then_subhi
+  LaneBitmask(0x0000000000000040), // subhi16_then_sublo
+  LaneBitmask(0x0000000000000040), // subhi16_then_sublsb
+  LaneBitmask(0x0000000000000080), // subhi16_then_subhi_then_sublsb
+ };
+
+
+
+static const TargetRegisterInfo::RegClassInfo MOSRegClassInfos[] = {
+  // Mode = 0 (DefaultMode)
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // Anyi1
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // CV_GPR_LSB
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // Flag
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // GPR_LSB
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // AllocatableFlags
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // Cc
+  { 1, 8, 8, /*MOSVTLists+*/0 },    // Vc
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Anyi8
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // AImag8
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Imag8
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // AXYP
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // GPR
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // MOSAsmParamRegClass
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // AP
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // AY
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // XY
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Ac
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Pc
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Xc
+  { 8, 8, 8, /*MOSVTLists+*/2 },    // Yc
+  { 16, 16, 8, /*MOSVTLists+*/4 },    // Imag16
+  { 16, 16, 8, /*MOSVTLists+*/4 },    // Ac16
+  { 16, 16, 8, /*MOSVTLists+*/4 },    // Xc16
+  { 16, 16, 8, /*MOSVTLists+*/4 },    // Yc16
+  { 32, 32, 8, /*MOSVTLists+*/6 },    // Imag32
+  { 32, 32, 8, /*MOSVTLists+*/6 },    // Fakei32
+  { 64, 64, 8, /*MOSVTLists+*/8 },    // Fakei64
+};
+static const uint32_t Anyi1SubClassMask[] = {
+  0x0000007b, 
+  0x00020000, // subcarry
+  0x01fdcb80, // sublsb
+  0x00020000, // subv
+  0x01100000, // subhi_then_sublsb
+  0x01000000, // subhi16_then_sublsb
+  0x01000000, // subhi16_then_subhi_then_sublsb
+};
+
+static const uint32_t CV_GPR_LSBSubClassMask[] = {
+  0x0000007a, 
+  0x00020000, // subcarry
+  0x00edc800, // sublsb
+  0x00020000, // subv
+};
+
+static const uint32_t FlagSubClassMask[] = {
+  0x00000074, 
+  0x00020000, // subcarry
+  0x00020000, // subn
+  0x00020000, // subv
+  0x00020000, // subz
+};
+
+static const uint32_t GPR_LSBSubClassMask[] = {
+  0x00000008, 
+  0x00edc800, // sublsb
+};
+
+static const uint32_t AllocatableFlagsSubClassMask[] = {
+  0x00000070, 
+  0x00020000, // subcarry
+  0x00020000, // subv
+};
+
+static const uint32_t CcSubClassMask[] = {
+  0x00000020, 
+  0x00020000, // subcarry
+};
+
+static const uint32_t VcSubClassMask[] = {
+  0x00000040, 
+  0x00020000, // subv
+};
+
+static const uint32_t Anyi8SubClassMask[] = {
+  0x000dcb80, 
+  0x01100000, // subhi
+  0x01f00000, // sublo
+  0x01000000, // subhi16_then_subhi
+  0x01000000, // subhi16_then_sublo
+};
+
+static const uint32_t AImag8SubClassMask[] = {
+  0x00010300, 
+  0x01100000, // subhi
+  0x01300000, // sublo
+  0x01000000, // subhi16_then_subhi
+  0x01000000, // subhi16_then_sublo
+};
+
+static const uint32_t Imag8SubClassMask[] = {
+  0x00000200, 
+  0x01100000, // subhi
+  0x01100000, // sublo
+  0x01000000, // subhi16_then_subhi
+  0x01000000, // subhi16_then_sublo
+};
+
+static const uint32_t AXYPSubClassMask[] = {
+  0x000fec00, 
+  0x00e00000, // sublo
+};
+
+static const uint32_t GPRSubClassMask[] = {
+  0x000dc800, 
+  0x00e00000, // sublo
+};
+
+static const uint32_t MOSAsmParamRegClassSubClassMask[] = {
+  0x000c9000, 
+  0x00c00000, // sublo
+};
+
+static const uint32_t APSubClassMask[] = {
+  0x00032000, 
+  0x00200000, // sublo
+};
+
+static const uint32_t AYSubClassMask[] = {
+  0x00094000, 
+  0x00a00000, // sublo
+};
+
+static const uint32_t XYSubClassMask[] = {
+  0x000c8000, 
+  0x00c00000, // sublo
+};
+
+static const uint32_t AcSubClassMask[] = {
+  0x00010000, 
+  0x00200000, // sublo
+};
+
+static const uint32_t PcSubClassMask[] = {
+  0x00020000, 
+};
+
+static const uint32_t XcSubClassMask[] = {
+  0x00040000, 
+  0x00400000, // sublo
+};
+
+static const uint32_t YcSubClassMask[] = {
+  0x00080000, 
+  0x00800000, // sublo
+};
+
+static const uint32_t Imag16SubClassMask[] = {
+  0x00100000, 
+  0x01000000, // subhi16
+  0x01000000, // sublo16
+};
+
+static const uint32_t Ac16SubClassMask[] = {
+  0x00200000, 
+};
+
+static const uint32_t Xc16SubClassMask[] = {
+  0x00400000, 
+};
+
+static const uint32_t Yc16SubClassMask[] = {
+  0x00800000, 
+};
+
+static const uint32_t Imag32SubClassMask[] = {
+  0x01000000, 
+};
+
+static const uint32_t Fakei32SubClassMask[] = {
+  0x06000000, 
+};
+
+static const uint32_t Fakei64SubClassMask[] = {
+  0x04000000, 
+};
+
+static const uint16_t SuperRegIdxSeqs[] = {
+  /* 0 */ 1, 0,
+  /* 2 */ 4, 0,
+  /* 4 */ 3, 5, 0,
+  /* 7 */ 6, 0,
+  /* 9 */ 1, 9, 0,
+  /* 12 */ 1, 6, 9, 0,
+  /* 16 */ 1, 7, 9, 10, 0,
+  /* 21 */ 2, 4, 12, 13, 0,
+  /* 26 */ 1, 6, 9, 11, 14, 15, 0,
+};
+
+static unsigned const CV_GPR_LSBSuperclasses[] = {
+  MOS::Anyi1RegClassID,
+};
+
+static unsigned const GPR_LSBSuperclasses[] = {
+  MOS::Anyi1RegClassID,
+  MOS::CV_GPR_LSBRegClassID,
+};
+
+static unsigned const AllocatableFlagsSuperclasses[] = {
+  MOS::Anyi1RegClassID,
+  MOS::CV_GPR_LSBRegClassID,
+  MOS::FlagRegClassID,
+};
+
+static unsigned const CcSuperclasses[] = {
+  MOS::Anyi1RegClassID,
+  MOS::CV_GPR_LSBRegClassID,
+  MOS::FlagRegClassID,
+  MOS::AllocatableFlagsRegClassID,
+};
+
+static unsigned const VcSuperclasses[] = {
+  MOS::Anyi1RegClassID,
+  MOS::CV_GPR_LSBRegClassID,
+  MOS::FlagRegClassID,
+  MOS::AllocatableFlagsRegClassID,
+};
+
+static unsigned const AImag8Superclasses[] = {
+  MOS::Anyi8RegClassID,
+};
+
+static unsigned const Imag8Superclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AImag8RegClassID,
+};
+
+static unsigned const GPRSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AXYPRegClassID,
+};
+
+static unsigned const APSuperclasses[] = {
+  MOS::AXYPRegClassID,
+};
+
+static unsigned const AYSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AXYPRegClassID,
+  MOS::GPRRegClassID,
+};
+
+static unsigned const XYSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AXYPRegClassID,
+  MOS::GPRRegClassID,
+  MOS::MOSAsmParamRegClassRegClassID,
+};
+
+static unsigned const AcSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AImag8RegClassID,
+  MOS::AXYPRegClassID,
+  MOS::GPRRegClassID,
+  MOS::APRegClassID,
+  MOS::AYRegClassID,
+};
+
+static unsigned const PcSuperclasses[] = {
+  MOS::AXYPRegClassID,
+  MOS::APRegClassID,
+};
+
+static unsigned const XcSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AXYPRegClassID,
+  MOS::GPRRegClassID,
+  MOS::MOSAsmParamRegClassRegClassID,
+  MOS::XYRegClassID,
+};
+
+static unsigned const YcSuperclasses[] = {
+  MOS::Anyi8RegClassID,
+  MOS::AXYPRegClassID,
+  MOS::GPRRegClassID,
+  MOS::MOSAsmParamRegClassRegClassID,
+  MOS::AYRegClassID,
+  MOS::XYRegClassID,
+};
+
+static unsigned const Fakei64Superclasses[] = {
+  MOS::Fakei32RegClassID,
+};
+
+namespace MOS {
+
+// Register class instances.
+  extern const TargetRegisterClass Anyi1RegClass = {
+    &MOSMCRegisterClasses[Anyi1RegClassID],
+    Anyi1SubClassMask,
+    SuperRegIdxSeqs + 26,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass CV_GPR_LSBRegClass = {
+    &MOSMCRegisterClasses[CV_GPR_LSBRegClassID],
+    CV_GPR_LSBSubClassMask,
+    SuperRegIdxSeqs + 12,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    CV_GPR_LSBSuperclasses,  1,
+    nullptr
+  };
+
+  extern const TargetRegisterClass FlagRegClass = {
+    &MOSMCRegisterClasses[FlagRegClassID],
+    FlagSubClassMask,
+    SuperRegIdxSeqs + 16,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass GPR_LSBRegClass = {
+    &MOSMCRegisterClasses[GPR_LSBRegClassID],
+    GPR_LSBSubClassMask,
+    SuperRegIdxSeqs + 7,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    GPR_LSBSuperclasses,  2,
+    nullptr
+  };
+
+  extern const TargetRegisterClass AllocatableFlagsRegClass = {
+    &MOSMCRegisterClasses[AllocatableFlagsRegClassID],
+    AllocatableFlagsSubClassMask,
+    SuperRegIdxSeqs + 9,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    AllocatableFlagsSuperclasses,  3,
+    nullptr
+  };
+
+  extern const TargetRegisterClass CcRegClass = {
+    &MOSMCRegisterClasses[CcRegClassID],
+    CcSubClassMask,
+    SuperRegIdxSeqs + 0,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    CcSuperclasses,  4,
+    nullptr
+  };
+
+  extern const TargetRegisterClass VcRegClass = {
+    &MOSMCRegisterClasses[VcRegClassID],
+    VcSubClassMask,
+    SuperRegIdxSeqs + 10,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    VcSuperclasses,  4,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Anyi8RegClass = {
+    &MOSMCRegisterClasses[Anyi8RegClassID],
+    Anyi8SubClassMask,
+    SuperRegIdxSeqs + 21,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass AImag8RegClass = {
+    &MOSMCRegisterClasses[AImag8RegClassID],
+    AImag8SubClassMask,
+    SuperRegIdxSeqs + 21,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    AImag8Superclasses,  1,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Imag8RegClass = {
+    &MOSMCRegisterClasses[Imag8RegClassID],
+    Imag8SubClassMask,
+    SuperRegIdxSeqs + 21,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    Imag8Superclasses,  2,
+    nullptr
+  };
+
+  extern const TargetRegisterClass AXYPRegClass = {
+    &MOSMCRegisterClasses[AXYPRegClassID],
+    AXYPSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x000000000000001F),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass GPRRegClass = {
+    &MOSMCRegisterClasses[GPRRegClassID],
+    GPRSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    GPRSuperclasses,  2,
+    nullptr
+  };
+
+  extern const TargetRegisterClass MOSAsmParamRegClassRegClass = {
+    &MOSMCRegisterClasses[MOSAsmParamRegClassRegClassID],
+    MOSAsmParamRegClassSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass APRegClass = {
+    &MOSMCRegisterClasses[APRegClassID],
+    APSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x000000000000001F),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    APSuperclasses,  1,
+    nullptr
+  };
+
+  extern const TargetRegisterClass AYRegClass = {
+    &MOSMCRegisterClasses[AYRegClassID],
+    AYSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    AYSuperclasses,  3,
+    nullptr
+  };
+
+  extern const TargetRegisterClass XYRegClass = {
+    &MOSMCRegisterClasses[XYRegClassID],
+    XYSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    XYSuperclasses,  4,
+    nullptr
+  };
+
+  extern const TargetRegisterClass AcRegClass = {
+    &MOSMCRegisterClasses[AcRegClassID],
+    AcSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    AcSuperclasses,  6,
+    nullptr
+  };
+
+  extern const TargetRegisterClass PcRegClass = {
+    &MOSMCRegisterClasses[PcRegClassID],
+    PcSubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x000000000000001D),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    PcSuperclasses,  2,
+    nullptr
+  };
+
+  extern const TargetRegisterClass XcRegClass = {
+    &MOSMCRegisterClasses[XcRegClassID],
+    XcSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    XcSuperclasses,  5,
+    nullptr
+  };
+
+  extern const TargetRegisterClass YcRegClass = {
+    &MOSMCRegisterClasses[YcRegClassID],
+    YcSubClassMask,
+    SuperRegIdxSeqs + 2,
+    LaneBitmask(0x0000000000000002),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    YcSuperclasses,  6,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Imag16RegClass = {
+    &MOSMCRegisterClasses[Imag16RegClassID],
+    Imag16SubClassMask,
+    SuperRegIdxSeqs + 4,
+    LaneBitmask(0x0000000000000022),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    true, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Ac16RegClass = {
+    &MOSMCRegisterClasses[Ac16RegClassID],
+    Ac16SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x0000000000000022),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    true, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Xc16RegClass = {
+    &MOSMCRegisterClasses[Xc16RegClassID],
+    Xc16SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x0000000000000022),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    true, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Yc16RegClass = {
+    &MOSMCRegisterClasses[Yc16RegClassID],
+    Yc16SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x0000000000000022),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    true, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Imag32RegClass = {
+    &MOSMCRegisterClasses[Imag32RegClassID],
+    Imag32SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x00000000000000E2),
+    0,
+    false,
+    0x00, /* TSFlags */
+    true, /* HasDisjunctSubRegs */
+    true, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Fakei32RegClass = {
+    &MOSMCRegisterClasses[Fakei32RegClassID],
+    Fakei32SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    nullptr, 0,
+    nullptr
+  };
+
+  extern const TargetRegisterClass Fakei64RegClass = {
+    &MOSMCRegisterClasses[Fakei64RegClassID],
+    Fakei64SubClassMask,
+    SuperRegIdxSeqs + 1,
+    LaneBitmask(0x0000000000000001),
+    0,
+    false,
+    0x00, /* TSFlags */
+    false, /* HasDisjunctSubRegs */
+    false, /* CoveredBySubRegs */
+    Fakei64Superclasses,  1,
+    nullptr
+  };
+
+
+} // namespace MOS
+static const TargetRegisterClass *const MOSRegisterClasses[] = {
+    &MOS::Anyi1RegClass,
+    &MOS::CV_GPR_LSBRegClass,
+    &MOS::FlagRegClass,
+    &MOS::GPR_LSBRegClass,
+    &MOS::AllocatableFlagsRegClass,
+    &MOS::CcRegClass,
+    &MOS::VcRegClass,
+    &MOS::Anyi8RegClass,
+    &MOS::AImag8RegClass,
+    &MOS::Imag8RegClass,
+    &MOS::AXYPRegClass,
+    &MOS::GPRRegClass,
+    &MOS::MOSAsmParamRegClassRegClass,
+    &MOS::APRegClass,
+    &MOS::AYRegClass,
+    &MOS::XYRegClass,
+    &MOS::AcRegClass,
+    &MOS::PcRegClass,
+    &MOS::XcRegClass,
+    &MOS::YcRegClass,
+    &MOS::Imag16RegClass,
+    &MOS::Ac16RegClass,
+    &MOS::Xc16RegClass,
+    &MOS::Yc16RegClass,
+    &MOS::Imag32RegClass,
+    &MOS::Fakei32RegClass,
+    &MOS::Fakei64RegClass,
+  };
+
+static const uint8_t MOSCostPerUseTable[] = { 
+0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+
+
+static const bool MOSInAllocatableClassTable[] = { 
+false, true, true, false, true, false, false, false, true, true, true, true, false, true, true, false, true, false, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, };
+
+
+static const TargetRegisterInfoDesc MOSRegInfoDesc = { // Extra Descriptors
+MOSCostPerUseTable, 1, MOSInAllocatableClassTable};
+
+unsigned MOSGenRegisterInfo::composeSubRegIndicesImpl(unsigned IdxA, unsigned IdxB) const {
+  static const uint8_t RowMap[15] = {
+    0, 0, 1, 2, 2, 0, 0, 0, 0, 0, 0, 3, 1, 0, 0, 
+  };
+  static const uint8_t Rows[4][15] = {
+    { 0, 0, 0, 0, 0, MOS::subhi_then_sublsb, MOS::subn, 0, 0, MOS::subz, 0, 0, 0, 0, 0, },
+    { 0, MOS::subhi16_then_subhi, 0, MOS::subhi16_then_sublo, 0, MOS::subhi16_then_sublsb, 0, 0, 0, 0, MOS::subhi16_then_subhi_then_sublsb, 0, 0, 0, 0, },
+    { 0, MOS::subhi, 0, MOS::sublo, 0, MOS::sublsb, 0, 0, 0, 0, MOS::subhi_then_sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, MOS::subhi16_then_subhi_then_sublsb, 0, 0, 0, 0, 0, 0, 0, 0, 0, },
+  };
+
+  --IdxA; assert(IdxA < 15); (void) IdxA;
+  --IdxB; assert(IdxB < 15);
+  return Rows[RowMap[IdxA]][IdxB];
+}
+
+unsigned MOSGenRegisterInfo::reverseComposeSubRegIndicesImpl(unsigned IdxA, unsigned IdxB) const {
+  static const uint8_t Table[15][15] = {
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOS::subhi, MOS::sublo, MOS::sublsb, MOS::subhi_then_sublsb, },
+    { 0, MOS::subhi, 0, MOS::sublo, 0, MOS::sublsb, 0, 0, 0, 0, MOS::subhi_then_sublsb, 0, 0, 0, 0, },
+    { 0, MOS::subhi, 0, MOS::sublo, 0, MOS::sublsb, 0, 0, 0, 0, MOS::subhi_then_sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOS::sublsb, },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, MOS::subhi, MOS::sublo, MOS::sublsb, MOS::subhi_then_sublsb, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+    { 0, 0, 0, 0, 0, 0, MOS::subn, 0, 0, MOS::subz, MOS::sublsb, 0, 0, 0, 0, },
+  };
+
+  --IdxA; assert(IdxA < 15);
+  --IdxB; assert(IdxB < 15);
+  return Table[IdxA][IdxB];
+  }
+
+  struct MaskRolOp {
+    LaneBitmask Mask;
+    uint8_t  RotateLeft;
+  };
+  static const MaskRolOp LaneMaskComposeSequences[] = {
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  0 }, { LaneBitmask::getNone(), 0 },   // Sequence 0
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  4 }, { LaneBitmask::getNone(), 0 },   // Sequence 2
+    { LaneBitmask(0x0000000000000002),  5 }, { LaneBitmask(0x0000000000000020),  2 }, { LaneBitmask::getNone(), 0 },   // Sequence 4
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  1 }, { LaneBitmask::getNone(), 0 },   // Sequence 7
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  2 }, { LaneBitmask::getNone(), 0 },   // Sequence 9
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  3 }, { LaneBitmask::getNone(), 0 },   // Sequence 11
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  5 }, { LaneBitmask::getNone(), 0 },   // Sequence 13
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  6 }, { LaneBitmask::getNone(), 0 },   // Sequence 15
+    { LaneBitmask(0xFFFFFFFFFFFFFFFF),  7 }, { LaneBitmask::getNone(), 0 }  // Sequence 17
+  };
+  static const uint8_t CompositeSequences[] = {
+    0, // to subcarry
+    2, // to subhi
+    4, // to subhi16
+    0, // to sublo
+    0, // to sublo16
+    7, // to sublsb
+    9, // to subn
+    0, // to subnz
+    11, // to subv
+    2, // to subz
+    13, // to subhi_then_sublsb
+    15, // to subhi16_then_subhi
+    13, // to subhi16_then_sublo
+    15, // to subhi16_then_sublsb
+    17 // to subhi16_then_subhi_then_sublsb
+  };
+
+LaneBitmask MOSGenRegisterInfo::composeSubRegIndexLaneMaskImpl(unsigned IdxA, LaneBitmask LaneMask) const {
+  --IdxA; assert(IdxA < 15 && "Subregister index out of bounds");
+  LaneBitmask Result;
+  for (const MaskRolOp *Ops =
+       &LaneMaskComposeSequences[CompositeSequences[IdxA]];
+       Ops->Mask.any(); ++Ops) {
+    LaneBitmask::Type M = LaneMask.getAsInteger() & Ops->Mask.getAsInteger();
+    if (unsigned S = Ops->RotateLeft)
+      Result |= LaneBitmask((M << S) | (M >> (LaneBitmask::BitWidth - S)));
+    else
+      Result |= LaneBitmask(M);
+  }
+  return Result;
+}
+
+LaneBitmask MOSGenRegisterInfo::reverseComposeSubRegIndexLaneMaskImpl(unsigned IdxA,  LaneBitmask LaneMask) const {
+  LaneMask &= getSubRegIndexLaneMask(IdxA);
+  --IdxA; assert(IdxA < 15 && "Subregister index out of bounds");
+  LaneBitmask Result;
+  for (const MaskRolOp *Ops =
+       &LaneMaskComposeSequences[CompositeSequences[IdxA]];
+       Ops->Mask.any(); ++Ops) {
+    LaneBitmask::Type M = LaneMask.getAsInteger();
+    if (unsigned S = Ops->RotateLeft)
+      Result |= LaneBitmask((M >> S) | (M << (LaneBitmask::BitWidth - S)));
+    else
+      Result |= LaneBitmask(M);
+  }
+  return Result;
+}
+
+const TargetRegisterClass *MOSGenRegisterInfo::getSubClassWithSubReg(const TargetRegisterClass *RC, unsigned Idx) const {
+  static constexpr uint8_t Table[27][15] = {
+    {	// Anyi1
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// CV_GPR_LSB
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Flag
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// GPR_LSB
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// AllocatableFlags
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Cc
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Vc
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Anyi8
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      8,	// sublsb -> Anyi8
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// AImag8
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      9,	// sublsb -> AImag8
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag8
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      10,	// sublsb -> Imag8
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// AXYP
+      18,	// subcarry -> Pc
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      12,	// sublsb -> GPR
+      18,	// subn -> Pc
+      18,	// subnz -> Pc
+      18,	// subv -> Pc
+      18,	// subz -> Pc
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// GPR
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      12,	// sublsb -> GPR
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// MOSAsmParamRegClass
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      16,	// sublsb -> XY
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// AP
+      18,	// subcarry -> Pc
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      17,	// sublsb -> Ac
+      18,	// subn -> Pc
+      18,	// subnz -> Pc
+      18,	// subv -> Pc
+      18,	// subz -> Pc
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// AY
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      15,	// sublsb -> AY
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// XY
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      16,	// sublsb -> XY
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Ac
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      17,	// sublsb -> Ac
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Pc
+      18,	// subcarry -> Pc
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      18,	// subn -> Pc
+      18,	// subnz -> Pc
+      18,	// subv -> Pc
+      18,	// subz -> Pc
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Xc
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      19,	// sublsb -> Xc
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Yc
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      20,	// sublsb -> Yc
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag16
+      0,	// subcarry
+      21,	// subhi -> Imag16
+      0,	// subhi16
+      21,	// sublo -> Imag16
+      0,	// sublo16
+      21,	// sublsb -> Imag16
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      21,	// subhi_then_sublsb -> Imag16
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Ac16
+      0,	// subcarry
+      22,	// subhi -> Ac16
+      0,	// subhi16
+      22,	// sublo -> Ac16
+      0,	// sublo16
+      22,	// sublsb -> Ac16
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Xc16
+      0,	// subcarry
+      23,	// subhi -> Xc16
+      0,	// subhi16
+      23,	// sublo -> Xc16
+      0,	// sublo16
+      23,	// sublsb -> Xc16
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Yc16
+      0,	// subcarry
+      24,	// subhi -> Yc16
+      0,	// subhi16
+      24,	// sublo -> Yc16
+      0,	// sublo16
+      24,	// sublsb -> Yc16
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag32
+      0,	// subcarry
+      25,	// subhi -> Imag32
+      25,	// subhi16 -> Imag32
+      25,	// sublo -> Imag32
+      25,	// sublo16 -> Imag32
+      25,	// sublsb -> Imag32
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      25,	// subhi_then_sublsb -> Imag32
+      25,	// subhi16_then_subhi -> Imag32
+      25,	// subhi16_then_sublo -> Imag32
+      25,	// subhi16_then_sublsb -> Imag32
+      25,	// subhi16_then_subhi_then_sublsb -> Imag32
+    },
+    {	// Fakei32
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+    {	// Fakei64
+      0,	// subcarry
+      0,	// subhi
+      0,	// subhi16
+      0,	// sublo
+      0,	// sublo16
+      0,	// sublsb
+      0,	// subn
+      0,	// subnz
+      0,	// subv
+      0,	// subz
+      0,	// subhi_then_sublsb
+      0,	// subhi16_then_subhi
+      0,	// subhi16_then_sublo
+      0,	// subhi16_then_sublsb
+      0,	// subhi16_then_subhi_then_sublsb
+    },
+
+  };
+  assert(RC && "Missing regclass");
+  if (!Idx) return RC;
+  --Idx;
+  assert(Idx < 15 && "Bad subreg");
+  unsigned TV = Table[RC->getID()][Idx];
+  return TV ? getRegClass(TV - 1) : nullptr;
+}const TargetRegisterClass *MOSGenRegisterInfo::getSubRegisterClass(const TargetRegisterClass *RC, unsigned Idx) const {
+  static constexpr uint8_t Table[27][15] = {
+    {	// Anyi1
+      0,	// Anyi1:subcarry
+      0,	// Anyi1:subhi
+      0,	// Anyi1:subhi16
+      0,	// Anyi1:sublo
+      0,	// Anyi1:sublo16
+      0,	// Anyi1:sublsb
+      0,	// Anyi1:subn
+      0,	// Anyi1:subnz
+      0,	// Anyi1:subv
+      0,	// Anyi1:subz
+      0,	// Anyi1:subhi_then_sublsb
+      0,	// Anyi1:subhi16_then_subhi
+      0,	// Anyi1:subhi16_then_sublo
+      0,	// Anyi1:subhi16_then_sublsb
+      0,	// Anyi1:subhi16_then_subhi_then_sublsb
+    },
+    {	// CV_GPR_LSB
+      0,	// CV_GPR_LSB:subcarry
+      0,	// CV_GPR_LSB:subhi
+      0,	// CV_GPR_LSB:subhi16
+      0,	// CV_GPR_LSB:sublo
+      0,	// CV_GPR_LSB:sublo16
+      0,	// CV_GPR_LSB:sublsb
+      0,	// CV_GPR_LSB:subn
+      0,	// CV_GPR_LSB:subnz
+      0,	// CV_GPR_LSB:subv
+      0,	// CV_GPR_LSB:subz
+      0,	// CV_GPR_LSB:subhi_then_sublsb
+      0,	// CV_GPR_LSB:subhi16_then_subhi
+      0,	// CV_GPR_LSB:subhi16_then_sublo
+      0,	// CV_GPR_LSB:subhi16_then_sublsb
+      0,	// CV_GPR_LSB:subhi16_then_subhi_then_sublsb
+    },
+    {	// Flag
+      0,	// Flag:subcarry
+      0,	// Flag:subhi
+      0,	// Flag:subhi16
+      0,	// Flag:sublo
+      0,	// Flag:sublo16
+      0,	// Flag:sublsb
+      0,	// Flag:subn
+      0,	// Flag:subnz
+      0,	// Flag:subv
+      0,	// Flag:subz
+      0,	// Flag:subhi_then_sublsb
+      0,	// Flag:subhi16_then_subhi
+      0,	// Flag:subhi16_then_sublo
+      0,	// Flag:subhi16_then_sublsb
+      0,	// Flag:subhi16_then_subhi_then_sublsb
+    },
+    {	// GPR_LSB
+      0,	// GPR_LSB:subcarry
+      0,	// GPR_LSB:subhi
+      0,	// GPR_LSB:subhi16
+      0,	// GPR_LSB:sublo
+      0,	// GPR_LSB:sublo16
+      0,	// GPR_LSB:sublsb
+      0,	// GPR_LSB:subn
+      0,	// GPR_LSB:subnz
+      0,	// GPR_LSB:subv
+      0,	// GPR_LSB:subz
+      0,	// GPR_LSB:subhi_then_sublsb
+      0,	// GPR_LSB:subhi16_then_subhi
+      0,	// GPR_LSB:subhi16_then_sublo
+      0,	// GPR_LSB:subhi16_then_sublsb
+      0,	// GPR_LSB:subhi16_then_subhi_then_sublsb
+    },
+    {	// AllocatableFlags
+      0,	// AllocatableFlags:subcarry
+      0,	// AllocatableFlags:subhi
+      0,	// AllocatableFlags:subhi16
+      0,	// AllocatableFlags:sublo
+      0,	// AllocatableFlags:sublo16
+      0,	// AllocatableFlags:sublsb
+      0,	// AllocatableFlags:subn
+      0,	// AllocatableFlags:subnz
+      0,	// AllocatableFlags:subv
+      0,	// AllocatableFlags:subz
+      0,	// AllocatableFlags:subhi_then_sublsb
+      0,	// AllocatableFlags:subhi16_then_subhi
+      0,	// AllocatableFlags:subhi16_then_sublo
+      0,	// AllocatableFlags:subhi16_then_sublsb
+      0,	// AllocatableFlags:subhi16_then_subhi_then_sublsb
+    },
+    {	// Cc
+      0,	// Cc:subcarry
+      0,	// Cc:subhi
+      0,	// Cc:subhi16
+      0,	// Cc:sublo
+      0,	// Cc:sublo16
+      0,	// Cc:sublsb
+      0,	// Cc:subn
+      0,	// Cc:subnz
+      0,	// Cc:subv
+      0,	// Cc:subz
+      0,	// Cc:subhi_then_sublsb
+      0,	// Cc:subhi16_then_subhi
+      0,	// Cc:subhi16_then_sublo
+      0,	// Cc:subhi16_then_sublsb
+      0,	// Cc:subhi16_then_subhi_then_sublsb
+    },
+    {	// Vc
+      0,	// Vc:subcarry
+      0,	// Vc:subhi
+      0,	// Vc:subhi16
+      0,	// Vc:sublo
+      0,	// Vc:sublo16
+      0,	// Vc:sublsb
+      0,	// Vc:subn
+      0,	// Vc:subnz
+      0,	// Vc:subv
+      0,	// Vc:subz
+      0,	// Vc:subhi_then_sublsb
+      0,	// Vc:subhi16_then_subhi
+      0,	// Vc:subhi16_then_sublo
+      0,	// Vc:subhi16_then_sublsb
+      0,	// Vc:subhi16_then_subhi_then_sublsb
+    },
+    {	// Anyi8
+      0,	// Anyi8:subcarry
+      0,	// Anyi8:subhi
+      0,	// Anyi8:subhi16
+      0,	// Anyi8:sublo
+      0,	// Anyi8:sublo16
+      1,	// Anyi8:sublsb -> Anyi1
+      0,	// Anyi8:subn
+      0,	// Anyi8:subnz
+      0,	// Anyi8:subv
+      0,	// Anyi8:subz
+      0,	// Anyi8:subhi_then_sublsb
+      0,	// Anyi8:subhi16_then_subhi
+      0,	// Anyi8:subhi16_then_sublo
+      0,	// Anyi8:subhi16_then_sublsb
+      0,	// Anyi8:subhi16_then_subhi_then_sublsb
+    },
+    {	// AImag8
+      0,	// AImag8:subcarry
+      0,	// AImag8:subhi
+      0,	// AImag8:subhi16
+      0,	// AImag8:sublo
+      0,	// AImag8:sublo16
+      1,	// AImag8:sublsb -> Anyi1
+      0,	// AImag8:subn
+      0,	// AImag8:subnz
+      0,	// AImag8:subv
+      0,	// AImag8:subz
+      0,	// AImag8:subhi_then_sublsb
+      0,	// AImag8:subhi16_then_subhi
+      0,	// AImag8:subhi16_then_sublo
+      0,	// AImag8:subhi16_then_sublsb
+      0,	// AImag8:subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag8
+      0,	// Imag8:subcarry
+      0,	// Imag8:subhi
+      0,	// Imag8:subhi16
+      0,	// Imag8:sublo
+      0,	// Imag8:sublo16
+      1,	// Imag8:sublsb -> Anyi1
+      0,	// Imag8:subn
+      0,	// Imag8:subnz
+      0,	// Imag8:subv
+      0,	// Imag8:subz
+      0,	// Imag8:subhi_then_sublsb
+      0,	// Imag8:subhi16_then_subhi
+      0,	// Imag8:subhi16_then_sublo
+      0,	// Imag8:subhi16_then_sublsb
+      0,	// Imag8:subhi16_then_subhi_then_sublsb
+    },
+    {	// AXYP
+      6,	// AXYP:subcarry -> Cc
+      0,	// AXYP:subhi
+      0,	// AXYP:subhi16
+      0,	// AXYP:sublo
+      0,	// AXYP:sublo16
+      4,	// AXYP:sublsb -> GPR_LSB
+      3,	// AXYP:subn -> Flag
+      0,	// AXYP:subnz
+      7,	// AXYP:subv -> Vc
+      3,	// AXYP:subz -> Flag
+      0,	// AXYP:subhi_then_sublsb
+      0,	// AXYP:subhi16_then_subhi
+      0,	// AXYP:subhi16_then_sublo
+      0,	// AXYP:subhi16_then_sublsb
+      0,	// AXYP:subhi16_then_subhi_then_sublsb
+    },
+    {	// GPR
+      0,	// GPR:subcarry
+      0,	// GPR:subhi
+      0,	// GPR:subhi16
+      0,	// GPR:sublo
+      0,	// GPR:sublo16
+      4,	// GPR:sublsb -> GPR_LSB
+      0,	// GPR:subn
+      0,	// GPR:subnz
+      0,	// GPR:subv
+      0,	// GPR:subz
+      0,	// GPR:subhi_then_sublsb
+      0,	// GPR:subhi16_then_subhi
+      0,	// GPR:subhi16_then_sublo
+      0,	// GPR:subhi16_then_sublsb
+      0,	// GPR:subhi16_then_subhi_then_sublsb
+    },
+    {	// MOSAsmParamRegClass
+      0,	// MOSAsmParamRegClass:subcarry
+      0,	// MOSAsmParamRegClass:subhi
+      0,	// MOSAsmParamRegClass:subhi16
+      0,	// MOSAsmParamRegClass:sublo
+      0,	// MOSAsmParamRegClass:sublo16
+      4,	// MOSAsmParamRegClass:sublsb -> GPR_LSB
+      0,	// MOSAsmParamRegClass:subn
+      0,	// MOSAsmParamRegClass:subnz
+      0,	// MOSAsmParamRegClass:subv
+      0,	// MOSAsmParamRegClass:subz
+      0,	// MOSAsmParamRegClass:subhi_then_sublsb
+      0,	// MOSAsmParamRegClass:subhi16_then_subhi
+      0,	// MOSAsmParamRegClass:subhi16_then_sublo
+      0,	// MOSAsmParamRegClass:subhi16_then_sublsb
+      0,	// MOSAsmParamRegClass:subhi16_then_subhi_then_sublsb
+    },
+    {	// AP
+      6,	// AP:subcarry -> Cc
+      0,	// AP:subhi
+      0,	// AP:subhi16
+      0,	// AP:sublo
+      0,	// AP:sublo16
+      4,	// AP:sublsb -> GPR_LSB
+      3,	// AP:subn -> Flag
+      0,	// AP:subnz
+      7,	// AP:subv -> Vc
+      3,	// AP:subz -> Flag
+      0,	// AP:subhi_then_sublsb
+      0,	// AP:subhi16_then_subhi
+      0,	// AP:subhi16_then_sublo
+      0,	// AP:subhi16_then_sublsb
+      0,	// AP:subhi16_then_subhi_then_sublsb
+    },
+    {	// AY
+      0,	// AY:subcarry
+      0,	// AY:subhi
+      0,	// AY:subhi16
+      0,	// AY:sublo
+      0,	// AY:sublo16
+      4,	// AY:sublsb -> GPR_LSB
+      0,	// AY:subn
+      0,	// AY:subnz
+      0,	// AY:subv
+      0,	// AY:subz
+      0,	// AY:subhi_then_sublsb
+      0,	// AY:subhi16_then_subhi
+      0,	// AY:subhi16_then_sublo
+      0,	// AY:subhi16_then_sublsb
+      0,	// AY:subhi16_then_subhi_then_sublsb
+    },
+    {	// XY
+      0,	// XY:subcarry
+      0,	// XY:subhi
+      0,	// XY:subhi16
+      0,	// XY:sublo
+      0,	// XY:sublo16
+      4,	// XY:sublsb -> GPR_LSB
+      0,	// XY:subn
+      0,	// XY:subnz
+      0,	// XY:subv
+      0,	// XY:subz
+      0,	// XY:subhi_then_sublsb
+      0,	// XY:subhi16_then_subhi
+      0,	// XY:subhi16_then_sublo
+      0,	// XY:subhi16_then_sublsb
+      0,	// XY:subhi16_then_subhi_then_sublsb
+    },
+    {	// Ac
+      0,	// Ac:subcarry
+      0,	// Ac:subhi
+      0,	// Ac:subhi16
+      0,	// Ac:sublo
+      0,	// Ac:sublo16
+      4,	// Ac:sublsb -> GPR_LSB
+      0,	// Ac:subn
+      0,	// Ac:subnz
+      0,	// Ac:subv
+      0,	// Ac:subz
+      0,	// Ac:subhi_then_sublsb
+      0,	// Ac:subhi16_then_subhi
+      0,	// Ac:subhi16_then_sublo
+      0,	// Ac:subhi16_then_sublsb
+      0,	// Ac:subhi16_then_subhi_then_sublsb
+    },
+    {	// Pc
+      6,	// Pc:subcarry -> Cc
+      0,	// Pc:subhi
+      0,	// Pc:subhi16
+      0,	// Pc:sublo
+      0,	// Pc:sublo16
+      0,	// Pc:sublsb
+      3,	// Pc:subn -> Flag
+      0,	// Pc:subnz
+      7,	// Pc:subv -> Vc
+      3,	// Pc:subz -> Flag
+      0,	// Pc:subhi_then_sublsb
+      0,	// Pc:subhi16_then_subhi
+      0,	// Pc:subhi16_then_sublo
+      0,	// Pc:subhi16_then_sublsb
+      0,	// Pc:subhi16_then_subhi_then_sublsb
+    },
+    {	// Xc
+      0,	// Xc:subcarry
+      0,	// Xc:subhi
+      0,	// Xc:subhi16
+      0,	// Xc:sublo
+      0,	// Xc:sublo16
+      4,	// Xc:sublsb -> GPR_LSB
+      0,	// Xc:subn
+      0,	// Xc:subnz
+      0,	// Xc:subv
+      0,	// Xc:subz
+      0,	// Xc:subhi_then_sublsb
+      0,	// Xc:subhi16_then_subhi
+      0,	// Xc:subhi16_then_sublo
+      0,	// Xc:subhi16_then_sublsb
+      0,	// Xc:subhi16_then_subhi_then_sublsb
+    },
+    {	// Yc
+      0,	// Yc:subcarry
+      0,	// Yc:subhi
+      0,	// Yc:subhi16
+      0,	// Yc:sublo
+      0,	// Yc:sublo16
+      4,	// Yc:sublsb -> GPR_LSB
+      0,	// Yc:subn
+      0,	// Yc:subnz
+      0,	// Yc:subv
+      0,	// Yc:subz
+      0,	// Yc:subhi_then_sublsb
+      0,	// Yc:subhi16_then_subhi
+      0,	// Yc:subhi16_then_sublo
+      0,	// Yc:subhi16_then_sublsb
+      0,	// Yc:subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag16
+      0,	// Imag16:subcarry
+      10,	// Imag16:subhi -> Imag8
+      0,	// Imag16:subhi16
+      10,	// Imag16:sublo -> Imag8
+      0,	// Imag16:sublo16
+      1,	// Imag16:sublsb -> Anyi1
+      0,	// Imag16:subn
+      0,	// Imag16:subnz
+      0,	// Imag16:subv
+      0,	// Imag16:subz
+      1,	// Imag16:subhi_then_sublsb -> Anyi1
+      0,	// Imag16:subhi16_then_subhi
+      0,	// Imag16:subhi16_then_sublo
+      0,	// Imag16:subhi16_then_sublsb
+      0,	// Imag16:subhi16_then_subhi_then_sublsb
+    },
+    {	// Ac16
+      0,	// Ac16:subcarry
+      0,	// Ac16:subhi
+      0,	// Ac16:subhi16
+      17,	// Ac16:sublo -> Ac
+      0,	// Ac16:sublo16
+      4,	// Ac16:sublsb -> GPR_LSB
+      0,	// Ac16:subn
+      0,	// Ac16:subnz
+      0,	// Ac16:subv
+      0,	// Ac16:subz
+      0,	// Ac16:subhi_then_sublsb
+      0,	// Ac16:subhi16_then_subhi
+      0,	// Ac16:subhi16_then_sublo
+      0,	// Ac16:subhi16_then_sublsb
+      0,	// Ac16:subhi16_then_subhi_then_sublsb
+    },
+    {	// Xc16
+      0,	// Xc16:subcarry
+      0,	// Xc16:subhi
+      0,	// Xc16:subhi16
+      19,	// Xc16:sublo -> Xc
+      0,	// Xc16:sublo16
+      4,	// Xc16:sublsb -> GPR_LSB
+      0,	// Xc16:subn
+      0,	// Xc16:subnz
+      0,	// Xc16:subv
+      0,	// Xc16:subz
+      0,	// Xc16:subhi_then_sublsb
+      0,	// Xc16:subhi16_then_subhi
+      0,	// Xc16:subhi16_then_sublo
+      0,	// Xc16:subhi16_then_sublsb
+      0,	// Xc16:subhi16_then_subhi_then_sublsb
+    },
+    {	// Yc16
+      0,	// Yc16:subcarry
+      0,	// Yc16:subhi
+      0,	// Yc16:subhi16
+      20,	// Yc16:sublo -> Yc
+      0,	// Yc16:sublo16
+      4,	// Yc16:sublsb -> GPR_LSB
+      0,	// Yc16:subn
+      0,	// Yc16:subnz
+      0,	// Yc16:subv
+      0,	// Yc16:subz
+      0,	// Yc16:subhi_then_sublsb
+      0,	// Yc16:subhi16_then_subhi
+      0,	// Yc16:subhi16_then_sublo
+      0,	// Yc16:subhi16_then_sublsb
+      0,	// Yc16:subhi16_then_subhi_then_sublsb
+    },
+    {	// Imag32
+      0,	// Imag32:subcarry
+      10,	// Imag32:subhi -> Imag8
+      21,	// Imag32:subhi16 -> Imag16
+      10,	// Imag32:sublo -> Imag8
+      21,	// Imag32:sublo16 -> Imag16
+      1,	// Imag32:sublsb -> Anyi1
+      0,	// Imag32:subn
+      0,	// Imag32:subnz
+      0,	// Imag32:subv
+      0,	// Imag32:subz
+      1,	// Imag32:subhi_then_sublsb -> Anyi1
+      10,	// Imag32:subhi16_then_subhi -> Imag8
+      10,	// Imag32:subhi16_then_sublo -> Imag8
+      1,	// Imag32:subhi16_then_sublsb -> Anyi1
+      1,	// Imag32:subhi16_then_subhi_then_sublsb -> Anyi1
+    },
+    {	// Fakei32
+      0,	// Fakei32:subcarry
+      0,	// Fakei32:subhi
+      0,	// Fakei32:subhi16
+      0,	// Fakei32:sublo
+      0,	// Fakei32:sublo16
+      0,	// Fakei32:sublsb
+      0,	// Fakei32:subn
+      0,	// Fakei32:subnz
+      0,	// Fakei32:subv
+      0,	// Fakei32:subz
+      0,	// Fakei32:subhi_then_sublsb
+      0,	// Fakei32:subhi16_then_subhi
+      0,	// Fakei32:subhi16_then_sublo
+      0,	// Fakei32:subhi16_then_sublsb
+      0,	// Fakei32:subhi16_then_subhi_then_sublsb
+    },
+    {	// Fakei64
+      0,	// Fakei64:subcarry
+      0,	// Fakei64:subhi
+      0,	// Fakei64:subhi16
+      0,	// Fakei64:sublo
+      0,	// Fakei64:sublo16
+      0,	// Fakei64:sublsb
+      0,	// Fakei64:subn
+      0,	// Fakei64:subnz
+      0,	// Fakei64:subv
+      0,	// Fakei64:subz
+      0,	// Fakei64:subhi_then_sublsb
+      0,	// Fakei64:subhi16_then_subhi
+      0,	// Fakei64:subhi16_then_sublo
+      0,	// Fakei64:subhi16_then_sublsb
+      0,	// Fakei64:subhi16_then_subhi_then_sublsb
+    },
+
+  };
+  assert(RC && "Missing regclass");
+  if (!Idx) return RC;
+  --Idx;
+  assert(Idx < 15 && "Bad subreg");
+  unsigned TV = Table[RC->getID()][Idx];
+  return TV ? getRegClass(TV - 1) : nullptr;
+}/// Get the weight in units of pressure for this register class.
+const RegClassWeight &MOSGenRegisterInfo::
+getRegClassWeight(const TargetRegisterClass *RC) const {
+  static const RegClassWeight RCWeightTable[] = {
+    {1, 261},  	// Anyi1
+    {1, 5},  	// CV_GPR_LSB
+    {1, 4},  	// Flag
+    {1, 3},  	// GPR_LSB
+    {1, 2},  	// AllocatableFlags
+    {1, 1},  	// Cc
+    {1, 1},  	// Vc
+    {1, 259},  	// Anyi8
+    {1, 257},  	// AImag8
+    {1, 256},  	// Imag8
+    {1, 7},  	// AXYP
+    {1, 3},  	// GPR
+    {1, 3},  	// MOSAsmParamRegClass
+    {1, 5},  	// AP
+    {1, 2},  	// AY
+    {1, 2},  	// XY
+    {1, 1},  	// Ac
+    {4, 4},  	// Pc
+    {1, 1},  	// Xc
+    {1, 1},  	// Yc
+    {2, 256},  	// Imag16
+    {2, 2},  	// Ac16
+    {2, 2},  	// Xc16
+    {2, 2},  	// Yc16
+    {4, 256},  	// Imag32
+    {0, 0},  	// Fakei32
+    {0, 0},  	// Fakei64
+  };
+  return RCWeightTable[RC->getID()];
+}
+
+/// Get the weight in units of pressure for this register unit.
+unsigned MOSGenRegisterInfo::
+getRegUnitWeight(MCRegUnit RegUnit) const {
+  assert(static_cast<unsigned>(RegUnit) < 268 && "invalid register unit");
+  // All register units have unit weight.
+  return 1;
+}
+
+
+// Get the number of dimensions of register pressure.
+unsigned MOSGenRegisterInfo::getNumRegPressureSets() const {
+  return 14;
+}
+
+// Get the name of this register unit pressure set.
+const char *MOSGenRegisterInfo::
+getRegPressureSetName(unsigned Idx) const {
+  static const char *PressureNameTable[] = {
+    "Ac16",
+    "Pc",
+    "Xc16",
+    "Yc16",
+    "GPR_LSB",
+    "GPR_LSB_with_Ac16",
+    "GPR_LSB_with_Xc16",
+    "GPR_LSB_with_Yc16",
+    "GPR_LSB_with_Pc",
+    "Anyi1",
+    "Anyi1_with_Ac16",
+    "Anyi1_with_Xc16",
+    "Anyi1_with_Yc16",
+    "Anyi1_with_Pc",
+  };
+  return PressureNameTable[Idx];
+}
+
+// Get the register unit pressure limit for this dimension.
+// This limit must be adjusted dynamically for reserved registers.
+unsigned MOSGenRegisterInfo::
+getRegPressureSetLimit(const MachineFunction &MF, unsigned Idx) const {
+  static const uint16_t PressureLimitTable[] = {
+    2,  	// 0: Ac16
+    4,  	// 1: Pc
+    4,  	// 2: Xc16
+    4,  	// 3: Yc16
+    6,  	// 4: GPR_LSB
+    6,  	// 5: GPR_LSB_with_Ac16
+    6,  	// 6: GPR_LSB_with_Xc16
+    6,  	// 7: GPR_LSB_with_Yc16
+    7,  	// 8: GPR_LSB_with_Pc
+    262,  	// 9: Anyi1
+    262,  	// 10: Anyi1_with_Ac16
+    262,  	// 11: Anyi1_with_Xc16
+    262,  	// 12: Anyi1_with_Yc16
+    263,  	// 13: Anyi1_with_Pc
+  };
+  return PressureLimitTable[Idx];
+}
+
+/// Table of pressure sets per register class or unit.
+static const int RCSetsTable[] = {
+  /* 0 */ 2, 3, 4, 9, -1,
+  /* 5 */ 0, 5, 10, -1,
+  /* 9 */ 2, 6, 11, -1,
+  /* 13 */ 3, 7, 12, -1,
+  /* 17 */ 1, 8, 13, -1,
+  /* 21 */ 0, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+  /* 33 */ 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+  /* 45 */ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, -1,
+};
+
+/// Get the dimensions of register pressure impacted by this register class.
+/// Returns a -1 terminated array of pressure set IDs
+const int *MOSGenRegisterInfo::
+getRegClassPressureSets(const TargetRegisterClass *RC) const {
+  static const uint8_t RCSetStartTable[] = {
+    27,22,4,22,33,33,33,27,27,27,4,22,0,4,22,45,21,17,45,45,27,5,9,13,27,4,4,};
+  return &RCSetsTable[RCSetStartTable[RC->getID()]];
+}
+
+/// Get the dimensions of register pressure impacted by this register unit.
+/// Returns a -1 terminated array of pressure set IDs
+const int *MOSGenRegisterInfo::
+getRegUnitPressureSets(MCRegUnit RegUnit) const {
+  assert(static_cast<unsigned>(RegUnit) < 268 && "invalid register unit");
+  static const uint8_t RUSetStartTable[] = {
+    21,5,33,4,17,17,33,0,45,9,45,13,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,27,};
+  return &RCSetsTable[RUSetStartTable[static_cast<unsigned>(RegUnit)]];
+}
+
+extern const MCRegisterDesc MOSRegDesc[];
+extern const int16_t MOSRegDiffLists[];
+extern const LaneBitmask MOSLaneMaskLists[];
+extern const char MOSRegStrings[];
+extern const char MOSRegClassStrings[];
+extern const MCPhysReg MOSRegUnitRoots[][2];
+extern const uint16_t MOSSubRegIdxLists[];
+extern const uint16_t MOSRegEncodingTable[];
+// MOS Dwarf<->LLVM register mappings.
+extern const MCRegisterInfo::DwarfLLVMRegPair MOSDwarfFlavour0Dwarf2L[];
+extern const unsigned MOSDwarfFlavour0Dwarf2LSize;
+
+extern const MCRegisterInfo::DwarfLLVMRegPair MOSEHFlavour0Dwarf2L[];
+extern const unsigned MOSEHFlavour0Dwarf2LSize;
+
+extern const MCRegisterInfo::DwarfLLVMRegPair MOSDwarfFlavour0L2Dwarf[];
+extern const unsigned MOSDwarfFlavour0L2DwarfSize;
+
+extern const MCRegisterInfo::DwarfLLVMRegPair MOSEHFlavour0L2Dwarf[];
+extern const unsigned MOSEHFlavour0L2DwarfSize;
+
+
+MOSGenRegisterInfo::
+MOSGenRegisterInfo(unsigned RA, unsigned DwarfFlavour, unsigned EHFlavour,
+    unsigned PC, unsigned HwMode)
+  : TargetRegisterInfo(&MOSRegInfoDesc, MOSRegisterClasses,
+      MOSSubRegIndexStrings, MOSSubRegIndexNameOffsets,
+      MOSSubRegIdxRangeTable, MOSSubRegIndexLaneMaskTable,
+
+  LaneBitmask(0xFFFFFFFFFFFFFFE0), MOSRegClassInfos, MOSVTLists, HwMode) {
+  InitMCRegisterInfo(MOSRegDesc, 725, RA, PC,
+    MOSMCRegisterClasses, 27, MOSRegUnitRoots, 268, MOSRegDiffLists,
+    MOSLaneMaskLists, MOSRegStrings, MOSRegClassStrings, MOSSubRegIdxLists, 16,
+    MOSRegEncodingTable, nullptr);
+
+  switch (DwarfFlavour) {
+  default:
+    llvm_unreachable("Unknown DWARF flavour");
+  case 0:
+    mapDwarfRegsToLLVMRegs(MOSDwarfFlavour0Dwarf2L, MOSDwarfFlavour0Dwarf2LSize, false);
+    break;
+  }
+  switch (EHFlavour) {
+  default:
+    llvm_unreachable("Unknown DWARF flavour");
+  case 0:
+    mapDwarfRegsToLLVMRegs(MOSEHFlavour0Dwarf2L, MOSEHFlavour0Dwarf2LSize, true);
+    break;
+  }
+  switch (DwarfFlavour) {
+  default:
+    llvm_unreachable("Unknown DWARF flavour");
+  case 0:
+    mapLLVMRegsToDwarfRegs(MOSDwarfFlavour0L2Dwarf, MOSDwarfFlavour0L2DwarfSize, false);
+    break;
+  }
+  switch (EHFlavour) {
+  default:
+    llvm_unreachable("Unknown DWARF flavour");
+  case 0:
+    mapLLVMRegsToDwarfRegs(MOSEHFlavour0L2Dwarf, MOSEHFlavour0L2DwarfSize, true);
+    break;
+  }
+}
+
+static const MCPhysReg MOS_CSR_SaveList[] = { MOS::RC20, MOS::RC21, MOS::RC22, MOS::RC23, MOS::RC24, MOS::RC25, MOS::RC26, MOS::RC27, MOS::RC28, MOS::RC29, MOS::RC30, MOS::RC31, 0 };
+static const uint32_t MOS_CSR_RegMask[] = { 0x00000000, 0x0007ff80, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x07000000, 0x00000000, 0xe0000000, 0x00000007, 0x00000000, 0x00000000, 0x00000000, 0x001ffe00, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, };
+static const MCPhysReg MOS_Interrupt_CSR_SaveList[] = { MOS::A, MOS::X, MOS::Y, MOS::RC2, MOS::RC3, MOS::RC4, MOS::RC5, MOS::RC6, MOS::RC7, MOS::RC8, MOS::RC9, MOS::RC10, MOS::RC11, MOS::RC12, MOS::RC13, MOS::RC14, MOS::RC15, MOS::RC16, MOS::RC17, MOS::RC18, MOS::RC19, MOS::RC20, MOS::RC21, MOS::RC22, MOS::RC23, MOS::RC24, MOS::RC25, MOS::RC26, MOS::RC27, MOS::RC28, MOS::RC29, MOS::RC30, MOS::RC31, 0 };
+static const uint32_t MOS_Interrupt_CSR_RegMask[] = { 0xffe16806, 0x0007ffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x07f00000, 0x00000000, 0xfff00000, 0x00000007, 0x00000000, 0x00000000, 0xff800000, 0x001fffff, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, };
+
+
+ArrayRef<const uint32_t *> MOSGenRegisterInfo::getRegMasks() const {
+  static const uint32_t *const Masks[] = {
+    MOS_CSR_RegMask,
+    MOS_Interrupt_CSR_RegMask,
+  };
+  return ArrayRef(Masks);
+}
+
+bool MOSGenRegisterInfo::
+isGeneralPurposeRegister(const MachineFunction &MF, MCRegister PhysReg) const {
+  return
+      false;
+}
+
+bool MOSGenRegisterInfo::
+isGeneralPurposeRegisterClass(const TargetRegisterClass *RC) const {
+  return
+      false;
+}
+
+bool MOSGenRegisterInfo::
+isFixedRegister(const MachineFunction &MF, MCRegister PhysReg) const {
+  return
+      false;
+}
+
+bool MOSGenRegisterInfo::
+isArgumentRegister(const MachineFunction &MF, MCRegister PhysReg) const {
+  return
+      false;
+}
+
+bool MOSGenRegisterInfo::
+isConstantPhysReg(MCRegister PhysReg) const {
+  return
+      false;
+}
+
+ArrayRef<const char *> MOSGenRegisterInfo::getRegMaskNames() const {
+  static const char *Names[] = {
+    "MOS_CSR",
+    "MOS_Interrupt_CSR",
+  };
+  return ArrayRef(Names);
+}
+
+const MOSFrameLowering *
+MOSGenRegisterInfo::getFrameLowering(const MachineFunction &MF) {
+  return static_cast<const MOSFrameLowering *>(
+      MF.getSubtarget().getFrameLowering());
+}
+
+
+} // namespace llvm

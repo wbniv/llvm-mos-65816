@@ -1,0 +1,370 @@
+{
+  "schema": 1,
+  "date_utc": "2026-09-26T11:56:05.854569+00:00",
+  "destination": {
+    "repository": "llvm-mos/llvm-mos",
+    "branch": "main",
+    "revision": "7bd67c0ae4e8bb65a3f980912bf201df22131e34"
+  },
+  "candidate": {
+    "branch": "mos-computed-carry-scheduling",
+    "commit": "155e209c4cee8eeac01397aac3542e76841a9856",
+    "checkout": "/home/will/llvm-mos-65816/.scratch/carry-pr/source",
+    "patch": {
+      "path": "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+      "sha256": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983"
+    }
+  },
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; author review, not independent review.",
+  "configuration": {
+    "image": "sha256:eeecfab76840167d9f16982b1efddae90d4969c5d7891ec16e87e46150ac94c1",
+    "build_type": "Release",
+    "assertions": true,
+    "targets": [
+      "MOS",
+      "X86",
+      "ARM",
+      "AArch64"
+    ],
+    "compiler_projects": [],
+    "container_source_alias": "/work/build/register-exhaustion-src",
+    "container_build_alias": "/work/build/0029-cross-target-build",
+    "network": "none"
+  },
+  "tools": {
+    "baseline_llc": {
+      "path": ".scratch/carry-pr/baseline/bin/llc",
+      "sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331"
+    },
+    "candidate_llc": {
+      "path": ".scratch/carry-pr/build/bin/llc",
+      "sha256": "ba2b05dd77f4d8433bbf1d3332930e82727a8063231d9c9c57a690acaa1a3895"
+    },
+    "FileCheck": {
+      "path": ".scratch/carry-pr/build/bin/FileCheck",
+      "sha256": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38"
+    },
+    "objdump": {
+      "path": ".scratch/carry-pr/build/bin/llvm-objdump",
+      "sha256": "f87a25615a440e024ad83c68ee135903db5d18b3abb6da4246cd072a6ba9be51"
+    },
+    "fixed_frontend": {
+      "path": ".scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "sha256": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc"
+    },
+    "fixed_linker": {
+      "path": ".scratch/carry-scheduling/build/llvm-mos-install/bin/ld.lld",
+      "sha256": "b208f3732a7cccf22501d09207a4975eaa5f15d3e7f62049c255a9ee14331df5"
+    },
+    "simulator": {
+      "path": "build/utils/sim/mos-sim",
+      "sha256": "e7bf3477fc14e12603bed35963fbcd38cfba8a50b8901529429f3f6eee441593"
+    },
+    "sim_config": {
+      "path": "build/install/bin/mos-sim.cfg",
+      "sha256": "5d41be974550974589354b338f150c269935f9232e35b15bb54e5f6083a7889a"
+    },
+    "common_config": {
+      "path": "build/install/bin/mos-common.cfg",
+      "sha256": "bc1174409cd1a5c76f5bb290f673bfa53b4023456b8e93cd264e4772190c0ea8"
+    }
+  },
+  "results": {
+    "focused_baseline": {
+      "failed": 5,
+      "passed": 5,
+      "reason": "Interleaved shift/add retains overlapping computed carries for default and bottom-up scheduling; top-down is an existing passing control."
+    },
+    "focused_candidate": {
+      "failed": 0,
+      "passed": 10
+    },
+    "baseline_suites": {
+      "passed": 131,
+      "unsupported": 1,
+      "excluded_new_regression": 1
+    },
+    "candidate_suites": {
+      "passed": 132,
+      "unsupported": 1,
+      "failed": 0
+    },
+    "runtime": {
+      "cpu": "mos6502",
+      "vectors": 512,
+      "oracle": "Python arbitrary-precision arithmetic masked to 32 bits; frozen little-endian byte arrays",
+      "baseline": "P / exit 0",
+      "candidate": "P / exit 0",
+      "kernel_text_before": 133,
+      "kernel_text_after": 59,
+      "carry_materializations_before": 6,
+      "carry_materializations_after": 0
+    },
+    "ordinary_census": {
+      "sources": 13,
+      "cpus": [
+        "mos6502",
+        "mos65c02",
+        "mosw65816"
+      ],
+      "optimization": [
+        "Os",
+        "Oz",
+        "O2"
+      ],
+      "paired": 117,
+      "changed_disassemblies": 0,
+      "unmatched_outcomes": 0,
+      "scope": "Fixed downstream Clang frontend emits LLVM IR once per source/optimization. Only the exact-current llc backend differs; no current-upstream frontend or broad speed claim."
+    },
+    "cycles": "unmeasured",
+    "compile_time": "unmeasured",
+    "exploratory_null_emission": "A debug-pass=Structure -filetype=null probe of arith.Os.ll exits on signal 11 with both baseline and candidate; retained as an inherited, unisolated non-gate observation. Normal verified object emission succeeds."
+  },
+  "artifacts": [
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/CMakeCache.txt",
+      "sha256": "e0be28d76e8809b59aac4e4562e7115a9ce61fe94b1783ce0db376fb7bd9cf52"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/audit/destination.json",
+      "sha256": "8eed86ea141d2abce0c26ce9cd51dc743c58a1ab05ebc72e1180f5f25cd899b9"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/audit/related-prs.json",
+      "sha256": "ad720346663f37caf933100623dc7ba07010e697ed1896d2aa56fcbe864b44cf"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/audit/scheduler-history.json",
+      "sha256": "81ac51b82290bbe32ff42cd916d303025b50f1d968f3f6c96f46786b4ae2cfd7"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/baseline-diagnostic-null.log",
+      "sha256": "73bf0969b7c728e7c379e2a0b2cedab849b1c2470b12bdef3397a0f784ff0836"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/baseline-rebuild.log",
+      "sha256": "bb628f5736e1016f360696d4e23d6ed09dc324afb1b9ec94cde7039556bc67f5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/baseline-suite.log",
+      "sha256": "69ed659672426382698a9d75a614a7c3b3bd0be96e13cb78bcb02708bf77c3a4"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/candidate-diagnostic-null.log",
+      "sha256": "3a9e020a01853a5b9ce7ad4732ea904c655b620965d6cef1899cbfe1903d21a5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/candidate-rebuild.log",
+      "sha256": "bb628f5736e1016f360696d4e23d6ed09dc324afb1b9ec94cde7039556bc67f5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/carry-pressure-schedule.mir",
+      "sha256": "4d1e4c83b480586bebe496c3f6116aaf26d1d6c184ff5d0f8fca5cdfdeaaaeda"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/census-artifacts.tar.gz",
+      "sha256": "691fae49cfcab69d96b46139adc0d320aa0514943031b8eb1626f3cbedded48e"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/census-results.json",
+      "sha256": "fb0b08fd8df3612199624876dbff6ab77b10bf04b4105fe1307bfab1c2e8b6a1"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/census-summary.json",
+      "sha256": "a4030e4ef03fa40d1334fbc9df415c346bf2b35378eeee2eae60099bcfaaf61c"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/final-build.log",
+      "sha256": "4a0d1762670e8ac81500b50d74bd4cbfb9e69a6a639f29af18f9ccaf5de8417d"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/final-suite.log",
+      "sha256": "d266b1c40359b4f18127d6e1722c0bc925267ff4296927978b7a46ce232cb7c1"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-0.log",
+      "sha256": "6195e843afc70a27d39ffba43ae7f67eeed6f1bfd99217408ab06342824f4fc7"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-1.log",
+      "sha256": "420159cf53337b0893ca0415c59cffb8aa92caeff4ffaffacf5ffcce000d9131"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-2.log",
+      "sha256": "9ee9a4424a81c46f479cd99ee77b4f253d68333ab28a82d509bd44da088d71dc"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-3.log",
+      "sha256": "a6b2a7501d04af21179ba5fbcf13935c7478a823a980af88329218b91557d351"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-4.log",
+      "sha256": "2952ae3ffea39c29f5193802a4a15a558c620f8455021e2ba53d549034057fad"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-5.log",
+      "sha256": "147fb979c4478400e10b603cda9137d39feaa069e82e232ac7518ddbad446e73"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-6.log",
+      "sha256": "54ca5902beec48b93b7b0ac7a2dc6613b03c9d04873cd1019021e26bd4474043"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-7.log",
+      "sha256": "9f055c61e8d4bf9338f5dcff8b1f410fe3106335c0c9fb5c63384b6037d1582e"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-8.log",
+      "sha256": "cb79eac3af36d0ed5fc86c0bafdfc235f98e62ffa9c8cfd3a82dd2abc1a3802d"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/baseline-9.log",
+      "sha256": "81932160074d62024d3ea0cf4d73701dc090b3c1771e3b037aeffc766c5a1800"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-0.log",
+      "sha256": "74475cb64e7a47d5c5a61b65f836f245585478a5e72ee658a6b167a7957d3977"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-1.log",
+      "sha256": "818d407268e9f3398d29addaa13c8fddabe7074338ae8413eae033ade7017fa9"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-2.log",
+      "sha256": "3a171e411161c1acc1ecbd90b1e70266f58349b66f8fbcd5c6c789d912e1d8b4"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-3.log",
+      "sha256": "9f909620fef024eb192e2a55c76454f1767c22de68d7c94da40288d6934645bb"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-4.log",
+      "sha256": "3d7049cc60454451979c47f92cbc568eb5b067488ae270d8a466fdbf64cc0165"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-5.log",
+      "sha256": "9c637f4d907f831afa522f49a0578a809ece734afb64ce88f303dc6076d6f7a1"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-6.log",
+      "sha256": "b57096cbf50934be9771bb6f8f93cd13aad93d8882352e3abcd68dc59871562a"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-7.log",
+      "sha256": "de924a9b609c79594eec141a969096bb9ad03eb1a0c2e5632900c95f9beef5a1"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-8.log",
+      "sha256": "9f23cb6d83c2b9d32c96e7f2b12c1874f1f6393c5aa1c9a117e6b2a6974bc6bb"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/candidate-9.log",
+      "sha256": "a8792f50a95fe7a36c805b564639f7309b5868d1f9bfc96afdf0349ae946c550"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused-final/results.json",
+      "sha256": "79202ade8f82b6718586f66060da977bf95096f7dbf3aa48b58ba49dd7f34d5b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/focused.py.txt",
+      "sha256": "57bba9a6def0dbd277fa5e540e48d2e6bdc03e9148171acdf525593618ea1da2"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/measure.py.txt",
+      "sha256": "7dcd12f173ca2dfbff05799e8cc5ad6fc9aeb6e45f397ca7aee9a1c6fc981e07"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline-compile.log",
+      "sha256": "d1a38448aac9b58f43dd5cded0f08e37efde01587ca6de9e9924e8180d8173c5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline-disassembly.log",
+      "sha256": "32f96563f240c57c3fc5ee29b2768cb8db670ab38e955611311f0d3d21478634"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline-execute.log",
+      "sha256": "69dc1166b6762942887688820233ac47b4958c413cf8b123746eb30a08923626"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline-link.log",
+      "sha256": "3c357a0d604045cc01430cb94e2d795d507a1b53192059d6d6fa518d78be32bd"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline-sections.log",
+      "sha256": "1314d580e3eaf0beb16715c9211d8093bdb710c2bdb51a079646fa970f2a8917"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline.o",
+      "sha256": "aa10b5c17480cbc5d1920d9e471b4fa2bb5542d7e3e95ddc0d53b18796cf755b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline.simg",
+      "sha256": "eac99538f6bb62add5378489b4940eb60b4f0d6e34237bdb4c9fb179c2873c97"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/baseline.simg.elf",
+      "sha256": "fc2e2e87ba3bd40495900979f0b08acaf41bb3646062c518e74f1f2da75154c3"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate-compile.log",
+      "sha256": "fe393add7dc50a4e4c56d0b9a1d8c62c1a3c339cd3971c681b3fa54ae0e1ae84"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate-disassembly.log",
+      "sha256": "e3fbf4b62e4d957bd4b95043102a5ea2b4a9b46731e3216e014779e0e4a53b40"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate-execute.log",
+      "sha256": "7423e4d7850bbd5213f9f3f08c37fa6e4ec95ff6d61d7ea44229fed8a1c1ab0a"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate-link.log",
+      "sha256": "4e064cea7c42984167f8a2661c735344ebabde67f1aa3627f06811cfc437003e"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate-sections.log",
+      "sha256": "6965bd5fb60e82f1e0be7aab9a8ae2c12e065b513e59a652cc37b747cc65fd5c"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate.o",
+      "sha256": "37e85381ec9cf0afcf87135868ab9fc146b09c0f0ed0c422707228c4ef6e70ba"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate.simg",
+      "sha256": "34701b437a175914e30c28ca30caa79af316eb1a9009cb8b0ad1eb1333fb1963"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/candidate.simg.elf",
+      "sha256": "70dcfbe7b3db5aa6ae6240dfc990666cf1f996654f9cd47ce5a5ac19f7e1f994"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/driver.log",
+      "sha256": "75ad326147dbe775a795c58e5e8c41e0bd4473a5a32a6727ba44577b64982081"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/driver.o",
+      "sha256": "e0b662514f570697c617e9fa9b21c87cae432facf10ddc87c42b7b369e7339e9"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/kernel.mir",
+      "sha256": "e47083964562edae6000f3b2c4e2fd40dc0ea67a27996bac66f88a4f1a54e831"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime/results.json",
+      "sha256": "5d5a9125b40aa96747dd29ef92eb0b0feda54b176a16985b90aedb6787a8a3e8"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime-vectors.h.txt",
+      "sha256": "fad69ad429245feda98133cce9c6e2a2e3ef677e4fc55ad378ab379aa9714177"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime.c.txt",
+      "sha256": "d865ff83ff75c52348a2de36bb35c01a1bf9dbc4907e8bbac27cd833401e611d"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime.py.txt",
+      "sha256": "394ff91a0e835a686f237fd27876ea2a5d9ec5c8a9454ef60b077ee7403a72d2"
+    }
+  ]
+}

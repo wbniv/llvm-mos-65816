@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MOS carry scheduling — implementation and results</title>
+<style>
+body{font:17px/1.65 system-ui,sans-serif;color:#202938;background:#fafbfc;
+max-width:1120px;margin:40px auto;padding:0 24px 80px}
+h1,h2,h3{line-height:1.25;scroll-margin-top:20px}h2{margin-top:2.5em}
+a{color:#175eb5}nav{display:flex;flex-wrap:wrap;gap:20px;margin-bottom:28px}
+table{display:block;overflow-x:auto;border-collapse:collapse;margin:24px 0;
+font-size:15px;background:white}th,td{border:1px solid #cdd5df;padding:10px 14px;
+vertical-align:top}th{background:#edf2f7;text-align:left}
+code{font-size:.9em;background:#eef1f5;padding:2px 4px;border-radius:3px}
+pre{overflow:auto;background:#eef1f5;padding:16px}pre code{padding:0}
+li{margin:8px 0}blockquote{border-left:3px solid #9db4cd;margin-left:0;padding-left:20px}
+@media print{body{font-size:11pt;max-width:none}nav{display:none}table{font-size:9pt}}
+</style>
+<nav><a href="#7-implementation-and-measured-outcome">Implementation and results</a>
+<a href="#8-completed-validation-and-packaging">Validation</a>
+<a href="#9-remaining-work">Remaining work</a>
+<a href="2026-09-26-mos-carry-scheduling.md">Markdown source</a></nav>
+<main><h1 id="mos-carry-chain-scheduling-diagnosis-optimization-and-acceptance-plan">MOS carry-chain scheduling: diagnosis, optimization, and acceptance plan</h1>
+<p><strong>Date:</strong> 2026-09-26. <strong>Priority:</strong> T4; selected as the next optimization.
+<strong>Status:</strong> implemented and validated locally as patch <strong>0064</strong>.
+The carry-saving optimization is complete; the generic TableGen pressure-contract
+defect remains a qualified workaround. Results and remaining work are in §7–§9.
+<strong>Objective:</strong> reduce avoidable carry materialization caused by pre-register-
+allocation scheduling, with a demonstrated code-size benefit and preserved
+runtime behavior across the MOS corpus.</p>
+<p>Planning, implementation, measurement, and completion update: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>),
+model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified from session
+<code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code> metadata. The earlier measurements retain
+the attribution recorded in their source documents.</p>
+<p>Sections 1–5 retain the original September 26 execution plan and its acceptance
+criteria. Section 7 records what was actually implemented, including deviations
+and the explicitly accepted size tradeoffs.</p>
+<h2 id="1-evidence-and-intended-scope">1. Evidence and intended scope</h2>
+<p>The original report is the <a href="2026-09-25-dpy-indexed-phase2-increment1.md#the-three-access-cliff--a-separate-reproducible-defect">three-access cliff in the increment 1 plan</a>.
+Its September 25 measurements were:</p>
+<table>
+<thead>
+<tr>
+<th>Shape</th>
+<th style="text-align:right">Before increment 1, scheduler on/off</th>
+<th style="text-align:right">After increment 1, scheduler on/off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Three-access sum</td>
+<td style="text-align:right">397 / 369 B</td>
+<td style="text-align:right">410 / 290 B</td>
+</tr>
+<tr>
+<td>Three-access rotate</td>
+<td style="text-align:right">412 / 426 B</td>
+<td style="text-align:right">420 / 340 B</td>
+</tr>
+</tbody>
+</table>
+<p>The report attributes the growth to interleaving a 32-bit scaling shift with a
+32-bit pointer add. Two carry values become live together despite one physical
+carry flag. Saving and restoring carry introduces branches, byte-register
+temporaries, and comparisons. Disabling the post-RA scheduler did not change
+the reported output.</p>
+<p>These are historical measurements, not a current baseline or a promised
+120-byte saving. Scheduling off is a diagnostic control. Success requires an
+identified scheduling change with normal scheduling enabled.</p>
+<p>Runtime <code>[dp],Y</code> increment 2 is already published in downstream commit
+<code>a4eb416c</code>, with <a href="https://github.com/wbniv/llvm-mos-65816/blob/a4eb416c/docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md">verification recorded in its plan</a>.
+The implementation baseline must also include the reviewed local 0061/0062/0063
+optimizations. Their effect on the original trigger must be measured before
+choosing a repair. Preserve narrow-add wrapping, scaled-index range checks,
+memory ordering, and M/X mode transitions throughout.</p>
+<h2 id="2-prior-work-reconciliation">2. Prior-work reconciliation</h2>
+<p>Read-only reconciliation for this plan covered the original report, TODO M2,
+the dashboard's <code>opt:carry-scheduler</code> item, structured defect records, patch
+bundles, Git history, and the live MOS scheduler and register definitions.
+Searches included carry/scheduler/pressure combinations and
+<code>MOSSchedStrategy</code>, <code>registerClassPressureDiff</code>, <code>Cc</code>, <code>RegPressure</code>, and
+<code>overrideSchedPolicy</code>.</p>
+<ul>
+<li>No existing canonical carry-scheduling record or standalone carry-scheduling
+repair was found. Preserve the original report as the discovery entry point.</li>
+<li><code>MOSMachineScheduler.cpp</code> and <code>MOSSubtarget.cpp</code> match the vendored pin
+<code>8be0546128a55e78c63ca571d466aa72a782cd36</code>; neither has a local working diff.
+The native-width register definitions do have downstream changes. The
+checkout and build scripts contain unrelated pending edits, so the current
+executable cannot be treated as a reproducible baseline from HEAD alone.</li>
+<li><code>MOSSubtarget::overrideSchedPolicy</code> already enables pressure tracking and
+allows both scheduling directions. Turning pressure tracking on is therefore
+not an implementation proposal.</li>
+<li><code>MOSSchedStrategy::tryCandidate</code> ranks physical <code>Ac</code>, <code>XY</code>, and <code>Imag8</code>
+pressure changes before generic excess/critical/maximum-pressure checks.
+<code>registerClassPressureDiff</code> explicitly ignores virtual registers. Whether this
+ordering hides virtual carry pressure on the trigger remains a hypothesis.</li>
+<li><code>Cc</code> is a fine-grained, single-register class, while <code>CV_GPR_LSB</code> includes
+carry, overflow, and byte-register alternatives. Inspect the actual assigned
+virtual classes and generated pressure sets before changing their costs.</li>
+<li>The existing native-shift carry-clobber repair (<code>Defs = [C]</code> on
+<code>ASLAcc16</code>/<code>LSRAcc16</code>) protects correctness. It is a distinct mechanism from
+avoidable carry overlap. Preserve it and its CRC/shift controls. Likewise,
+two-address rescheduling fix 0029 is a separate pass and contract.</li>
+</ul>
+<p>Before compiler edits, retain this audit's exact searches/results and migrate
+the historical report into its first structured record, provisionally
+<code>docs/defects/mos-carry-scheduling-pressure.json</code>. Use
+<code>prior_work.disposition = historical_migration</code>, explain the distinctions above,
+and follow the <a href="../howto-defect-evidence.md">defect evidence workflow</a>.
+Record creation follows baseline recovery; this plan makes no new confirmed
+failure or resolution claim. If another record is found, extend that record.</p>
+<h2 id="3-execution-sequence">3. Execution sequence</h2>
+<h3 id="a-reconstruct-and-freeze-the-baseline">A. Reconstruct and freeze the baseline</h3>
+<ol>
+<li>Create an isolated compiler worktree under <code>.scratch/carry-scheduling</code> using
+the <a href="../howto-feature-worktree.md">compiler-changing worktree recipe</a>.
+Give rebuilt sources and tools independent writable copies. Record the
+parent revision, vendor pin, complete ordered patch hashes, selected local
+overlays, SDK revision, and container identity. Reconcile increment 2 and
+0061–0063 explicitly; do not infer their presence from a binary timestamp.</li>
+<li>Recover the exact sum and rotate inputs and their commands from the original
+worktree, saved session artifacts, and Git history. Keep
+<code>examples/65816/farindex.c</code> as an integration witness. If an original reduced
+input is missing, label its replacement reconstructed and retain the gap.</li>
+<li>Preserve baseline Clang, llc, linker, resource headers, input/header hashes,
+preprocessed C, IR, and MIR immediately before/after machine scheduling and
+register allocation. Record the pass pipeline and verify the retained MIR
+replays at the intended boundary. Preserve object disassembly, function text
+sizes, commands, diagnostics, and exit statuses.</li>
+<li>Re-measure identical inputs at <code>-Os</code> with the pre-RA scheduler on/off, holding
+post-RA scheduling fixed. Repeat the post-RA-only diagnostic. Cover default,
+a16, and xy16 where supported. Compare the historical configuration and the
+reconciled current stack without conflating them.</li>
+<li>Establish a reproducible regression check for excess carry materialization
+and code size. Its failure must describe the recorded performance condition;
+compilation success is not that check. Freeze the baseline artifacts before
+candidate work. A current pass means not reproduced on that build; investigate
+which intervening change removed the trigger before claiming closure.</li>
+</ol>
+<h3 id="b-identify-the-scheduling-decision">B. Identify the scheduling decision</h3>
+<p>Trace both scheduling boundaries on the reduced MIR. Record ready candidates,
+their chosen reasons, virtual carry live ranges, register classes, pressure-set
+limits/deltas, and competing A/X/Y/Imag pressure. Use an assertions-enabled build
+with local diagnostics when the installed build cannot expose this information.</p>
+<p>Locate the first choice that makes independent carries overlap. Follow those
+values through allocation and expansion to the final save/restore instructions.
+Establish whether the problem is an absent pressure set, an inaccurate limit or
+weight, an early physical-register preference, or a later allocation decision.
+Count actual carry-preservation sequences; unrelated <code>bcs</code>, <code>ldy</code>, or <code>cpy</code>
+instructions are not evidence of a carry spill by themselves.</p>
+<h3 id="c-compare-small-candidate-changes">C. Compare small candidate changes</h3>
+<p>Test one explanation at a time, against the same frozen baseline:</p>
+<ol>
+<li>Correct a demonstrated pressure-model error if the generated model fails to
+represent the carry resource accurately.</li>
+<li>If the model is correct, prefer candidates that avoid exceeding carry
+capacity before applying the physical-register heuristics that caused the
+overlap. Use live pressure and virtual register classes, not a count of
+physical C operands. Account for both top-down and bottom-up scheduling.</li>
+<li>If those approaches lose elsewhere, evaluate a narrowly justified preference
+for completing an existing carry chain. Retain legal DAG dependencies and
+permit genuinely necessary overlapping live values. Global serialization or
+a blanket scheduler disable is not an acceptable release change.</li>
+</ol>
+<p>The first prototype belongs in <code>MOSMachineScheduler.{cpp,h}</code>; change
+<code>MOSRegisterInfo</code> or subtarget policy only when the trace demonstrates a need.
+Measure A/A16, X/Y, and imaginary-register pressure as well as carry: exchanging
+carry saves for larger spills or extra REP/SEP transitions is not a win.
+Preserve deterministic tie-breaking and check repeated builds of changed cases.
+Decide whether to gate on native features from observed scope and regressions.
+A change affecting ordinary MOS code requires ordinary MOS coverage.</p>
+<h2 id="4-verification-and-measurements">4. Verification and measurements</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Required evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scheduling regression</td>
+<td>Small replayable MIR with competing shift/add carries, plus single-chain and necessary-overlap controls. Check the contract and final preservation cost, allowing equivalent schedules.</td>
+</tr>
+<tr>
+<td>C integration</td>
+<td>Recovered sum/rotate inputs and <code>farindex</code>; stress 16/32/64-bit carry chains, carry-consuming branches, native shifts, high register pressure, calls, volatile accesses, and inline-assembly clobbers.</td>
+</tr>
+<tr>
+<td>Feature compatibility</td>
+<td>Current runtime <code>[dp],Y</code>, global <code>long,X</code>, native far words, and near-store controls remain selected where expected. Preserve wrapping and bank-crossing inputs.</td>
+</tr>
+<tr>
+<td>Static corpus</td>
+<td>All compilable C inputs in <code>examples/65816</code>, <code>examples/snes/corpus</code>, and <code>examples/snes</code>, with the required generated assets; machine verification, default/a16/xy16, <code>-Os</code> and <code>-Oz</code>, no LTO. Repeat changed and carry-heavy cases at <code>-O2</code>. Include a representative ordinary 6502 near-code set if its scheduling changes.</td>
+</tr>
+<tr>
+<td>Runtime</td>
+<td>Host/MAME/bsnes checks for <code>farindex</code>, <code>farblit</code>, <code>farbank</code>, BankWalk, both near-store gates, CRC and carry-heavy kernels; full native corpus and 50 fixed fuzz seeds. Retain actual failures and classify skips.</td>
+</tr>
+<tr>
+<td>Backend and packaging</td>
+<td>Full MOS lit with an exact-baseline failure comparison; assembly round trips; patch-stack round trip; rebuild and identify the candidate tools used for each result.</td>
+</tr>
+</tbody>
+</table>
+<p>Extend the existing <a href="../../dev/measure-near-store.py">size census runner</a> or use
+its corpus/SDK discovery for <code>dev/measure-carry-scheduling.py</code>. Retain per-file
+and per-function bytes, changed disassembly, spill counts, REP/SEP counts, and
+errors. Summarize wins, losses, unchanged cases, total delta, and worst regression
+for each mode and optimization level. Unsupported inputs and new compile failures
+must remain visible in the report.</p>
+<p>Use non-LTO runs to keep the backend trigger observable. Also build and execute
+representative affected demos with their normal LTO settings. Cycle claims need
+explicitly identified static estimates or reproducible emulator instrumentation;
+ROM size, instruction counts, and frame counts alone do not establish a speedup.
+Published <a href="https://biohack.net/snes/bankwalk/">BankWalk</a> and
+<a href="https://biohack.net/snes/lfsr2/">Dual-LFSR</a> demos are relevant integration
+customers; their existing publication is not evidence for the candidate build.</p>
+<h2 id="5-acceptance-and-disposition">5. Acceptance and disposition</h2>
+<ul>
+<li>The preserved regression input fails its recorded performance check on the
+baseline and passes with an identified change, with scheduling enabled and a
+causal trace linking scheduling to reduced carry-preservation work.</li>
+<li>The original sum and rotate cases improve or, if no longer reproducible,
+receive an evidence-backed current disposition without erasing old results.
+The 290/340 B historical scheduler-off results are reference points, not
+hardcoded current acceptance thresholds.</li>
+<li>Aggregate text size improves in the affected native modes. Every individual
+growth is inspected; the default acceptance target is zero unexplained size
+regressions and zero regressions in measured hot-loop cycles. An aggregate win
+does not by itself excuse a material loss. Tighten the rule or reject it if
+that condition cannot be met.</li>
+<li>Machine verification and runtime checks introduce no new failures. Reproduce
+existing full-suite failures on the identified baseline. Preserve required
+carry/overflow/processor-status dependencies, alias ordering, and mode rules.</li>
+<li>Retain source, preprocessed input, IR/MIR, tools, logs, and the regression
+artifact in the canonical record. Mark fixed only with matching-input evidence.
+Update the original increment 1 report, TODO M2, dashboard item, handoff, and
+dependent summaries with the result and exact attribution.</li>
+<li>Package a scoped compiler patch and prove its application and regeneration.
+Before any upstream submission, inspect the exact destination scheduler,
+callers, tests, and history. Submission readiness depends on whether the final
+implementation requires #320/#321; SNES platform code remains on its separate
+submission track.</li>
+</ul>
+<p>If the candidates only shift costs or require broad changes without a measured
+benefit, record that result and retain the open performance report. Broader lane
+lowering and near-Y correctness work have their own scope and evidence.</p>
+<h2 id="6-progress">6. Progress</h2>
+<ul>
+<li>[x] Reconcile the original report and inspect the live scheduling policy.</li>
+<li>[x] Write the implementation and acceptance plan.</li>
+<li>[x] Recover inputs, reconstruct tools, and freeze a reproducible baseline.</li>
+<li>[x] Create or update the canonical evidence record and preserve <code>prior_work</code>.</li>
+<li>[x] Trace the responsible scheduling choice and compare candidate policies.</li>
+<li>[x] Complete focused, corpus, runtime, and packaging checks.</li>
+<li>[x] Record the disposition and refresh all affected documents and views.</li>
+</ul>
+<h2 id="7-implementation-and-measured-outcome">7. Implementation and measured outcome</h2>
+<h3 id="baseline-and-causal-evidence">Baseline and causal evidence</h3>
+<p>The isolated compiler lives in <code>.scratch/carry-scheduling</code> on
+<code>wt/321-carry-scheduling</code>, based on downstream <code>c8a1403d</code>. Vendor pin:
+<code>8be0546128a55e78c63ca571d466aa72a782cd36</code>. Its independently writable source
+includes runtime <code>[dp],Y</code> increment 2 and patches 0049–0063. The captured
+<a href="../defects/evidence/2026-09-26-mos-carry-scheduling/baseline-identity.json">identity</a>,
+<a href="../defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt">source diff</a>,
+<a href="../defects/evidence/2026-09-26-mos-carry-scheduling/baseline-untracked-source.tar.gz">untracked source archive</a>,
+and <a href="../defects/evidence/2026-09-26-mos-carry-scheduling/baseline-overlay.txt">overlay inventory</a>
+identify the reconstruction. Baseline tools and resource headers are preserved
+independently in <code>build/carry-baseline-install</code>; candidate tools are in this
+worktree's <code>build/llvm-mos-install</code>. Main's installed compiler was not replaced.</p>
+<p>The original <code>p_sum.c</code> and <code>p_rot.c</code> were recovered byte-for-byte from the
+September 25 session artifacts. Original discovery credit: <strong>Claude Code
+2.1.278, model <code>claude-opus-5</code>, high reasoning effort</strong>, session
+<code>65695418-7e9b-45bd-92e3-2ecfd88ecf0b</code>, agent <code>a35017d73ff4d881d</code>.
+The original September 25 binary was unavailable; its old byte counts remain
+historical evidence. All numbers below use the identified reconstruction.</p>
+<table>
+<thead>
+<tr>
+<th>Original function, <code>-Os</code>, no LTO</th>
+<th style="text-align:right">Baseline scheduler on</th>
+<th style="text-align:right">Baseline scheduler off</th>
+<th style="text-align:right">0064 scheduler on</th>
+<th style="text-align:right">0064 scheduler off</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Three-access sum</td>
+<td style="text-align:right">409 B</td>
+<td style="text-align:right">289 B</td>
+<td style="text-align:right"><strong>248 B</strong></td>
+<td style="text-align:right">289 B</td>
+</tr>
+<tr>
+<td>Three-access rotate</td>
+<td style="text-align:right">385 B</td>
+<td style="text-align:right">313 B</td>
+<td style="text-align:right"><strong>285 B</strong></td>
+<td style="text-align:right">313 B</td>
+</tr>
+</tbody>
+</table>
+<p>A16 and XY16 give the same function sizes. Disabling only post-RA scheduling
+leaves the baseline unchanged. Default 8-bit mode cannot legalize these far
+32-bit-index inputs; those failures are retained, not counted as scheduling
+passes. The sum's carry materializations fall <strong>17 → 0</strong>, and its compare-#1
+restores <strong>18 → 0</strong>; rotate falls <strong>12 → 0</strong> for both. REP/SEP counts stay at
+6 and 8 respectively. <a href="../defects/evidence/2026-09-26-mos-carry-scheduling/dynamic-runs.json">Exact runs</a>
+and <a href="../defects/evidence/2026-09-26-mos-carry-scheduling/carry-sequence-counts.json">sequence counts</a>
+retain the disassembly evidence.</p>
+<p>MIR before/after scheduling exposes the interleaved ASL/ROL and ADC carry
+values. Generated register information confirms that TableGen reads
+<code>IsPressureFineGrained</code> but does not propagate it to initial register-unit
+sets, allowing the carry subset to be pruned. This diagnosis used source,
+generated tables, and replayable MIR on a Release build with assertions off;
+an assertions-enabled candidate-reason trace was not produced.</p>
+<h3 id="selected-policy-and-rejected-candidates">Selected policy and rejected candidates</h3>
+<p><a href="../../patches/llvm-mos/0064-mos-computed-carry-scheduling.patch">Patch 0064</a>
+changes <code>MOSMachineScheduler.{cpp,h}</code> and adds
+<code>CodeGen/MOS/carry-pressure-schedule.mir</code>:</p>
+<ul>
+<li>Track each computed virtual <code>Cc</code> value by its defining scheduling node and
+data-dependency users. Two-address chains can redefine one virtual register,
+so a register ID alone does not identify the value.</li>
+<li>Maintain live counts across both scheduling boundaries. Compare the change
+in excess above one live computed carry before the physical-register costs.</li>
+<li>Exclude <code>LDImm1</code> constants: CLC/SEC can rematerialize them. Update only values
+referenced by the candidate node.</li>
+<li>Preserve the legal DAG and normal tie-breaking after equal costs. Necessary
+carry overlap remains legal. Physical carry values entering a region are
+outside this additional model.</li>
+</ul>
+<p>The implementation applies to ordinary MOS as well as native-width modes.
+It has no native opcode or SNES platform dependency; native-width test RUNs
+belong to the downstream coverage. Upstream extraction still needs an exact
+current destination audit and review.</p>
+<table>
+<thead>
+<tr>
+<th>Candidate</th>
+<th>Decision and evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Restore all fine-grained TableGen pressure sets</td>
+<td>Rejected: native <code>-Os</code> aggregate <strong>+40,483 B</strong>, 214 growing files, and five additional lit failures.</td>
+</tr>
+<tr>
+<td>Restore only the carry set</td>
+<td>Rejected: native aggregate −2,400 B but 144 growing files, including <code>a16mixfold</code> 59 → 196 B and <code>a16thread</code> 53 → 110 B.</td>
+</tr>
+<tr>
+<td>Count computed carries at the scheduling boundaries</td>
+<td>Selected: removes the original materializations and improves all measured corpus totals.</td>
+</tr>
+<tr>
+<td>Put computed-carry cost after physical-register heuristics</td>
+<td>No improvement: all nine Os/Oz growing sources were byte-identical across three modes and both optimization levels.</td>
+</tr>
+</tbody>
+</table>
+<p>The <a href="../defects/mos-carry-scheduling-pressure.json">canonical record</a> is
+<strong>workaround</strong>, because its frozen TableGen contract test still fails with the
+selected compiler. The scheduler regression has separate matching-input
+<a href="../defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json">red/green evidence</a>.
+The broader pressure-model failure is not marked fixed.</p>
+<h3 id="corpus-results-and-accepted-costs">Corpus results and accepted costs</h3>
+<p><a href="../../dev/measure-carry-scheduling.py">The census runner</a> compiles all 409 C
+sources in the three planned directories with the same SDK/assets, machine
+verification, and no LTO. Pairs count inputs that compile on both tools.
+There are <strong>zero unmatched compilation outcomes</strong> in every row; other inputs
+fail on both tools and remain in the retained reports.</p>
+<table>
+<thead>
+<tr>
+<th>Optimization</th>
+<th>Mode</th>
+<th style="text-align:right">Paired / inputs</th>
+<th style="text-align:right">Smaller</th>
+<th style="text-align:right">Larger</th>
+<th style="text-align:right">Aggregate text delta</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Os</td>
+<td>default</td>
+<td style="text-align:right">372 / 409</td>
+<td style="text-align:right">220</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">−43,332 B</td>
+</tr>
+<tr>
+<td>Os</td>
+<td>a16</td>
+<td style="text-align:right">408 / 409</td>
+<td style="text-align:right">64</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right">−8,088 B</td>
+</tr>
+<tr>
+<td>Os</td>
+<td>xy16</td>
+<td style="text-align:right">408 / 409</td>
+<td style="text-align:right">62</td>
+<td style="text-align:right">6</td>
+<td style="text-align:right">−8,059 B</td>
+</tr>
+<tr>
+<td>Oz</td>
+<td>default</td>
+<td style="text-align:right">372 / 409</td>
+<td style="text-align:right">226</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">−46,317 B</td>
+</tr>
+<tr>
+<td>Oz</td>
+<td>a16</td>
+<td style="text-align:right">404 / 409</td>
+<td style="text-align:right">66</td>
+<td style="text-align:right">2</td>
+<td style="text-align:right">−7,190 B</td>
+</tr>
+<tr>
+<td>Oz</td>
+<td>xy16</td>
+<td style="text-align:right">404 / 409</td>
+<td style="text-align:right">63</td>
+<td style="text-align:right">4</td>
+<td style="text-align:right">−7,090 B</td>
+</tr>
+<tr>
+<td>O2, union of changed inputs</td>
+<td>default</td>
+<td style="text-align:right">240 / 252</td>
+<td style="text-align:right">218</td>
+<td style="text-align:right">1</td>
+<td style="text-align:right">−50,731 B</td>
+</tr>
+<tr>
+<td>O2, union of changed inputs</td>
+<td>a16</td>
+<td style="text-align:right">250 / 252</td>
+<td style="text-align:right">72</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">−14,386 B</td>
+</tr>
+<tr>
+<td>O2, union of changed inputs</td>
+<td>xy16</td>
+<td style="text-align:right">248 / 252</td>
+<td style="text-align:right">71</td>
+<td style="text-align:right">3</td>
+<td style="text-align:right">−13,921 B</td>
+</tr>
+</tbody>
+</table>
+<p>Thirteen ordinary NMOS 6502 fixtures were adapted only by replacing their
+terminal SNES <code>wai</code> with an empty volatile asm; all 13 compile on both tools.
+Os/Oz/O2 totals improve by <strong>970/996/941 B</strong>. One fixture grows 1 B at Os/Oz;
+none grow at O2. Adapted inputs and the initial unsupported-WAI attempts are
+retained separately.</p>
+<p><a href="../defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json">All 32 growing configurations</a>
+are enumerated with function deltas and archived disassembly. Nine unique
+Os/Oz sources grow:</p>
+<table>
+<thead>
+<tr>
+<th>Source family</th>
+<th style="text-align:right">Largest growth</th>
+<th>Inspected cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>lsystem_sim</code></td>
+<td style="text-align:right">41 B (Oz xy16, 2.04%)</td>
+<td>Different frame allocation adds indirect frame traffic in the turtle loop; two fewer REP/SEP instructions. Os/O2 increases are 5–8 B.</td>
+</tr>
+<tr>
+<td><code>rcundef2</code></td>
+<td style="text-align:right">17 B</td>
+<td>ASR/rotate ordering changes scratch allocation and, at Oz xy16, static-stack spill routing. Os/O2 increases are 3 B.</td>
+</tr>
+<tr>
+<td><code>spirograph</code></td>
+<td style="text-align:right">15 B</td>
+<td>Earlier HUD offset computation adds ZP saves/reloads; xy16 adds one mode-change instruction. Other functions retain their sizes.</td>
+</tr>
+<tr>
+<td><code>avalanche</code></td>
+<td style="text-align:right">11 B</td>
+<td>Palette setup uses additional ZP shifts and reloads; core named worker function sizes stay unchanged.</td>
+</tr>
+<tr>
+<td><code>lsystem</code></td>
+<td style="text-align:right">9 B</td>
+<td>Different scratch allocation adds transfers around multiplication, shifts, and lookup work.</td>
+</tr>
+<tr>
+<td><code>dctbloom</code></td>
+<td style="text-align:right">4 B</td>
+<td>Four additional transfers in <code>fill_cell</code> setup, before its nested loops.</td>
+</tr>
+<tr>
+<td><code>bf_vm_sim</code>, <code>rotkal_sim</code>, <code>seqvm_sim</code></td>
+<td style="text-align:right">1 B each</td>
+<td>Loading the high pointer byte into X/Y early adds TXA/TYA when consuming it.</td>
+</tr>
+</tbody>
+</table>
+<p>These bounded losses are accepted for the local optimization after inspecting
+all growing cases and rejecting the broader models. This is a documented
+tradeoff, not a claim of universal profitability. <strong>Hot-loop cycles and compile
+time were not measured</strong>; runtime checks establish correctness, not speed.
+The zero-regression criterion for measured cycles therefore has no supporting
+cycle experiment. In particular, the L-system frame traffic and XY16 HUD mode
+change remain candidates for later profitability work.</p>
+<h2 id="8-completed-validation-and-packaging">8. Completed validation and packaging</h2>
+<ul>
+<li><strong>Matching-input scheduler check:</strong> baseline fails and 0064 passes for normal,
+top-down, and bottom-up scheduling on 6502, a16, and xy16: nine red/green pairs.
+Single-chain/dead-carry and necessary-overlap controls pass. The final MIR
+also lowers through the remaining pipeline with machine verification.</li>
+<li><strong>Full MOS CodeGen + MC lit:</strong> <strong>177 passed, 2 unsupported, 0 failed</strong>.
+The original baseline MOS tests pass. The TableGen-only experimental test
+is retained as evidence and is not shipped in 0064.</li>
+<li><strong>Runtime corpus:</strong> all <strong>79 native corpus cases + 50 fixed fuzz seeds</strong> pass
+the manifest/generated oracle, MAME default/a16/xy16, and bsnes a16 checks.
+<a href="../defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json">Results</a>
+and complete emulator logs are retained.</li>
+<li><strong>Original C functions:</strong> both tools, both functions, and a16/xy16 function
+modes pass 24 iterations over six bank-boundary index triples with a common
+a16 driver: eight ROMs × two emulators = <strong>16 passes</strong>. Functions compile
+separately without LTO. Sum/rotate oracle hashes are <code>0x7BF2E264</code> /
+<code>0xAF1D6A7D</code>. The first all-XY16-driver attempt fails on both tools; its
+distinct wrong values are preserved and its cause is not yet isolated.</li>
+<li><strong>Focused gates:</strong> <code>farindex</code>, <code>farbank</code>, BankWalk, <code>a16storebytes</code>,
+<code>a16indirectstore</code>, <code>a16shift</code>, and <code>a16ashift</code> pass. The normal SDK-linked
+BankWalk/far-index gates cover their default LTO configuration in addition
+to explicit non-LTO objects.</li>
+<li><strong>Inherited blocker:</strong> <code>farblit</code> fails before scheduling while legalizing an
+s8 <code>G_LOAD_FAR_ABS</code> at 8355871, on both preserved baseline and candidate.
+<a href="../defects/mos-farblit-byte-load-legalization.json">Separate canonical record</a>
+preserves source, preprocessing, IR/MIR, commands, and diagnostics. The patch
+interaction is unisolated; this is not a passing runtime gate.</li>
+<li><strong>Assembly roundtrip:</strong> default <strong>97 identical / 25 skipped</strong>, a16 and xy16
+each <strong>121 identical / 1 skipped</strong>, zero divergent. XY16 was repeated after
+an initial <code>/tmp</code> capacity failure; both logs are retained.</li>
+<li><strong>Patch roundtrip:</strong> <code>dev/regen-patch.sh</code> passes against a pristine vendor
+worktree plus the patch stack. <strong>0002 is byte-identical</strong> to its starting
+version. 0064 is registered in toolchain application, standalone exclusions,
+and focused-test regeneration. The initial <code>/tmp</code> capacity failure and
+successful workspace-TMPDIR retry are both retained.</li>
+<li>The final cleanup rebuild is byte-identical to the installed candidate used
+for the census and runtime checks. <a href="../defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json">Candidate identity</a>
+records Clang, llc, linker, and patch hashes. No candidate compiler was
+installed over main's differently based compiler.</li>
+</ul>
+<h2 id="9-upstream-pr-preparation">9. Upstream PR preparation</h2>
+<p>The standalone <a href="../pr-preparations/2026-09-26/0064-pr-body.md">PR packet</a> is
+ready for upstream review on llvm-mos main
+<code>7bd67c0ae4e8bb65a3f980912bf201df22131e34</code>. Local branch
+<code>mos-computed-carry-scheduling</code> in <code>.scratch/carry-pr/source</code> contains commit
+<code>155e209c4cee8eeac01397aac3542e76841a9856</code>. At completion of local preparation, no branch had been pushed or PR posted.
+<a href="../pr-preparations/2026-09-26/0064-review.md">Destination and profitability review</a>
+and <a href="../pr-preparations/2026-09-26/0064-validation.md">exact validation</a> distinguish
+this extraction from the earlier downstream stack.</p>
+<ul>
+<li>The original grouped MIR already passes at this upstream revision. A valid
+interleaved shift/add input supplies the current regression: five scheduling
+checks fail on baseline, all ten candidate RUNs pass; top-down is an existing
+passing control. Native feature RUNs are replaced by ordinary 6502, 65C02,
+65CE02 and stock 65816 checks; multiple carry users are also covered.</li>
+<li>The 6502 kernel shrinks <strong>133 → 59 bytes</strong>, removing six materializations.
+Baseline and candidate each pass <strong>512 frozen Python-oracle vectors</strong> in
+mos-sim. Full candidate MOS suites: <strong>132 passed / one unsupported</strong>.</li>
+<li>With a fixed downstream frontend, 13 ordinary near-code fixtures across
+three CPUs and Os/Oz/O2 give <strong>117 identical object disassemblies</strong>. This is
+neutral current-upstream backend coverage, not a broad upstream size gain.</li>
+<li>The recorded downstream 1–41-byte losses remain accepted in the proposal.
+Extra loop frame traffic and the HUD mode transition are explicit costs;
+neither cycles nor compiler overhead was measured.</li>
+<li>Review is by the implementation agent, <strong>not independent review</strong>. Attribution:
+OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning
+effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</li>
+</ul>
+<p><strong>PASS — upstream candidate MOS CodeGen + MC suite.</strong> The retained
+<a href="../pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/final-suite.log">suite log</a>
+records:</p>
+<pre><code class="language-text">Total Discovered Tests: 133
+  Unsupported:   1 (0.75%)
+  Passed     : 132 (99.25%)
+</code></pre>
+<p>This result covers the exact upstream extraction above. The inherited farblit,
+all-XY16 driver, and diagnostic-only null-emission observations retain their
+separate qualified status below.</p>
+<h2 id="10-remaining-work">10. Remaining work</h2>
+<p>Recheck the destination if it moves before publication, then submit the prepared
+packet when requested. The generic TableGen pressure-contract repair, inherited
+farblit legalization failure, and unisolated all-XY16 driver observation remain
+separate follow-ups. Cycle and compile-time measurements are needed before
+making speed or compiler-overhead claims. The upstream validation record also
+retains an unisolated diagnostic-only null-emission failure on both builds;
+normal object emission passes, and this preparation does not attempt its repair.</p>
+<h2 id="11-publication">11. Publication</h2>
+<p>Following the user’s commit/push instruction, compiler commit <code>155e209c4cee</code>
+is pushed to the <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">fork branch</a>.
+The downstream patch, retained evidence and PR packet are committed on
+<code>carry-scheduling-preparation</code>, based on repository <code>origin/main</code> at <code>b3938bda</code>.
+The shared checkout and unrelated staged work are preserved. No PR has been
+opened. The earlier local-preparation statements describe their dated state.</p>
+<p>Publication: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</p>
+</main>
+<!-- Source SHA-256: 793bb533150d22dedf4f35f514d925b8b35c5e4fa15b65a00ffc564a37b588ff -->
+</html>

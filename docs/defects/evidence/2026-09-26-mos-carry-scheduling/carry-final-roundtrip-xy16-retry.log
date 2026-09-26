@@ -1,0 +1,5 @@
+SKIP  farblit.c  (does not compile: fatal error: error in backend: unable to legalize instruction: %346:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main))
+
+cc=/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang
+mc=/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-mc
+round-trip: 121 identical, 0 divergent, 1 skipped

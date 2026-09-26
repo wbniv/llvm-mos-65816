@@ -1,0 +1,4214 @@
+[
+  {
+    "source": "arith.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mos6502.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mos6502.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mos65c02.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mos65c02.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mosw65816.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Os.mosw65816.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "b623180fc29b90cc6d637f49994cb8266572eceb8979043280f98e142a27e7f0",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mos6502.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mos6502.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "b623180fc29b90cc6d637f49994cb8266572eceb8979043280f98e142a27e7f0",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mos65c02.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mos65c02.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "b623180fc29b90cc6d637f49994cb8266572eceb8979043280f98e142a27e7f0",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mosw65816.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.Oz.mosw65816.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "88523769ef10d2fd8123daac9f2ce25a63c47ef63dc78bff2f34bbd2c80e290b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mos6502.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mos6502.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "88523769ef10d2fd8123daac9f2ce25a63c47ef63dc78bff2f34bbd2c80e290b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mos65c02.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mos65c02.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arith.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "88523769ef10d2fd8123daac9f2ce25a63c47ef63dc78bff2f34bbd2c80e290b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mosw65816.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arith.O2.mosw65816.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "3002dc440ff77b378f1d6160dac586ec2574a7bb5150da3370f7ff66d9bcda59",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mos6502.baseline.o"
+      ],
+      "text": 139
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mos6502.candidate.o"
+      ],
+      "text": 139
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "3002dc440ff77b378f1d6160dac586ec2574a7bb5150da3370f7ff66d9bcda59",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mos65c02.baseline.o"
+      ],
+      "text": 139
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mos65c02.candidate.o"
+      ],
+      "text": 139
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "3002dc440ff77b378f1d6160dac586ec2574a7bb5150da3370f7ff66d9bcda59",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mosw65816.baseline.o"
+      ],
+      "text": 139
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Os.mosw65816.candidate.o"
+      ],
+      "text": 139
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "5c29b12087b80dca57cb6d2c216550725695b45174af7cbe7ca4fdf38c329f33",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mos6502.baseline.o"
+      ],
+      "text": 117
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mos6502.candidate.o"
+      ],
+      "text": 117
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "5c29b12087b80dca57cb6d2c216550725695b45174af7cbe7ca4fdf38c329f33",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mos65c02.baseline.o"
+      ],
+      "text": 117
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mos65c02.candidate.o"
+      ],
+      "text": 117
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "5c29b12087b80dca57cb6d2c216550725695b45174af7cbe7ca4fdf38c329f33",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mosw65816.baseline.o"
+      ],
+      "text": 117
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.Oz.mosw65816.candidate.o"
+      ],
+      "text": 117
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "509664314ffa9f8b374dacea63965768d410788d1cd97322ee67f6d97e22fd56",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mos6502.baseline.o"
+      ],
+      "text": 33
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mos6502.candidate.o"
+      ],
+      "text": 33
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "509664314ffa9f8b374dacea63965768d410788d1cd97322ee67f6d97e22fd56",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mos65c02.baseline.o"
+      ],
+      "text": 33
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mos65c02.candidate.o"
+      ],
+      "text": 33
+    }
+  },
+  {
+    "source": "arrays.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "509664314ffa9f8b374dacea63965768d410788d1cd97322ee67f6d97e22fd56",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mosw65816.baseline.o"
+      ],
+      "text": 33
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/arrays.O2.mosw65816.candidate.o"
+      ],
+      "text": 33
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "5ac62aaf501942f56ba5332f8482602d662d99aeb40d953aa5218d56e4bfec3b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "5ac62aaf501942f56ba5332f8482602d662d99aeb40d953aa5218d56e4bfec3b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "5ac62aaf501942f56ba5332f8482602d662d99aeb40d953aa5218d56e4bfec3b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "f505c965b295c6e2897ff5eb29fb7e0daf9747d0628918403838d629b7ee7d36",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 701
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 701
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "f505c965b295c6e2897ff5eb29fb7e0daf9747d0628918403838d629b7ee7d36",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 701
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 701
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "f505c965b295c6e2897ff5eb29fb7e0daf9747d0628918403838d629b7ee7d36",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 701
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 701
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "7a059253e379991f40e45db167d40c2f555a2effe16d7685ea14b0478b4c468a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "7a059253e379991f40e45db167d40c2f555a2effe16d7685ea14b0478b4c468a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitshuffle_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "7a059253e379991f40e45db167d40c2f555a2effe16d7685ea14b0478b4c468a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 673
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitshuffle_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 673
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "992dce0703af485c433d41d8d24b638a5090e56f8204962ad634172857ac638b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 381
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 381
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "992dce0703af485c433d41d8d24b638a5090e56f8204962ad634172857ac638b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 381
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 381
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "992dce0703af485c433d41d8d24b638a5090e56f8204962ad634172857ac638b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 381
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 381
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "217f7e944546d0146a40a6386af623473c87fb145102ba54a27b2897ae81e038",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 379
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 379
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "217f7e944546d0146a40a6386af623473c87fb145102ba54a27b2897ae81e038",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 379
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 379
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "217f7e944546d0146a40a6386af623473c87fb145102ba54a27b2897ae81e038",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 379
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 379
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "04488102da090462419a2d75033c3502153f42952c04139bbca45adc2607a2af",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 387
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 387
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "04488102da090462419a2d75033c3502153f42952c04139bbca45adc2607a2af",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 387
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 387
+    }
+  },
+  {
+    "source": "bitweave_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "04488102da090462419a2d75033c3502153f42952c04139bbca45adc2607a2af",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 387
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/bitweave_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 387
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "96b61f352ca99f586327504114cbce69220105fd397bf6b1c9ebcafba5b42ce6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mos6502.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mos6502.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "96b61f352ca99f586327504114cbce69220105fd397bf6b1c9ebcafba5b42ce6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mos65c02.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mos65c02.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "96b61f352ca99f586327504114cbce69220105fd397bf6b1c9ebcafba5b42ce6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mosw65816.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Os.mosw65816.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "2aeabc6648e57acc619befb736cec55b7dbb6d21ea277bd52bfe218a76a83029",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mos6502.baseline.o"
+      ],
+      "text": 189
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mos6502.candidate.o"
+      ],
+      "text": 189
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "2aeabc6648e57acc619befb736cec55b7dbb6d21ea277bd52bfe218a76a83029",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mos65c02.baseline.o"
+      ],
+      "text": 189
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mos65c02.candidate.o"
+      ],
+      "text": 189
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "2aeabc6648e57acc619befb736cec55b7dbb6d21ea277bd52bfe218a76a83029",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mosw65816.baseline.o"
+      ],
+      "text": 189
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.Oz.mosw65816.candidate.o"
+      ],
+      "text": 189
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "f109fd19da195db955c2247b6e2d45d60b734a310e62b9e2fb1057ac1a6f516a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mos6502.baseline.o"
+      ],
+      "text": 226
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mos6502.candidate.o"
+      ],
+      "text": 226
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "f109fd19da195db955c2247b6e2d45d60b734a310e62b9e2fb1057ac1a6f516a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mos65c02.baseline.o"
+      ],
+      "text": 226
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mos65c02.candidate.o"
+      ],
+      "text": 226
+    }
+  },
+  {
+    "source": "control.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "f109fd19da195db955c2247b6e2d45d60b734a310e62b9e2fb1057ac1a6f516a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mosw65816.baseline.o"
+      ],
+      "text": 226
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/control.O2.mosw65816.candidate.o"
+      ],
+      "text": 226
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "20518ed3575d0e8424f6c50abb10e722b1861478ff3f3931d964721d5474fa24",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 4823
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 4823
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "20518ed3575d0e8424f6c50abb10e722b1861478ff3f3931d964721d5474fa24",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 4823
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 4823
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "20518ed3575d0e8424f6c50abb10e722b1861478ff3f3931d964721d5474fa24",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 4823
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 4823
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "8acb5e8b3eacc21c68b5799b80f8b2ed0e938e66b2a479028448860d29c8293a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 4791
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 4791
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "8acb5e8b3eacc21c68b5799b80f8b2ed0e938e66b2a479028448860d29c8293a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 4791
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 4791
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "8acb5e8b3eacc21c68b5799b80f8b2ed0e938e66b2a479028448860d29c8293a",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 4791
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 4791
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "d8046373cbb2f10766d145c7de539b1755fba23298e1db5acc035f20b4c4bc50",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 4956
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 4956
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "d8046373cbb2f10766d145c7de539b1755fba23298e1db5acc035f20b4c4bc50",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 4956
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 4956
+    }
+  },
+  {
+    "source": "cordic_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "d8046373cbb2f10766d145c7de539b1755fba23298e1db5acc035f20b4c4bc50",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 4956
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/cordic_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 4956
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "8f11cedeb4ea8959ea4b0eaeeaa2d071fc0d3ac3ec84d83e2a20fabd26b03619",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mos6502.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mos6502.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "8f11cedeb4ea8959ea4b0eaeeaa2d071fc0d3ac3ec84d83e2a20fabd26b03619",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mos65c02.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mos65c02.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "8f11cedeb4ea8959ea4b0eaeeaa2d071fc0d3ac3ec84d83e2a20fabd26b03619",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mosw65816.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Os.mosw65816.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "05e72728fd5f2b00766831f2fe8d6d36362aea458d52529c4452aab979057740",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mos6502.baseline.o"
+      ],
+      "text": 162
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mos6502.candidate.o"
+      ],
+      "text": 162
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "05e72728fd5f2b00766831f2fe8d6d36362aea458d52529c4452aab979057740",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mos65c02.baseline.o"
+      ],
+      "text": 162
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mos65c02.candidate.o"
+      ],
+      "text": 162
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "05e72728fd5f2b00766831f2fe8d6d36362aea458d52529c4452aab979057740",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mosw65816.baseline.o"
+      ],
+      "text": 162
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.Oz.mosw65816.candidate.o"
+      ],
+      "text": 162
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "5203ab55873d19fb7e85b456ff7cbfd3160732f3003aab774f3fac8834d0aa8e",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mos6502.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mos6502.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "5203ab55873d19fb7e85b456ff7cbfd3160732f3003aab774f3fac8834d0aa8e",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mos65c02.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mos65c02.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "funcs.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "5203ab55873d19fb7e85b456ff7cbfd3160732f3003aab774f3fac8834d0aa8e",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mosw65816.baseline.o"
+      ],
+      "text": 168
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/funcs.O2.mosw65816.candidate.o"
+      ],
+      "text": 168
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "3568ca5f66d2e7b60b45924544085f0d147916d64e500ccbcf205ef0e4ed4e76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mos6502.baseline.o"
+      ],
+      "text": 176
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mos6502.candidate.o"
+      ],
+      "text": 176
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "3568ca5f66d2e7b60b45924544085f0d147916d64e500ccbcf205ef0e4ed4e76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mos65c02.baseline.o"
+      ],
+      "text": 176
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mos65c02.candidate.o"
+      ],
+      "text": 176
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "3568ca5f66d2e7b60b45924544085f0d147916d64e500ccbcf205ef0e4ed4e76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mosw65816.baseline.o"
+      ],
+      "text": 176
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Os.mosw65816.candidate.o"
+      ],
+      "text": 176
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "5f8ecf6bd167fcbb95a23cd3d515b015532f8970a29bf1f38d32da61d03a650b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mos6502.baseline.o"
+      ],
+      "text": 167
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mos6502.candidate.o"
+      ],
+      "text": 167
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "5f8ecf6bd167fcbb95a23cd3d515b015532f8970a29bf1f38d32da61d03a650b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mos65c02.baseline.o"
+      ],
+      "text": 167
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mos65c02.candidate.o"
+      ],
+      "text": 167
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "5f8ecf6bd167fcbb95a23cd3d515b015532f8970a29bf1f38d32da61d03a650b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mosw65816.baseline.o"
+      ],
+      "text": 167
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.Oz.mosw65816.candidate.o"
+      ],
+      "text": 167
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "37ff8f28efe024f07f1dca1ddd3f53923bf022de99d9e357541c5ab1b64bb22b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mos6502.baseline.o"
+      ],
+      "text": 380
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mos6502.candidate.o"
+      ],
+      "text": 380
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "37ff8f28efe024f07f1dca1ddd3f53923bf022de99d9e357541c5ab1b64bb22b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mos65c02.baseline.o"
+      ],
+      "text": 380
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mos65c02.candidate.o"
+      ],
+      "text": 380
+    }
+  },
+  {
+    "source": "globals.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "37ff8f28efe024f07f1dca1ddd3f53923bf022de99d9e357541c5ab1b64bb22b",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mosw65816.baseline.o"
+      ],
+      "text": 380
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/globals.O2.mosw65816.candidate.o"
+      ],
+      "text": 380
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "39dcf7905498a8100896f9e72015b5c58e0c1bcffb4ea6940e4fbb52f805ca02",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 1868
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 1868
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "39dcf7905498a8100896f9e72015b5c58e0c1bcffb4ea6940e4fbb52f805ca02",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 1868
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 1868
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "39dcf7905498a8100896f9e72015b5c58e0c1bcffb4ea6940e4fbb52f805ca02",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 1868
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 1868
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "5d05a98abb1a38481acabc0d3c4c648293d428bc8731bea895563586bb90c468",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 1988
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 1988
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "5d05a98abb1a38481acabc0d3c4c648293d428bc8731bea895563586bb90c468",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 1988
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 1988
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "5d05a98abb1a38481acabc0d3c4c648293d428bc8731bea895563586bb90c468",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 1988
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 1988
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "ec59a7d5ed42d1dde0277982cad2e760225a0a139db98f4e676c967c2fa1fe76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 1902
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 1902
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "ec59a7d5ed42d1dde0277982cad2e760225a0a139db98f4e676c967c2fa1fe76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 1902
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 1902
+    }
+  },
+  {
+    "source": "lsystem_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "ec59a7d5ed42d1dde0277982cad2e760225a0a139db98f4e676c967c2fa1fe76",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 1902
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/lsystem_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 1902
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "fe9a5525a014d739a0e77b5e083bf74a5de9b6d4b7776d8d9437c9b5f3fbed0c",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 9446
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 9446
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "fe9a5525a014d739a0e77b5e083bf74a5de9b6d4b7776d8d9437c9b5f3fbed0c",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 9446
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 9446
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "fe9a5525a014d739a0e77b5e083bf74a5de9b6d4b7776d8d9437c9b5f3fbed0c",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 9446
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 9446
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "a27445f0b64d54bd967bce4491bc1c9d215b525f7fd341cb00fcde4febd909ae",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 9184
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 9184
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "a27445f0b64d54bd967bce4491bc1c9d215b525f7fd341cb00fcde4febd909ae",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 9184
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 9184
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "a27445f0b64d54bd967bce4491bc1c9d215b525f7fd341cb00fcde4febd909ae",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 9184
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 9184
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "c124401400ba029f54344b43d3789c62ad75c61e384cb1f10929b8edeff104e6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 9472
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 9472
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "c124401400ba029f54344b43d3789c62ad75c61e384cb1f10929b8edeff104e6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 9472
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 9472
+    }
+  },
+  {
+    "source": "ovmatrix_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "c124401400ba029f54344b43d3789c62ad75c61e384cb1f10929b8edeff104e6",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 9472
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/ovmatrix_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 9472
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "739dbe4aeba05387a5bfd3e14b55505405e1cb062d0ea4cbc16e4ea458a9f485",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 441
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 441
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "739dbe4aeba05387a5bfd3e14b55505405e1cb062d0ea4cbc16e4ea458a9f485",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 441
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 441
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "739dbe4aeba05387a5bfd3e14b55505405e1cb062d0ea4cbc16e4ea458a9f485",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 441
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 441
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "0147be31bf36dc7618fb305c4ee2a8c339a5b507d3af739303a5c435845253df",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "0147be31bf36dc7618fb305c4ee2a8c339a5b507d3af739303a5c435845253df",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "0147be31bf36dc7618fb305c4ee2a8c339a5b507d3af739303a5c435845253df",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 440
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 440
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "f94d1a86bb1684baf48968dec6b007888c26f3af3f6405328718898c22bf1241",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 504
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 504
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "f94d1a86bb1684baf48968dec6b007888c26f3af3f6405328718898c22bf1241",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 504
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 504
+    }
+  },
+  {
+    "source": "rotkal_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "f94d1a86bb1684baf48968dec6b007888c26f3af3f6405328718898c22bf1241",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 504
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/rotkal_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 504
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "09991ce6e3c4be35b96252a0cad53b46aa3c8601aa85465eb70a4b32aad2843d",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mos6502.baseline.o"
+      ],
+      "text": 150
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mos6502.candidate.o"
+      ],
+      "text": 150
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "09991ce6e3c4be35b96252a0cad53b46aa3c8601aa85465eb70a4b32aad2843d",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mos65c02.baseline.o"
+      ],
+      "text": 150
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mos65c02.candidate.o"
+      ],
+      "text": 150
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "09991ce6e3c4be35b96252a0cad53b46aa3c8601aa85465eb70a4b32aad2843d",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mosw65816.baseline.o"
+      ],
+      "text": 150
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Os.mosw65816.candidate.o"
+      ],
+      "text": 150
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "869e74e185a5c4e3413918266f729945767c1ea77ccefc2ee35350fd949f5af4",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mos6502.baseline.o"
+      ],
+      "text": 146
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mos6502.candidate.o"
+      ],
+      "text": 146
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "869e74e185a5c4e3413918266f729945767c1ea77ccefc2ee35350fd949f5af4",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mos65c02.baseline.o"
+      ],
+      "text": 146
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mos65c02.candidate.o"
+      ],
+      "text": 146
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "869e74e185a5c4e3413918266f729945767c1ea77ccefc2ee35350fd949f5af4",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mosw65816.baseline.o"
+      ],
+      "text": 146
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.Oz.mosw65816.candidate.o"
+      ],
+      "text": 146
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "d2180208e726c21aeb1e4c6e8c71436474364693d0562afe3cac007d52b3fc3f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mos6502.baseline.o"
+      ],
+      "text": 205
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mos6502.candidate.o"
+      ],
+      "text": 205
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "d2180208e726c21aeb1e4c6e8c71436474364693d0562afe3cac007d52b3fc3f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mos65c02.baseline.o"
+      ],
+      "text": 205
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mos65c02.candidate.o"
+      ],
+      "text": 205
+    }
+  },
+  {
+    "source": "structs.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "d2180208e726c21aeb1e4c6e8c71436474364693d0562afe3cac007d52b3fc3f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mosw65816.baseline.o"
+      ],
+      "text": 205
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/structs.O2.mosw65816.candidate.o"
+      ],
+      "text": 205
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Os",
+    "cpu": "mos6502",
+    "ir_sha256": "ccebe0cb31a46484a661d49a7673b90abf74634b4c14510d72a87b521260a11f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mos6502.baseline.o"
+      ],
+      "text": 213
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mos6502.candidate.o"
+      ],
+      "text": 213
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Os",
+    "cpu": "mos65c02",
+    "ir_sha256": "ccebe0cb31a46484a661d49a7673b90abf74634b4c14510d72a87b521260a11f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mos65c02.baseline.o"
+      ],
+      "text": 213
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mos65c02.candidate.o"
+      ],
+      "text": 213
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Os",
+    "cpu": "mosw65816",
+    "ir_sha256": "ccebe0cb31a46484a661d49a7673b90abf74634b4c14510d72a87b521260a11f",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mosw65816.baseline.o"
+      ],
+      "text": 213
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Os.mosw65816.candidate.o"
+      ],
+      "text": 213
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos6502",
+    "ir_sha256": "c8ad357a61a364b6427fed47a511df2771e493cddb9e8d725aea38612660e875",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mos6502.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mos6502.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Oz",
+    "cpu": "mos65c02",
+    "ir_sha256": "c8ad357a61a364b6427fed47a511df2771e493cddb9e8d725aea38612660e875",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mos65c02.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mos65c02.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "Oz",
+    "cpu": "mosw65816",
+    "ir_sha256": "c8ad357a61a364b6427fed47a511df2771e493cddb9e8d725aea38612660e875",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mosw65816.baseline.o"
+      ],
+      "text": 216
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.Oz.mosw65816.candidate.o"
+      ],
+      "text": 216
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "O2",
+    "cpu": "mos6502",
+    "ir_sha256": "d0ad07beb9d8bf200d3dc841d8359b59c776455893c2f89ef834e4ff8b9cd5f2",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mos6502.baseline.o"
+      ],
+      "text": 137
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos6502",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mos6502.candidate.o"
+      ],
+      "text": 137
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "O2",
+    "cpu": "mos65c02",
+    "ir_sha256": "d0ad07beb9d8bf200d3dc841d8359b59c776455893c2f89ef834e4ff8b9cd5f2",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mos65c02.baseline.o"
+      ],
+      "text": 137
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mos65c02",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mos65c02.candidate.o"
+      ],
+      "text": 137
+    }
+  },
+  {
+    "source": "uarteye_sim.c",
+    "optimization": "O2",
+    "cpu": "mosw65816",
+    "ir_sha256": "d0ad07beb9d8bf200d3dc841d8359b59c776455893c2f89ef834e4ff8b9cd5f2",
+    "baseline": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/baseline/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mosw65816.baseline.o"
+      ],
+      "text": 137
+    },
+    "candidate": {
+      "exit": 0,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-O=2",
+        "-verify-machineinstrs",
+        "-filetype=obj",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.ll",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/carry-pr/measure/uarteye_sim.O2.mosw65816.candidate.o"
+      ],
+      "text": 137
+    }
+  }
+]

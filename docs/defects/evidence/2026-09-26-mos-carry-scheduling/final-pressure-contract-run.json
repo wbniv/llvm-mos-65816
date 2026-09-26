@@ -1,0 +1,17 @@
+{
+  "command": [
+    "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos/bin/llvm-tblgen",
+    "-gen-register-info",
+    "-I",
+    "/home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/include",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt"
+  ],
+  "check_command": [
+    "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos/bin/FileCheck",
+    "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt"
+  ],
+  "tool_sha256": "aaddd47fd1dba6c147c246187e7b11f55c9d9f5fc672c6275f824bb84e4c14eb",
+  "input_sha256": "83929aee43680775131b1643a81c0336c5bab3ab3e5e0ae95a4588edacceface",
+  "exit_code": 1,
+  "conclusion": "Generic TableGen contract remains failing; 0064 is a scheduler mitigation."
+}

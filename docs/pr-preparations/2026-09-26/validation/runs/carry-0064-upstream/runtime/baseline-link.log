@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang --config /home/will/llvm-mos-65816/build/install/bin/mos-sim.cfg -mcpu=mos6502 -fno-lto /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/driver.o /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.o -o /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.simg
+exit=0

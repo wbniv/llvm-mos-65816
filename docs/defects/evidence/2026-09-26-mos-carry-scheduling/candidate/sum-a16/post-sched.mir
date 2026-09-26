@@ -1,0 +1,483 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt'
+  source_filename = "/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_sum.c.txt"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @i0 = dso_local global i32 100, align 1
+  @i1 = dso_local global i32 50000, align 1
+  @i2 = dso_local global i32 90000, align 1
+  @tbl = external dso_local local_unnamed_addr addrspace(2) constant [0 x i16], align 1
+  @out = dso_local global i32 0, align 1
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none)
+  define dso_local void @f() local_unnamed_addr #0 {
+    %1 = load volatile i32, ptr @i0, align 1, !tbaa !6
+    %2 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %1
+    %3 = load i16, ptr addrspace(2) %2, align 1, !tbaa !2
+    %4 = zext i16 %3 to i32
+    %5 = load volatile i32, ptr @i1, align 1, !tbaa !6
+    %6 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %5
+    %7 = load i16, ptr addrspace(2) %6, align 1, !tbaa !2
+    %8 = zext i16 %7 to i32
+    %9 = add nuw nsw i32 %8, %4
+    %10 = load volatile i32, ptr @i2, align 1, !tbaa !6
+    %11 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %10
+    %12 = load i16, ptr addrspace(2) %11, align 1, !tbaa !2
+    %13 = zext i16 %12 to i32
+    %14 = add nuw nsw i32 %9, %13
+    store volatile i32 %14, ptr @out, align 1, !tbaa !6
+    ret void
+  }
+  
+  attributes #0 = { nofree norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16" }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (/upstream 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!7, !7, i64 0}
+  !7 = !{!"long", !4, i64 0}
+...
+---
+name:            f
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: any, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 21, class: _, preferred-register: '', flags: [  ] }
+  - { id: 22, class: _, preferred-register: '', flags: [  ] }
+  - { id: 23, class: _, preferred-register: '', flags: [  ] }
+  - { id: 24, class: _, preferred-register: '', flags: [  ] }
+  - { id: 25, class: _, preferred-register: '', flags: [  ] }
+  - { id: 26, class: _, preferred-register: '', flags: [  ] }
+  - { id: 27, class: _, preferred-register: '', flags: [  ] }
+  - { id: 28, class: _, preferred-register: '', flags: [  ] }
+  - { id: 29, class: _, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: _, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: _, preferred-register: '', flags: [  ] }
+  - { id: 38, class: _, preferred-register: '', flags: [  ] }
+  - { id: 39, class: _, preferred-register: '', flags: [  ] }
+  - { id: 40, class: _, preferred-register: '', flags: [  ] }
+  - { id: 41, class: _, preferred-register: '', flags: [  ] }
+  - { id: 42, class: _, preferred-register: '', flags: [  ] }
+  - { id: 43, class: _, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 46, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 47, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 48, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 49, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 50, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 51, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 52, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 53, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 54, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 55, class: any, preferred-register: '', flags: [  ] }
+  - { id: 56, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 57, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 58, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 59, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 60, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 61, class: _, preferred-register: '', flags: [  ] }
+  - { id: 62, class: _, preferred-register: '', flags: [  ] }
+  - { id: 63, class: _, preferred-register: '', flags: [  ] }
+  - { id: 64, class: _, preferred-register: '', flags: [  ] }
+  - { id: 65, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 66, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 67, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 68, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 69, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 70, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 71, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 72, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 73, class: _, preferred-register: '', flags: [  ] }
+  - { id: 74, class: _, preferred-register: '', flags: [  ] }
+  - { id: 75, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 76, class: _, preferred-register: '', flags: [  ] }
+  - { id: 77, class: _, preferred-register: '', flags: [  ] }
+  - { id: 78, class: _, preferred-register: '', flags: [  ] }
+  - { id: 79, class: _, preferred-register: '', flags: [  ] }
+  - { id: 80, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 81, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 82, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 83, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 84, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 85, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 86, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 87, class: _, preferred-register: '', flags: [  ] }
+  - { id: 88, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 89, class: _, preferred-register: '', flags: [  ] }
+  - { id: 90, class: _, preferred-register: '', flags: [  ] }
+  - { id: 91, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 92, class: _, preferred-register: '', flags: [  ] }
+  - { id: 93, class: _, preferred-register: '', flags: [  ] }
+  - { id: 94, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 95, class: _, preferred-register: '', flags: [  ] }
+  - { id: 96, class: _, preferred-register: '', flags: [  ] }
+  - { id: 97, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 98, class: _, preferred-register: '', flags: [  ] }
+  - { id: 99, class: _, preferred-register: '', flags: [  ] }
+  - { id: 100, class: _, preferred-register: '', flags: [  ] }
+  - { id: 101, class: _, preferred-register: '', flags: [  ] }
+  - { id: 102, class: _, preferred-register: '', flags: [  ] }
+  - { id: 103, class: _, preferred-register: '', flags: [  ] }
+  - { id: 104, class: _, preferred-register: '', flags: [  ] }
+  - { id: 105, class: _, preferred-register: '', flags: [  ] }
+  - { id: 106, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 107, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 108, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 109, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 110, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 111, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 112, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 113, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 114, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 115, class: any, preferred-register: '', flags: [  ] }
+  - { id: 116, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 117, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 118, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 119, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 120, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 121, class: _, preferred-register: '', flags: [  ] }
+  - { id: 122, class: _, preferred-register: '', flags: [  ] }
+  - { id: 123, class: _, preferred-register: '', flags: [  ] }
+  - { id: 124, class: _, preferred-register: '', flags: [  ] }
+  - { id: 125, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 126, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 127, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 128, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 129, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 130, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 131, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 132, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 133, class: _, preferred-register: '', flags: [  ] }
+  - { id: 134, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 135, class: _, preferred-register: '', flags: [  ] }
+  - { id: 136, class: _, preferred-register: '', flags: [  ] }
+  - { id: 137, class: _, preferred-register: '', flags: [  ] }
+  - { id: 138, class: _, preferred-register: '', flags: [  ] }
+  - { id: 139, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 140, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 141, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 142, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 143, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 144, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 145, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 146, class: _, preferred-register: '', flags: [  ] }
+  - { id: 147, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 148, class: _, preferred-register: '', flags: [  ] }
+  - { id: 149, class: _, preferred-register: '', flags: [  ] }
+  - { id: 150, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 151, class: _, preferred-register: '', flags: [  ] }
+  - { id: 152, class: _, preferred-register: '', flags: [  ] }
+  - { id: 153, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 154, class: _, preferred-register: '', flags: [  ] }
+  - { id: 155, class: _, preferred-register: '', flags: [  ] }
+  - { id: 156, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 157, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 158, class: any, preferred-register: '', flags: [  ] }
+  - { id: 159, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 160, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 161, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 162, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 163, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 164, class: _, preferred-register: '', flags: [  ] }
+  - { id: 165, class: _, preferred-register: '', flags: [  ] }
+  - { id: 166, class: _, preferred-register: '', flags: [  ] }
+  - { id: 167, class: _, preferred-register: '', flags: [  ] }
+  - { id: 168, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 169, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 170, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 171, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 172, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 173, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 174, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 175, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 176, class: _, preferred-register: '', flags: [  ] }
+  - { id: 177, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 178, class: _, preferred-register: '', flags: [  ] }
+  - { id: 179, class: _, preferred-register: '', flags: [  ] }
+  - { id: 180, class: _, preferred-register: '', flags: [  ] }
+  - { id: 181, class: _, preferred-register: '', flags: [  ] }
+  - { id: 182, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 183, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 184, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 185, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 186, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 187, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 188, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 189, class: _, preferred-register: '', flags: [  ] }
+  - { id: 190, class: _, preferred-register: '', flags: [  ] }
+  - { id: 191, class: _, preferred-register: '', flags: [  ] }
+  - { id: 192, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 193, class: _, preferred-register: '', flags: [  ] }
+  - { id: 194, class: _, preferred-register: '', flags: [  ] }
+  - { id: 195, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 196, class: _, preferred-register: '', flags: [  ] }
+  - { id: 197, class: _, preferred-register: '', flags: [  ] }
+  - { id: 198, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 199, class: _, preferred-register: '', flags: [  ] }
+  - { id: 200, class: _, preferred-register: '', flags: [  ] }
+  - { id: 201, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 202, class: _, preferred-register: '', flags: [  ] }
+  - { id: 203, class: _, preferred-register: '', flags: [  ] }
+  - { id: 204, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 205, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 206, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 207, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 208, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 209, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 210, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 211, class: _, preferred-register: '', flags: [  ] }
+  - { id: 212, class: _, preferred-register: '', flags: [  ] }
+  - { id: 213, class: _, preferred-register: '', flags: [  ] }
+  - { id: 214, class: _, preferred-register: '', flags: [  ] }
+  - { id: 215, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 216, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 217, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 218, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 219, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 220, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 221, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 222, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 223, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 224, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 225, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 226, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 227, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 228, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 229, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 230, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 231, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 232, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 233, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 234, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 235, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 236, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 237, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 238, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 239, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 240, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 241, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 242, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 243, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 244, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 245, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 246, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 247, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 248, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 249, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 250, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 251, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 252, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 253, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 254, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 255, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 256, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 257, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 258, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 259, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 260, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 261, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 262, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 263, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 264, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 265, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 266, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 267, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 268, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 269, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 270, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 271, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 272, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 273, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 274, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 275, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 276, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 277, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 278, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 279, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 280, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 281, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 282, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 283, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 284, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 285, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 286, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 287, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 288, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 289, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 290, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 291, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    %168:ac = LDAbs @i0 :: (volatile dereferenceable load (s8) from @i0, !tbaa !6)
+    %168:ac, %187:cc = ASL %168
+    %170:ac = LDAbs @i0 + 1 :: (volatile dereferenceable load (s8) from @i0 + 1, !tbaa !6)
+    %170:ac, %187:cc = ROL %170, %187
+    %172:ac = LDAbs @i0 + 2 :: (volatile dereferenceable load (s8) from @i0 + 2, !tbaa !6)
+    %172:ac, %187:cc = ROL %172, %187
+    %174:ac = LDAbs @i0 + 3 :: (volatile dereferenceable load (s8) from @i0 + 3, !tbaa !6)
+    %174:ac, dead %187:cc = ROL %174, %187
+    %65:ac = LDImm target-flags(<unknown target flag>) @tbl
+    %160:imag8 = COPY %65
+    %67:ac = LDImm target-flags(<unknown target flag>) @tbl
+    %161:imag8 = COPY %67
+    %53:cc = LDImm1 0
+    %168:ac, %169:cc, dead %261:vc = ADCImag8 %168, %160, %53
+    %170:ac, %171:cc, dead %260:vc = ADCImag8 %170, %161, %169
+    %69:ac = LDImm target-flags(<unknown target flag>) @tbl
+    %162:imag8 = COPY %69
+    %172:ac, %173:cc, dead %259:vc = ADCImag8 %172, %162, %171
+    %71:ac = LDImm 0
+    %163:imag8 = COPY %71
+    %174:ac, dead %175:cc, dead %258:vc = ADCImag8 %174, %163, %173
+    undef %159.sublo:imag32 = COPY %168
+    %159.subhi:imag32 = COPY %170
+    %159.subhi16_then_sublo:imag32 = COPY %172
+    %159.subhi16_then_subhi:imag32 = COPY %174
+    %257:ac16 = LDIndirLong16 %159 :: (invariant load (s16) from %ir.2, align 1, !tbaa !2, addrspace 2)
+    %125:ac = LDAbs @i1 :: (volatile dereferenceable load (s8) from @i1, !tbaa !6)
+    %127:ac = LDAbs @i1 + 1 :: (volatile dereferenceable load (s8) from @i1 + 1, !tbaa !6)
+    %125:ac, %144:cc = ASL %125
+    %127:ac, %144:cc = ROL %127, %144
+    %129:ac = LDAbs @i1 + 2 :: (volatile dereferenceable load (s8) from @i1 + 2, !tbaa !6)
+    %129:ac, %144:cc = ROL %129, %144
+    %131:ac = LDAbs @i1 + 3 :: (volatile dereferenceable load (s8) from @i1 + 3, !tbaa !6)
+    %131:ac, dead %144:cc = ROL %131, %144
+    %117:imag8 = COPY %65
+    %118:imag8 = COPY %67
+    %125:ac, %126:cc, dead %250:vc = ADCImag8 %125, %117, %53
+    %127:ac, %128:cc, dead %249:vc = ADCImag8 %127, %118, %126
+    %119:imag8 = COPY %69
+    %129:ac, %130:cc, dead %248:vc = ADCImag8 %129, %119, %128
+    %120:imag8 = COPY %71
+    %131:ac, dead %132:cc, dead %247:vc = ADCImag8 %131, %120, %130
+    undef %116.sublo:imag32 = COPY %125
+    %116.subhi:imag32 = COPY %127
+    %116.subhi16_then_sublo:imag32 = COPY %129
+    %116.subhi16_then_subhi:imag32 = COPY %131
+    %157:imag16 = STAImag16 %257
+    %246:ac16 = LDIndirLong16 %116 :: (invariant load (s16) from %ir.6, align 1, !tbaa !2, addrspace 2)
+    %114:imag16 = STAImag16 %246
+    %45:ac = COPY %114.sublo
+    %47:ac = COPY %114.subhi
+    %45:ac, %107:cc, dead %245:vc = ADCImag8 %45, %157.sublo, %53
+    %47:ac, %113:cc, dead %244:vc = ADCImag8 %47, %157.subhi, %107
+    %49:ac = LDZ
+    %49:ac, %113:cc, dead %243:vc = ADCImm %49, 0, %113
+    %51:ac = LDZ
+    %51:ac, dead %113:cc, dead %242:vc = ADCImm %51, 0, %113
+    %285:ac = LDAbs @i2 :: (volatile dereferenceable load (s8) from @i2, !tbaa !6)
+    %287:ac = LDAbs @i2 + 1 :: (volatile dereferenceable load (s8) from @i2 + 1, !tbaa !6)
+    %285:ac, %85:cc = ASL %285
+    %287:ac, %85:cc = ROL %287, %85
+    %289:ac = LDAbs @i2 + 2 :: (volatile dereferenceable load (s8) from @i2 + 2, !tbaa !6)
+    %289:ac, %85:cc = ROL %289, %85
+    %291:ac = LDAbs @i2 + 3 :: (volatile dereferenceable load (s8) from @i2 + 3, !tbaa !6)
+    %291:ac, dead %85:cc = ROL %291, %85
+    %80:imag8 = COPY %285
+    %82:imag8 = COPY %287
+    %84:imag8 = COPY %289
+    %86:imag8 = COPY %291
+    %65:ac, %66:cc, dead %235:vc = ADCImag8 %65, %80, %53
+    %67:ac, %68:cc, dead %234:vc = ADCImag8 %67, %82, %66
+    %69:ac, %70:cc, dead %233:vc = ADCImag8 %69, %84, %68
+    %71:ac, dead %72:cc, dead %232:vc = ADCImag8 %71, %86, %70
+    undef %56.sublo:imag32 = COPY %65
+    %56.subhi:imag32 = COPY %67
+    %56.subhi16_then_sublo:imag32 = COPY %69
+    %56.subhi16_then_subhi:imag32 = COPY %71
+    %231:ac16 = LDIndirLong16 %56 :: (invariant load (s16) from %ir.11, align 1, !tbaa !2, addrspace 2)
+    %54:imag16 = STAImag16 %231
+    %45:ac, %46:cc, dead %230:vc = ADCImag8 %45, %54.sublo, %53
+    STAbs %45, @out :: (volatile store (s8) into @out, !tbaa !6)
+    %47:ac, %52:cc, dead %229:vc = ADCImag8 %47, %54.subhi, %46
+    STAbs %47, @out + 1 :: (volatile store (s8) into @out + 1, !tbaa !6)
+    %49:ac, %52:cc, dead %228:vc = ADCImm %49, 0, %52
+    STAbs %49, @out + 2 :: (volatile store (s8) into @out + 2, !tbaa !6)
+    %51:ac, dead %52:cc, dead %227:vc = ADCImm %51, 0, %52
+    STAbs %51, @out + 3 :: (volatile store (s8) into @out + 3, !tbaa !6)
+    RTS
+...

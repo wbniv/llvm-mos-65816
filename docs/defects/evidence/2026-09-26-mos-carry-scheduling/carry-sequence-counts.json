@@ -1,0 +1,30 @@
+[
+  {
+    "stage": "baseline",
+    "shape": "sum",
+    "carry_materializations": 17,
+    "rep_sep": 6,
+    "carry_restore_cmp1": 18
+  },
+  {
+    "stage": "baseline",
+    "shape": "rot",
+    "carry_materializations": 12,
+    "rep_sep": 8,
+    "carry_restore_cmp1": 12
+  },
+  {
+    "stage": "dynamic",
+    "shape": "sum",
+    "carry_materializations": 0,
+    "rep_sep": 6,
+    "carry_restore_cmp1": 0
+  },
+  {
+    "stage": "dynamic",
+    "shape": "rot",
+    "carry_materializations": 0,
+    "rep_sep": 8,
+    "carry_restore_cmp1": 0
+  }
+]

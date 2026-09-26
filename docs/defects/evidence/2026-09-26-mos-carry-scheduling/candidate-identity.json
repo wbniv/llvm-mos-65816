@@ -1,0 +1,17 @@
+{
+  "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+  "tools": {
+    "clang-23": "21c42f442f1d10c02346018b0fb1a4277320a1103f397c15e7e47ac3bf7316cc",
+    "llc": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "lld": "b208f3732a7cccf22501d09207a4975eaa5f15d3e7f62049c255a9ee14331df5",
+    "llvm-mc": "2de0ba596d1e8dde0c323061de4a29cb4f74476582974614cc9e757ce72b3de3",
+    "llvm-objdump": "132203a58bc571e6f151d6ca022e380331d9f71ae8113482d81b12adeb23260c",
+    "llvm-size": "a63ded4056161679aad09295fa3935ab28558b8fe41a9ed41e09ffc81a272801"
+  },
+  "change": "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+  "patch_sha256": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
+  "source_base": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "baseline_source_diff": "baseline-source.diff.txt",
+  "baseline_untracked_source_archive": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-untracked-source.tar.gz",
+  "baseline_untracked_source_sha256": "6df4de8a4afd8a74d47de6e9f33e19aae134c7c36c82785182642bb50ee6e6f2"
+}

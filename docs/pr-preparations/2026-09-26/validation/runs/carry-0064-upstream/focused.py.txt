@@ -1,0 +1,20 @@
+from pathlib import Path
+import json
+import resource
+import shlex
+import subprocess
+
+resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+work = Path(__file__).resolve().parent
+test = work / 'source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir'
+out = work / 'focused-final'
+out.mkdir(exist_ok=True)
+rows = []
+for label, tool in [('baseline', work / 'baseline/bin/llc'), ('candidate', work / 'build/bin/llc')]:
+    for i, line in enumerate(x[7:] for x in test.read_text().splitlines() if x.startswith('# RUN: ')):
+        cmd = line.replace('llc ', shlex.quote(str(tool)) + ' ', 1).replace('FileCheck ', shlex.quote(str(work / 'build/bin/FileCheck')) + ' ').replace('%s', shlex.quote(str(test)))
+        p = subprocess.run(['bash', '-o', 'pipefail', '-c', cmd], capture_output=True, text=True)
+        (out / f'{label}-{i}.log').write_text('$ ' + cmd + '\nexit=' + str(p.returncode) + '\n' + p.stdout + p.stderr)
+        rows.append({'label': label, 'run': i, 'exit': p.returncode, 'command': cmd})
+(out / 'results.json').write_text(json.dumps(rows, indent=2) + '\n')
+print([(r['label'], r['run'], r['exit']) for r in rows])

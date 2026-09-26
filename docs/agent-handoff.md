@@ -1,5 +1,14 @@
 # llvm-mos-65816 — agent handoff: build/test mechanics & backend navigation
 
+## Carry-scheduling publication
+
+Compiler branch `mos-computed-carry-scheduling` is pushed at `155e209c4cee`.
+The [0064 packet](pr-preparations/2026-09-26/README.md) retains exact upstream
+validation, downstream costs and separate open follow-ups. The downstream
+publication branch is `carry-scheduling-preparation`, based on `b3938bda`, in
+`.scratch/carry-publish`. The shared checkout and installed compiler remain
+unchanged. No PR was opened. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
 three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics

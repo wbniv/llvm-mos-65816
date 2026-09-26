@@ -1,0 +1,92 @@
+[
+  {
+    "cpu": "mos6502",
+    "optimization": "Os",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mos6502",
+    "optimization": "Oz",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mos6502",
+    "optimization": "O2",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mos65c02",
+    "optimization": "Os",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mos65c02",
+    "optimization": "Oz",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mos65c02",
+    "optimization": "O2",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mosw65816",
+    "optimization": "Os",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mosw65816",
+    "optimization": "Oz",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  },
+  {
+    "cpu": "mosw65816",
+    "optimization": "O2",
+    "inputs": 13,
+    "paired": 13,
+    "smaller": 0,
+    "larger": 0,
+    "delta": 0,
+    "unmatched": 0
+  }
+]

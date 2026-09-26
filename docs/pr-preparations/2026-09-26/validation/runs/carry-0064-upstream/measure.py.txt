@@ -1,0 +1,64 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import hashlib
+import json
+import resource
+import subprocess
+
+resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+root = Path(__file__).resolve().parents[2]
+work = Path(__file__).resolve().parent
+out = work / 'measure'
+out.mkdir(exist_ok=True)
+frontend = root / '.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang'
+config = root / 'build/install/bin/mos-sim.cfg'
+objdump = work / 'build/bin/llvm-objdump'
+rows = []
+
+def run(cmd, path):
+    p = subprocess.run([str(v) for v in cmd], capture_output=True, text=True, timeout=120)
+    path.write_text('$ ' + ' '.join(map(str, cmd)) + '\nexit=' + str(p.returncode) + '\n' + p.stdout + p.stderr)
+    return p
+
+def measure(job):
+    source, opt = job
+    stem = out / (source.stem + '.' + opt)
+    ir = stem.with_suffix(stem.suffix + '.ll')
+    p = run([frontend, '--config', config, '-mcpu=mos6502', '-' + opt, '-fno-lto', '-I' + str(root / 'examples/snes/corpus'), '-emit-llvm', '-S', source, '-o', ir], Path(str(stem) + '.frontend.log'))
+    assert not p.returncode, p.stderr
+    results = []
+    for cpu in ['mos6502', 'mos65c02', 'mosw65816']:
+        row = {'source': source.name, 'optimization': opt, 'cpu': cpu, 'ir_sha256': hashlib.sha256(ir.read_bytes()).hexdigest()}
+        for label, tool in [('baseline', work / 'baseline/bin/llc'), ('candidate', work / 'build/bin/llc')]:
+            dest = Path(str(stem) + '.' + cpu + '.' + label)
+            obj = Path(str(dest) + '.o')
+            cmd = [tool, '-mtriple=mos', '-mcpu=' + cpu, '-O=2', '-verify-machineinstrs', '-filetype=obj', ir, '-o', obj]
+            p = run(cmd, Path(str(dest) + '.log'))
+            entry = {'exit': p.returncode, 'command': list(map(str, cmd))}
+            if not p.returncode:
+                sections = subprocess.check_output([objdump, '-h', obj], text=True)
+                entry['text'] = sum(int(v[2], 16) for line in sections.splitlines() if len(v := line.split()) > 2 and v[1].startswith('.text'))
+                dis = subprocess.check_output([objdump, '-dr', obj], text=True)
+                Path(str(dest) + '.dis').write_text(dis)
+            row[label] = entry
+        results.append(row)
+    return results
+
+jobs = [(s, opt) for s in sorted((work / 'inputs').glob('*.c')) for opt in ['Os', 'Oz', 'O2']]
+with ThreadPoolExecutor(max_workers=4) as pool:
+    for result in pool.map(measure, jobs):
+        rows.extend(result)
+(out / 'results.json').write_text(json.dumps(rows, indent=2) + '\n')
+summary = []
+for cpu in ['mos6502', 'mos65c02', 'mosw65816']:
+    for opt in ['Os', 'Oz', 'O2']:
+        group = [r for r in rows if r['cpu'] == cpu and r['optimization'] == opt]
+        paired = [r for r in group if 'text' in r['baseline'] and 'text' in r['candidate']]
+        item = {'cpu': cpu, 'optimization': opt, 'inputs': len(group), 'paired': len(paired),
+                'smaller': sum(r['candidate']['text'] < r['baseline']['text'] for r in paired),
+                'larger': sum(r['candidate']['text'] > r['baseline']['text'] for r in paired),
+                'delta': sum(r['candidate']['text'] - r['baseline']['text'] for r in paired),
+                'unmatched': sum(r['candidate']['exit'] != r['baseline']['exit'] for r in group)}
+        summary.append(item)
+print(json.dumps(summary, indent=2))
+(out / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n')

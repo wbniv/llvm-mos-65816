@@ -1,0 +1,2 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llc -mtriple=mos -mcpu=mos6502 -start-before=machine-scheduler -verify-machineinstrs -filetype=obj /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/kernel.mir -o /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/candidate.o
+exit=0

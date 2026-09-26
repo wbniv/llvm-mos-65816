@@ -1,0 +1,21 @@
+#include <stdint.h>
+#include "runtime-vectors.h"
+
+extern void scale_then_add(void);
+
+int main(void) {
+  volatile uint8_t *input = (volatile uint8_t *)20480;
+  volatile uint8_t *output = (volatile uint8_t *)20736;
+  for (uint16_t i = 0; i != 512; ++i) {
+    for (uint8_t j = 0; j != 4; ++j)
+      input[j] = inputs[i][j];
+    scale_then_add();
+    for (uint8_t j = 0; j != 4; ++j)
+      if (output[j] != expected[i][j]) {
+        *(volatile uint8_t *)0xfff9 = 'F';
+        return 1;
+      }
+  }
+  *(volatile uint8_t *)0xfff9 = 'P';
+  return 0;
+}

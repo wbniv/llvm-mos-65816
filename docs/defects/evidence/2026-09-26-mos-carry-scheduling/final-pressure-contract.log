@@ -1,0 +1,77 @@
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt:20:11: error: CHECK: expected string not found in input
+// CHECK: "ACc",
+          ^
+<stdin>:415:44: note: scanning from here
+getRegPressureSetName(unsigned Idx) const {
+                                           ^
+<stdin>:417:2: note: possible intended match here
+ "Vc",
+ ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt:24:11: error: CHECK: expected string not found in input
+// CHECK: 1,{{ *}}// 0: ACc
+          ^
+<stdin>:425:72: note: scanning from here
+getRegPressureSetLimit(const MachineFunction &MF, unsigned Idx) const {
+                                                                       ^
+<stdin>:427:2: note: possible intended match here
+ 2, // 0: Vc
+ ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-mos-carry-scheduling/pressure-contract.td.txt
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+          410:  return 1; 
+          411: } 
+          412:  
+          413: // Get the name of this register unit pressure set. 
+          414: const char *TestGenRegisterInfo:: 
+          415: getRegPressureSetName(unsigned Idx) const { 
+check:20'0                                                X error: no match found
+          416:  static const char *PressureNameTable[] = { 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          417:  "Vc", 
+check:20'0     ~~~~~~~
+check:20'1      ?      possible intended match
+          418:  }; 
+check:20'0     ~~~~
+          419:  return PressureNameTable[Idx]; 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          420: } 
+check:20'0     ~~
+          421:  
+check:20'0     ~
+          422: // Get the register unit pressure limit for this dimension. 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          423: // This limit must be adjusted dynamically for reserved registers. 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          424: unsigned TestGenRegisterInfo:: 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          425: getRegPressureSetLimit(const MachineFunction &MF, unsigned Idx) const { 
+check:20'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check:24'0                                                                            X error: no match found
+          426:  static const uint8_t PressureLimitTable[] = { 
+check:24'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          427:  2, // 0: Vc 
+check:24'0     ~~~~~~~~~~~~~
+check:24'1      ?            possible intended match
+          428:  }; 
+check:24'0     ~~~~
+          429:  return PressureLimitTable[Idx]; 
+check:24'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+          430: } 
+check:24'0     ~~
+          431:  
+check:24'0     ~
+          432: /// Table of pressure sets per register class or unit. 
+check:24'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

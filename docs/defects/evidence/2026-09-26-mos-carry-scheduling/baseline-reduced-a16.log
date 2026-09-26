@@ -1,0 +1,35 @@
+command: ['/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc', '-mtriple=mos', '-mcpu=mosw65816', '-mattr=+mos-a16', '-run-pass=machine-scheduler', '-verify-machineinstrs', '-o', '-', '/home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir'] | FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+/home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir:33:14: error: CHECK-NOT: excluded string found in input
+# CHECK-NOT: ADC
+             ^
+<stdin>:87:29: note: found here
+ %0:ac, %6:cc, dead %7:vc = ADCImm %0, 23, %4
+                            ^~~
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/.scratch/carry-scheduling/vendor/llvm-mos/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+        .
+        .
+        .
+       82:  bb.0: 
+       83:  %0:ac = LDAbs 1000 
+       84:  %1:ac = LDAbs 1001 
+       85:  %4:cc = LDImm1 0 
+       86:  %0:ac, %5:cc = ASL %0 
+       87:  %0:ac, %6:cc, dead %7:vc = ADCImm %0, 23, %4 
+not:33                                 !~~                error: no match expected
+       88:  %2:ac = LDAbs 1002 
+       89:  %3:ac = LDAbs 1003 
+       90:  STAbs %0, 2000 
+       91:  %1:ac, %5:cc = ROL %1, %5 
+       92:  %1:ac, %8:cc, dead %9:vc = ADCImm %1, 45, %6 
+        .
+        .
+        .
+>>>>>>
+exit_code: 1

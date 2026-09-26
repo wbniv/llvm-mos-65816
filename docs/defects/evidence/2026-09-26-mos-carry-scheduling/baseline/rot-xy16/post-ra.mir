@@ -1,0 +1,248 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt'
+  source_filename = "/home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/p_rot.c.txt"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @i0 = dso_local global i32 100, align 1
+  @i1 = dso_local global i32 50000, align 1
+  @i2 = dso_local global i32 90000, align 1
+  @tbl = external dso_local local_unnamed_addr addrspace(2) constant [0 x i16], align 1
+  @out = dso_local global i32 0, align 1
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none)
+  define dso_local void @f() local_unnamed_addr #0 {
+    %1 = load volatile i32, ptr @i0, align 1, !tbaa !6
+    %2 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %1
+    %3 = load i16, ptr addrspace(2) %2, align 1, !tbaa !2
+    %4 = zext i16 %3 to i32
+    %5 = load volatile i32, ptr @i1, align 1, !tbaa !6
+    %6 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %5
+    %7 = load i16, ptr addrspace(2) %6, align 1, !tbaa !2
+    %8 = zext i16 %7 to i32
+    %9 = load volatile i32, ptr @i2, align 1, !tbaa !6
+    %10 = getelementptr inbounds [2 x i8], ptr addrspace(2) @tbl, i32 %9
+    %11 = load i16, ptr addrspace(2) %10, align 1, !tbaa !2
+    %12 = shl nuw nsw i32 %4, 2
+    %13 = shl nuw nsw i32 %8, 1
+    %14 = xor i32 %13, %12
+    %15 = zext i16 %11 to i32
+    %16 = xor i32 %14, %15
+    store volatile i32 %16, ptr @out, align 1, !tbaa !6
+    ret void
+  }
+  
+  attributes #0 = { nofree norecurse nounwind optsize memory(readwrite, argmem: none, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (/upstream 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!7, !7, i64 0}
+  !7 = !{!"long", !4, i64 0}
+...
+---
+name:            f
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    renamable $a = LDAbs @i0 :: (volatile dereferenceable load (s8) from @i0, !tbaa !6)
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $ylsb = COPY killed renamable $c
+    renamable $x = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $rc2 = COPY renamable $x
+    renamable $rc8 = COPY killed renamable $x
+    renamable $c = LDImm1 0
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc3lsb = COPY killed renamable $c
+    renamable $rc4 = COPY killed renamable $a
+    renamable $a = LDAbs @i0 + 1 :: (volatile dereferenceable load (s8) from @i0 + 1, !tbaa !6)
+    renamable $c = COPY killed renamable $ylsb
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $ylsb = COPY killed renamable $c
+    renamable $x = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $rc2 = COPY renamable $x
+    renamable $rc9 = COPY killed renamable $x
+    renamable $c = COPY killed renamable $rc3lsb
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc3lsb = COPY killed renamable $c
+    renamable $rc5 = COPY killed renamable $a
+    renamable $a = LDAbs @i0 + 2 :: (volatile dereferenceable load (s8) from @i0 + 2, !tbaa !6)
+    renamable $c = COPY killed renamable $ylsb
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $xlsb = COPY killed renamable $c
+    renamable $y = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $rc2 = COPY renamable $y
+    renamable $c = COPY killed renamable $rc3lsb
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc3lsb = COPY killed renamable $c
+    renamable $rc6 = COPY killed renamable $a
+    renamable $a = LDAbs @i0 + 3 :: (volatile dereferenceable load (s8) from @i0 + 3, !tbaa !6)
+    renamable $c = COPY killed renamable $xlsb
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $x = LDImm 0
+    renamable $rc2 = COPY renamable $x
+    renamable $c = COPY killed renamable $rc3lsb
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc2, killed renamable $c
+    renamable $rc7 = COPY killed renamable $a
+    renamable $a16 = LDIndirLong16 killed renamable $rl1 :: (invariant load (s16) from %ir.2, align 1, !tbaa !2, addrspace 2)
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $rc4 = COPY killed renamable $rc8
+    renamable $a = LDAbs @i1 :: (volatile dereferenceable load (s8) from @i1, !tbaa !6)
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $rc5lsb = COPY killed renamable $c
+    renamable $c = LDImm1 0
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc4, killed renamable $c
+    renamable $rc6lsb = COPY killed renamable $c
+    renamable $rc4 = COPY killed renamable $a
+    renamable $a = LDAbs @i1 + 1 :: (volatile dereferenceable load (s8) from @i1 + 1, !tbaa !6)
+    renamable $c = COPY killed renamable $rc5lsb
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc8lsb = COPY killed renamable $c
+    renamable $rc5 = COPY killed renamable $rc9
+    renamable $c = COPY killed renamable $rc6lsb
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc5, killed renamable $c
+    renamable $rc7lsb = COPY killed renamable $c
+    renamable $rc5 = COPY killed renamable $a
+    renamable $a = LDAbs @i1 + 2 :: (volatile dereferenceable load (s8) from @i1 + 2, !tbaa !6)
+    renamable $c = COPY killed renamable $rc8lsb
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc8lsb = COPY killed renamable $c
+    renamable $rc6 = COPY killed renamable $y
+    renamable $c = COPY killed renamable $rc7lsb
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc6, killed renamable $c
+    renamable $rc9lsb = COPY killed renamable $c
+    renamable $rc6 = COPY killed renamable $a
+    renamable $a = LDAbs @i1 + 3 :: (volatile dereferenceable load (s8) from @i1 + 3, !tbaa !6)
+    renamable $c = COPY killed renamable $rc8lsb
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc7 = COPY killed renamable $x
+    renamable $c = COPY killed renamable $rc9lsb
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc7, killed renamable $c
+    renamable $rc7 = COPY killed renamable $a
+    renamable $a16 = LDIndirLong16 killed renamable $rl1 :: (invariant load (s16) from %ir.6, align 1, !tbaa !2, addrspace 2)
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a = LDAbs @i2 :: (volatile dereferenceable load (s8) from @i2, !tbaa !6)
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $rc6 = COPY killed renamable $a
+    renamable $a = LDAbs @i2 + 1 :: (volatile dereferenceable load (s8) from @i2 + 1, !tbaa !6)
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc7 = COPY killed renamable $a
+    renamable $a = LDAbs @i2 + 2 :: (volatile dereferenceable load (s8) from @i2 + 2, !tbaa !6)
+    renamable $a, renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc8 = COPY killed renamable $a
+    renamable $a = LDAbs @i2 + 3 :: (volatile dereferenceable load (s8) from @i2 + 3, !tbaa !6)
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc9 = COPY killed renamable $a
+    renamable $c = LDImm1 0
+    renamable $a = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc6, killed renamable $c
+    renamable $rc12 = COPY killed renamable $a
+    renamable $a = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc7, killed renamable $c
+    renamable $rc13 = COPY killed renamable $a
+    renamable $a = LDImm target-flags(<unknown target flag>) @tbl
+    renamable $a, renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc8, killed renamable $c
+    renamable $rc14 = COPY killed renamable $a
+    renamable $a = LDImm 0
+    renamable $a, dead renamable $c, dead renamable $v = ADCImag8 killed renamable $a, killed renamable $rc9, killed renamable $c
+    renamable $rc15 = COPY killed renamable $a
+    renamable $a16 = LDIndirLong16 killed renamable $rl3 :: (invariant load (s16) from %ir.10, align 1, !tbaa !2, addrspace 2)
+    renamable $rs3 = STAImag16 killed renamable $a16
+    renamable $a = COPY renamable $rc2
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $rc3, renamable $c = ROL killed renamable $rc3, killed renamable $c
+    renamable $rc2 = LDZ
+    renamable $rc8 = LDZ
+    renamable $rc8, renamable $c = ROL killed renamable $rc8, killed renamable $c
+    renamable $rc9 = LDZ
+    renamable $rc9, dead renamable $c = ROL killed renamable $rc9, killed renamable $c
+    renamable $a, renamable $c = ASL killed renamable $a
+    renamable $rc3, renamable $c = ROL killed renamable $rc3, killed renamable $c
+    renamable $rc8, renamable $c = ROL killed renamable $rc8, killed renamable $c
+    renamable $rc9, dead renamable $c = ROL killed renamable $rc9, killed renamable $c
+    renamable $rc4, renamable $c = ASL renamable $rc4
+    renamable $rc5, renamable $c = ROL renamable $rc5, killed renamable $c
+    renamable $rc10 = LDZ
+    renamable $rc10, renamable $c = ROL killed renamable $rc10, killed renamable $c
+    renamable $rc2, dead renamable $c = ROL killed renamable $rc2, killed renamable $c
+    renamable $rc11 = COPY killed renamable $rc2
+    renamable $rc2 = COPY killed renamable $a
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs1
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs5
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs4
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs3
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $a16 = EORImm16 killed renamable $a16, 0
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $x = COPY renamable $rc2
+    STAbs killed renamable $x, @out :: (volatile store (s8) into @out, !tbaa !6)
+    renamable $x = COPY killed renamable $rc3
+    STAbs killed renamable $x, @out + 1 :: (volatile store (s8) into @out + 1, !tbaa !6)
+    renamable $x = COPY renamable $rc4
+    STAbs killed renamable $x, @out + 2 :: (volatile store (s8) into @out + 2, !tbaa !6)
+    renamable $x = COPY killed renamable $rc5
+    STAbs killed renamable $x, @out + 3 :: (volatile store (s8) into @out + 3, !tbaa !6)
+    RTS
+...

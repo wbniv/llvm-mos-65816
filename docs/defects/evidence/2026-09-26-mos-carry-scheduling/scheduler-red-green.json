@@ -1,0 +1,440 @@
+[
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-6502-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-a16-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bidirectional.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-topdown.log",
+      "sha256": "1771bf0008325944077ee6faebf3b45c8292b4de7ff22871ca7ef0daec79b4ea"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "40680ae0aad4985f977451cae66f069856cb00f907cc325c1b2834babb1c00c0",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-scheduler-xy16-bottomup.log",
+      "sha256": "a724eb53d296e49cff55c8787c22b1eeafb2c8bfc2b1fb230260659989706afe"
+    },
+    "exit_code": 1,
+    "label": "baseline"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mos6502",
+      "features": [],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-6502-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16"
+      ],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-a16-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=bidirectional -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "bidirectional",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bidirectional.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "topdown",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-topdown.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir | /home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install/bin/FileCheck /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+    "working_directory": "/home/will/llvm-mos-65816/.scratch/carry-scheduling",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "-mattr=+mos-a16,+mos-xy16"
+      ],
+      "direction": "bottomup",
+      "pass": "machine-scheduler",
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/llvm-mos-install",
+    "toolchain_sha256": "356ada3b7f057ecd1b4cb969d19f6b1a248cda1ec4b05831a7cdaf15f8a51ec7",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-regression.mir",
+      "sha256": "a02ab4f79e34e4a95a1ab08095cd6ea6a37843c3bb0632afcfd976ef035c317c"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-scheduler-xy16-bottomup.log",
+      "sha256": "849b5308ba7bcccd173022e0041ad23d29f0c18d9443404c8beff30520eed937"
+    },
+    "exit_code": 0,
+    "label": "candidate"
+  }
+]

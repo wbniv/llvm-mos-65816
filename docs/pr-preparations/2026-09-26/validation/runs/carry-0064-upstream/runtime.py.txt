@@ -1,0 +1,49 @@
+from pathlib import Path
+import hashlib
+import json
+import resource
+import subprocess
+
+resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+root = Path(__file__).resolve().parents[2]
+work = Path(__file__).resolve().parent
+out = work / 'runtime'
+out.mkdir(exist_ok=True)
+frontend = root / '.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang'
+config = root / 'build/install/bin/mos-sim.cfg'
+sim = root / 'build/utils/sim/mos-sim'
+test = work / 'source/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir'
+kernel = out / 'kernel.mir'
+kernel.write_text('---\n' + test.read_text().split('---\n', 1)[1].split('...\n', 1)[0] + '...\n')
+state = 0x9134beef
+inputs = []
+for i in range(512):
+    state = ((state << 7) ^ (state >> 3) ^ 0x9e3779b9) & 0xffffffff
+    inputs.append([0, 0xffffffff, 0x7fffffff, 0x80000000][i] if i < 4 else state)
+expected = [((v << 1) + 0x00432d17) & 0xffffffff for v in inputs]
+header = ''
+for name, values in [('inputs', inputs), ('expected', expected)]:
+    header += 'static const uint8_t ' + name + '[512][4] = {\n'
+    header += ''.join('  {' + ','.join(str(b) for b in v.to_bytes(4, 'little')) + '},\n' for v in values)
+    header += '};\n'
+(work / 'runtime-vectors.h').write_text(header)
+
+def run(name, cmd):
+    p = subprocess.run(list(map(str, cmd)), capture_output=True, text=True, timeout=60)
+    (out / (name + '.log')).write_text('$ ' + ' '.join(map(str, cmd)) + '\nexit=' + str(p.returncode) + '\n' + p.stdout + p.stderr)
+    assert p.returncode == 0, (name, p.stderr)
+    return {'command': list(map(str, cmd)), 'exit': p.returncode, 'stdout': p.stdout}
+
+driver = out / 'driver.o'
+runs = {'driver': run('driver', [frontend, '--config', config, '-mcpu=mos6502', '-Os', '-fno-lto', '-c', work / 'runtime.c', '-o', driver])}
+for label, llc in [('baseline', work / 'baseline/bin/llc'), ('candidate', work / 'build/bin/llc')]:
+    obj = out / (label + '.o')
+    image = out / (label + '.simg')
+    runs[label] = {'compile': run(label + '-compile', [llc, '-mtriple=mos', '-mcpu=mos6502', '-start-before=machine-scheduler', '-verify-machineinstrs', '-filetype=obj', kernel, '-o', obj]),
+                   'link': run(label + '-link', [frontend, '--config', config, '-mcpu=mos6502', '-fno-lto', driver, obj, '-o', image]),
+                   'execute': run(label + '-execute', [sim, image])}
+    assert runs[label]['execute']['stdout'] == 'P', runs[label]
+    run(label + '-disassembly', [work / 'build/bin/llvm-objdump', '-dr', obj])
+    run(label + '-sections', [work / 'build/bin/llvm-objdump', '-h', obj])
+(out / 'results.json').write_text(json.dumps(runs, indent=2) + '\n')
+print('512 NMOS 6502 arithmetic vectors: baseline P / exit 0; candidate P / exit 0')

@@ -1,0 +1,97 @@
+$ /home/will/llvm-mos-65816/.scratch/carry-pr/build/bin/llvm-objdump -dr /home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.o
+exit=0
+
+/home/will/llvm-mos-65816/.scratch/carry-pr/runtime/baseline.o:	file format elf32-mos
+
+Disassembly of section .text:
+
+00000000 <scale_then_add>:
+       0: ad 00 50     	lda	$5000                   ; 0x5000 <scale_then_add+0x5000>
+       3: ae 01 50     	ldx	$5001                   ; 0x5001 <scale_then_add+0x5001>
+       6: 86 00        	stx	$0                      ; 0x0 <scale_then_add>
+			00000007:  R_MOS_ADDR8	__rc2
+       8: ac 02 50     	ldy	$5002                   ; 0x5002 <scale_then_add+0x5002>
+       b: ae 03 50     	ldx	$5003                   ; 0x5003 <scale_then_add+0x5003>
+       e: 86 00        	stx	$0                      ; 0x0 <scale_then_add>
+			0000000f:  R_MOS_ADDR8	__rc3
+      10: 0a           	asl
+      11: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000012:  R_MOS_ADDR8	__rc17
+      13: a2 01        	ldx	#$1
+      15: b0 02        	bcs	$19 <scale_then_add+0x19>
+      17: a2 00        	ldx	#$0
+      19: 86 00        	stx	$0                      ; 0x0 <scale_then_add>
+			0000001a:  R_MOS_ADDR8	__rc5
+      1b: 18           	clc
+      1c: 69 17        	adc	#$17
+      1e: a2 01        	ldx	#$1
+      20: b0 02        	bcs	$24 <scale_then_add+0x24>
+      22: a2 00        	ldx	#$0
+      24: 86 00        	stx	$0                      ; 0x0 <scale_then_add>
+			00000025:  R_MOS_ADDR8	__rc4
+      26: aa           	tax
+      27: a5 00        	lda	$0                      ; 0x0 <scale_then_add>
+			00000028:  R_MOS_ADDR8	__rc2
+      29: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			0000002a:  R_MOS_ADDR8	__rc5
+      2b: c0 01        	cpy	#$1
+      2d: 2a           	rol
+      2e: a0 01        	ldy	#$1
+      30: b0 02        	bcs	$34 <scale_then_add+0x34>
+      32: a0 00        	ldy	#$0
+      34: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000035:  R_MOS_ADDR8	__rc5
+      36: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			00000037:  R_MOS_ADDR8	__rc4
+      38: c0 01        	cpy	#$1
+      3a: 69 2d        	adc	#$2d
+      3c: a0 01        	ldy	#$1
+      3e: b0 02        	bcs	$42 <scale_then_add+0x42>
+      40: a0 00        	ldy	#$0
+      42: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000043:  R_MOS_ADDR8	__rc4
+      44: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			00000045:  R_MOS_ADDR8	__rc17
+      46: 85 00        	sta	$0                      ; 0x0 <scale_then_add>
+			00000047:  R_MOS_ADDR8	__rc2
+      48: 98           	tya
+      49: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			0000004a:  R_MOS_ADDR8	__rc5
+      4b: c0 01        	cpy	#$1
+      4d: 2a           	rol
+      4e: a0 01        	ldy	#$1
+      50: b0 02        	bcs	$54 <scale_then_add+0x54>
+      52: a0 00        	ldy	#$0
+      54: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000055:  R_MOS_ADDR8	__rc5
+      56: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			00000057:  R_MOS_ADDR8	__rc4
+      58: c0 01        	cpy	#$1
+      5a: 69 43        	adc	#$43
+      5c: a0 01        	ldy	#$1
+      5e: b0 02        	bcs	$62 <scale_then_add+0x62>
+      60: a0 00        	ldy	#$0
+      62: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000063:  R_MOS_ADDR8	__rc4
+      64: a8           	tay
+      65: a5 00        	lda	$0                      ; 0x0 <scale_then_add>
+			00000066:  R_MOS_ADDR8	__rc3
+      67: 84 00        	sty	$0                      ; 0x0 <scale_then_add>
+			00000068:  R_MOS_ADDR8	__rc17
+      69: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			0000006a:  R_MOS_ADDR8	__rc5
+      6b: c0 01        	cpy	#$1
+      6d: 2a           	rol
+      6e: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			0000006f:  R_MOS_ADDR8	__rc4
+      70: c0 01        	cpy	#$1
+      72: a4 00        	ldy	$0                      ; 0x0 <scale_then_add>
+			00000073:  R_MOS_ADDR8	__rc17
+      74: 69 00        	adc	#$0
+      76: 8e 00 51     	stx	$5100                   ; 0x5100 <scale_then_add+0x5100>
+      79: a6 00        	ldx	$0                      ; 0x0 <scale_then_add>
+			0000007a:  R_MOS_ADDR8	__rc2
+      7b: 8e 01 51     	stx	$5101                   ; 0x5101 <scale_then_add+0x5101>
+      7e: 8c 02 51     	sty	$5102                   ; 0x5102 <scale_then_add+0x5102>
+      81: 8d 03 51     	sta	$5103                   ; 0x5103 <scale_then_add+0x5103>
+      84: 60           	rts

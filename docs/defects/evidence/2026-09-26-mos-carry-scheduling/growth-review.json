@@ -1,0 +1,614 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort",
+  "disposition": "Accept bounded size tradeoffs for this local optimization; no universal size or speed claim. TableGen-wide candidates were rejected for larger widespread losses. Reordering physical priority did not improve the nine Os/Oz growing sources.",
+  "rows": [
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/65816/rcundef2.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 2019,
+      "after": 2022,
+      "delta": 3,
+      "rep_sep_before": 87,
+      "rep_sep_after": 87,
+      "function_deltas": {
+        "main": 3
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_65816_rcundef2.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_65816_rcundef2.c.a16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering after __mulsi3 changes scratch allocation; Os/O2 add transfers, Oz xy16 also changes static-stack spill routing (one extra stack byte)."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/avalanche.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 5228,
+      "after": 5234,
+      "delta": 6,
+      "rep_sep_before": 177,
+      "rep_sep_after": 177,
+      "function_deltas": {
+        "main": 6
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_avalanche.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_avalanche.c.a16.Os.after.dis"
+      ],
+      "assessment": "Palette setup and color routing in main use additional ZP shift/store/reload operations; compute_col, tick_cycle and blit_in function sizes are unchanged. No extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 2028,
+      "after": 2033,
+      "delta": 5,
+      "rep_sep_before": 83,
+      "rep_sep_after": 83,
+      "function_deltas": {
+        "main": 5
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.a16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate and add ordering changes scratch allocation. Os/O2 add transfers; Oz xy16 changes frame allocation and introduces extra indirect frame traffic in the turtle loop, while dropping two REP/SEP instructions. Largest retained loss: 41 bytes (2.04%). Cycle effect is unmeasured."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 11130,
+      "after": 11134,
+      "delta": 4,
+      "rep_sep_before": 681,
+      "rep_sep_after": 681,
+      "function_deltas": {
+        "fill_cell": 4
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_dctbloom.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_dctbloom.c.a16.Os.after.dis"
+      ],
+      "assessment": "fill_cell adds TAX/TAY/TXA/TYA around independent subtract/add chains, before its nested fill loops. Four added transfer bytes; no extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/lsystem.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 11276,
+      "after": 11281,
+      "delta": 5,
+      "rep_sep_before": 644,
+      "rep_sep_after": 644,
+      "function_deltas": {
+        "main": 5
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_lsystem.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_lsystem.c.a16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering around multiplication and sine lookup changes scratch allocation and adds register transfers/PHY/PLY; no REP/SEP increase."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/spirograph.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "before": 15026,
+      "after": 15037,
+      "delta": 11,
+      "rep_sep_before": 844,
+      "rep_sep_after": 844,
+      "function_deltas": {
+        "hud_update": 11
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_spirograph.c.a16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_spirograph.c.a16.Os.after.dis"
+      ],
+      "assessment": "hud_update computes offsets earlier and saves/reloads them through ZP. Other function sizes are unchanged. xy16 also has one additional mode-change instruction (871 to 872 across file)."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 1944,
+      "after": 1947,
+      "delta": 3,
+      "rep_sep_before": 78,
+      "rep_sep_after": 78,
+      "function_deltas": {
+        "main": 3
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering after __mulsi3 changes scratch allocation; Os/O2 add transfers, Oz xy16 also changes static-stack spill routing (one extra stack byte)."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/avalanche.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 5161,
+      "after": 5167,
+      "delta": 6,
+      "rep_sep_before": 175,
+      "rep_sep_after": 175,
+      "function_deltas": {
+        "main": 6
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_avalanche.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_avalanche.c.xy16.Os.after.dis"
+      ],
+      "assessment": "Palette setup and color routing in main use additional ZP shift/store/reload operations; compute_col, tick_cycle and blit_in function sizes are unchanged. No extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 2121,
+      "after": 2129,
+      "delta": 8,
+      "rep_sep_before": 101,
+      "rep_sep_after": 101,
+      "function_deltas": {
+        "main": 8
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate and add ordering changes scratch allocation. Os/O2 add transfers; Oz xy16 changes frame allocation and introduces extra indirect frame traffic in the turtle loop, while dropping two REP/SEP instructions. Largest retained loss: 41 bytes (2.04%). Cycle effect is unmeasured."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/dctbloom.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 11135,
+      "after": 11139,
+      "delta": 4,
+      "rep_sep_before": 695,
+      "rep_sep_after": 695,
+      "function_deltas": {
+        "fill_cell": 4
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Os.after.dis"
+      ],
+      "assessment": "fill_cell adds TAX/TAY/TXA/TYA around independent subtract/add chains, before its nested fill loops. Four added transfer bytes; no extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/lsystem.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 11350,
+      "after": 11359,
+      "delta": 9,
+      "rep_sep_before": 689,
+      "rep_sep_after": 689,
+      "function_deltas": {
+        "main": 9
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_lsystem.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_lsystem.c.xy16.Os.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering around multiplication and sine lookup changes scratch allocation and adds register transfers/PHY/PLY; no REP/SEP increase."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/spirograph.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "before": 14948,
+      "after": 14963,
+      "delta": 15,
+      "rep_sep_before": 871,
+      "rep_sep_after": 872,
+      "function_deltas": {
+        "hud_update": 15
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_spirograph.c.xy16.Os.before.dis",
+        "carry-dynamic-census/examples_snes_spirograph.c.xy16.Os.after.dis"
+      ],
+      "assessment": "hud_update computes offsets earlier and saves/reloads them through ZP. Other function sizes are unchanged. xy16 also has one additional mode-change instruction (871 to 872 across file)."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "Os",
+      "before": 1499,
+      "after": 1500,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Os.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Os.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into Y ahead of the low ADC, then copied to A with TYA; scratch registers are reassigned. One extra byte."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/rotkal_sim.c",
+      "mode": "default",
+      "optimization": "Os",
+      "before": 419,
+      "after": 420,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Os.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Os.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into X ahead of the low ADC, then copied to A with TXA instead of loading A directly. One extra byte, also on the adapted NMOS6502 fixture."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/avalanche.c",
+      "mode": "a16",
+      "optimization": "Oz",
+      "before": 4467,
+      "after": 4478,
+      "delta": 11,
+      "rep_sep_before": 150,
+      "rep_sep_after": 150,
+      "function_deltas": {
+        "main": 11
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_avalanche.c.a16.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_avalanche.c.a16.Oz.after.dis"
+      ],
+      "assessment": "Palette setup and color routing in main use additional ZP shift/store/reload operations; compute_col, tick_cycle and blit_in function sizes are unchanged. No extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "optimization": "Oz",
+      "before": 9098,
+      "after": 9102,
+      "delta": 4,
+      "rep_sep_before": 499,
+      "rep_sep_after": 499,
+      "function_deltas": {
+        "fill_cell": 4
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_dctbloom.c.a16.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_dctbloom.c.a16.Oz.after.dis"
+      ],
+      "assessment": "fill_cell adds TAX/TAY/TXA/TYA around independent subtract/add chains, before its nested fill loops. Four added transfer bytes; no extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "before": 1840,
+      "after": 1857,
+      "delta": 17,
+      "rep_sep_before": 61,
+      "rep_sep_after": 61,
+      "function_deltas": {
+        "main": 17
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Oz.before.dis",
+        "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Oz.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering after __mulsi3 changes scratch allocation; Os/O2 add transfers, Oz xy16 also changes static-stack spill routing (one extra stack byte)."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/avalanche.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "before": 4403,
+      "after": 4414,
+      "delta": 11,
+      "rep_sep_before": 151,
+      "rep_sep_after": 151,
+      "function_deltas": {
+        "main": 11
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_avalanche.c.xy16.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_avalanche.c.xy16.Oz.after.dis"
+      ],
+      "assessment": "Palette setup and color routing in main use additional ZP shift/store/reload operations; compute_col, tick_cycle and blit_in function sizes are unchanged. No extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "before": 2005,
+      "after": 2046,
+      "delta": 41,
+      "rep_sep_before": 84,
+      "rep_sep_after": 82,
+      "function_deltas": {
+        "main": 41
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Oz.after.dis"
+      ],
+      "assessment": "ASR/rotate and add ordering changes scratch allocation. Os/O2 add transfers; Oz xy16 changes frame allocation and introduces extra indirect frame traffic in the turtle loop, while dropping two REP/SEP instructions. Largest retained loss: 41 bytes (2.04%). Cycle effect is unmeasured."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/dctbloom.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "before": 9128,
+      "after": 9132,
+      "delta": 4,
+      "rep_sep_before": 512,
+      "rep_sep_after": 512,
+      "function_deltas": {
+        "fill_cell": 4
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Oz.after.dis"
+      ],
+      "assessment": "fill_cell adds TAX/TAY/TXA/TYA around independent subtract/add chains, before its nested fill loops. Four added transfer bytes; no extra REP/SEP."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "before": 1616,
+      "after": 1617,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Oz.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into Y ahead of the low ADC, then copied to A with TYA; scratch registers are reassigned. One extra byte."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/rotkal_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "before": 427,
+      "after": 428,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Oz.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into X ahead of the low ADC, then copied to A with TXA instead of loading A directly. One extra byte, also on the adapted NMOS6502 fixture."
+    },
+    {
+      "census": "carry-dynamic-census",
+      "source": "examples/snes/corpus/seqvm_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "before": 618,
+      "after": 619,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-dynamic-census/examples_snes_corpus_seqvm_sim.c.default.Oz.before.dis",
+        "carry-dynamic-census/examples_snes_corpus_seqvm_sim.c.default.Oz.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into X early and copied to A with TXA. One extra byte."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "O2",
+      "before": 1524,
+      "after": 1525,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_snes_corpus_bf_vm_sim.c.default.O2.before.dis",
+        "carry-O2-census/examples_snes_corpus_bf_vm_sim.c.default.O2.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into Y ahead of the low ADC, then copied to A with TYA; scratch registers are reassigned. One extra byte."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/65816/rcundef2.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "before": 2051,
+      "after": 2054,
+      "delta": 3,
+      "rep_sep_before": 88,
+      "rep_sep_after": 88,
+      "function_deltas": {
+        "main": 3
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_65816_rcundef2.c.a16.O2.before.dis",
+        "carry-O2-census/examples_65816_rcundef2.c.a16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering after __mulsi3 changes scratch allocation; Os/O2 add transfers, Oz xy16 also changes static-stack spill routing (one extra stack byte)."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "before": 2058,
+      "after": 2063,
+      "delta": 5,
+      "rep_sep_before": 83,
+      "rep_sep_after": 83,
+      "function_deltas": {
+        "main": 5
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_snes_corpus_lsystem_sim.c.a16.O2.before.dis",
+        "carry-O2-census/examples_snes_corpus_lsystem_sim.c.a16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate and add ordering changes scratch allocation. Os/O2 add transfers; Oz xy16 changes frame allocation and introduces extra indirect frame traffic in the turtle loop, while dropping two REP/SEP instructions. Largest retained loss: 41 bytes (2.04%). Cycle effect is unmeasured."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/snes/lsystem.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "before": 12845,
+      "after": 12850,
+      "delta": 5,
+      "rep_sep_before": 794,
+      "rep_sep_after": 794,
+      "function_deltas": {
+        "main": 5
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_snes_lsystem.c.a16.O2.before.dis",
+        "carry-O2-census/examples_snes_lsystem.c.a16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering around multiplication and sine lookup changes scratch allocation and adds register transfers/PHY/PLY; no REP/SEP increase."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "before": 1976,
+      "after": 1979,
+      "delta": 3,
+      "rep_sep_before": 79,
+      "rep_sep_after": 79,
+      "function_deltas": {
+        "main": 3
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_65816_rcundef2.c.xy16.O2.before.dis",
+        "carry-O2-census/examples_65816_rcundef2.c.xy16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering after __mulsi3 changes scratch allocation; Os/O2 add transfers, Oz xy16 also changes static-stack spill routing (one extra stack byte)."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "before": 2151,
+      "after": 2159,
+      "delta": 8,
+      "rep_sep_before": 101,
+      "rep_sep_after": 101,
+      "function_deltas": {
+        "main": 8
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_snes_corpus_lsystem_sim.c.xy16.O2.before.dis",
+        "carry-O2-census/examples_snes_corpus_lsystem_sim.c.xy16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate and add ordering changes scratch allocation. Os/O2 add transfers; Oz xy16 changes frame allocation and introduces extra indirect frame traffic in the turtle loop, while dropping two REP/SEP instructions. Largest retained loss: 41 bytes (2.04%). Cycle effect is unmeasured."
+    },
+    {
+      "census": "carry-O2-census",
+      "source": "examples/snes/lsystem.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "before": 12905,
+      "after": 12914,
+      "delta": 9,
+      "rep_sep_before": 840,
+      "rep_sep_after": 840,
+      "function_deltas": {
+        "main": 9
+      },
+      "disassembly_archive_members": [
+        "carry-O2-census/examples_snes_lsystem.c.xy16.O2.before.dis",
+        "carry-O2-census/examples_snes_lsystem.c.xy16.O2.after.dis"
+      ],
+      "assessment": "ASR/rotate ordering around multiplication and sine lookup changes scratch allocation and adds register transfers/PHY/PLY; no REP/SEP increase."
+    },
+    {
+      "census": "carry-6502-adapted-census",
+      "source": "build/carry-6502-src/rotkal_sim.c",
+      "mode": "6502",
+      "optimization": "Os",
+      "before": 434,
+      "after": 435,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Os.before.dis",
+        "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Os.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into X ahead of the low ADC, then copied to A with TXA instead of loading A directly. One extra byte, also on the adapted NMOS6502 fixture."
+    },
+    {
+      "census": "carry-6502-adapted-census",
+      "source": "build/carry-6502-src/rotkal_sim.c",
+      "mode": "6502",
+      "optimization": "Oz",
+      "before": 434,
+      "after": 435,
+      "delta": 1,
+      "rep_sep_before": 0,
+      "rep_sep_after": 0,
+      "function_deltas": {
+        "main": 1
+      },
+      "disassembly_archive_members": [
+        "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Oz.before.dis",
+        "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Oz.after.dis"
+      ],
+      "assessment": "The high byte of the pointer add is loaded into X ahead of the low ADC, then copied to A with TXA instead of loading A directly. One extra byte, also on the adapted NMOS6502 fixture."
+    }
+  ]
+}

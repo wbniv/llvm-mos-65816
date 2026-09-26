@@ -317,20 +317,10 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 - [x] **Narrow-count s64 shift legalization repaired by 0055 (2026-09-25).** Native-width s8/s16/s32-to-s64 `G_ANYEXT` uses the existing zero-extension lowering. The original recovered preprocessed input and reduced masked-byte IR fail on the preserved baseline and pass on the candidate. All 36 recovered-source configurations and nine SNES runtime checks pass, including three LTO runs; installed Clang and LLD are refreshed. Existing patch 0028 repairs the inline-bitboard verifier failure. [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md) · [shift status](docs/defects/shift64-narrow-count.json) · [bitboard resolution](docs/defects/bitboard-inline-register-pressure.json). The reentrant attribute remains a separate [contract clarification](docs/defects/reentrant-attribute-contract.json).
 - [x] **Near store shared with unit arithmetic — implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1`/`-1` consumer can remain in byte operations. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch).
 - [T3] **Broader near-store profitability remains open.** Indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths; measure each before widening the predicate. Values live across calls and atomic word stores retain their existing contracts.
-- [T4] **Pre-RA machine scheduler interleaves two carry chains, forcing `Cc` into a GPR.** Found while
-  measuring `[dp],Y` increment 1. When a 32-bit index-scaling shift feeds a 32-bit pointer add, the pre-RA
-  scheduler sinks each `rol` next to its `adc` consumer, so both carries are live at once; there
-  is only one `P.C`, so the second is materialised as `ldy #1 / bcs +2 / ldy #0` (5 B) and
-  restored with `cpy #1` (2 B) — twelve times in a three-access function. Reproducer and numbers
-  in [the plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md#the-three-access-cliff--a-separate-reproducible-defect):
-  a 3-access far shape is **397 → 410 B** at `-Os`, but **369 → 290 B** with
-  `-mllvm -enable-misched=false` — i.e. the scheduler costs ~80 B on that shape and is **already**
-  costing the unmodified compiler 28 B on it today. `-enable-post-misched=false` changes nothing,
-  so it is the pre-RA scheduler. This is the only reason increment 1 shows +8 B on `farindex`
-  instead of a win. These are real before/after size regressions. No reliable local profitability
-  predicate has been demonstrated; investigate the scheduler pressure model or a measured gate. Reason for T4: scheduler heuristics with an unknown blast
-  radius — measure across the whole corpus (governing lesson 2) before and after; a fix that helps
-  this shape and hurts others is not a fix.
+- [x] **Computed-carry scheduling implemented and prepared as 0064.** [Compiler branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling) pushed at `155e209c4cee`; no PR opened. [PR packet](docs/pr-preparations/2026-09-26/README.md) records exact-current author review, 132 MOS passes, 512 oracle vectors and 117 neutral ordinary-MOS comparisons. Targeted kernel 133 → 59 B; downstream 1–41 B costs retained. [Plan](docs/plans/2026-09-26-mos-carry-scheduling.md).
+- [T4] **Generic fine-grained pressure contract remains open.** 0064 is a [qualified workaround](docs/defects/mos-carry-scheduling-pressure.json). Measure cycles and compiler time before making corresponding performance claims.
+- [T4] **Combined-stack farblit byte-load legalization.** The pre-0064 baseline already rejects an s8 far absolute load; isolate the causal interaction. [Retained evidence](docs/defects/mos-farblit-byte-load-legalization.json).
+
 - [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
   "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
   on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
