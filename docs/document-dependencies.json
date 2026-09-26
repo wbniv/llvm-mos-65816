@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "discovery": {
+    "exclude": [
+      "vendor/**",
+      "build/**",
+      ".scratch/**",
+      ".claude/**",
+      "powerdevil-*/**",
+      "**/.history/**",
+      "docs/defects/evidence/**",
+      "docs/transcripts/**",
+      ".history/**"
+    ]
+  },
+  "generated": [],
+  "maintained": [
+    {
+      "document": "docs/320-far-memset-miscompile.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-far-memset-wrong-bank.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change",
+            "unknowns"
+          ]
+        },
+        "dev/check-far-memset.py"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-far-memset-wrong-bank.json": "374918c27ffbac7681da881026e1c529fe0757384849be09bb9784dd2294f8ee",
+          "dev/check-far-memset.py": "6df164a4123095120f16f3443c6ae727a872248948ada10b3fca7d7c44015570"
+        },
+        "reviewed_at": "2026-09-26T01:37:34.189273+00:00",
+        "note": "The original entry point identifies existing a81874d/0013, links the canonical record and physical-byte regression, and labels its original open prose as historical. Exact June input and reconstructed compiler limitations remain explicit.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "docs/howto-defect-evidence.md",
+      "sources": [
+        "dev/check-defect-evidence.py",
+        "dev/test-defect-evidence.py",
+        ".github/workflows/defect-evidence.yml"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/check-defect-evidence.py": "a8b61b5c65f293f32d62bfeff919c9001dc82247744ede96887ef8eee698eeb7",
+          "dev/test-defect-evidence.py": "ab3f87929f1c732316852187ce43ebd6f070bd4d1bc7c24e40a6ef489b44f8fb",
+          ".github/workflows/defect-evidence.yml": "9e5bd9ed772d5e41fe18ee9e5d87a95235d178fdcf7f84e9e5adc8844ce2995f"
+        },
+        "reviewed_at": "2026-09-26T01:37:38.887917+00:00",
+        "note": "The workflow matches prior_work validation, the explicit 14-record legacy allowance, canonical-record reuse, immutable baselines, and CI scope. CI publication is distinguished from required branch protection.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "docs/howto-document-dependencies.md",
+      "sources": [
+        "dev/docs-deps.py",
+        "dev/test-docs-deps.py",
+        ".githooks/pre-commit"
+      ],
+      "receipt": {
+        "sources": {
+          "dev/docs-deps.py": "f17a2469961a96b0a48b2b8198e82fbc24bb10d0b0d7710c12128aa6ce8193cb",
+          "dev/test-docs-deps.py": "6f33ceeffb0e5ba24cb17292edee682f1c443eff9222ca2f035ff4fc220e0c9f",
+          ".githooks/pre-commit": "549d721b3888d790580d965562376c518fbc6e7f548a3efc548a74f8adbe57ac"
+        },
+        "reviewed_at": "2026-09-26T01:37:43.841912+00:00",
+        "note": "The workflow matches reference discovery, declared dependencies, content fingerprints, substantive review receipts, staged checks, and partial-commit inventory generation. Only dependency groups published in this scoped snapshot are registered; pending generators remain outside this commit.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "AGENTS.md",
+      "sources": [
+        "docs/howto-defect-evidence.md",
+        "docs/howto-document-dependencies.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/howto-document-dependencies.md": "b883d658506f61d265e842ac06eb03cd4451305bafc7cf5522724257bb9ba438"
+        },
+        "reviewed_at": "2026-09-26T01:37:48.658023+00:00",
+        "note": "Mandatory instructions require prior-work reconciliation, canonical-record reuse, preserved baselines, original-entry-point closure, and dependency review. The staged instructions include the dependency-check prerequisite without unrelated upstream-submission policy edits.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "CLAUDE.md",
+      "sources": [
+        "AGENTS.md",
+        "docs/howto-defect-evidence.md"
+      ],
+      "receipt": {
+        "sources": {
+          "AGENTS.md": "4486c9914d346ab7fab5a9a1e835978ee08ebeeca400b941d0d8e6085a1068b1",
+          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958"
+        },
+        "reviewed_at": "2026-09-26T01:37:53.718223+00:00",
+        "note": "The second agent entry point requires the same prior-work audit and canonical record as AGENTS, without claiming semantic deduplication can be automated.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "docs/agent-handoff.md",
+      "sources": [
+        "docs/howto-defect-evidence.md",
+        {
+          "glob": "docs/defects/mos-far-memset-wrong-bank.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/defects/mos-far-memset-wrong-bank.json": "374918c27ffbac7681da881026e1c529fe0757384849be09bb9784dd2294f8ee"
+        },
+        "reviewed_at": "2026-09-26T01:37:59.505028+00:00",
+        "note": "The handoff names the required reconciliation and current far-memset repair, while retaining the dated initial recheck. Unpublished narrow-shift and bitboard follow-ups are not included in this scoped snapshot.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "TODO.md",
+      "sources": [
+        "docs/howto-defect-evidence.md",
+        {
+          "glob": "docs/defects/mos-far-memset-wrong-bank.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/defects/mos-far-memset-wrong-bank.json": "374918c27ffbac7681da881026e1c529fe0757384849be09bb9784dd2294f8ee"
+        },
+        "reviewed_at": "2026-09-26T01:38:04.825643+00:00",
+        "note": "The new current note records revalidation of existing 0013, the matching-input and physical-byte evidence, and the audit required before another defect or fix plan. Other TODO work remains outside this change.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "docs/upstream-pending-work.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-far-memset-wrong-bank.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-far-memset-wrong-bank.json": "374918c27ffbac7681da881026e1c529fe0757384849be09bb9784dd2294f8ee"
+        },
+        "reviewed_at": "2026-09-26T01:38:11.654604+00:00",
+        "note": "Far memset is attributed to existing a81874d/0013 with causal and physical-byte evidence. No new independent submission is claimed; compiler/ABI and far-runtime integration remain feature-series work. Other dated preparation and remote status claims are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    },
+    {
+      "document": "docs/upstream-contribution-status.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-far-memset-wrong-bank.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-far-memset-wrong-bank.json": "374918c27ffbac7681da881026e1c529fe0757384849be09bb9784dd2294f8ee"
+        },
+        "reviewed_at": "2026-09-26T01:38:16.425832+00:00",
+        "note": "The dated local note identifies existing 0013 and the same-input/4096-byte comparison without claiming new compiler work, upstream publication, or live PR verification. The earlier GitHub snapshot remains dated.",
+        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+      }
+    }
+  ]
+}

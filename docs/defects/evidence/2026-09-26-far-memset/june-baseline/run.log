@@ -1,0 +1,100 @@
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll -stop-before=legalizer -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/prelegalizer.mir
+
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll -stop-after=legalizer -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/legalized.mir
+
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll -filetype=obj -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.o
+
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump -dr --mcpu=mosw65816 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.o
+
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.o:	file format elf32-mos
+
+Disassembly of section .text:
+
+00000000 <main>:
+       0: a2 00        	ldx	#$0
+       2: 86 00        	stx	$0                      ; 0x0 <main>
+			00000003:  R_MOS_ADDR8	__rc4
+       4: a2 20        	ldx	#$20
+       6: 86 00        	stx	$0                      ; 0x0 <main>
+			00000007:  R_MOS_ADDR8	__rc5
+       8: a2 7e        	ldx	#$7e
+       a: 86 00        	stx	$0                      ; 0x0 <main>
+			0000000b:  R_MOS_ADDR8	__rc6
+       c: a2 00        	ldx	#$0
+       e: 86 00        	stx	$0                      ; 0x0 <main>
+			0000000f:  R_MOS_ADDR8	__rc7
+      10: a2 10        	ldx	#$10
+      12: a9 42        	lda	#$42
+      14: 86 00        	stx	$0                      ; 0x0 <main>
+			00000015:  R_MOS_ADDR8	__rc2
+      16: 64 00        	stz	$0                      ; 0x0 <main>
+			00000017:  R_MOS_ADDR8	__rc3
+      18: 64 00        	stz	$0                      ; 0x0 <main>
+			00000019:  R_MOS_ADDR8	__rc8
+      1a: a2 00        	ldx	#$0
+      1c: 20 00 00     	jsr	$0 <main>
+			0000001d:  R_MOS_ADDR16	__memset
+      1f: 64 00        	stz	$0                      ; 0x0 <main>
+			00000020:  R_MOS_ADDR8	__rc2
+      21: 64 00        	stz	$0                      ; 0x0 <main>
+			00000022:  R_MOS_ADDR8	__rc3
+      23: 64 00        	stz	$0                      ; 0x0 <main>
+			00000024:  R_MOS_ADDR8	__rc4
+      25: 64 00        	stz	$0                      ; 0x0 <main>
+			00000026:  R_MOS_ADDR8	__rc5
+      27: a2 00        	ldx	#$0
+      29: 64 00        	stz	$0                      ; 0x0 <main>
+			0000002a:  R_MOS_ADDR8	__rc7
+      2b: e2 20        	sep	#$20
+      2d: a9 00        	lda	#$0
+      2f: 18           	clc
+      30: 65 00        	adc	$0                      ; 0x0 <main>
+			00000031:  R_MOS_ADDR8	__rc2
+      32: 85 00        	sta	$0                      ; 0x0 <main>
+			00000033:  R_MOS_ADDR8	__rc8
+      34: a9 20        	lda	#$20
+      36: 65 00        	adc	$0                      ; 0x0 <main>
+			00000037:  R_MOS_ADDR8	__rc3
+      38: 85 00        	sta	$0                      ; 0x0 <main>
+			00000039:  R_MOS_ADDR8	__rc9
+      3a: a9 7e        	lda	#$7e
+      3c: 69 00        	adc	#$0
+      3e: 85 00        	sta	$0                      ; 0x0 <main>
+			0000003f:  R_MOS_ADDR8	__rc10
+      40: a9 00        	lda	#$0
+      42: 69 00        	adc	#$0
+      44: 85 00        	sta	$0                      ; 0x0 <main>
+			00000045:  R_MOS_ADDR8	__rc11
+      46: a7 00        	lda	[$0]                    ; 0x0 <main>
+			00000047:  R_MOS_ADDR8	__rc8
+      48: 85 00        	sta	$0                      ; 0x0 <main>
+			00000049:  R_MOS_ADDR8	__rc6
+      4a: c2 20        	rep	#$20
+      4c: a5 00        	lda	$0                      ; 0x0 <main>
+			0000004d:  R_MOS_ADDR8	__rc4
+      4e: 18           	clc
+      4f: 65 00        	adc	$0                      ; 0x0 <main>
+			00000050:  R_MOS_ADDR8	__rc6
+      51: 85 00        	sta	$0                      ; 0x0 <main>
+			00000052:  R_MOS_ADDR8	__rc4
+      53: a5 00        	lda	$0                      ; 0x0 <main>
+			00000054:  R_MOS_ADDR8	__rc2
+      55: 1a           	inc
+      56: 85 00        	sta	$0                      ; 0x0 <main>
+			00000057:  R_MOS_ADDR8	__rc2
+      58: c9 00 10     	cmp	#$1000
+      5b: d0 ce        	bne	$2b <main+0x2b>
+      5d: a5 00        	lda	$0                      ; 0x0 <main>
+			0000005e:  R_MOS_ADDR8	__rc4
+      5f: 8d 00 00     	sta	$0                      ; 0x0 <main>
+			00000060:  R_MOS_ADDR16	corpus_result
+      62: 80 fe        	bra	$62 <main+0x62>
+FAIL: far memset uses near runtime or lacks __memset_far
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/clang --target=mos --config /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/sdk/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -fno-lto -Wl,-Map=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.map /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.o -o /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc
+
+$ python3 /home/will/llvm-mos-65816/tools/snes-checksum.py /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x5888 complement=0xA777
+$ /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/Database 200 2 2000 300
+SMOKE: FAIL off=0x200 len=2 got=0x0000 want=0x2000
+FAIL: physical WRAM $7E2000..$7E2FFF: 4096/4096 bytes differ from 0x42
+RESULT: FAIL (far-runtime-routing, runtime, physical-wram)

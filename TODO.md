@@ -31,6 +31,14 @@ user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
 
 
 ## Open
+
+September 26 status reconciliation: the original far-memset wrong-bank report is
+[fixed by existing 0013](docs/defects/mos-far-memset-wrong-bank.json), established
+with identical-input backend comparison and all 4096 physical bytes checked.
+It is a revalidation of `a81874d`, not new compiler work. The
+[prior-work audit](docs/howto-defect-evidence.md#reconcile-prior-work-before-opening-or-fixing-a-defect)
+is required before opening another compiler defect or fix plan.
+
 - [x] ~~**`__attribute__((interrupt))` prologue is unsafe under `+mos-a16`/`+mos-xy16` — found by
   Round 7 #123 `nmitally`.** Default mode passes the deterministic 120-NMI tally (`0xDA3B`), while
   a16 produced `0xF4F4` then `0x0000`/`0x0000`, and xy16 `0x0000`. The ISR starts `cld; pha`

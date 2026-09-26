@@ -1,0 +1,22 @@
+LLVM (http://llvm.org/):
+  LLVM version 23.0.0git
+  Optimized build.
+  Default target: mos-unknown-unknown
+  Host CPU: tigerlake
+
+  Registered Targets:
+    mos - MOS Technologies 65xx and variants
+LLVM (http://llvm.org/):
+  LLVM version 23.0.0git
+  Optimized build.
+  Default target: mos-unknown-unknown
+  Host CPU: tigerlake
+
+  Registered Targets:
+    mos - MOS Technologies 65xx and variants
+clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)
+Target: mos-unknown-unknown
+Thread model: posix
+InstalledDir: /home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin
+
+permission denied while trying to connect to the docker API at unix:///var/run/docker.sock

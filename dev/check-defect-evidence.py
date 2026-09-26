@@ -14,6 +14,24 @@ STATUSES = {'confirmed', 'not_reproduced', 'workaround', 'fixed', 'invalid',
             'contract_clarification'}
 SHA256 = re.compile(r'[0-9a-f]{64}\Z')
 RECORD = re.compile(r'docs/defects/[a-z0-9][a-z0-9-]*\.json\Z')
+# Only these established records may omit a prior-work audit. New IDs must
+# identify their relationship to existing reports, implementations, and builds.
+LEGACY_RECORDS = frozenset({
+    'bitboard-inline-register-pressure',
+    'gisel-inline-asm-register-bounds',
+    'llvm-reduce-parallel-mir-crash',
+    'mos-bank-relax-section-offset',
+    'mos-coalescing-rc-undef',
+    'mos-float-vector-legalization',
+    'mos-trunc-imag8-i1',
+    'mos-vector-o0-status-scavenge',
+    'mos-zp-index-same-width-trunc',
+    'reentrant-attribute-contract',
+    'selectiondag-inline-asm-nonstandard-integer',
+    'selectiondag-inline-asm-register-bounds',
+    'selectiondag-inline-asm-vector-parts',
+    'shift64-narrow-count',
+})
 
 
 def require(condition, message):
@@ -56,6 +74,46 @@ def check_run(run, read, red):
                 'baseline log must contain the expected failure signature')
     else:
         require(code == 0, 'candidate regression must pass')
+
+
+def check_prior_work(record, read, previous):
+    audit = record.get('prior_work')
+    if audit is None:
+        require(not previous or previous.get('prior_work') is None,
+                'preserve the committed prior-work audit')
+        require(record['id'] in LEGACY_RECORDS,
+                'new defect records require a prior_work audit; reconcile existing reports and patches')
+        return
+    require(isinstance(audit, dict), 'prior_work must be an object')
+    disposition = audit.get('disposition')
+    require(disposition in {'new_defect', 'historical_migration', 'distinct_from_related'},
+            'repeat sightings must extend the canonical record; choose an evidence-backed disposition')
+    for field in ('search_terms', 'related_records', 'related_reports', 'related_changes'):
+        values = audit.get(field)
+        require(isinstance(values, list) and all(nonempty(x) for x in values),
+                f'prior_work needs a {field} list')
+        require(len(set(values)) == len(values), f'prior_work {field} contains duplicate entries')
+    require(audit['search_terms'], 'prior_work needs actual search terms')
+    for field in ('source_assessment', 'binary_assessment', 'decision'):
+        require(nonempty(audit.get(field)), f'prior_work needs {field}')
+    if disposition == 'historical_migration':
+        require(audit['related_reports'], 'historical_migration needs the existing report')
+    if disposition == 'distinct_from_related':
+        require(audit['related_records'], 'distinct_from_related needs a related canonical record')
+    if audit['related_records']:
+        require(disposition == 'distinct_from_related',
+                'related canonical records require an explicit distinct_from_related decision')
+    for path in audit['related_records']:
+        require(RECORD.fullmatch(path), 'related record must use a canonical defect path')
+        require(Path(path).stem != record['id'], 'a prior-work audit cannot refer to itself')
+        related = json.loads(read(path))
+        require(isinstance(related, dict) and related.get('id') == Path(path).stem,
+                f'{path}: related record id must match its filename')
+    for path in audit['related_reports']:
+        require(not PurePosixPath(path).is_absolute() and '..' not in PurePosixPath(path).parts,
+                'related report path must stay inside the repo')
+        read(path)
+    artifact(audit.get('evidence'), read)
 
 
 def validate(record, read, previous=None):
@@ -101,9 +159,10 @@ def validate(record, read, previous=None):
     if record['status'] == 'invalid':
         require(nonempty(record.get('invalidation_reason')),
                 'invalid needs a specific evidence-backed reporting error')
+    check_prior_work(record, read, previous)
     if previous and previous.get('baseline') is not None:
         require(baseline == previous['baseline'],
-                'captured baseline is immutable; retain it and add a separate report for new evidence')
+                'captured baseline is immutable; append observations/additional_runs to the canonical record')
 
 
 def git(root, *args):

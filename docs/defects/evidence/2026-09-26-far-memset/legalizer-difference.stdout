@@ -1,0 +1,91 @@
+--- /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/baseline/legalized.mir	2026-09-26 07:29:10.067959033 +0700
++++ /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/legalized.mir	2026-09-26 07:29:10.078959007 +0700
+@@ -158,6 +158,7 @@
+   - { id: 77, class: _, preferred-register: '', flags: [  ] }
+   - { id: 78, class: _, preferred-register: '', flags: [  ] }
+   - { id: 79, class: _, preferred-register: '', flags: [  ] }
++  - { id: 80, class: _, preferred-register: '', flags: [  ] }
+ liveins:         []
+ frameInfo:
+   isFrameAddressTaken: false
+@@ -191,53 +192,51 @@
+   bb.1 (%ir-block.0):
+     successors: %bb.2(0x80000000)
+   
+-    %64:_(s8) = G_CONSTANT i8 0
+-    %67:_(s8) = G_CONSTANT i8 32
+-    %68:_(s8) = G_CONSTANT i8 126
+-    %78:_(s16) = G_MERGE_VALUES %64(s8), %67(s8)
+-    %79:_(s16) = G_MERGE_VALUES %68(s8), %64(s8)
+-    %1:_(s32) = G_MERGE_VALUES %78(s16), %79(s16)
++    %63:_(s8) = G_CONSTANT i8 0
++    %66:_(s8) = G_CONSTANT i8 32
++    %67:_(s8) = G_CONSTANT i8 126
++    %79:_(s16) = G_MERGE_VALUES %63(s8), %66(s8)
++    %80:_(s16) = G_MERGE_VALUES %67(s8), %63(s8)
++    %1:_(s32) = G_MERGE_VALUES %79(s16), %80(s16)
+     %0:_(p2) = G_INTTOPTR %1(s32)
+     %2:_(s8) = G_CONSTANT i8 66
+-    %65:_(s8) = G_CONSTANT i8 16
+-    %66:_(s8) = G_CONSTANT i8 1
+-    %12:_(s16) = G_MERGE_VALUES %66(s8), %64(s8)
+-    %14:_(s16) = G_MERGE_VALUES %64(s8), %65(s8)
++    %64:_(s8) = G_CONSTANT i8 16
++    %65:_(s8) = G_CONSTANT i8 1
++    %12:_(s16) = G_MERGE_VALUES %65(s8), %63(s8)
++    %14:_(s16) = G_MERGE_VALUES %63(s8), %64(s8)
+     ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+     $rl1 = COPY %0(p2)
+     $a = COPY %2(s8)
+-    $x = COPY %64(s8)
+-    $rc2 = COPY %65(s8)
+-    $rc3 = COPY %64(s8)
+-    $rc8 = COPY %64(s8)
+-    JSR &__memset, mos_csr, implicit $rl1, implicit $a, implicit $x, implicit $rc2, implicit $rc3, implicit $rc8
++    $x = COPY %63(s8)
++    $rc2 = COPY %64(s8)
++    JSR &__memset_far, mos_csr, implicit $rl1, implicit $a, implicit $x, implicit $rc2
+     ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+   
+   bb.2 (%ir-block.1):
+     successors: %bb.3(0x04000000), %bb.2(0x7c000000)
+   
+-    %58:_(s8) = G_PHI %54(s8), %bb.2, %64(s8), %bb.1
+-    %59:_(s8) = G_PHI %55(s8), %bb.2, %64(s8), %bb.1
+-    %52:_(s8) = G_PHI %48(s8), %bb.2, %64(s8), %bb.1
+-    %53:_(s8) = G_PHI %49(s8), %bb.2, %64(s8), %bb.1
++    %58:_(s8) = G_PHI %54(s8), %bb.2, %63(s8), %bb.1
++    %59:_(s8) = G_PHI %55(s8), %bb.2, %63(s8), %bb.1
++    %52:_(s8) = G_PHI %48(s8), %bb.2, %63(s8), %bb.1
++    %53:_(s8) = G_PHI %49(s8), %bb.2, %63(s8), %bb.1
+     %4:_(s16) = G_MERGE_VALUES %58(s8), %59(s8)
+     %5:_(s16) = G_MERGE_VALUES %52(s8), %53(s8)
+-    %71:_(s8) = G_CONSTANT i8 0
++    %72:_(s8) = G_CONSTANT i8 0
+     %29:_(s32) = G_PTRTOINT %0(p2)
+-    %72:_(s16), %73:_(s16) = G_UNMERGE_VALUES %29(s32)
+-    %31:_(s8), %32:_(s8) = G_UNMERGE_VALUES %72(s16)
+-    %33:_(s8), %34:_(s8) = G_UNMERGE_VALUES %73(s16)
++    %73:_(s16), %74:_(s16) = G_UNMERGE_VALUES %29(s32)
++    %31:_(s8), %32:_(s8) = G_UNMERGE_VALUES %73(s16)
++    %33:_(s8), %34:_(s8) = G_UNMERGE_VALUES %74(s16)
+     %47:_(s1) = G_CONSTANT i1 false
+     %39:_(s8), %40:_(s1) = G_UADDE %31, %58, %47
+     %41:_(s8), %42:_(s1) = G_UADDE %32, %59, %40
+-    %43:_(s8), %44:_(s1) = G_UADDE %33, %71, %42
+-    %45:_(s8), %46:_(s1) = G_UADDE %34, %71, %44
+-    %76:_(s16) = G_MERGE_VALUES %39(s8), %41(s8)
+-    %77:_(s16) = G_MERGE_VALUES %43(s8), %45(s8)
+-    %30:_(s32) = G_MERGE_VALUES %76(s16), %77(s16)
++    %43:_(s8), %44:_(s1) = G_UADDE %33, %72, %42
++    %45:_(s8), %46:_(s1) = G_UADDE %34, %72, %44
++    %77:_(s16) = G_MERGE_VALUES %39(s8), %41(s8)
++    %78:_(s16) = G_MERGE_VALUES %43(s8), %45(s8)
++    %30:_(s32) = G_MERGE_VALUES %77(s16), %78(s16)
+     %7:_(p2) = G_INTTOPTR %30(s32)
+     %28:_(s8) = G_LOAD_FAR_INDIR %7(p2) :: (load (s8) from %ir.5, !tbaa !6, addrspace 2)
+-    %10:_(s16) = G_MERGE_VALUES %28(s8), %71(s8)
++    %10:_(s16) = G_MERGE_VALUES %28(s8), %72(s8)
+     %11:_(s16) = G_ADD %5, %10
+     %13:_(s16) = nuw nsw G_ADD %4, %12
+     %22:_(s1) = G_CONSTANT i1 true

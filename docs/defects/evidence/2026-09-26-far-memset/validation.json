@@ -1,0 +1,292 @@
+{
+  "runs": [
+    {
+      "name": "focused-baseline-a16",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "-"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "focused-baseline-a16-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "focused-baseline-xy16",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "-"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "focused-baseline-xy16-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "focused-candidate-a16",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "-"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "focused-candidate-a16-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "focused-candidate-xy16",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+        "-o",
+        "-"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "focused-candidate-xy16-check",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/FileCheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "legalizer-difference",
+      "command": [
+        "diff",
+        "-u",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/baseline/legalized.mir",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/legalized.mir"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 1,
+      "expected_exit": 1
+    },
+    {
+      "name": "patch-apply",
+      "command": [
+        "git",
+        "apply",
+        "--unsafe-paths",
+        "--directory=/tmp/far-memset-patch-sect_1ku",
+        "/home/will/llvm-mos-65816/patches/llvm-mos/0013-320-far-memops.patch"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "patch-reverse",
+      "command": [
+        "git",
+        "apply",
+        "-R",
+        "--unsafe-paths",
+        "--directory=/tmp/far-memset-patch-sect_1ku",
+        "/home/will/llvm-mos-65816/patches/llvm-mos/0013-320-far-memops.patch"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "test-import",
+      "command": [
+        "git",
+        "apply",
+        "--unsafe-paths",
+        "--directory=/tmp/far-memset-patch-sect_1ku",
+        "--include=**/far-memset.ll",
+        "/home/will/llvm-mos-65816/patches/llvm-mos/0013-320-far-memops.patch"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-addressing",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-addressing.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-call",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-call.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-global-long-x",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-global-long-x.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-indir-indexed",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-indir-indexed.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-legalizer-bridges",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-legalizer-bridges.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-memset",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-memset.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-native-word",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-native-word.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    },
+    {
+      "name": "verify-far-phi",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/far-phi.ll",
+        "-o",
+        "/dev/null"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "expected_exit": 0
+    }
+  ],
+  "identical_prelegalizer_mir": true,
+  "compiler_source_change": false,
+  "patch_roundtrip": true
+}

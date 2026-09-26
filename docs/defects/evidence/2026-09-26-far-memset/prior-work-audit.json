@@ -1,0 +1,41 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0db16-f6a0-7e32-ada6-0c8098813933",
+  "runs": [
+    {
+      "command": "rg -l -i 'far.?memset|wrong.bank|createFarMemLibcall|__memset_far' docs/defects/*.json",
+      "exit_code": 1,
+      "output": ""
+    },
+    {
+      "command": "git log --all --oneline --grep='far.*mem' -i",
+      "exit_code": 0,
+      "output": "e1a4adad docs(321): record the last three verification legs in the [dp],Y plan\n30553278 docs(blossom): re-test + close out #3 Blossom optional-polish item (a/b/c)\nff350367 fix(321): Mode 7 splash handoff contract — post-title force-blank 720 -> 22 frames\ndfd467dd feat(snes/mvscrl): 60 fps dual scroll-ring (F2, Batch B)\n3e51e056 docs(plan): confirm bitmask misdiagnosis under real LTO build; SDK footgun\nc09912a3 docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis\nde1aaf89 Merge wt/321-blossom into main: #3 Blossom interactive SNES demo\n551bc20b memory: forget the resolved far-ptr G_PHI(p2) note; persist pending memory index\nd1099dbb #321 far-pointer loop induction variable: legalize G_PHI(p2) -> s32 phi\nd73ffce5 docs(far-memops): reconcile plan + TODO with as-built fix\n1127ddc0 docs(plan-index): add the far-memset wrong-bank fix row (151 plans)\na81874d8 #321 fix far (addrspace 2) memset/memcpy/memmove silent wrong-bank miscompile\nc75750e9 #3 Blossom Stage 1: shared hopalong.h + headless far-RMW hit-grid gate\n007bb692 #320 upstream note: fold in Phase 0/3 corrections (posting-ready; not posted)\nf84efcd6 #320 five-space: Phase 3 (cast/value-state matrix) + correct the verdict (defer, don't null)\ncaef3e9b #320 five-address-space model: plan + Phase 0 census (packed-24/zero-bank = measured nulls)\nebaa515f #320 Inc 4 Ph2 A3: far-ptr CC variant (d) Stack — soft-stack (CCAssignToStack)\n"
+    },
+    {
+      "command": "git log --all --oneline -- docs/320-far-memset-miscompile.md",
+      "exit_code": 0,
+      "output": "c75750e9 #3 Blossom Stage 1: shared hopalong.h + headless far-RMW hit-grid gate\n"
+    },
+    {
+      "command": "rg -n 'createFarMemLibcall|anyFarPointerOperand' vendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp patches/llvm-mos/0002-321-accum16.patch patches/llvm-mos/0013-320-far-memops.patch",
+      "exit_code": 0,
+      "output": "patches/llvm-mos/0013-320-far-memops.patch:22:+static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,\npatches/llvm-mos/0013-320-far-memops.patch:45:+static bool createFarMemLibcall(LegalizerHelper &Helper,\npatches/llvm-mos/0013-320-far-memops.patch:129:+  if (anyFarPointerOperand(MRI, MI))\npatches/llvm-mos/0013-320-far-memops.patch:130:+    return createFarMemLibcall(Helper, MRI, MI);\npatches/llvm-mos/0002-321-accum16.patch:5531:+static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,\npatches/llvm-mos/0002-321-accum16.patch:5554:+static bool createFarMemLibcall(LegalizerHelper &Helper,\npatches/llvm-mos/0002-321-accum16.patch:5638:+  if (anyFarPointerOperand(MRI, MI))\npatches/llvm-mos/0002-321-accum16.patch:5639:+    return createFarMemLibcall(Helper, MRI, MI);\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:3291:static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:3314:static bool createFarMemLibcall(LegalizerHelper &Helper,\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:3436:  if (anyFarPointerOperand(MRI, MI))\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:3437:    return createFarMemLibcall(Helper, MRI, MI);\n"
+    },
+    {
+      "command": "git show c75750e9:examples/65816/far_memset.c | sha256sum",
+      "exit_code": 0,
+      "output": "109cefb6a492c317deddab5f87defdecaebd920d7272eb48429aa766e9e64588  -\n"
+    },
+    {
+      "command": "sha256sum docs/defects/evidence/2026-09-26-far-memset/original.c.txt",
+      "exit_code": 0,
+      "output": "0f35f308a85bd4a32378a6a5edbb35857b6ef02c4afe70ad904e437f61990a4a  docs/defects/evidence/2026-09-26-far-memset/original.c.txt\n"
+    },
+    {
+      "command": "git ls-files docs/plans/2026-06-26-321-far-memset-miscompile.md",
+      "exit_code": 0,
+      "output": ""
+    }
+  ],
+  "finding": "The existing far-memops repair is a81874d / 0013, present in the current source and folded into 0002. The discovery report has no update after its June 26 creation. No canonical structured record for this wrong-bank memset defect exists. The current retained fixture differs from June only in the final idle loop: commit 903de3e5 adds WAI. The exact June source is separately recovered as june-original.c.txt. The new canonical record migrates that historical report and revalidates its existing repair."
+}

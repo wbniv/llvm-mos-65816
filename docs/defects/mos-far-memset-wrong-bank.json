@@ -1,0 +1,662 @@
+{
+  "schema": 1,
+  "id": "mos-far-memset-wrong-bank",
+  "title": "Far memset selects the near runtime and loses the destination bank",
+  "status": "fixed",
+  "summary": "The June 26 4096-byte fill is causally repaired by existing a81874d / patch 0013. Identical retained IR calls near __memset without the patch (4096 physical bytes wrong, checksum 0) and __memset_far with it (all bytes 0x42, checksum 0x2000). The baseline compiler is explicitly reconstructed; no new compiler fix was needed.",
+  "report": "docs/investigations/2026-09-26-far-memset-revalidation.md",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933: reconstruction, revalidation, regression coverage, process enforcement, and documentation. No new executable compiler or runtime change.",
+    "Existing a81874d credit is preserved verbatim in historical-commit.txt: Claude Opus 4.8 (1M context). Tool version, exact model ID/version from session metadata, and reasoning effort remain unknown; no attribution is guessed."
+  ],
+  "reproducer_origin": "original",
+  "unknowns": "The exact June source is recovered from c75750e9, but the June compiler and crash-era preprocessed TU are unavailable. Current preprocessing is newly generated. The comparison isolates removal of 0013 on the captured September fork; it is not the June toolchain. Closure covers the original 4096-byte fill and near/far runtime routing, not every far memory operation or lengths above 65535.",
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "far memset",
+      "wrong bank",
+      "createFarMemLibcall",
+      "__memset_far"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/320-far-memset-miscompile.md",
+      "docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md"
+    ],
+    "related_changes": [
+      "a81874d89ffaac1c34b06cbb8539db9e4785c41b",
+      "patches/llvm-mos/0013-320-far-memops.patch",
+      "patches/llvm-mos/0002-321-accum16.patch"
+    ],
+    "source_assessment": "The far-runtime helpers and diversion are already in the current MOSLegalizerInfo.cpp and folded 0002. Removing and reapplying precisely 0013 reproduces the current source byte-for-byte.",
+    "binary_assessment": "Captured llc and a reconstruction replacing only the legalizer object use identical other libraries. Identical prelegalizer MIR and input IR isolate the backend routing; the captured binary passes physical-memory checks. Hashes, versions, build commands, SDK, and headers are retained.",
+    "decision": "No existing structured record covers this memset defect. This first canonical record migrates the June discovery and revalidates its existing repair, preserving original status text as dated evidence. The unrelated Imag8 truncation record describes another contract.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/prior-work-audit.json",
+      "sha256": "c50ac38cb95033d00c69b5a37df73d3118509344aca3b7ce0f294eafcfe4804b"
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/0013.patch.txt",
+      "sha256": "9746eabe55e0cd1c57d1cdf1870dea390de5292362a4a110b82389a9679f2345"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/c-entry.o",
+      "sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.i",
+      "sha256": "c9fb52e660a6390bc1ed302cf242b1eda6bc1f004037d88d8f2de8541a111142"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.ll",
+      "sha256": "eba7a375220b7905b3bd21069f04e2b2b056cbf893e2a15bd45e199b6b7f1c74"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.map",
+      "sha256": "26db25cdffe21f6fcf4465e87be4c7e5e1617021e01f31474fff51fe7bddc24d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.o",
+      "sha256": "afcca640ba49e012531277192b46aea8e489d5e699a444c784b0d6555668accb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.sfc",
+      "sha256": "4d415ccbaec72984dbbbfa346438e66618254bb924265ed0479af4f5dd9331e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.sfc.elf",
+      "sha256": "d16bc549282e75b4dddfc376e1bf24536eeba3f1fec0e6853621431addea6789"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/legalized.mir",
+      "sha256": "6926d2c7c50e295710914d47029600c004292ecdc88756dcc94b6792bf3096ad"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/prelegalizer.mir",
+      "sha256": "fa068417e6c735758786d5195664660ef3b71d2ce99b515412eeb34ed076e255"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/run.log",
+      "sha256": "45bdbc7606c74b9c702983ca5bf4a769313b945304b179f75df3d0c84eeababf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/runs.json",
+      "sha256": "93eadeb3d70134c9074629a6035f8f1e248c5897b4d2533081b21649622c3ebf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/a16-O2/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/input.map",
+      "sha256": "8a4aca3a0d677e5deb286b9c51a60d1145151d8d799b564fec36db978bf87f09"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/input.o",
+      "sha256": "f892809a190ab88d82c1b675648d667f65a71755f5f8494a6eaf5820bc57bf82"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/input.sfc",
+      "sha256": "41ca18f6f64614656e359dfecf93b0e868ba55376029ab0b3d910bf4a1861054"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/input.sfc.elf",
+      "sha256": "9c3f8e52f64848e9955ccb795d7b1059ca61c4fd7b28b268f04b3ecec5589c34"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/legalized.mir",
+      "sha256": "6f0bc7f1e1c0d553639d003248cf9ce09a859cc8766eba1d5ac281657f87194d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/physical-wram.bin",
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/prelegalizer.mir",
+      "sha256": "ba7a30ed394b0bd7a2019d01a92c510aac607cf43f1df3bb2f3152011a07e5b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/run.log",
+      "sha256": "5c462b1a90f0a3831d622cc8108304d1adb9dad57bbdfb8b14776b1798cea4c9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/runs.json",
+      "sha256": "c8531e3040e27e8ca2ffabd9165f4e42224e3866bce314a7857cc0c984ca5f00"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/baseline/runtime.stdout",
+      "sha256": "00f7d407456c5a8f2b5b8daaab64094b7629817a0ac2e81c48d4798e3684340c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/c-entry.o",
+      "sha256": "98ec9fa0a1434c603b74204d4aa1d27e72a07e9edbcff1cd9d6b5d201618db9d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.i",
+      "sha256": "19b054adc3a1322cd4831b6121bfc9d344b6284d52e783e23028189623a2f086"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.ll",
+      "sha256": "c5d85031607b4dd94d9cc74ca79c61dbc9182f6b077a8832100124ab3b3fb194"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.map",
+      "sha256": "8b0e5269bd6d2f6372e1d1506d75a3f1c6d32d400ecfbb31816267a22017f48a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.o",
+      "sha256": "a602c63d3b9873588bf05fa8499c8514a725a900eb66ec0a1d7e07827d0a2bfc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.sfc",
+      "sha256": "4d415ccbaec72984dbbbfa346438e66618254bb924265ed0479af4f5dd9331e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/input.sfc.elf",
+      "sha256": "96fd393586e807dfabbb96b9fddff4f04659384809886b335667483ba928357b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/legalized.mir",
+      "sha256": "06cb0c3eb27a4dee5b761101913aa21ec147c803bccc4e878d7eae14731ac95e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/prelegalizer.mir",
+      "sha256": "ba7a30ed394b0bd7a2019d01a92c510aac607cf43f1df3bb2f3152011a07e5b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/run.log",
+      "sha256": "afdcce3db9feee5d9f02f3ac2956be3ab2aa0f14771e32c0ecfa346074d90bdd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/runs.json",
+      "sha256": "8ca9561d726f9487a742ec29fc5775b0352812212bedd517ed85376805af342f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/c-entry/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/input.map",
+      "sha256": "6a53fab73c6463676bed9065132fe7804a0e9b8a979c82e6e4336b59a606077c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/input.o",
+      "sha256": "a602c63d3b9873588bf05fa8499c8514a725a900eb66ec0a1d7e07827d0a2bfc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/input.sfc",
+      "sha256": "4d415ccbaec72984dbbbfa346438e66618254bb924265ed0479af4f5dd9331e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/input.sfc.elf",
+      "sha256": "96fd393586e807dfabbb96b9fddff4f04659384809886b335667483ba928357b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/legalized.mir",
+      "sha256": "06cb0c3eb27a4dee5b761101913aa21ec147c803bccc4e878d7eae14731ac95e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/prelegalizer.mir",
+      "sha256": "ba7a30ed394b0bd7a2019d01a92c510aac607cf43f1df3bb2f3152011a07e5b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/run.log",
+      "sha256": "6abb33a02f1c5bce56125ddfa281a834010d743e813c7861caa163a8b412e7e3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/runs.json",
+      "sha256": "3ab56bf644b520fbbc5202c9e618888b5121a8c5b822d6cf01e5b41bbd7b6fa9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/candidate/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/capture-build.log",
+      "sha256": "9b163646ff7b56e80f8282dee70cd78fa3a03e018eea6a7757f76427298d3f44"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/capture.py",
+      "sha256": "cb9345fdaa00e6496d16b093c2d637df5095e50ced728bf47cb2cc54e922d821"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/far-memset.ll",
+      "sha256": "58a83daa6827c2b026531127cbfd49f60fd1b315ba8b68951080964390ea5bd8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-a16-check.stderr",
+      "sha256": "209337b2440ef5ad702d243fd53e1938bdc8d948f64b26071d2123f44199395e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-a16-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-a16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-a16.stdout",
+      "sha256": "2acfa13b7dce879d60362cd8287097f865aff07e3ccdf33d50a5bde73ea360e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-xy16-check.stderr",
+      "sha256": "209337b2440ef5ad702d243fd53e1938bdc8d948f64b26071d2123f44199395e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-xy16-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-xy16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-baseline-xy16.stdout",
+      "sha256": "2acfa13b7dce879d60362cd8287097f865aff07e3ccdf33d50a5bde73ea360e7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-a16-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-a16-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-a16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-a16.stdout",
+      "sha256": "af72aa4ecb1ac0134cb7f358f9ac3f3750811b81f8d75ca3f1d965734f9a8a7e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-xy16-check.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-xy16-check.stdout",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-xy16.stderr",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/focused-candidate-xy16.stdout",
+      "sha256": "af72aa4ecb1ac0134cb7f358f9ac3f3750811b81f8d75ca3f1d965734f9a8a7e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/historical-commit.txt",
+      "sha256": "aed0f671305417dfde269e2790a111a9570bbd408dac82e8d13037861748ceb9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/identity.json",
+      "sha256": "3a1ec7ea5ad59380a98112e74f4c7051f01885f5b98c1f54fadeb492f7f3d446"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.map",
+      "sha256": "905c67281cf2a9695523ed9eaa571b125ed13be08f402047401e13b053e58e5a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.o",
+      "sha256": "9278ecd8d5e74e3a5a6e17002fb1cc1e0eb97e15423bf149c5f05f2ba6de049c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc",
+      "sha256": "23879a9879098d2d388f6cea32bdc9d0355887a0189e939b7298d3aebca6a1a8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/input.sfc.elf",
+      "sha256": "58fbf2dd79c9a44fef5726eff8cda312791383b70bb4fd0dd0a8c21475c82ab0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/legalized.mir",
+      "sha256": "2921129312c034f2ca35d0ea824442f929cba145e978498d31c9becc9cc74f14"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/physical-wram.bin",
+      "sha256": "ad7facb2586fc6e966c004d7d1d16b024f5805ff7cb47c7a85dabd8b48892ca7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/prelegalizer.mir",
+      "sha256": "8caaffc0ce0a5893ab7b221f58bb9832b3067cf78a265e6bb9d47a2dfd1a4a8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/run.log",
+      "sha256": "a89e1182cbb6b0b9ddf8c622aebb35825d9011fa732528b5fff917202a5bd033"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/runs.json",
+      "sha256": "d46cbd4b91df3f33907ed426ccfeab814b87eaaee99b9971ebe1a52ffc131f74"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/runtime.stdout",
+      "sha256": "00f7d407456c5a8f2b5b8daaab64094b7629817a0ac2e81c48d4798e3684340c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/c-entry.o",
+      "sha256": "544b275c28583b3249e418cadf9cb7ee2184375e19b27fa26dd63e0827fa571b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.i",
+      "sha256": "c9842892ec81f87694e441e55eba275f4b96dc12a4ee81e0b37eb5e2c02dc128"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+      "sha256": "e7e885ad88c0494e042953196ccbe9b9f1197aed8e9028d4e9b0682b2056321e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.map",
+      "sha256": "837cba32ac0471e894dd0c27024672927ba2c67175a2d4c99378b9018bd9b637"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.o",
+      "sha256": "828182e3d4ba83f355dd6441e0d466d8e8b161416ee6baaaddcfe35a468b2699"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.sfc",
+      "sha256": "d71ad3a1c6cd281dad6e7a5fa4c047b196a6de23dd29025dc00298b5b30c54eb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.sfc.elf",
+      "sha256": "be7acc8c9f0470e30e93a6c9ff5ddfaef537a54a4ef310cb7f4dce6d99775284"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/legalized.mir",
+      "sha256": "a0596e3115eaeae6fc9d0304a318eb6aa1ce02d54c64866eda1aa52acc9f3a1d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/prelegalizer.mir",
+      "sha256": "8caaffc0ce0a5893ab7b221f58bb9832b3067cf78a265e6bb9d47a2dfd1a4a8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/run.log",
+      "sha256": "2d1871ccb361e82cd730822ec89c20631f5e66d2f4d5add3cb095cf58b40eca8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/runs.json",
+      "sha256": "8dc889b10fc99a9f951720b11aa09477315fa96359546329b0086bc031a40fda"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/input.map",
+      "sha256": "bc027593b9e1d94fdb40100c02dc1b6d33032902943a803f4cb58488975aec0f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/input.o",
+      "sha256": "828182e3d4ba83f355dd6441e0d466d8e8b161416ee6baaaddcfe35a468b2699"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/input.sfc",
+      "sha256": "d71ad3a1c6cd281dad6e7a5fa4c047b196a6de23dd29025dc00298b5b30c54eb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/input.sfc.elf",
+      "sha256": "be7acc8c9f0470e30e93a6c9ff5ddfaef537a54a4ef310cb7f4dce6d99775284"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/legalized.mir",
+      "sha256": "a0596e3115eaeae6fc9d0304a318eb6aa1ce02d54c64866eda1aa52acc9f3a1d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/prelegalizer.mir",
+      "sha256": "8caaffc0ce0a5893ab7b221f58bb9832b3067cf78a265e6bb9d47a2dfd1a4a8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/run.log",
+      "sha256": "9566cddd01c2c32fe235123907faaa11f7db2d8a2358c7c9e4f7dcffae120e9b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/runs.json",
+      "sha256": "233a52af383879b11a57e1f1599e397b519e75e77e3930a9eb66b12f2de0f899"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-original.c.txt",
+      "sha256": "109cefb6a492c317deddab5f87defdecaebd920d7272eb48429aa766e9e64588"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/legalizer-with-0013.cpp.txt",
+      "sha256": "189c7021472286f4b5cf1d3c0c50dc09d3291a5c555cc151ae4a33843c8504af"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/legalizer-without-0013.cpp.txt",
+      "sha256": "36bf11208e8282651d20ae9dc7041d1a890785a988bd27afd7920308fb8b14d7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/original-report.md.txt",
+      "sha256": "fdf29b3b476dadd05971e71edc3081f91662895de69e5a032092164511706e61"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/original-source-commit.txt",
+      "sha256": "258d34c70a6a04887b306b3222e52591e037a47f18b88276868e6d85d95d1ed2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/original.c.txt",
+      "sha256": "0f35f308a85bd4a32378a6a5edbb35857b6ef02c4afe70ad904e437f61990a4a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/prior-dependencies.json",
+      "sha256": "d02b25a4296d5281148b9cfa0dc2f00f6866a957d69ce2c5b5b50d48f293470a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/prior-work-audit.json",
+      "sha256": "c50ac38cb95033d00c69b5a37df73d3118509344aca3b7ce0f294eafcfe4804b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/validate.py",
+      "sha256": "0b4d3675a0f824b114e77c8f1da2786cdd6ac2cb6c2455412631a94164473143"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/validation.json",
+      "sha256": "d98b7c0d6f8cf7cf55870a5f236d49da5ec0cff842db1a82c76b4b5e1304c4ef"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/c-entry.o",
+      "sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.i",
+      "sha256": "c9fb52e660a6390bc1ed302cf242b1eda6bc1f004037d88d8f2de8541a111142"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.ll",
+      "sha256": "b3690ea687cb308adb5a27f8cd5a92eea6b75a143777a982adb4bc5b189a9b9b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.map",
+      "sha256": "4123eeff53d3d8c83cb37a4f6a099b25bce31ffebb698c1a003636de04f28c14"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.o",
+      "sha256": "c7335fee830a1e4a09d5ef1ae12d166f5e16539b1f100c8aa4cf49f1dc461745"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.sfc",
+      "sha256": "d1186df75017faea3091871c048c3dc2a7a5b4611c5b422c448f1a2bcfa80aed"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.sfc.elf",
+      "sha256": "8099e47f216324019e229287b4fe43e8e11b1f5f39a26c23af640c76730d84e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/legalized.mir",
+      "sha256": "423ac9b8f7fb7b63f5e3934c3eff1a7a22c9681b8c3fe0d85ca42252694c6c8e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/prelegalizer.mir",
+      "sha256": "8cf2f307412ddbc6428beae89af7cfae1531c244c1de1708a79e4575c799efe0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/run.log",
+      "sha256": "b4c95972deb48e450f34bca60c5bbe5180be67d817eb1828d3b18811fb15de64"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/runs.json",
+      "sha256": "ee2ba57ac652e92b986030d583eb6acac91825a1cb998d71cfd52af450c6ba90"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-O2/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/c-entry.o",
+      "sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.i",
+      "sha256": "2acdaa49016e189402fe77de18c7f85e87b59c96c76ca2d4425a84937c2e3f31"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.ll",
+      "sha256": "723ec5c5736babbec6288cac2c57fde32f964ed4ce7fbb910e2873da903735cf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.map",
+      "sha256": "9d2f86c49f75c76d9e9bc90da1d86920087ee7be912b2bdf58282d4a53621826"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.o",
+      "sha256": "c7335fee830a1e4a09d5ef1ae12d166f5e16539b1f100c8aa4cf49f1dc461745"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.sfc",
+      "sha256": "d1186df75017faea3091871c048c3dc2a7a5b4611c5b422c448f1a2bcfa80aed"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.sfc.elf",
+      "sha256": "8099e47f216324019e229287b4fe43e8e11b1f5f39a26c23af640c76730d84e0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/legalized.mir",
+      "sha256": "65127a93da3095a3ee9020ee5ab0dc4fee9af43f5f63e49129340b7cb7703363"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/physical-wram.bin",
+      "sha256": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/prelegalizer.mir",
+      "sha256": "991e55cf0cb85ceea17c0affc92ff39fe063a0965c762ee8b8e0476defc62c0c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/run.log",
+      "sha256": "261c3b07ebd096063c1ef9707c6708ac910258219cf9b449be5132a1868a0bd1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/runs.json",
+      "sha256": "8263149e19de95b81684cfeff4653c953c12b95f2a5db9c98029fa845a6b7b9c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/xy16-Os/runtime.stdout",
+      "sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/tool-versions.txt",
+      "sha256": "916621633b0fe2c7c35381dfce32c8f0d5d8ed8ba9bd0b1f42d10af299b52972"
+    },
+    {
+      "path": "dev/check-far-memset.py",
+      "sha256": "6df164a4123095120f16f3443c6ae727a872248948ada10b3fca7d7c44015570"
+    },
+    {
+      "path": "patches/llvm-mos/0013-320-far-memops.patch",
+      "sha256": "c260942d57c00ee4ada175b207e64103c0f5278882addf1968aa58f5df6f14be"
+    }
+  ],
+  "baseline": {
+    "command": "python3 dev/check-far-memset.py --input docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll --clang build/defect-baselines/2026-09-26-far-memset/bin/clang --objdump build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump --sdk build/defect-baselines/2026-09-26-far-memset/sdk --emulator build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck --database build/defect-baselines/2026-09-26-far-memset/Database --llc build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013 --output docs/defects/evidence/2026-09-26-far-memset/june-baseline",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": "+mos-a16",
+      "optimization": "Os",
+      "backend_optimization": "O2",
+      "lto": false,
+      "entropy": 0,
+      "frames": 300,
+      "machine_verifier": true
+    },
+    "toolchain_location": "build/defect-baselines/2026-09-26-far-memset/bin/llc-without-0013; complete SDK, headers, source reconstruction, and hashes in docs/defects/evidence/2026-09-26-far-memset/identity.json",
+    "toolchain_sha256": "e39ec79bfa3c0fd76a6f99d65b8a1b7b79ba2ed3da7767220fdf7b695614aed8",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+      "sha256": "e7e885ad88c0494e042953196ccbe9b9f1197aed8e9028d4e9b0682b2056321e"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-baseline/run.log",
+      "sha256": "a89e1182cbb6b0b9ddf8c622aebb35825d9011fa732528b5fff917202a5bd033"
+    },
+    "exit_code": 1,
+    "failure_signature": "FAIL: physical WRAM $7E2000..$7E2FFF: 4096/4096 bytes differ from 0x42"
+  },
+  "resolution": {
+    "change": "a81874d89ffaac1c34b06cbb8539db9e4785c41b: existing patch 0013 and far runtime (implementation also folded into 0002)",
+    "causal_explanation": "A non-inlined AS2 G_MEMSET falls through the generic memory-libcall builder without 0013. Its near __memset callee takes a 16-bit destination, while the caller passes a far pointer. Patch 0013 names __memset_far and supplies its far pointer and 16-bit length ABI. The same retained backend input and identical prelegalizer MIR fail only without this change; physical WRAM confirms its runtime effect.",
+    "trigger_check": "The exact June C source emits llvm.memset.p2.i32 with destination 8265728, byte 66, length 4096. Both sides retain G_MEMSET with a p2 destination. The runner checks the fill call's relocation, target checksum, and all 4096 physical bytes independently on bsnes-jg. Focused constant/variable far and near IR checks also fail/pass on the isolated comparison in a16 and xy16.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+      "sha256": "e7e885ad88c0494e042953196ccbe9b9f1197aed8e9028d4e9b0682b2056321e"
+    },
+    "candidate": {
+      "command": "python3 dev/check-far-memset.py --input docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll --clang build/defect-baselines/2026-09-26-far-memset/bin/clang --objdump build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump --sdk build/defect-baselines/2026-09-26-far-memset/sdk --emulator build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck --database build/defect-baselines/2026-09-26-far-memset/Database --llc build/defect-baselines/2026-09-26-far-memset/bin/llc --output docs/defects/evidence/2026-09-26-far-memset/june-candidate",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": "+mos-a16",
+        "optimization": "Os",
+        "backend_optimization": "O2",
+        "lto": false,
+        "entropy": 0,
+        "frames": 300,
+        "machine_verifier": true
+      },
+      "toolchain_location": "build/defect-baselines/2026-09-26-far-memset/bin/llc; complete SDK, headers, source reconstruction, and hashes in docs/defects/evidence/2026-09-26-far-memset/identity.json",
+      "toolchain_sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-26-far-memset/june-c-entry/input.ll",
+        "sha256": "e7e885ad88c0494e042953196ccbe9b9f1197aed8e9028d4e9b0682b2056321e"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-26-far-memset/june-candidate/run.log",
+        "sha256": "9566cddd01c2c32fe235123907faaa11f7db2d8a2358c7c9e4f7dcffae120e9b"
+      },
+      "exit_code": 0
+    }
+  }
+}

@@ -1,0 +1,134 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 63571404f8ee..c4430bb145fa 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -46,6 +46,7 @@
+ #include "llvm/CodeGen/TargetInstrInfo.h"
+ #include "llvm/CodeGen/TargetOpcodes.h"
+ #include "llvm/CodeGen/TargetRegisterInfo.h"
++#include "llvm/IR/CallingConv.h"
+ #include "llvm/IR/InstrTypes.h"
+ #include "llvm/IR/Instructions.h"
+ #include "llvm/IR/Intrinsics.h"
+@@ -2774,6 +2775,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+   return true;
+ }
+ 
++// #320: does any *pointer* operand of a mem-op live in a far address space? The
++// operands are {dst, val|src, len, tail-imm}; the trailing tail-call imm is
++// skipped. AS_FarPacked never reaches a mem-op as the access pointer (it is
++// value-only and cast to AS_Far before any deref — see the G_LOAD/G_STORE comment
++// near the top of this file) but is matched defensively.
++static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,
++                                 const MachineInstr &MI) {
++  for (unsigned I = 0, E = MI.getNumOperands() - 1; I < E; ++I) {
++    const MachineOperand &MO = MI.getOperand(I);
++    if (!MO.isReg())
++      continue;
++    LLT Ty = MRI.getType(MO.getReg());
++    if (Ty.isPointer() && (Ty.getAddressSpace() == MOS::AS_Far ||
++                           Ty.getAddressSpace() == MOS::AS_FarPacked))
++      return true;
++  }
++  return false;
++}
++
++// #320: a far-aware mirror of LegalizerHelper::createMemLibcall. The generic
++// createMemLibcall would call the NEAR runtime (memcpy / __memset, a 16-bit
++// char*) while passing the 32-bit far pointer through the Imag32 far ABI — the
++// callee reads only the 16-bit offset, silently dropping the bank byte (a
++// wrong-bank access). Instead call the far runtime (__memset_far / __memcpy_far /
++// __memmove_far) and materialize every pointer arg as a far (addrspace 2) value:
++// any near/zp/packed pointer is widened with G_ADDRSPACE_CAST (near->far
++// zero-extends bank $00, correct under the DBR=0 model), so one far runtime
++// function per op covers far<-far, far<-near and near<-far in a single call.
++static bool createFarMemLibcall(LegalizerHelper &Helper,
++                                MachineRegisterInfo &MRI, MachineInstr &MI) {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  auto &Ctx = Builder.getMF().getFunction().getContext();
++  const LLT PF = LLT::pointer(MOS::AS_Far, 32);
++
++  unsigned Opc = MI.getOpcode();
++  const char *Callee;
++  switch (Opc) {
++  case MOS::G_MEMSET:
++    Callee = "__memset_far";
++    break;
++  case MOS::G_MEMCPY:
++    Callee = "__memcpy_far";
++    break;
++  case MOS::G_MEMMOVE:
++    Callee = "__memmove_far";
++    break;
++  default:
++    return false;
++  }
++  const bool IsSet = Opc == MOS::G_MEMSET;
++
++  // Build args by role. Operands are {dst, val|src, len, tail-imm}.
++  // A near/zp/packed pointer is widened to far (bank $00) so the runtime's far
++  // params match; a far pointer passes through unchanged.
++  auto asFar = [&](Register Reg) {
++    if (MRI.getType(Reg).getAddressSpace() != MOS::AS_Far)
++      Reg = Builder.buildAddrSpaceCast(PF, Reg).getReg(0);
++    return Reg;
++  };
++  Type *FarPtrTy = PointerType::get(Ctx, MOS::AS_Far);
++
++  SmallVector<CallLowering::ArgInfo, 3> Args;
++  // arg 0: destination pointer.
++  Args.push_back({asFar(MI.getOperand(0).getReg()), FarPtrTy, 0});
++  if (IsSet) {
++    // arg 1: fill byte (i8, matching __memset's `char` value).
++    Register Val = MI.getOperand(1).getReg();
++    Args.push_back(
++        {Val, IntegerType::get(Ctx, MRI.getType(Val).getSizeInBits()), 1});
++  } else {
++    // arg 1: source pointer.
++    Args.push_back({asFar(MI.getOperand(1).getReg()), FarPtrTy, 1});
++  }
++  // arg 2: length, coerced to size_t (16-bit on MOS). The loop-idiom recognizer
++  // forms a far memset with a 32-bit length (the far index width); narrow it so
++  // the ABI exactly matches the runtime's size_t parameter rather than relying on
++  // low-word register placement. The value always fits (size_t <= 0xFFFF).
++  Register Len = MI.getOperand(2).getReg();
++  unsigned LenBits = MRI.getType(Len).getSizeInBits();
++  if (LenBits > 16)
++    Len = Builder.buildTrunc(LLT::scalar(16), Len).getReg(0);
++  else if (LenBits < 16)
++    Len = Builder.buildZExt(LLT::scalar(16), Len).getReg(0);
++  Args.push_back({Len, IntegerType::get(Ctx, 16), 2});
++
++  auto &CLI = *Builder.getMF().getSubtarget().getCallLowering();
++  CallLowering::CallLoweringInfo Info;
++  Info.CallConv = CallingConv::C; // CC_MOS; the addrspace-2 args select Imag32.
++  Info.Callee = MachineOperand::CreateES(Callee);
++  Info.OrigRet = CallLowering::ArgInfo({0}, Type::getVoidTy(Ctx), 0);
++  // The far runtime returns void; nothing consumes a return, so there is no tail
++  // call and no "returned" arg coupling (unlike the near createMemLibcall).
++  Info.IsTailCall = false;
++  llvm::append_range(Info.OrigArgs, Args);
++  if (!CLI.lowerCall(Builder, Info))
++    return false;
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI, MachineInstr &MI,
+                                      LostDebugLocObserver &LocObserver) const {
+@@ -2819,6 +2920,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+     return true;
+   }
+ 
++  // #320: the inline path above already lowers a far memop correctly (per-byte
++  // far G_STOREs) for a constant size <= SizeLimit. When it bails (variable size,
++  // or constant size over the limit) we must NOT fall into the generic
++  // createMemLibcall: it calls the NEAR runtime with the far pointer, dropping the
++  // bank byte -> silent wrong-bank access. Route far memops to the far runtime.
++  if (anyFarPointerOperand(MRI, MI))
++    return createFarMemLibcall(Helper, MRI, MI);
++
+   // Try emitting a libcall.
+   Result = Helper.createMemLibcall(MRI, MI, LocObserver);
+   if (Result == LegalizerHelper::Legalized) {

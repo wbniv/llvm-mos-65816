@@ -1,0 +1,1 @@
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/c-entry/input.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x7739 complement=0x88C6

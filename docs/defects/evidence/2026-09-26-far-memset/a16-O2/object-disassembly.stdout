@@ -1,0 +1,82 @@
+
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/a16-O2/input.o:	file format elf32-mos
+
+Disassembly of section .text:
+
+00000000 <main>:
+       0: a2 00        	ldx	#$0
+       2: 86 00        	stx	$0                      ; 0x0 <main>
+			00000003:  R_MOS_ADDR8	__rc4
+       4: a2 20        	ldx	#$20
+       6: 86 00        	stx	$0                      ; 0x0 <main>
+			00000007:  R_MOS_ADDR8	__rc5
+       8: a2 7e        	ldx	#$7e
+       a: 86 00        	stx	$0                      ; 0x0 <main>
+			0000000b:  R_MOS_ADDR8	__rc6
+       c: a2 00        	ldx	#$0
+       e: 86 00        	stx	$0                      ; 0x0 <main>
+			0000000f:  R_MOS_ADDR8	__rc7
+      10: a2 10        	ldx	#$10
+      12: a9 42        	lda	#$42
+      14: 86 00        	stx	$0                      ; 0x0 <main>
+			00000015:  R_MOS_ADDR8	__rc2
+      16: a2 00        	ldx	#$0
+      18: 20 00 00     	jsr	$0 <main>
+			00000019:  R_MOS_ADDR16	__memset_far
+      1b: 64 00        	stz	$0                      ; 0x0 <main>
+			0000001c:  R_MOS_ADDR8	__rc2
+      1d: 64 00        	stz	$0                      ; 0x0 <main>
+			0000001e:  R_MOS_ADDR8	__rc3
+      1f: 64 00        	stz	$0                      ; 0x0 <main>
+			00000020:  R_MOS_ADDR8	__rc4
+      21: 64 00        	stz	$0                      ; 0x0 <main>
+			00000022:  R_MOS_ADDR8	__rc5
+      23: a2 00        	ldx	#$0
+      25: 64 00        	stz	$0                      ; 0x0 <main>
+			00000026:  R_MOS_ADDR8	__rc7
+      27: e2 20        	sep	#$20
+      29: a9 00        	lda	#$0
+      2b: 18           	clc
+      2c: 65 00        	adc	$0                      ; 0x0 <main>
+			0000002d:  R_MOS_ADDR8	__rc2
+      2e: 85 00        	sta	$0                      ; 0x0 <main>
+			0000002f:  R_MOS_ADDR8	__rc8
+      30: a9 20        	lda	#$20
+      32: 65 00        	adc	$0                      ; 0x0 <main>
+			00000033:  R_MOS_ADDR8	__rc3
+      34: 85 00        	sta	$0                      ; 0x0 <main>
+			00000035:  R_MOS_ADDR8	__rc9
+      36: a9 7e        	lda	#$7e
+      38: 69 00        	adc	#$0
+      3a: 85 00        	sta	$0                      ; 0x0 <main>
+			0000003b:  R_MOS_ADDR8	__rc10
+      3c: a9 00        	lda	#$0
+      3e: 69 00        	adc	#$0
+      40: 85 00        	sta	$0                      ; 0x0 <main>
+			00000041:  R_MOS_ADDR8	__rc11
+      42: a7 00        	lda	[$0]                    ; 0x0 <main>
+			00000043:  R_MOS_ADDR8	__rc8
+      44: 85 00        	sta	$0                      ; 0x0 <main>
+			00000045:  R_MOS_ADDR8	__rc6
+      46: c2 20        	rep	#$20
+      48: a5 00        	lda	$0                      ; 0x0 <main>
+			00000049:  R_MOS_ADDR8	__rc4
+      4a: 18           	clc
+      4b: 65 00        	adc	$0                      ; 0x0 <main>
+			0000004c:  R_MOS_ADDR8	__rc6
+      4d: 85 00        	sta	$0                      ; 0x0 <main>
+			0000004e:  R_MOS_ADDR8	__rc4
+      4f: a5 00        	lda	$0                      ; 0x0 <main>
+			00000050:  R_MOS_ADDR8	__rc2
+      51: 1a           	inc
+      52: 85 00        	sta	$0                      ; 0x0 <main>
+			00000053:  R_MOS_ADDR8	__rc2
+      54: c9 00 10     	cmp	#$1000
+      57: d0 ce        	bne	$27 <main+0x27>
+      59: a5 00        	lda	$0                      ; 0x0 <main>
+			0000005a:  R_MOS_ADDR8	__rc4
+      5b: 8d 00 00     	sta	$0                      ; 0x0 <main>
+			0000005c:  R_MOS_ADDR16	corpus_result
+      5e: e2 20        	sep	#$20
+      60: cb           	wai
+      61: 80 fd        	bra	$60 <main+0x60>

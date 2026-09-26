@@ -21,7 +21,43 @@ metadata for the work being credited; do not substitute current defaults or copy
 another agent's attribution. If a detail cannot be recovered, mark it unknown
 instead of guessing. Preserve earlier contributors' recorded credits.
 
+# Document dependencies
+
+Follow [the document dependency workflow](docs/howto-document-dependencies.md)
+for all documentation work. Before finishing a document change, run
+`python3 dev/docs-deps.py --impact <changed-source>` and review the affected
+current summaries, plans, PR drafts, previews, and follow-up records. Register
+new generated views and maintained summaries in `docs/document-dependencies.json`.
+Regenerate derivatives, record substantive summary reviews, and refresh the
+inventory. Preserve dated evidence and earlier attribution; do not silently
+rewrite historical records to match a current result.
+
+The pre-commit hook runs `python3 dev/docs-deps.py --staged`. Stage the sources,
+dependent outputs, review receipts, and inventory together. Do not acknowledge
+an unreviewed document just to clear a stale-dependency check.
+
 # Defect evidence and closure
+
+Before treating a compiler failure as new or starting a fix, reconcile prior work:
+search structured defects, original reports and follow-up plans, TODO/upstream
+summaries, Git history, standalone patches, and the live compiler source. Search
+both the symptom and the responsible operation/pass/runtime symbol. A standalone
+patch may already be folded into `0002`; inspect its implementation and identify
+the tested binary instead of relying on patch names or an old "open" status.
+Record the reconciliation in `prior_work` as specified by the workflow below.
+
+Use one canonical defect record per causal defect. A repeat sighting, another
+input, or another build belongs in that record's observations/additional runs;
+do not open a duplicate to preserve a new baseline. Keep earlier baselines
+immutable. A separate record requires an explicit explanation of the distinct
+mechanism or contract. Migrating an unstructured historical report into its first
+structured record is not a new discovery. If an existing patch appears relevant,
+test that hypothesis and qualify unknowns before claiming new work or a fix.
+
+When resolving a report, update its original entry point as well as the canonical
+record and dependent current summaries. Label retained historical status text as
+dated evidence and link it to current status. Do not leave an unqualified "open"
+or "fix not attempted" heading on a report whose repair is established elsewhere.
 
 Follow [the defect evidence workflow](docs/howto-defect-evidence.md). A passing
 reproduction attempt means **not reproduced on that build**, not fixed or invalid.

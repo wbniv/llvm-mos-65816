@@ -22,7 +22,8 @@ class EvidenceTests(unittest.TestCase):
     def setUp(self):
         self.files = {'report.md': b'investigation', 'repro.ll': b'input',
                       'red.log': b'error: undefined register\n',
-                      'green.log': b'PASS\n', 'changed.ll': b'different input'}
+                      'green.log': b'PASS\n', 'changed.ll': b'different input',
+                      'prior-work.txt': b'Searched records, reports, patches, and source; no related defect.\n'}
 
         def artifact(path):
             return {'path': path, 'sha256': hashlib.sha256(self.files[path]).hexdigest()}
@@ -43,12 +44,95 @@ class EvidenceTests(unittest.TestCase):
                            resolution=dict(change='patch-id', causal_explanation='Preserve the lane definition.',
                                            trigger_check='The physical read remains in the regression.',
                                            regression=artifact('repro.ll'), candidate=candidate))
+        self.record['prior_work'] = dict(
+            disposition='new_defect', search_terms=['undefined register', 'lane definition'],
+            related_records=[], related_reports=[], related_changes=[],
+            source_assessment='The inspected definition-erasure path lacks the proposed preservation.',
+            binary_assessment='The archived comparison is built from the recorded source.',
+            decision='No canonical record or existing repair matches this mechanism.',
+            evidence=artifact('prior-work.txt'))
 
     def check(self, previous=None):
         evidence.validate(self.record, self.files.__getitem__, previous)
 
     def test_complete_fixed_record(self):
         self.check()
+
+    def test_new_record_requires_prior_work(self):
+        del self.record['prior_work']
+        with self.assertRaisesRegex(ValueError, 'require a prior_work audit'):
+            self.check()
+
+    def test_committed_new_record_still_requires_prior_work(self):
+        del self.record['prior_work']
+        with self.assertRaisesRegex(ValueError, 'require a prior_work audit'):
+            self.check(copy.deepcopy(self.record))
+
+    def test_legacy_record_does_not_require_fabricated_audit(self):
+        self.record['id'] = 'bitboard-inline-register-pressure'
+        del self.record['prior_work']
+        self.check()
+
+    def test_committed_audit_cannot_be_removed(self):
+        self.record['id'] = 'bitboard-inline-register-pressure'
+        previous = copy.deepcopy(self.record)
+        del self.record['prior_work']
+        with self.assertRaisesRegex(ValueError, 'preserve the committed prior-work audit'):
+            self.check(previous)
+
+    def test_duplicate_disposition_requires_existing_record(self):
+        self.record['prior_work']['disposition'] = 'duplicate'
+        with self.assertRaisesRegex(ValueError, 'extend the canonical record'):
+            self.check()
+
+    def test_historical_migration_requires_original_report(self):
+        self.record['prior_work']['disposition'] = 'historical_migration'
+        with self.assertRaisesRegex(ValueError, 'needs the existing report'):
+            self.check()
+        self.record['prior_work']['related_reports'] = ['report.md']
+        self.check()
+
+    def test_distinct_defect_needs_canonical_reference_and_decision(self):
+        audit = self.record['prior_work']
+        audit['disposition'] = 'distinct_from_related'
+        with self.assertRaisesRegex(ValueError, 'needs a related canonical record'):
+            self.check()
+        audit['related_records'] = ['docs/defects/other.json']
+        self.files['docs/defects/other.json'] = b'{"id":"other"}'
+        self.check()
+        audit['decision'] = ''
+        with self.assertRaisesRegex(ValueError, 'needs decision'):
+            self.check()
+
+    def test_related_defect_cannot_be_called_unrelated_new_discovery(self):
+        self.record['prior_work']['related_records'] = ['docs/defects/other.json']
+        with self.assertRaisesRegex(ValueError, 'explicit distinct_from_related decision'):
+            self.check()
+
+    def test_related_report_must_exist(self):
+        self.record['prior_work']['related_reports'] = ['missing.md']
+        with self.assertRaises(KeyError):
+            self.check()
+
+    def test_related_report_cannot_leave_repository(self):
+        self.record['prior_work']['related_reports'] = ['../elsewhere.md']
+        with self.assertRaisesRegex(ValueError, 'must stay inside the repo'):
+            self.check()
+
+    def test_audit_hash_is_verified(self):
+        self.files['prior-work.txt'] = b'changed assessment'
+        with self.assertRaisesRegex(ValueError, 'artifact hash mismatch'):
+            self.check()
+
+    def test_source_and_binary_assessments_are_required(self):
+        for field in ['search_terms', 'source_assessment', 'binary_assessment']:
+            with self.subTest(field=field):
+                audit = self.record['prior_work']
+                saved = audit[field]
+                audit[field] = [] if field == 'search_terms' else ''
+                with self.assertRaises(ValueError):
+                    self.check()
+                audit[field] = saved
 
     def test_fixed_without_red_baseline(self):
         del self.record['baseline']
@@ -124,6 +208,27 @@ class EvidenceTests(unittest.TestCase):
                                      capture_output=True, text=True)
             self.assertNotEqual(working.returncode, 0)
             self.assertIn('artifact hash mismatch', working.stderr)
+
+    def test_unstaged_audit_cannot_certify_new_staged_record(self):
+        with tempfile.TemporaryDirectory(prefix='defect-triage-test-') as directory:
+            root = Path(directory)
+            subprocess.run(['git', 'init', '-q', str(root)], check=True)
+            for path, data in self.files.items():
+                (root / path).write_bytes(data)
+            record_path = root / 'docs/defects/test.json'
+            record_path.parent.mkdir(parents=True)
+            incomplete = copy.deepcopy(self.record)
+            del incomplete['prior_work']
+            record_path.write_text(json.dumps(incomplete))
+            subprocess.run(['git', '-C', str(root), 'add', '.'], check=True)
+            record_path.write_text(json.dumps(self.record))
+            staged = subprocess.run([sys.executable, str(CHECKER), '--staged'], cwd=root,
+                                    capture_output=True, text=True)
+            self.assertNotEqual(staged.returncode, 0)
+            self.assertIn('require a prior_work audit', staged.stderr)
+            working = subprocess.run([sys.executable, str(CHECKER), '--worktree'], cwd=root,
+                                     capture_output=True, text=True)
+            self.assertEqual(working.returncode, 0, working.stderr)
 
 
 if __name__ == '__main__':

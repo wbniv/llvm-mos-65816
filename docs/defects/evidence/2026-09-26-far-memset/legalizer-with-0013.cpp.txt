@@ -1,0 +1,4042 @@
+//===-- MOSLegalizerInfo.cpp - MOS Legalizer-------------------------------===//
+//
+// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the interface that MOS uses to legalize generic MIR.
+//
+// Broadly only 8-bit integers and pointers are legal. It's legal to extract a
+// 16-bit integer out of a pointer or to convert a 16-bit integer into one. The
+// 16-bit integers must be lowered to a pair of 8-bit values for further
+// manipulation, but they can be copied around and G_PHIed and so forth as-is.
+//
+//===----------------------------------------------------------------------===//
+
+#include "MOSLegalizerInfo.h"
+
+#include "MCTargetDesc/MOSMCTargetDesc.h"
+#include "MOSFrameLowering.h"
+#include "MOSInstrInfo.h"
+#include "MOSMachineFunctionInfo.h"
+#include "MOSRegisterInfo.h"
+#include "MOSSubtarget.h"
+
+#include "llvm/ADT/STLExtras.h"
+#include "llvm/ADT/SmallSet.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
+#include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
+#include "llvm/CodeGen/GlobalISel/LostDebugLocObserver.h"
+#include "llvm/CodeGen/GlobalISel/MIPatternMatch.h"
+#include "llvm/CodeGen/GlobalISel/MachineIRBuilder.h"
+#include "llvm/CodeGen/GlobalISel/Utils.h"
+#include "llvm/CodeGen/MachineFrameInfo.h"
+#include "llvm/CodeGen/MachineFunction.h"
+#include "llvm/CodeGen/MachineInstr.h"
+#include "llvm/CodeGen/MachineJumpTableInfo.h"
+#include "llvm/CodeGen/MachineMemOperand.h"
+#include "llvm/CodeGen/MachineOperand.h"
+#include "llvm/CodeGen/MachineRegisterInfo.h"
+#include "llvm/CodeGen/PseudoSourceValue.h"
+#include "llvm/CodeGen/Register.h"
+#include "llvm/CodeGen/RegisterBankInfo.h"
+#include "llvm/CodeGen/TargetInstrInfo.h"
+#include "llvm/CodeGen/TargetOpcodes.h"
+#include "llvm/CodeGen/TargetRegisterInfo.h"
+#include "llvm/IR/CallingConv.h"
+#include "llvm/IR/InstrTypes.h"
+#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Intrinsics.h"
+#include "llvm/IR/RuntimeLibcalls.h"
+#include "llvm/Support/ErrorHandling.h"
+#include "llvm/Support/MathExtras.h"
+
+using namespace llvm;
+using namespace TargetOpcode;
+using namespace MIPatternMatch;
+
+MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+  using namespace LegalityPredicates;
+  using namespace LegalizeMutations;
+
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+  LLT S16 = LLT::scalar(16);
+  LLT S32 = LLT::scalar(32);
+  LLT S64 = LLT::scalar(64);
+  LLT P = LLT::pointer(0, 16);
+  LLT PZ = LLT::pointer(1, 8);
+  // #320: 65816 "far" pointer — addrspace 2, 32-bit (low 24 bits are the
+  // 65816 long address; LLVM requires power-of-two pointer sizes). Legal only
+  // where it appears; far load/store select to absolute-long addressing.
+  LLT PF = LLT::pointer(2, 32);
+  // #320 packed-24: AS_FarPacked (addrspace 3) — the 3-byte STORAGE form of a far
+  // pointer (datalayout p3:24:8). Memory-only: a PFP value is converted to/from the
+  // 32-bit far pointer (PF) at the load/store/addrspacecast boundary via a 3x s8 <->
+  // p3 merge/unmerge bridge (the artifact combiner folds the bridge so no 24-bit
+  // value ever stands alone — there is no MVT::i24 / 24-bit register class).
+  LLT PFP = LLT::pointer(3, 24);
+
+  // Constants
+
+  getActionDefinitionsBuilder(G_CONSTANT)
+      .legalFor({S1, S8, P, PZ})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  getActionDefinitionsBuilder(G_IMPLICIT_DEF).scalarize(0)
+      .legalFor({S1, S8, P, PZ})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  getActionDefinitionsBuilder({G_GLOBAL_VALUE, G_FRAME_INDEX, G_BLOCK_ADDR})
+      .legalFor({P, PZ, PF})
+      .unsupported();
+
+  // Integer Extension and Truncation
+
+  // #321 a16: under +mos-a16 an s32 (long/int32_t) is represented as 2x s16 — s16 is a
+  // legal type, so wide ops narrow to s16 (not s8), and the s32<->s16 ext/trunc/(un)merge
+  // glue mirrors the default path's s16<->s8. All additions gated on hasAccum16() so
+  // default codegen is byte-for-byte untouched. (NB: G_ZEXT stays maxScalar(0, S8) — it
+  // narrows zext through bytes for BOTH widths; raising it to S16 broke plain s8->s16 zext.)
+  {
+    auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor({{S16, S8}});
+    if (STI.hasAccum16())
+      B.legalFor({{S32, S16}, {S32, S8}})
+          .customFor({{S64, S8}, {S64, S16}, {S64, S32}});
+    // Native-width s64 extensions and sources without a native lane
+    // decomposition lower through ZEXT. ANYEXT permits zero-filled high bits.
+    B.customIf([](const LegalityQuery &Q) {
+       unsigned SrcBits = Q.Types[1].getSizeInBits();
+       return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
+     }).unsupported();
+  }
+  {
+    auto &B = getActionDefinitionsBuilder(G_TRUNC).scalarize(0)
+                  .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
+    if (STI.hasAccum16())
+      B.legalFor({{S16, S32}});
+    B.unsupported();
+  }
+
+  getActionDefinitionsBuilder(G_SEXT).scalarize(0).custom();
+
+  getActionDefinitionsBuilder(G_SEXT_INREG).lower();
+
+  getActionDefinitionsBuilder(G_ZEXT).scalarize(0)
+      .customIf(typeIs(1, S1))
+      .maxScalar(0, S8)
+      .unsupported();
+
+  // Type Conversions
+
+  // #320 far runtime: a 32-bit far pointer (PF) round-trips to/from an s32
+  // (the cast that creates a runtime far pointer, and the integer view used by
+  // far-pointer arithmetic). Selected as a COPY, same as the near forms.
+  getActionDefinitionsBuilder(G_INTTOPTR)
+      .legalFor({{P, S16}, {PZ, S8}, {PF, S32}})
+      .scalarSameSizeAs(1, 0)
+      .unsupported();
+  getActionDefinitionsBuilder(G_PTRTOINT)
+      .legalFor({{S16, P}, {S8, PZ}, {S32, PF}})
+      .scalarSameSizeAs(0, 1)
+      .unsupported();
+  // #320 far runtime: near->far (AS0->AS2) zero-extends the 16-bit near pointer
+  // to the 32-bit far pointer (bank byte $00); handled in legalizeAddrSpaceCast.
+  getActionDefinitionsBuilder(G_ADDRSPACE_CAST)
+      .customForCartesianProduct({P, PZ, PF, PFP})
+      .unsupported();
+
+  // Vector bitcasts lower through element extraction and scalar merge/unmerge.
+  getActionDefinitionsBuilder(G_BITCAST)
+      .lowerIf(LegalityPredicates::any(isVector(0), isVector(1)))
+      .unsupported();
+
+  // Scalar Operations
+
+  // Constant element indices lower to unmerges; variable indices use a stack
+  // temporary. Shuffles lower to constant-index extracts and inserts.
+  getActionDefinitionsBuilder({G_EXTRACT_VECTOR_ELT, G_INSERT_VECTOR_ELT})
+      .lower();
+  getActionDefinitionsBuilder(G_SHUFFLE_VECTOR).lower();
+
+  getActionDefinitionsBuilder({G_EXTRACT, G_INSERT}).lower();
+
+  // #321 a16: s32<->2x s16 (un)merge is the glue for the 2x s16 representation of s32
+  // (see the ext/trunc note above), mirroring the default s16<->s8 (un)merge.
+  {
+    auto &B = getActionDefinitionsBuilder(G_MERGE_VALUES)
+                  .legalForCartesianProduct({S16, P}, {S8, PZ});
+    if (STI.hasAccum16())
+      // {S32,S16} 2x s16->s32 is the direct legal form; {S32,S8} is a 4x s8->s32
+      // merge (e.g. an i8->i32 sext the artifact combiner couldn't fold) that the
+      // 2-source selectMergeValues can't take — custom-rewrite it into the legal
+      // 2-level form (see legalizeMergeS32FromBytes).
+      // {S64,S32} 2x s32->s64 is the direct legal form; {S64,S16} is a 4x s16->s64
+      // merge that the 2-source selector can't take — custom-rewrite to the 2-level
+      // form (see legalizeMergeS64FromWords). Mirror of the s32 case, one level up.
+      B.legalFor({{S32, S16}, {S64, S32}}).customFor({{S32, S8}, {S64, S16}});
+    B.unsupported();
+  }
+  {
+    auto &B = getActionDefinitionsBuilder(G_UNMERGE_VALUES)
+                  .legalForCartesianProduct({S8, PZ}, {S16, P});
+    if (STI.hasAccum16())
+      // {S16,S32} 2x s16<-s32 is the direct legal form; {S8,S32} is a 4x s8<-s32
+      // unmerge (e.g. the byte split inside an s32 ±1 add or an s32 shift>=8) that
+      // the 2-dest selectUnmergeValues can't take — custom-rewrite it into the legal
+      // 2-level form (see legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
+      // {S32,S64} 2x s32<-s64 is the direct legal form; {S16,S64} is a 4x s16<-s64
+      // unmerge (e.g. splitting a 64-bit value into 16-bit lanes) — custom-rewrite to
+      // the 2-level form (see legalizeUnmergeS64ToWords). Mirror of the s32 case.
+      B.legalFor({{S16, S32}, {S32, S64}}).customFor({{S8, S32}, {S16, S64}});
+    B.unsupported();
+  }
+
+  getActionDefinitionsBuilder(G_BSWAP).scalarize(0)
+      .customFor({S8})
+      .unsupportedIf(scalarNarrowerThan(0, 8))
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  getActionDefinitionsBuilder(G_BITREVERSE).scalarize(0).lower();
+
+  // Integer Operations
+
+  getActionDefinitionsBuilder({G_ADD, G_SUB}).scalarize(0)
+      .legalFor({S8})
+      .widenScalarToNextMultipleOf(0, 8)
+      .custom();
+
+  // #321 Increment 1d-retry: under +mos-a16, s16 bitwise stays native (legal,
+  // selected by selectAlu16Native into an Imag16 pair) instead of narrowing to
+  // S8; larger scalars clamp to S16. Gated on hasAccum16 so default codegen is
+  // untouched. The 1b combiner still fast-paths all-global `g = a & b` shapes.
+  const LLT MaxBitwise = STI.hasAccum16() ? S16 : S8;
+  {
+    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).scalarize(0).legalFor({S8});
+    if (STI.hasAccum16())
+      B.legalFor({S16});
+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
+  }
+
+  {
+    auto &B = getActionDefinitionsBuilder(G_XOR).scalarize(0).legalFor({S8}).customFor({S1});
+    if (STI.hasAccum16())
+      B.legalFor({S16});
+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
+  }
+
+  getActionDefinitionsBuilder(G_MUL).scalarize(0)
+      .libcallFor({S8, S16, S32, S64})
+      .widenScalarToNextPow2(0)
+      // Multiplications can only be narrowed to sizes where a multiplication of
+      // double that size is legal, since that's the lowered algorithm invokes
+      // such multiplications. Lowering S128 to S64 would produce infinite
+      // regress because of this, so instead it's lowered to S32.
+      .clampScalar(0, S8, S32)
+      .unsupported();
+
+  getActionDefinitionsBuilder({G_SDIV, G_SREM, G_UDIV, G_UREM}).scalarize(0)
+      .clampScalar(0, S8, S64)
+      .widenScalarToNextPow2(0)
+      .libcall();
+
+  getActionDefinitionsBuilder({G_SDIVREM, G_UDIVREM}).scalarize(0)
+      .customFor({S8, S16, S32, S64})
+      .lower();
+
+  getActionDefinitionsBuilder(
+      {G_SADDSAT, G_UADDSAT, G_SSUBSAT, G_USUBSAT, G_SSHLSAT, G_USHLSAT}).scalarize(0)
+      .lower();
+
+  getActionDefinitionsBuilder({G_LSHR, G_SHL, G_ASHR}).scalarize(0)
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(1, S8)
+      .custom();
+
+  getActionDefinitionsBuilder({G_ROTL, G_ROTR}).scalarize(0)
+      .lowerIf([](const LegalityQuery &Query) {
+        assert(Query.Types[0].isScalar());
+        return !Query.Types[0].isByteSized();
+      })
+      .custom();
+
+  getActionDefinitionsBuilder(G_ICMP).scalarize(0)
+      .customFor({{S1, P}, {S1, S8}})
+      .widenScalarToNextMultipleOf(1, 8)
+      .custom();
+
+  getActionDefinitionsBuilder(G_SELECT).scalarize(0)
+      .customFor({P, PZ})
+      .legalFor({S1, S8})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  // #320 far runtime: {PF,S32} adds an integer offset to a 32-bit far pointer;
+  // the 32-bit add carries through the bank byte across a 64 KB boundary.
+  getActionDefinitionsBuilder(G_PTR_ADD)
+      .customFor({{P, S16}, {PZ, S8}, {PF, S32}})
+      .scalarSameSizeAs(1, 0)
+      .unsupported();
+  getActionDefinitionsBuilder(G_PTRMASK)
+      .customFor({{P, S16}, {PZ, S8}})
+      .scalarSameSizeAs(1, 0)
+      .unsupported();
+
+  getActionDefinitionsBuilder({G_SMIN, G_SMAX, G_UMIN, G_UMAX}).scalarize(0).lower();
+
+  // Three-way compares (llvm.scmp/ucmp — the C `(a>b)-(a<b)` spaceship idiom and libc-style
+  // comparators) have no native form on the 6502/65816; lower them to icmp+select primitives the
+  // backend already legalizes (LegalizerHelper::lowerThreewayCompare). Without this the backend
+  // aborts with "unable to legalize G_SCMP" on any qsort-style comparator. Not accum-specific —
+  // it fires at every width and in default/+mos-a16/+mos-xy16 alike.
+  getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();
+
+  getActionDefinitionsBuilder(G_ABS).scalarize(0).custom();
+
+  // Odd operations are handled via even ones: 6502 has only ADC/SBC.
+  getActionDefinitionsBuilder({G_UADDO, G_SADDO, G_USUBO, G_SSUBO}).scalarize(0)
+      .customFor({S8})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+  getActionDefinitionsBuilder({G_SMULO, G_UMULO}).scalarize(0).lower();
+  getActionDefinitionsBuilder({G_UADDE, G_SADDE}).scalarize(0)
+      .legalFor({S8})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+  getActionDefinitionsBuilder({G_USUBE, G_SSUBE}).scalarize(0)
+      .customFor({S8})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+  getActionDefinitionsBuilder({G_UMULH, G_SMULH}).scalarize(0).lower();
+
+  // WARNING: The default lowering of funnel shifts is terrible. Luckily, they
+  // appear to mostly be rotations, which are combined away and handled
+  // separately.
+  getActionDefinitionsBuilder({G_FSHL, G_FSHR}).scalarize(0).lower();
+
+  getActionDefinitionsBuilder(
+      {G_CTLZ, G_CTTZ, G_CTPOP, G_CTLZ_ZERO_UNDEF, G_CTTZ_ZERO_UNDEF}).scalarize(0)
+      .lower();
+
+  // Floating Point Operations
+
+  getActionDefinitionsBuilder({G_FADD,
+                               G_FSUB,
+                               G_FMUL,
+                               G_FDIV,
+                               G_FMA,
+                               G_FREM,
+                               G_FPOW,
+                               G_FEXP,
+                               G_FEXP2,
+                               G_FEXP10,
+                               G_FLOG,
+                               G_FLOG2,
+                               G_FLOG10,
+                               G_FMINNUM,
+                               G_FMAXNUM,
+                               G_FMINIMUM,
+                               G_FMAXIMUM,
+                               G_FMINIMUMNUM,
+                               G_FMAXIMUMNUM,
+                               G_FCEIL,
+                               G_FCOS,
+                               G_FSIN,
+                               G_FTAN,
+                               G_FACOS,
+                               G_FASIN,
+                               G_FATAN,
+                               G_FATAN2,
+                               G_FCOSH,
+                               G_FSINH,
+                               G_FTANH,
+                               G_FSQRT,
+                               G_FFLOOR,
+                               G_FRINT,
+                               G_FNEARBYINT,
+                               G_INTRINSIC_ROUND,
+                               G_INTRINSIC_TRUNC,
+                               G_INTRINSIC_ROUNDEVEN,
+                               G_FSINCOS})
+      .scalarize(0)
+      .libcallFor({S32, S64})
+      .unsupported();
+
+  // TODO: G_FFREXP needs custom libcall lowering with output pointer
+  // (no generic LegalizerHelper support). Will fail if encountered.
+
+  getActionDefinitionsBuilder(G_FABS).custom();
+
+  getActionDefinitionsBuilder({G_FCOPYSIGN, G_IS_FPCLASS}).lower();
+
+  getActionDefinitionsBuilder(G_FCANONICALIZE).custom();
+
+  getActionDefinitionsBuilder(G_FPEXT).libcallFor({{S64, S32}});
+  getActionDefinitionsBuilder(G_FPTRUNC).libcallFor({{S32, S64}});
+
+  getActionDefinitionsBuilder(G_FCONSTANT).customFor({S32, S64});
+
+  setFCmpLibcallsGNU();
+
+  getActionDefinitionsBuilder(G_FCMP).customForCartesianProduct({S1},
+                                                                {S32, S64});
+
+  getActionDefinitionsBuilder({G_FPTOSI, G_FPTOUI})
+      .libcallForCartesianProduct({S32, S64}, {S32, S64})
+      .minScalar(0, S32);
+
+  getActionDefinitionsBuilder({G_SITOFP, G_UITOFP})
+      .libcallForCartesianProduct({S32, S64}, {S32, S64})
+      .minScalar(1, S32);
+
+  // Memory Operations
+
+  {
+    // Convert to int to load/store; that way the operation can be narrowed to
+    // 8 bits. Once 8-bit, select an addressing mode to replace the generic
+    // G_LOAD and G_STORE. PF (far) pointers select to absolute-long. (#320)
+    // #321 native s16: under +mos-a16 an s16 data load/store is ALSO custom, so it
+    // reaches legalizeLoad/legalizeStore, which routes a non-absolute 16-bit-pointer
+    // access to a native 16-bit indirect op (else narrows to two 8-bit ops as before).
+    // #320 far runtime: PF appears as a *value* too (loading/storing a far
+    // pointer held in a variable), not just as the access pointer. A PF value
+    // routes through legalizeLoad/legalizeStore, which inttoptr/ptrtoint it to
+    // an s32 and re-runs; the s32 then narrows to bytes (maxScalar below). PF is
+    // addrspace 2 — only W65816 far code ever forms one — so listing it as a
+    // value type is inert on every other subtarget.
+    // #320 packed-24: PFP appears only as a *value* (a packed far pointer stored in
+    // / loaded from memory), never as the access pointer (it is cast to PF before any
+    // deref). A PFP value routes through legalizeLoad/legalizeStore, which accesses 3
+    // bytes and bridges to/from p3 via a 3x s8 merge/unmerge (see legalizePacked*).
+    auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE}).scalarize(0);
+    if (STI.hasAccum16())
+      B.customForCartesianProduct({S8, S16, PZ, P, PF, PFP}, {PZ, P, PF});
+    else
+      B.customForCartesianProduct({S8, PZ, P, PF, PFP}, {PZ, P, PF});
+    B.widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
+  }
+
+  getActionDefinitionsBuilder({G_SEXTLOAD, G_ZEXTLOAD}).custom();
+
+  getActionDefinitionsBuilder({G_MEMCPY, G_MEMMOVE, G_MEMSET, G_MEMCPY_INLINE})
+      .custom();
+
+  // Control Flow
+
+  getActionDefinitionsBuilder(G_PHI).scalarize(0)
+      .legalFor({S1, S8, P, PZ})
+      // #321: a far pointer (PF, p2) carried across a loop back-edge forms a
+      // G_PHI(p2) that no scalar/widen action covers. Custom-legalize it to an
+      // s32 phi via ptrtoint/inttoptr (see legalizePhi), reusing the same bridge
+      // far load/store and legalizePtrAdd already rely on. (PFP/p3 is memory-only
+      // — never a register/phi value — so it cannot reach here.)
+      .customFor({PF})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  getActionDefinitionsBuilder(G_BRCOND).customFor({S1}).unsupported();
+
+  getActionDefinitionsBuilder(G_BRINDIRECT).legalFor({P});
+
+  getActionDefinitionsBuilder(G_BRJT).customIf(
+      all(typeIs(0, P), scalarWiderThan(1, 8)));
+
+  getActionDefinitionsBuilder(G_JUMP_TABLE).unsupported();
+
+  getActionDefinitionsBuilder(G_TRAP).custom();
+
+  // A prefetch is a hint; the 6502 has nothing to hint, so it is dropped.
+  getActionDefinitionsBuilder(G_PREFETCH).custom();
+
+  // Variadic Arguments
+
+  getActionDefinitionsBuilder({G_VASTART, G_VAARG}).custom();
+
+  // Other Operations
+
+  getActionDefinitionsBuilder(G_DYN_STACKALLOC).custom();
+
+  getActionDefinitionsBuilder({G_STACKSAVE, G_STACKRESTORE}).lower();
+
+  getActionDefinitionsBuilder(G_FREEZE).scalarize(0)
+      .customFor({S1, S8, P, PZ})
+      .widenScalarToNextMultipleOf(0, 8)
+      .maxScalar(0, S8)
+      .unsupported();
+
+  getLegacyLegalizerInfo().computeTables();
+  verify(*STI.getInstrInfo());
+}
+
+bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
+                                         MachineInstr &MI) const {
+  LLT P = LLT::pointer(0, 16);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MachineRegisterInfo &MRI = *Builder.getMRI();
+  switch (cast<GIntrinsic>(MI).getIntrinsicID()) {
+  case Intrinsic::returnaddress:
+  case Intrinsic::frameaddress:
+    return legalizeReturnOrFrameAddress(Helper, MI);
+  case Intrinsic::vacopy: {
+    MachinePointerInfo MPO;
+    auto Tmp =
+        Builder.buildLoad(P, MI.getOperand(2),
+                          *MI.getMF()->getMachineMemOperand(
+                              MPO, MachineMemOperand::MOLoad, 2, Align()));
+    Builder.buildStore(Tmp, MI.getOperand(1),
+                       *MI.getMF()->getMachineMemOperand(
+                           MPO, MachineMemOperand::MOStore, 2, Align()));
+    MI.eraseFromParent();
+    return true;
+  }
+  case Intrinsic::fptoui_sat: {
+    LLT Ty = MRI.getType(MI.getOperand(0).getReg());
+    auto ZeroConst = Builder.buildFConstant(Ty, 0);
+    auto MaxConst = Builder.buildFConstant(
+        Ty, APInt::getMaxValue(Ty.getSizeInBits()).roundToDouble());
+    Builder.buildFPTOUI(
+        Ty,
+        Builder.buildFMinNum(
+            MI.getOperand(0),
+            // This also projects NaN to 0.
+            Builder.buildFMaxNum(Ty, MI.getOperand(2), ZeroConst), MaxConst));
+    MI.eraseFromParent();
+    return true;
+  }
+  case Intrinsic::fptosi_sat: {
+    LLT Ty = MRI.getType(MI.getOperand(0).getReg());
+
+    auto IsNan =
+        Builder.buildIsFPClass(LLT::scalar(1), MI.getOperand(2), fcNan);
+    auto ZeroConst = Builder.buildConstant(Ty, 0);
+    auto MinConst = Builder.buildFConstant(
+        Ty, APInt::getSignedMinValue(Ty.getSizeInBits()).roundToDouble());
+    auto MaxConst = Builder.buildFConstant(
+        Ty, APInt::getSignedMaxValue(Ty.getSizeInBits()).roundToDouble());
+    Builder.buildSelect(
+        MI.getOperand(0), IsNan, ZeroConst,
+        Builder.buildFPTOUI(
+            Ty, Builder.buildFMinNum(
+                    Ty, Builder.buildFMaxNum(Ty, MI.getOperand(2), MinConst),
+                    MaxConst)));
+    MI.eraseFromParent();
+    return true;
+  }
+  case Intrinsic::modf: {
+    // modf(x) returns (fractional_part, integer_part)
+    // The C library modf takes (x, &iptr) and returns fractional part
+    LLT Ty = MRI.getType(MI.getOperand(0).getReg());
+    unsigned Size = Ty.getSizeInBits();
+    auto &Ctx = MI.getMF()->getFunction().getContext();
+
+    RTLIB::Libcall Libcall = Size == 32 ? RTLIB::MODF_F32 : RTLIB::MODF_F64;
+    Type *HLTy = Size == 32 ? Type::getFloatTy(Ctx) : Type::getDoubleTy(Ctx);
+    Type *PtrTy = PointerType::get(Ctx, 0);
+
+    // Create stack temporary for the integer part output
+    MachinePointerInfo PtrInfo;
+    auto FI =
+        Helper.createStackTemporary(Ty.getSizeInBytes(), Align(), PtrInfo);
+
+    SmallVector<CallLowering::ArgInfo, 2> Args;
+    // For G_INTRINSIC with 2 results: op0=result0, op1=result1,
+    // op2=intrinsic_id, op3=input
+    Args.push_back({MI.getOperand(3).getReg(), HLTy, 0});   // input value
+    Args.push_back({FI->getOperand(0).getReg(), PtrTy, 1}); // output pointer
+
+    LostDebugLocObserver LocObserver("");
+    if (Helper.createLibcall(Libcall, {MI.getOperand(0).getReg(), HLTy, 0},
+                             Args, LocObserver) !=
+        LegalizerHelper::LegalizeResult::Legalized)
+      return false;
+
+    // Load the integer part from the stack temporary
+    Builder.buildLoad(
+        MI.getOperand(1), FI,
+        *MI.getMF()->getMachineMemOperand(
+            PtrInfo,
+            MachineMemOperand::MOLoad | MachineMemOperand::MODereferenceable,
+            Ty.getSizeInBytes(), Align()));
+
+    MI.eraseFromParent();
+    return true;
+  }
+    // TODO: Handle other intrinsics with odd calling conventions such as
+    // sincospi
+  }
+  return false;
+}
+
+bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+                                      LostDebugLocObserver &LocObserver) const {
+  MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
+
+  switch (MI.getOpcode()) {
+  default:
+    llvm_unreachable("Invalid opcode for custom legalization.");
+  // Integer Extension and Truncation
+  case G_ANYEXT:
+    return legalizeAnyExt(Helper, MRI, MI);
+  case G_SEXT:
+    return legalizeSExt(Helper, MRI, MI);
+  case G_ZEXT:
+    return legalizeZExt(Helper, MRI, MI);
+
+  case G_BSWAP:
+  case G_FCANONICALIZE:
+  case G_FREEZE:
+    return legalizeToCopy(Helper, MRI, MI);
+
+  case G_MERGE_VALUES:
+    // customFor {S32,S8} (4x s8->s32) and {S64,S16} (4x s16->s64); pick by dest width.
+    if (MRI.getType(MI.getOperand(0).getReg()).getSizeInBits() == 64)
+      return legalizeMergeS64FromWords(Helper, MRI, MI);
+    return legalizeMergeS32FromBytes(Helper, MRI, MI);
+  case G_UNMERGE_VALUES:
+    // customFor {S8,S32} (4x s8<-s32) and {S16,S64} (4x s16<-s64); pick by source width.
+    if (MRI.getType(MI.getOperand(MI.getNumOperands() - 1).getReg())
+            .getSizeInBits() == 64)
+      return legalizeUnmergeS64ToWords(Helper, MRI, MI);
+    return legalizeUnmergeS32ToBytes(Helper, MRI, MI);
+
+  // Integer Operations
+  case G_ADD:
+  case G_SUB:
+    return legalizeAddSub(Helper, MRI, MI);
+  case G_XOR:
+    return legalizeXor(Helper, MRI, MI);
+  case G_SDIVREM:
+  case G_UDIVREM:
+    return legalizeDivRem(Helper, MRI, MI, LocObserver);
+  case G_LSHR:
+  case G_SHL:
+  case G_ASHR:
+  case G_ROTL:
+  case G_ROTR:
+    return legalizeShiftRotate(Helper, MRI, MI, LocObserver);
+  case G_ICMP:
+    return legalizeICmp(Helper, MRI, MI);
+  case G_SELECT:
+    return legalizeSelect(Helper, MRI, MI);
+  case G_ABS:
+    return legalizeAbs(Helper, MRI, MI);
+  case G_PTR_ADD:
+    return legalizePtrAdd(Helper, MRI, MI);
+  case G_PTRMASK:
+    return legalizePtrMask(Helper, MRI, MI);
+  case G_ADDRSPACE_CAST:
+    return legalizeAddrSpaceCast(Helper, MRI, MI);
+  case G_UADDO:
+  case G_SADDO:
+  case G_USUBO:
+  case G_SSUBO:
+    return legalizeAddSubO(Helper, MRI, MI);
+  case G_USUBE:
+  case G_SSUBE:
+    return legalizeSubE(Helper, MRI, MI);
+
+  // Memory Operations
+  case G_SEXTLOAD:
+  case G_ZEXTLOAD:
+  case G_LOAD:
+    return legalizeLoad(Helper, MRI, cast<GAnyLoad>(MI));
+  case G_STORE:
+    return legalizeStore(Helper, MRI, cast<GStore>(MI));
+  case G_MEMCPY:
+  case G_MEMCPY_INLINE:
+  case G_MEMMOVE:
+  case G_MEMSET:
+    return legalizeMemOp(Helper, MRI, MI, LocObserver);
+
+  // Control Flow
+  case G_PHI:
+    return legalizePhi(Helper, MRI, MI);
+  case G_BRCOND:
+    return legalizeBrCond(Helper, MRI, MI);
+  case G_BRJT:
+    return legalizeBrJt(Helper, MRI, MI);
+  case G_TRAP:
+    return legalizeTrap(Helper, MRI, MI);
+  case G_PREFETCH:
+    MI.eraseFromParent();
+    return true;
+
+  // Variadic Arguments
+  case G_VAARG:
+    return legalizeVAArg(Helper, MRI, MI);
+  case G_VASTART:
+    return legalizeVAStart(Helper, MRI, MI);
+
+  // Floating Point
+  case G_FABS:
+    return legalizeFAbs(Helper, MRI, MI);
+  case G_FCMP:
+    return legalizeFCmp(Helper, MRI, MI, LocObserver);
+  case G_FCONSTANT:
+    return legalizeFConst(Helper, MRI, MI);
+
+  // Other Operations
+  case G_DYN_STACKALLOC:
+    return legalizeDynStackAlloc(Helper, MRI, MI);
+  }
+}
+
+//===----------------------------------------------------------------------===//
+// Integer Extension and Truncation
+//===----------------------------------------------------------------------===//
+
+static auto unmergeDefs(MachineInstr *MI) {
+  assert(MI->getOpcode() == TargetOpcode::G_UNMERGE_VALUES);
+  return make_range(MI->operands_begin(), MI->operands_end() - 1);
+}
+
+static auto unmergeDefsSplitHigh(MachineInstr *MI) {
+  assert(MI->getOpcode() == TargetOpcode::G_UNMERGE_VALUES);
+  struct LowsAndHigh {
+    iterator_range<MachineInstr::mop_iterator> Lows;
+    MachineOperand &High;
+  };
+  return LowsAndHigh{make_range(MI->operands_begin(), MI->operands_end() - 2),
+                     MI->getOperand(MI->getNumOperands() - 2)};
+}
+
+// #321 a16: a direct 4x s8 -> s32 G_MERGE_VALUES (only reached via customFor({S32,S8})
+// under +mos-a16) — rewrite into the legal 2-level form so it routes through the
+// s32-as-2x-s16 representation: merge(a,b)->s16, merge(c,d)->s16, then those ->s32.
+// Both halves are legal (legalForCartesianProduct {S16,S8}; legalFor {S32,S16}) and the
+// artifact combiner folds them against feeding unmerges. selectMergeValues only takes a
+// 2-source merge, so the 4-source form must be split here, not selected.
+bool MOSLegalizerInfo::legalizeMergeS32FromBytes(LegalizerHelper &Helper,
+                                                 MachineRegisterInfo &MRI,
+                                                 MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const LLT S16 = LLT::scalar(16);
+  Register Dst = MI.getOperand(0).getReg();
+  Register B0 = MI.getOperand(1).getReg();
+  Register B1 = MI.getOperand(2).getReg();
+  Register B2 = MI.getOperand(3).getReg();
+  Register B3 = MI.getOperand(4).getReg();
+  auto Lo = Builder.buildMergeValues(S16, {B0, B1});
+  auto Hi = Builder.buildMergeValues(S16, {B2, B3});
+  Builder.buildMergeValues(Dst, {Lo.getReg(0), Hi.getReg(0)});
+  MI.eraseFromParent();
+  return true;
+}
+
+// #321 a16: a direct 4x s8 <- s32 G_UNMERGE_VALUES (only reached via customFor({S8,S32})
+// under +mos-a16) — the symmetric inverse of legalizeMergeS32FromBytes. Rewrite it into
+// the legal 2-level form so it routes through the s32-as-2x-s16 representation: unmerge
+// the s32 into two s16 words (legal {S16,S32}), then unmerge each word into two s8 bytes
+// (legal {S8,S16}), reusing the four original byte def regs. selectUnmergeValues only
+// takes a 2-dest unmerge, so the 4-dest form must be split here, not selected. Building
+// only unmerges (no new merge) cannot create a merge<->unmerge artifact-combine loop.
+bool MOSLegalizerInfo::legalizeUnmergeS32ToBytes(LegalizerHelper &Helper,
+                                                 MachineRegisterInfo &MRI,
+                                                 MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const LLT S16 = LLT::scalar(16);
+  Register D0 = MI.getOperand(0).getReg();
+  Register D1 = MI.getOperand(1).getReg();
+  Register D2 = MI.getOperand(2).getReg();
+  Register D3 = MI.getOperand(3).getReg();
+  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
+  auto Words = Builder.buildUnmerge(S16, Src);     // s32 -> Lo:s16, Hi:s16
+  Builder.buildUnmerge({D0, D1}, Words.getReg(0)); // Lo -> D0, D1
+  Builder.buildUnmerge({D2, D3}, Words.getReg(1)); // Hi -> D2, D3
+  MI.eraseFromParent();
+  return true;
+}
+
+// #321 a16: a direct 4x s16 -> s64 G_MERGE_VALUES (only reached via customFor({S64,S16})
+// under +mos-a16) — the s64 analogue of legalizeMergeS32FromBytes, one level up: merge each
+// pair of s16 words into an s32 (legal {S32,S16}), then merge the two s32 halves into the s64
+// (legal {S64,S32}). selectMergeValues only takes a 2-source merge, so the 4-source form must be
+// split here, not selected.
+bool MOSLegalizerInfo::legalizeMergeS64FromWords(LegalizerHelper &Helper,
+                                                 MachineRegisterInfo &MRI,
+                                                 MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const LLT S32 = LLT::scalar(32);
+  Register Dst = MI.getOperand(0).getReg();
+  Register W0 = MI.getOperand(1).getReg();
+  Register W1 = MI.getOperand(2).getReg();
+  Register W2 = MI.getOperand(3).getReg();
+  Register W3 = MI.getOperand(4).getReg();
+  auto Lo = Builder.buildMergeValues(S32, {W0, W1});
+  auto Hi = Builder.buildMergeValues(S32, {W2, W3});
+  Builder.buildMergeValues(Dst, {Lo.getReg(0), Hi.getReg(0)});
+  MI.eraseFromParent();
+  return true;
+}
+
+// #321 a16: a direct 4x s16 <- s64 G_UNMERGE_VALUES (only reached via customFor({S16,S64})
+// under +mos-a16) — the symmetric inverse of legalizeMergeS64FromWords, and the s64 analogue of
+// legalizeUnmergeS32ToBytes: unmerge the s64 into two s32 halves (legal {S32,S64}), then unmerge
+// each half into two s16 words (legal {S16,S32}), reusing the four original word def regs.
+// selectUnmergeValues only takes a 2-dest unmerge, so the 4-dest form must be split here.
+bool MOSLegalizerInfo::legalizeUnmergeS64ToWords(LegalizerHelper &Helper,
+                                                 MachineRegisterInfo &MRI,
+                                                 MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const LLT S32 = LLT::scalar(32);
+  Register D0 = MI.getOperand(0).getReg();
+  Register D1 = MI.getOperand(1).getReg();
+  Register D2 = MI.getOperand(2).getReg();
+  Register D3 = MI.getOperand(3).getReg();
+  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
+  auto Halves = Builder.buildUnmerge(S32, Src);     // s64 -> Lo:s32, Hi:s32
+  Builder.buildUnmerge({D0, D1}, Halves.getReg(0)); // Lo -> D0, D1
+  Builder.buildUnmerge({D2, D3}, Halves.getReg(1)); // Hi -> D2, D3
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeAnyExt(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  Helper.Observer.changingInstr(MI);
+  MI.setDesc(Helper.MIRBuilder.getTII().get(G_ZEXT));
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeSExt(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  auto [Dst, DstTy, Src, SrcTy] = MI.getFirst2RegLLTs();
+
+  if (SrcTy == S1) {
+    auto NegOne = Builder.buildConstant(DstTy, -1);
+    auto Zero = Builder.buildConstant(DstTy, 0);
+    Builder.buildSelect(Dst, Src, NegOne, Zero);
+  } else {
+    auto Neg = Builder.buildICmp(CmpInst::ICMP_SLT, S1, Src,
+                                 Builder.buildConstant(SrcTy, 0));
+    auto NegOne = Builder.buildConstant(S8, -1);
+    auto Zero = Builder.buildConstant(S8, 0);
+
+    Register Fill = Builder.buildSelect(S8, Neg, NegOne, Zero).getReg(0);
+
+    SmallVector<Register> Parts;
+    unsigned Bits;
+    if (SrcTy == S8) {
+      Parts.push_back(Src);
+      Bits = 8;
+    } else {
+      auto Unmerge = Builder.buildUnmerge(S8, Src);
+      Bits = 0;
+      for (MachineOperand &Op : unmergeDefs(Unmerge)) {
+        Parts.push_back(Op.getReg());
+        Bits += 8;
+      }
+    }
+    while (Bits < DstTy.getSizeInBits()) {
+      Parts.push_back(Fill);
+      Bits += 8;
+    }
+    Builder.buildMergeValues(Dst, Parts);
+  }
+
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeZExt(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  auto [Dst, Src] = MI.getFirst2Regs();
+  LLT DstTy = MRI.getType(Dst);
+
+  assert(MRI.getType(Src) == LLT::scalar(1));
+  auto One = Builder.buildConstant(DstTy, 1);
+  auto Zero = Builder.buildConstant(DstTy, 0);
+  Builder.buildSelect(Dst, Src, One, Zero);
+  MI.eraseFromParent();
+  return true;
+}
+
+//===----------------------------------------------------------------------===//
+// Integer Operations
+//===----------------------------------------------------------------------===//
+
+bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  auto &Builder = Helper.MIRBuilder;
+  LLT S8 = LLT::scalar(8);
+
+  auto [Dst, Src] = MI.getFirst2Regs();
+  assert(MRI.getType(Dst).isByteSized());
+
+  // #321 Increment 1d-retry: under +mos-a16, leave an s16 add/sub UN-narrowed for the
+  // selector (selectAlu16Native), which carries the value in an Imag16 zero-page pair
+  // and emits a single 16-bit lda/adc/sta on the transient A16. This now includes ±1:
+  // selectAlu16Native turns a 16-bit ±1 into one `inc a`/`dec a` (the 8-bit byte
+  // inc/dec-with-carry chain below thrashes M-mode inside a 16-bit region). Gated on
+  // hasAccum16 so default 8-bit codegen keeps narrowing (incl. the byte inc/dec path).
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+  const LLT Ty = MRI.getType(Dst);
+  if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
+    // When an ABI byte pair is stored before a one-step arithmetic use, the
+    // byte increment/decrement can keep A:X live through the direct byte store.
+    // No wide value needs to be materialized for this local sequence.
+    auto RHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+    const MachineInstr *Def = MRI.getVRegDef(Src);
+    bool ByteSequence = RHS && RHS->Value.isOne() && Def &&
+                        Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
+                        Def->getParent() == MI.getParent() &&
+                        MRI.getType(Def->getOperand(1).getReg()) == S8;
+    if (ByteSequence) {
+      auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
+        const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
+        return ByteDef && ByteDef->isCopy() &&
+               ByteDef->getOperand(1).getReg() == PhysReg;
+      };
+      ByteSequence = isABIByte(Def->getOperand(1).getReg(), MOS::A) &&
+                     isABIByte(Def->getOperand(2).getReg(), MOS::X);
+    }
+    unsigned Stores = 0;
+    if (ByteSequence) {
+      for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
+        if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
+          continue;
+        if (Use.getOpcode() != TargetOpcode::G_STORE ||
+            Use.getParent() != MI.getParent() ||
+            Use.getIterator() == MI.getIterator()) {
+          ByteSequence = false;
+          break;
+        }
+        const auto &Store = cast<GStore>(Use);
+        if (Store.isAtomic() ||
+            !matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
+          ByteSequence = false;
+          break;
+        }
+        ++Stores;
+      }
+      if (Stores == 0)
+        ByteSequence = false;
+      for (auto I = std::next(Def->getIterator()); ByteSequence &&
+           I != MI.getIterator(); ++I)
+        if (I->isCall() || I->isInlineAsm())
+          ByteSequence = false;
+    }
+    if (!ByteSequence)
+      return true; // selected natively (selectAlu16Native)
+  }
+
+  auto RHSConst =
+      getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+  if (!RHSConst || std::abs(RHSConst->Value.getSExtValue()) != 1) {
+    return Helper.narrowScalarAddSub(MI, 0, S8) !=
+           LegalizerHelper::UnableToLegalize;
+  }
+
+  // Handle multi-byte increments and decrements.
+
+  assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
+  int64_t Amt = RHSConst->Value.getSExtValue();
+  if (MI.getOpcode() == MOS::G_SUB)
+    Amt = -Amt;
+
+  auto Unmerge = Builder.buildUnmerge(S8, Src);
+  size_t NumParts = llvm::size(unmergeDefs(Unmerge));
+  auto IncDec = Builder.buildInstr(Amt == 1 ? MOS::G_INC : MOS::G_DEC);
+  SmallVector<Register> DstParts;
+  for (size_t Idx = 0; Idx < NumParts; ++Idx) {
+    Register R = MRI.createGenericVirtualRegister(S8);
+    IncDec.addDef(R);
+    DstParts.push_back(R);
+  }
+  for (MachineOperand &MO : unmergeDefs(Unmerge))
+    IncDec.addUse(MO.getReg());
+  Builder.buildMergeValues(Dst, DstParts);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeXor(LegalizerHelper &Helper,
+                                   MachineRegisterInfo &MRI,
+                                   MachineInstr &MI) const {
+  LLT S1 = LLT::scalar(1);
+
+  Register Dst = MI.getOperand(0).getReg();
+  assert(MRI.getType(Dst) == S1);
+
+  Register Not;
+  if (mi_match(Dst, MRI, m_Not(m_Reg(Not)))) {
+    // The G_XOR may have been created by legalizing the definition of Dst.
+    // If so, since uses are legalized before defs, the legalization of the
+    // use of Dst has already occurred. Since the G_XOR didn't exist when the
+    // use was being legalized, there hasn't yet been any opportunity to fold
+    // the G_XOR in to the use. We do such folding here; hopefully that will
+    // make the G_XOR dead.
+
+    for (MachineInstr &UseMI : MRI.use_nodbg_instructions(Dst)) {
+      if (UseMI.getOpcode() == MOS::G_BRCOND_IMM) {
+        assert(UseMI.getOperand(0).getReg() == Dst);
+        Helper.Observer.changingInstr(UseMI);
+        UseMI.getOperand(0).setReg(Not);
+        UseMI.getOperand(2).setImm(!UseMI.getOperand(2).getImm());
+        Helper.Observer.changedInstr(UseMI);
+      } else if (UseMI.getOpcode() == MOS::G_SELECT &&
+                 mi_match(UseMI.getOperand(2).getReg(), MRI, m_ZeroInt()) &&
+                 mi_match(UseMI.getOperand(3).getReg(), MRI, m_AllOnesInt())) {
+        Helper.Observer.changingInstr(UseMI);
+        UseMI.getOperand(1).setReg(Not);
+        UseMI.removeOperand(3);
+        UseMI.removeOperand(2);
+        UseMI.setDesc(Helper.MIRBuilder.getTII().get(MOS::COPY));
+        Helper.Observer.changedInstr(UseMI);
+      }
+    }
+
+    if (!isTriviallyDead(MI, MRI) &&
+        llvm::all_of(MRI.use_nodbg_instructions(Dst),
+                     [](const MachineInstr &UseMI) {
+                       switch (UseMI.getOpcode()) {
+                       case MOS::G_SBC:
+                       case MOS::G_UADDE:
+                       case MOS::G_BRCOND_IMM:
+                       case MOS::G_SELECT:
+                         return true;
+                       default:
+                         return false;
+                       }
+                     })) {
+      MachineIRBuilder &Builder = Helper.MIRBuilder;
+      // If Not is true, select 0, otherwise select 1. This will eventually
+      // lower to control flow.
+      auto Zero = Builder.buildConstant(S1, 0);
+      auto One = Builder.buildConstant(S1, 1);
+      Helper.MIRBuilder.buildSelect(Dst, Not, Zero, One);
+      MI.eraseFromParent();
+      return true;
+    }
+  }
+
+  if (isTriviallyDead(MI, MRI))
+    MI.eraseFromParent();
+  else
+    Helper.widenScalar(MI, 0, LLT::scalar(8));
+
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeDivRem(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI,
+                                      LostDebugLocObserver &LocObserver) const {
+  LLT Ty = MRI.getType(MI.getOperand(0).getReg());
+  auto &Ctx = MI.getMF()->getFunction().getContext();
+
+  auto Libcall = Helper.getRTLibDesc(MI.getOpcode(), Ty.getSizeInBits());
+
+  Type *HLTy = IntegerType::get(Ctx, Ty.getSizeInBits());
+
+  SmallVector<CallLowering::ArgInfo, 3> Args;
+  Args.push_back({MI.getOperand(2).getReg(), HLTy, 0});
+  Args.push_back({MI.getOperand(3).getReg(), HLTy, 1});
+
+  // Pass a pointer to receive the remainder.
+  MachinePointerInfo PtrInfo;
+  auto FI = Helper.createStackTemporary(Ty.getSizeInBytes(), Align(), PtrInfo);
+
+  Type *PtrTy = PointerType::get(Ctx, 0);
+  Args.push_back({FI->getOperand(0).getReg(), PtrTy, 2});
+
+  if (Helper.createLibcall(Libcall, {MI.getOperand(0).getReg(), HLTy, 0}, Args,
+                           LocObserver) !=
+      LegalizerHelper::LegalizeResult::Legalized)
+    return false;
+
+  Helper.MIRBuilder.buildLoad(
+      MI.getOperand(1), FI,
+      *Helper.MIRBuilder.getMF().getMachineMemOperand(
+          PtrInfo,
+          MachineMemOperand::MOLoad | MachineMemOperand::MODereferenceable,
+          Ty.getSizeInBytes(), Align()));
+
+  MI.eraseFromParent();
+  return true;
+}
+
+// Whether or not it's worth shifting/rotating by 8 (in a type one byte wider
+// for shifts) and shifting/rotating in the opposite direction by 8-n.
+static bool shouldOverCorrect(uint64_t Amt, LLT Ty, bool IsRotate) {
+  assert(Amt < 8);
+
+  if (IsRotate)
+    return Amt > 4;
+
+  // The choice is between emitting Amt operations at width Ty, or emitting 8
+  // - Amt operations (in the opposite direction) at width Ty + 8.
+  return Amt * Ty.getSizeInBytes() > (8 - Amt) * (Ty.getSizeInBytes() + 1);
+}
+
+bool MOSLegalizerInfo::legalizeShiftRotate(
+    LegalizerHelper &Helper, MachineRegisterInfo &MRI, MachineInstr &MI,
+    LostDebugLocObserver &LocObserver) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  auto [Dst, Src, AmtReg] = MI.getFirst3Regs();
+
+  bool IsRotate = MI.getOpcode() == G_ROTL || MI.getOpcode() == G_ROTR;
+
+  LLT Ty = MRI.getType(Dst);
+  assert(Ty == MRI.getType(Src));
+  assert(Ty.isByteSized());
+
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+
+  // Presently, only left shifts by one bit are supported.
+  auto ConstantAmt = getIConstantVRegValWithLookThrough(AmtReg, MRI);
+  if (!ConstantAmt) {
+    if (!isPowerOf2_32(Ty.getSizeInBits())) {
+      return IsRotate
+                 ? Helper.lowerRotate(MI)
+                 : Helper.widenScalar(
+                       MI, 0, LLT::scalar(NextPowerOf2(Ty.getSizeInBits())));
+    }
+    if (Ty.getSizeInBits() > 64) {
+      return IsRotate ? Helper.lowerRotate(MI)
+                      : Helper.narrowScalar(MI, 0, LLT::scalar(64));
+    }
+    LLT AmtTy = MRI.getType(AmtReg);
+    if (AmtTy != S8)
+      MI.getOperand(2).setReg(Builder.buildTrunc(S8, AmtReg).getReg(0));
+    return shiftRotateLibcall(Helper, MRI, MI, LocObserver);
+  }
+
+  uint64_t Amt = ConstantAmt->Value.getZExtValue();
+
+  // This forms the base case for the problem decompositions below.
+  if (Amt == 0) {
+    Builder.buildCopy(Dst, Src);
+    MI.eraseFromParent();
+    return true;
+  }
+
+  // #321 native 16-bit constant shifts: under +mos-a16 a small s16 shift is one
+  // `lda; <shift>*Amt; sta` run in 16-bit-A mode, far cheaper than the 8-bit
+  // byte-pair decomposition below. Leave the s16 G_SHL/G_LSHR/G_ASHR un-narrowed
+  // (mirrors legalizeAddSub's native passthrough) for selectShift16Native: left and
+  // unsigned-right shift to one `asl`/`lsr` per bit; signed-right (ASHR) to
+  // `cmp #$8000; ror` per bit (the cmp sets carry from the sign, ror replicates it).
+  // Gated to Amt in [1,7]: Amt>=8 keeps the byte path (it relabels bytes with a
+  // sign/zero fill — free for byte-aligned shifts). After the Amt==0 copy, before
+  // the byte/over-correct paths.
+  {
+    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+    if (STI.hasAccum16() && Ty == LLT::scalar(16) &&
+        (MI.getOpcode() == MOS::G_SHL || MI.getOpcode() == MOS::G_LSHR ||
+         MI.getOpcode() == MOS::G_ASHR) &&
+        Amt >= 1 && Amt <= 7)
+      return true; // native; selected by selectShift16Native
+  }
+
+  Register Partial;
+  Register NewAmt;
+  // Shift by one multiples of one byte.
+  if (Amt >= 8) {
+    auto Unmerge = Builder.buildUnmerge(S8, Src);
+    SmallVector<Register> DstBytes;
+    for (MachineOperand &Op : unmergeDefs(Unmerge))
+      DstBytes.push_back(Op.getReg());
+    Register Fill;
+    switch (MI.getOpcode()) {
+    default:
+      llvm_unreachable("Invalid opcode.");
+    case MOS::G_ROTL:
+    case MOS::G_ROTR:
+      break;
+    case MOS::G_ASHR: {
+      // Sign-fill byte = the high byte's sign bit broadcast across all 8 bits
+      // (arithmetic-shift-right by 7). The previous formulation built an s16
+      // ICMP_SLT(Src, 0); under +mos-a16 that re-enters the native signed-compare
+      // legalization (the SLT -> ULT sign-flip rewrite) as a compare-result-AS-VALUE
+      // and the legalizer loops — a signed (arithmetic) right shift by >= 8 hung the
+      // compiler. The pure 8-bit sign broadcast is equivalent and never builds an s16
+      // compare. (Found + minimized by the Tier-1 differential fuzzer; see
+      // docs/plans/2026-06-15-321-tier1-broaden-corpus.md and examples/65816/known.)
+      Fill = Builder.buildAShr(S8, DstBytes.back(), Builder.buildConstant(S8, 7))
+                 .getReg(0);
+      break;
+    }
+    case MOS::G_LSHR:
+    case MOS::G_SHL:
+      Fill = Builder.buildConstant(S8, 0).getReg(0);
+      break;
+    }
+    // Instead of decomposing the problem recursively byte-by-byte, looping
+    // here ensures that Fill is reused for G_ASHR.
+    while (Amt >= 8) {
+      switch (MI.getOpcode()) {
+      default:
+        llvm_unreachable("Invalid opcode.");
+      case MOS::G_LSHR:
+      case MOS::G_ASHR:
+      case MOS::G_SHL:
+        break;
+      case MOS::G_ROTR:
+        Fill = DstBytes.front();
+        break;
+      case MOS::G_ROTL:
+        Fill = DstBytes.back();
+        break;
+      }
+      switch (MI.getOpcode()) {
+      default:
+        llvm_unreachable("Invalid opcode.");
+      case MOS::G_LSHR:
+      case MOS::G_ASHR:
+      case MOS::G_ROTR:
+        DstBytes.erase(DstBytes.begin());
+        DstBytes.push_back(Fill);
+        break;
+      case MOS::G_SHL:
+      case MOS::G_ROTL:
+        DstBytes.pop_back();
+        DstBytes.insert(DstBytes.begin(), Fill);
+        break;
+      }
+      Amt -= 8;
+    }
+    assert(Amt < 8);
+    Partial = Builder.buildMergeValues(Ty, DstBytes).getReg(0);
+    NewAmt = Builder.buildConstant(S8, Amt).getReg(0);
+  } else if (shouldOverCorrect(Amt, Ty, IsRotate)) {
+    Register LeftAmt, RightAmt;
+    switch (MI.getOpcode()) {
+    default:
+      llvm_unreachable("Invalid opcode.");
+    case G_SHL:
+    case G_ROTL:
+      if (Ty == S8 && MI.getOpcode() == G_ROTL)
+        LeftAmt = Builder.buildConstant(S8, 0).getReg(0);
+      else
+        LeftAmt = Builder.buildConstant(S8, 8).getReg(0);
+      RightAmt = Builder.buildConstant(S8, 8 - Amt).getReg(0);
+      break;
+    case G_LSHR:
+    case G_ASHR:
+    case G_ROTR:
+      LeftAmt = Builder.buildConstant(S8, 8 - Amt).getReg(0);
+      if (Ty == S8 && MI.getOpcode() == G_ROTR)
+        RightAmt = Builder.buildConstant(S8, 0).getReg(0);
+      else
+        RightAmt = Builder.buildConstant(S8, 8).getReg(0);
+    }
+    if (IsRotate) {
+      auto Left = Builder.buildRotateLeft(Ty, Src, LeftAmt);
+      Builder.buildRotateRight(Dst, Left, RightAmt);
+    } else {
+      LLT WideTy = LLT::scalar(Ty.getSizeInBits() + 8);
+      Register WideSrc;
+      switch (MI.getOpcode()) {
+      default:
+        llvm_unreachable("Invalid opcode.");
+      case G_SHL:
+        WideSrc = Builder.buildAnyExt(WideTy, Src).getReg(0);
+        break;
+      case G_LSHR:
+        WideSrc = Builder.buildZExt(WideTy, Src).getReg(0);
+        break;
+      case G_ASHR:
+        WideSrc = Builder.buildSExt(WideTy, Src).getReg(0);
+        break;
+      }
+      auto Left = Builder.buildShl(WideTy, WideSrc, LeftAmt);
+      auto Right = Builder.buildLShr(WideTy, Left, RightAmt).getReg(0);
+      Builder.buildTrunc(Dst, Right);
+    }
+    MI.eraseFromParent();
+    return true;
+  } else {
+    // Shift by one, then shift the remainder.
+
+    Register CarryIn;
+    switch (MI.getOpcode()) {
+    default:
+      llvm_unreachable("Invalid opcode.");
+    case G_SHL:
+    case G_LSHR:
+      CarryIn = Builder.buildConstant(S1, 0).getReg(0);
+      break;
+    case G_ROTR: {
+      // Once selected, this places the low bit in the carry flag.
+      Register LowByte =
+          (Ty == S8) ? Src : Builder.buildUnmerge(S8, Src).getReg(0);
+      CarryIn = Builder
+                    .buildInstr(MOS::G_LSHRE, {S8, S1},
+                                {LowByte, Builder.buildUndef(S1)})
+                    .getReg(1);
+      break;
+    }
+    case G_ASHR:
+    case G_ROTL: {
+      // Once selected, this places the high bit in the carry flag.
+      Register HighByte =
+          (Ty == S8)
+              ? Src
+              : Builder.buildUnmerge(S8, Src).getReg(Ty.getSizeInBytes() - 1);
+      CarryIn = Builder
+                    .buildICmp(ICmpInst::ICMP_UGE, S1, HighByte,
+                               Builder.buildConstant(S8, 0x80))
+                    .getReg(0);
+      break;
+    }
+    }
+
+    unsigned Opcode;
+    switch (MI.getOpcode()) {
+    default:
+      llvm_unreachable("Invalid opcode.");
+    case G_SHL:
+    case G_ROTL:
+      Opcode = MOS::G_SHLE;
+      break;
+    case G_LSHR:
+    case G_ASHR:
+    case G_ROTR:
+      Opcode = MOS::G_LSHRE;
+      break;
+    }
+    auto Even = Builder.buildInstr(Opcode, {Ty, S1}, {Src, CarryIn});
+    Partial = Even.getReg(0);
+    if (!legalizeLshrEShlE(Helper, MRI, *Even))
+      return false;
+    NewAmt = Builder.buildConstant(S8, Amt - 1).getReg(0);
+  }
+
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(1).setReg(Partial);
+  MI.getOperand(2).setReg(NewAmt);
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeLshrEShlE(LegalizerHelper &Helper,
+                                         MachineRegisterInfo &MRI,
+                                         MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+
+  auto [Dst, CarryOut, Src, CarryIn] = MI.getFirst4Regs();
+  LLT Ty = MRI.getType(Dst);
+  if (Ty == S8)
+    return true;
+
+  auto Unmerge = Builder.buildUnmerge(S8, Src);
+  SmallVector<Register> Parts;
+
+  SmallVector<Register> Defs;
+  for (MachineOperand &SrcPart : unmergeDefs(Unmerge))
+    Defs.push_back(SrcPart.getReg());
+
+  if (MI.getOpcode() == MOS::G_LSHRE)
+    std::reverse(Defs.begin(), Defs.end());
+
+  Register Carry = CarryIn;
+  for (const auto &I : enumerate(Defs)) {
+    Parts.push_back(MRI.createGenericVirtualRegister(S8));
+    Register NewCarry = I.index() == Defs.size() - 1
+                            ? CarryOut
+                            : MRI.createGenericVirtualRegister(S1);
+    Builder.buildInstr(MI.getOpcode(), {Parts.back(), NewCarry},
+                       {I.value(), Carry});
+    Carry = NewCarry;
+  }
+
+  if (MI.getOpcode() == MOS::G_LSHRE)
+    std::reverse(Parts.begin(), Parts.end());
+
+  Builder.buildMergeValues(Dst, Parts).getReg(0);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::shiftRotateLibcall(
+    LegalizerHelper &Helper, MachineRegisterInfo &MRI, MachineInstr &MI,
+    LostDebugLocObserver &LocObserver) const {
+  unsigned Size = MRI.getType(MI.getOperand(0).getReg()).getSizeInBits();
+  auto &Ctx = MI.getMF()->getFunction().getContext();
+
+  auto Libcall = Helper.getRTLibDesc(MI.getOpcode(), Size);
+
+  Type *HLTy = IntegerType::get(Ctx, Size);
+  Type *HLAmtTy = IntegerType::get(Ctx, 8);
+
+  SmallVector<CallLowering::ArgInfo, 3> Args;
+  Args.push_back({MI.getOperand(1).getReg(), HLTy, 0});
+  Args.push_back({MI.getOperand(2).getReg(), HLAmtTy, 1});
+  if (Helper.createLibcall(Libcall, {MI.getOperand(0).getReg(), HLTy, 0}, Args,
+                           LocObserver) !=
+      LegalizerHelper::LegalizeResult::Legalized)
+    return false;
+
+  MI.eraseFromParent();
+  return true;
+}
+
+// Lowers a comparison to the negation of the inverse comparison. For example,
+// G_ICMP intpred(eq), A, B would become "not G_ICMP intpred(ne) A, B".
+static void negateInverseComparison(LegalizerHelper &Helper, MachineInstr &MI) {
+  Register Dst = MI.getOperand(0).getReg();
+  auto Pred = static_cast<CmpInst::Predicate>(MI.getOperand(1).getPredicate());
+
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Register Not = Builder.getMRI()->createGenericVirtualRegister(LLT::scalar(1));
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(0).setReg(Not);
+  MI.getOperand(1).setPredicate(CmpInst::getInversePredicate(Pred));
+  Helper.Observer.changedInstr(MI);
+
+  Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+  Builder.buildNot(Dst, Not);
+}
+
+// Adjust the constant RHS to swap strictness of the predicate. This keeps the
+// RHS constant, as opposed to swapping the arguments, which forces a load of
+// the RHS into a GPR.
+static bool adjustConstRHS(LegalizerHelper &Helper, MachineInstr &MI) {
+  auto &Builder = Helper.MIRBuilder;
+  const auto &MRI = *Builder.getMRI();
+
+  Register RHS = MI.getOperand(3).getReg();
+  auto Pred = static_cast<CmpInst::Predicate>(MI.getOperand(1).getPredicate());
+
+  auto ConstRHS = getIConstantVRegValWithLookThrough(RHS, MRI);
+  if (!ConstRHS)
+    return false;
+
+  switch (Pred) {
+  default:
+    llvm_unreachable("Unexpected predicate.");
+  case CmpInst::ICMP_ULE:
+  case CmpInst::ICMP_UGT:
+    if (ConstRHS->Value.isMaxValue())
+      return false;
+    break;
+  case CmpInst::ICMP_SLE:
+  case CmpInst::ICMP_SGT:
+    if (ConstRHS->Value.isMaxSignedValue())
+      return false;
+    break;
+  }
+
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(1).setPredicate(CmpInst::getFlippedStrictnessPredicate(Pred));
+  MI.getOperand(3).setReg(
+      Builder.buildConstant(MRI.getType(RHS), ConstRHS->Value + 1).getReg(0));
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+// Lowers a comparison to the swapped comparison on swapped operands. For
+// example, G_ICMP intpred(ult), A, B would become "G_ICMP intpred(ugt) B, A".
+static void swapComparison(LegalizerHelper &Helper, MachineInstr &MI) {
+  Register LHS = MI.getOperand(2).getReg();
+  Register RHS = MI.getOperand(3).getReg();
+  auto Pred = static_cast<CmpInst::Predicate>(MI.getOperand(1).getPredicate());
+
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(1).setPredicate(CmpInst::getSwappedPredicate(Pred));
+  MI.getOperand(2).setReg(RHS);
+  MI.getOperand(3).setReg(LHS);
+  Helper.Observer.changedInstr(MI);
+}
+
+static std::pair<Register, Register> splitHighRest(Register Reg,
+                                                   MachineIRBuilder &Builder) {
+  LLT S8 = LLT::scalar(8);
+
+  auto Unmerge = Builder.buildUnmerge(S8, Reg);
+  auto UnmergeDefs = unmergeDefsSplitHigh(Unmerge);
+
+  SmallVector<Register> RestParts;
+  for (MachineOperand &Op : UnmergeDefs.Lows)
+    RestParts.push_back(Op.getReg());
+  Register Rest =
+      (RestParts.size() > 1)
+          ? Builder
+                .buildMergeValues(LLT::scalar(RestParts.size() * 8), RestParts)
+                .getReg(0)
+          : RestParts[0];
+
+  return {UnmergeDefs.High.getReg(), Rest};
+}
+
+static bool isNZUseLegal(Register R, const MachineRegisterInfo &MRI) {
+  for (MachineOperand &MO : MRI.use_nodbg_operands(R)) {
+    MachineInstr &MI = *MO.getParent();
+    switch (MO.getParent()->getOpcode()) {
+    case MOS::COPY:
+      if (isNZUseLegal(MI.getOperand(0).getReg(), MRI))
+        continue;
+      break;
+    case MOS::G_BRCOND_IMM:
+      continue;
+    case MOS::G_SELECT:
+      if (&MO == &MI.getOperand(1))
+        continue;
+      break;
+    }
+    return false;
+  }
+
+  return true;
+}
+
+static Register buildNZSelect(Register R, MachineIRBuilder &Builder) {
+  LLT S1 = LLT::scalar(1);
+  return Builder
+      .buildSelect(S1, R, Builder.buildConstant(S1, -1),
+                   Builder.buildConstant(S1, 0))
+      .getReg(0);
+}
+
+bool MOSLegalizerInfo::legalizeICmp(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  Register Dst = MI.getOperand(0).getReg();
+  CmpInst::Predicate Pred =
+      static_cast<CmpInst::Predicate>(MI.getOperand(1).getPredicate());
+  Register LHS = MI.getOperand(2).getReg();
+  Register RHS = MI.getOperand(3).getReg();
+
+  // Implement most comparisons in terms of EQ, UGE, and SLT, as these can be
+  // implemented directly via 6502 flags.
+  switch (Pred) {
+  case CmpInst::ICMP_NE:
+  case CmpInst::ICMP_ULT:
+  case CmpInst::ICMP_SGE:
+    negateInverseComparison(Helper, MI);
+    return true;
+  case CmpInst::ICMP_ULE:
+  case CmpInst::ICMP_UGT:
+  case CmpInst::ICMP_SLE:
+  case CmpInst::ICMP_SGT:
+    if (adjustConstRHS(Helper, MI))
+      return true;
+    swapComparison(Helper, MI);
+    return true;
+  default:
+    break;
+  }
+
+  LLT Type = MRI.getType(LHS);
+
+  // #321 native s16 signed ordering: signed order equals unsigned order after
+  // flipping the sign bit, a <ₛ b ⟺ (a ^ 0x8000) <ᵤ (b ^ 0x8000). Under +mos-a16
+  // rewrite the canonical signed primitive (SLT) to an unsigned ULT on the
+  // sign-flipped operands, reusing the already-native 16-bit EOR (the XORs) and the
+  // native unsigned UGE carry path (ULT re-legalizes to !UGE). No new flag handling.
+  // A constant RHS stays constant (b ^ 0x8000) and folds into cmp #imm.
+  {
+    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+    if (STI.hasAccum16() && Type == LLT::scalar(16) &&
+        Pred == CmpInst::ICMP_SLT) {
+      auto Mask = Builder.buildConstant(Type, 0x8000);
+      Register LHSf = Builder.buildXor(Type, LHS, Mask).getReg(0);
+      Register RHSf = Builder.buildXor(Type, RHS, Mask).getReg(0);
+      Helper.Observer.changingInstr(MI);
+      MI.getOperand(1).setPredicate(CmpInst::ICMP_ULT);
+      MI.getOperand(2).setReg(LHSf);
+      MI.getOperand(3).setReg(RHSf);
+      Helper.Observer.changedInstr(MI);
+      return true;
+    }
+  }
+
+  // Compare pointers by first converting to integer. This allows the
+  // comparison to be reduced to 8-bit comparisons.
+  if (Type.isPointer()) {
+    LLT S = LLT::scalar(Type.getScalarSizeInBits());
+
+    Helper.Observer.changingInstr(MI);
+    MI.getOperand(2).setReg(Builder.buildPtrToInt(S, LHS).getReg(0));
+    MI.getOperand(3).setReg(Builder.buildPtrToInt(S, RHS).getReg(0));
+    Helper.Observer.changedInstr(MI);
+    return true;
+  }
+
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+
+  bool RHSIsZero = mi_match(RHS, MRI, m_SpecificICst(0));
+  Register CIn;
+
+  // #321 native s16: under +mos-a16, keep an s16 UGE comparison UN-narrowed and
+  // lower it via a 16-bit G_SBC (the C-flag path) — selectSbc16 emits one
+  // rep/lda/cmp/sep. The other canonical predicates (EQ via Z, SLT via N^V) still
+  // narrow to the 8-bit byte chain (deferred follow-ups). UGE is the slice that
+  // needs no terminator-fusion (C is a plain i1), so the branch reads it directly.
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+  // #321 native s16 equality: take the native EQ path (one rep/lda/cmp/sep producing Z,
+  // selected via CmpBrImag16) when either (a) the result feeds a branch (every use is
+  // G_BRCOND_IMM — Z fuses into the terminator directly), or (b) an operand is a
+  // non-absolute (indirect) s16 load. Case (b) is the EQ-as-VALUE win: the loaded value
+  // already lands in Imag16, so the native 16-bit compare reads it directly instead of
+  // unmerging it back into bytes for an 8-bit chain (measured -4 B on `*p == c`); the
+  // value materializes via buildNZSelect -> MOSLowerSelect -> G_BRCOND_IMM -> CmpBrImag16.
+  // Register/global/computed operands stay 8-bit: there the native form would force an
+  // Imag16 spill the tight 8-bit `cpx;cmp` avoids (measured regressions) — see
+  // docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md (v2/v3 cover those).
+  auto isIndirectS16Load = [&](Register Reg) -> bool {
+    MachineInstr *Def = getDefIgnoringCopies(Reg, MRI);
+    if (!Def || (Def->getOpcode() != TargetOpcode::G_LOAD &&
+                 Def->getOpcode() != MOS::G_LOAD16_INDIR))
+      return false;
+    if (MRI.getType(Def->getOperand(0).getReg()) != LLT::scalar(16))
+      return false;
+    // Non-absolute pointer => indirect load => value is in Imag16 (native wins).
+    return !matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
+  };
+  // #321 v3: a SINGLE-USE s16 load of an ABSOLUTE (global) address — the operand
+  // selectBrCondImm's abs-fold reads in place via `lda abs` / `cmp abs`
+  // (foldableAbsLoad16) instead of materializing the global into an Imag16 pair.
+  // Mirror of isIndirectS16Load with the abs test inverted + single-use (the fold is
+  // 1-to-1 / volatile-safe only for one consumer); the single-use check keeps this
+  // gate in step with the selector's fold (so firing native never ships the round-
+  // trip the spike measured as a regression). Checks the generic G_LOAD (before
+  // legalizeLoadStore16) and the lowered G_LOAD16_ABS.
+  auto isFoldableAbsS16Load = [&](Register Reg) -> bool {
+    MachineInstr *Def = getDefIgnoringCopies(Reg, MRI);
+    if (!Def || (Def->getOpcode() != TargetOpcode::G_LOAD &&
+                 Def->getOpcode() != MOS::G_LOAD16_ABS))
+      return false;
+    if (MRI.getType(Def->getOperand(0).getReg()) != LLT::scalar(16))
+      return false;
+    if (!MRI.hasOneNonDBGUse(Def->getOperand(0).getReg()))
+      return false;
+    // G_LOAD16_ABS is already a confirmed absolute load; a generic G_LOAD is
+    // absolute iff its pointer matches the absolute-addressing pattern.
+    if (Def->getOpcode() == MOS::G_LOAD16_ABS)
+      return true;
+    return matchAbsoluteAddressing(MRI, Def->getOperand(1).getReg()).has_value();
+  };
+  // v3: a both-global s16 equality-as-value (`g1 == g2`) goes native and folds each
+  // operand in place via `lda abs; cmp abs` (selectBrCondImm -> CmpBrAbsAbs16), and a
+  // global-vs-nonzero-immediate (`g == 0x1234`) folds the global LHS via `lda abs` and
+  // the constant via `cmp #imm` (-> CmpBrAbsImm16) — turning the blanket-native Imag16
+  // round-trip the spike measured into a win. Mixed global-vs-register/local stays
+  // 8-bit (only one operand folds — the other would force a spill); `g == 0` stays on
+  // the G_CMPZ path (!RHSIsZero / !LHSIsZero). The constant is still a plain G_CONSTANT
+  // here (it is byte-split only later), so m_ICst sees it; the selector recovers the
+  // byte-split form via getI16Const. Single-use => 1-to-1 volatile-safe fold.
+  int64_t CstTmp;
+  const bool RHSIsCst = mi_match(RHS, MRI, m_ICst(CstTmp));
+  const bool LHSIsCst = mi_match(LHS, MRI, m_ICst(CstTmp));
+  const bool LHSIsZero = mi_match(LHS, MRI, m_SpecificICst(0));
+  const bool BothGlobal =
+      isFoldableAbsS16Load(LHS) && isFoldableAbsS16Load(RHS);
+  const bool GlobalVsImm =
+      (isFoldableAbsS16Load(LHS) && RHSIsCst && !RHSIsZero) ||
+      (isFoldableAbsS16Load(RHS) && LHSIsCst && !LHSIsZero);
+  // #321 v2: an s16 value already resident in Imag16 — a computed native-s16 ALU/shift
+  // result (selectAlu16Native writes Imag16) or an indirect load. NOT a register-arg
+  // (G_MERGE_VALUES of COPY $physreg, which would force a spill for CMPImag16), a global
+  // (v3's abs-fold), or a constant (handled separately). getDefIgnoringCopies looks
+  // through COPYs. Fire native EQ only when both operands are Imag16-resident (or one is
+  // a constant) — the -3 B win the spike measured for `(a+b) == c`, with the +8 B
+  // register-operand spill avoided by construction.
+  auto isComputedS16 = [&](Register Reg) -> bool {
+    MachineInstr *Def = getDefIgnoringCopies(Reg, MRI);
+    if (!Def || MRI.getType(Def->getOperand(0).getReg()) != LLT::scalar(16))
+      return false;
+    switch (Def->getOpcode()) {
+    // Generic native-s16 ALU/shift (a single-use computed value -> Imag16).
+    case TargetOpcode::G_ADD:
+    case TargetOpcode::G_SUB:
+    case TargetOpcode::G_AND:
+    case TargetOpcode::G_OR:
+    case TargetOpcode::G_XOR:
+    case TargetOpcode::G_SHL:
+    case TargetOpcode::G_LSHR:
+    case TargetOpcode::G_ASHR:
+      return true;
+    default:
+      return false;
+    }
+  };
+  auto isImag16Resident = [&](Register Reg) -> bool {
+    return isComputedS16(Reg) || isIndirectS16Load(Reg);
+  };
+  const bool ComputedEq =
+      (isImag16Resident(LHS) && (isImag16Resident(RHS) || RHSIsCst)) ||
+      (isImag16Resident(RHS) && (isImag16Resident(LHS) || LHSIsCst));
+  // #321 task7: one operand Imag16-resident (computed/indirect), the other a foldable near-abs
+  // global. Fills the gap between ComputedEq (both-Imag16) and BothGlobal (both-abs): selects
+  // `lda zp_computed; cmp abs_global` via CmpBrImagAbs16. The canonicalization swaps below keep
+  // the Imag16-resident value on LHS and the global on RHS so selectBrCondImm finds them.
+  const bool ComputedVsGlobal =
+      (isImag16Resident(LHS) && isFoldableAbsS16Load(RHS)) ||
+      (isImag16Resident(RHS) && isFoldableAbsS16Load(LHS));
+  const bool NativeS16Eq =
+      STI.hasAccum16() && Type == LLT::scalar(16) && Pred == CmpInst::ICMP_EQ &&
+      !RHSIsZero &&
+      (isIndirectS16Load(LHS) || isIndirectS16Load(RHS) || // v1: indirect-load operand
+       BothGlobal || GlobalVsImm ||                        // v3: abs-fold globals
+       ComputedEq || ComputedVsGlobal ||                   // v2: Imag16-resident; task7: mixed
+       all_of(MRI.use_instructions(Dst), [](const MachineInstr &U) {
+         return U.getOpcode() == MOS::G_BRCOND_IMM;
+       }));
+  const bool NativeS16 =
+      STI.hasAccum16() && Type == LLT::scalar(16) &&
+      (Pred == CmpInst::ICMP_UGE || NativeS16Eq);
+
+  // #321 canonicalization: EQ's Z is symmetric (a-b==0 iff b-a==0); swaps below are safe.
+  // task7: for ComputedVsGlobal, put the Imag16-resident value on LHS (for `lda zp` via
+  // LDAImag16) and the global on RHS (for `cmp abs` via CMPAbs16), so foldableAbsLoad16(RHS16)
+  // fires in selectBrCondImm. Covers both `(a+b)==g` (LHS is already computed — swap is no-op
+  // since isFoldableAbsS16Load(LHS) is false) and `g==(a+b)` (global on LHS — swaps them).
+  if (NativeS16Eq && ComputedVsGlobal && isFoldableAbsS16Load(LHS) &&
+      isImag16Resident(RHS))
+    std::swap(LHS, RHS);
+  // GlobalVsImm: put a lone foldable-abs global on LHS (read by `lda abs`) and any constant on
+  // RHS (`cmp #imm`), so CmpBrAbsImm16 fires for `0x1234 == g` too. Guard !isImag16Resident(LHS)
+  // so ComputedVsGlobal cases (computed LHS + global RHS, after the swap above) are not
+  // accidentally re-swapped back.
+  if (NativeS16Eq && isFoldableAbsS16Load(RHS) && !isFoldableAbsS16Load(LHS) &&
+      !isImag16Resident(LHS))
+    std::swap(LHS, RHS);
+
+  if (Type != S8 && !NativeS16) {
+    if (RHSIsZero && Pred == CmpInst::ICMP_EQ &&
+        all_of(MRI.use_instructions(Dst), [](const MachineInstr &MI) {
+          return MI.getOpcode() == MOS::G_BRCOND_IMM;
+        })) {
+      auto Unmerge = Builder.buildUnmerge(S8, LHS);
+      auto Cmp = Builder.buildInstr(MOS::G_CMPZ, {Dst}, {});
+      for (const MachineOperand &MO : unmergeDefs(Unmerge))
+        Cmp.addUse(MO.getReg());
+      MI.eraseFromParent();
+      return true;
+    }
+
+    if (Pred != CmpInst::ICMP_SLT) {
+      Register LHSHigh, LHSRest;
+      Register RHSHigh, RHSRest;
+      std::tie(LHSHigh, LHSRest) = splitHighRest(LHS, Builder);
+      std::tie(RHSHigh, RHSRest) = splitHighRest(RHS, Builder);
+
+      auto EqHigh = Builder.buildICmp(CmpInst::ICMP_EQ, S1, LHSHigh, RHSHigh);
+      // If EqHigh is false, we defer to CmpHigh, which is equal to EqHigh if
+      // Pred==ICMP_EQ.
+      auto CmpHigh = (Pred == CmpInst::ICMP_EQ)
+                         ? Builder.buildConstant(S1, 0)
+                         : Builder.buildICmp(Pred, S1, LHSHigh, RHSHigh);
+      auto RestPred = Pred;
+      if (CmpInst::isSigned(RestPred))
+        RestPred = ICmpInst::getUnsignedPredicate(Pred);
+      auto CmpRest =
+          Builder.buildICmp(RestPred, S1, LHSRest, RHSRest).getReg(0);
+
+      // If the high byte is equal, defer to the unsigned comparison on the
+      // rest. Otherwise, defer to the comparison on the high byte.
+      Builder.buildSelect(Dst, EqHigh, CmpRest, CmpHigh);
+      MI.eraseFromParent();
+      return true;
+    }
+
+    auto LHSUnmerge = Builder.buildUnmerge(S8, LHS);
+    auto LHSUnmergeDefs = unmergeDefsSplitHigh(LHSUnmerge);
+
+    // Determining whether the LHS is negative only requires looking at the
+    // highest byte (bit, really).
+    if (RHSIsZero) {
+      Helper.Observer.changingInstr(MI);
+      MI.getOperand(2).setReg(LHSUnmergeDefs.High.getReg());
+      MI.getOperand(3).setReg(Builder.buildConstant(S8, 0).getReg(0));
+      Helper.Observer.changedInstr(MI);
+      return true;
+    }
+
+    // Perform multibyte signed comparisons by a multibyte subtraction.
+    auto RHSUnmerge = Builder.buildUnmerge(S8, RHS);
+    auto RHSUnmergeDefs = unmergeDefsSplitHigh(RHSUnmerge);
+    assert(LHSUnmerge->getNumOperands() == RHSUnmerge->getNumOperands());
+    CIn = Builder.buildConstant(S1, 1).getReg(0);
+    for (const auto &[LHS, RHS] :
+         zip(LHSUnmergeDefs.Lows, RHSUnmergeDefs.Lows)) {
+      auto Sbc =
+          Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
+      CIn = Sbc.getReg(1);
+    }
+    Type = S8;
+    LHS = LHSUnmergeDefs.High.getReg();
+    RHS = RHSUnmergeDefs.High.getReg();
+    // Fall through to produce the final SBC that determines the comparison
+    // result.
+  } else {
+    CIn = Builder.buildConstant(S1, 1).getReg(0);
+  }
+
+  assert(Type == S8 || NativeS16);
+
+  // Lower 8-bit comparisons to a generic G_SBC instruction with similar
+  // capabilities to the 6502's SBC and CMP instructions.  See
+  // www.6502.org/tutorials/compare_beyond.html.
+  switch (Pred) {
+  case CmpInst::ICMP_EQ: {
+    // #321 native s16 equality (branch-fused): one 16-bit G_SBC -> selectBrCondImm
+    // emits rep/lda/cmp/sep/beq. Z (getReg(4)) is the live flag; the branch reads it.
+    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
+    auto Sbc =
+        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
+    Register Z = Sbc.getReg(4);
+    // Value use of a native 16-bit Z: wrap it in a select so MOSLowerSelect turns it into
+    // a G_BRCOND_IMM that selectBrCondImm fuses into CmpBrImag16 (the materialization
+    // diamond loads 0/1). For a branch use isNZUseLegal is true, so this is skipped.
+    if (!isNZUseLegal(Dst, MRI))
+      Z = buildNZSelect(Z, Builder);
+    Builder.buildCopy(Dst, Z);
+    MI.eraseFromParent();
+    break;
+  }
+  case CmpInst::ICMP_UGE: {
+    // Native 16-bit under +mos-a16 (NativeS16), else 8-bit. The 16-bit G_SBC is
+    // selected to one rep/lda/cmp/sep producing C; its result + N/V/Z are unused.
+    LLT CmpTy = NativeS16 ? LLT::scalar(16) : S8;
+    auto Sbc =
+        Builder.buildInstr(MOS::G_SBC, {CmpTy, S1, S1, S1, S1}, {LHS, RHS, CIn});
+    Builder.buildCopy(Dst, Sbc.getReg(1) /*=C*/);
+    MI.eraseFromParent();
+    break;
+  }
+  case CmpInst::ICMP_SLT: {
+    // Subtractions of zero cannot overflow, so N is always correct.
+    if (RHSIsZero) {
+      auto Sbc =
+          Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
+      Register N = Sbc.getReg(2);
+      if (!isNZUseLegal(Dst, MRI))
+        N = buildNZSelect(N, Builder);
+      Builder.buildCopy(Dst, N);
+    } else {
+      // General subtractions can overflow; if so, N is flipped.
+      auto Sbc =
+          Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1}, {LHS, RHS, CIn});
+      // The quickest way to XOR N with V is to XOR the accumulator with 0x80
+      // iff V, then reexamine N of the accumulator.
+      auto Eor = Builder.buildXor(S8, Sbc, Builder.buildConstant(S8, 0x80));
+      auto Zero = Builder.buildConstant(S8, 0);
+      auto One = Builder.buildConstant(S1, 1);
+      Register N =
+          Builder
+              .buildInstr(
+                  MOS::G_SBC, {S8, S1, S1, S1, S1},
+                  {Builder.buildSelect(S8, Sbc.getReg(3) /*=V*/, Eor, Sbc),
+                   Zero, One})
+              .getReg(2);
+      if (!isNZUseLegal(Dst, MRI))
+        N = buildNZSelect(N, Builder);
+      Builder.buildCopy(Dst, N);
+    }
+    MI.eraseFromParent();
+    break;
+  }
+  default:
+    llvm_unreachable("Unexpected integer comparison type.");
+  }
+
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeSelect(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  auto [Dst, Test, LHS, RHS] = MI.getFirst4Regs();
+
+  LLT P = MRI.getType(Dst);
+  assert(P.isPointer());
+
+  LLT S = LLT::scalar(P.getScalarSizeInBits());
+
+  assert(MRI.getType(Dst) == P);
+  assert(MRI.getType(Test) == LLT::scalar(1));
+  assert(MRI.getType(LHS) == P);
+  assert(MRI.getType(RHS) == P);
+
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(2).setReg(Builder.buildPtrToInt(S, LHS).getReg(0));
+  MI.getOperand(3).setReg(Builder.buildPtrToInt(S, RHS).getReg(0));
+  Register Tmp = MRI.createGenericVirtualRegister(S);
+  MI.getOperand(0).setReg(Tmp);
+  Helper.Observer.changedInstr(MI);
+
+  Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+  Builder.buildIntToPtr(Dst, Tmp);
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeAbs(LegalizerHelper &Helper,
+                                   MachineRegisterInfo &MRI,
+                                   MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  Register Arg = MI.getOperand(1).getReg();
+  LLT Ty = MRI.getType(Arg);
+  assert(MRI.getType(MI.getOperand(0).getReg()) == Ty);
+
+  auto IsNeg = Builder.buildICmp(CmpInst::ICMP_SLT, LLT::scalar(1), Arg,
+                                 Builder.buildConstant(Ty, 0));
+  Builder.buildSelect(MI.getOperand(0), IsNeg, Builder.buildNeg(Ty, Arg), Arg);
+  MI.eraseFromParent();
+  return true;
+}
+
+// #321: legalize a far-pointer (PF, p2) G_PHI by converting it to an s32 phi.
+// G_PHI is legal only for {s1,s8,p0,p1}; a far pointer carried across a loop
+// back-edge (a far-pointer induction variable) otherwise aborts the backend
+// ("unable to legalize ... G_PHI (p2)"). We ptrtoint each incoming value at the
+// end of its predecessor block, retype the phi to s32, then inttoptr the result
+// back to p2 after the block's phis — the same bridge legalizePtrAdd / far
+// load+store use. The resulting s32 phi hands off to the standard
+// narrowScalar-of-G_PHI(s32)->bytes path (exercised by any i32 loop counter).
+// Modeled on LegalizerHelper::widenScalar's G_PHI case for the insert points.
+bool MOSLegalizerInfo::legalizePhi(LegalizerHelper &Helper,
+                                   MachineRegisterInfo &MRI,
+                                   MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  Register Dst = MI.getOperand(0).getReg();
+  LLT IntTy = LLT::scalar(MRI.getType(Dst).getSizeInBits()); // s32 for p2
+
+  Helper.Observer.changingInstr(MI);
+
+  // ptrtoint each incoming far-pointer value at the end of its predecessor
+  // block (operands come in (value, block) pairs).
+  for (unsigned I = 1, E = MI.getNumOperands(); I < E; I += 2) {
+    MachineBasicBlock &Pred = *MI.getOperand(I + 1).getMBB();
+    Builder.setInsertPt(Pred, Pred.getFirstTerminatorForward());
+    auto Int = Builder.buildPtrToInt(IntTy, MI.getOperand(I).getReg());
+    MI.getOperand(I).setReg(Int.getReg(0));
+  }
+
+  // Retype the phi def to the integer, then inttoptr it back to the far pointer
+  // immediately after the block's phis.
+  Register NewDst = MRI.createGenericVirtualRegister(IntTy);
+  MI.getOperand(0).setReg(NewDst);
+  MachineBasicBlock &MBB = *MI.getParent();
+  Builder.setInsertPt(MBB, MBB.getFirstNonPHI());
+  Builder.buildIntToPtr(Dst, NewDst);
+
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  auto [Result, Base, Offset] = MI.getFirst3Regs();
+
+  MachineInstr *GlobalBase = getOpcodeDef(G_GLOBAL_VALUE, Base, MRI);
+  auto ConstOffset = getIConstantVRegValWithLookThrough(Offset, MRI);
+
+  // Fold constant offsets into global value operand.
+  if (GlobalBase && ConstOffset) {
+    const MachineOperand &Op = GlobalBase->getOperand(1);
+    Builder.buildInstr(G_GLOBAL_VALUE)
+        .addDef(Result)
+        .addGlobalAddress(Op.getGlobal(),
+                          Op.getOffset() + ConstOffset->Value.getSExtValue());
+    MI.eraseFromParent();
+    return true;
+  }
+
+  // #320 far runtime: a 32-bit far pointer (PF) has no G_INC/G_DEC form; let it
+  // fall through to the generic ptrtoint/add/inttoptr lowering below (the 32-bit
+  // add carries through the bank byte). Only near pointers take the ±1 fast path.
+  if (ConstOffset && ConstOffset->Value.abs().isOne() &&
+      MRI.getType(Base).getScalarSizeInBits() != 32) {
+    Builder.buildInstr(ConstOffset->Value.isOne() ? MOS::G_INC : MOS::G_DEC,
+                       {Result}, {Base});
+    MI.eraseFromParent();
+    return true;
+  }
+
+  // Generalized pointer additions must be lowered to integer arithmetic.
+  LLT S = LLT::scalar(MRI.getType(Base).getScalarSizeInBits());
+  auto PtrVal = Builder.buildPtrToInt(S, Base);
+  auto Sum = Builder.buildAdd(S, PtrVal, Offset);
+  Builder.buildIntToPtr(Result, Sum);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizePtrMask(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  auto [Result, Base, Mask] = MI.getFirst3Regs();
+  LLT S = LLT::scalar(MRI.getType(Base).getScalarSizeInBits());
+
+  Builder.buildIntToPtr(
+      Result, Builder.buildAnd(S, Builder.buildPtrToInt(S, Base), Mask));
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
+                                             MachineRegisterInfo &MRI,
+                                             MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  auto [DestReg, DestTypeP, SrcReg, SrcTypeP] = MI.getFirst2RegLLTs();
+  LLT DestTypeS = LLT::scalar(DestTypeP.getScalarSizeInBits());
+  LLT SrcTypeS = LLT::scalar(SrcTypeP.getScalarSizeInBits());
+
+  // #320 packed-24: AS_FarPacked (p3, 24-bit) <-> AS_Far (p2, 32-bit). Convert via
+  // the three shared low address bytes — never a 24-bit scalar (no MVT::i24). The
+  // 3x s8 <-> p3 merge/unmerge here is folded away by the artifact combiner against
+  // the matching merge/unmerge in the producing/consuming load/store (legalizePacked*).
+  const unsigned DestAS = DestTypeP.getAddressSpace();
+  const unsigned SrcAS = SrcTypeP.getAddressSpace();
+  if (DestAS == MOS::AS_FarPacked || SrcAS == MOS::AS_FarPacked) {
+    LLT S8 = LLT::scalar(8);
+    LLT S32 = LLT::scalar(32);
+    if (SrcAS == MOS::AS_FarPacked && DestAS == MOS::AS_Far) {
+      // p3 -> p2: zero-extend the bank pad byte (the address bits are identical).
+      auto Bytes = Builder.buildUnmerge(S8, SrcReg); // p3 -> 3x s8
+      auto Zero = Builder.buildConstant(S8, 0);
+      auto Merged = Builder.buildMergeValues(
+          S32, {Bytes.getReg(0), Bytes.getReg(1), Bytes.getReg(2), Zero.getReg(0)});
+      Builder.buildIntToPtr(DestReg, Merged);
+    } else if (SrcAS == MOS::AS_Far && DestAS == MOS::AS_FarPacked) {
+      // p2 -> p3: keep the three low address bytes, drop the unused pad byte.
+      auto SrcInt = Builder.buildPtrToInt(S32, SrcReg); // p2 -> s32
+      auto Bytes = Builder.buildUnmerge(S8, SrcInt);    // s32 -> 4x s8
+      Builder.buildMergeValues(
+          DestReg, {Bytes.getReg(0), Bytes.getReg(1), Bytes.getReg(2)}); // 3x s8 -> p3
+    } else {
+      // Other packed casts (e.g. near<->packed) are not formed by clang for the
+      // far-pointer-table use case; fail loudly rather than miscompile.
+      return false;
+    }
+    MI.eraseFromParent();
+    return true;
+  }
+
+  auto Tmp = Builder.buildPtrToInt(SrcTypeS, SrcReg);
+
+  if (DestTypeS.getSizeInBits() < SrcTypeS.getSizeInBits()) {
+    // larger -> smaller address space: truncate
+    Tmp = Builder.buildTrunc(DestTypeS, Tmp);
+  } else if (DestTypeS.getSizeInBits() > SrcTypeS.getSizeInBits()) {
+    // smaller -> larger address space: zero-extend the address.
+    Tmp = Builder.buildZExt(DestTypeS, Tmp);
+    // ZeroPage (AS1) -> Memory (AS0): the direct page lives at ZeroPageOffset, so
+    // bias the widened address into it. #320 far runtime: Memory (AS0) -> Far
+    // (AS2) needs no bias — the near 16-bit address is already the far address's
+    // low word and the bank byte is $00.
+    if (SrcTypeP.getAddressSpace() == MOS::AS_ZeroPage &&
+        STI.getZeroPageOffset() != 0) {
+      // Dest = (Src | ZeroPageOffset)
+      Tmp = Builder.buildOr(
+          DestTypeS, Tmp,
+          Builder.buildConstant(DestTypeS, STI.getZeroPageOffset()));
+    }
+  }
+
+  assert(MRI.getType(Tmp->getOperand(0).getReg()) == DestTypeS);
+
+  Builder.buildIntToPtr(DestReg, Tmp);
+
+  MI.eraseFromParent();
+  return true;
+}
+
+// Convert odd versions of generic add/sub to even versions, which can subsume
+// the odd versions via a zero carry-in.
+bool MOSLegalizerInfo::legalizeAddSubO(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  LLT S1 = LLT::scalar(1);
+
+  unsigned Opcode;
+  switch (MI.getOpcode()) {
+  default:
+    llvm_unreachable("Unexpected opcode");
+  case G_UADDO:
+    Opcode = G_UADDE;
+    break;
+  case G_SADDO:
+    Opcode = G_SADDE;
+    break;
+  case G_USUBO:
+    Opcode = G_USUBE;
+    break;
+  case G_SSUBO:
+    Opcode = G_SSUBE;
+    break;
+  }
+
+  Builder.buildInstr(
+      Opcode, {MI.getOperand(0), MI.getOperand(1)},
+      {MI.getOperand(2), MI.getOperand(3), Builder.buildConstant(S1, 0)});
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeSubE(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  LLT S1 = LLT::scalar(1);
+  LLT S8 = LLT::scalar(8);
+
+  auto CarryIn = Builder.buildNot(S1, MI.getOperand(4));
+  if (MI.getOpcode() == MOS::G_USUBE) {
+    auto Sbc =
+        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1},
+                           {MI.getOperand(2), MI.getOperand(3), CarryIn});
+    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+    Builder.buildCopy(MI.getOperand(0), Sbc.getReg(0));
+    Builder.buildNot(MI.getOperand(1), Sbc.getReg(1) /*=C*/);
+  } else {
+    assert(MI.getOpcode() == MOS::G_SSUBE);
+    auto Sbc =
+        Builder.buildInstr(MOS::G_SBC, {S8, S1, S1, S1, S1},
+                           {MI.getOperand(2), MI.getOperand(3), CarryIn});
+    Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+    Builder.buildCopy(MI.getOperand(0), Sbc.getReg(0));
+    Builder.buildCopy(MI.getOperand(1), Sbc.getReg(3) /*=V*/);
+  }
+
+  MI.eraseFromParent();
+  return true;
+}
+
+//===----------------------------------------------------------------------===//
+// Memory Operations
+//===----------------------------------------------------------------------===//
+
+// #321 xy16 B1 gate: return true if every use of Vreg (an s16 vreg produced by
+// G_LOAD16_ABS) is compatible with the 16-bit X/Y register class — meaning it can
+// be selected without going through A16/Imag16. Compatible uses:
+//   G_STORE16_ABS       (val operand) → STXAbs16/STYAbs16
+//   G_STORE16_INDIR     (val operand) → STXImag16 + LDAImag16 + STAIndir16
+//   G_ADD/G_SUB ±1      (LHS operand) → INX16/DEX16/INY16/DEY16
+//   G_SBC compare form  (LHS=op5)     → CPX*/CPY*16
+//   G_PHI / COPY        → follow the result vreg (cycle-safe via Visited set)
+// Any other use → false (conservative; misclassification must miss a win only).
+static bool allUsesAreXY16Compatible(Register Vreg, const MachineRegisterInfo &MRI,
+                                     SmallSet<Register, 8> &Visited) {
+  if (!Visited.insert(Vreg).second)
+    return true; // already-visited (cycle from PHI/COPY chain)
+  for (const MachineInstr &Use : MRI.use_nodbg_instructions(Vreg)) {
+    switch (Use.getOpcode()) {
+    case MOS::G_STORE16_ABS:
+    case MOS::G_STORE16_INDIR:
+      if (Use.getOperand(0).getReg() != Vreg)
+        return false; // must be the stored value, not an address
+      break;
+    case TargetOpcode::G_ADD: {
+      if (MRI.getType(Use.getOperand(0).getReg()) != LLT::scalar(16))
+        return false;
+      // Either operand may be Vreg (G_ADD is commutative); the other must be ±1.
+      Register Other = (Use.getOperand(1).getReg() == Vreg)
+                           ? Use.getOperand(2).getReg()
+                           : Use.getOperand(1).getReg();
+      auto C = getIConstantVRegValWithLookThrough(Other, MRI);
+      if (!C)
+        return false;
+      uint64_t V = C->Value.getZExtValue() & 0xFFFF;
+      if (V != 1 && V != 0xFFFF)
+        return false;
+      break;
+    }
+    case TargetOpcode::G_SUB: {
+      if (MRI.getType(Use.getOperand(0).getReg()) != LLT::scalar(16))
+        return false;
+      if (Use.getOperand(1).getReg() != Vreg)
+        return false; // Vreg must be the minuend (LHS); RHS = step to subtract
+      auto C = getIConstantVRegValWithLookThrough(Use.getOperand(2).getReg(), MRI);
+      if (!C)
+        return false;
+      uint64_t V = C->Value.getZExtValue() & 0xFFFF;
+      if (V != 1 && V != 0xFFFF)
+        return false;
+      break;
+    }
+    case MOS::G_SBC: {
+      // Only compare form: LHS=op5, result (op0) dead, carryIn (op7) = 1.
+      if (MRI.getType(Use.getOperand(5).getReg()) != LLT::scalar(16))
+        return false;
+      if (Use.getOperand(5).getReg() != Vreg)
+        return false; // Vreg must be LHS; RHS stays in Imag16
+      if (!MRI.use_nodbg_empty(Use.getOperand(0).getReg()))
+        return false; // result used → arithmetic SBC, not compare
+      auto CarryIn =
+          getIConstantVRegValWithLookThrough(Use.getOperand(7).getReg(), MRI);
+      if (!CarryIn || CarryIn->Value.isZero())
+        return false; // carryIn not known 1 → not a compare form
+      break;
+    }
+    case TargetOpcode::G_PHI:
+      if (!allUsesAreXY16Compatible(Use.getOperand(0).getReg(), MRI, Visited))
+        return false;
+      break;
+    case TargetOpcode::COPY:
+      if (!allUsesAreXY16Compatible(Use.getOperand(0).getReg(), MRI, Visited))
+        return false;
+      break;
+    default:
+      return false; // unknown use — conservative
+    }
+  }
+  return true;
+}
+
+// Native s16 accesses use absolute, indexed, or indirect addressing when their
+// operands can benefit from the 16-bit register path. Other accesses narrow to
+// two byte operations.
+bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+                                           MachineRegisterInfo &MRI,
+                                           GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+  Register Ptr = MI.getPointerReg();
+  const bool IsLoad = isa<GLoad>(MI);
+
+  // A byte-built value used only by absolute stores or byte consumers does not
+  // need an Imag16 pair. Keeping these stores byte-wise lets the register allocator
+  // store each byte directly without an accumulator-width transition. Calls,
+  // inline assembly, and cross-block uses can require the bytes to be spilled;
+  // keep those values on the native path, where a single wide reload is cheaper.
+  auto isByteBuiltStoreValue = [&](Register Value) {
+    const MachineInstr *Def = MRI.getVRegDef(Value);
+    if (!Def || Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
+        Def->getNumOperands() != 3 ||
+        MRI.getType(Def->getOperand(1).getReg()) != LLT::scalar(8))
+      return false;
+    return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
+      if (Use.getParent() != Def->getParent())
+        return false;
+      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
+        if (I->isCall() || I->isInlineAsm())
+          return false;
+      switch (Use.getOpcode()) {
+      case TargetOpcode::G_UNMERGE_VALUES:
+        return true;
+      case TargetOpcode::G_ADD:
+      case TargetOpcode::G_SUB: {
+        if (Use.getOperand(1).getReg() != Value)
+          return false;
+        auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
+          const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
+          return ByteDef && ByteDef->isCopy() &&
+                 ByteDef->getOperand(1).getReg() == PhysReg;
+        };
+        if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
+            !isABIByte(Def->getOperand(2).getReg(), MOS::X))
+          return false;
+        auto Step = getIConstantVRegValWithLookThrough(
+            Use.getOperand(2).getReg(), MRI);
+        return Step && Step->Value.isOne();
+      }
+      case MOS::G_STORE16_ABS:
+        return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
+          return MMO->isAtomic();
+        });
+      case TargetOpcode::G_STORE: {
+        const auto &Store = cast<GStore>(Use);
+        return !Store.isAtomic() &&
+               matchAbsoluteAddressing(MRI, Store.getPointerReg()).has_value();
+      }
+      default:
+        return false;
+      }
+    });
+  };
+
+  // A single plain indirect store can consume an A:X value directly. Imaginary
+  // argument pairs and values shared with other stores can favor one wide load.
+  // Allow only copies and byte splits between the merge and its consumers: other
+  // work can clobber A:X or establish a native-width context with cheaper stores.
+  auto isByteIndirectStore = [&]() {
+    // Atomic stores must remain a single memory operation.
+    if (IsLoad || MI.isAtomic())
+      return false;
+    const MachineInstr *PtrDef = getDefIgnoringCopies(Ptr, MRI);
+    if (!PtrDef || !PtrDef->isCopy() ||
+        !MOS::Imag16RegClass.contains(PtrDef->getOperand(1).getReg()))
+      return false;
+    Register Value = cast<GStore>(MI).getValueReg();
+    const MachineInstr *Def = MRI.getVRegDef(Value);
+    if (!Def || Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
+        Def->getNumOperands() != 3)
+      return false;
+    auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
+      const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
+      return ByteDef && ByteDef->isCopy() &&
+             ByteDef->getOperand(1).getReg() == PhysReg;
+    };
+    if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
+        !isABIByte(Def->getOperand(2).getReg(), MOS::X))
+      return false;
+    return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
+      if (Use.getParent() != Def->getParent() ||
+          (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES))
+        return false;
+      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
+        if (&*I != &MI && !I->isCopy() && !I->isDebugInstr() &&
+            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES)
+          return false;
+      return true;
+    });
+  };
+
+  // Don't take a constant-valued store native: materializing the constant into an
+  // Imag16 pair just to `lda zp; sta` is worse than the byte path — a store of zero
+  // wants the STZ-fusion peephole (`rep; stz; sep`), and a small immediate stays a
+  // cheap pair of 8-bit immediate stores. Only register-valued stores win here.
+  if (!IsLoad && !MI.isAtomic() &&
+      getIConstantVRegValWithLookThrough(cast<GStore>(MI).getValueReg(), MRI))
+    return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
+           LegalizerHelper::Legalized;
+
+  // #321: an s16 LOAD whose result is only ever split into bytes (every use is a
+  // G_UNMERGE — e.g. an s16 global feeding an 8-bit-narrowed compare like
+  // `b = (a == c)`) should keep its byte-wise lowering. Forming the native 16-bit
+  // `lda abs -> A16; sta imag16` here only for the consumer to read the bytes straight
+  // back is a wasteful round-trip (worse than the default byte loads). Narrow it
+  // instead. Indirect loads retain the native form.
+  const bool AllUsesUnmerge =
+      IsLoad && !MI.isAtomic() &&
+      !MRI.use_nodbg_empty(MI.getOperand(0).getReg()) &&
+      all_of(MRI.use_nodbg_instructions(MI.getOperand(0).getReg()),
+             [](const MachineInstr &U) {
+               return U.getOpcode() == TargetOpcode::G_UNMERGE_VALUES;
+             });
+
+  if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 32) {
+    // A byte-built ABI value can be stored as two direct byte writes. Native
+    // producers use one M=0 access, and a load split only into bytes gains no
+    // benefit from occupying the wide accumulator.
+    bool ByteStore = false;
+    if (!IsLoad && !MI.isAtomic()) {
+      Register Value = cast<GStore>(MI).getValueReg();
+      const MachineInstr *Def = getDefIgnoringCopies(Value, MRI);
+      ByteStore = Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES;
+    }
+    if (!AllUsesUnmerge && !ByteStore) {
+      if (auto Abs = matchAbsoluteAddressing(MRI, Ptr)) {
+        Builder.buildInstr(IsLoad ? MOS::G_LOAD16_FAR_ABS
+                                  : MOS::G_STORE16_FAR_ABS)
+            .add(MI.getOperand(0))
+            .add(*Abs)
+            .addMemOperand(*MI.memoperands_begin());
+        MI.eraseFromParent();
+        return true;
+      }
+      if (tryFarAbsoluteIndexedAddressing(Helper, MRI, MI) ||
+          tryFarIndirectIndexedAddressing(Helper, MRI, MI))
+        return true;
+      Builder.buildInstr(IsLoad ? MOS::G_LOAD16_FAR_INDIR
+                                : MOS::G_STORE16_FAR_INDIR)
+          .add(MI.getOperand(0))
+          .addUse(Ptr)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+  }
+
+  if (STI.hasAccum16() && MRI.getType(Ptr).getScalarSizeInBits() == 16) {
+    // Absolute address (global/static/const) -> native 16-bit `lda abs`/`sta abs`.
+    if (auto AbsOp = matchAbsoluteAddressing(MRI, Ptr)) {
+      const bool ByteStore =
+          !IsLoad && isByteBuiltStoreValue(cast<GStore>(MI).getValueReg());
+      if (!AllUsesUnmerge && !ByteStore) {
+        Register Dst = MI.getOperand(0).getReg();
+        Builder
+            .buildInstr(IsLoad ? MOS::G_LOAD16_ABS : MOS::G_STORE16_ABS)
+            .add(MI.getOperand(0)) // dst (load) / value (store)
+            .add(*AbsOp)
+            .addMemOperand(*MI.memoperands_begin());
+        // B1: under +mos-xy16, constrain the load result to Xc16 when ALL uses
+        // are X-register-compatible (compare, ±1 inc/dec, store-abs, PHI/COPY
+        // chains). This lets selectXY16 emit LDXAbs16 instead of the A16 round-
+        // trip; a misclassification can only miss a win, never add a copy.
+        if (IsLoad && STI.hasIndex16() && !MRI.use_nodbg_empty(Dst)) {
+          SmallSet<Register, 8> Visited;
+          if (allUsesAreXY16Compatible(Dst, MRI, Visited))
+            MRI.setRegClass(Dst, &MOS::Xc16RegClass);
+        }
+        MI.eraseFromParent();
+        return true;
+      }
+      // Byte-only loads and byte-built stores use the narrowing below.
+    } else if (tryIndexedAddressing16(Helper, MRI, MI)) {
+      // abs,x or (zp),y indexed 16-bit load/store (#321 Increment 1e).
+      return true;
+    } else if (STI.has65C02()) {
+      if (isByteIndirectStore())
+        return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
+               LegalizerHelper::Legalized;
+      // Runtime 16-bit pointer -> native 16-bit `lda (zp)`/`sta (zp)`.
+      Builder.buildInstr(IsLoad ? MOS::G_LOAD16_INDIR : MOS::G_STORE16_INDIR)
+          .add(MI.getOperand(0))
+          .addUse(Ptr)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+  }
+  // zp-pointer / far / non-a16: fall back to the 8-bit byte-pair lowering.
+  return Helper.narrowScalar(MI, 0, LLT::scalar(8)) ==
+         LegalizerHelper::Legalized;
+}
+
+// Load pointers by loading a 16-bit integer, then converting to pointer. This
+// allows the 16-bit loads to be reduced to a pair of 8-bit loads.
+bool MOSLegalizerInfo::legalizeLoad(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    GAnyLoad &MI) const {
+  if (auto *Load = dyn_cast<GLoad>(&MI)) {
+    if (MRI.getType(Load->getDstReg()) == LLT::scalar(8))
+      return selectAddressingMode(Helper, MRI, MI);
+    // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer ->
+    // one native indirect load (else narrow to two 8-bit, as before).
+    if (MRI.getType(Load->getDstReg()) == LLT::scalar(16))
+      return legalizeLoadStore16(Helper, MRI, MI);
+    // #320 packed-24: loading a packed far pointer VALUE (p3) reads 3 bytes and
+    // merges them into a p3 (the merge is folded against the consuming cast/store).
+    LLT DstTy = MRI.getType(Load->getDstReg());
+    if (DstTy.isPointer() && DstTy.getAddressSpace() == MOS::AS_FarPacked)
+      return legalizePackedPtrAccess(Helper, MRI, *Load);
+  }
+
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Builder.setInsertPt(Builder.getMBB(), std::next(Builder.getInsertPt()));
+  Register Tmp;
+  const MachineMemOperand &MMO = **MI.memoperands_begin();
+  switch (MI.getOpcode()) {
+  case MOS::G_SEXTLOAD:
+    Tmp = MRI.createGenericVirtualRegister(MMO.getType());
+    Builder.buildSExt(MI.getDstReg(), Tmp);
+    break;
+  case MOS::G_ZEXTLOAD:
+    Tmp = MRI.createGenericVirtualRegister(MMO.getType());
+    Builder.buildZExt(MI.getDstReg(), Tmp);
+    break;
+  default:
+    auto DstType = MRI.getType(MI.getDstReg());
+    assert(DstType.isPointer());
+    Tmp = MRI.createGenericVirtualRegister(
+        LLT::scalar(DstType.getScalarSizeInBits()));
+    Builder.buildIntToPtr(MI.getDstReg(), Tmp);
+    break;
+  }
+  Helper.Observer.changingInstr(MI);
+  MI.setDesc(Builder.getTII().get(MOS::G_LOAD));
+  MI.getOperand(0).setReg(Tmp);
+  Helper.Observer.changedInstr(MI);
+  // Select a far byte address while its G_PTR_ADD and zero-extended index are
+  // still available; the new G_LOAD can otherwise outlive that address tree.
+  if (MMO.getType() == LLT::scalar(8) &&
+      MRI.getType(MI.getPointerReg()).getScalarSizeInBits() == 32) {
+    Builder.setInsertPt(*MI.getParent(), MI.getIterator());
+    return selectAddressingMode(Helper, MRI, cast<GLoad>(MI));
+  }
+  return true;
+}
+
+// #320 packed-24: legalize a load/store whose VALUE is a packed far pointer (p3,
+// 24-bit, datalayout p3:24:8) as a 3-byte memory access bridged to/from p3 via a
+// 3x s8 merge/unmerge. The bridge merge/unmerge is folded away by the artifact
+// combiner against the matching unmerge/merge in the adjacent addrspacecast (or an
+// adjacent packed load/store for a packed->packed copy), so no 24-bit value or
+// pointer ever reaches the selector (there is no MVT::i24 / 24-bit register class).
+bool MOSLegalizerInfo::legalizePackedPtrAccess(LegalizerHelper &Helper,
+                                               MachineRegisterInfo &MRI,
+                                               GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  MachineFunction &MF = Builder.getMF();
+  const LLT S8 = LLT::scalar(8);
+  Register Ptr = MI.getPointerReg();
+  LLT PtrTy = MRI.getType(Ptr);
+  LLT OffTy = LLT::scalar(PtrTy.getSizeInBits());
+  const MachineMemOperand &MMO = **MI.memoperands_begin();
+  constexpr unsigned NumBytes = 3;
+
+  // Byte address: base, base+1, base+2.
+  auto byteAddr = [&](unsigned I) -> Register {
+    if (I == 0)
+      return Ptr;
+    return Builder.buildPtrAdd(PtrTy, Ptr, Builder.buildConstant(OffTy, I))
+        .getReg(0);
+  };
+
+  if (auto *Store = dyn_cast<GStore>(&MI)) {
+    auto Bytes = Builder.buildUnmerge(S8, Store->getValueReg()); // p3 -> 3x s8
+    for (unsigned I = 0; I < NumBytes; ++I)
+      Builder.buildStore(Bytes.getReg(I), byteAddr(I),
+                         *MF.getMachineMemOperand(&MMO, I, S8));
+  } else {
+    auto &Load = cast<GLoad>(MI);
+    SmallVector<Register, NumBytes> Bytes;
+    for (unsigned I = 0; I < NumBytes; ++I)
+      Bytes.push_back(Builder
+                          .buildLoad(S8, byteAddr(I),
+                                     *MF.getMachineMemOperand(&MMO, I, S8))
+                          .getReg(0));
+    Builder.buildMergeValues(Load.getDstReg(), Bytes); // 3x s8 -> p3
+  }
+  MI.eraseFromParent();
+  return true;
+}
+
+// Converts pointer to integer before store, allowing the store to later be
+// narrowed to 8 bits.
+bool MOSLegalizerInfo::legalizeStore(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI,
+                                     GStore &MI) const {
+  if (MRI.getType(MI.getValueReg()) == LLT::scalar(8))
+    return selectAddressingMode(Helper, MRI, MI);
+  // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer -> one
+  // native indirect store (else narrow to two 8-bit, as before).
+  if (MRI.getType(MI.getValueReg()) == LLT::scalar(16))
+    return legalizeLoadStore16(Helper, MRI, MI);
+  // #320 packed-24: storing a packed far pointer VALUE (p3) writes 3 bytes (the p3
+  // is unmerged to bytes; the unmerge is folded against the producing cast/load).
+  {
+    LLT ValTy = MRI.getType(MI.getValueReg());
+    if (ValTy.isPointer() && ValTy.getAddressSpace() == MOS::AS_FarPacked)
+      return legalizePackedPtrAccess(Helper, MRI, MI);
+  }
+
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  auto ValueType = MRI.getType(MI.getValueReg());
+  assert(ValueType.isPointer());
+
+  Register Tmp =
+      Builder
+          .buildPtrToInt(LLT::scalar(ValueType.getScalarSizeInBits()),
+                         MI.getValueReg())
+          .getReg(0);
+  Helper.Observer.changingInstr(MI);
+  MI.getOperand(0).setReg(Tmp);
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+  const MachineFunction &MF = *MO.getParent()->getMF();
+  const MOSFrameLowering &TFL =
+      *MF.getSubtarget<MOSSubtarget>().getFrameLowering();
+  assert(MO.isFI());
+  if (!TFL.usesStaticStack(MF))
+    return false;
+  return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
+}
+
+bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
+                                              MachineRegisterInfo &MRI,
+                                              GLoadStore &MI) const {
+  LLT S8 = LLT::scalar(8);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  if (!STI.hasAccum16() || !STI.has65C02())
+    return false;
+
+  const bool IsLoad = isa<GLoad>(MI);
+  Register Addr = MI.getPointerReg();
+  int64_t ConstOffset = 0;
+  Register VarIndex = 0;
+  // B2: set when a direct s16 offset (16-bit index) is found; switches the
+  // emitted opcode from G_LOAD16_ABS_IDX (8-bit X) to G_LOAD_ABS_IDX16 (16-bit X).
+  bool Use16BitIdx = false;
+
+  // Returns the abs-indexed or indir-indexed opcode based on data width and index width.
+  auto AbsIdxOpc  = [&]() -> unsigned {
+    return Use16BitIdx ? (IsLoad ? MOS::G_LOAD_ABS_IDX16   : MOS::G_STORE_ABS_IDX16)
+                       : (IsLoad ? MOS::G_LOAD16_ABS_IDX    : MOS::G_STORE16_ABS_IDX);
+  };
+  auto IndirIdxOpc = [&]() -> unsigned {
+    return Use16BitIdx ? (IsLoad ? MOS::G_LOAD_INDIR_IDX16  : MOS::G_STORE_INDIR_IDX16)
+                       : (IsLoad ? MOS::G_LOAD16_INDIR_IDX   : MOS::G_STORE16_INDIR_IDX);
+  };
+
+  while (true) {
+    // Absolute base cases — require a VarIndex already found.
+    if (auto ConstAddr = getIConstantVRegValWithLookThrough(Addr, MRI)) {
+      if (!VarIndex)
+        return false;
+      int64_t Base = ConstAddr->Value.getSExtValue() + ConstOffset;
+      unsigned Opc = AbsIdxOpc();
+      Builder.buildInstr(Opc)
+          .add(MI.getOperand(0))
+          .addImm(Base)
+          .addUse(VarIndex)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    if (const MachineInstr *GVAddr = getOpcodeDef(G_GLOBAL_VALUE, Addr, MRI)) {
+      if (!VarIndex)
+        return false;
+      const MachineOperand &GV = GVAddr->getOperand(1);
+      Builder.buildInstr(AbsIdxOpc())
+          .add(MI.getOperand(0))
+          .addGlobalAddress(GV.getGlobal(), GV.getOffset() + ConstOffset)
+          .addUse(VarIndex)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    if (const MachineInstr *FIAddr = getOpcodeDef(G_FRAME_INDEX, Addr, MRI)) {
+      const MachineOperand &FI = FIAddr->getOperand(1);
+      if (!VarIndex || !willBeStaticallyAllocated(FI))
+        return false;
+      Builder.buildInstr(AbsIdxOpc())
+          .add(MI.getOperand(0))
+          .addFrameIndex(FI.getIndex(), FI.getOffset() + ConstOffset)
+          .addUse(VarIndex)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    // Peel a G_PTR_ADD: constant offsets accumulate; a single 8-bit variable
+    // becomes VarIndex (first one wins; a second means we can't fold both).
+    if (const auto *PtrAdd =
+            cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+      Addr = PtrAdd->getBaseReg();
+      Register Off = PtrAdd->getOffsetReg();
+      if (auto C = getIConstantVRegValWithLookThrough(Off, MRI)) {
+        ConstOffset += C->Value.getSExtValue();
+        continue;
+      }
+      if (MachineInstr *ZExt = getOpcodeDef(G_ZEXT, Off, MRI)) {
+        // Pre-legalization: explicit G_ZEXT from a ≤8-bit source.
+        if (VarIndex)
+          return false;
+        Register Src = ZExt->getOperand(1).getReg();
+        LLT SrcTy = MRI.getType(Src);
+        if (SrcTy.getSizeInBits() > 8)
+          return false;
+        if (SrcTy.getSizeInBits() < 8)
+          Src = Builder.buildZExt(S8, Src).getReg(0);
+        VarIndex = Src;
+        continue;
+      }
+      // G_ZEXTLOAD(s16, ptr): the result is a zero-extending load of an ≤8-bit
+      // memory operand.  Using G_TRUNC to s8 here is safe because after the
+      // G_ZEXTLOAD legalizes to G_MERGE_VALUES(lo_s8, G_CONSTANT(0)), the
+      // LegalizationArtifactCombiner reduces the G_TRUNC to lo_s8 directly
+      // (a standalone s8 register).  Crucially, the G_CONSTANT(0) high byte IS
+      // explicitly materialized by the legalizer — unlike a "known-zero" from
+      // bounds analysis, which the RA can elide, leaving the pair's high byte
+      // undefined and crashing the spill-around-call path (seed 56 bug).
+      if (MachineInstr *ZExtLoad = getOpcodeDef(G_ZEXTLOAD, Off, MRI)) {
+        if (VarIndex)
+          return false;
+        LLT LoadTy = ZExtLoad->memoperands().front()->getMemoryType();
+        if (!LoadTy.isScalar() || LoadTy.getSizeInBits() > 8)
+          return false;
+        VarIndex = Builder.buildZExtOrTrunc(S8, Off).getReg(0);
+        continue;
+      }
+      // B2: under +mos-xy16, a direct s16 offset uses the widened index form.
+      // Use16BitIdx switches the emitted opcodes to G_LOAD_ABS_IDX16 etc.
+      if (STI.hasIndex16() && !VarIndex && MRI.getType(Off) == LLT::scalar(16)) {
+        VarIndex = Off;
+        Use16BitIdx = true;
+        continue;
+      }
+      return false;
+    }
+    // Non-absolute base (runtime ZP pointer).
+    // Case 1: variable index, zero accumulated const → `lda (zp),y` with VarIndex.
+    // Case 2: no variable index, const offset in [1,255] → materialise as Y.
+    // Mixed (VarIndex + ConstOffset != 0) can't be expressed in one indexed op.
+    if (VarIndex && ConstOffset == 0) {
+      Builder.buildInstr(IndirIdxOpc())
+          .add(MI.getOperand(0))
+          .addUse(Addr)
+          .addUse(VarIndex)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    if (!VarIndex && ConstOffset >= 1 && ConstOffset <= 255 && !Use16BitIdx) {
+      Register Idx = Builder.buildConstant(S8, ConstOffset).getReg(0);
+      Builder.buildInstr(IndirIdxOpc())
+          .add(MI.getOperand(0))
+          .addUse(Addr)
+          .addUse(Idx)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+                                            MachineRegisterInfo &MRI,
+                                            GLoadStore &MI) const {
+  switch (MRI.getType(MI.getPointerReg()).getScalarSizeInBits()) {
+  case 8: {
+    if (tryAbsoluteAddressing(Helper, MRI, MI, true))
+      return true;
+    if (tryAbsoluteIndexedAddressing(Helper, MRI, MI, true))
+      return true;
+    return selectZeroIndexedAddressing(Helper, MRI, MI);
+  }
+  case 16: {
+    if (tryAbsoluteAddressing(Helper, MRI, MI, false))
+      return true;
+    if (tryAbsoluteIndexedAddressing(Helper, MRI, MI, false))
+      return true;
+    return selectIndirectAddressing(Helper, MRI, MI);
+  }
+  case 32: {
+    // #320: 32-bit far pointer. A compile-time-constant/global far address uses
+    // 65816 absolute-long (`lda $xxxxxx`); a RUNTIME far pointer uses indirect-
+    // long (`lda [dp]`) through a ZP Imag32 quad.
+    if (tryFarAbsoluteAddressing(Helper, MRI, MI))
+      return true;
+    if (tryFarAbsoluteIndexedAddressing(Helper, MRI, MI))
+      return true;
+    // #321 Phase 2 inc 1: a small constant displacement off that runtime
+    // pointer folds into `lda [dp],y`/`sta [dp],y` instead of a 32-bit add.
+    if (tryFarIndirectIndexedAddressing(Helper, MRI, MI))
+      return true;
+    return tryFarIndirectAddressing(Helper, MRI, MI);
+  }
+  default:
+    llvm_unreachable("unknown pointer size");
+  }
+}
+
+std::optional<MachineOperand>
+MOSLegalizerInfo::matchAbsoluteAddressing(MachineRegisterInfo &MRI,
+                                          Register Addr) const {
+  int64_t Offset = 0;
+
+  while (true) {
+    if (auto ConstAddr = getIConstantVRegValWithLookThrough(Addr, MRI)) {
+      return MachineOperand::CreateImm(Offset +
+                                       ConstAddr->Value.getSExtValue());
+    }
+    if (const MachineInstr *GVAddr = getOpcodeDef(G_GLOBAL_VALUE, Addr, MRI)) {
+      const MachineOperand &GV = GVAddr->getOperand(1);
+      return MachineOperand::CreateGA(GV.getGlobal(), GV.getOffset() + Offset);
+    }
+    if (const MachineInstr *FIAddr = getOpcodeDef(G_FRAME_INDEX, Addr, MRI)) {
+      const MachineOperand &FI = FIAddr->getOperand(1);
+      if (willBeStaticallyAllocated(FI)) {
+        return MachineOperand::CreateFI(FI.getIndex(), FI.getOffset() + Offset);
+      }
+    }
+    if (const auto *PtrAddAddr =
+            cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+      auto ConstOffset =
+          getIConstantVRegValWithLookThrough(PtrAddAddr->getOffsetReg(), MRI);
+      if (!ConstOffset)
+        return std::nullopt;
+      Offset += ConstOffset->Value.getSExtValue();
+      Addr = PtrAddAddr->getBaseReg();
+      continue;
+    }
+    return std::nullopt;
+  }
+  return std::nullopt;
+}
+
+bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
+                                             MachineRegisterInfo &MRI,
+                                             GLoadStore &MI, bool ZP) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_ABS : MOS::G_STORE_ABS;
+  auto Operand = matchAbsoluteAddressing(MRI, MI.getPointerReg());
+
+  if (Operand.has_value()) {
+    Helper.Observer.changingInstr(MI);
+    MI.setDesc(Builder.getTII().get(Opcode));
+    MI.removeOperand(1);
+    if (ZP && Operand->isImm())
+      Operand->setImm(STI.getZeroPageOffset() + (Operand->getImm() & 0xFF));
+    MI.addOperand(*Operand);
+    if (ZP)
+      MI.getOperand(1).setTargetFlags(MOS::MO_ZEROPAGE);
+    Helper.Observer.changedInstr(MI);
+    return true;
+  }
+
+  return false;
+}
+
+// #320: select 65816 absolute-long addressing for a 32-bit far pointer whose
+// address is a compile-time constant or (far) global. Replaces the generic
+// G_LOAD/G_STORE with G_LOAD_FAR_ABS/G_STORE_FAR_ABS carrying the 24-bit
+// address operand; the instruction selector lowers those to LDA/STA
+// AbsoluteLong. Returns false for non-absolute far addresses (e.g. a runtime
+// far pointer needing indirect-long) so legalization fails loudly.
+bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+                                                MachineRegisterInfo &MRI,
+                                                GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS : MOS::G_STORE_FAR_ABS;
+  auto Operand = matchAbsoluteAddressing(MRI, MI.getPointerReg());
+
+  if (!Operand.has_value())
+    return false;
+
+  Helper.Observer.changingInstr(MI);
+  MI.setDesc(Builder.getTII().get(Opcode));
+  MI.removeOperand(1);
+  MI.addOperand(*Operand);
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+bool MOSLegalizerInfo::tryFarAbsoluteIndexedAddressing(
+    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Register Addr = MI.getPointerReg();
+  int64_t Displacement = 0;
+  Register Index;
+  bool WideIndex = false;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  while (const auto *Add =
+             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+    Addr = Add->getBaseReg();
+    Register Offset = Add->getOffsetReg();
+    if (auto C = getIConstantVRegValWithLookThrough(Offset, MRI)) {
+      Displacement += C->Value.getSExtValue();
+      continue;
+    }
+    if (Index)
+      return false;
+    if (const MachineInstr *Shift = getOpcodeDef(G_SHL, Offset, MRI)) {
+      auto Amount = getIConstantVRegValWithLookThrough(
+          Shift->getOperand(2).getReg(), MRI);
+      if (!STI.hasIndex16() || !Amount || !Amount->Value.isOne())
+        return false;
+      Register Unscaled = Shift->getOperand(1).getReg();
+      const MachineInstr *Ext = getOpcodeDef(G_ZEXT, Unscaled, MRI);
+      const MachineInstr *Load = getOpcodeDef(G_ZEXTLOAD, Unscaled, MRI);
+      if (Ext && MRI.getType(Ext->getOperand(1).getReg()) == LLT::scalar(8))
+        Unscaled = Ext->getOperand(1).getReg();
+      else if (Load && Load->memoperands().front()->getMemoryType() ==
+                           LLT::scalar(8))
+        Unscaled = Builder.buildZExtOrTrunc(LLT::scalar(8), Unscaled).getReg(0);
+      else
+        return false;
+      Register Wide = Builder.buildZExt(LLT::scalar(16), Unscaled).getReg(0);
+      Index = Builder.buildShl(LLT::scalar(16), Wide,
+                               Builder.buildConstant(LLT::scalar(16), 1))
+                  .getReg(0);
+      WideIndex = true;
+      continue;
+    }
+    const MachineInstr *ZExt = getOpcodeDef(G_ZEXT, Offset, MRI);
+    Register Source;
+    LLT SourceType;
+    if (ZExt) {
+      Source = ZExt->getOperand(1).getReg();
+      SourceType = MRI.getType(Source);
+    } else if (const MachineInstr *Load =
+                   getOpcodeDef(G_ZEXTLOAD, Offset, MRI)) {
+      SourceType = Load->memoperands().front()->getMemoryType();
+      if (SourceType != LLT::scalar(8) && SourceType != LLT::scalar(16))
+        return false;
+      Source = Builder.buildZExtOrTrunc(SourceType, Offset).getReg(0);
+    } else
+      return false;
+    // X contributes an unsigned 8-bit offset in the ambient mode. A full
+    // 16-bit offset requires the +mos-xy16 index-width bracket.
+    if (SourceType == LLT::scalar(8))
+      Index = Source;
+    else if (SourceType == LLT::scalar(16) && STI.hasIndex16()) {
+      Index = Source;
+      WideIndex = true;
+    } else
+      return false;
+  }
+
+  if (!Index)
+    return false;
+  auto Base = matchAbsoluteAddressing(MRI, Addr);
+  if (!Base)
+    return false;
+  if (Base->isImm())
+    Base->setImm(Base->getImm() + Displacement);
+  else if (Base->isGlobal())
+    Base->setOffset(Base->getOffset() + Displacement);
+  else
+    return false;
+
+  bool Wide = MRI.getType(MI.getOperand(0).getReg()) == LLT::scalar(16);
+  unsigned Opcode =
+      Wide ? (WideIndex ? (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_ABS_IDX16
+                                           : MOS::G_STORE16_FAR_ABS_IDX16)
+                        : (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_ABS_IDX
+                                          : MOS::G_STORE16_FAR_ABS_IDX))
+           : (WideIndex ? (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX16
+                                           : MOS::G_STORE_FAR_ABS_IDX16)
+                        : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX
+                                          : MOS::G_STORE_FAR_ABS_IDX));
+  Builder.buildInstr(Opcode)
+      .add(MI.getOperand(0))
+      .add(*Base)
+      .addUse(Index)
+      .addMemOperand(*MI.memoperands_begin());
+  MI.eraseFromParent();
+  return true;
+}
+
+// #320 far runtime: select 65816 indirect-long addressing for a RUNTIME far
+// pointer — one not matchable as a constant/global, so absolute-long can't be
+// used. Replaces the generic G_LOAD/G_STORE with G_LOAD_FAR_INDIR/
+// G_STORE_FAR_INDIR carrying the far pointer itself; the selector + the Imag32
+// operand class place its 32 bits into a contiguous ZP quad that `lda [dp]` /
+// `sta [dp]` dereferences (reading the low 3 bytes as the 24-bit address).
+// Mirrors how the 16-bit indirect path hands its pointer to G_LOAD_INDIR.
+bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
+                                                MachineRegisterInfo &MRI,
+                                                GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  unsigned Opcode =
+      isa<GLoad>(MI) ? MOS::G_LOAD_FAR_INDIR : MOS::G_STORE_FAR_INDIR;
+  Builder.buildInstr(Opcode)
+      .add(MI.getOperand(0))      // dst (load) / value (store)
+      .addUse(MI.getPointerReg()) // far pointer -> Imag32 ZP quad
+      .addMemOperand(*MI.memoperands_begin());
+  MI.eraseFromParent();
+  return true;
+}
+
+// Fold a byte displacement of 1..3 from a runtime far pointer into the
+// 65816's [dp],Y addressing mode. Y contains an s8 constant, and the effective
+// address carries into the bank byte. The base remains in an Imag32 ZP quad.
+// Zero displacement needs no index; a link-time base uses absolute-long
+// addressing. Runtime offsets remain part of the materialized base pointer.
+// The small window targets adjacent bytes of scalar loads and stores without
+// requiring range analysis or widening the index register.
+static constexpr int64_t kMaxFarIndirIdxDisp = 3;
+
+bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
+    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+
+  Register Addr = MI.getPointerReg();
+  int64_t ConstOffset = 0;
+
+  // (a) Peel constant-offset G_PTR_ADDs down to the runtime base pointer.
+  // STOP (don't fail) at the first non-constant offset: that G_PTR_ADD is the
+  // runtime far pointer this access hangs off — e.g. `tbl[i]`'s second byte is
+  // G_PTR_ADD(G_PTR_ADD(@tbl, i), 1), and the base we want is the inner node,
+  // which the legalizer materialises into the Imag32 quad exactly as it already
+  // does for the byte-0 access. Failing here instead would miss the single most
+  // common customer (the far array subscript).
+  while (const auto *PtrAdd =
+             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+    auto C = getIConstantVRegValWithLookThrough(PtrAdd->getOffsetReg(), MRI);
+    if (!C)
+      break;
+    ConstOffset += C->Value.getSExtValue();
+    Addr = PtrAdd->getBaseReg();
+  }
+
+  // (b) Only the zero-proof displacement window.
+  if (ConstOffset < 1 || ConstOffset > kMaxFarIndirIdxDisp)
+    return false;
+
+  // (c) Defensive: never steal a base that absolute-long addressing could take.
+  // The caller's tryFarAbsoluteAddressing already ruled this out; re-checking
+  // here keeps the predicate true independently of call order.
+  if (matchAbsoluteAddressing(MRI, Addr).has_value())
+    return false;
+
+  bool Wide = MRI.getType(MI.getOperand(0).getReg()) == LLT::scalar(16);
+  unsigned Opcode = Wide ? (isa<GLoad>(MI) ? MOS::G_LOAD16_FAR_INDIR_IDX
+                                         : MOS::G_STORE16_FAR_INDIR_IDX)
+                         : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_INDIR_IDX
+                                           : MOS::G_STORE_FAR_INDIR_IDX);
+  Register Idx = Builder.buildConstant(LLT::scalar(8), ConstOffset).getReg(0);
+  Builder.buildInstr(Opcode)
+      .add(MI.getOperand(0)) // dst (load) / value (store)
+      .addUse(Addr)          // runtime far pointer -> Imag32 ZP quad
+      .addUse(Idx)           // displacement -> Y
+      .addMemOperand(*MI.memoperands_begin());
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+                                                    MachineRegisterInfo &MRI,
+                                                    GLoadStore &MI,
+                                                    bool ZP) const {
+  LLT S8 = LLT::scalar(8);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  Register Addr = MI.getPointerReg();
+  int64_t Offset = 0;
+  Register Index = 0;
+
+  unsigned Opcode = isa<GLoad>(MI)
+                        ? (ZP ? MOS::G_LOAD_ZP_IDX : MOS::G_LOAD_ABS_IDX)
+                        : (ZP ? MOS::G_STORE_ZP_IDX : MOS::G_STORE_ABS_IDX);
+
+  while (true) {
+    if (auto ConstAddr = getIConstantVRegValWithLookThrough(Addr, MRI)) {
+      assert(Index); // Otherwise, Absolute addressing would have been selected.
+
+      Offset = ConstAddr->Value.getSExtValue() + Offset;
+      if (ZP)
+        Offset = STI.getZeroPageOffset() + (Offset & 0xFF);
+      auto Inst = Builder.buildInstr(Opcode)
+                      .add(MI.getOperand(0))
+                      .addImm(Offset)
+                      .addUse(Index)
+                      .addMemOperand(*MI.memoperands_begin());
+      if (ZP)
+        Inst->getOperand(1).setTargetFlags(MOS::MO_ZEROPAGE);
+      MI.eraseFromParent();
+      return true;
+    }
+    if (const MachineInstr *GVAddr = getOpcodeDef(G_GLOBAL_VALUE, Addr, MRI)) {
+      assert(Index); // Otherwise, Absolute addressing would have been selected.
+      const MachineOperand &GV = GVAddr->getOperand(1);
+      auto Inst = Builder.buildInstr(Opcode)
+                      .add(MI.getOperand(0))
+                      .addGlobalAddress(GV.getGlobal(), GV.getOffset() + Offset)
+                      .addUse(Index)
+                      .addMemOperand(*MI.memoperands_begin());
+      if (ZP)
+        Inst->getOperand(1).setTargetFlags(MOS::MO_ZEROPAGE);
+      MI.eraseFromParent();
+      return true;
+    }
+    if (const MachineInstr *FIAddr = getOpcodeDef(G_FRAME_INDEX, Addr, MRI)) {
+      const MachineOperand &FI = FIAddr->getOperand(1);
+      if (willBeStaticallyAllocated(FI)) {
+        assert(Index); // Otherwise, Absolute addressing would have been
+                       // selected.
+        auto Inst = Builder.buildInstr(Opcode)
+                        .add(MI.getOperand(0))
+                        .addFrameIndex(FI.getIndex(), FI.getOffset() + Offset)
+                        .addUse(Index)
+                        .addMemOperand(*MI.memoperands_begin());
+        if (ZP)
+          Inst->getOperand(1).setTargetFlags(MOS::MO_ZEROPAGE);
+        MI.eraseFromParent();
+        return true;
+      }
+    }
+    if (const auto *PtrAddAddr =
+            cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+      Addr = PtrAddAddr->getBaseReg();
+      Register NewOffset = PtrAddAddr->getOffsetReg();
+      if (auto ConstOffset =
+              getIConstantVRegValWithLookThrough(NewOffset, MRI)) {
+        Offset += ConstOffset->Value.getSExtValue();
+        continue;
+      }
+      if (MachineInstr *ZExtOffset = getOpcodeDef(G_ZEXT, NewOffset, MRI)) {
+        if (Index)
+          return false;
+
+        Register Src = ZExtOffset->getOperand(1).getReg();
+        LLT SrcTy = MRI.getType(Src);
+        if (SrcTy.getSizeInBits() > 8)
+          return false;
+        if (SrcTy.getSizeInBits() < 8)
+          Src = Builder.buildZExt(S8, Src).getReg(0);
+        assert(MRI.getType(Src) == S8);
+        Index = Src;
+        continue;
+      }
+      if (Helper.getValueTracking()
+              ->getKnownBits(NewOffset)
+              .countMaxActiveBits() <= 8) {
+        if (Index)
+          return false;
+
+        // A zero-page pointer already has an s8 offset. Use that byte directly;
+        // only wider offsets need an explicit low-byte/high-zero decomposition.
+        if (MRI.getType(NewOffset) == S8) {
+          Index = NewOffset;
+          continue;
+        }
+
+        // NewOffset:s16 is known to have only 8 active bits (high byte = 0).
+        // A plain G_TRUNC would leave the s16 Imag16 pair with a dead high
+        // lane: the RA's live-range splitter can emit an "undef %d.sublo =
+        // COPY %s.sublo" partial-define, and the subsequent spill of the full
+        // Imag16 pair reads the undefined high byte → crash (seed-56).
+        //
+        // Fix: insert G_TRUNC + G_CONSTANT(0) + G_MERGE_VALUES *before* the
+        // G_PTR_ADD so the replacement s16 value has an explicit zero high
+        // byte.  Replace all uses of NewOffset (except the G_TRUNC) with the
+        // new explicit s16, then use the s8 Lo as the index.  GPR (s8)
+        // spills never have the Imag16 partial-define issue.
+        LLT S16 = LLT::scalar(16);
+        auto &SavedMBB = Builder.getMBB();
+        auto SavedInsertPt = Builder.getInsertPt();
+
+        // Insert the trunc + explicit zero-extend right after NewOffset's DEFINITION, which by
+        // SSA dominates EVERY use of NewOffset. The value can also be used in a sibling block
+        // (e.g. (uint16_t)arr[i] used as this index AND XOR'd in the loop header); inserting at
+        // the G_PTR_ADD's block left the replacement Explicit16 not dominating those sibling uses
+        // -> machine-verifier "Virtual register defs don't dominate all uses". This was a fork
+        // regression vs upstream (minimal repro: a fold-while-walk loop -- the maze demo;
+        // default-8-bit + +mos-a16/+mos-xy16).
+        MachineInstr *OffDef = MRI.getVRegDef(NewOffset);
+        MachineBasicBlock &OffMBB = *OffDef->getParent();
+        Builder.setInsertPt(OffMBB, OffDef->isPHI()
+                                        ? OffMBB.getFirstNonPHI()
+                                        : std::next(OffDef->getIterator()));
+
+        Register Lo = Builder.buildTrunc(S8, NewOffset).getReg(0);
+        Register ZeroHi = Builder.buildConstant(S8, 0).getReg(0);
+        Register Explicit16 =
+            Builder.buildMergeLikeInstr(S16, {Lo, ZeroHi}).getReg(0);
+
+        // Replace every use of NewOffset with Explicit16, except the G_TRUNC
+        // we just created (which still needs to read the original s16 value).
+        //
+        // Each rewrite is bracketed by the legalizer's observer, exactly as the
+        // generic register-replacement helpers do. The users can be CSE-able
+        // (G_TRUNC, G_PTR_ADD, G_ADD ...) and GISelCSEInfo keys its FoldingSet
+        // on the operand profile, which includes the parent MBB pointer: an
+        // in-place operand change without changingInstr/changedInstr leaves a
+        // stale node whose bucket is the OLD profile's hash, so a later lookup
+        // for the NEW form (`G_TRUNC Explicit16` from selectIndirectAddressing's
+        // buildZExtOrTrunc when this mode is then rejected) hits or misses
+        // depending on whether the two hashes collide modulo the bucket count —
+        // i.e. on heap layout. That is a non-reproducible build (the `sec`
+        // placement flip in `_title_blank`, ~0.5 % of builds). The notification
+        // also queues the users for re-legalization, which is the contract for
+        // any operand change.
+        MachineInstr *TruncMI = MRI.getVRegDef(Lo);
+        for (MachineOperand &MO :
+             llvm::make_early_inc_range(MRI.use_operands(NewOffset))) {
+          MachineInstr &UseMI = *MO.getParent();
+          if (&UseMI == TruncMI)
+            continue;
+          Helper.Observer.changingInstr(UseMI);
+          MO.setReg(Explicit16);
+          Helper.Observer.changedInstr(UseMI);
+        }
+
+        Builder.setInsertPt(SavedMBB, SavedInsertPt);
+        Index = Lo;
+        continue;
+      }
+      // B2: under +mos-xy16, a direct s16 offset uses the widened form.
+      if (STI.hasIndex16() && !Index && MRI.getType(NewOffset) == LLT::scalar(16)) {
+        Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_ABS_IDX16 : MOS::G_STORE_ABS_IDX16;
+        Index = NewOffset;
+        continue;
+      }
+    }
+    return false;
+  }
+  return false;
+}
+
+bool MOSLegalizerInfo::selectZeroIndexedAddressing(LegalizerHelper &Helper,
+                                                   MachineRegisterInfo &MRI,
+                                                   GLoadStore &MI) const {
+  // Selects absolute indexed, but with the pointer as the index.
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  assert(MRI.getType(MI.getPointerReg()).getScalarSizeInBits() == 8);
+  LLT S = LLT::scalar(8);
+  auto Addr = MI.getOperand(1).getReg();
+  int64_t Offset = 0;
+
+  if (const auto *PtrAddAddr =
+          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+    auto ConstOffset =
+        getIConstantVRegValWithLookThrough(PtrAddAddr->getOffsetReg(), MRI);
+    if (ConstOffset) {
+      Offset += ConstOffset->Value.getSExtValue();
+      Addr = PtrAddAddr->getBaseReg();
+    }
+  }
+
+  Offset = STI.getZeroPageOffset() + (Offset & 0xFF);
+
+  auto AddrP = Builder.buildPtrToInt(S, Addr).getReg(0);
+  unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_ZP_IDX : MOS::G_STORE_ZP_IDX;
+  auto Inst = Builder.buildInstr(Opcode)
+                  .add(MI.getOperand(0))
+                  .addImm(Offset)
+                  .addUse(AddrP)
+                  .addMemOperand(*MI.memoperands_begin());
+  Inst->getOperand(1).setTargetFlags(MOS::MO_ZEROPAGE);
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+                                                MachineRegisterInfo &MRI,
+                                                GLoadStore &MI) const {
+  LLT S8 = LLT::scalar(8);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  Register Addr = MI.getPointerReg();
+  Register Index = 0;
+
+  unsigned Opcode =
+      isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX : MOS::G_STORE_INDIR_IDX;
+
+  if (const auto *PtrAddAddr =
+          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
+    Register Base = PtrAddAddr->getBaseReg();
+    Register Offset = PtrAddAddr->getOffsetReg();
+    if (auto ConstOffset = getIConstantVRegValWithLookThrough(Offset, MRI)) {
+      if (ConstOffset->Value.getActiveBits() <= 8) {
+        Index = Builder.buildConstant(S8, ConstOffset->Value.getSExtValue())
+                    .getReg(0);
+        Addr = Base;
+      }
+    } else if (MachineInstr *ZExtOffset = getOpcodeDef(G_ZEXT, Offset, MRI)) {
+      Register Src = ZExtOffset->getOperand(1).getReg();
+      LLT SrcTy = MRI.getType(Src);
+      if (SrcTy.getSizeInBits() <= 8) {
+        if (SrcTy.getSizeInBits() < 8)
+          Src = Builder.buildZExt(S8, Src).getReg(0);
+        assert(MRI.getType(Src) == S8);
+        Index = Src;
+        Addr = Base;
+      }
+    } else if (Helper.getValueTracking()
+                   ->getKnownBits(Offset)
+                   .countMaxActiveBits() <= 8) {
+      Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
+      Addr = Base;
+    } else if (STI.hasIndex16() && MRI.getType(Offset) == LLT::scalar(16)) {
+      // B2: direct s16 offset → (zp),Y16 indirect indexed (16-bit Y).
+      Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX16 : MOS::G_STORE_INDIR_IDX16;
+      Index = Offset;
+      Addr = Base;
+    }
+  }
+
+  if (!Index) {
+    if (STI.has65C02()) {
+      Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_INDIR : MOS::G_STORE_INDIR;
+      Builder.buildInstr(Opcode)
+          .add(MI.getOperand(0))
+          .addUse(Addr)
+          .addMemOperand(*MI.memoperands_begin());
+      MI.eraseFromParent();
+      return true;
+    }
+    Index = Builder.buildConstant(S8, 0).getReg(0);
+  }
+  Builder.buildInstr(Opcode)
+      .add(MI.getOperand(0))
+      .addUse(Addr)
+      .addUse(Index)
+      .addMemOperand(*MI.memoperands_begin());
+  MI.eraseFromParent();
+  return true;
+}
+
+// #320: does any *pointer* operand of a mem-op live in a far address space? The
+// operands are {dst, val|src, len, tail-imm}; the trailing tail-call imm is
+// skipped. AS_FarPacked never reaches a mem-op as the access pointer (it is
+// value-only and cast to AS_Far before any deref — see the G_LOAD/G_STORE comment
+// near the top of this file) but is matched defensively.
+static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,
+                                 const MachineInstr &MI) {
+  for (unsigned I = 0, E = MI.getNumOperands() - 1; I < E; ++I) {
+    const MachineOperand &MO = MI.getOperand(I);
+    if (!MO.isReg())
+      continue;
+    LLT Ty = MRI.getType(MO.getReg());
+    if (Ty.isPointer() && (Ty.getAddressSpace() == MOS::AS_Far ||
+                           Ty.getAddressSpace() == MOS::AS_FarPacked))
+      return true;
+  }
+  return false;
+}
+
+// #320: a far-aware mirror of LegalizerHelper::createMemLibcall. The generic
+// createMemLibcall would call the NEAR runtime (memcpy / __memset, a 16-bit
+// char*) while passing the 32-bit far pointer through the Imag32 far ABI — the
+// callee reads only the 16-bit offset, silently dropping the bank byte (a
+// wrong-bank access). Instead call the far runtime (__memset_far / __memcpy_far /
+// __memmove_far) and materialize every pointer arg as a far (addrspace 2) value:
+// any near/zp/packed pointer is widened with G_ADDRSPACE_CAST (near->far
+// zero-extends bank $00, correct under the DBR=0 model), so one far runtime
+// function per op covers far<-far, far<-near and near<-far in a single call.
+static bool createFarMemLibcall(LegalizerHelper &Helper,
+                                MachineRegisterInfo &MRI, MachineInstr &MI) {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  auto &Ctx = Builder.getMF().getFunction().getContext();
+  const LLT PF = LLT::pointer(MOS::AS_Far, 32);
+
+  unsigned Opc = MI.getOpcode();
+  const char *Callee;
+  switch (Opc) {
+  case MOS::G_MEMSET:
+    Callee = "__memset_far";
+    break;
+  case MOS::G_MEMCPY:
+    Callee = "__memcpy_far";
+    break;
+  case MOS::G_MEMMOVE:
+    Callee = "__memmove_far";
+    break;
+  default:
+    return false;
+  }
+  const bool IsSet = Opc == MOS::G_MEMSET;
+
+  // Build args by role. Operands are {dst, val|src, len, tail-imm}.
+  // A near/zp/packed pointer is widened to far (bank $00) so the runtime's far
+  // params match; a far pointer passes through unchanged.
+  auto asFar = [&](Register Reg) {
+    if (MRI.getType(Reg).getAddressSpace() != MOS::AS_Far)
+      Reg = Builder.buildAddrSpaceCast(PF, Reg).getReg(0);
+    return Reg;
+  };
+  Type *FarPtrTy = PointerType::get(Ctx, MOS::AS_Far);
+
+  SmallVector<CallLowering::ArgInfo, 3> Args;
+  // arg 0: destination pointer.
+  Args.push_back({asFar(MI.getOperand(0).getReg()), FarPtrTy, 0});
+  if (IsSet) {
+    // arg 1: fill byte (i8, matching __memset's `char` value).
+    Register Val = MI.getOperand(1).getReg();
+    Args.push_back(
+        {Val, IntegerType::get(Ctx, MRI.getType(Val).getSizeInBits()), 1});
+  } else {
+    // arg 1: source pointer.
+    Args.push_back({asFar(MI.getOperand(1).getReg()), FarPtrTy, 1});
+  }
+  // arg 2: length, coerced to size_t (16-bit on MOS). The loop-idiom recognizer
+  // forms a far memset with a 32-bit length (the far index width); narrow it so
+  // the ABI exactly matches the runtime's size_t parameter rather than relying on
+  // low-word register placement. The value always fits (size_t <= 0xFFFF).
+  Register Len = MI.getOperand(2).getReg();
+  unsigned LenBits = MRI.getType(Len).getSizeInBits();
+  if (LenBits > 16)
+    Len = Builder.buildTrunc(LLT::scalar(16), Len).getReg(0);
+  else if (LenBits < 16)
+    Len = Builder.buildZExt(LLT::scalar(16), Len).getReg(0);
+  Args.push_back({Len, IntegerType::get(Ctx, 16), 2});
+
+  auto &CLI = *Builder.getMF().getSubtarget().getCallLowering();
+  CallLowering::CallLoweringInfo Info;
+  Info.CallConv = CallingConv::C; // CC_MOS; the addrspace-2 args select Imag32.
+  Info.Callee = MachineOperand::CreateES(Callee);
+  Info.OrigRet = CallLowering::ArgInfo({0}, Type::getVoidTy(Ctx), 0);
+  // The far runtime returns void; nothing consumes a return, so there is no tail
+  // call and no "returned" arg coupling (unlike the near createMemLibcall).
+  Info.IsTailCall = false;
+  llvm::append_range(Info.OrigArgs, Args);
+  if (!CLI.lowerCall(Builder, Info))
+    return false;
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI, MachineInstr &MI,
+                                     LostDebugLocObserver &LocObserver) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+  // Special handling for HuC6280 block copy extensions.
+  if (STI.hasHUC6280())
+    if (tryHuCBlockCopy(Helper, MRI, MI))
+      return true;
+
+  bool IsSet = MI.getOpcode() == MOS::G_MEMSET;
+  bool IsInline = MI.getOpcode() == MOS::G_MEMCPY_INLINE;
+  uint32_t SizeLimit;
+  if (IsInline) {
+    SizeLimit = UINT16_MAX;
+  } else {
+    MachineFunction *MF = MI.getParent()->getParent();
+    if (MF && MF->getFunction().hasMinSize()) {
+      // Copies:
+      // => inline LDA/STA: 6n bytes
+      // => memcpy(): ~23 bytes
+      // Sets:
+      // => inline LDA/STA: 2 + 3n bytes
+      // => __memset(): ~21? bytes
+      SizeLimit = IsSet ? 6 : 3;
+    } else if (!MF || MF->getFunction().hasOptSize()) {
+      SizeLimit = IsSet ? 8 : 4;
+    } else {
+      SizeLimit = IsSet ? 16 : 8;
+    }
+  }
+
+  LegalizerHelper::LegalizeResult Result;
+
+  // Try lowering, keeping in mind the size limit.
+  if (IsInline) {
+    Result = Helper.lowerMemcpyInline(MI);
+  } else {
+    Result = Helper.lowerMemCpyFamily(MI, SizeLimit);
+  }
+  if (Result == LegalizerHelper::Legalized) {
+    return true;
+  }
+
+  // #320: the inline path above already lowers a far memop correctly (per-byte
+  // far G_STOREs) for a constant size <= SizeLimit. When it bails (variable size,
+  // or constant size over the limit) we must NOT fall into the generic
+  // createMemLibcall: it calls the NEAR runtime with the far pointer, dropping the
+  // bank byte -> silent wrong-bank access. Route far memops to the far runtime.
+  if (anyFarPointerOperand(MRI, MI))
+    return createFarMemLibcall(Helper, MRI, MI);
+
+  // Try emitting a libcall.
+  Result = Helper.createMemLibcall(MRI, MI, LocObserver);
+  if (Result == LegalizerHelper::Legalized) {
+    MI.eraseFromParent();
+    return true;
+  }
+
+  return false;
+}
+
+static std::optional<uint64_t>
+getUInt64FromConstantOper(const MachineOperand &Operand) {
+  if (Operand.isImm())
+    return Operand.getImm();
+  if (Operand.isCImm())
+    return Operand.getCImm()->getZExtValue();
+  return std::nullopt;
+}
+
+static MachineOperand offsetMachineOperand(MachineOperand &Operand,
+                                           int64_t Offset) {
+  if (Offset == 0)
+    return Operand;
+  if (Operand.isImm())
+    return MachineOperand::CreateImm(Operand.getImm() + Offset);
+  if (Operand.isCImm())
+    return MachineOperand::CreateCImm(Operand.getCImm() + Offset);
+  if (Operand.isGlobal())
+    return MachineOperand::CreateGA(Operand.getGlobal(),
+                                    Operand.getOffset() + Offset);
+  if (Operand.isFI())
+    return MachineOperand::CreateFI(Operand.getIndex(),
+                                    Operand.getOffset() + Offset);
+  llvm_unreachable("Unsupported machine operand type!");
+}
+
+template <typename T> static inline int compareNumbers(T A, T B) {
+  return A < B ? -1 : (A > B ? 1 : 0);
+}
+
+static std::optional<int> compareOperandLocations(const MachineOperand &A,
+                                                  const MachineOperand &B) {
+  if (A.isImm() && B.isImm())
+    return compareNumbers(A.getImm(), B.getImm());
+  if (A.isGlobal() && B.isGlobal())
+    if (A.getGlobal() == B.getGlobal())
+      return compareNumbers(A.getOffset(), B.getOffset());
+  return std::nullopt;
+}
+
+bool MOSLegalizerInfo::tryHuCBlockCopy(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  MachineFunction &MF = Builder.getMF();
+
+  bool IsSet = MI.getOpcode() == MOS::G_MEMSET;
+  bool IsInline = MI.getOpcode() == MOS::G_MEMCPY_INLINE;
+
+  // Match supported combinations.
+  if (MI.getOpcode() != MOS::G_MEMCPY &&
+      MI.getOpcode() != MOS::G_MEMCPY_INLINE &&
+      MI.getOpcode() != MOS::G_MEMMOVE && MI.getOpcode() != MOS::G_MEMSET) {
+    return false;
+  }
+
+  Register DstReg = MI.getOperand(0).getReg();
+  auto Dst = matchAbsoluteAddressing(MRI, DstReg);
+  Register SrcReg = MI.getOperand(1).getReg();
+  auto Src = matchAbsoluteAddressing(MRI, SrcReg);
+  auto Len = matchAbsoluteAddressing(MRI, MI.getOperand(2).getReg());
+  bool Descending = false;
+  if (!Src.has_value() || !Dst.has_value() || !Len.has_value())
+    return false;
+
+  if (IsSet) {
+    // A TII-based memory set is always slower than the alternative.
+    // Skip using it unless -Os, -Oz is set.
+    if (!MF.getFunction().hasOptSize())
+      return false;
+
+    auto SrcValue = getUInt64FromConstantOper(Src.value());
+    if (!SrcValue.has_value())
+      return false;
+    if (MRI.getType(SrcReg).getSizeInBytes() != 1)
+      return false;
+  }
+  if (MI.getOpcode() == MOS::G_MEMMOVE) {
+    auto OperandOrder = compareOperandLocations(Src.value(), Dst.value());
+    // TODO: Handle case when two G_MEMMOVE destinations cannot alias.
+    if (!OperandOrder.has_value())
+      return false;
+    if (OperandOrder.value() == -1)
+      Descending = true;
+  }
+
+  // On HuC platforms, block copies can be emitted, and sets can be done
+  // with them too. However, some requirements have to be considered:
+  // 1) The source, destination, and length have to be constant; however,
+  //    they can be opaque constants (such as symbols).
+  // 2) A block copy instruction stalls all interrupts until it completes.
+  //    As such, one instruction should only do some amount of transfers,
+  //    to prevent stalling video interrupts mid-execution.
+  // Each transfer is 7 bytes and (17 + 6n) cycles, where n is the length
+  // of the transfer in bytes.
+  bool HuCIrqSafeBlockCopies = true; // TODO
+  uint64_t BytesPerTransfer = HuCIrqSafeBlockCopies ? 16 : UINT16_MAX;
+  uint64_t SizeMin, SizeMax;
+  // Note that non-indexed LDA/STA memory calls are 1 cycle slower on
+  // HuC6280 compared to other 6502 derivatives.
+  if (MF.getFunction().hasMinSize()) {
+    // Copies:
+    // => inline LDA/STA: 6n bytes
+    // => TII: 7 bytes
+    // => memcpy(): ~23 bytes
+    // Sets:
+    // => inline LDA/STA: 2 + 3n bytes
+    // => (LDA/STA|STZ)/TII: 3-5 + 7 bytes
+    // => __memset(): ~21? bytes
+    SizeMin = IsSet ? 5 : 2;
+    SizeMax = IsSet ? (BytesPerTransfer * 2 + 1) : (BytesPerTransfer * 3);
+  } else if (MF.getFunction().hasOptSize()) {
+    // Try to strike a balance.
+    SizeMin = IsSet ? 5 : 4;
+    SizeMax = IsSet ? (BytesPerTransfer * 3 + 1) : (BytesPerTransfer * 4);
+  } else {
+    // Copies:
+    // => inline LDA/STA: 10n cycles
+    // => TII: 17 + 6n cycles
+    // Sets:
+    // => inline LDA/STA: 2 + 5n cycles
+    // => (LDA/STA|STZ)/TII: 22-24 + 6n cycles
+    SizeMin = 5;
+    SizeMax = BytesPerTransfer * 5;
+  }
+  if (IsInline)
+    SizeMax = UINT16_MAX;
+  uint64_t KnownLen = UINT16_MAX;
+
+  // If we require IRQ-safe chunks, the length has to be known.
+  auto LenValue = getUInt64FromConstantOper(Len.value());
+  if (LenValue.has_value()) {
+    KnownLen = LenValue.value();
+    if (KnownLen < SizeMin || KnownLen > SizeMax) {
+      return false;
+    }
+  } else if (BytesPerTransfer < UINT16_MAX || Descending) {
+    return false;
+  }
+
+  auto DstPointerInfo = MI.memoperands()[0]->getPointerInfo();
+  auto SrcPointerInfo = MI.memoperands()[IsSet ? 0 : 1]->getPointerInfo();
+
+  // Proceed with the custom lowering.
+  if (IsSet) {
+    // Emit a G_STORE, then set Src = Dst, Dst = Dst + 1, Len = Len - 1.
+    auto StoreReg = MRI.createGenericVirtualRegister(LLT::scalar(8));
+    Builder.buildConstant(
+        StoreReg, getUInt64FromConstantOper(Src.value()).value() & 0xFF);
+    Builder.buildStore(StoreReg, DstReg,
+                       *MF.getMachineMemOperand(SrcPointerInfo,
+                                                MachineMemOperand::MOStore, 1,
+                                                Align(1)));
+
+    Src = Dst;
+    Dst = offsetMachineOperand(Dst.value(), 1);
+    DstPointerInfo = DstPointerInfo.getWithOffset(1);
+    Len = offsetMachineOperand(Len.value(), -1);
+    KnownLen -= 1;
+  }
+
+  // Note that Descending transfers must be done in backwards order.
+  if (KnownLen <= BytesPerTransfer) {
+    uint64_t AdjOfs = Descending ? (KnownLen - 1) : 0;
+    Builder.buildInstr(MOS::HuCMemcpy)
+        .add(offsetMachineOperand(Src.value(), AdjOfs))
+        .add(offsetMachineOperand(Dst.value(), AdjOfs))
+        .add(Len.value())
+        .addImm(Descending)
+        .addMemOperand(MF.getMachineMemOperand(
+            SrcPointerInfo, MachineMemOperand::MOLoad, 1, Align(1)))
+        .addMemOperand(MF.getMachineMemOperand(
+            DstPointerInfo, MachineMemOperand::MOStore, 1, Align(1)));
+  } else {
+    // Transfer Offset
+    for (uint64_t TOfs = 0; TOfs < KnownLen; TOfs += BytesPerTransfer) {
+      // Transfer Length
+      uint64_t TLen = std::min(KnownLen - TOfs, BytesPerTransfer);
+      // Adjusted Transfer Offset (opcode)
+      uint64_t AdjTOfs = Descending ? (KnownLen - TOfs - 1) : TOfs;
+      // Adjusted Transfer Offset (memory)
+      uint64_t AdjTOfsMO = Descending ? (KnownLen - TOfs - TLen) : TOfs;
+      Builder.buildInstr(MOS::HuCMemcpy)
+          .add(offsetMachineOperand(Src.value(), AdjTOfs))
+          .add(offsetMachineOperand(Dst.value(), AdjTOfs))
+          .add(MachineOperand::CreateImm(TLen))
+          .addImm(Descending)
+          .addMemOperand(
+              MF.getMachineMemOperand(SrcPointerInfo.getWithOffset(AdjTOfsMO),
+                                      MachineMemOperand::MOLoad, 1, Align(1)))
+          .addMemOperand(
+              MF.getMachineMemOperand(DstPointerInfo.getWithOffset(AdjTOfsMO),
+                                      MachineMemOperand::MOStore, 1, Align(1)));
+    }
+  }
+
+  MI.eraseFromParent();
+  return true;
+}
+
+//===----------------------------------------------------------------------===//
+// Control Flow
+//===----------------------------------------------------------------------===//
+
+bool MOSLegalizerInfo::legalizeBrCond(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  Register Tst = MI.getOperand(0).getReg();
+  int64_t Val = 1;
+  Register Not;
+  if (mi_match(Tst, MRI, m_Not(m_Reg(Not)))) {
+    Val = 0;
+    Tst = Not;
+  }
+
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Helper.Observer.changingInstr(MI);
+  MI.setDesc(Builder.getTII().get(MOS::G_BRCOND_IMM));
+  MI.getOperand(0).setReg(Tst);
+  MI.addOperand(MachineOperand::CreateImm(Val));
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeBrJt(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  LLT S8 = LLT::scalar(8);
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+
+#ifndef NDEBUG
+  const MachineInstr *Base =
+      getOpcodeDef(G_JUMP_TABLE, MI.getOperand(0).getReg(), MRI);
+#endif
+  assert(Base && "Invalid first argument to G_BRJT; expected G_JUMP_TABLE.");
+
+  assert(MI.getOperand(1).isJTI());
+  assert(MI.getOperand(1).getIndex() == Base->getOperand(1).getIndex() &&
+         "Expected G_JUMP_TABLE to have same index.");
+
+  const MachineJumpTableInfo *JTI = MI.getMF()->getJumpTableInfo();
+  const auto &Table = JTI->getJumpTables()[MI.getOperand(1).getIndex()];
+
+  // Note: Jump table size is hard-limited to 256 entries.
+  Register Offset = Builder.buildTrunc(S8, MI.getOperand(2)).getReg(0);
+
+  if (STI.hasJMPIdxIndir() && Table.MBBs.size() <= 128) {
+    Offset =
+        Builder.buildShl(S8, Offset, Builder.buildConstant(S8, 1)).getReg(0);
+    Builder.buildInstr(MOS::G_BRINDIRECT_IDX)
+        .add(MI.getOperand(1))
+        .addUse(Offset);
+  } else {
+    Register LoAddr = MRI.createGenericVirtualRegister(S8);
+    Builder.buildInstr(MOS::G_LOAD_ABS_IDX)
+        .addDef(LoAddr)
+        .add(MI.getOperand(1))
+        .addUse(Offset);
+    Register HiAddr = MRI.createGenericVirtualRegister(S8);
+    Builder.buildInstr(MOS::G_LOAD_ABS_IDX)
+        .addDef(HiAddr)
+        .addJumpTableIndex(MI.getOperand(1).getIndex(), MOS::MO_HI_JT)
+        .addUse(Offset);
+    Builder.buildBrIndirect(
+        Builder.buildMergeValues(LLT::pointer(0, 16), {LoAddr, HiAddr})
+            .getReg(0));
+  }
+
+  MI.eraseFromParent();
+  return true;
+}
+
+// __builtin_frame_address(0) is the incoming soft stack pointer: the address
+// just above this function's soft-stack frame, where its stack arguments begin.
+// A fixed object at offset zero names exactly that address, so the existing
+// frame-index lowering produces it and no frame pointer is needed.
+//
+// __builtin_return_address(0) is the word JSR/JSL pushed on the hard stack plus
+// one: both push the address of their own last byte, and RTS/RTL add one on the
+// way back. SPC700 CALL pushes the return address itself. How deep that word
+// sits below the stack pointer at the point of the read is not known until
+// frame lowering and register scavenging are done, so the read stays where it
+// is as a pseudo and MOSLowerReturnAddress expands it last, once every push is
+// in place.
+//
+// Neither stack carries a frame chain, so levels above zero are zero, which is
+// what SelectionDAG's generic expansion of these nodes returns. An interrupt
+// handler has no C return address (the interrupted PC sits below P, and the
+// 65816 handler prologue pushes more), so it returns zero as well.
+bool MOSLegalizerInfo::legalizeReturnOrFrameAddress(LegalizerHelper &Helper,
+                                                    MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  MachineFunction &MF = *MI.getMF();
+  MachineFrameInfo &MFI = MF.getFrameInfo();
+  const MOSSubtarget &STI = MF.getSubtarget<MOSSubtarget>();
+  Register Dst = MI.getOperand(0).getReg();
+  bool IsReturnAddress =
+      cast<GIntrinsic>(MI).getIntrinsicID() == Intrinsic::returnaddress;
+  int64_t Level = MI.getOperand(2).getImm();
+  LLT P = LLT::pointer(0, 16);
+  LLT S8 = LLT::scalar(8);
+  LLT S16 = LLT::scalar(16);
+
+  if (Level != 0 || (IsReturnAddress && STI.getFrameLowering()->isISR(MF))) {
+    Builder.buildConstant(Dst, 0);
+    MI.eraseFromParent();
+    return true;
+  }
+
+  if (!IsReturnAddress) {
+    int FI = MFI.CreateFixedObject(1, 0, /*IsImmutable=*/true);
+    Builder.buildFrameIndex(Dst, FI);
+    MI.eraseFromParent();
+    return true;
+  }
+
+  MFI.setReturnAddressIsTaken(true);
+  auto Lo = Builder.buildInstr(MOS::G_RETURN_ADDRESS_BYTE, {S8}, {}).addImm(0);
+  auto Hi = Builder.buildInstr(MOS::G_RETURN_ADDRESS_BYTE, {S8}, {}).addImm(1);
+  auto Pushed = Builder.buildIntToPtr(
+      P, Builder.buildMergeLikeInstr(S16, {Lo.getReg(0), Hi.getReg(0)}));
+  if (STI.hasSPC700())
+    Builder.buildCopy(Dst, Pushed);
+  else
+    Builder.buildPtrAdd(Dst, Pushed, Builder.buildConstant(S16, 1));
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeTrap(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  auto *RetTy = Type::getVoidTy(MI.getMF()->getFunction().getContext());
+  LostDebugLocObserver LocObserver("");
+  if (Helper.createLibcall(RTLIB::ABORT, {{}, RetTy, 0}, {}, LocObserver) !=
+      LegalizerHelper::LegalizeResult::Legalized)
+    return false;
+  MI.eraseFromParent();
+  return true;
+}
+
+//===----------------------------------------------------------------------===//
+// Variadic Arguments
+//===----------------------------------------------------------------------===//
+
+// Lower variable argument access intrinsic.
+bool MOSLegalizerInfo::legalizeVAArg(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI,
+                                     MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  MachineFunction &MF = Builder.getMF();
+
+  Register Dst = MI.getOperand(0).getReg();
+  Register VaListPtr = MI.getOperand(1).getReg();
+
+  LLT P = LLT::pointer(0, 16);
+  LLT S16 = LLT::scalar(16);
+
+  // Load the current VAArg address out of the VAList.
+  MachineMemOperand *AddrLoadMMO = MF.getMachineMemOperand(
+      MachinePointerInfo::getUnknownStack(MF),
+      MachineMemOperand::MOLoad | MachineMemOperand::MOInvariant, 2, Align());
+  Register Addr = Builder.buildLoad(P, VaListPtr, *AddrLoadMMO).getReg(0);
+
+  // Load the argument value out of the current VAArg address;
+  unsigned Size = MRI.getType(Dst).getSizeInBytes();
+  MachineMemOperand *ValueMMO = MF.getMachineMemOperand(
+      MachinePointerInfo::getUnknownStack(MF),
+      MachineMemOperand::MOLoad | MachineMemOperand::MOInvariant, Size,
+      Align());
+  Builder.buildLoad(Dst, Addr, *ValueMMO);
+
+  // Increment the current VAArg address.
+  auto NextAddr =
+      Builder.buildPtrAdd(P, Addr, Builder.buildConstant(S16, Size));
+  MachineMemOperand *AddrStoreMMO =
+      MF.getMachineMemOperand(MachinePointerInfo::getUnknownStack(MF),
+                              MachineMemOperand::MOStore, 2, Align());
+  Builder.buildStore(NextAddr, VaListPtr, *AddrStoreMMO);
+  MI.eraseFromParent();
+  return true;
+}
+
+// Lower variable argument pointer setup intrinsic.
+bool MOSLegalizerInfo::legalizeVAStart(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+  LLT P = LLT::pointer(0, 16);
+
+  // Store the address of the fake varargs frame index into the valist.
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  auto *FuncInfo = Builder.getMF().getInfo<MOSFunctionInfo>();
+  Builder.buildStore(Builder.buildFrameIndex(P, FuncInfo->VarArgsStackIndex),
+                     MI.getOperand(0), **MI.memoperands_begin());
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeFAbs(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI,
+                                    MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Register Dst = MI.getOperand(0).getReg();
+  LLT Ty = MRI.getType(Dst);
+  Register Src = MI.getOperand(1).getReg();
+
+  Builder.buildAnd(
+      Dst, Src,
+      Builder.buildConstant(Ty, ~APInt::getSignMask(Ty.getScalarSizeInBits())));
+  MI.eraseFromParent();
+  return true;
+}
+
+// Legalize floating-point comparisons to libcalls.
+bool MOSLegalizerInfo::legalizeFCmp(LegalizerHelper &Helper,
+                                    MachineRegisterInfo &MRI, MachineInstr &MI,
+                                    LostDebugLocObserver &LocObserver) const {
+  assert(MRI.getType(MI.getOperand(2).getReg()) ==
+             MRI.getType(MI.getOperand(3).getReg()) &&
+         "Mismatched operands for G_FCMP");
+  auto OpSize = MRI.getType(MI.getOperand(2).getReg()).getSizeInBits();
+
+  auto OriginalResult = MI.getOperand(0).getReg();
+  auto Predicate =
+      static_cast<CmpInst::Predicate>(MI.getOperand(1).getPredicate());
+  auto Libcalls = getFCmpLibcalls(Predicate, OpSize);
+
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  LLVMContext &Ctx = Builder.getMF().getFunction().getContext();
+
+  if (Libcalls.empty()) {
+    assert(
+        (Predicate == CmpInst::FCMP_TRUE || Predicate == CmpInst::FCMP_FALSE) &&
+        "Predicate needs libcalls, but none specified");
+    Builder.buildConstant(OriginalResult,
+                          Predicate == CmpInst::FCMP_TRUE ? 1 : 0);
+    MI.eraseFromParent();
+    return true;
+  }
+
+  assert((OpSize == 32 || OpSize == 64) && "Unsupported operand size");
+  auto *ArgTy = OpSize == 32 ? Type::getFloatTy(Ctx) : Type::getDoubleTy(Ctx);
+  auto *RetTy = Type::getInt32Ty(Ctx);
+
+  SmallVector<Register, 2> Results;
+  for (auto Libcall : Libcalls) {
+    auto LibcallResult = MRI.createGenericVirtualRegister(LLT::scalar(32));
+    auto Status =
+        Helper.createLibcall(Libcall.LibcallID, {LibcallResult, RetTy, 0},
+                             {{MI.getOperand(2).getReg(), ArgTy, 0},
+                              {MI.getOperand(3).getReg(), ArgTy, 0}},
+                             LocObserver);
+
+    if (Status != LegalizerHelper::Legalized)
+      return false;
+
+    auto ProcessedResult =
+        Libcalls.size() == 1
+            ? OriginalResult
+            : MRI.createGenericVirtualRegister(MRI.getType(OriginalResult));
+
+    // We have a result, but we need to transform it into a proper 1-bit 0 or
+    // 1, taking into account the different peculiarities of the values
+    // returned by the comparison functions.
+    CmpInst::Predicate ResultPred = Libcall.Predicate;
+    if (ResultPred == CmpInst::BAD_ICMP_PREDICATE) {
+      // We have a nice 0 or 1, and we just need to truncate it back to 1 bit
+      // to keep the types consistent.
+      Builder.buildTrunc(ProcessedResult, LibcallResult);
+    } else {
+      // We need to compare against 0.
+      assert(CmpInst::isIntPredicate(ResultPred) && "Unsupported predicate");
+      auto Zero = Builder.buildConstant(LLT::scalar(32), 0);
+      Builder.buildICmp(ResultPred, ProcessedResult, LibcallResult, Zero);
+    }
+    Results.push_back(ProcessedResult);
+  }
+
+  if (Results.size() != 1) {
+    assert(Results.size() == 2 && "Unexpected number of results");
+    Builder.buildOr(OriginalResult, Results[0], Results[1]);
+  }
+
+  MI.eraseFromParent();
+  return true;
+}
+
+// Convert floating-point constants into their binary integer equivalents.
+bool MOSLegalizerInfo::legalizeFConst(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  LLVMContext &Ctx = Builder.getMF().getFunction().getContext();
+
+  // Convert to integer constants, while preserving the binary representation.
+  auto AsInteger = MI.getOperand(1).getFPImm()->getValueAPF().bitcastToAPInt();
+  Builder.buildConstant(MI.getOperand(0), *ConstantInt::get(Ctx, AsInteger));
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeDynStackAlloc(LegalizerHelper &Helper,
+                                             MachineRegisterInfo &MRI,
+                                             MachineInstr &MI) const {
+  MachineIRBuilder &Builder = Helper.MIRBuilder;
+  Register Dst = MI.getOperand(0).getReg();
+  Register AllocSize = MI.getOperand(1).getReg();
+  Align Alignment = assumeAligned(MI.getOperand(2).getImm());
+
+  LLT PtrTy = MRI.getType(Dst);
+  LLT IntPtrTy = LLT::scalar(PtrTy.getSizeInBits());
+
+  auto SPTmp = Builder.buildCopy(PtrTy, Register(MOS::RS0));
+  SPTmp = Builder.buildCast(IntPtrTy, SPTmp);
+
+  // Subtract the final alloc from the SP. We use G_PTRTOINT here so we don't
+  // have to generate an extra instruction to negate the alloc and then use
+  // G_PTR_ADD to add the negative offset.
+  auto Alloc = Builder.buildSub(IntPtrTy, SPTmp, AllocSize);
+  if (Alignment > Align(1)) {
+    APInt AlignMask(IntPtrTy.getSizeInBits(), Alignment.value(), true);
+    AlignMask.negate();
+    auto AlignCst = Builder.buildConstant(IntPtrTy, AlignMask);
+    Alloc = Builder.buildAnd(IntPtrTy, Alloc, AlignCst);
+  }
+
+  SPTmp = Builder.buildCast(PtrTy, Alloc);
+  Builder.buildCopy(MOS::RS0, SPTmp);
+  Builder.buildCopy(Dst, SPTmp);
+
+  MI.eraseFromParent();
+  return true;
+}
+
+bool MOSLegalizerInfo::legalizeToCopy(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI,
+                                      MachineInstr &MI) const {
+  Helper.Observer.changingInstr(MI);
+  MI.setDesc(Helper.MIRBuilder.getTII().get(COPY));
+  Helper.Observer.changedInstr(MI);
+  return true;
+}
+
+void MOSLegalizerInfo::setFCmpLibcallsGNU() {
+  // FCMP_TRUE and FCMP_FALSE don't need libcalls, they should be
+  // default-initialized.
+  FCmp32Libcalls.resize(CmpInst::LAST_FCMP_PREDICATE + 1);
+  FCmp32Libcalls[CmpInst::FCMP_OEQ] = {{RTLIB::OEQ_F32, CmpInst::ICMP_EQ}};
+  FCmp32Libcalls[CmpInst::FCMP_OGE] = {{RTLIB::OGE_F32, CmpInst::ICMP_SGE}};
+  FCmp32Libcalls[CmpInst::FCMP_OGT] = {{RTLIB::OGT_F32, CmpInst::ICMP_SGT}};
+  FCmp32Libcalls[CmpInst::FCMP_OLE] = {{RTLIB::OLE_F32, CmpInst::ICMP_SLE}};
+  FCmp32Libcalls[CmpInst::FCMP_OLT] = {{RTLIB::OLT_F32, CmpInst::ICMP_SLT}};
+  FCmp32Libcalls[CmpInst::FCMP_ORD] = {{RTLIB::UO_F32, CmpInst::ICMP_EQ}};
+  FCmp32Libcalls[CmpInst::FCMP_UGE] = {{RTLIB::OLT_F32, CmpInst::ICMP_SGE}};
+  FCmp32Libcalls[CmpInst::FCMP_UGT] = {{RTLIB::OLE_F32, CmpInst::ICMP_SGT}};
+  FCmp32Libcalls[CmpInst::FCMP_ULE] = {{RTLIB::OGT_F32, CmpInst::ICMP_SLE}};
+  FCmp32Libcalls[CmpInst::FCMP_ULT] = {{RTLIB::OGE_F32, CmpInst::ICMP_SLT}};
+  FCmp32Libcalls[CmpInst::FCMP_UNE] = {{RTLIB::UNE_F32, CmpInst::ICMP_NE}};
+  FCmp32Libcalls[CmpInst::FCMP_UNO] = {{RTLIB::UO_F32, CmpInst::ICMP_NE}};
+  FCmp32Libcalls[CmpInst::FCMP_ONE] = {{RTLIB::OGT_F32, CmpInst::ICMP_SGT},
+                                       {RTLIB::OLT_F32, CmpInst::ICMP_SLT}};
+  FCmp32Libcalls[CmpInst::FCMP_UEQ] = {{RTLIB::OEQ_F32, CmpInst::ICMP_EQ},
+                                       {RTLIB::UO_F32, CmpInst::ICMP_NE}};
+
+  FCmp64Libcalls.resize(CmpInst::LAST_FCMP_PREDICATE + 1);
+  FCmp64Libcalls[CmpInst::FCMP_OEQ] = {{RTLIB::OEQ_F64, CmpInst::ICMP_EQ}};
+  FCmp64Libcalls[CmpInst::FCMP_OGE] = {{RTLIB::OGE_F64, CmpInst::ICMP_SGE}};
+  FCmp64Libcalls[CmpInst::FCMP_OGT] = {{RTLIB::OGT_F64, CmpInst::ICMP_SGT}};
+  FCmp64Libcalls[CmpInst::FCMP_OLE] = {{RTLIB::OLE_F64, CmpInst::ICMP_SLE}};
+  FCmp64Libcalls[CmpInst::FCMP_OLT] = {{RTLIB::OLT_F64, CmpInst::ICMP_SLT}};
+  FCmp64Libcalls[CmpInst::FCMP_ORD] = {{RTLIB::UO_F64, CmpInst::ICMP_EQ}};
+  FCmp64Libcalls[CmpInst::FCMP_UGE] = {{RTLIB::OLT_F64, CmpInst::ICMP_SGE}};
+  FCmp64Libcalls[CmpInst::FCMP_UGT] = {{RTLIB::OLE_F64, CmpInst::ICMP_SGT}};
+  FCmp64Libcalls[CmpInst::FCMP_ULE] = {{RTLIB::OGT_F64, CmpInst::ICMP_SLE}};
+  FCmp64Libcalls[CmpInst::FCMP_ULT] = {{RTLIB::OGE_F64, CmpInst::ICMP_SLT}};
+  FCmp64Libcalls[CmpInst::FCMP_UNE] = {{RTLIB::UNE_F64, CmpInst::ICMP_NE}};
+  FCmp64Libcalls[CmpInst::FCMP_UNO] = {{RTLIB::UO_F64, CmpInst::ICMP_NE}};
+  FCmp64Libcalls[CmpInst::FCMP_ONE] = {{RTLIB::OGT_F64, CmpInst::ICMP_SGT},
+                                       {RTLIB::OLT_F64, CmpInst::ICMP_SLT}};
+  FCmp64Libcalls[CmpInst::FCMP_UEQ] = {{RTLIB::OEQ_F64, CmpInst::ICMP_EQ},
+                                       {RTLIB::UO_F64, CmpInst::ICMP_NE}};
+}
+
+MOSLegalizerInfo::FCmpLibcallsList
+MOSLegalizerInfo::getFCmpLibcalls(CmpInst::Predicate Predicate,
+                                  unsigned Size) const {
+  assert(CmpInst::isFPPredicate(Predicate) && "Unsupported FCmp predicate");
+  if (Size == 32)
+    return FCmp32Libcalls[Predicate];
+  if (Size == 64)
+    return FCmp64Libcalls[Predicate];
+  llvm_unreachable("Unsupported size for FCmp predicate");
+}

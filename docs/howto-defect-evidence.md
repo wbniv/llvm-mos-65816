@@ -5,6 +5,92 @@ that failure to reproduce is not evidence of a fix. Workflow and documentation:
 OpenAI Codex CLI 0.155.1 using GPT-6 Astra (`gpt-6-astra`), `xhigh` reasoning
 effort. [Motivating investigation](investigations/2026-09-25-older-defect-recheck.md).
 
+## Reconcile prior work before opening or fixing a defect
+
+Do this before labeling a failure new, writing a new defect plan, or changing
+compiler code. A user may be pointing at stale discovery prose for an existing
+repair. The [far-memset revalidation](investigations/2026-09-26-far-memset-revalidation.md)
+demonstrates that case: the June report still said "not attempted" although its
+repair and passing results were recorded elsewhere the same day.
+
+1. Search `docs/defects/*.json`, investigations, plans, original reports, TODO,
+   and upstream summaries using both the diagnostic/symptom and the relevant
+   pass, operation, or runtime symbol. Read matching follow-ups and resolutions.
+2. Search Git history and `patches/llvm-mos/` for those symbols and changes.
+   Inspect the implementation in `vendor/llvm-mos/`, including the large 0002
+   patch: standalone artifacts may already be folded into it. Patch numbering
+   and document dates do not establish absence from the compiler.
+3. Identify the actual executable, source pin and dirty changes, and applicable
+   patch contents. Distinguish "patch exists", "source contains it", "binary
+   contains it", and "same input passes because of it". Keep uncertain links
+   explicit; a file timestamp alone does not prove binary contents.
+4. Choose the canonical record. Extend a matching record with dated observations
+   and `additional_runs`, keeping its captured `baseline` unchanged. Create a
+   record only for a distinct defect or to migrate a historical report that has
+   no structured record. Explain the difference from related defects. Preserve
+   earlier evidence and attribution instead of issuing a new discovery claim.
+5. If a candidate repair already exists, compare the preserved trigger with and
+   without that change when feasible. A current pass alone remains qualified.
+   Report the result as revalidation of the existing change when established.
+6. On closure, update the original report's visible current status and link it
+   to the canonical record, then review dependent summaries and generated views.
+   Register that original entry point as a maintained summary. Historical
+   passages may remain verbatim under an explicit historical heading.
+
+Useful starting searches (replace the concrete terms for each report):
+
+```sh
+rg -n -i 'far.?memset|wrong.bank|createFarMemLibcall|__memset_far' docs TODO.md patches dev
+git log --all --oneline --grep='far.*mem' -i
+git log --all -S'createFarMemLibcall' -- patches/llvm-mos
+rg -n 'createFarMemLibcall|anyFarPointerOperand' vendor/llvm-mos/llvm/lib/Target/MOS
+```
+
+Every newly created structured record requires `prior_work`:
+
+```json
+{
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": ["far memset", "__memset_far", "createFarMemLibcall"],
+    "related_records": [],
+    "related_reports": ["docs/320-far-memset-miscompile.md"],
+    "related_changes": ["a81874d", "patches/llvm-mos/0013-320-far-memops.patch"],
+    "source_assessment": "Describe applicable changes present in the inspected source.",
+    "binary_assessment": "Identify the binary and its verified or unknown relationship to that source.",
+    "decision": "Explain why this is the canonical record and how related defects differ.",
+    "evidence": {"path": "retained prior-work audit", "sha256": "64 lowercase hexadecimal digits"}
+  }
+}
+```
+
+Allowed dispositions are `new_defect`, `historical_migration`, and
+`distinct_from_related`; the last requires a related canonical record and a
+decision explaining the distinction. A duplicate sighting must update the
+existing record. Related records/reports must exist in the staged tree. The
+audit artifact retains the searches and findings; empty search results are valid
+evidence, not a reason to invent a match.
+
+The checker has an explicit list of the 14 records already present when this
+requirement was adopted, including pending uncommitted records. Those may retain
+their schema-1 evidence without a fabricated retrospective audit. New IDs must
+provide the audit, and an audit cannot be removed once committed. This is a
+structural gate: it checks that reconciliation is recorded, not that a search
+was exhaustive or a semantic distinction is sound. Do not add new IDs to the
+legacy list to clear the gate.
+
+The tracked `.github/workflows/defect-evidence.yml` runs the checker and its tests
+on pull requests and pushes to main without a compiler build or secrets. Local
+hooks are enabled in this checkout (`core.hooksPath=.githooks`); Git does not
+install them automatically in another clone. The workflow takes effect after
+publication of the files. Making its status required for merging is a separate
+repository-rules setting; do not claim branch protection merely because the
+workflow exists.
+
+Prior-work and canonical-record process, checker enforcement, and tests:
+OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning
+effort; verified session `01a0db16-f6a0-7e32-ada6-0c8098813933`.
+
 ## Capture a failing baseline before changing anything
 
 Keep one immutable evidence directory per report. Do not overwrite it with a
@@ -75,7 +161,7 @@ Investigations link to their records. Use `schema: 1`, an `id` matching the file
 name, `title`, `summary`, `report` (repository path), `attribution` (list), and
 `reproducer_origin` (`original`, `reduced`, `reconstructed`, or `unknown`).
 `observations` is a nonempty list of `{ "path": "...", "sha256": "..." }`
-artifacts retained in Git. The three [current records](defects/) are examples
+artifacts retained in Git. The [current records](defects/) include examples
 of qualified statuses; `not_reproduced` requires an explicit `unknowns` field.
 
 Statuses are `confirmed`, `not_reproduced`, `workaround`, `fixed`, `invalid`, and
@@ -113,8 +199,9 @@ automatically. Check the setting with `git config --get core.hooksPath`.
 The repository pre-commit hook runs `python3 dev/check-defect-evidence.py --staged`.
 It checks index blobs, so concurrent unstaged edits cannot substitute evidence.
 It rejects changed artifact hashes, missing evidence, deleted records, and edits
-to a baseline already recorded in HEAD. Keep the baseline and open a separate
-record if materially different failing evidence needs to be captured.
+to a baseline already recorded in HEAD. Keep the baseline and append later
+evidence to the same record. A separate record requires a distinct causal defect,
+not merely another input, build, failure log, or reconstructed baseline.
 
 Run `python3 dev/check-defect-evidence.py --worktree` before staging and
 `python3 dev/test-defect-evidence.py` when modifying the checker. Do not bypass

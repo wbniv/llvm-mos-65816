@@ -245,6 +245,9 @@ if [ ! -d "$SRC/.git" ]; then
   # so 0002 can neither absorb nor drop it. Downstream-only — AS2 is not
   # upstream-standalone-testable until the far ABI is blessed.
   apply_patch 0048-mos-far-codegen-lit-tests
+  # Far memop lowering is in 0002; retain its independent runtime-ABI test.
+  apply_patch 0013-320-far-memops \
+    --include='llvm/test/CodeGen/MOS/far-memset.ll'
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and

@@ -1,5 +1,12 @@
 # Fix the far (addrspace 2) memset/memcpy/memmove silent wrong-bank miscompile
 
+**September 26 revalidation:** the [original 4096-byte fill](../320-far-memset-miscompile.md)
+is causally repaired by this plan's existing `a81874d` / 0013 change. The
+[canonical record](../defects/mos-far-memset-wrong-bank.json) retains the same-input
+comparison and physical-memory checks. The dated plan and results below remain
+unchanged; the separate canonical-plan filename proposed under Verification was
+never created. Current status is now linked from the original discovery report.
+
 ## Context
 
 **The defect.** A `memset`/`memcpy`/`memmove` (or any compiler-formed equivalent) on a **far**

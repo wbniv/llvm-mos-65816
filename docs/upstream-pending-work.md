@@ -14,6 +14,12 @@ called an issue or a pull request.
 Use the [saved unpatched upstream reference](upstream-reference-build.md) for new
 reproduction checks; keep candidate patches in separate builds.
 
+The [original far-memset wrong-bank report](defects/mos-far-memset-wrong-bank.json)
+is revalidated as fixed by existing `a81874d` / 0013, with matching-input backend
+comparison and physical WRAM checks. Its stale discovery status is corrected;
+this creates no new independent fix submission. Compiler/ABI and far-runtime
+integration remain with the #320/#321 feature work.
+
 ## What remains to post
 
 **Feature-independent submissions prepared September 22–23:**

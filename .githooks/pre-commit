@@ -15,6 +15,7 @@ fi
 
 python3 "$repo_root/dev/check-comment-history.py"
 python3 "$repo_root/dev/check-defect-evidence.py" --staged
+python3 "$repo_root/dev/docs-deps.py" --staged
 
 # --staged: judge the staged blobs and HEAD, not concurrent unstaged work.
 # Register a reviewed display access site with

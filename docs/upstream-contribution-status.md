@@ -1,5 +1,11 @@
 # Upstream contribution status — PR progress and submission queue
 
+**September 26 local revalidation:** the [original far-memset report](defects/mos-far-memset-wrong-bank.json)
+is fixed by existing `a81874d` / 0013. Identical IR fails without its backend
+routing and passes with it, including all 4096 physical WRAM bytes. This updates
+stale discovery status and adds regression coverage; the compiler/ABI and far
+runtime remain feature-series work, with no new independent PR claimed.
+
 **GitHub status last verified:** 2026-09-25, live `gh pr view` / `gh issue view` / `gh pr checks` of
 every PR and issue referenced in this document. Scope: PRs/issues authored by `wbniv` in
 `llvm-mos/llvm-mos`, plus authored PRs in `llvm-mos/llvm-mos-sdk`.

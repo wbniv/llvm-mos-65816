@@ -33,6 +33,13 @@ glitch. (Exact commands + the micro-test pattern: `docs/agent-handoff.md`.)
 
 ## Defect evidence and closure — mandatory for every agent
 
+Before starting a compiler fix or calling a failure new, perform the
+[prior-work reconciliation](docs/howto-defect-evidence.md#reconcile-prior-work-before-opening-or-fixing-a-defect):
+check canonical records, follow-ups, Git history, folded/standalone patches,
+live source, and the tested binary. Extend the existing canonical record for
+repeat sightings; a new record needs the staged `prior_work` audit. Update the
+original report's visible status when an existing repair is established.
+
 Follow [the defect evidence workflow](docs/howto-defect-evidence.md) and the
 closure rules in [AGENTS.md](AGENTS.md). Every new compiler defect or status
 change needs a structured `docs/defects/*.json` record. Capture the exact input,

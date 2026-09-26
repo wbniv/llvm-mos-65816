@@ -1,0 +1,98 @@
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll:11:10: error: CHECK: expected string not found in input
+; CHECK: {{jsr|jmp}} __memset_far{{$}}
+         ^
+<stdin>:37:19: note: scanning from here
+far_constant_fill: ; @far_constant_fill
+                  ^
+<stdin>:53:2: note: possible intended match here
+ jmp __memset
+ ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll:18:10: error: CHECK: expected string not found in input
+; CHECK: {{jsr|jmp}} __memset_far{{$}}
+         ^
+<stdin>:59:19: note: scanning from here
+far_variable_fill: ; @far_variable_fill
+                  ^
+<stdin>:63:2: note: possible intended match here
+ jmp __memset
+ ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/far-memset.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           32:  .zeropage __rc31 
+           33:  .file "far-memset.ll" 
+           34:  .text 
+           35:  .globl far_constant_fill ; -- Begin function far_constant_fill 
+           36:  .type far_constant_fill,@function 
+           37: far_constant_fill: ; @far_constant_fill 
+check:11'0                       X~~~~~~~~~~~~~~~~~~~~~ error: no match found
+           38: ; %bb.0: 
+check:11'0     ~~~~~~~~~
+           39:  ldx #0 
+check:11'0     ~~~~~~~~
+           40:  stx __rc4 
+check:11'0     ~~~~~~~~~~~
+           41:  ldx #32 
+check:11'0     ~~~~~~~~~
+           42:  stx __rc5 
+check:11'0     ~~~~~~~~~~~
+            .
+            .
+            .
+           48:  ldx #16 
+check:11'0     ~~~~~~~~~
+           49:  stx __rc2 
+check:11'0     ~~~~~~~~~~~
+           50:  stz __rc3 
+check:11'0     ~~~~~~~~~~~
+           51:  stz __rc8 
+check:11'0     ~~~~~~~~~~~
+           52:  ldx #0 
+check:11'0     ~~~~~~~~
+           53:  jmp __memset 
+check:11'0     ~~~~~~~~~~~~~~
+check:11'1      ?             possible intended match
+           54: .Lfunc_end0: 
+check:11'0     ~~~~~~~~~~~~~
+           55:  .size far_constant_fill, .Lfunc_end0-far_constant_fill 
+check:11'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           56:  ; -- End function 
+check:11'0     ~~~~~~~~~~~~~~~~~~~
+           57:  .globl far_variable_fill ; -- Begin function far_variable_fill 
+check:11'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           58:  .type far_variable_fill,@function 
+check:11'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           59: far_variable_fill: ; @far_variable_fill 
+check:11'0     ~~~~~~~~~~~~~~~~~~
+check:18'0                       X~~~~~~~~~~~~~~~~~~~~~ error: no match found
+           60: ; %bb.0: 
+check:18'0     ~~~~~~~~~
+           61:  stz __rc3 
+check:18'0     ~~~~~~~~~~~
+           62:  stz __rc8 
+check:18'0     ~~~~~~~~~~~
+           63:  jmp __memset 
+check:18'0     ~~~~~~~~~~~~~~
+check:18'1      ?             possible intended match
+           64: .Lfunc_end1: 
+check:18'0     ~~~~~~~~~~~~~
+           65:  .size far_variable_fill, .Lfunc_end1-far_variable_fill 
+check:18'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           66:  ; -- End function 
+check:18'0     ~~~~~~~~~~~~~~~~~~~
+           67:  .globl near_variable_fill ; -- Begin function near_variable_fill 
+check:18'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           68:  .type near_variable_fill,@function 
+check:18'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            .
+            .
+            .
+>>>>>>

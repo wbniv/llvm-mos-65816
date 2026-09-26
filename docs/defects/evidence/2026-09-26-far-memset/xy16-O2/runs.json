@@ -1,0 +1,303 @@
+{
+  "input": {
+    "path": "/home/will/llvm-mos-65816/examples/65816/far_memset.c",
+    "sha256": "c0bdb93159ae73aa7188e148676d76292412ed311bbabdea0f1defc2d5e9a21f"
+  },
+  "tools": {
+    "llc": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445"
+    },
+    "clang": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+      "sha256": "1cdb89253124d48b8f0e3a8aea613e3611beb4fd2bc0d00b9fc40c53ab2fcbec"
+    },
+    "objdump": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump",
+      "sha256": "1bfef2d624ce5320a70c0bb419ff53196c9d5f4a118ce3d929a2273d0d92ebf9"
+    },
+    "emulator": {
+      "path": "/home/will/llvm-mos-65816/build/jgxcheck",
+      "sha256": "4d4531d9355f60b70f98bbbba67c17615e04eaf0fe18157163bd1ecb43e4075d"
+    }
+  },
+  "configuration": {
+    "cpu": "mosw65816",
+    "features": "+mos-a16,+mos-xy16",
+    "optimization": "O2",
+    "backend_optimization": "O2",
+    "lto": false,
+    "entropy": 0,
+    "frames": 300
+  },
+  "runs": [
+    {
+      "name": "preprocess",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+        "--target=mos",
+        "--config",
+        "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-O2",
+        "-fno-lto",
+        "-E",
+        "-x",
+        "c",
+        "/home/will/llvm-mos-65816/examples/65816/far_memset.c",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.i"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "frontend",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+        "--target=mos",
+        "--config",
+        "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-O2",
+        "-fno-lto",
+        "-S",
+        "-emit-llvm",
+        "-x",
+        "cpp-output",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.i",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.ll"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "c-object",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+        "--target=mos",
+        "--config",
+        "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-O2",
+        "-fno-lto",
+        "-mllvm",
+        "-verify-machineinstrs",
+        "-c",
+        "-x",
+        "cpp-output",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.i",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/c-entry.o"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "prelegalizer",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.ll",
+        "-stop-before=legalizer",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/prelegalizer.mir"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "legalized",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.ll",
+        "-stop-after=legalizer",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/legalized.mir"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "backend",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16,+mos-xy16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.ll",
+        "-filetype=obj",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.o"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "object-disassembly",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump",
+        "-dr",
+        "--mcpu=mosw65816",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.o"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "da646cb044f7e1de31e092c711a02124a67c09f389340a7377e14be4339db2e4",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link",
+      "command": [
+        "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+        "--target=mos",
+        "--config",
+        "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-O2",
+        "-fno-lto",
+        "-Wl,-Map=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.map",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.o",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.sfc"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "checksum",
+      "command": [
+        "python3",
+        "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.sfc"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "1a1cf05807d30b7c1558c17a1bcd8021e575300bf264c5669722a6635622c78f",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "runtime",
+      "command": [
+        "/home/will/llvm-mos-65816/build/jgxcheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/input.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "200",
+        "2",
+        "2000",
+        "300"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {
+        "JGX_ENTROPY": "0",
+        "JGX_WRAM_DUMP": "2000",
+        "JGX_WRAM_DUMP_LEN": "4096",
+        "JGX_WRAM_DUMP_FILE": "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-O2/physical-wram.bin"
+      },
+      "stdout_sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "failures": [],
+  "output_hashes": {
+    "object-disassembly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "object-disassembly.stdout": "da646cb044f7e1de31e092c711a02124a67c09f389340a7377e14be4339db2e4",
+    "checksum.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "preprocess.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime.stdout": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea",
+    "legalized.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legalized.mir": "423ac9b8f7fb7b63f5e3934c3eff1a7a22c9681b8c3fe0d85ca42252694c6c8e",
+    "preprocess.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "link.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input.map": "4123eeff53d3d8c83cb37a4f6a099b25bce31ffebb698c1a003636de04f28c14",
+    "backend.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "c-entry.o": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962",
+    "input.i": "c9fb52e660a6390bc1ed302cf242b1eda6bc1f004037d88d8f2de8541a111142",
+    "input.sfc": "d1186df75017faea3091871c048c3dc2a7a5b4611c5b422c448f1a2bcfa80aed",
+    "input.sfc.elf": "8099e47f216324019e229287b4fe43e8e11b1f5f39a26c23af640c76730d84e0",
+    "prelegalizer.mir": "8cf2f307412ddbc6428beae89af7cfae1531c244c1de1708a79e4575c799efe0",
+    "runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "checksum.stdout": "1a1cf05807d30b7c1558c17a1bcd8021e575300bf264c5669722a6635622c78f",
+    "prelegalizer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "run.log": "b4c95972deb48e450f34bca60c5bbe5180be67d817eb1828d3b18811fb15de64",
+    "legalized.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prelegalizer.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "c-object.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "link.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input.o": "c7335fee830a1e4a09d5ef1ae12d166f5e16539b1f100c8aa4cf49f1dc461745",
+    "input.ll": "b3690ea687cb308adb5a27f8cd5a92eea6b75a143777a982adb4bc5b189a9b9b",
+    "c-object.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "frontend.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "backend.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "physical-wram.bin": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+  }
+}

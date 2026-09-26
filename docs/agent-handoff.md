@@ -84,13 +84,23 @@ combined fixes. See the focused record for hashes, exclusions, and attribution.
 
 ## Defect reproduction and closure
 
+Before treating a failure as new, complete the workflow's prior-work audit across
+records, reports, Git history, standalone/folded patches, source, and binary.
+Extend the existing canonical record for another sighting; preserve its baseline
+and append observations/additional runs. New records require a `prior_work`
+audit under the pre-commit checker and lightweight defect-evidence CI workflow.
+
 Follow [the evidence workflow](howto-defect-evidence.md) and the mandatory rules
 in `AGENTS.md`. New compiler reports/status changes require a `docs/defects/*.json`
 record. The active pre-commit hook validates staged evidence and rejects unsupported
 fixed claims or changes to captured baselines. Passing current inputs means only
 **not reproduced on this build** unless a causal red/green repair is established.
 
-The [2026-09-25 older-report recheck](investigations/2026-09-25-older-defect-recheck.md)
+Current far-memset status: the [original wrong-bank report](defects/mos-far-memset-wrong-bank.json)
+is repaired by existing 0013, with identical-input backend comparison and
+all 4096 physical WRAM bytes checked. Use its canonical record for present work.
+
+**Historical initial recheck:** the [2026-09-25 older-report recheck](investigations/2026-09-25-older-defect-recheck.md)
 records 132 successful compiles and narrow-shift/inline-bitboard runtime checks.
 Both historical failure reports remain not reproduced, with missing baseline
 information explicit; reentrant remains a contract clarification. OpenAI Codex

@@ -1,0 +1,194 @@
+{
+  "input": {
+    "path": "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/c-entry/input.ll",
+    "sha256": "c5d85031607b4dd94d9cc74ca79c61dbc9182f6b077a8832100124ab3b3fb194"
+  },
+  "tools": {
+    "llc": {
+      "path": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+      "sha256": "f965b29659e9fc708b595f705393b3bcabf3d414e1acac14217e97c22b57d445"
+    },
+    "clang": {
+      "path": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/clang",
+      "sha256": "1cdb89253124d48b8f0e3a8aea613e3611beb4fd2bc0d00b9fc40c53ab2fcbec"
+    },
+    "objdump": {
+      "path": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump",
+      "sha256": "1bfef2d624ce5320a70c0bb419ff53196c9d5f4a118ce3d929a2273d0d92ebf9"
+    },
+    "emulator": {
+      "path": "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck",
+      "sha256": "4d4531d9355f60b70f98bbbba67c17615e04eaf0fe18157163bd1ecb43e4075d"
+    }
+  },
+  "configuration": {
+    "cpu": "mosw65816",
+    "features": "+mos-a16",
+    "optimization": "Os",
+    "backend_optimization": "O2",
+    "lto": false,
+    "entropy": 0,
+    "frames": 300
+  },
+  "runs": [
+    {
+      "name": "prelegalizer",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/c-entry/input.ll",
+        "-stop-before=legalizer",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/prelegalizer.mir"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "legalized",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/c-entry/input.ll",
+        "-stop-after=legalizer",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/legalized.mir"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "backend",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-O2",
+        "-verify-machineinstrs",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/c-entry/input.ll",
+        "-filetype=obj",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.o"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "object-disassembly",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/llvm-objdump",
+        "-dr",
+        "--mcpu=mosw65816",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.o"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "0503087f05cd4bce4a37e9746b7784cf89b4f741d43e9490795d73551937381a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "link",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/clang",
+        "--target=mos",
+        "--config",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/sdk/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-a16",
+        "-Os",
+        "-fno-lto",
+        "-Wl,-Map=/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.map",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.o",
+        "-o",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.sfc"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "checksum",
+      "command": [
+        "python3",
+        "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.sfc"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {},
+      "stdout_sha256": "6783bb5b872b14216f1977bbb42f56e418db3b166b949518edce3e8743f4dbe6",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "runtime",
+      "command": [
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/bin/jgxcheck",
+        "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/input.sfc",
+        "/home/will/llvm-mos-65816/build/defect-baselines/2026-09-26-far-memset/Database",
+        "200",
+        "2",
+        "2000",
+        "300"
+      ],
+      "working_directory": "/home/will/llvm-mos-65816",
+      "exit_code": 0,
+      "environment": {
+        "JGX_ENTROPY": "0",
+        "JGX_WRAM_DUMP": "2000",
+        "JGX_WRAM_DUMP_LEN": "4096",
+        "JGX_WRAM_DUMP_FILE": "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/candidate/physical-wram.bin"
+      },
+      "stdout_sha256": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "failures": [],
+  "output_hashes": {
+    "object-disassembly.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "object-disassembly.stdout": "0503087f05cd4bce4a37e9746b7784cf89b4f741d43e9490795d73551937381a",
+    "checksum.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "runtime.stdout": "c40d03250f5a5bf4c636ce832fbe7547019d6350843bdf62269acc217c0759ea",
+    "legalized.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "legalized.mir": "06cb0c3eb27a4dee5b761101913aa21ec147c803bccc4e878d7eae14731ac95e",
+    "link.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input.map": "6a53fab73c6463676bed9065132fe7804a0e9b8a979c82e6e4336b59a606077c",
+    "backend.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input.sfc": "4d415ccbaec72984dbbbfa346438e66618254bb924265ed0479af4f5dd9331e0",
+    "input.sfc.elf": "96fd393586e807dfabbb96b9fddff4f04659384809886b335667483ba928357b",
+    "prelegalizer.mir": "ba7a30ed394b0bd7a2019d01a92c510aac607cf43f1df3bb2f3152011a07e5b0",
+    "runtime.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "checksum.stdout": "6783bb5b872b14216f1977bbb42f56e418db3b166b949518edce3e8743f4dbe6",
+    "prelegalizer.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "run.log": "6abb33a02f1c5bce56125ddfa281a834010d743e813c7861caa163a8b412e7e3",
+    "legalized.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "prelegalizer.stdout": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "link.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "input.o": "a602c63d3b9873588bf05fa8499c8514a725a900eb66ec0a1d7e07827d0a2bfc",
+    "backend.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "physical-wram.bin": "725bcd6c66d02acf6ebeab9c92410e010ea22e336876256aaf05a211f4ce1902"
+  }
+}

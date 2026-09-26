@@ -1,0 +1,32 @@
+commit a81874d89ffaac1c34b06cbb8539db9e4785c41b
+Author:     Will Norris <will@biohack.net>
+AuthorDate: Fri Jun 26 17:09:45 2026 +0700
+Commit:     Will Norris <will@biohack.net>
+CommitDate: Fri Jun 26 17:09:45 2026 +0700
+
+    #321 fix far (addrspace 2) memset/memcpy/memmove silent wrong-bank miscompile
+    
+    A far memop the backend can't inline-expand (variable size, or constant size over
+    legalizeMemOp's SizeLimit) fell through to the generic createMemLibcall, which calls
+    the NEAR runtime (__memset/memcpy, 16-bit char*) while passing the 32-bit far pointer
+    -> the bank byte was silently dropped -> wrong-bank store/load, no diagnostic. The
+    loop-idiom recognizer is only ONE source: clang EmitAggregateCopy (any far struct
+    copy, no size threshold), null/const init, __builtin_mem*, and MemCpyOpt all converge
+    on the same path -- so the fix must live at the backend chokepoint, not the recognizer.
+    
+    Fix (patch 0013, MOSLegalizerInfo.cpp): two static helpers (anyFarPointerOperand +
+    createFarMemLibcall) route a far memop to a far-aware runtime
+    (__memset_far/__memcpy_far/__memmove_far, platforms/snes/mem-far.c), widening any
+    near pointer to far bank $00 and coercing the length to size_t (i16). The near path
+    is untouched. No generic-LLVM change; upstream-worthy for llvm-mos once #320 lands.
+    
+    The runtime is written index-style (ptr[i], invariant far base) because a far-pointer
+    loop induction variable forms an unsupported G_PHI(p2) -- a pre-existing backend gap
+    noted for follow-up.
+    
+    Gate: dev/run.sh far_memops -- variable far memset + far aggregate memcpy into HIGH
+    WRAM ($7E), read back via far loads == 0x74 on MAME (-Os/-O2) + bsnes-jg (xcheck).
+    No regression: corpus 7/7, corpus-a16 6/6, far suite 14/14, torture 40/40.
+    
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
+    Claude-Session: https://claude.ai/code/session_01J79PZm5LMmiJGxQH9kHcuQ

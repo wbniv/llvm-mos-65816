@@ -1,5 +1,23 @@
 # #320 far-pointer defect — a far constant-fill is miscompiled to the near `__memset`
 
+**Current status — September 26: fixed by existing patch 0013 and runtime,
+commit `a81874d` (June 26).** The [matching-input revalidation](investigations/2026-09-26-far-memset-revalidation.md)
+removes only 0013 from a reconstructed compiler: all 4096 physical WRAM bytes
+fail without it and pass with it. The [canonical defect record](defects/mos-far-memset-wrong-bank.json)
+retains both runs and tool identities. The original June compiler remains
+unavailable; the comparison is explicitly reconstructed. No new compiler fix
+was required. Current gate:
+
+```sh
+python3 dev/check-far-memset.py --output /tmp/far-memset-replay
+```
+
+## Original June 26 discovery report
+
+The text below preserves the report before the June 26 repair. Its open status,
+proposed fixes, workaround description, and expected failures are historical.
+Use the current status and runner above for present work.
+
 **Found:** 2026-06-26, building the #3 SNES Blossom renderer (the far hit-count grid clear).
 **Status:** root-caused + minimal repro + workaround in place; **backend fix not yet attempted** (a
 follow-up, like the [default-8bit coalescer miscompile](upstream-coalesce-rotate-ac-pr.md) before it).

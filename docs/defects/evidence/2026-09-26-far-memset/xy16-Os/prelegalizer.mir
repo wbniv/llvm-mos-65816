@@ -1,0 +1,168 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-far-memset/xy16-Os/input.ll'
+  source_filename = "/home/will/llvm-mos-65816/examples/65816/far_memset.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @corpus_result = dso_local global i16 0, align 1
+  
+  ; Function Attrs: noreturn nounwind optsize
+  define dso_local noundef i16 @main() local_unnamed_addr #0 {
+    tail call void @llvm.memset.p2.i32(ptr addrspace(2) noundef nonnull align 8192 dereferenceable(4096) inttoptr (i32 8265728 to ptr addrspace(2)), i8 66, i32 4096, i1 false), !tbaa !6
+    br label %1
+  
+  1:                                                ; preds = %1, %0
+    %2 = phi i16 [ %9, %1 ], [ 0, %0 ]
+    %3 = phi i16 [ %8, %1 ], [ 0, %0 ]
+    %4 = zext nneg i16 %2 to i32
+    %5 = getelementptr inbounds nuw i8, ptr addrspace(2) inttoptr (i32 8265728 to ptr addrspace(2)), i32 %4
+    %6 = load i8, ptr addrspace(2) %5, align 1, !tbaa !6
+    %7 = zext i8 %6 to i16
+    %8 = add i16 %3, %7
+    %9 = add nuw nsw i16 %2, 1
+    %10 = icmp eq i16 %9, 4096
+    br i1 %10, label %11, label %1, !llvm.loop !7
+  
+  11:                                               ; preds = %1
+    store volatile i16 %8, ptr @corpus_result, align 1, !tbaa !2
+    br label %12
+  
+  12:                                               ; preds = %12, %11
+    tail call void asm sideeffect "wai", ""() #2, !srcloc !9
+    br label %12
+  }
+  
+  ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: write)
+  declare void @llvm.memset.p2.i32(ptr addrspace(2) writeonly captures(none), i8, i32, i1 immarg) #1
+  
+  attributes #0 = { noreturn nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #1 = { nocallback nofree nounwind willreturn memory(argmem: write) "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" }
+  attributes #2 = { nounwind }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!4, !4, i64 0}
+  !7 = distinct !{!7, !8}
+  !8 = !{!"llvm.loop.mustprogress"}
+  !9 = !{i64 2285}
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       false
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.0):
+    successors: %bb.2(0x80000000)
+  
+    %1:_(s32) = G_CONSTANT i32 8265728
+    %0:_(p2) = G_INTTOPTR %1(s32)
+    %2:_(s8) = G_CONSTANT i8 66
+    %3:_(s32) = G_CONSTANT i32 4096
+    %12:_(s16) = G_CONSTANT i16 1
+    %14:_(s16) = G_CONSTANT i16 4096
+    %16:_(p0) = G_GLOBAL_VALUE @corpus_result
+    %17:_(s16) = G_CONSTANT i16 0
+    G_MEMSET %0(p2), %2(s8), %3(s32), 1 :: (store (s8) into `ptr addrspace(2) inttoptr (i32 8265728 to ptr addrspace(2))`, align 8192, !tbaa !6, addrspace 2)
+  
+  bb.2 (%ir-block.1):
+    successors: %bb.3(0x04000000), %bb.2(0x7c000000)
+  
+    %4:_(s16) = G_PHI %13(s16), %bb.2, %17(s16), %bb.1
+    %5:_(s16) = G_PHI %11(s16), %bb.2, %17(s16), %bb.1
+    %6:_(s32) = nneg G_ZEXT %4(s16)
+    %7:_(p2) = nuw nusw inbounds G_PTR_ADD %0, %6(s32)
+    %10:_(s16) = G_ZEXTLOAD %7(p2) :: (load (s8) from %ir.5, !tbaa !6, addrspace 2)
+    %11:_(s16) = G_ADD %5, %10
+    %13:_(s16) = nuw nsw G_ADD %4, %12
+    %15:_(s1) = G_ICMP intpred(ne), %13(s16), %14
+    G_BRCOND %15(s1), %bb.2
+    G_BR %bb.3
+  
+  bb.3 (%ir-block.11):
+    successors: %bb.4(0x80000000)
+  
+    G_STORE %11(s16), %16(p0) :: (volatile store (s16) into @corpus_result, align 1, !tbaa !2)
+  
+  bb.4 (%ir-block.12):
+    successors: %bb.4(0x80000000)
+  
+    INLINEASM &wai, sideeffect attdialect, !9
+    G_BR %bb.4
+...

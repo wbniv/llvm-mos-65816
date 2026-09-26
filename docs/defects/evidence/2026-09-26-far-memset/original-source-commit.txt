@@ -1,0 +1,51 @@
+commit 903de3e587e2c78d9df24ef6ba6bd22204e6fc9e
+Author:     Will Norris <will@biohack.net>
+AuthorDate: Sat Aug 1 07:46:58 2026 -0600
+Commit:     Will Norris <will@biohack.net>
+CommitDate: Sat Aug 1 07:46:58 2026 -0600
+
+    fix(examples): give every reachable idle loop a forward-progress-proof body (wai idiom)
+    
+    An empty `for (;;) {}` (or a body reduced to comments only, e.g. "stay alive
+    while MAME settles") is removable under C11 forward-progress rules, letting
+    main() fall through into a reset loop -- exactly the class of hazard the
+    cartsize-canary fix (3e80748, 92c1b74) hardened against by re-storing a
+    volatile. That commit flagged but did not fix the other 173 files sharing the
+    same bare idiom, since the existing differential gates assert only WRAM state
+    and are insensitive to a reset loop.
+    
+    Adopted the idiom already in production use in the two most recently
+    hardened demos (snes-video-codec-bench.c, snes-video-reel.c):
+    
+        for (;;) __asm__ volatile("wai");
+    
+    `wai` is never DCE'd (inline asm), so the loop survives regardless of NMI
+    being enabled -- these are all TERMINAL halts (nothing runs after them), so a
+    CPU parked forever on `wai` with no interrupt source is exactly as correct as
+    one parked forever re-storing a volatile; the differential gates only inspect
+    memory contents, not continued execution.
+    
+    Audit (comment-aware classifier, 338 raw for(;;)/while(1) hits under
+    examples/): 107 loops already carry a real per-frame body (gallery demo main
+    loops -- display_frame()/PPU writes every iteration, not removable) and
+    needed no change; 216 loop sites across 214 files were bare (empty, or
+    comment-only) and reachable at the tail of main/a helper -- all fixed here.
+    Zero were unreachable dead code. 18 files under active edit by another
+    worker (bitweave.c, borrowlad.c, compass.c, crcwall.c, keycmp64.c, lfsr2.c,
+    modexp256.c, oddmask.c, ovmove.c, pcooker.c, permscat.c, ropeedit.c,
+    rotkal.c, rotslab.c, satcast.c, sbitfld.c, uarteye.c, ucmprank.c) were
+    skipped per the hot-shared-tree rule; snes-video-reel.c and video_hud.h were
+    also skipped -- already mid-edit and already using the safe idiom.
+    
+    None of the fixed files are display-bearing biohack.net gallery demos (those
+    are all in the 107-loop safe set already); the fixed set is corpus/*_sim.c
+    gate programs and examples/65816/*.c compiler micro-tests, which are headless
+    WRAM-only. Verified instead by: (1) disasm of 4 rebuilt samples (a16.c,
+    corpus/arith.c, torture/_shim.c, corpus/setjmp_sim.c) -- each idle point now
+    shows `wai; bra $-2`, no fall-through past end of main; (2)
+    dev/display-check.py --only blossom,maze,life against the existing published
+    manifest as a project-health sanity check (3/3 PASS, unaffected by this
+    change); (3) maze.c and invaders.c (untouched, real-loop class) rebuild
+    byte-identical/deterministic under mos-clang.
+    
+    Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>
