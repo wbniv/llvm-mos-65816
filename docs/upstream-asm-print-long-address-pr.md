@@ -1,3 +1,5 @@
+> **Superseded 2026-09-26** by the combined draft [`pr-preparations/2026-09-26/0044-pr-body.md`](pr-preparations/2026-09-26/0044-pr-body.md), which adds this draft's breaking commit, before/after bytes and measured 0044-without-0039 result to the Codex packet draft (newer base, extra MIR test). Post that one, not this.
+
 # [MOS] Print an explicit width on 24-bit address operands
 
 The 65816 assembler picks an operand's addressing mode from the text it reads, not from
