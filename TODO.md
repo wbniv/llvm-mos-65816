@@ -914,7 +914,7 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 
 ### Test Bench / CI
 
-- [T1] **Full 138-demo gate sweep for the build-determinism fix.** Left open by the [2026‑09‑14 plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md) (corpus, corpus-a16 and four demos were gated). First check whether a later full sweep on a toolchain containing the fix already covers it; if so, close this with that run as evidence. Reason for T1: runs existing gates.
+- [T3] **Full 138-demo gate sweep for the build-determinism fix.** Left open by the [2026‑09‑14 plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md) (corpus, corpus-a16 and four demos were gated). First check whether a later full sweep on a toolchain containing the fix already covers it; if so, close this with that run as evidence. No later full sweep exists: after the 2026‑09‑15 fix only `fft`, `mulov64`, `n-body` and `smulorbit` ran their differential gates; the rest got `-verify-machineinstrs` and a ROM byte comparison. Reason for T3 (escalated from T1): no single command runs every demo gate, so the sweep needs a batch driver, a defined demo set and a wall-time budget.
 - [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
   The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
   `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
