@@ -739,7 +739,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/0064-pr-body.md": "3f156808a702f81f72bfc1146b8998f7e91b51ae9ceca70d228c0b5e48f39e71",
+          "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
           "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
@@ -764,8 +764,8 @@
           "docs/pr-preparations/2026-09-26/0059-pr-body.md": "6d209a6d918aaf5c1243c15f23aad43675cab480530395bf17b8008bd76282a4",
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "a26fbe356394f2cc4ae495b677899c02a5a0b6f59ee1f315910f2d587889b288"
         },
-        "reviewed_at": "2026-09-26T23:48:13.465906+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:23:36.132285+00:00",
+        "note": "Reviewed the 0064 packet after whitespace-only reflow of its public PR description. GitHub rendered 33 source newlines as line-break tags. Paragraphs and list items now occupy single source lines; token sequence, links, attribution, validation results, profitability limits, and independent-review status are unchanged. The packet summary and linked plans remain accurate.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
