@@ -1,17 +1,11 @@
 | Date | Change |
 |------|--------|
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/c3c1967c) | mos: add and measure experimental competing-carry gate |
-| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/1c5e12fc) | fix(mos): repair far extload legalization and measure carry scheduling |
 
 <!--history-meta v1
 c3c1967c	author	Will Norris
-c3c1967c	added	2
+c3c1967c	added	246
 c3c1967c	deleted	0
 c3c1967c	files	1
 c3c1967c	body	Add patch 0067 with off, always and gated scheduling policies. The gate\nexcludes cheap constants, provisional frame carries and boundary users,\nthen requires potentially overlapping computed carries. Preserve always\nas the default because the full evaluation rejects default promotion.\n\nThe 3,720-configuration census has 3,592 successful three-way comparisons\nand no policy-specific compile failures. Gated recovers the 32 original\ngrowing configurations, but gives up 6.81% of the aggregate saving and\nleaves four growth cases without fewer carry materializations.\n\nRetain measured runtime and compile-time results, exact inputs, identities,\nROMs and profiles. All 30 originally growing SNES cases recover off-policy\nclock counts; the targeted sum/rotate gains remain. Compile-time ranges\noverlap, so make no compile-speed claim. Qualify the XY16 VLA oracle\nmismatch reproduced on the preserved baseline and all three policies.\n\nDocument the causal explanation, rejected refinements and acceptance\noutcome; update current summaries and generated views while preserving\ndated baselines and the withdrawn upstream packet.\n\nValidation: 181 MOS tests pass (2 unsupported); 4 counter tests pass;\n32 always-policy outputs match the preserved pre-gate compiler; 64 final\npolicy comparisons match the frozen measured arms; patch application\nreproduces all four final source/test files. Runtime passes 78/79 corpus\ninputs and all 50 signed-32-bit fuzz seeds, with the baseline VLA mismatch\nretained. Structured evidence and documentation dependency checks pass.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
-1c5e12fc	author	Will Norris
-1c5e12fc	added	88
-1c5e12fc	deleted	0
-1c5e12fc	files	1
-1c5e12fc	body	Replace queued generic far loads with new target instructions and erase the\ngeneric instruction, so eager address selection cannot leave a target pseudo\non the legalizer worklist. Package 0066 with extending-byte MIR coverage and\npreserve the original failing farblit input, toolchain, and red/green evidence.\n\nMeasure the preserved pre-0064 and 0064 ROMs using an independently instrumented\nbsnes-jg core. Sum and rotate take 30.45% and 17.61% fewer master clocks. The\nisolated XY16 Oz L-system interpreter takes 2.80% more. Record these costs and\nstate that the original zero-cycle-regression acceptance criterion is not met.\n\nValidation: original farblit input red/green at Os/O2 in A16/XY16; direct MIR in\nthree width modes; 180 MOS tests pass, two unsupported; eight farblit/pressure\nemulator assertions pass. The existing farblit shell gate still fails its\naggregate opcode-count expectations, retained as a separate qualification.\nTiming: 34 baseline/candidate comparisons repeated identically (136 executions),\nfour isolated interpreter executions, NOP/RTS/refresh calibration, and a\nbyte-identical probe rebuild. Preserve earlier evidence and posted PR text.\n\nAI assistance: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96.
 -->

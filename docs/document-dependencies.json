@@ -32,12 +32,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "243eb72237a17d887e9b503dc67249d64aea831163226c0593625fc36919ada7",
+          "docs/upstream-dashboard-curation.json": "ba11d0c8d5afdcb3f0031d753fd6012e46da987dbf307dd8916137a38df0946d",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
-          "docs/defects/mos-carry-scheduling-pressure.json": "b690903ab4f05ff570841f86829c425761122578ddcd32ecc3a9c2d6312ba37d",
+          "docs/defects/mos-carry-scheduling-pressure.json": "69434bd2d1ac8ffc1141ce3f7a4178a8a35fc9291ab6d939d639c94cc5271019",
           "docs/defects/mos-coalescing-rc-undef.json": "17a8635cdbcb50795f93e4738e171b8432089e263e4228a87dfd10b7d21b88f0",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
@@ -56,7 +56,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "4ce52f3272678bf8d794f55164e61f44bdf72cab1bb18beaa02b8bd58186d4f4"
+          "docs/upstream-dashboard.json": "b412461cc7c89ec42ba6c71a2c192183f09702a105488efee5229ca4c5e8a731"
         }
       }
     },
@@ -77,13 +77,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "e3755d2837ea5addd74de9ec20f573f76ef83123c9c4bb2eb3c26f00070d4050",
+          "docs/upstream-pending-work.md": "ed96297d7d1a451fadae67480789b6f95c0cb54a765a0e263331cf97b8395be8",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "4ce52f3272678bf8d794f55164e61f44bdf72cab1bb18beaa02b8bd58186d4f4",
+          "docs/upstream-dashboard.json": "b412461cc7c89ec42ba6c71a2c192183f09702a105488efee5229ca4c5e8a731",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "6c02578f83b218a615bb4dd1ae5aa3d1bdf6adeb2b070c2342cf9c974a831798"
+          "docs/upstream-dashboard-graph.json": "e3a9e95494b8bea9ab98bf4f1aa6170579e661be614ce1e331638a5b74dca99f"
         }
       }
     },
@@ -112,16 +112,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "e3755d2837ea5addd74de9ec20f573f76ef83123c9c4bb2eb3c26f00070d4050",
-          "docs/upstream-contribution-status.md": "eafa22efc417d3e6d91bbc4896edff6b14de8777ad99b9bb8153ea7af688899b",
+          "docs/upstream-pending-work.md": "ed96297d7d1a451fadae67480789b6f95c0cb54a765a0e263331cf97b8395be8",
+          "docs/upstream-contribution-status.md": "119e0ac2f9d736ed147af0e631f74ffb86cc071f1559daafa3be57c9e4d5dda9",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "46921321fd742bb66d60e5c18e126c4dadc810a0b1405988c86fc4ad5dfe4bb0",
-          "docs/mos-upstream-status-2026-09-21.html": "6167d9bd24e6de24258f487f4561816f190434bb9bf319cbac451e67944d95a8"
+          "docs/mos-upstream-flowchart.html": "9a5f656529562d1a99476575bc0ea469432a8b7a57b6d4a1b11a21d44767609c",
+          "docs/mos-upstream-status-2026-09-21.html": "02bd9095510b49d091a2398e92169788ea1f0ff900e8a683c841e36035db7708"
         }
       }
     },
@@ -250,11 +250,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
         },
         "outputs": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.html": "c7f2c830126fc175ede60d9b072e6d9d93fcfb5c7b6e3c55832b97219e2c0e86"
+          "docs/plans/2026-09-26-mos-carry-scheduling.html": "2e70adcedfe9372f138cec79c8a1950dd0cb7f4d2fa6986d706206432cde9230"
         }
       }
     },
@@ -278,6 +278,31 @@
         },
         "outputs": {
           "docs/snes-demo-compiler-bug-public.json": "8ae947005b15bb6bac79d6d9c5ce4ecb44767890b65f303fec0b5b145c04cd8f"
+        }
+      }
+    },
+    {
+      "id": "carry-selection-options",
+      "sources": [
+        "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz",
+        "dev/summarize-carry-selection.py"
+      ],
+      "outputs": [
+        "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json"
+      ],
+      "command": [
+        "python3",
+        "dev/summarize-carry-selection.py",
+        "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz",
+        "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz": "faad18dc8d1d29225e0df9d026b4e35cd26173c48ea7263c36270fab0305af19",
+          "dev/summarize-carry-selection.py": "9052eba0683ba951c906e6c3c867ea0a03776609b9d8cda0dd8a418b0166006e"
+        },
+        "outputs": {
+          "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json": "2fcbd6dd20233aa4b2654b671c82b7f98fb52fcf1a7f879dd0a41d35b2524510"
         }
       }
     }
@@ -314,7 +339,7 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
-          "docs/defects/mos-carry-scheduling-pressure.json": "25953c7fbbd91980bdc4a676d0d4372ce7dad2340f3b1cf3a87b0e4f33dd04e6",
+          "docs/defects/mos-carry-scheduling-pressure.json": "2d89014a99eb7973cad8a51b91ae95ed4aa1cf0d129163b7f3ff496cd475978a",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
@@ -335,15 +360,15 @@
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c8d215d2f69cffefc8b3f428f83c01e5c5f97c255633676ab10dff2e8943dc4a",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "50f7b9e233d268bb3c7823be0b1c4b5b933b124b0f8db1605b2b9b501d3d3145",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:27.913905+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:09.504347+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -376,7 +401,7 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
-          "docs/defects/mos-carry-scheduling-pressure.json": "25953c7fbbd91980bdc4a676d0d4372ce7dad2340f3b1cf3a87b0e4f33dd04e6",
+          "docs/defects/mos-carry-scheduling-pressure.json": "2d89014a99eb7973cad8a51b91ae95ed4aa1cf0d129163b7f3ff496cd475978a",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
@@ -395,15 +420,15 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:30.707965+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:12.034386+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -436,7 +461,7 @@
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
-          "docs/defects/mos-carry-scheduling-pressure.json": "25953c7fbbd91980bdc4a676d0d4372ce7dad2340f3b1cf3a87b0e4f33dd04e6",
+          "docs/defects/mos-carry-scheduling-pressure.json": "2d89014a99eb7973cad8a51b91ae95ed4aa1cf0d129163b7f3ff496cd475978a",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
@@ -455,15 +480,15 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:33.489637+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:14.449516+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -605,16 +630,16 @@
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:37.005092+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:17.545368+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -652,7 +677,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "7f76b7210a931e29512c646d187a65fcf610193355b1829335e031aee97be11f",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "75cc7930b323fe6213053ea1e26315ee336a4b95fc17f63d943bc1322c448fb2",
           "patches/llvm-mos/0002-321-accum16.patch": "1df78787935143745820fe9075520a949dca6348a541a8e1f4f371bf7ccf8faa",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
@@ -661,7 +686,7 @@
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
-          "docs/defects/mos-carry-scheduling-pressure.json": "b690903ab4f05ff570841f86829c425761122578ddcd32ecc3a9c2d6312ba37d",
+          "docs/defects/mos-carry-scheduling-pressure.json": "69434bd2d1ac8ffc1141ce3f7a4178a8a35fc9291ab6d939d639c94cc5271019",
           "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
@@ -675,14 +700,14 @@
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "e80d66dc4e7a38af1daef7b7db05da9a43addd73d0279d8ff2ad81acb2aa7836",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "3b1f58ff45e01cc6b012b94f043aa75d381151d4cca5040b1b7b070ef9a1cf14",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:45.493178+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:24.294859+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -703,12 +728,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-carry-scheduling-pressure.json": "802d24a6e40a19e4db412a06398b71e457154c9e51bd021d48e3a68295e1d8b8",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/defects/mos-carry-scheduling-pressure.json": "acb83cb0dbd10f74e8cad298105e12acd2bb694392ecb82ce508275e6e596635",
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:46.408989+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:24.970360+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -761,11 +786,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/0064-review.md": "e80d66dc4e7a38af1daef7b7db05da9a43addd73d0279d8ff2ad81acb2aa7836",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "3b1f58ff45e01cc6b012b94f043aa75d381151d4cca5040b1b7b070ef9a1cf14"
+          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd"
         },
-        "reviewed_at": "2026-09-27T08:07:27.987770+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
+        "reviewed_at": "2026-09-27T09:03:25.460101+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -791,11 +816,11 @@
           "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:49.088309+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:27.583289+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -814,10 +839,10 @@
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:50.640227+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:28.805590+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -855,8 +880,8 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "e80d66dc4e7a38af1daef7b7db05da9a43addd73d0279d8ff2ad81acb2aa7836",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "3b1f58ff45e01cc6b012b94f043aa75d381151d4cca5040b1b7b070ef9a1cf14",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
@@ -882,8 +907,8 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T08:07:34.542971+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
+        "reviewed_at": "2026-09-27T09:03:35.253585+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -957,11 +982,11 @@
           "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "3b1f58ff45e01cc6b012b94f043aa75d381151d4cca5040b1b7b070ef9a1cf14",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "e80d66dc4e7a38af1daef7b7db05da9a43addd73d0279d8ff2ad81acb2aa7836"
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099"
         },
-        "reviewed_at": "2026-09-27T08:07:40.592596+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
+        "reviewed_at": "2026-09-27T09:03:41.368166+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1384,12 +1409,12 @@
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T08:07:22.448194+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
+        "reviewed_at": "2026-09-27T09:03:42.778904+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1563,11 +1588,11 @@
         "sources": {
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:51.854414+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:43.783445+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1603,17 +1628,17 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-carry-scheduling-pressure.json": "b690903ab4f05ff570841f86829c425761122578ddcd32ecc3a9c2d6312ba37d",
+          "docs/defects/mos-carry-scheduling-pressure.json": "69434bd2d1ac8ffc1141ce3f7a4178a8a35fc9291ab6d939d639c94cc5271019",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/receipt.json": "e5f3753b19812a30882c341ab0b179ec122a3f48ade98e49a3dd504bccd95f19",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/results.json": "d4716cbbbdb98edda548b1d7b0a5f3a7e17c28bfecbbc89091cd7b5b4a315280",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/interpreter-results.json": "8a37cc4d8c4d64c56f43e6465732ba538717bbeee38ec5eab0c7e5db9ea6dbdd",
           "dev/build-cycle-probe.py": "525a574c36c9edf022205a6ad0cfafa371406bb9c996a30f47e171be25292f98",
           "dev/jgxcycles.cpp": "67e5ed9b4eb4a6f9d65fdf90b2f0670b8f3e233965dcb560ed63e2160bcadb0d",
           "dev/measure-carry-cycles.py": "13a50d5677ae9d4b3f476ee4aac4d3c2551d2b60f9911aa79a6ac23079a8a2fd",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:54.190998+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:45.720513+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1627,13 +1652,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7b269d19c030cdc28114335c7bc0c2097dd2fd63ab133a9160d051804d7b0eb8",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "2b93f7be1d05d9aa6c4ec0fcd62b2882856341d473f465243978d0256a6dea61",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "23062968a10357eb885ea665f367dd567999e786ec4cc2bf895477eda87af3f9",
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "c1f3d826d93b22dcb109631ba1e7195f88486f0f84540aad6e00b76ed0b65dbe"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "7fe1efb19c38f57cea33e0639bc37bbe92df17a874914bf4b7863ee1ead1ca06"
         },
-        "reviewed_at": "2026-09-27T08:14:55.279580+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:46.695792+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1645,7 +1670,10 @@
         "dev/measure-carry-gate.py",
         {
           "glob": "docs/defects/evidence/2026-09-27-competing-carry-gate/*.json"
-        }
+        },
+        "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json",
+        "docs/defects/evidence/2026-09-27-carry-selection-options/pipeline-excerpts.txt",
+        "dev/summarize-carry-selection.py"
       ],
       "receipt": {
         "sources": {
@@ -1680,10 +1708,13 @@
           "docs/defects/evidence/2026-09-27-competing-carry-gate/source-inputs.json": "3e3d5f77d099cce98e28316e7b9b6a90337b1adf93ee4d40da62a85cacc827fb",
           "docs/defects/evidence/2026-09-27-competing-carry-gate/timing-identity.json": "35e03ac254e42f5b27b0307c49c79c2e186a4c59100a68e9c8f2f191831b3cdd",
           "docs/defects/evidence/2026-09-27-competing-carry-gate/timing.json": "5f988ccb4d582be36ac6d76692c5989526113c8ee0f05223a3fa92490b647f75",
-          "docs/defects/evidence/2026-09-27-competing-carry-gate/vlastack-observation.json": "8bd88380ee3dc6adc231c79f85e6033ffdb0e3bafb7dfade249feb89b53cb63b"
+          "docs/defects/evidence/2026-09-27-competing-carry-gate/vlastack-observation.json": "8bd88380ee3dc6adc231c79f85e6033ffdb0e3bafb7dfade249feb89b53cb63b",
+          "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json": "2fcbd6dd20233aa4b2654b671c82b7f98fb52fcf1a7f879dd0a41d35b2524510",
+          "docs/defects/evidence/2026-09-27-carry-selection-options/pipeline-excerpts.txt": "a078d73f58d0891c7c384778be62eb830dbd3eef5038a91c8b7f1c47d6ef9c33",
+          "dev/summarize-carry-selection.py": "9052eba0683ba951c906e6c3c867ea0a03776609b9d8cda0dd8a418b0166006e"
         },
-        "reviewed_at": "2026-09-27T08:14:56.401103+00:00",
-        "note": "Reviewed carry-related claims against patch 0067, the 3720-configuration census, retained size and timing evidence, rejected refinements, baseline-reproduced VLA observation, and final 181-test result. Current summaries consistently retain always as default, describe gated as experimental, record the failed 5% and carry-save acceptance criteria, and preserve the withdrawn upstream packet and dated measurements. Rechecked the exact four-file patch roundtrip after blank-context formatting and added the identified runtime engines to the evidence receipt; neither change alters the conclusions.",
+        "reviewed_at": "2026-09-27T09:03:48.387292+00:00",
+        "note": "Reviewed the carry-related claims after rewriting the report for LLVM discussion. Current summaries present 213866 versus 199309 bytes saved and 39 versus 6 growing objects without a default-selection verdict; the 5% threshold is identified as local historical planning. Verified the derived mode and function counts against retained census summaries, qualified hypothetical selection totals and shared allocation state, and separated proposed experiments from implementation and measured overhead. Dated upstream extraction claims, the withdrawn PR body and original evidence remain unchanged. Generic pressure status remains workaround; no submission, new compiler run or runtime repair is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     }

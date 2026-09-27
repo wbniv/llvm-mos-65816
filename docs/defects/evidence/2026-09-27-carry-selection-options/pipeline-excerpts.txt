@@ -1,0 +1,115 @@
+MOS pipeline excerpts inspected for the selection design; no compiler changes or new compiler runs.
+
+vendor/llvm-mos/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+SHA-256: 5b54715dee1ac5384999f40df46be826c17f70140b9cad00e3315576564184a3
+290: void MOSPassConfig::addMachineSSAOptimization() {
+291:   TargetPassConfig::addMachineSSAOptimization();
+292:   if (getOptLevel() != CodeGenOptLevel::None)
+293:     addPass(createMOSInsertCopiesPass());
+294: }
+295:
+296: void MOSPassConfig::addOptimizedRegAlloc() {
+297:   if (getOptLevel() != CodeGenOptLevel::None) {
+298:     // Run the coalescer twice to coalesce RMW patterns revealed by the first
+299:     // coalesce.
+300:     insertPass(&llvm::TwoAddressInstructionPassID, &llvm::RegisterCoalescerID);
+301:
+302:     // Re-run Live Intervals after coalescing to renumber the contained values.
+303:     // This can allow constant rematerialization after aggressive coalescing.
+304:     insertPass(&llvm::MachineSchedulerID, &llvm::LiveIntervalsID);
+305:   }
+306:   TargetPassConfig::addOptimizedRegAlloc();
+307: }
+308:
+309: void MOSPassConfig::addMachineLateOptimization() {
+310:   TargetPassConfig::addMachineLateOptimization();
+311:   if (getOptLevel() != CodeGenOptLevel::None)
+312:     addPass(createMOSCopyOptPass());
+313: }
+314:
+315: void MOSPassConfig::addPrePEI() {
+316:   if (getOptLevel() != CodeGenOptLevel::None)
+317:     addPass(createMOSZeroPageAllocPass());
+318: }
+319:
+320: void MOSPassConfig::addPreSched2() {
+321:   addPass(createMOSPostRAScavengingPass());
+322:   // Lower control flow pseudos.
+323:   addPass(&FinalizeISelID);
+324:   // Lower pseudos produced by control flow pseudos.
+325:   addPass(&ExpandPostRAPseudosID);
+326:   addPass(createMOSPostRAScavengingPass());
+327:
+328:   // This is currently mandatory, since it lowers CMPTermZ.
+329:   addPass(createMOSLateOptimizationPass());
+330:   // Every hard-stack push is in place now; expand the return-address reads.
+331:   addPass(createMOSLowerReturnAddressPass());
+332:   if (getOptLevel() != CodeGenOptLevel::None)
+333:     addPass(createMOSStaticStackAllocPass());
+334: }
+335:
+336: void MOSPassConfig::addPreEmitPass() {
+337:   // #321: insert REP/SEP for 16-bit-accumulator instructions (opt-in, +mos-a16;
+338:   // a no-op otherwise). Runs before branch relaxation so the added REP/SEP are
+339:   // accounted for in branch distances.
+340:   addPass(createMOSInsertREPSEPPass());
+341:   addPass(&BranchRelaxationPassID);
+342: }
+343:
+344: namespace {
+345:
+346: class MOSCSEConfigFull : public CSEConfigFull {
+347: public:
+
+vendor/llvm-mos/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+SHA-256: 3aebd73e41646aa6e9c39536627aa69f9f63843b00a2aa64c28307ca44ecd604
+214: class MOSZeroPageAlloc : public ModulePass {
+215: public:
+216:   static char ID;
+217:
+218:   MOSZeroPageAlloc() : ModulePass(ID) {
+219:     llvm::initializeMOSZeroPageAllocPass(*PassRegistry::getPassRegistry());
+220:   }
+221:
+222:   bool runOnModule(Module &M) override;
+223:   void getAnalysisUsage(AnalysisUsage &AU) const override;
+224:
+225: private:
+226:   MachineModuleInfo *MMI;
+227:   unsigned ModuleZPAvail;
+228:   SCCGraph buildSCCGraph(Module &M);
+229:
+230:   void collectCandidates(MachineFunction &MF,
+231:                          std::vector<std::unique_ptr<Candidate>> &Candidates,
+232:                          SmallVectorImpl<LocalCandidate> &LocalCandidates,
+233:                          DenseMap<GlobalVariable *, Candidate *> &GVCandidates);
+234:
+235:   std::vector<EntryGraph> buildEntryGraphs(Module &M, SCCGraph &SCCGraph);
+236:   bool assignZPs(SCCGraph &SCCGraph, std::vector<EntryGraph>::iterator Begin,
+237:                  std::vector<EntryGraph>::iterator End);
+238:   bool assignZP(SCCGraph &SCCGraph, EntryGraph &EG);
+239: };
+261:
+262: static float getFreq(const BlockFrequencyInfo &BFI, MachineBasicBlock &MBB);
+263:
+264: bool MOSZeroPageAlloc::runOnModule(Module &M) {
+265:   if (!ZPAvail)
+266:     return false;
+267:
+268:   // The frontend should report this error on the corresponding option.
+269:   assert(ZPAvail <= 256 - 32 &&
+270:          "There must be room for the imaginary registers.");
+271:
+272:   ModuleZPAvail = ZPAvail;
+273:   for (GlobalVariable &GV : M.globals()) {
+274:     StringRef SecName = GV.getSection();
+275:     if (MOS::isZeroPageSectionName(SecName) ||
+276:         GV.getAddressSpace() == MOS::AS_ZeroPage) {
+277:       size_t Size = (GV.getParent()->getDataLayout().getTypeSizeInBits(
+278:                          GV.getValueType()) +
+279:                      7) /
+280:                     8;
+281:       if (Size >= ModuleZPAvail)
+282:         return false;
+283:       ModuleZPAvail -= Size;
+284:     }

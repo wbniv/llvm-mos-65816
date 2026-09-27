@@ -1,0 +1,846 @@
+{
+  "schema": 1,
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96",
+  "source": {
+    "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz",
+    "sha256": "faad18dc8d1d29225e0df9d026b4e35cd26173c48ea7263c36270fab0305af19"
+  },
+  "scope": "Arithmetic on retained object and function sizes; no new compiler or runtime runs. Configurations are not independent programs. Function minima are hypothetical: cross-function allocation and linked layout have not been recomputed.",
+  "configurations": 3720,
+  "paired": 3592,
+  "modes": [
+    {
+      "mode": "6502",
+      "configurations": 39,
+      "always": {
+        "text_saving": 2907,
+        "growing_objects": 2,
+        "growing_functions": 2,
+        "function_growth": [
+          {
+            "source": "build/carry-6502-src/rotkal_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "build/carry-6502-src/rotkal_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          }
+        ]
+      },
+      "gated": {
+        "text_saving": 2909,
+        "growing_objects": 0,
+        "growing_functions": 0,
+        "function_growth": []
+      }
+    },
+    {
+      "mode": "a16",
+      "configurations": 1219,
+      "always": {
+        "text_saving": 29330,
+        "growing_objects": 11,
+        "growing_functions": 13,
+        "function_growth": [
+          {
+            "source": "examples/65816/rcundef2.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/corpus/lsystem_sim.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 5,
+            "object_delta": 5
+          },
+          {
+            "source": "examples/snes/lsystem.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 5,
+            "object_delta": 5
+          },
+          {
+            "source": "examples/65816/rcundef2.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 13,
+            "object_delta": 13
+          },
+          {
+            "source": "examples/snes/corpus/lsystem_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 5,
+            "object_delta": 5
+          },
+          {
+            "source": "examples/snes/dctbloom.c",
+            "optimization": "Os",
+            "function": "fill_cell",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/lsystem.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 5,
+            "object_delta": 5
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "Os",
+            "function": "hud_update",
+            "bytes": 11,
+            "object_delta": 11
+          },
+          {
+            "source": "examples/snes/wireframe.c",
+            "optimization": "Os",
+            "function": "hud_update",
+            "bytes": 10,
+            "object_delta": -4
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 7,
+            "object_delta": 7
+          },
+          {
+            "source": "examples/snes/dctbloom.c",
+            "optimization": "Oz",
+            "function": "fill_cell",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/seamdemo.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -23
+          }
+        ]
+      },
+      "gated": {
+        "text_saving": 28237,
+        "growing_objects": 0,
+        "growing_functions": 0,
+        "function_growth": []
+      }
+    },
+    {
+      "mode": "default",
+      "configurations": 1117,
+      "always": {
+        "text_saving": 153149,
+        "growing_objects": 12,
+        "growing_functions": 53,
+        "function_growth": [
+          {
+            "source": "examples/snes/bsearchviz.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -113
+          },
+          {
+            "source": "examples/snes/corpus/bf_vm_sim.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/corpus/cpu6502_sim.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -38
+          },
+          {
+            "source": "examples/snes/corpus/gf256_sim.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 5,
+            "object_delta": 5
+          },
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "O2",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -60
+          },
+          {
+            "source": "examples/snes/corpus/wire3d_sim.c",
+            "optimization": "O2",
+            "function": "mat3_mul",
+            "bytes": 9,
+            "object_delta": -112
+          },
+          {
+            "source": "examples/snes/csrjmp.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -260
+          },
+          {
+            "source": "examples/snes/jt256.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -227
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "O2",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -635
+          },
+          {
+            "source": "examples/snes/seqvm.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -182
+          },
+          {
+            "source": "examples/snes/spigot.c",
+            "optimization": "O2",
+            "function": "_pihud_emit",
+            "bytes": 3,
+            "object_delta": -144
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "O2",
+            "function": "hud_update",
+            "bytes": 1,
+            "object_delta": -161
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 4,
+            "object_delta": -161
+          },
+          {
+            "source": "examples/snes/vlanest.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -232
+          },
+          {
+            "source": "examples/snes/vlastack.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -184
+          },
+          {
+            "source": "examples/snes/wireframe.c",
+            "optimization": "O2",
+            "function": "mat3_mul",
+            "bytes": 9,
+            "object_delta": -312
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/bhut.c",
+            "optimization": "Os",
+            "function": "bh_force",
+            "bytes": 7,
+            "object_delta": -212
+          },
+          {
+            "source": "examples/snes/bsearchviz.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -83
+          },
+          {
+            "source": "examples/snes/corpus/bf_vm_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/corpus/bhut_sim.c",
+            "optimization": "Os",
+            "function": "bh_force",
+            "bytes": 7,
+            "object_delta": -41
+          },
+          {
+            "source": "examples/snes/corpus/cpu6502_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -47
+          },
+          {
+            "source": "examples/snes/corpus/gf256_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "Os",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -60
+          },
+          {
+            "source": "examples/snes/corpus/rotkal_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 2,
+            "object_delta": 2
+          },
+          {
+            "source": "examples/snes/csrjmp.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -204
+          },
+          {
+            "source": "examples/snes/jt256.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -196
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "Os",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -361
+          },
+          {
+            "source": "examples/snes/permscat.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -94
+          },
+          {
+            "source": "examples/snes/seqvm.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -153
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -173
+          },
+          {
+            "source": "examples/snes/vlanest.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -201
+          },
+          {
+            "source": "examples/snes/vlastack.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": -153
+          },
+          {
+            "source": "examples/snes/wireframe.c",
+            "optimization": "Os",
+            "function": "hud_update",
+            "bytes": 10,
+            "object_delta": -264
+          },
+          {
+            "source": "examples/snes/adpcm.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -161
+          },
+          {
+            "source": "examples/snes/apollo-reel.c",
+            "optimization": "Oz",
+            "function": "video_hud_flush_row",
+            "bytes": 6,
+            "object_delta": -15
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/boids.c",
+            "optimization": "Oz",
+            "function": "app_frame",
+            "bytes": 3,
+            "object_delta": -188
+          },
+          {
+            "source": "examples/snes/boids.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 19,
+            "object_delta": -188
+          },
+          {
+            "source": "examples/snes/corpus/arrays.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 8,
+            "object_delta": 8
+          },
+          {
+            "source": "examples/snes/corpus/bf_vm_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/corpus/boids_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 19,
+            "object_delta": -32
+          },
+          {
+            "source": "examples/snes/corpus/cpu6502_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 2,
+            "object_delta": -39
+          },
+          {
+            "source": "examples/snes/corpus/gf256_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "Oz",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -60
+          },
+          {
+            "source": "examples/snes/corpus/rotkal_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 2,
+            "object_delta": 2
+          },
+          {
+            "source": "examples/snes/corpus/seqvm_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/double-pendulum.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 4,
+            "object_delta": -266
+          },
+          {
+            "source": "examples/snes/funnelkal.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -331
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "Oz",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -337
+          },
+          {
+            "source": "examples/snes/permscat.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -137
+          },
+          {
+            "source": "examples/snes/seqvm.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -194
+          },
+          {
+            "source": "examples/snes/snes-video-reel.c",
+            "optimization": "Oz",
+            "function": "video_hud_flush_row",
+            "bytes": 6,
+            "object_delta": -51
+          }
+        ]
+      },
+      "gated": {
+        "text_saving": 140514,
+        "growing_objects": 5,
+        "growing_functions": 21,
+        "function_growth": [
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "O2",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/corpus/wire3d_sim.c",
+            "optimization": "O2",
+            "function": "mat3_mul",
+            "bytes": 9,
+            "object_delta": -112
+          },
+          {
+            "source": "examples/snes/hdr-bloom.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 4,
+            "object_delta": -380
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "O2",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -433
+          },
+          {
+            "source": "examples/snes/newton.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 12,
+            "object_delta": -98
+          },
+          {
+            "source": "examples/snes/snes-video-codec.c",
+            "optimization": "O2",
+            "function": "svc_decode_frame",
+            "bytes": 3,
+            "object_delta": -8
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "O2",
+            "function": "hud_update",
+            "bytes": 1,
+            "object_delta": -165
+          },
+          {
+            "source": "examples/snes/wireframe.c",
+            "optimization": "O2",
+            "function": "mat3_mul",
+            "bytes": 9,
+            "object_delta": -315
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/bhut.c",
+            "optimization": "Os",
+            "function": "bh_force",
+            "bytes": 7,
+            "object_delta": -212
+          },
+          {
+            "source": "examples/snes/corpus/bhut_sim.c",
+            "optimization": "Os",
+            "function": "bh_force",
+            "bytes": 7,
+            "object_delta": -41
+          },
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "Os",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/gouraud.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 7,
+            "object_delta": -137
+          },
+          {
+            "source": "examples/snes/hdr-bloom.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 4,
+            "object_delta": -291
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "Os",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -141
+          },
+          {
+            "source": "examples/snes/apollo-reel.c",
+            "optimization": "Oz",
+            "function": "video_hud_flush_row",
+            "bytes": 6,
+            "object_delta": -15
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": 1
+          },
+          {
+            "source": "examples/snes/boids.c",
+            "optimization": "Oz",
+            "function": "app_frame",
+            "bytes": 3,
+            "object_delta": -207
+          },
+          {
+            "source": "examples/snes/corpus/matcascade_sim.c",
+            "optimization": "Oz",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/matcascade.c",
+            "optimization": "Oz",
+            "function": "mat_mul",
+            "bytes": 4,
+            "object_delta": -134
+          },
+          {
+            "source": "examples/snes/snes-video-reel.c",
+            "optimization": "Oz",
+            "function": "video_hud_flush_row",
+            "bytes": 6,
+            "object_delta": -51
+          }
+        ]
+      }
+    },
+    {
+      "mode": "xy16",
+      "configurations": 1217,
+      "always": {
+        "text_saving": 28480,
+        "growing_objects": 14,
+        "growing_functions": 16,
+        "function_growth": [
+          {
+            "source": "examples/65816/farblit.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 45,
+            "object_delta": 45
+          },
+          {
+            "source": "examples/65816/rcundef2.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/corpus/lsystem_sim.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 8,
+            "object_delta": 8
+          },
+          {
+            "source": "examples/snes/lsystem.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 9,
+            "object_delta": 9
+          },
+          {
+            "source": "examples/65816/rcundef2.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 3,
+            "object_delta": 3
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 13,
+            "object_delta": 13
+          },
+          {
+            "source": "examples/snes/corpus/lsystem_sim.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 8,
+            "object_delta": 8
+          },
+          {
+            "source": "examples/snes/dctbloom.c",
+            "optimization": "Os",
+            "function": "fill_cell",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/lsystem.c",
+            "optimization": "Os",
+            "function": "main",
+            "bytes": 9,
+            "object_delta": 9
+          },
+          {
+            "source": "examples/snes/spirograph.c",
+            "optimization": "Os",
+            "function": "hud_update",
+            "bytes": 15,
+            "object_delta": 15
+          },
+          {
+            "source": "examples/snes/wireframe.c",
+            "optimization": "Os",
+            "function": "hud_update",
+            "bytes": 10,
+            "object_delta": -4
+          },
+          {
+            "source": "examples/65816/rcundef2.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 17,
+            "object_delta": 17
+          },
+          {
+            "source": "examples/snes/avalanche.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 7,
+            "object_delta": 7
+          },
+          {
+            "source": "examples/snes/corpus/lsystem_sim.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 17,
+            "object_delta": 17
+          },
+          {
+            "source": "examples/snes/dctbloom.c",
+            "optimization": "Oz",
+            "function": "fill_cell",
+            "bytes": 4,
+            "object_delta": 4
+          },
+          {
+            "source": "examples/snes/seamdemo.c",
+            "optimization": "Oz",
+            "function": "main",
+            "bytes": 1,
+            "object_delta": -23
+          }
+        ]
+      },
+      "gated": {
+        "text_saving": 27649,
+        "growing_objects": 1,
+        "growing_functions": 1,
+        "function_growth": [
+          {
+            "source": "examples/65816/farblit.c",
+            "optimization": "O2",
+            "function": "main",
+            "bytes": 45,
+            "object_delta": 45
+          }
+        ]
+      }
+    }
+  ],
+  "selection": [
+    {
+      "policies": [
+        "off",
+        "always"
+      ],
+      "whole_object_text_saving": 214124,
+      "whole_object_growth": 0,
+      "hypothetical_function_text_saving": 214323
+    },
+    {
+      "policies": [
+        "off",
+        "always",
+        "gated"
+      ],
+      "whole_object_text_saving": 214344,
+      "whole_object_growth": 0,
+      "hypothetical_function_text_saving": 214446
+    }
+  ]
+}

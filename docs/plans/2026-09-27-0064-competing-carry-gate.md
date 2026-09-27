@@ -1,12 +1,12 @@
 # Gate 0064 to regions with competing carries
 
-**Status (2026-09-27):** implementation and evaluation complete; **default promotion rejected**. Patch 0067 exposes `off`, `always` and experimental `gated`, with `always` retained as the default. The [report](../investigations/2026-09-27-competing-carry-gate.md) explains [why the gate removes the original incidental costs](../investigations/2026-09-27-competing-carry-gate.md#why-the-gate-removes-the-incidental-regressions), and why that is insufficient for general profitability.
+**Status (2026-09-27):** implementation and measurements complete; results are presented as an [investigative report for LLVM discussion](../investigations/2026-09-27-competing-carry-gate.md). Default selection remains open. Patch 0067 currently exposes `off`, `always` and experimental `gated`, with `always` as the existing downstream default.
 
-The 3,720-configuration census has 3,592 successful three-way comparisons and zero policy-specific compile failures. The gate recovers all 32 original growing configurations and their measured timing costs, but relinquishes 6.81% of the existing aggregate size saving (limit: 5%) and leaves four growing configurations without fewer carry materializations. The 181 supported MOS tests pass. Runtime has one XY16 VLA mismatch reproduced on the preserved baseline and every policy; no gate-specific mismatch was found. Sequential compile-time measurements are recorded without a speed claim.
+The 3,720-configuration census has 3,592 successful three-policy comparisons and no policy-specific compile failures. Aggregate savings versus `off` are 213,866 B for `always` and 199,309 B for `gated`; growing objects number 39 and six. The gate recovers the 32 original growth cases and the measured timing costs of the 30 SNES cases. A16 and ordinary-6502 subsets show no function growth in this sample. The report adds completed-output selection and narrower gating as implementation options, with a recommendation for further experiments rather than adoption.
 
-This finishes the proposed experiment with a rejected default change. The original plan below remains dated context, including its intended default and acceptance criteria. Further default promotion needs a better profitability model; PR #609 remains withdrawn.
+The original plan below retains its 5% threshold and other criteria as dated project planning. They do not constitute LLVM acceptance criteria. The [initial downstream assessment](https://github.com/wbniv/llvm-mos-65816/blob/c3c1967c9c54bda475d6bc8b15d3a00281a82901/docs/plans/2026-09-27-0064-competing-carry-gate.md) and frozen receipt recorded rejection under those criteria; the current report supersedes that policy conclusion while preserving the measurements. The 181 supported MOS tests pass, compile-time samples overlap, and one XY16 VLA mismatch reproduces on the preserved baseline and every policy. PR #609 remains withdrawn.
 
-Completion: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+Completion and LLVM-facing report revision: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
 
 **Earlier preserved-build measurement follow-up (2026-09-27):** the [preserved-build timing comparison](../investigations/2026-09-27-mos-carry-timing.md) measures 0064 execution time. Sum and rotate improve by 30.45% and 17.61%, while the XY16 Oz L-system interpreter regresses by 2.80%; smaller HUD and DCT costs are also retained. The original zero-cycle-regression criterion is not met. That report did not measure compiler overhead, ordinary-6502 timing or timing of the exact upstream extraction; the later gate report adds bounded current-stack compile-time and kernel timing. At the time of that measurement, the region-gate hypothesis below was untested; byte-size recovery alone would not establish that these execution-time regressions were resolved. The implementation report records the subsequent gated comparison.
 
@@ -89,6 +89,8 @@ per-configuration and per-function deltas.
 It guarantees no per-function growth, but it roughly doubles back-end compile time, does not
 fit LLVM's pass pipeline, and could never go upstream. It stays as the downstream fallback
 from Phase 1.
+
+**Subsequent investigation:** the estimated doubling of backend time and the categorical upstream-suitability statement above were not established by an implementation. The [current report](../investigations/2026-09-27-competing-carry-gate.md#compare-completed-alternatives-and-retain-the-smaller-result) treats completed-output selection as an option to prototype, distinguishes function and compilation-unit granularity, and leaves upstream suitability open.
 
 This change has no visible surface (scheduler heuristic, measurement script), so there are
 no mockups.

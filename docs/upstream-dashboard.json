@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "fb698ccb48de1e274c731427c9b3811b6fb374c81e626abd191df09501e7c01d",
+  "sourceHash": "1e24c62111adaaf4cdb08ac451c5b785164f8b7f16bb69cc11dec5bb7b4257a4",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -79,10 +79,10 @@
       "id": "defect:mos-carry-scheduling-pressure",
       "kind": "defect",
       "title": "Fine-grained carry pressure is lost before register pressure set pruning",
-      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met. Patch 0067 implements an experimental region gate. It recovers the 32 original growth cases and their measured costs, but fails default-promotion criteria: 6.81% of the aggregate saving is lost and four growing configurations remove no materializations. Always remains the default.",
+      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met. Patch 0067 compares always and gated policies: aggregate savings versus off are 213866 B and 199309 B, with 39 and six growing objects. The gate recovers the 32 original growth cases. The LLVM-facing report presents these trade-offs and selection options without an upstream default decision; the current downstream compiler defaults to always.",
       "localStatus": "qualified",
       "publicationStatus": "unposted",
-      "nextStep": "Scheduler workaround PR #609 was withdrawn at the user's request; its branch and validation on 7bd67c0ae4e8 are retained. The generic TableGen pressure contract remains open; 0067 exposes an experimental gate but keeps always as default after a 6.81% aggregate-saving loss and four unjustified growth cases. The original timing costs are recovered by gated; bounded compiler-time samples are complete. Resolve profitability and baseline runtime observations before any default promotion.",
+      "nextStep": "PR #609 remains withdrawn. The LLVM-facing investigation presents carry-policy measurements and implementation options without selecting a default. Evaluate completed-output size selection and narrower gating, with compile-time and timing coverage. The downstream compiler currently defaults to always; the generic pressure contract and baseline runtime observations remain open.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-carry-scheduling-pressure.json"
       ],
@@ -437,10 +437,10 @@
       "id": "opt:carry-scheduler",
       "kind": "optimization",
       "title": "0064 computed-carry scheduling",
-      "summary": "PR #609 withdrawn at the user's request; retained validation on 7bd67c0ae4e8: targeted 6502 kernel 133 to 59 bytes, 132 MOS tests and 512 oracle vectors pass; 117 C-to-object pairs with rebuilt upstream Clang across three CPUs are identical excluding compiler-version metadata. 0067 implements an experimental competing-carry gate that recovers all 32 original costs, but default promotion is rejected: 6.81% aggregate-saving loss and four growth cases without fewer carry saves. Always remains default. Runtime and compile-time measurements are retained; author review only.",
+      "summary": "PR #609 remains withdrawn; the retained upstream extraction has its own validation. The downstream investigation measures 213866 versus 199309 bytes of aggregate savings and 39 versus 6 growing objects for always versus gated. A16 and ordinary-6502 subsets show no function growth in this sample. Size-based selection and narrower gating are proposed experiments; no upstream default decision is made. Author review only.",
       "localStatus": "needs-work",
       "publicationStatus": "posted",
-      "nextStep": "PR #609 is withdrawn at the user's request; retain the branch for later revision. Validated on 7bd67c0ae4e8; destination rechecked at 26d7c2c1eebf without a new-base rebuild. Author review only. Gated recovers the original timing costs, but fails broader profitability criteria and remains experimental. Bounded compiler-time samples are complete; resolve remaining profitability and baseline runtime observations before default promotion.",
+      "nextStep": "Review the LLVM-facing investigation and its size/time trade-offs. Prototype completed-output selection for Os/Oz and test the narrower subsets on additional inputs and the intended upstream revision. The current downstream default remains always; PR #609 remains withdrawn.",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/pull/609",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-competing-carry-gate.md",
