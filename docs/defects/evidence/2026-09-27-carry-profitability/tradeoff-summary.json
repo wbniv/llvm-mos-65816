@@ -1,0 +1,62 @@
+{
+  "always": {
+    "paired": 139,
+    "saving": 28003,
+    "growing_objects": 39,
+    "growth_bytes": 258,
+    "growing_functions": 45,
+    "changed_from_always": 0,
+    "changed_from_gated": 136,
+    "policy_specific_failures": []
+  },
+  "gated": {
+    "paired": 139,
+    "saving": 18376,
+    "growing_objects": 6,
+    "growth_bytes": 59,
+    "growing_functions": 11,
+    "changed_from_always": 136,
+    "changed_from_gated": 0,
+    "policy_specific_failures": []
+  },
+  "always:tradeoff:size": {
+    "paired": 139,
+    "saving": 24897,
+    "growing_objects": 27,
+    "growth_bytes": 766,
+    "growing_functions": 30,
+    "changed_from_always": 74,
+    "changed_from_gated": 118,
+    "policy_specific_failures": []
+  },
+  "gated:tradeoff:size": {
+    "paired": 139,
+    "saving": 17534,
+    "growing_objects": 6,
+    "growth_bytes": 672,
+    "growing_functions": 11,
+    "changed_from_always": 137,
+    "changed_from_gated": 12,
+    "policy_specific_failures": []
+  },
+  "always:tradeoff:speed": {
+    "paired": 139,
+    "saving": 24897,
+    "growing_objects": 27,
+    "growth_bytes": 766,
+    "growing_functions": 30,
+    "changed_from_always": 74,
+    "changed_from_gated": 118,
+    "policy_specific_failures": []
+  },
+  "gated:tradeoff:speed": {
+    "paired": 139,
+    "saving": 17534,
+    "growing_objects": 6,
+    "growth_bytes": 672,
+    "growing_functions": 11,
+    "changed_from_always": 137,
+    "changed_from_gated": 12,
+    "policy_specific_failures": []
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "base_identity": "identity.json",
+  "scheduler_sha256": "1370bbf7cf2b7d8a41b45baca0651410ad4ef2d605bfce9b05da36b77282e38b",
+  "tools": {
+    "clang-23": "c3f6c254f995d06a097cc3527b27779eda19b05343353caba3c59055d207d571",
+    "llc": "716b01269eb51e5864a04c7a4e74cc964c172e78cbf0a5b18e92ed5ac01e66f4",
+    "lld": "092614222d74d35a6bc2e54640a98c0a28ce33a6f5470c8ad98ee75d5dbbf96d"
+  }
+}

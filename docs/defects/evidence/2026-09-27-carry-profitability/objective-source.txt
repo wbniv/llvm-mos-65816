@@ -1,0 +1,124 @@
+llvm/lib/Target/MOS/MOSInstrCost.cpp
+SHA256 43ee48a29b850a26b0d9a67f734af79a3d8274197fe417479e845ae3cc090e5e
+//===-- MOSInstrCost.cpp - MOS Instruction Cost structure -------*- C++ -*-===//
+//
+// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file contains additional helpers for the MOSInstrCost class.
+//
+//===----------------------------------------------------------------------===//
+
+#include "MOSInstrCost.h"
+
+#include "llvm/IR/Function.h"
+
+using namespace llvm; 
+
+namespace llvm {
+
+int64_t MOSInstrCost::value(Mode Mode) const {
+  switch (Mode) {
+  case Mode::PreferBytes:
+    return ((int64_t) Bytes << 32) + Cycles;
+  case Mode::PreferCycles:
+    return ((int64_t) Cycles << 32) + Bytes;
+  case Mode::Average:
+    return Bytes + Cycles;
+  }
+}
+
+MOSInstrCost::Mode MOSInstrCost::getModeFor(const MachineFunction &MF) {
+  if (MF.getFunction().hasMinSize())
+    return Mode::PreferBytes;
+  if (MF.getFunction().hasOptSize() || MF.getFunction().hasOptNone())
+    return Mode::Average;
+  return Mode::PreferCycles;
+}
+
+} // namespace llvm
+
+llvm/lib/Target/MOS/MOSInstrCost.h
+SHA256 41c3c0f076d0a476f646e466f60a779bd3e3c3b0e325a679b80019e1d6dbc98d
+//===-- MOSInstrCost.h - MOS Instruction Cost structure ---------*- C++ -*-===//
+//
+// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file contains the definition of the MOSInstrCost class.
+//
+//===----------------------------------------------------------------------===//
+
+#ifndef LLVM_LIB_TARGET_MOS_MOSINSTRCOST_H
+#define LLVM_LIB_TARGET_MOS_MOSINSTRCOST_H
+
+#include "llvm/CodeGen/MachineFunction.h"
+#include <cstdint>
+
+namespace llvm {
+
+class MOSInstrCost {
+public:
+  enum class Mode {
+    PreferBytes,
+    PreferCycles,
+    Average
+  };
+
+  MOSInstrCost() : Bytes(0), Cycles(0) {}
+
+  MOSInstrCost(int32_t Bytes, int32_t Cycles)
+    : MOSInstrCost(Bytes, Cycles, 256) {}
+
+  friend MOSInstrCost operator+(MOSInstrCost Left,
+                                const MOSInstrCost& Right) {
+    return MOSInstrCost(Left.Bytes + Right.Bytes,
+                        Left.Cycles + Right.Cycles, 1);
+  }
+
+  MOSInstrCost& operator+=(const MOSInstrCost& Right) {
+    this->Bytes += Right.Bytes;
+    this->Cycles += Right.Cycles;
+    return *this;
+  }
+
+  friend MOSInstrCost operator-(MOSInstrCost Left,
+                                const MOSInstrCost& Right) {
+    return MOSInstrCost(Left.Bytes - Right.Bytes,
+                        Left.Cycles - Right.Cycles, 1);
+  }
+
+  MOSInstrCost& operator-=(const MOSInstrCost& Right) {
+    this->Bytes -= Right.Bytes;
+    this->Cycles -= Right.Cycles;
+    return *this;
+  }
+
+  friend MOSInstrCost operator*(MOSInstrCost Left, int Right) {
+    return MOSInstrCost(Left.Bytes * Right, Left.Cycles * Right, 1);
+  }
+
+  friend MOSInstrCost operator/(MOSInstrCost Left, int Right) {
+    return MOSInstrCost(Left.Bytes / Right, Left.Cycles / Right, 1);
+  }
+
+  int64_t value(Mode Mode = Mode::Average) const;
+
+  static Mode getModeFor(const MachineFunction &MF);
+
+private:
+  MOSInstrCost(int32_t Bytes, int32_t Cycles, int Multiplier)
+    : Bytes(Bytes * Multiplier), Cycles(Cycles * Multiplier) {}
+
+  int32_t Bytes, Cycles;
+};
+
+} // namespace llvm
+
+#endif // not LLVM_LIB_TARGET_MOS_MOSCYCLECOST_H

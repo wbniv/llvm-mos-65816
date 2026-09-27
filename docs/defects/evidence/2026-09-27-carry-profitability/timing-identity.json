@@ -1,0 +1,8 @@
+{
+  "compiler": "3b7fb8c905ac404f8cf45bc5d20defaa5cf52bf4c0b771f0dcc3510f584f2d17",
+  "linker": "30aa087a142c7aea4ba837d2ad35f0354f3faa681485c05e2b50747deb4a513b",
+  "probe": "e294aed948506ab5b131afa983b6c82d838707949f84e1f6720e9cfea3e114ba",
+  "host_audit_expected": 24288,
+  "configurations": 41,
+  "executions": 250
+}

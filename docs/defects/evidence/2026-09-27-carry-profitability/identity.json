@@ -1,0 +1,18 @@
+{
+  "base_repository_revision": "b65bb8539c00e85f3dc882087aa7973be49347d6",
+  "compiler_source_revision": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "tools": {
+    "clang-23": "3b7fb8c905ac404f8cf45bc5d20defaa5cf52bf4c0b771f0dcc3510f584f2d17",
+    "llc": "20e268c53141730944b084426a1f25348cc605eca41693e64d574c975d29b290",
+    "lld": "ca7638e87d673dfdd9ad9ce12cdb08f6b1e341ec7bc3586da0547b5b0ffc25d7",
+    "llvm-size": "a63ded4056161679aad09295fa3935ab28558b8fe41a9ed41e09ffc81a272801",
+    "llvm-readobj": "6958f18390b05c36508862f376e06debb4ca260dc7c1f46ed201ac2256c93630",
+    "llvm-objdump": "7df8689f67e6a9d987c04cfda1ac566750a1de87214597fdacb3705ec3673cf5"
+  },
+  "source_diff_sha256": "758ec4c7077aa2a5b12a5765b8f9d0cb38001f331aa821c3b58d98456a2e676d",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "xhigh",
+  "tool": "OpenAI Codex CLI 0.157.1 (codex-tui)",
+  "session": "01a0e126-2178-79f3-adba-51b951fb1f96",
+  "scheduler_sha256": "24c1b01518bd567014843e935753cb6af3001abde5613bdebefc06e4ee9e7b5d"
+}

@@ -1,0 +1,4 @@
+{
+  "reason": "The first weighted prototype narrowed a 64-bit score through tryLess(int,int), discarding its primary objective. Its screen is not evidence for the intended model. The first timing job also spans a compiler rebuild, so its entire timing dataset is excluded. Corrected screening and timing-v2 use identified builds; timing-v2 uses separately copied frozen tools.",
+  "included_in_report_statistics": false
+}

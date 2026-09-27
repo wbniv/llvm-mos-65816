@@ -1,0 +1,87 @@
+{
+  "command": [
+    "python3",
+    "dev/evaluate-carry-selection.py",
+    "/home/will/llvm-mos-65816/.scratch/carry-profitability/build/profitability/replay-smoke/census.json.gz",
+    "/home/will/llvm-mos-65816/build/carry-gate/final-install/bin/llvm-readobj",
+    "--objects-dir",
+    "/home/will/llvm-mos-65816/.scratch/carry-profitability/build/profitability/replay-smoke/objects",
+    "--out",
+    "/home/will/llvm-mos-65816/.scratch/carry-profitability/build/profitability/replay-smoke/selected"
+  ],
+  "exit_code": 0,
+  "summary": {
+    "inputs": 1,
+    "paired": 1,
+    "excluded_unpaired": 0,
+    "census_sha256": "4229bf25976d61c6399c94d35887387755270ee2242cd2d5814d65ab694e301b",
+    "readobj_sha256": "02395e8f25635539310368ffcc31c4e278bf8867abe4ee610fd13af2f6d86bdf",
+    "growing_functions_three_way": 0,
+    "selected_off_always": {
+      "choices": {
+        "off": 0,
+        "always": 1,
+        "gated": 0
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_off_gated": {
+      "choices": {
+        "off": 0,
+        "always": 0,
+        "gated": 1
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected": {
+      "choices": {
+        "off": 0,
+        "always": 1,
+        "gated": 0
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_file_only_off_always": {
+      "choices": {
+        "off": 0,
+        "always": 1,
+        "gated": 0
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_file_only_off_gated": {
+      "choices": {
+        "off": 0,
+        "always": 0,
+        "gated": 1
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_file_only": {
+      "choices": {
+        "off": 0,
+        "always": 1,
+        "gated": 0
+      },
+      "file_byte_saving": 43,
+      "text_byte_saving": 43,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    }
+  }
+}

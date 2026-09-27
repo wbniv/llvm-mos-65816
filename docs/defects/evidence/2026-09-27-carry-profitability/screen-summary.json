@@ -1,0 +1,102 @@
+{
+  "always": {
+    "paired": 139,
+    "saving": 28003,
+    "growing_objects": 39,
+    "growth_bytes": 258,
+    "growing_functions": 45,
+    "changed_from_always": 0,
+    "changed_from_gated": 136,
+    "policy_specific_failures": []
+  },
+  "gated": {
+    "paired": 139,
+    "saving": 18376,
+    "growing_objects": 6,
+    "growth_bytes": 59,
+    "growing_functions": 11,
+    "changed_from_always": 136,
+    "changed_from_gated": 0,
+    "policy_specific_failures": []
+  },
+  "always:legacy:auto": {
+    "paired": 139,
+    "saving": 28003,
+    "growing_objects": 39,
+    "growth_bytes": 258,
+    "growing_functions": 45,
+    "changed_from_always": 0,
+    "changed_from_gated": 136,
+    "policy_specific_failures": []
+  },
+  "gated:legacy:auto": {
+    "paired": 139,
+    "saving": 18376,
+    "growing_objects": 6,
+    "growth_bytes": 59,
+    "growing_functions": 11,
+    "changed_from_always": 136,
+    "changed_from_gated": 0,
+    "policy_specific_failures": []
+  },
+  "always:pressure-first:auto": {
+    "paired": 139,
+    "saving": 9677,
+    "growing_objects": 21,
+    "growth_bytes": 322,
+    "growing_functions": 41,
+    "changed_from_always": 114,
+    "changed_from_gated": 123,
+    "policy_specific_failures": []
+  },
+  "gated:pressure-first:auto": {
+    "paired": 139,
+    "saving": 5843,
+    "growing_objects": 11,
+    "growth_bytes": 244,
+    "growing_functions": 33,
+    "changed_from_always": 137,
+    "changed_from_gated": 66,
+    "policy_specific_failures": []
+  },
+  "always:weighted:size": {
+    "paired": 139,
+    "saving": 22274,
+    "growing_objects": 28,
+    "growth_bytes": 1171,
+    "growing_functions": 113,
+    "changed_from_always": 134,
+    "changed_from_gated": 138,
+    "policy_specific_failures": []
+  },
+  "gated:weighted:size": {
+    "paired": 139,
+    "saving": 15281,
+    "growing_objects": 17,
+    "growth_bytes": 1036,
+    "growing_functions": 96,
+    "changed_from_always": 137,
+    "changed_from_gated": 99,
+    "policy_specific_failures": []
+  },
+  "always:weighted:speed": {
+    "paired": 139,
+    "saving": 22274,
+    "growing_objects": 28,
+    "growth_bytes": 1171,
+    "growing_functions": 113,
+    "changed_from_always": 134,
+    "changed_from_gated": 138,
+    "policy_specific_failures": []
+  },
+  "gated:weighted:speed": {
+    "paired": 139,
+    "saving": 15281,
+    "growing_objects": 17,
+    "growth_bytes": 1036,
+    "growing_functions": 96,
+    "changed_from_always": 137,
+    "changed_from_gated": 99,
+    "policy_specific_failures": []
+  }
+}

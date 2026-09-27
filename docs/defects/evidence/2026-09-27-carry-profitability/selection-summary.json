@@ -1,0 +1,74 @@
+{
+  "inputs": 3720,
+  "paired": 3592,
+  "excluded_unpaired": 128,
+  "census_sha256": "faad18dc8d1d29225e0df9d026b4e35cd26173c48ea7263c36270fab0305af19",
+  "readobj_sha256": "6958f18390b05c36508862f376e06debb4ca260dc7c1f46ed201ac2256c93630",
+  "growing_functions_three_way": 18,
+  "selected_off_always": {
+    "choices": {
+      "off": 2492,
+      "always": 1100,
+      "gated": 0
+    },
+    "file_byte_saving": 211754,
+    "text_byte_saving": 211754,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 0
+  },
+  "selected_off_gated": {
+    "choices": {
+      "off": 2628,
+      "always": 0,
+      "gated": 964
+    },
+    "file_byte_saving": 195011,
+    "text_byte_saving": 195011,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 0
+  },
+  "selected": {
+    "choices": {
+      "off": 2492,
+      "always": 1045,
+      "gated": 55
+    },
+    "file_byte_saving": 211974,
+    "text_byte_saving": 211974,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 0
+  },
+  "selected_file_only_off_always": {
+    "choices": {
+      "off": 2485,
+      "always": 1107,
+      "gated": 0
+    },
+    "file_byte_saving": 214124,
+    "text_byte_saving": 214124,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 7
+  },
+  "selected_file_only_off_gated": {
+    "choices": {
+      "off": 2619,
+      "always": 0,
+      "gated": 973
+    },
+    "file_byte_saving": 199368,
+    "text_byte_saving": 199368,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 9
+  },
+  "selected_file_only": {
+    "choices": {
+      "off": 2485,
+      "always": 1052,
+      "gated": 55
+    },
+    "file_byte_saving": 214344,
+    "text_byte_saving": 214344,
+    "growing_file_bytes": 0,
+    "growing_writable_bytes": 7
+  }
+}

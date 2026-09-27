@@ -1,0 +1,56 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import gzip,hashlib,importlib.util,json,re,subprocess,threading
+root=Path('/home/will/llvm-mos-65816'); wt=root/'.scratch/carry-profitability'; out=wt/'build/profitability/timing-v2';out.mkdir(exist_ok=True)
+tool=wt/'build/profitability/final-bin'; linktool=root/'build/carry-gate/final-install/bin'; old=root/'.scratch/carry-scheduling'; probe=root/'.scratch/carry-timing/jgxcycles'
+spec=importlib.util.spec_from_file_location('selection',wt/'dev/select-carry-object.py'); sel=importlib.util.module_from_spec(spec);spec.loader.exec_module(sel)
+def key(r):return tuple(r[k] for k in ('source','mode','optimization'))
+census={key(r):r for r in json.loads(gzip.decompress((root/'docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz').read_bytes()))}
+selected={key(r):r for r in json.loads((wt/'build/profitability/selection/report.json').read_text())}
+controls=json.loads((root/'build/carry-gate/controls/report.json').read_text())
+cases=[]
+for r in json.loads((root/'docs/defects/evidence/2026-09-27-mos-carry-timing/results.json').read_text()):
+ b=r['baseline']; cases.append({**{k:r[k] for k in ('name','mode','optimization')},'source':r.get('source'),'function':b['function'],'stop':b['stop'],'expected':b['expected'],'count':b['sample_count'],'hirom':'source' not in r})
+for r in json.loads((root/'build/carry-gate/additional-growth/results.json').read_text()):
+ cmd=r['off']['commands'][-1]['command']; cases.append({**{k:r[k] for k in ('source','mode','optimization')},'name':Path(r['source']).stem+'.'+r['mode']+'.'+r['optimization'],'function':'main','stop':0xffffffff,'expected':int(cmd[8],16),'count':1,'hirom':False})
+cases.append({'source':'examples/65816/farblit.c','mode':'xy16','optimization':'O2','name':'farblit.xy16.O2','function':'main','stop':0xffffffff,'expected':json.loads((root/'build/carry-gate/farblit/results.json').read_text())['expected'],'count':1,'hirom':True})
+subprocess.run(['cc','-DHOST_ORACLE',str(root/'examples/65816/a16cmpaudit.c'),'-o',str(out/'audit-host')],check=True)
+expected=int(subprocess.check_output([str(out/'audit-host')],text=True).strip(),16)
+cases.append({'source':'examples/65816/a16cmpaudit.c','mode':'default','optimization':'Oz','name':'a16cmpaudit.default.Oz','function':'main','stop':0xffffffff,'expected':expected,'count':1,'hirom':False})
+lock=threading.Lock();results=[]
+def one(case):
+ name=case['name'];r={'case':case,'runs':{}};commands=[]
+ def run(cmd,label):
+  cmd=list(map(str,cmd));p=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/(name+'.'+label+'.log')).write_text(p.stdout+p.stderr);commands.append({'command':cmd,'exit_code':p.returncode,'log':name+'.'+label+'.log'});assert p.returncode==0,p.stderr[-2000:];return p.stdout
+ if case['source']:
+  base=census[key(case)]; command=base['off']['command']; selected_policy=selected[key(case)]['selected'];chosen=Path(selected[key(case)]['output']); inputs=[]
+ else:
+  shape=name.split('-')[0];base=next(x for x in controls if x['shape']==shape and x['mode']==case['mode']);command=base['off']['command'];costs={p:sel.object_cost(tool/'llvm-readobj',Path(base[p]['command'][base[p]['command'].index('-o')+1])) for p in ('off','always','gated')};selected_policy=sel.choose(costs);chosen=Path(base[selected_policy]['command'][base[selected_policy]['command'].index('-o')+1]);inputs=[old/'build/carry-original-runtime-a16-driver'/(shape+'-candidate-a16.driver.o'),old/'build/carry-original-runtime-a16-driver/table.s']
+ if case['source']=='examples/65816/farblit.c':inputs=[root/'build/carry-gate/farblit/table.s']
+ variants=['selection','gated:pressure-first:auto','gated:weighted:size']
+ if 'a16cmpaudit' in name:variants+=['gated:weighted:speed','off']
+ for variant in variants:
+  label=variant.replace(':','-'); obj=chosen
+  if variant!='selection':
+   obj=out/(name+'.'+label+'.o');cmd=command[:];cmd[0]=str(tool/'mos-clang');cmd[cmd.index('-o')+1]=str(obj);cmd=[('-mos-carry-sched=gated' if a.startswith('-mos-carry-sched=') else a) for a in cmd]
+   if variant=='off':cmd=[('-mos-carry-sched=off' if a=='-mos-carry-sched=gated' else a) for a in cmd]
+   else:
+    _,model,objective=variant.split(':');cmd+=['-mllvm','-mos-carry-cost='+model,'-mllvm','-mos-carry-objective='+objective]
+   run(cmd,label+'.compile')
+  rom=out/(name+'.'+label+'.sfc');config=old/'build/install/bin'/('mos-snes-hirom.cfg' if case['hirom'] else 'mos-snes.cfg')
+  run([linktool/'mos-clang','--config',config,'-mcpu=mosw65816','-fno-lto',*inputs,obj,'-o',rom],label+'.link')
+  run(['python3',root/'tools/snes-checksum.py',*(['--hirom'] if case['hirom'] else []),rom],label+'.checksum')
+  symbols={p[-1]:(int(p[0],16),int(p[-2],16)) for line in run([linktool/'llvm-objdump','-t',str(rom)+'.elf'],label+'.symbols').splitlines() if len(p:=line.split())>=5 and re.fullmatch('[0-9a-f]{8}',p[0])}
+  start,size=symbols[case['function']];offset,length=symbols['corpus_result'];cmd=[probe,rom,root/'vendor/bsnes-jg/Database',hex(start),hex(start+size),hex(case['stop']),hex(offset),length,hex(case['expected']),2000,case['count']]
+  runs=[json.loads(run(cmd,label+'.timing-'+str(i))) for i in range(2)]
+  assert runs[0]==runs[1] and runs[0]['pass'],name+' '+variant
+  r['runs'][variant]={'master_clocks':sum(runs[0]['samples']),'samples':runs[0]['samples'],'pass':runs[0]['pass'],'repeat_identical':True,'rom_sha256':sel.digest(rom),'object_sha256':sel.digest(obj),'linked_cost':None,'selected_policy':selected_policy if variant=='selection' else None,'function_size':size}
+  # Linked section sizes expose allocation/layout changes that ROM padding hides.
+  data=json.loads(run([linktool/'llvm-readobj','--elf-output-style=JSON','--sections',str(rom)+'.elf'],label+'.sections'))[0]
+  r['runs'][variant]['linked_sections']=[x['Section'] for x in data['Sections'] if x['Section']['Flags']['Value'] & 2]
+ r['commands']=commands
+ with lock:
+  results.append(r);(out/'results.json').write_text(json.dumps(results,indent=2)+'\n'); print(name,{p:x['master_clocks'] for p,x in r['runs'].items()},flush=True)
+ return r
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(one,cases))
+(out/'identity.json').write_text(json.dumps({'compiler':sel.digest(tool/'clang-23'),'linker':sel.digest(linktool/'lld'),'probe':sel.digest(probe),'host_audit_expected':expected,'configurations':len(cases),'executions':sum(len(r['runs'])*2 for r in results)},indent=2)+'\n')

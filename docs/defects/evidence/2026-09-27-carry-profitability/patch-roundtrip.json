@@ -1,0 +1,30 @@
+[
+  {
+    "patch": "profitability-models.patch",
+    "command": [
+      "patch",
+      "-p1",
+      "--forward",
+      "-i",
+      "/home/will/llvm-mos-65816/.scratch/carry-profitability/docs/defects/evidence/2026-09-27-carry-profitability/profitability-models.patch"
+    ],
+    "stdout": "patching file llvm/lib/Target/MOS/MOSMachineScheduler.cpp\n",
+    "exit_code": 0,
+    "source_sha256": "24c1b01518bd567014843e935753cb6af3001abde5613bdebefc06e4ee9e7b5d",
+    "matches_snapshot": true
+  },
+  {
+    "patch": "tradeoff-model.patch",
+    "command": [
+      "patch",
+      "-p1",
+      "--forward",
+      "-i",
+      "/home/will/llvm-mos-65816/.scratch/carry-profitability/docs/defects/evidence/2026-09-27-carry-profitability/tradeoff-model.patch"
+    ],
+    "stdout": "patching file llvm/lib/Target/MOS/MOSMachineScheduler.cpp\n",
+    "exit_code": 0,
+    "source_sha256": "1370bbf7cf2b7d8a41b45baca0651410ad4ef2d605bfce9b05da36b77282e38b",
+    "matches_snapshot": true
+  }
+]

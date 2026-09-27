@@ -1,0 +1,92 @@
+--- a/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
++++ b/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
+@@ -30,6 +30,7 @@
+ #include "MOSMachineScheduler.h"
+ #include "MCTargetDesc/MOSMCTargetDesc.h"
+ #include "MOSRegisterInfo.h"
++#include "MOSInstrCost.h"
+ #include "llvm/CodeGen/MachineInstr.h"
+ #include "llvm/CodeGen/MachineOperand.h"
+ #include "llvm/CodeGen/MachineRegisterInfo.h"
+@@ -48,6 +49,22 @@
+                           "Track competing computed carries"),
+                clEnumValN(CarrySchedMode::Always, "always",
+                           "Track all non-LDImm1 carry definitions")));
++enum class CarryCostModel { Legacy, PressureFirst, Weighted };
++cl::opt<CarryCostModel> CarryCost(
++    "mos-carry-cost", cl::Hidden, cl::init(CarryCostModel::Legacy),
++    cl::desc("MOS experimental carry profitability model"),
++    cl::values(clEnumValN(CarryCostModel::Legacy, "legacy", "Carry first"),
++               clEnumValN(CarryCostModel::PressureFirst, "pressure-first",
++                          "Use carry to break other pressure ties"),
++               clEnumValN(CarryCostModel::Weighted, "weighted",
++                          "Combine carry and generic pressure estimates")));
++enum class CarryObjective { Auto, Size, Speed };
++cl::opt<CarryObjective> Objective(
++    "mos-carry-objective", cl::Hidden, cl::init(CarryObjective::Auto),
++    cl::desc("MOS experimental carry cost objective"),
++    cl::values(clEnumValN(CarryObjective::Auto, "auto", "Use function attributes"),
++               clEnumValN(CarryObjective::Size, "size", "Prefer estimated bytes"),
++               clEnumValN(CarryObjective::Speed, "speed", "Prefer estimated cycles")));
+ } // namespace
+ 
+ MOSSchedStrategy::MOSSchedStrategy(const MachineSchedContext *C)
+@@ -179,7 +196,45 @@
+     return true;
+   }
+ 
+-  if (TrackCarries &&
++  if (TrackCarries && CarryCost == CarryCostModel::Weighted) {
++    // Generic pressure deltas estimate allocation risk. Only one of the
++    // overlapping excess/critical/maximum estimates contributes to the cost.
++    auto Cost = [&](const SchedCandidate &Candidate) {
++      const auto &Delta = Candidate.RPDelta;
++      const PressureChange &Pressure =
++          Delta.Excess.isValid() ? Delta.Excess :
++          Delta.CriticalMax.isValid() ? Delta.CriticalMax : Delta.CurrentMax;
++      int Spill = DAG->isTrackingPressure() && Pressure.isValid()
++                      ? Pressure.getUnitInc() : 0;
++      int Carry = carryExcessDiff(Candidate.SU, Candidate.AtTop);
++      // An 8-bit carry diamond and compare occupy eight bytes. A zero-page
++      // store/reload pair occupies four bytes and costs six processor cycles.
++      // These are marginal proxies; allocation and native widths can differ.
++      int64_t Bytes = 8 * Carry + 4 * Spill;
++      int64_t Cycles = 8 * Carry + 6 * Spill;
++      auto Mode = MOSInstrCost::getModeFor(DAG->MF);
++      if (Objective == CarryObjective::Size)
++        Mode = MOSInstrCost::Mode::PreferBytes;
++      else if (Objective == CarryObjective::Speed)
++        Mode = MOSInstrCost::Mode::PreferCycles;
++      switch (Mode) {
++      case MOSInstrCost::Mode::PreferBytes:
++        return Bytes * (int64_t(1) << 32) + Cycles;
++      case MOSInstrCost::Mode::PreferCycles:
++        return Cycles * (int64_t(1) << 32) + Bytes;
++      case MOSInstrCost::Mode::Average:
++        return Bytes + Cycles;
++      }
++      llvm_unreachable("Unknown cost mode");
++    };
++    int64_t TryCost = Cost(TryCand), CandCost = Cost(Cand);
++    // Keep the lexicographic score at full width; tryLess accepts int values.
++    int Order = int(TryCost > CandCost) - int(TryCost < CandCost);
++    if (tryLess(Order, 0, TryCand, Cand, RegExcess))
++      return TryCand.Reason != NoCand;
++  }
++
++  if (TrackCarries && CarryCost == CarryCostModel::Legacy &&
+       tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
+               carryExcessDiff(Cand.SU, Cand.AtTop), TryCand, Cand, RegExcess))
+     return TryCand.Reason != NoCand;
+@@ -219,6 +274,11 @@
+   if (DAG->isTrackingPressure() &&
+       tryPressure(TryCand.RPDelta.CurrentMax, Cand.RPDelta.CurrentMax, TryCand,
+                   Cand, RegMax, TRI, DAG->MF))
++    return TryCand.Reason != NoCand;
++
++  if (TrackCarries && CarryCost == CarryCostModel::PressureFirst &&
++      tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
++              carryExcessDiff(Cand.SU, Cand.AtTop), TryCand, Cand, RegExcess))
+     return TryCand.Reason != NoCand;
+ 
+   // We only compare a subset of features when comparing nodes between

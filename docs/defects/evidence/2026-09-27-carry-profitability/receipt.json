@@ -1,0 +1,120 @@
+{
+  "date": "2026-09-27",
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96",
+  "report": "docs/investigations/2026-09-27-carry-profitability-model.md",
+  "baseline": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-identity.json",
+  "census": "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz",
+  "source_inputs": "docs/defects/evidence/2026-09-27-competing-carry-gate/census-inputs.tar.gz",
+  "experiment_sources": [
+    "profitability-models.patch",
+    "tradeoff-model.patch"
+  ],
+  "patch_application": "Both patches independently apply to the 0067 scheduler on downstream b65bb853, not on top of each other; tradeoff-model.patch contains all three experimental models. Patch roundtrips reproduce the snapshots.",
+  "build_command": "dev/container.sh -- ninja -C build/llvm-mos -j3 clang llc lld",
+  "configuration": "Release, LLVM_ENABLE_ASSERTIONS=OFF; all measured C-to-object commands include -verify-machineinstrs. Main installed compiler is unchanged.",
+  "screen": {
+    "configurations": 139,
+    "compilations": 1668,
+    "legacy_disassembly_matches": 278,
+    "failures": 0,
+    "scope": "All existing growing objects plus 100 largest lost gated wins; biased exploratory screen, not held-out data."
+  },
+  "selection": {
+    "paired_configurations": 3592,
+    "objects_verified": 10776,
+    "source": "existing frozen census objects",
+    "fresh_selector_invocations": 144,
+    "fresh_object_hash_matches": 336,
+    "metric": "allocated file-backed sections, with an optional writable-section cap"
+  },
+  "runtime": {
+    "configurations": 41,
+    "conditional_additional_cases": 5,
+    "executions": 260,
+    "all_oracles_pass": true,
+    "all_repeats_identical": true,
+    "selected_timing_regressions": 0,
+    "selected_linked_section_growth": 0,
+    "scope": "Known SNES cases plus positive controls and compare audit; no universal speed or final-link guarantee."
+  },
+  "compiler_time": {
+    "configurations": 6,
+    "warmups_per_arm": 1,
+    "measured_rounds_per_arm": 7,
+    "outer_invocations": 240,
+    "clang_invocations": 432,
+    "includes": "complete compilation plus Python, hashing, object inspection and evidence output",
+    "integrated_backend_overhead": "unmeasured"
+  },
+  "validation": {
+    "mos_lit": {
+      "weighted_build": {
+        "pass": 181,
+        "unsupported": 2
+      },
+      "conditional_build": {
+        "pass": 181,
+        "unsupported": 2
+      }
+    },
+    "selector_tests": 4,
+    "relocated_object_replay": "pass"
+  },
+  "status": "Investigated and retained for discussion. Default unchanged; generic pressure contract remains a workaround. No upstream submission.",
+  "excluded": "discarded-prototype.json explains invalid initial score narrowing and mixed-build timing; neither contributes to reported results.",
+  "artifacts_sha256": {
+    "tradeoff-screen.json.gz": "40ac0b519261e29fc2de2bf96f03be6f8f658612ae79d2190c4bd46afe702be6",
+    "screen-summary.json": "120293ada71931ad2427a395999dfcd4b9bdfb5a0b083b50bb47ca2fea8945a2",
+    "replay-smoke.json": "fb9af99c43235f189d242051223ff2af09c3cf74edbfcf043dced922562e5e6d",
+    "measure-tradeoff-runtime.py.txt": "2dd4e768e9826867249b51bd973fcde7cc40be7ea85ebeba4037d8d9b7755815",
+    "identity.json": "9d6facbdfb6c97370710da7220c4f5dd76c12c989a45b0edc3b774decabbed9a",
+    "mir.tar.gz": "a6322c8a2a337bdf3760e2ee34e151a819425efb075a2301222bbe5f84454986",
+    "measure-runtime.py.txt": "a9147a94f73de657074e56fbd2880f04cf76eecc92e6b217572dbe5b04d8b429",
+    "tradeoff-lit.json": "b2b4839ac403e359124c0c0b8837b73e03838c3443b597ae374bedf1b143c701",
+    "patch-roundtrip.json": "bd870c20238285118a5de31ac45a7df930139d3e71f9290d0479c5b05868cb95",
+    "prior-work-audit.json": "5d124f8aa00b362aeeb863749c473cd7968f76a9592d0d317f102a501ab6ff17",
+    "test-select-carry-object.py.txt": "eec99539711d9c13fc7ca8693ab8fdec729df23d3c94767297f6f56a5dd51feb",
+    "source-diff.txt.gz": "2561dedd0db51e94c585dc87af5be3ee816f276112c524e639086d844fb4c625",
+    "compile-time-runs.json.gz": "87e8fd3b1bb21df871f547f034d4de8d53d3054faa6c072959a24940de42cdb1",
+    "baseline-scheduler.cpp.txt": "7291ef78c41ea7154e49d76b7f618d41401823f6dc1fb701c825292fd43471e6",
+    "tradeoff-artifacts.tar.gz": "328794beff8266ec021a11b0dbb7bf1ec498412e2757a54508c3d6dabe77fd77",
+    "tradeoff-summary.json": "12185d283136320da889522dbbd0c93e8975cc3a5b5a0e046b18ee18903b40a5",
+    "timing-identity.json": "93ff7c5e2e91c3089fe786ee32069670b684851a0ab6c3db5d31214f87d35d08",
+    "discarded-prototype.json": "67be0bd49fb21dd63c3a3d536b9319b0deba167348a2ce95dc1091ea5f461f2d",
+    "profitability-models.patch": "f0d22eb2cc5abe1a94c3ff5df4ea4b1bb469b9bf3efceea6dd90f2ee999d002b",
+    "candidate-scheduler.cpp.txt": "24c1b01518bd567014843e935753cb6af3001abde5613bdebefc06e4ee9e7b5d",
+    "tradeoff-timing.json.gz": "192701669e5515c553af31673b0adaabccf2e4e077bbc0e2d710a7622cbf8ec1",
+    "linked-baselines.json": "f6e3bb02713f6fcf57d406826bc86c840910ed1115b792e7beebfa55163186b0",
+    "mir-commands.json": "5d388a684ea83a809b6ee81c9c9458d3c076bcbf528793eff6ce38ae6d79deea",
+    "tradeoff-identity.json": "7eb8fec367376b81b3aa9767929df0e6a82eb86c36bbdfec2205c12187910cfb",
+    "screen.json.gz": "c69148781cbadcfaeafde7c829ec21f7d89e96d761fad442349bf4fab8723ffa",
+    "tradeoff-model.patch": "57bb4a2b1903fb31505a2dedb44aef56ce3a939db2a081581a3baefe61a76019",
+    "census-objects-off.tar.gz": "c228cc2c363a46b07bcf8c7041f1f2173ddb8f834aaeccc893e9c6aa8c02d03d",
+    "compile-time.json": "6b9288f41817cacfa2d6af6bd47ef7089f2818e0a711351f5e3b6320286b5adb",
+    "census-objects-gated.tar.gz": "262467a682590a31db997cbbb127790e7eeff99f8dd0a93ac31bd8c1cdde77bb",
+    "measure-carry-profitability.py.txt": "cb6bdf0137263ecb584937de05f9f68a67c772b593ec640c013e3f579b2cb4b5",
+    "screen-identity.json": "970be31d132b866501a9fbcc52b3c198cf206c03562281d2f0c110ea0486f341",
+    "compile-time-artifacts.tar.gz": "59c69b2bbe24776606a55ebd43dccfaca54189d5cc04f4f2cbfd719836a4dc2b",
+    "timing-artifacts.tar.gz": "af0bca6c95108ac22d511eafc22ed7b97e35f6e012c892fc8e16a20afa9ee941",
+    "measure-compile-time.py.txt": "03c5ad5f24e539a625af89826d9cdd9c0a4c1406c82b6bb494c47f48c9f199dd",
+    "lit.json": "90e836428a39bc7804778a280d7c76533a1b0fc22a39ffa2252b16a0d81475b7",
+    "tradeoff-scheduler.cpp.txt": "1370bbf7cf2b7d8a41b45baca0651410ad4ef2d605bfce9b05da36b77282e38b",
+    "tradeoff-timing-identity.json": "56ed17a2aa2eea64d7169436578369b4ce7fda72610aa6a4d24c0305e6e7a68e",
+    "timing.json.gz": "aeab84102a7764830400a5c3662c0d9cce5834e1d36f00b5fdf4e933ea3912e0",
+    "selector-tests.log": "feabb4add9e2ca3374e538560634d1ec97dc4f4ce89aab12f3d726e36ea9b2f6",
+    "compile-time-details.json.gz": "5f3634038c187d29ef05b99755245b8e3ee05c468a0559dcc890fbd42b9600f5",
+    "tradeoff-screen-identity.json": "975ec69579d88c5bc669ad563d2a9e31dfe51d2734d768e3b2c013396af63934",
+    "selection.json.gz": "a95f74d94419bce7f71f5fab8059db48ff468457cc8afcf8bb64da3d50194f56",
+    "select-carry-object.py.txt": "e548644f83d9a7a44639ab86fccdab56581630faae7899012f266a278cb36bd7",
+    "summarize-carry-profitability.py.txt": "2bcdfb933787e4b055d774221809da4485063e8bcb3686c8a1f724b9f62fe7cf",
+    "farblit-counts.json": "fef96bcb6fa8b1199900b0a6a817fb6f15c251fef617cdb83137547dd80de8c7",
+    "census-objects-always.tar.gz": "293416e78030ead169acea4dac86b5f0ce053b69339e26413d576bdfa420f8e5",
+    "fresh-selection-verification.json": "73533bedd3e1270627b2ab1c25dad71beb09e8016c7237c06e634d3bb13ca34a",
+    "discarded-prototype-metadata.tar.gz": "72d90dc8aff1b92e4e69c7b6b9c139dfbb76af7942abda5125d259c6bc97d7a9",
+    "evaluate-carry-selection.py.txt": "98a08862e08c26c24bd2fbcaba66e358bc2fb443eeaeb1c01ee7ab3448b802b0",
+    "objective-source.txt": "1ee480aa8941efe529bd032f38b4dd013407a9878122ece4dd8325ed72ef7188",
+    "selection-summary.json": "28a0e80761da4f08f12a5e18378c2f36b45af622d2af71e524e2c591f89e1002",
+    "screen-always-artifacts.tar.gz": "b129a3738bda9a272d9344e848a23aef57b3179c346e01a5fef0813c632fcd42",
+    "screen-gated-artifacts.tar.gz": "515965d570c066b526704198a6df98b7aa593377c485588e9d854e6f9922d44b"
+  }
+}

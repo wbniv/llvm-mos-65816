@@ -1,0 +1,2090 @@
+{
+  "scope": "Screening is a biased 139-case sample. Full selection reuses verified frozen objects. Timing covers named inputs only.",
+  "screen": {
+    "always": {
+      "paired": 139,
+      "saving": 28003,
+      "growing_objects": 39,
+      "growth_bytes": 258,
+      "growing_functions": 45,
+      "changed_from_always": 0,
+      "changed_from_gated": 136,
+      "policy_specific_failures": []
+    },
+    "gated": {
+      "paired": 139,
+      "saving": 18376,
+      "growing_objects": 6,
+      "growth_bytes": 59,
+      "growing_functions": 11,
+      "changed_from_always": 136,
+      "changed_from_gated": 0,
+      "policy_specific_failures": []
+    },
+    "always:legacy:auto": {
+      "paired": 139,
+      "saving": 28003,
+      "growing_objects": 39,
+      "growth_bytes": 258,
+      "growing_functions": 45,
+      "changed_from_always": 0,
+      "changed_from_gated": 136,
+      "policy_specific_failures": []
+    },
+    "gated:legacy:auto": {
+      "paired": 139,
+      "saving": 18376,
+      "growing_objects": 6,
+      "growth_bytes": 59,
+      "growing_functions": 11,
+      "changed_from_always": 136,
+      "changed_from_gated": 0,
+      "policy_specific_failures": []
+    },
+    "always:pressure-first:auto": {
+      "paired": 139,
+      "saving": 9677,
+      "growing_objects": 21,
+      "growth_bytes": 322,
+      "growing_functions": 41,
+      "changed_from_always": 114,
+      "changed_from_gated": 123,
+      "policy_specific_failures": []
+    },
+    "gated:pressure-first:auto": {
+      "paired": 139,
+      "saving": 5843,
+      "growing_objects": 11,
+      "growth_bytes": 244,
+      "growing_functions": 33,
+      "changed_from_always": 137,
+      "changed_from_gated": 66,
+      "policy_specific_failures": []
+    },
+    "always:weighted:size": {
+      "paired": 139,
+      "saving": 22274,
+      "growing_objects": 28,
+      "growth_bytes": 1171,
+      "growing_functions": 113,
+      "changed_from_always": 134,
+      "changed_from_gated": 138,
+      "policy_specific_failures": []
+    },
+    "gated:weighted:size": {
+      "paired": 139,
+      "saving": 15281,
+      "growing_objects": 17,
+      "growth_bytes": 1036,
+      "growing_functions": 96,
+      "changed_from_always": 137,
+      "changed_from_gated": 99,
+      "policy_specific_failures": []
+    },
+    "always:weighted:speed": {
+      "paired": 139,
+      "saving": 22274,
+      "growing_objects": 28,
+      "growth_bytes": 1171,
+      "growing_functions": 113,
+      "changed_from_always": 134,
+      "changed_from_gated": 138,
+      "policy_specific_failures": []
+    },
+    "gated:weighted:speed": {
+      "paired": 139,
+      "saving": 15281,
+      "growing_objects": 17,
+      "growth_bytes": 1036,
+      "growing_functions": 96,
+      "changed_from_always": 137,
+      "changed_from_gated": 99,
+      "policy_specific_failures": []
+    }
+  },
+  "tradeoff_screen": {
+    "always": {
+      "paired": 139,
+      "saving": 28003,
+      "growing_objects": 39,
+      "growth_bytes": 258,
+      "growing_functions": 45,
+      "changed_from_always": 0,
+      "changed_from_gated": 136,
+      "policy_specific_failures": []
+    },
+    "gated": {
+      "paired": 139,
+      "saving": 18376,
+      "growing_objects": 6,
+      "growth_bytes": 59,
+      "growing_functions": 11,
+      "changed_from_always": 136,
+      "changed_from_gated": 0,
+      "policy_specific_failures": []
+    },
+    "always:tradeoff:size": {
+      "paired": 139,
+      "saving": 24897,
+      "growing_objects": 27,
+      "growth_bytes": 766,
+      "growing_functions": 30,
+      "changed_from_always": 74,
+      "changed_from_gated": 118,
+      "policy_specific_failures": []
+    },
+    "gated:tradeoff:size": {
+      "paired": 139,
+      "saving": 17534,
+      "growing_objects": 6,
+      "growth_bytes": 672,
+      "growing_functions": 11,
+      "changed_from_always": 137,
+      "changed_from_gated": 12,
+      "policy_specific_failures": []
+    },
+    "always:tradeoff:speed": {
+      "paired": 139,
+      "saving": 24897,
+      "growing_objects": 27,
+      "growth_bytes": 766,
+      "growing_functions": 30,
+      "changed_from_always": 74,
+      "changed_from_gated": 118,
+      "policy_specific_failures": []
+    },
+    "gated:tradeoff:speed": {
+      "paired": 139,
+      "saving": 17534,
+      "growing_objects": 6,
+      "growth_bytes": 672,
+      "growing_functions": 11,
+      "changed_from_always": 137,
+      "changed_from_gated": 12,
+      "policy_specific_failures": []
+    }
+  },
+  "selection": {
+    "inputs": 3720,
+    "paired": 3592,
+    "excluded_unpaired": 128,
+    "census_sha256": "faad18dc8d1d29225e0df9d026b4e35cd26173c48ea7263c36270fab0305af19",
+    "readobj_sha256": "6958f18390b05c36508862f376e06debb4ca260dc7c1f46ed201ac2256c93630",
+    "growing_functions_three_way": 18,
+    "selected_off_always": {
+      "choices": {
+        "off": 2492,
+        "always": 1100,
+        "gated": 0
+      },
+      "file_byte_saving": 211754,
+      "text_byte_saving": 211754,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_off_gated": {
+      "choices": {
+        "off": 2628,
+        "always": 0,
+        "gated": 964
+      },
+      "file_byte_saving": 195011,
+      "text_byte_saving": 195011,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected": {
+      "choices": {
+        "off": 2492,
+        "always": 1045,
+        "gated": 55
+      },
+      "file_byte_saving": 211974,
+      "text_byte_saving": 211974,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 0
+    },
+    "selected_file_only_off_always": {
+      "choices": {
+        "off": 2485,
+        "always": 1107,
+        "gated": 0
+      },
+      "file_byte_saving": 214124,
+      "text_byte_saving": 214124,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 7
+    },
+    "selected_file_only_off_gated": {
+      "choices": {
+        "off": 2619,
+        "always": 0,
+        "gated": 973
+      },
+      "file_byte_saving": 199368,
+      "text_byte_saving": 199368,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 9
+    },
+    "selected_file_only": {
+      "choices": {
+        "off": 2485,
+        "always": 1052,
+        "gated": 55
+      },
+      "file_byte_saving": 214344,
+      "text_byte_saving": 214344,
+      "growing_file_bytes": 0,
+      "growing_writable_bytes": 7
+    }
+  },
+  "runtime": [
+    {
+      "name": "sum-xy16",
+      "baseline_master_clocks": 106784,
+      "runs": {
+        "selection": {
+          "master_clocks": 74264,
+          "delta_clocks": -32520,
+          "delta_percent": -30.454000599340723,
+          "linked_file_bytes": 197839,
+          "linked_delta_bytes": -161,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 103600,
+          "delta_clocks": -3184,
+          "delta_percent": -2.981720107881336,
+          "linked_file_bytes": 197968,
+          "linked_delta_bytes": -32,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 84624,
+          "delta_clocks": -22160,
+          "delta_percent": -20.75217261012886,
+          "linked_file_bytes": 197887,
+          "linked_delta_bytes": -113,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "sum-a16",
+      "baseline_master_clocks": 106784,
+      "runs": {
+        "selection": {
+          "master_clocks": 74264,
+          "delta_clocks": -32520,
+          "delta_percent": -30.454000599340723,
+          "linked_file_bytes": 197839,
+          "linked_delta_bytes": -161,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 103600,
+          "delta_clocks": -3184,
+          "delta_percent": -2.981720107881336,
+          "linked_file_bytes": 197968,
+          "linked_delta_bytes": -32,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 84624,
+          "delta_clocks": -22160,
+          "delta_percent": -20.75217261012886,
+          "linked_file_bytes": 197887,
+          "linked_delta_bytes": -113,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "rot-a16",
+      "baseline_master_clocks": 111192,
+      "runs": {
+        "selection": {
+          "master_clocks": 91608,
+          "delta_clocks": -19584,
+          "delta_percent": -17.612777897690478,
+          "linked_file_bytes": 197876,
+          "linked_delta_bytes": -100,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 106288,
+          "delta_clocks": -4904,
+          "delta_percent": -4.410389236635726,
+          "linked_file_bytes": 197938,
+          "linked_delta_bytes": -38,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 108360,
+          "delta_clocks": -2832,
+          "delta_percent": -2.5469458234405384,
+          "linked_file_bytes": 197943,
+          "linked_delta_bytes": -33,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "rot-xy16",
+      "baseline_master_clocks": 111192,
+      "runs": {
+        "selection": {
+          "master_clocks": 91608,
+          "delta_clocks": -19584,
+          "delta_percent": -17.612777897690478,
+          "linked_file_bytes": 197876,
+          "linked_delta_bytes": -100,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 106288,
+          "delta_clocks": -4904,
+          "delta_percent": -4.410389236635726,
+          "linked_file_bytes": 197938,
+          "linked_delta_bytes": -38,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 108360,
+          "delta_clocks": -2832,
+          "delta_percent": -2.5469458234405384,
+          "linked_file_bytes": 197943,
+          "linked_delta_bytes": -33,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_65816_rcundef2.c.a16.Os",
+      "baseline_master_clocks": 188506206,
+      "runs": {
+        "selection": {
+          "master_clocks": 188506206,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3088,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 188506206,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3088,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 188506206,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3088,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_avalanche.c.a16.Os",
+      "baseline_master_clocks": 199409522,
+      "runs": {
+        "selection": {
+          "master_clocks": 199409522,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 11659,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 199409522,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 11659,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 199409918,
+          "delta_clocks": 396,
+          "delta_percent": 0.00019858630422309176,
+          "linked_file_bytes": 11674,
+          "linked_delta_bytes": 15,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_lsystem_sim.c.a16.Os",
+      "baseline_master_clocks": 189978406,
+      "runs": {
+        "selection": {
+          "master_clocks": 189978406,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3097,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 189978406,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3097,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 189978406,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3097,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_dctbloom.c.a16.Os",
+      "baseline_master_clocks": 20670778,
+      "runs": {
+        "selection": {
+          "master_clocks": 20670778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17476,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 20670778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17476,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 20670778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17476,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_spirograph.c.a16.Os",
+      "baseline_master_clocks": 60534,
+      "runs": {
+        "selection": {
+          "master_clocks": 60534,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22241,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 60534,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22241,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 60534,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22241,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_65816_rcundef2.c.xy16.Os",
+      "baseline_master_clocks": 188076608,
+      "runs": {
+        "selection": {
+          "master_clocks": 188076608,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3013,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 188076608,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3013,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 188076608,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3013,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_lsystem.c.a16.Os",
+      "baseline_master_clocks": 227323622,
+      "runs": {
+        "selection": {
+          "master_clocks": 227323622,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17794,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 227323622,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17794,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 227323622,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17794,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_avalanche.c.xy16.Os",
+      "baseline_master_clocks": 199406714,
+      "runs": {
+        "selection": {
+          "master_clocks": 199406714,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 11592,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 199406714,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 11592,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 199407090,
+          "delta_clocks": 376,
+          "delta_percent": 0.0001885593481132375,
+          "linked_file_bytes": 11607,
+          "linked_delta_bytes": 15,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_lsystem_sim.c.xy16.Os",
+      "baseline_master_clocks": 190346778,
+      "runs": {
+        "selection": {
+          "master_clocks": 190346778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3152,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 190346778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3152,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 190346778,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3152,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_spirograph.c.xy16.Os",
+      "baseline_master_clocks": 60414,
+      "runs": {
+        "selection": {
+          "master_clocks": 60414,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22150,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 60414,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22150,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 60414,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 22150,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_bf_vm_sim.c.default.Os",
+      "baseline_master_clocks": 2113600,
+      "runs": {
+        "selection": {
+          "master_clocks": 2113600,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1821,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 2113600,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1821,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 2113810,
+          "delta_clocks": 210,
+          "delta_percent": 0.00993565480695846,
+          "linked_file_bytes": 1827,
+          "linked_delta_bytes": 6,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_rotkal_sim.c.default.Os",
+      "baseline_master_clocks": 885416,
+      "runs": {
+        "selection": {
+          "master_clocks": 885416,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 628,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 885416,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 628,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 885416,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 628,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_dctbloom.c.xy16.Os",
+      "baseline_master_clocks": 22233764,
+      "runs": {
+        "selection": {
+          "master_clocks": 22233764,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17464,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 22233764,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17464,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 22233764,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17464,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_lsystem.c.xy16.Os",
+      "baseline_master_clocks": 228337900,
+      "runs": {
+        "selection": {
+          "master_clocks": 228337900,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17813,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 228337900,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17813,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 228337900,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 17813,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_avalanche.c.a16.Oz",
+      "baseline_master_clocks": 200836312,
+      "runs": {
+        "selection": {
+          "master_clocks": 200836312,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 10813,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 200836312,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 10813,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 200835928,
+          "delta_clocks": -384,
+          "delta_percent": -0.0001912004837012482,
+          "linked_file_bytes": 10796,
+          "linked_delta_bytes": -17,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_dctbloom.c.a16.Oz",
+      "baseline_master_clocks": 18966378,
+      "runs": {
+        "selection": {
+          "master_clocks": 18966378,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15392,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 18966378,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15392,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 18966378,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15392,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_65816_rcundef2.c.xy16.Oz",
+      "baseline_master_clocks": 187648016,
+      "runs": {
+        "selection": {
+          "master_clocks": 187648016,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 2909,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 187648016,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 2909,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 187648016,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 2909,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_lsystem_sim.c.xy16.Oz",
+      "baseline_master_clocks": 189871752,
+      "runs": {
+        "selection": {
+          "master_clocks": 189871752,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3037,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 189871752,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3037,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 189871752,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3037,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_bf_vm_sim.c.default.Oz",
+      "baseline_master_clocks": 2512228,
+      "runs": {
+        "selection": {
+          "master_clocks": 2512228,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1979,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 2512228,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1979,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 2512688,
+          "delta_clocks": 460,
+          "delta_percent": 0.018310439975999238,
+          "linked_file_bytes": 1991,
+          "linked_delta_bytes": 12,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_rotkal_sim.c.default.Oz",
+      "baseline_master_clocks": 942342,
+      "runs": {
+        "selection": {
+          "master_clocks": 942342,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 626,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 942342,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 626,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 942342,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 626,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_seqvm_sim.c.default.Oz",
+      "baseline_master_clocks": 1825012,
+      "runs": {
+        "selection": {
+          "master_clocks": 1825012,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 884,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 1825012,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 884,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 1852006,
+          "delta_clocks": 26994,
+          "delta_percent": 1.4791135619930174,
+          "linked_file_bytes": 892,
+          "linked_delta_bytes": 8,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_avalanche.c.xy16.Oz",
+      "baseline_master_clocks": 200118772,
+      "runs": {
+        "selection": {
+          "master_clocks": 200118772,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 10743,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 200118772,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 10743,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 200118354,
+          "delta_clocks": -418,
+          "delta_percent": -0.00020887595691965188,
+          "linked_file_bytes": 10726,
+          "linked_delta_bytes": -17,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_bf_vm_sim.c.default.O2",
+      "baseline_master_clocks": 2046042,
+      "runs": {
+        "selection": {
+          "master_clocks": 2046042,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1932,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 2046042,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1932,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 2046330,
+          "delta_clocks": 288,
+          "delta_percent": 0.014075957385029092,
+          "linked_file_bytes": 1940,
+          "linked_delta_bytes": 8,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_dctbloom.c.xy16.Oz",
+      "baseline_master_clocks": 19287838,
+      "runs": {
+        "selection": {
+          "master_clocks": 19287838,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15414,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 19287838,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15414,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 19287838,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 15414,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_65816_rcundef2.c.a16.O2",
+      "baseline_master_clocks": 188506796,
+      "runs": {
+        "selection": {
+          "master_clocks": 188506796,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3120,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 188506796,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3120,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 188506796,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3120,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_lsystem_sim.c.a16.O2",
+      "baseline_master_clocks": 189990372,
+      "runs": {
+        "selection": {
+          "master_clocks": 189990372,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3127,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 189990372,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3127,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 189990372,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3127,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_lsystem.c.a16.O2",
+      "baseline_master_clocks": 226838018,
+      "runs": {
+        "selection": {
+          "master_clocks": 226838018,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19544,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 226838018,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19544,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 226838018,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19544,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_65816_rcundef2.c.xy16.O2",
+      "baseline_master_clocks": 188077238,
+      "runs": {
+        "selection": {
+          "master_clocks": 188077238,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3045,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 188077238,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3045,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 188077238,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3045,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_corpus_lsystem_sim.c.xy16.O2",
+      "baseline_master_clocks": 190358744,
+      "runs": {
+        "selection": {
+          "master_clocks": 190358744,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3182,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 190358744,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3182,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 190358744,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 3182,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "examples_snes_lsystem.c.xy16.O2",
+      "baseline_master_clocks": 227632332,
+      "runs": {
+        "selection": {
+          "master_clocks": 227632332,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19549,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 227632332,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19549,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 227632332,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 19549,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "matcascade_sim.default.Os",
+      "baseline_master_clocks": 6015316,
+      "runs": {
+        "selection": {
+          "master_clocks": 5999420,
+          "delta_clocks": -15896,
+          "delta_percent": -0.2642587687828879,
+          "linked_file_bytes": 1918,
+          "linked_delta_bytes": -60,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 6015316,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1978,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 6009404,
+          "delta_clocks": -5912,
+          "delta_percent": -0.09828245099675614,
+          "linked_file_bytes": 1968,
+          "linked_delta_bytes": -10,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "matcascade_sim.default.O2",
+      "baseline_master_clocks": 6015932,
+      "runs": {
+        "selection": {
+          "master_clocks": 5999996,
+          "delta_clocks": -15936,
+          "delta_percent": -0.26489661119839525,
+          "linked_file_bytes": 1921,
+          "linked_delta_bytes": -60,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 6015932,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 1981,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 6009980,
+          "delta_clocks": -5952,
+          "delta_percent": -0.0989372885198847,
+          "linked_file_bytes": 1971,
+          "linked_delta_bytes": -10,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "avalanche.default.Os",
+      "baseline_master_clocks": 194399540,
+      "runs": {
+        "selection": {
+          "master_clocks": 194399540,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 11237,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 194399582,
+          "delta_clocks": 42,
+          "delta_percent": 2.160498939751676e-05,
+          "linked_file_bytes": 11238,
+          "linked_delta_bytes": 1,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 194399542,
+          "delta_clocks": 2,
+          "delta_percent": 1.0288090157573038e-06,
+          "linked_file_bytes": 11236,
+          "linked_delta_bytes": -1,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "matcascade_sim.default.Oz",
+      "baseline_master_clocks": 6032318,
+      "runs": {
+        "selection": {
+          "master_clocks": 6016382,
+          "delta_clocks": -15936,
+          "delta_percent": -0.2641770543263755,
+          "linked_file_bytes": 1952,
+          "linked_delta_bytes": -60,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 6032318,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 2012,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 6026366,
+          "delta_clocks": -5952,
+          "delta_percent": -0.09866853836286715,
+          "linked_file_bytes": 2002,
+          "linked_delta_bytes": -10,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "farblit.xy16.O2",
+      "baseline_master_clocks": 298012,
+      "runs": {
+        "selection": {
+          "master_clocks": 298012,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 200056,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 300516,
+          "delta_clocks": 2504,
+          "delta_percent": 0.8402346214246403,
+          "linked_file_bytes": 200226,
+          "linked_delta_bytes": 170,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 312440,
+          "delta_clocks": 14428,
+          "delta_percent": 4.841415781914815,
+          "linked_file_bytes": 200716,
+          "linked_delta_bytes": 660,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "a16cmpaudit.default.Oz",
+      "baseline_master_clocks": 4356920,
+      "runs": {
+        "selection": {
+          "master_clocks": 4188726,
+          "delta_clocks": -168194,
+          "delta_percent": -3.8603876132680903,
+          "linked_file_bytes": 6794,
+          "linked_delta_bytes": -563,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 4230308,
+          "delta_clocks": -126612,
+          "delta_percent": -2.905997814970207,
+          "linked_file_bytes": 7144,
+          "linked_delta_bytes": -213,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 4320974,
+          "delta_clocks": -35946,
+          "delta_percent": -0.8250323623109956,
+          "linked_file_bytes": 7040,
+          "linked_delta_bytes": -317,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:speed": {
+          "master_clocks": 4320974,
+          "delta_clocks": -35946,
+          "delta_percent": -0.8250323623109956,
+          "linked_file_bytes": 7040,
+          "linked_delta_bytes": -317,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "off": {
+          "master_clocks": 4356920,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 7357,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "name": "avalanche.default.Oz",
+      "baseline_master_clocks": 195115060,
+      "runs": {
+        "selection": {
+          "master_clocks": 195115060,
+          "delta_clocks": 0,
+          "delta_percent": 0.0,
+          "linked_file_bytes": 10533,
+          "linked_delta_bytes": 0,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:pressure-first:auto": {
+          "master_clocks": 195115058,
+          "delta_clocks": -2,
+          "delta_percent": -1.0250362003638713e-06,
+          "linked_file_bytes": 10534,
+          "linked_delta_bytes": 1,
+          "pass": true,
+          "repeat_identical": true
+        },
+        "gated:weighted:size": {
+          "master_clocks": 195115342,
+          "delta_clocks": 282,
+          "delta_percent": 0.00014453010444004377,
+          "linked_file_bytes": 10530,
+          "linked_delta_bytes": -3,
+          "pass": true,
+          "repeat_identical": true
+        }
+      }
+    }
+  ],
+  "conditional_runtime": [
+    {
+      "name": "sum-a16",
+      "master_clocks": 74264,
+      "baseline_master_clocks": 106784
+    },
+    {
+      "name": "sum-xy16",
+      "master_clocks": 74264,
+      "baseline_master_clocks": 106784
+    },
+    {
+      "name": "rot-xy16",
+      "master_clocks": 91608,
+      "baseline_master_clocks": 111192
+    },
+    {
+      "name": "rot-a16",
+      "master_clocks": 91608,
+      "baseline_master_clocks": 111192
+    },
+    {
+      "name": "farblit.xy16.O2",
+      "master_clocks": 316900,
+      "baseline_master_clocks": 298012
+    }
+  ],
+  "runtime_summary": {
+    "configurations": 41,
+    "executions": 260,
+    "selected_slower": 0,
+    "selected_linked_growth": 0,
+    "all_oracles_and_repeats_pass": true
+  },
+  "compile_time": {
+    "compiler_sha256": "6e004a8a8c9b095013d1e6e786822e9d930b20691749413a3a2ca312d5bb1fd5",
+    "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "cpu": "\t: 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+    "method": "Sequential process launches after compiler/runtime probes finish. One warmup plus seven measured rounds; arm order rotates by input and round. Selection includes Python startup, identity hashing, multiple complete frontend/backend compilations, section queries and report output. Shared host; no claim about integrated LLVM overhead.",
+    "cases": [
+      {
+        "source": "examples/65816/farblit.c",
+        "mode": "xy16",
+        "optimization": "O2",
+        "off": {
+          "wall_seconds": {
+            "median": 0.1666438690153882,
+            "min": 0.15571560797980055,
+            "max": 0.20971886801999062
+          },
+          "cpu_seconds": {
+            "median": 0.16612199999999966,
+            "min": 0.15523800000000065,
+            "max": 0.20910300000000026
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.1846184090245515,
+            "min": 0.1577961390139535,
+            "max": 0.2521407559979707
+          },
+          "cpu_seconds": {
+            "median": 0.18410400000000182,
+            "min": 0.15688200000000663,
+            "max": 0.24674499999999888
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 0.8369106560130604,
+            "min": 0.7907693869783543,
+            "max": 0.8719234300078824
+          },
+          "cpu_seconds": {
+            "median": 0.8311279999999996,
+            "min": 0.7892490000000159,
+            "max": 0.868139999999995
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 0.874766353983432,
+            "min": 0.7843304179841653,
+            "max": 1.1204848500201479
+          },
+          "cpu_seconds": {
+            "median": 0.8408849999999966,
+            "min": 0.7754250000000091,
+            "max": 1.0902149999999882
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 0.9769013919867575,
+            "min": 0.9399208030081354,
+            "max": 1.2284447649726644
+          },
+          "cpu_seconds": {
+            "median": 0.968295999999981,
+            "min": 0.9357749999999889,
+            "max": 1.208781999999994
+          }
+        }
+      },
+      {
+        "source": "examples/65816/rcundef2.c",
+        "mode": "xy16",
+        "optimization": "Os",
+        "off": {
+          "wall_seconds": {
+            "median": 0.20403321902267635,
+            "min": 0.18262775300536305,
+            "max": 0.28202039300231263
+          },
+          "cpu_seconds": {
+            "median": 0.2015849999999979,
+            "min": 0.1821429999999964,
+            "max": 0.27371600000000207
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.21309025801019743,
+            "min": 0.19401103700511158,
+            "max": 0.2972929159877822
+          },
+          "cpu_seconds": {
+            "median": 0.21265599999999552,
+            "min": 0.19350500000000004,
+            "max": 0.29546600000000467
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 0.8955171990091912,
+            "min": 0.8519727849634364,
+            "max": 1.1642512449761853
+          },
+          "cpu_seconds": {
+            "median": 0.8947869999999973,
+            "min": 0.846602000000015,
+            "max": 1.1523379999999896
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 0.8931257739895955,
+            "min": 0.8077483989764005,
+            "max": 1.1481211879872717
+          },
+          "cpu_seconds": {
+            "median": 0.8873759999999988,
+            "min": 0.8062970000000043,
+            "max": 1.1331390000000106
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 1.0247194549883716,
+            "min": 0.9909192430204712,
+            "max": 1.458201601053588
+          },
+          "cpu_seconds": {
+            "median": 1.020970000000009,
+            "min": 0.9891869999999958,
+            "max": 1.4151550000000057
+          }
+        }
+      },
+      {
+        "source": "examples/snes/corpus/lsystem_sim.c",
+        "mode": "xy16",
+        "optimization": "Oz",
+        "off": {
+          "wall_seconds": {
+            "median": 0.20010542101226747,
+            "min": 0.1926506960298866,
+            "max": 0.2512690080329776
+          },
+          "cpu_seconds": {
+            "median": 0.19960599999999218,
+            "min": 0.19087700000000574,
+            "max": 0.25060700000000935
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.2497983499779366,
+            "min": 0.19550922798225656,
+            "max": 0.27362167299725115
+          },
+          "cpu_seconds": {
+            "median": 0.23043900000002182,
+            "min": 0.19318699999998756,
+            "max": 0.26790399999998726
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 0.9585856270277873,
+            "min": 0.8400441649719141,
+            "max": 1.1078009370248765
+          },
+          "cpu_seconds": {
+            "median": 0.9459909999999985,
+            "min": 0.8342250000000142,
+            "max": 1.1059840000000065
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 0.8613339809817262,
+            "min": 0.8235826839809306,
+            "max": 1.057683836959768
+          },
+          "cpu_seconds": {
+            "median": 0.8609100000000023,
+            "min": 0.8195400000000141,
+            "max": 1.0498110000000072
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 1.0785917100147344,
+            "min": 1.0344619660172611,
+            "max": 1.2961714750272222
+          },
+          "cpu_seconds": {
+            "median": 1.0706199999999875,
+            "min": 1.0182250000000046,
+            "max": 1.2916130000000088
+          }
+        }
+      },
+      {
+        "source": "examples/snes/dctbloom.c",
+        "mode": "a16",
+        "optimization": "Os",
+        "off": {
+          "wall_seconds": {
+            "median": 0.9006420269724913,
+            "min": 0.8273641839623451,
+            "max": 1.135275994951371
+          },
+          "cpu_seconds": {
+            "median": 0.8933960000000063,
+            "min": 0.8194730000000021,
+            "max": 1.1205460000000116
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.9337707149679773,
+            "min": 0.8327432969817892,
+            "max": 0.9765190659672953
+          },
+          "cpu_seconds": {
+            "median": 0.9220169999999959,
+            "min": 0.8287709999999961,
+            "max": 0.9603120000000018
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 2.2879921380081214,
+            "min": 2.1820387950283475,
+            "max": 2.9706648720311932
+          },
+          "cpu_seconds": {
+            "median": 2.265885999999991,
+            "min": 2.171562999999992,
+            "max": 2.958842999999991
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 2.2214395200135186,
+            "min": 2.137717553996481,
+            "max": 2.566771754005458
+          },
+          "cpu_seconds": {
+            "median": 2.215116000000009,
+            "min": 2.1286609999999726,
+            "max": 2.5542060000000024
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 3.061944590008352,
+            "min": 2.9630284100421704,
+            "max": 3.4530884260311723
+          },
+          "cpu_seconds": {
+            "median": 3.0416730000000207,
+            "min": 2.9600730000000084,
+            "max": 3.441781000000006
+          }
+        }
+      },
+      {
+        "source": "examples/snes/avalanche.c",
+        "mode": "default",
+        "optimization": "Os",
+        "off": {
+          "wall_seconds": {
+            "median": 0.4988447689684108,
+            "min": 0.4610139839933254,
+            "max": 0.5874062799848616
+          },
+          "cpu_seconds": {
+            "median": 0.4875099999999968,
+            "min": 0.4604110000000041,
+            "max": 0.5851370000000031
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.49099291500169784,
+            "min": 0.43772509100381285,
+            "max": 0.5181741559645161
+          },
+          "cpu_seconds": {
+            "median": 0.49038600000000443,
+            "min": 0.43716199999999716,
+            "max": 0.5175270000000118
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 1.4318100849632174,
+            "min": 1.3643055239808746,
+            "max": 1.641729754046537
+          },
+          "cpu_seconds": {
+            "median": 1.4233440000000028,
+            "min": 1.3488410000000037,
+            "max": 1.6395479999999978
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 1.4530802390072495,
+            "min": 1.341747070022393,
+            "max": 1.6533932820311747
+          },
+          "cpu_seconds": {
+            "median": 1.4442750000000064,
+            "min": 1.340554000000001,
+            "max": 1.6329870000000088
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 1.9613156939740293,
+            "min": 1.840504851017613,
+            "max": 2.159083407954313
+          },
+          "cpu_seconds": {
+            "median": 1.9491660000000195,
+            "min": 1.8317700000000166,
+            "max": 2.1491389999999964
+          }
+        }
+      },
+      {
+        "source": "examples/snes/corpus/arith.c",
+        "mode": "default",
+        "optimization": "Os",
+        "off": {
+          "wall_seconds": {
+            "median": 0.043872421025298536,
+            "min": 0.0428207180229947,
+            "max": 0.05088544200407341
+          },
+          "cpu_seconds": {
+            "median": 0.043133000000006305,
+            "min": 0.04229899999999276,
+            "max": 0.050086999999995996
+          }
+        },
+        "always": {
+          "wall_seconds": {
+            "median": 0.04417802399257198,
+            "min": 0.041866088984534144,
+            "max": 0.0533433350501582
+          },
+          "cpu_seconds": {
+            "median": 0.042657000000005496,
+            "min": 0.041113999999986106,
+            "max": 0.046841000000025446
+          }
+        },
+        "select-always": {
+          "wall_seconds": {
+            "median": 0.5635968379792757,
+            "min": 0.5262546360027045,
+            "max": 0.6040692550013773
+          },
+          "cpu_seconds": {
+            "median": 0.5533770000000047,
+            "min": 0.5241180000000014,
+            "max": 0.5938329999999956
+          }
+        },
+        "select-gated": {
+          "wall_seconds": {
+            "median": 0.5668857750133611,
+            "min": 0.5319901740294881,
+            "max": 0.6134637540089898
+          },
+          "cpu_seconds": {
+            "median": 0.5562880000000199,
+            "min": 0.5299979999999778,
+            "max": 0.6030729999999966
+          }
+        },
+        "select-three": {
+          "wall_seconds": {
+            "median": 0.620789009029977,
+            "min": 0.5809912660042755,
+            "max": 0.6968903730157763
+          },
+          "cpu_seconds": {
+            "median": 0.6122220000000134,
+            "min": 0.5810999999999993,
+            "max": 0.6909249999999947
+          }
+        }
+      }
+    ]
+  },
+  "compile_time_sum_of_medians": {
+    "off": {
+      "wall_seconds": 2.0141417260165326,
+      "cpu_seconds": 1.9913519999999991
+    },
+    "always": {
+      "wall_seconds": 2.1164486709749326,
+      "cpu_seconds": 2.082259000000025
+    },
+    "select-always": {
+      "wall_seconds": 6.974412543000653,
+      "cpu_seconds": 6.914512999999994
+    },
+    "select-gated": {
+      "wall_seconds": 6.870631642988883,
+      "cpu_seconds": 6.804850000000033
+    },
+    "select-three": {
+      "wall_seconds": 8.724261850002222,
+      "cpu_seconds": 8.662947000000031
+    }
+  },
+  "compiler_subprocess_sum_of_wall_medians": {
+    "select-always": 4.130805129010696,
+    "select-gated": 4.003028763982002,
+    "select-three": 5.891949926153757
+  },
+  "compile_wall_ratio_to_always": {
+    "off": 0.9516610318211626,
+    "always": 1.0,
+    "select-always": 3.2953374389126675,
+    "select-gated": 3.246302042290474,
+    "select-three": 4.12212304963835
+  },
+  "input_sha256": {
+    "screen-summary.json": "120293ada71931ad2427a395999dfcd4b9bdfb5a0b083b50bb47ca2fea8945a2",
+    "tradeoff-summary.json": "12185d283136320da889522dbbd0c93e8975cc3a5b5a0e046b18ee18903b40a5",
+    "selection-summary.json": "28a0e80761da4f08f12a5e18378c2f36b45af622d2af71e524e2c591f89e1002",
+    "timing.json.gz": "aeab84102a7764830400a5c3662c0d9cce5834e1d36f00b5fdf4e933ea3912e0",
+    "tradeoff-timing.json.gz": "192701669e5515c553af31673b0adaabccf2e4e077bbc0e2d710a7622cbf8ec1",
+    "linked-baselines.json": "f6e3bb02713f6fcf57d406826bc86c840910ed1115b792e7beebfa55163186b0",
+    "compile-time.json": "6b9288f41817cacfa2d6af6bd47ef7089f2818e0a711351f5e3b6320286b5adb",
+    "compile-time-details.json.gz": "5f3634038c187d29ef05b99755245b8e3ee05c468a0559dcc890fbd42b9600f5"
+  }
+}

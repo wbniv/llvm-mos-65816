@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "1e24c62111adaaf4cdb08ac451c5b785164f8b7f16bb69cc11dec5bb7b4257a4",
+  "sourceHash": "d7a19485fce2bec0e9623f88d2239d3de324328648a4b37e55492146eac19b71",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -79,7 +79,7 @@
       "id": "defect:mos-carry-scheduling-pressure",
       "kind": "defect",
       "title": "Fine-grained carry pressure is lost before register pressure set pruning",
-      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met. Patch 0067 compares always and gated policies: aggregate savings versus off are 213866 B and 199309 B, with 39 and six growing objects. The gate recovers the 32 original growth cases. The LLVM-facing report presents these trade-offs and selection options without an upstream default decision; the current downstream compiler defaults to always.",
+      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met. Patch 0067 compares always and gated policies: aggregate savings versus off are 213866 B and 199309 B, with 39 and six growing objects. The gate recovers the 32 original growth cases. The LLVM-facing report presents these trade-offs and selection options without an upstream default decision; the current downstream compiler defaults to always. A subsequent profitability screen tests three pressure-cost models: all give up aggregate savings and increase total positive growth. Complete-object selection is implemented and measured; including gated among off/always alternatives gains 220 B in 55 configurations. A writable-storage cap selects 211974 B of savings, with no selected file/writable-section growth in the frozen census; object selection does not imply per-function or universal speed improvement.",
       "localStatus": "qualified",
       "publicationStatus": "unposted",
       "nextStep": "PR #609 remains withdrawn. The LLVM-facing investigation presents carry-policy measurements and implementation options without selecting a default. Evaluate completed-output size selection and narrower gating, with compile-time and timing coverage. The downstream compiler currently defaults to always; the generic pressure contract and baseline runtime observations remain open.",
@@ -437,10 +437,10 @@
       "id": "opt:carry-scheduler",
       "kind": "optimization",
       "title": "0064 computed-carry scheduling",
-      "summary": "PR #609 remains withdrawn; the retained upstream extraction has its own validation. The downstream investigation measures 213866 versus 199309 bytes of aggregate savings and 39 versus 6 growing objects for always versus gated. A16 and ordinary-6502 subsets show no function growth in this sample. Size-based selection and narrower gating are proposed experiments; no upstream default decision is made. Author review only.",
+      "summary": "PR #609 remains withdrawn; the retained upstream extraction has its own validation. The downstream report compares always and gated without selecting a default. Three new pressure-cost models lose aggregate savings and increase total positive growth on the screen. A complete-object selector is implemented and measured: including gated among off/always alternatives adds 220 bytes of savings. Object selection does not guarantee per-function or universal speed improvement. Author review only.",
       "localStatus": "needs-work",
       "publicationStatus": "posted",
-      "nextStep": "Review the LLVM-facing investigation and its size/time trade-offs. Prototype completed-output selection for Os/Oz and test the narrower subsets on additional inputs and the intended upstream revision. The current downstream default remains always; PR #609 remains withdrawn.",
+      "nextStep": "Review the measured selector and its compilation cost. Use completed-output choices to evaluate a cheaper predictor on unseen inputs, and investigate shared frontend work with module-wide allocation preserved. Current default remains always; no upstream default decision or new submission.",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/pull/609",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-competing-carry-gate.md",
@@ -452,7 +452,7 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-review.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-validation.md"
       ],
-      "evidenceNote": "",
+      "evidenceNote": "Detailed evidence awaits publication.",
       "dependsOn": [],
       "demoUrls": []
     },

@@ -1,0 +1,22 @@
+{
+  "date": "2026-09-27",
+  "canonical_record": "docs/defects/mos-carry-scheduling-pressure.json",
+  "base_revision": "b65bb853",
+  "reviewed": [
+    "docs/plans/2026-09-26-mos-carry-scheduling.md",
+    "docs/plans/2026-09-27-0064-competing-carry-gate.md",
+    "docs/investigations/2026-09-27-competing-carry-gate.md",
+    "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+    "patches/llvm-mos/0067-mos-competing-carry-gate.patch",
+    "vendor/llvm-mos/llvm/lib/Target/MOS/MOSMachineScheduler.cpp",
+    "vendor/llvm-mos/llvm/lib/Target/MOS/MOSInstrCost.cpp"
+  ],
+  "findings": [
+    "Physical-register-first was already tried and had no effect; the new priority trial also compares generic virtual pressure.",
+    "Earlier gate eligibility trials trade recovered savings for restored growth.",
+    "MOSInstrCost already chooses bytes/average/cycles from function attributes.",
+    "The generic fine-grained pressure contract is still unresolved; no new causal defect or default decision is claimed."
+  ],
+  "control": "Preserved final 0067 tools; hashes and original census remain immutable. Corrected experimental compiler reproduces 139 always and 139 gated disassemblies.",
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+}

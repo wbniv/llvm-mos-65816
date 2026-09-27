@@ -8,6 +8,8 @@ Across 3,592 successful three-policy comparisons, the original carry preference 
 
 These results describe a trade-off for review. They do not select or reject an upstream default. The local experiment plan used a 5% limit on lost aggregate savings; that was a project-specific evaluation threshold, not an LLVM acceptance criterion. The current downstream compiler exposes `off`, `always` and `gated`, with `always` as its existing default.
 
+**Profitability follow-up:** [Objective switches, three pressure-model trials and a working object selector](2026-09-27-carry-profitability-model.md). MOS already has size/speed cost objectives. The tested pressure models lose aggregate savings and increase total positive growth in the screen. Complete-object selection is now implemented: file-byte selection saves 214,344 B, or 211,974 B with writable storage capped at `off`. Adding the gate to `off`/`always` gains 220 B in 55 configurations. The follow-up records fresh execution and compilation-cost measurements and retains the limits of object-level selection.
+
 ## Motivation and policies
 
 The underlying [pressure-set investigation](../defects/mos-carry-scheduling-pressure.json) found that the retained TableGen implementation reads `IsPressureFineGrained` but does not propagate it to initial register-unit pressure sets. The experiments here use a MOS scheduler workaround that counts carry values directly. They do not establish a generic pressure-contract repair or its suitability for other targets.
@@ -150,9 +152,9 @@ Recalculating the retained object sizes gives the following potential selections
 | `off`, `always` | 214,124 B | 0 |
 | `off`, `always`, `gated` | 214,344 B | 0 |
 
-These are arithmetic minima of existing outputs, not results from an implemented selector or a newly linked program. Taking the smaller function independently gives hypothetical sums of 214,323 B and 214,446 B, respectively. Those function totals do not account for recomputing shared allocation and layout. The [analysis script](../../dev/summarize-carry-selection.py) makes these distinctions explicit.
+At the initial selection-options stage, these were arithmetic minima of existing outputs. The [subsequent prototype](2026-09-27-carry-profitability-model.md#a-working-completed-object-selector) implements whole-object selection, confirms these file-byte minima, examines writable storage, and links a measured subset. Taking the smaller function independently gives hypothetical sums of 214,323 B and 214,446 B, respectively. Those function totals do not account for recomputing shared allocation and layout. The [analysis script](../../dev/summarize-carry-selection.py) makes these distinctions explicit.
 
-Generating alternatives adds compilation work. Sharing frontend and early backend work might reduce that cost; selecting only functions with eligible carry competition might reduce it further. Neither approach nor its overhead has been measured. The earlier local plan's estimate of roughly doubled backend time and categorical statement about upstream suitability were not established by an implementation. A size guarantee would also not establish a speed guarantee: fewer bytes can execute more slowly.
+Generating alternatives adds compilation work. Sharing frontend and early backend work might reduce that cost; selecting only functions with eligible carry competition might reduce it further. Sharing frontend or early backend work remains unimplemented. The [subsequent prototype](2026-09-27-carry-profitability-model.md#compilation-cost) measures complete alternative compilations, including driver and evidence-recording overhead; it does not estimate the cost of an integrated LLVM implementation. The earlier local plan's estimate of roughly doubled backend time and categorical statement about upstream suitability were not established by an implementation. A size guarantee would also not establish a speed guarantee: fewer bytes can execute more slowly.
 
 ### Restrict the heuristic to a narrower subset
 
@@ -164,7 +166,7 @@ Another possibility is a structural restriction: only change schedules when carr
 
 The evidence supports two conclusions: directly accounting for computed carries can remove substantial avoidable costs, and carry competition or fewer materializations alone does not guarantee a profitable final schedule. The measurements do not determine the best default across targets, optimization levels and workloads.
 
-**Recommendation for discussion:** prototype comparison of completed alternatives for `-Os`/`-Oz`, beginning at compilation-unit granularity so that the size decision includes downstream allocation costs. Measure compilation overhead and final linked size before considering finer-grained integration. In parallel, test the A16/ordinary-6502 restriction on additional inputs as a lower-cost alternative. This recommends experiments, not adoption of a particular default or a conclusion about upstream acceptability.
+**Recommendation for discussion:** use the [completed-object prototype and its measured choices](2026-09-27-carry-profitability-model.md) to evaluate a cheaper predictor and a design that shares frontend work while preserving module-wide allocation state. The tested generic-pressure estimates lose useful carry savings. Broader mode-restricted testing and final-link comparisons remain useful experiments. These recommendations do not select a default or determine upstream acceptability.
 
 Useful review questions are where such a comparison should live in the backend, what shared state it must preserve, whether a cheaper predictor can reproduce most of the measured selections, and how size and execution time should be weighted for each optimization level. The preserved inputs and three-policy controls allow those questions to be tested against the same evidence.
 

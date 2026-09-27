@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/b65bb853) | docs: present carry scheduling as an LLVM investigation |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/c3c1967c) | mos: add and measure experimental competing-carry gate |
 
 <!--history-meta v1
+b65bb853	author	Will Norris
+b65bb853	added	152
+b65bb853	deleted	213
+b65bb853	files	1
+b65bb853	body	Present the measured saving and individual-growth trade-offs without\nselecting or rejecting an upstream default. Identify the 5% threshold as\nhistorical local planning and preserve the initial assessment and frozen\nmeasurements. The current compiler default remains documented as an\nimplementation fact.\n\nAdd completed-output selection at compilation-unit and function granularity,\nshared zero-page allocation constraints, linked-size verification, and a\nnarrower A16/ordinary-6502 gate as implementation options. Recommend further\nexperiments, with compilation cost and upstream suitability left open.\n\nDerive mode subsets and hypothetical selection totals reproducibly from the\nretained census. A16 and ordinary-6502 samples have no growing functions;\nwhole-object minima would save 214124 bytes with off/always and 214344 bytes\nwith all three policies. Qualify these calculations as unimplemented\nselections and disclose function growth hidden by object-level savings.\n\nUpdate the canonical record, current summaries and generated views. Preserve\nthe withdrawn PR body, baseline artifacts and previous contributors' credits.\n\nValidation: derived totals agree with the retained census summaries; local\nreport links and paragraph formatting pass; comment, structured evidence,\ndocument dependency and repository pre-commit checks pass. No compiler or\nruntime behavior changes and no new upstream submission.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
 c3c1967c	author	Will Norris
 c3c1967c	added	246
 c3c1967c	deleted	0
