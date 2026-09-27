@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "4b96980283981226b9b4818cd334bfe8af3a119331c770baf80cbbca893f624f",
+  "sourceHash": "1adbf130b75c8fa74e77db1b960e04b0244241a560af11c284c93bd38da70745",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -79,10 +79,10 @@
       "id": "defect:mos-carry-scheduling-pressure",
       "kind": "defect",
       "title": "Fine-grained carry pressure is lost before register pressure set pruning",
-      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation.",
+      "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met.",
       "localStatus": "qualified",
       "publicationStatus": "unposted",
-      "nextStep": "Scheduler workaround PR #609 was withdrawn at the user's request; its branch and validation on 7bd67c0ae4e8 are retained. The generic TableGen pressure contract remains open; cycles and compile time remain unmeasured.",
+      "nextStep": "Scheduler workaround PR #609 was withdrawn at the user's request; its branch and validation on 7bd67c0ae4e8 are retained. The generic TableGen pressure contract remains open; preserved downstream timings show sum/rotate gains but a 2.80% L-system interpreter regression. Resolve measured costs; compiler time remains unmeasured.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-carry-scheduling-pressure.json"
       ],
@@ -130,10 +130,10 @@
       "id": "defect:mos-farblit-byte-load-legalization",
       "kind": "defect",
       "title": "Combined native-width stack rejects a farblit absolute byte load",
-      "summary": "The preserved carry-scheduling baseline and all scheduling candidates reject farblit.c during legalization of an s8 G_LOAD_FAR_ABS at address 8355871. This blocks the farblit runtime gate before scheduling and is not introduced by the carry preference.",
-      "localStatus": "qualified",
+      "summary": "Patch 0066 repairs the farblit byte-load legalization failure: 0061 eagerly selects an extending far byte load after queuing its generic G_LOAD, and the in-place absolute rewrite leaves that target pseudo on the generic worklist. Build-and-erase removes the queued instruction. The unchanged historical source fails on the preserved baseline and passes with the repair; eight farblit/pressure emulator runs pass.",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
-      "nextStep": "Isolate the combined-stack legalization failure on the preserved pre-0064 baseline; causal patch interaction is unconfirmed.",
+      "nextStep": "0066 repairs the retained legalization failure. Reconcile the separate farblit opcode-count gate; retain this repair with the far-address/native-width series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-farblit-byte-load-legalization.json"
       ],
@@ -437,12 +437,13 @@
       "id": "opt:carry-scheduler",
       "kind": "optimization",
       "title": "0064 computed-carry scheduling",
-      "summary": "PR #609 withdrawn at the user's request; retained validation on 7bd67c0ae4e8: targeted 6502 kernel 133 to 59 bytes, 132 MOS tests and 512 oracle vectors pass; 117 C-to-object pairs with rebuilt upstream Clang across three CPUs are identical excluding compiler-version metadata. Downstream 1–41 byte losses retained. Author review only.",
-      "localStatus": "ready",
+      "summary": "PR #609 withdrawn at the user's request; retained validation on 7bd67c0ae4e8: targeted 6502 kernel 133 to 59 bytes, 132 MOS tests and 512 oracle vectors pass; 117 C-to-object pairs with rebuilt upstream Clang across three CPUs are identical excluding compiler-version metadata. Downstream 1–41 byte losses retained. Timing confirms sum/rotate gains but a 2.80% L-system interpreter regression; the zero-cycle-regression criterion is not met. Author review only.",
+      "localStatus": "needs-work",
       "publicationStatus": "posted",
-      "nextStep": "PR #609 is withdrawn at the user's request; retain the branch for later revision. Validated on 7bd67c0ae4e8; destination rechecked at 26d7c2c1eebf without a new-base rebuild. Author review only; cycles and compile time are unmeasured.",
+      "nextStep": "PR #609 is withdrawn at the user's request; retain the branch for later revision. Validated on 7bd67c0ae4e8; destination rechecked at 26d7c2c1eebf without a new-base rebuild. Author review only. Downstream timing shows sum/rotate gains but a 2.80% L-system interpreter regression; the zero-cycle-regression criterion is not met. Compiler time remains unmeasured.",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/pull/609",
       "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-mos-carry-timing.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-26-mos-carry-scheduling.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-carry-scheduling-pressure.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",

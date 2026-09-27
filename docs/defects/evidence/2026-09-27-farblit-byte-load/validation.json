@@ -1,0 +1,76 @@
+{
+  "signed_mir_runs": [
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "docs/defects/evidence/2026-09-27-farblit-byte-load/read_sext.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/farblit-t4/sext-baseline.mir"
+      ],
+      "exit_code": 1,
+      "log": "docs/defects/evidence/2026-09-27-farblit-byte-load/sext-direct-baseline.log",
+      "sha256": "a9fbc10c56ffb879138e8c9420d750ed80e091ff8a9e080b019f60879dc3ca9d"
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+        "-mtriple=mos",
+        "-mcpu=mosw65816",
+        "-mattr=+mos-a16",
+        "-run-pass=legalizer",
+        "-verify-machineinstrs",
+        "docs/defects/evidence/2026-09-27-farblit-byte-load/read_sext.mir",
+        "-o",
+        "/home/will/llvm-mos-65816/.scratch/farblit-t4/sext-candidate.mir"
+      ],
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-27-farblit-byte-load/sext-direct-candidate.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "mc_suite": {
+    "command": "dev/container.sh -v /home/will/llvm-mos-65816/.scratch/farblit-t4/build:/work/build/llvm-mos -- /work/build/llvm-mos/bin/llvm-lit -s /work/vendor/llvm-mos/llvm/test/MC/MOS",
+    "exit_code": 0,
+    "result": "Total Discovered Tests: 52; Passed: 52 (100.00%)"
+  },
+  "ablation_object_comparison": [
+    {
+      "input": "original",
+      "ablation_object": ".scratch/farblit-t4/ablation-original.o",
+      "candidate_object": ".scratch/farblit-t4/candidate-original.o",
+      "ablation_sha256": "f6d4e9d8fcc59c18176c8e4095b369081614cff3867224ac6be06f614397654c",
+      "candidate_sha256": "f6d4e9d8fcc59c18176c8e4095b369081614cff3867224ac6be06f614397654c",
+      "identical": true
+    },
+    {
+      "input": "zext",
+      "ablation_object": ".scratch/farblit-t4/ablation-zext.o",
+      "candidate_object": ".scratch/farblit-t4/candidate-zext.o",
+      "ablation_sha256": "f4106fb36c0db4dc03fa8e63edefa4c20e7dbb9f4894863d0610712f489b5a30",
+      "candidate_sha256": "f4106fb36c0db4dc03fa8e63edefa4c20e7dbb9f4894863d0610712f489b5a30",
+      "identical": true
+    },
+    {
+      "input": "sext",
+      "ablation_object": ".scratch/farblit-t4/ablation-sext.o",
+      "candidate_object": ".scratch/farblit-t4/candidate-sext.o",
+      "ablation_sha256": "91f3d5ae90e63458e1f117ae5685b443c61cb8b06335132df643a851f6df7c87",
+      "candidate_sha256": "91f3d5ae90e63458e1f117ae5685b443c61cb8b06335132df643a851f6df7c87",
+      "identical": true
+    },
+    {
+      "input": "byte",
+      "ablation_object": ".scratch/farblit-t4/ablation-byte.o",
+      "candidate_object": ".scratch/farblit-t4/candidate-byte.o",
+      "ablation_sha256": "1ba63071c01d4855ae22081dfab4bf410e19791404414c21acbfd428b1cb60cd",
+      "candidate_sha256": "1ba63071c01d4855ae22081dfab4bf410e19791404414c21acbfd428b1cb60cd",
+      "identical": true
+    }
+  ],
+  "mir_storage": "Raw captured MIR files with whitespace-only lines are stored as lossless .mir.gz files. Decompress to the recorded .mir input path to replay the signed-MIR commands; generated output hashes in runs.json identify their compressed storage."
+}

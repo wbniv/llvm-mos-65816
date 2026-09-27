@@ -1,5 +1,9 @@
 # 0064: destination review and profitability assessment
 
+**Downstream timing follow-up (2026-09-27):** [Execution measurements](../../investigations/2026-09-27-mos-carry-timing.md) establish sum/rotate gains and a 2.80% XY16 Oz L-system interpreter regression. The original zero-cycle-regression criterion is not met. These results use the preserved downstream 0064 stack; the exact upstream extraction reviewed below was not timed. The posted body and dated review evidence remain unchanged. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+
+**Farblit follow-up (2026-09-27):** [0066 repairs the separate extending-byte legalization failure](../../investigations/2026-09-27-farblit-byte-load.md). The carry-pressure record remains a workaround; the all-XY16 driver diagnosis and farblit opcode-count checks retain their own scopes. The review below describes its dated compiler and publication state. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+
 **Current publication status (2026-09-27):** PR #609 was withdrawn at the user's request; its branch and the review evidence below are retained. See the [withdrawal record](0064-submission.json). Status update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
 Author review by OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`,

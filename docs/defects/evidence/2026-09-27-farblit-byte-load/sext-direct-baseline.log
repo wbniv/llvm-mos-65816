@@ -1,0 +1,1 @@
+LLVM ERROR: unable to legalize instruction: %6:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !6, addrspace 2) (in function: read_sext)

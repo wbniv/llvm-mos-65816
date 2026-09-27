@@ -1,0 +1,32 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96",
+  "date": "2026-09-27",
+  "units": "SNES master clocks, including bus wait states, DRAM refresh and DMA/interrupt time inside the measured region",
+  "pairs": 34,
+  "repeated_runs": 136,
+  "interpreter_runs": 4,
+  "calibration": "64 SlowROM NOPs + native RTS = 896 + 42 master clocks, plus one 40-clock DRAM refresh: measured 978. Every NOP executes once and takes 14 clocks, except the refresh-overlapping NOP at 54. RTS takes 42. Profile sum equals interval total.",
+  "retained_object_checks": "All 60 growing-configuration object disassemblies match their immutable September 26 archive. Original ROMs match the hashes in the immutable original-functions-runtime-results.json; its copy in the preserved worktree is byte-identical.",
+  "probe_rebuild_identical": true,
+  "interpretation": "Original sum and rotate execute faster. Measured regressions invalidate the original zero-cycle-regression acceptance criterion; no universal speed improvement is claimed.",
+  "exclusions": [
+    "Two ordinary 6502 adapted rotkal configurations need a 6502 execution harness.",
+    "Compile-time overhead is outside this execution-time measurement.",
+    "The withdrawn upstream extraction and current combined compiler were not timed."
+  ],
+  "artifacts": {
+    "commands.json": "9522fadfd61e1b6c37de8ac0efed2e59f0d1dabf54853bfe0f84021aed2c0576",
+    "emulator-identity.json": "9d74bf492f4513aaa81b7699fb91d38001547d594d32b8ace9872ff2e780fee2",
+    "identity.json": "9128c332631444a1b40f46cd6bb73d11ccda3103c153ecbe7a5ed6c020b7332b",
+    "interpreter-baseline-0.json": "a40a0845d717c87a0c240d20c26d44343eacf9381bc4e0ed96cc8c996bb73ab8",
+    "interpreter-baseline-1.json": "a40a0845d717c87a0c240d20c26d44343eacf9381bc4e0ed96cc8c996bb73ab8",
+    "interpreter-candidate-0.json": "bce7d381508d87c6ba3fa7e35902bbc932f275f8089f9596eb786216536b0b19",
+    "interpreter-candidate-1.json": "bce7d381508d87c6ba3fa7e35902bbc932f275f8089f9596eb786216536b0b19",
+    "interpreter-results.json": "8a37cc4d8c4d64c56f43e6465732ba538717bbeee38ec5eab0c7e5db9ea6dbdd",
+    "measure-interpreter.py.txt": "829ca4306de42b54592b0bec12b1b52599711dffed75ad22f058b1215388df0c",
+    "results.json": "d4716cbbbdb98edda548b1d7b0a5f3a7e17c28bfecbbc89091cd7b5b4a315280",
+    "timing-runs.tar.gz": "0040ccc3313ea1ed517fddd4fc498a06b2d19fda54df2d68896703163b22d958",
+    "bsnes-timing-hooks.diff.txt.gz": "d2042ff472877427bb69eb269d06a0ac8f9c50f7428ff570304d66511908aa20"
+  },
+  "raw_format": "The emulator patch is gzip-compressed to preserve blank context lines losslessly without whitespace-check noise."
+}

@@ -1,0 +1,22 @@
+{
+  "command": [
+    "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+    "--target=mos",
+    "-mcpu=mosw65816",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-a16",
+    "-Os",
+    "-mllvm",
+    "-verify-machineinstrs",
+    "-c",
+    "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+    "-o",
+    ".scratch/farblit-t4/installed.o"
+  ],
+  "exit_code": 0,
+  "sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+  "candidate_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+  "log": ""
+}

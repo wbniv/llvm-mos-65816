@@ -1,0 +1,337 @@
+[
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/baseline-a16-Os.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-a16-Os.log",
+      "sha256": "7d3197b6d70993af60a84fcda2c671cdafb1e80a1be71f28c4db34ca9ee1f0e7"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction:"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/baseline-a16-O2.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "O2",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-a16-O2.log",
+      "sha256": "2b646c00fb5cdf5e64c1879afe934a2ad1e284b8532c2e28fac98d1d83fa01b2"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction:"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -Xclang -target-feature -Xclang +mos-xy16 -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/baseline-xy16-Os.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-xy16-Os.log",
+      "sha256": "3157a93b12f368bbfc57580f2cfd6a3dd4fb67eb9a4b9c08c63e1f79f19125fc"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction:"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -mllvm -verify-machineinstrs -Xclang -target-feature -Xclang +mos-xy16 -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/baseline-xy16-O2.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "O2",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install",
+    "toolchain_sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-xy16-O2.log",
+      "sha256": "2f078df2b9fe4fbeb6d3039b2a84fbfca8ac0d30dca9de5ed7dcfb541313aa56"
+    },
+    "exit_code": 1,
+    "failure_signature": "unable to legalize instruction:"
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-a16-Os.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install",
+    "toolchain_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-a16-Os.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-a16-O2.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16"
+      ],
+      "optimization": "O2",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install",
+    "toolchain_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-a16-O2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -Xclang -target-feature -Xclang +mos-xy16 -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-xy16-Os.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "Os",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install",
+    "toolchain_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-xy16-Os.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit_code": 0
+  },
+  {
+    "command": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -O2 -mllvm -verify-machineinstrs -Xclang -target-feature -Xclang +mos-xy16 -c /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-xy16-O2.o",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "O2",
+      "lto": false,
+      "machine_verifier": true
+    },
+    "toolchain_location": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install",
+    "toolchain_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "sha256": "62500396052fce165ae1c967a938fa00a226ab5d2493341a7bc222c8982538d3"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-xy16-O2.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 1,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-byte.log",
+      "sha256": "5bcb2d13707baad5c14931be7df8e0aa9cb57daed0f11957e3875338eab3faea"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-byte.mir",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 1,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-a16.log",
+      "sha256": "5bcb2d13707baad5c14931be7df8e0aa9cb57daed0f11957e3875338eab3faea"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-a16.mir",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 1,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-xy16.log",
+      "sha256": "5bcb2d13707baad5c14931be7df8e0aa9cb57daed0f11957e3875338eab3faea"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/baseline-mir-xy16.mir",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 0,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-byte.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-byte.mir.gz",
+      "sha256": "36f1036ba94984652941775d0cff1aeff0e8dfcba2863309b3f8dd72f76eee2d"
+    },
+    "filecheck_exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 0,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-a16.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-a16.mir.gz",
+      "sha256": "ba1ca186b9cd08ed49239b99ad48be85809d44bc6d0745b26a47c9c246a06367"
+    },
+    "filecheck_exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-farblit-byte-load/far-absolute-extload.mir",
+      "-o",
+      "-"
+    ],
+    "exit_code": 0,
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-xy16.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "output": {
+      "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/candidate-mir-xy16.mir.gz",
+      "sha256": "53aeee6965c0740b172a2641be3caaba837327d3a495362cb7dfe2e126d360f2"
+    },
+    "filecheck_exit_code": 0
+  }
+]

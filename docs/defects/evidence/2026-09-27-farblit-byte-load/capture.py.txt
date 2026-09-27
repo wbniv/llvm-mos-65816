@@ -1,0 +1,64 @@
+from pathlib import Path
+import gzip, hashlib, json, shutil, subprocess, tarfile
+root = Path.cwd()
+scratch = root / '.scratch/farblit-t4'
+evidence = root / 'docs/defects/evidence/2026-09-27-farblit-byte-load'
+evidence.mkdir(exist_ok=True)
+def digest(path):
+    with Path(path).open('rb') as f:
+        return hashlib.file_digest(f, 'sha256').hexdigest()
+def artifact(path):
+    return {'path': str(path.relative_to(root)), 'sha256': digest(path)}
+for name in ['replay.json', 'baseline.log', 'current.log', 'ablation-runs.json', 'candidate-runs.json', 'ablation-original.log', 'candidate-original.log', 'runtime.log', 'lit.log', 'roundtrip.log', 'read_zext.c', 'read_sext.c', 'read_byte.c', 'read_zext.mir', 'read_sext.mir', 'read_byte.mir', 'read_zext.log', 'read_sext.log', 'read_byte.log', 'far-absolute-extload.mir', 'farblit-a16.dis', 'farblit-xy16.dis']:
+    shutil.copy2(scratch / name, evidence / name)
+for name in ['MOSLegalizerInfo.original.cpp', 'MOSLegalizerInfo.ablation.cpp', 'MOSLegalizerInfo.candidate.cpp', 'vendor-before.diff']:
+    (evidence / (name + '.gz')).write_bytes(gzip.compress((scratch / name).read_bytes(), mtime=0))
+for name in ['MOSLegalizerInfo.cpp', 'MOSInstructionSelector.cpp']:
+    assert (root / 'vendor/llvm-mos/llvm/lib/Target/MOS' / name).exists()
+with tarfile.open(evidence / 'mos-source.tar.gz', 'w:gz') as tf:
+    tf.add(root / 'vendor/llvm-mos/llvm/lib/Target/MOS', arcname='llvm/lib/Target/MOS')
+identity = json.loads((scratch / 'identity.json').read_text())
+identity['build_method'] = 'Independent copy of build/llvm-mos mounted at /work/build/llvm-mos. Source overlay changes only MOSLegalizerInfo.cpp. Ablation removes the seven-line 0061 eager selection block; candidate replaces the in-place absolute-far rewrite with build-and-erase. clang, llc and LTO linker lld rebuilt. Original source and complete tracked vendor diff retained; MOS source archive includes the candidate.'
+identity['container_image'] = subprocess.check_output(['docker', 'image', 'inspect', 'llvm-mos-65816-dev', '--format', '{{.Id}}'], text=True).strip()
+identity['tools'] = {}
+for label, directory in [('baseline', root / '.scratch/carry-scheduling/build/carry-baseline-install/bin'), ('candidate', scratch / 'candidate-install/bin'), ('ablation', scratch / 'ablation-bin')]:
+    for tool in ['clang-23', 'llc', 'lld']:
+        path = directory / tool
+        if path.exists():
+            identity['tools'][label + '/' + tool] = {'path': str(path), 'sha256': digest(path), 'version': subprocess.check_output([str(path), '--version'], text=True, stderr=subprocess.STDOUT).splitlines()[:3] if tool != 'lld' else 'LLVM lld; invoked through ld.lld symlink'}
+identity['patches'] = {str(p.relative_to(root)): digest(p) for p in sorted((root / 'patches/llvm-mos').glob('*.patch'))}
+identity['sdk_head'] = subprocess.check_output(['git', '-C', 'vendor/llvm-mos-sdk', 'rev-parse', 'HEAD'], text=True).strip()
+identity['runtime_artifacts'] = {str(p.relative_to(root)): digest(p) for p in sorted((root / 'build').glob('farblit*.sfc'))}
+identity['runtime_artifacts'].update({str(p.relative_to(root)): digest(p) for p in sorted((root / 'build').glob('farblit*.map'))})
+(evidence / 'identity.json').write_text(json.dumps(identity, indent=2) + '\n')
+original = root / 'docs/defects/evidence/2026-09-26-farblit-byte-load'
+runs = []
+for label, cc in [('baseline', root / '.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang'), ('candidate', scratch / 'candidate-install/bin/mos-clang')]:
+    for mode in ['a16', 'xy16']:
+        for opt in ['Os', 'O2']:
+            cmd = [str(cc), '--target=mos', '-mcpu=mosw65816', '-Xclang', '-target-feature', '-Xclang', '+mos-a16', '-' + opt, '-mllvm', '-verify-machineinstrs']
+            if mode == 'xy16':
+                cmd += ['-Xclang', '-target-feature', '-Xclang', '+mos-xy16']
+            cmd += ['-c', str(original / 'source.i'), '-o', str(scratch / (label + '-' + mode + '-' + opt + '.o'))]
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+            log = evidence / (label + '-' + mode + '-' + opt + '.log')
+            log.write_text(result.stdout)
+            run = {'command': subprocess.list2cmdline(cmd), 'working_directory': str(root), 'configuration': {'cpu': 'mosw65816', 'features': ['+mos-a16'] + (['+mos-xy16'] if mode == 'xy16' else []), 'optimization': opt, 'lto': False, 'machine_verifier': True}, 'toolchain_location': str(cc.parent.parent), 'toolchain_sha256': digest(cc), 'input': artifact(original / 'source.i'), 'log': artifact(log), 'exit_code': result.returncode}
+            if result.returncode:
+                run['failure_signature'] = 'unable to legalize instruction:'
+            runs.append(run)
+            print(label, mode, opt, result.returncode)
+for label, llc in [('baseline', root / '.scratch/carry-scheduling/build/carry-baseline-install/bin/llc'), ('candidate', scratch / 'candidate-install/bin/llc')]:
+    for mode, features in [('byte', ''), ('a16', '+mos-a16'), ('xy16', '+mos-a16,+mos-xy16')]:
+        cmd = [str(llc), '-mtriple=mos', '-mcpu=mosw65816', '-mattr=' + features, '-run-pass=legalizer', '-verify-machineinstrs', str(evidence / 'far-absolute-extload.mir'), '-o', '-']
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        log = evidence / (label + '-mir-' + mode + '.log'); log.write_text(result.stderr)
+        output = evidence / (label + '-mir-' + mode + '.mir'); output.write_text(result.stdout)
+        row = {'command': cmd, 'exit_code': result.returncode, 'log': artifact(log), 'output': artifact(output)}
+        if result.returncode == 0:
+            check = subprocess.run([str(root / 'build/llvm-mos/bin/FileCheck'), str(evidence / 'far-absolute-extload.mir')], input=result.stdout, capture_output=True, text=True)
+            row['filecheck_exit_code'] = check.returncode
+            assert check.returncode == 0, check.stderr
+        runs.append(row)
+        print(label, mode, result.returncode)
+(evidence / 'runs.json').write_text(json.dumps(runs, indent=2) + '\n')

@@ -1,0 +1,44 @@
+[
+  {
+    "label": "baseline",
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8179",
+      "0x87ff",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "rom_sha256": "38bd6adb7b6ec5114d1071682add9fc1cfc914e44a5a4c25897e2df19e811de9",
+    "clocks": [
+      17535642
+    ],
+    "repeat_identical": true
+  },
+  {
+    "label": "candidate",
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8179",
+      "0x8828",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "rom_sha256": "52a030a1d287cb83d33377b058d8edc45b5a7ed433b015357bf2217dfec03804",
+    "clocks": [
+      18026532
+    ],
+    "repeat_identical": true
+  }
+]

@@ -1,0 +1,57 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96.",
+  "searches": [
+    {
+      "command": [
+        "rg",
+        "-n",
+        "farblit|G_LOAD_FAR_ABS|tryFarAbsoluteAddressing",
+        "docs/defects/mos-farblit-byte-load-legalization.json",
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "TODO.md"
+      ],
+      "exit_code": 0,
+      "stdout": "docs/plans/2026-09-26-mos-carry-scheduling.md:3:**Current status (2026-09-27):** PR #609 was withdrawn at the user's explicit request; its branch remains available. The near-decoder investigation separately repairs Y lifetime and near bank wrapping; the [original gallery now passes](../investigations/2026-09-27-near-y-decoder.md). This does not resolve the generic pressure-contract or farblit reports. Earlier publication and validation passages below are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.\ndocs/plans/2026-09-26-mos-carry-scheduling.md:162:| Runtime | Host/MAME/bsnes checks for `farindex`, `farblit`, `farbank`, BankWalk, both near-store gates, CRC and carry-heavy kernels; full native corpus and 50 fixed fuzz seeds. Retain actual failures and classify skips. |\ndocs/plans/2026-09-26-mos-carry-scheduling.md:371:- **Inherited blocker:** `farblit` fails before scheduling while legalizing an\ndocs/plans/2026-09-26-mos-carry-scheduling.md:372:  s8 `G_LOAD_FAR_ABS` at 8355871, on both preserved baseline and candidate.\ndocs/plans/2026-09-26-mos-carry-scheduling.md:373:  [Separate canonical record](../defects/mos-farblit-byte-load-legalization.json)\ndocs/plans/2026-09-26-mos-carry-scheduling.md:430:This result covers the exact upstream extraction above. The inherited farblit,\ndocs/plans/2026-09-26-mos-carry-scheduling.md:437:farblit legalization failure, and unisolated all-XY16 driver observation remain\nTODO.md:300:- [T4] **Combined-stack farblit byte-load legalization.** The pre-0064 baseline already rejects an s8 far absolute load; isolate the causal interaction. [Retained evidence](docs/defects/mos-farblit-byte-load-legalization.json).\ndocs/defects/mos-farblit-byte-load-legalization.json:3:  \"id\": \"mos-farblit-byte-load-legalization\",\ndocs/defects/mos-farblit-byte-load-legalization.json:4:  \"title\": \"Combined native-width stack rejects a farblit absolute byte load\",\ndocs/defects/mos-farblit-byte-load-legalization.json:6:  \"summary\": \"The preserved carry-scheduling baseline and all scheduling candidates reject farblit.c during legalization of an s8 G_LOAD_FAR_ABS at address 8355871. This blocks the farblit runtime gate before scheduling and is not introduced by the carry preference.\",\ndocs/defects/mos-farblit-byte-load-legalization.json:16:      \"G_LOAD_FAR_ABS\",\ndocs/defects/mos-farblit-byte-load-legalization.json:17:      \"farblit failure\",\ndocs/defects/mos-farblit-byte-load-legalization.json:18:      \"tryFarAbsoluteAddressing\",\ndocs/defects/mos-farblit-byte-load-legalization.json:37:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/prior-work.json\",\ndocs/defects/mos-farblit-byte-load-legalization.json:43:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.log\",\ndocs/defects/mos-farblit-byte-load-legalization.json:47:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/input.ll\",\ndocs/defects/mos-farblit-byte-load-legalization.json:51:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/pre-legalizer.mir\",\ndocs/defects/mos-farblit-byte-load-legalization.json:55:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/prior-work.json\",\ndocs/defects/mos-farblit-byte-load-legalization.json:59:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/runs.json\",\ndocs/defects/mos-farblit-byte-load-legalization.json:63:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/source.c.txt\",\ndocs/defects/mos-farblit-byte-load-legalization.json:67:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/source.i\",\ndocs/defects/mos-farblit-byte-load-legalization.json:72:    \"command\": \"/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/mos-clang --target=mos -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Os -mllvm -verify-machineinstrs -c /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i -o /home/will/llvm-mos-65816/.scratch/carry-scheduling/docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.o\",\ndocs/defects/mos-farblit-byte-load-legalization.json:86:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/source.i\",\ndocs/defects/mos-farblit-byte-load-legalization.json:90:      \"path\": \"docs/defects/evidence/2026-09-26-farblit-byte-load/baseline.log\",\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:7:increment-2 plus 0049\u20130063 baseline rejects `farblit.c` before scheduling on an\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:8:absolute byte load. [Retained failure](../defects/mos-farblit-byte-load-legalization.json)\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:75:(`trunc(Off)`), never a re-associated sum (\u00a73.1, pinned by `far_rt_wrap16` and `farblit`'s `rdw16`).\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:187:  run time by `farblit` step 6 (blossom/buddha far RMW under `+mos-xy16`). **The near `(zp),Y16` path\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:208:4. New differential gate `dev/run.sh farblit` \u2014 runtime-indexed far reads **and** stores, 8-bit and\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:272:**4. `dev/run.sh farblit`**\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:304:**PASS.** Sensitivity, shown by injection (scratch, not committed): assembling `farblit_press.c`'s\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:345:**PASS** \u2014 120 fixtures now (118 + `farblit.c` + `farblit_press.c`).\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:414:  WIN     farblit: 2198 -> 2084 (-114)\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:416:  WIN     farblit: 2199 -> 2052 (-147)\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:418:  WIN     farblit: 2198 -> 1978 (-220)\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:420:  WIN     farblit: 2199 -> 1974 (-225)\ndocs/plans/2026-09-25-dpy-indexed-phase2-increment2.md:531:- [x] Run farblit, farindex and farbank on MAME and bsnes-jg.\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "log",
+        "--all",
+        "--oneline",
+        "-SSelect a far byte address",
+        "--",
+        "patches/llvm-mos"
+      ],
+      "exit_code": 0,
+      "stdout": "f2be629f Publish compiler evidence and dashboard exports\n8c19c703 Refresh and commit the evidence-backed upstream dashboard and summaries\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rg",
+        "-n",
+        "G_LOAD_FAR_ABS|Select a far byte|changedInstr",
+        "patches/llvm-mos/0061-mos-far-global-long-x.patch"
+      ],
+      "exit_code": 0,
+      "stdout": "13:+def G_LOAD_FAR_ABS_IDX : MOSGenericInstruction {\n26:+def G_LOAD_FAR_ABS_IDX16 : MOSGenericInstruction {\n86:   case MOS::G_LOAD_FAR_ABS:\n88:+  case MOS::G_LOAD_FAR_ABS_IDX:\n90:+  case MOS::G_LOAD_FAR_ABS_IDX16:\n96:   case MOS::G_LOAD_FAR_ABS: // #320: 65816 far load -> LDA AbsoluteLong.\n99:+  case MOS::G_LOAD_FAR_ABS_IDX:\n102:+  case MOS::G_LOAD_FAR_ABS_IDX16:\n127:   Helper.Observer.changedInstr(MI);\n128:+  // Select a far byte address while its G_PTR_ADD and zero-extended index are\n150:   Helper.Observer.changedInstr(MI);\n235:+                        ? (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX16\n237:+                        : (isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS_IDX\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rg",
+        "-n",
+        "tryFarAbsoluteAddressing|createdOrChangedInstr|void changingInstr|void erasingInstr",
+        "vendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+        "vendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp"
+      ],
+      "exit_code": 0,
+      "stdout": "vendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp:133:  void createdOrChangedInstr(MachineInstr &MI) {\nvendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp:147:    createdOrChangedInstr(MI);\nvendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp:158:  void erasingInstr(MachineInstr &MI) override {\nvendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp:164:  void changingInstr(MachineInstr &MI) override {\nvendor/llvm-mos/llvm/lib/CodeGen/GlobalISel/Legalizer.cpp:172:    createdOrChangedInstr(MI);\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:2848:    if (tryFarAbsoluteAddressing(Helper, MRI, MI))\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:2929:bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,\nvendor/llvm-mos/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp:3292:  // The caller's tryFarAbsoluteAddressing already ruled this out; re-checking\n",
+      "stderr": ""
+    }
+  ],
+  "assessment": "Continue the existing canonical record. The September 26 preserved compiler hash is unchanged and reproduces the same absolute-byte diagnostic. The pre-edit source is retained as MOSLegalizerInfo.original.cpp.gz. The 0061 eager extended-byte path publishes G_LOAD to the worklist, then the 0001 in-place absolute-address rewrite turns the queued instruction into a target pseudo without erasing it. Removing only that eager block makes the original and reduced inputs pass. 0066 instead builds the target pseudo and erases the generic instruction, retaining eager addressing and memory operands. 0062 and carry scheduling are not required to explain this failure. The post-edit live source matches the tested candidate. No upstream submission is prepared."
+}

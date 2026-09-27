@@ -1,0 +1,5432 @@
+[
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/lsystem-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/lsystem-oracle"
+    ],
+    "exit_code": 0,
+    "log": "lsystem-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/lsystem-oracle"
+    ],
+    "exit_code": 0,
+    "log": "lsystem-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/spiro-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/spiro-oracle"
+    ],
+    "exit_code": 0,
+    "log": "spiro-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/spiro-oracle"
+    ],
+    "exit_code": 0,
+    "log": "spiro-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/dctbloom-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/dctbloom-oracle"
+    ],
+    "exit_code": 0,
+    "log": "dctbloom-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/dctbloom-oracle"
+    ],
+    "exit_code": 0,
+    "log": "dctbloom-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/avalanche-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/avalanche-oracle"
+    ],
+    "exit_code": 0,
+    "log": "avalanche-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/avalanche-oracle"
+    ],
+    "exit_code": 0,
+    "log": "avalanche-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/bf-vm-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/bf-vm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "bf-vm-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/bf-vm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "bf-vm-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/rotkal-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/rotkal-oracle"
+    ],
+    "exit_code": 0,
+    "log": "rotkal-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/rotkal-oracle"
+    ],
+    "exit_code": 0,
+    "log": "rotkal-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/seqvm-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/seqvm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "seqvm-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/seqvm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "seqvm-host-run.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x839a",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-a16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x839a",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-a16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-a16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x82f9",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-a16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x82f9",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-a16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-a16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x839a",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-xy16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x839a",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-xy16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-baseline-xy16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x82f9",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-xy16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x82f9",
+      "0x0",
+      "0x20c",
+      "4",
+      "0x7bf2e264",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-xy16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/sum-candidate-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "sum-candidate-xy16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x8382",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-a16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x8382",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-a16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-a16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x831e",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-a16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x831e",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-a16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-a16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x8382",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-xy16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x8382",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-xy16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-baseline-xy16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x831e",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-xy16-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x8201",
+      "0x831e",
+      "0x0",
+      "0x20c",
+      "4",
+      "0xaf1d6a7d",
+      "2000",
+      "24"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-xy16-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-scheduling/build/carry-original-runtime-a16-driver/rot-candidate-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "rot-candidate-xy16-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x880d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x880d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8810",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8810",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ee9",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ee9",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8eef",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8eef",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8816",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8816",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x881b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x881b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa714",
+      "0xa96b",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa714",
+      "0xa96b",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa714",
+      "0xa96f",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa714",
+      "0xa96f",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9281",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9281",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9286",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/lsystem-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/lsystem-oracle"
+    ],
+    "exit_code": 0,
+    "log": "lsystem-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/lsystem-oracle"
+    ],
+    "exit_code": 0,
+    "log": "lsystem-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/spiro-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/spiro-oracle"
+    ],
+    "exit_code": 0,
+    "log": "spiro-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/spiro-oracle"
+    ],
+    "exit_code": 0,
+    "log": "spiro-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/dctbloom-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/dctbloom-oracle"
+    ],
+    "exit_code": 0,
+    "log": "dctbloom-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/dctbloom-oracle"
+    ],
+    "exit_code": 0,
+    "log": "dctbloom-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/avalanche-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/avalanche-oracle"
+    ],
+    "exit_code": 0,
+    "log": "avalanche-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/avalanche-oracle"
+    ],
+    "exit_code": 0,
+    "log": "avalanche-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/bf-vm-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/bf-vm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "bf-vm-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/bf-vm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "bf-vm-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/rotkal-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/rotkal-oracle"
+    ],
+    "exit_code": 0,
+    "log": "rotkal-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/rotkal-oracle"
+    ],
+    "exit_code": 0,
+    "log": "rotkal-host-run.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-O2",
+      "-I/work/.scratch/carry-scheduling/examples/65816",
+      "/work/.scratch/carry-scheduling/tools/seqvm-sim.c",
+      "-o",
+      "/work/.scratch/carry-timing/runs/seqvm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "seqvm-host-build.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/runs/seqvm-oracle"
+    ],
+    "exit_code": 0,
+    "log": "seqvm-host-run.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x91c8",
+      "0x94e9",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x91c8",
+      "0x94e9",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x91c8",
+      "0x94f4",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87c2",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x91c8",
+      "0x94f4",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9281",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87c2",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ec5",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9281",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87c5",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ec5",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9286",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87c5",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ecb",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9286",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8873",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8ecb",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8873",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa6f5",
+      "0xa970",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x926c",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x887b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa6f5",
+      "0xa970",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x926c",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x887b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa6f5",
+      "0xa974",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9178",
+      "0x9495",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9178",
+      "0x9495",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9178",
+      "0x94a4",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9178",
+      "0x94a4",
+      "0x0",
+      "0x1409",
+      "2",
+      "0x32d4",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_spirograph.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_spirograph.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9275",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8336",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0xa6f5",
+      "0xa974",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8336",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x810c",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8337",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x810c",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8337",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x810d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x810d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9275",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.Os.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.Os.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b28",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f00",
+      "0xa154",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x875a",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b28",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f00",
+      "0xa154",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x875a",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b33",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f00",
+      "0xa158",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x876b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b33",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.a16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.a16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f00",
+      "0xa158",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.a16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.a16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x876b",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b04",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87ff",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f0a",
+      "0xa172",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87ff",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b04",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f0a",
+      "0xa172",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8828",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b0f",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f0a",
+      "0xa176",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8828",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x82f8",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x82f8",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8b0f",
+      "0xffffffff",
+      "0x210",
+      "2",
+      "0x27ea",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_avalanche.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_avalanche.c.xy16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8114",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x82f9",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8114",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x82f9",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8115",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8294",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0xe8c5",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8115",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x300c",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_rotkal_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_rotkal_sim.c.default.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8294",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0xe8c5",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8314",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8295",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0xe8c5",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8314",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8295",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0xe8c5",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_seqvm_sim.c.default.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_seqvm_sim.c.default.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8315",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x9f0a",
+      "0xa176",
+      "0x0",
+      "0x13e9",
+      "2",
+      "0x5364",
+      "2000",
+      "128"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_dctbloom.c.xy16.Oz.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_dctbloom.c.xy16.Oz.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8315",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x9954",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_bf_vm_sim.c.default.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_bf_vm_sim.c.default.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x882d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8834",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x93ae",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x882d",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8834",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x93ae",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8830",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8839",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8830",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.a16.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x93b3",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8839",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.a16.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87e2",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8891",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x93b3",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.a16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.a16.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87e2",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8891",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x938b",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87e5",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8899",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x938b",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.baseline.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.baseline-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/work/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.o",
+      "-Wl,-Map=/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.map",
+      "-o",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/work/tools/snes-checksum.py",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-checksum.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-symbols.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x87e5",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_65816_rcundef2.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_65816_rcundef2.c.xy16.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x8899",
+      "0xffffffff",
+      "0x200",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_corpus_lsystem_sim.c.xy16.O2.candidate-disassembly.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9394",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-timing-0.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-timing/jgxcycles",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc",
+      "/work/vendor/bsnes-jg/Database",
+      "0x802a",
+      "0x9394",
+      "0xffffffff",
+      "0x135d",
+      "2",
+      "0x8073",
+      "2000",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-timing-1.log"
+  },
+  {
+    "command": [
+      "/work/.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/work/.scratch/carry-timing/runs/examples_snes_lsystem.c.xy16.O2.candidate.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "examples_snes_lsystem.c.xy16.O2.candidate-disassembly.log"
+  }
+]

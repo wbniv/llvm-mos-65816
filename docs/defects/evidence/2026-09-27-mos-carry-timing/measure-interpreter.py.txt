@@ -1,0 +1,25 @@
+import json, subprocess, hashlib
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+root=Path('/work');out=root/'.scratch/carry-timing';runs=out/'runs';tool=root/'.scratch/carry-scheduling/build/llvm-mos-install/bin/llvm-objdump'
+def one(label):
+    rom=runs/('examples_snes_corpus_lsystem_sim.c.xy16.Oz.'+label+'.sfc')
+    text=subprocess.check_output([str(tool),'-t',str(rom)+'.elf'],text=True)
+    symbols={p[-1]:(int(p[0],16),int(p[-2],16)) for line in text.splitlines() if len(p:=line.split())>=5 and len(p[0])==8}
+    start,size=symbols['main'];offset,length=symbols['corpus_result']
+    # The generation-exit block begins the inlined interpreter: SEP, heading
+    # 192, and initial turtle coordinates. Both objects put it at main+0x14f.
+    start+=0x14f
+    assert rom.read_bytes()[start-0x8000:start-0x8000+5]==bytes.fromhex('e220a2c08a')
+    cmd=[str(out/'jgxcycles'),str(rom),str(root/'vendor/bsnes-jg/Database'),hex(start),hex(symbols['main'][0]+size),'0xffffffff',hex(offset),str(length),'0x8073','2000','1']
+    results=[]
+    for n in range(2):
+        p=subprocess.run(cmd,capture_output=True,text=True,timeout=300)
+        (out/f'interpreter-{label}-{n}.json').write_text(p.stdout)
+        assert p.returncode==0,p.stderr
+        results.append(json.loads(p.stdout))
+    assert results[0]==results[1]
+    return dict(label=label,command=cmd,rom_sha256=hashlib.sha256(rom.read_bytes()).hexdigest(),clocks=results[0]['samples'],repeat_identical=True)
+with ThreadPoolExecutor(max_workers=2) as pool: results=list(pool.map(one,['baseline','candidate']))
+(out/'interpreter-results.json').write_text(json.dumps(results,indent=2)+'\n')
+print(json.dumps(results,indent=2))

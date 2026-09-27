@@ -1,0 +1,86 @@
+[
+  {
+    "name": "original",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/ablation-bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "-o",
+      ".scratch/farblit-t4/ablation-original.o"
+    ],
+    "exit_code": 0,
+    "diagnostic": []
+  },
+  {
+    "name": "zext",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/ablation-bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/read_zext.c",
+      "-o",
+      ".scratch/farblit-t4/ablation-zext.o"
+    ],
+    "exit_code": 0,
+    "diagnostic": []
+  },
+  {
+    "name": "sext",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/ablation-bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/read_sext.c",
+      "-o",
+      ".scratch/farblit-t4/ablation-sext.o"
+    ],
+    "exit_code": 0,
+    "diagnostic": []
+  },
+  {
+    "name": "byte",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/ablation-bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/read_byte.c",
+      "-o",
+      ".scratch/farblit-t4/ablation-byte.o"
+    ],
+    "exit_code": 0,
+    "diagnostic": []
+  }
+]

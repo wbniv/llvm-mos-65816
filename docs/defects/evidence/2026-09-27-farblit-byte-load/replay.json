@@ -1,0 +1,52 @@
+[
+  {
+    "name": "baseline",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/carry-baseline-install/bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "-o",
+      ".scratch/farblit-t4/baseline.o"
+    ],
+    "exit_code": 1,
+    "sha256": "18086f4ee6f863534845f7b385d10d31da0eb27a3128bb655b51cd85ebdc3206",
+    "diagnostic": [
+      "fatal error: error in backend: unable to legalize instruction: %346:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script."
+    ]
+  },
+  {
+    "name": "current",
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-26-farblit-byte-load/source.i",
+      "-o",
+      ".scratch/farblit-t4/current.o"
+    ],
+    "exit_code": 1,
+    "sha256": "55ed2de7987a0785d8f960d9d304d89d0fff5801469e70832f27cad6d299c825",
+    "diagnostic": [
+      "fatal error: error in backend: unable to legalize instruction: %346:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main)",
+      "PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace, preprocessed source, and associated run script."
+    ]
+  }
+]
