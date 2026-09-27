@@ -55,7 +55,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "dd8b17c0cd488b1b2b5bde7a396b4cbdb69db16eef731e9df5023c2893387490"
+          "docs/upstream-dashboard.json": "6316b576195f51992dace748f9efc45748dfe3395cd7424d8a025e589331c076"
         }
       }
     },
@@ -78,7 +78,7 @@
         "sources": {
           "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "dd8b17c0cd488b1b2b5bde7a396b4cbdb69db16eef731e9df5023c2893387490",
+          "docs/upstream-dashboard.json": "6316b576195f51992dace748f9efc45748dfe3395cd7424d8a025e589331c076",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
@@ -226,11 +226,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
+          "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-map.md": "a8db65fec7ab4e3f5b1a98ff548872834513eed62803b9a075838834916b666e"
+          "docs/snes-demo-compiler-bug-map.md": "b2caa257e65f3c3cfc116956379b8678af52773062531d95f404936c2c882c02"
         }
       }
     },
@@ -272,11 +272,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
+          "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-public.json": "00ce2d42aad91ce64957aaa7403e734ba0f0e061e3a7025aae52adbf5492ce77"
+          "docs/snes-demo-compiler-bug-public.json": "8ae947005b15bb6bac79d6d9c5ce4ecb44767890b65f303fec0b5b145c04cd8f"
         }
       }
     }
@@ -1397,8 +1397,8 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
         },
-        "reviewed_at": "2026-09-27T02:34:41.206804+00:00",
-        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
+        "reviewed_at": "2026-09-27T02:40:49.630949+00:00",
+        "note": "Integrated the concurrent website BRK/COP split from biohack commit 458290e into the canonical registry while retaining all four gallery mechanisms and their dates. GitHub API confirms PR 586 is Accept an optional BRK signature operand, open on September 27; associate it with BRK and retain 588 for COP and 577 for QSort. The per-line PR objects and simulations match each parent record. This preserves the other website work during the publication merge and corrects its misplaced QSort PR association. No compiler status, ROM bytes, or native-width submission gate changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -1412,13 +1412,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
+          "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9",
           "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65"
         },
-        "reviewed_at": "2026-09-27T02:34:41.531502+00:00",
-        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
+        "reviewed_at": "2026-09-27T02:40:50.028908+00:00",
+        "note": "Integrated the concurrent website BRK/COP split from biohack commit 458290e into the canonical registry while retaining all four gallery mechanisms and their dates. GitHub API confirms PR 586 is Accept an optional BRK signature operand, open on September 27; associate it with BRK and retain 588 for COP and 577 for QSort. The per-line PR objects and simulations match each parent record. This preserves the other website work during the publication merge and corrects its misplaced QSort PR association. No compiler status, ROM bytes, or native-width submission gate changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     }

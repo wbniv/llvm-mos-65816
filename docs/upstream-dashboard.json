@@ -174,9 +174,10 @@
       ],
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-index-bank-wrap.json",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "upstreamUrl": null
     },
     {
@@ -227,9 +228,10 @@
       ],
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-xy16-near-indirect-y-clobber.json",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "upstreamUrl": null
     },
     {

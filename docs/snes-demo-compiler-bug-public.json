@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_source": "docs/snes-demo-compiler-bug-pages.json",
-  "records_sha256": "20c98cbbbcda4c2ccd59c9fd91fcc0bca53aa3cc79e27efb2d45e57386f0996d",
+  "records_sha256": "4d8b1cebc3d22fb791d1144791dd0fb45e9bbe96f4a44053d53af1a93f12b99b",
   "records": [
     {
       "slug": "blossom",
@@ -111,13 +111,41 @@
       "evidence": "docs/upstream-cop-brk-signature-pr.md",
       "prs": [
         {
+          "label": "PR #586",
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
+          "status": "open"
+        },
+        {
           "label": "PR #588",
           "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
           "status": "open"
         }
       ],
       "pr_simulations": [
+        "docs/upstream-brk-signature-operand-pr.md",
         "docs/upstream-cop-brk-signature-pr.md"
+      ],
+      "lines": [
+        {
+          "defect": "BRK optional signature operand",
+          "evidence": "docs/upstream-brk-signature-operand-pr.md",
+          "pr": {
+            "label": "PR #586",
+            "url": "https://github.com/llvm-mos/llvm-mos/pull/586",
+            "status": "open"
+          },
+          "pr_simulation": "docs/upstream-brk-signature-operand-pr.md"
+        },
+        {
+          "defect": "COP mandatory signature operand",
+          "evidence": "docs/upstream-cop-brk-signature-pr.md",
+          "pr": {
+            "label": "PR #588",
+            "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
+            "status": "open"
+          },
+          "pr_simulation": "docs/upstream-cop-brk-signature-pr.md"
+        }
       ]
     },
     {
