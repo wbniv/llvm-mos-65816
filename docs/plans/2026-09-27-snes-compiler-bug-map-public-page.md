@@ -52,6 +52,16 @@ It is a provenance index, not a defect dashboard: each row identifies the origin
 
 Use the initial responsive table implementation: it preserves a compact chronological comparison on desktop and permits horizontal scrolling on narrow screens. Revisit the card alternative if mobile testing shows the six columns are hard to scan.
 
+## Rendered screenshots
+
+Desktop capture:
+
+![Compiler-bug discovery map on desktop](2026-09-27-snes-compiler-bug-map-desktop.png)
+
+390px mobile verification capture:
+
+![Compiler-bug discovery map as mobile cards](2026-09-27-snes-compiler-bug-map-mobile.png)
+
 ## Data and synchronization contract
 
 1. Keep `docs/snes-demo-compiler-bug-pages.json` as the canonical source. Its required fields are `slug`, `page`, `discovered`, `defect`, `evidence`, `prs`, and `pr_simulations`.

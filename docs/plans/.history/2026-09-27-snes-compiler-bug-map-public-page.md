@@ -1,9 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/afec07f0) | docs(snes): restore compiler-bug map automation |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/9995d9b2) | Revert "docs(snes): automate compiler-bug map updates" |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/de844568) | docs(snes): automate compiler-bug map updates |
 
 <!--history-meta v1
+afec07f0	author	Will Norris
+afec07f0	added	102
+afec07f0	deleted	0
+afec07f0	files	1
 9995d9b2	author	Will Norris
 9995d9b2	added	0
 9995d9b2	deleted	102
