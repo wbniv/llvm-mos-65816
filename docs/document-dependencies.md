@@ -579,7 +579,7 @@ Raw defect evidence, transcripts, vendored trees, and editor history are exclude
 | [docs/plans/2026-09-26-mos-carry-scheduling.html](<plans/2026-09-26-mos-carry-scheduling.html>) | generated | 2 | 0 |
 | [docs/plans/2026-09-26-mos-carry-scheduling.md](<plans/2026-09-26-mos-carry-scheduling.md>) | maintained | 36 | 12 |
 | [docs/plans/2026-09-26-one-command-dashboard-publication.md](<plans/2026-09-26-one-command-dashboard-publication.md>) | dated record | 0 | 0 |
-| [docs/plans/2026-09-27-snes-compiler-bug-map-public-page.md](<plans/2026-09-27-snes-compiler-bug-map-public-page.md>) | dated record | 0 | 0 |
+| [docs/plans/2026-09-27-snes-compiler-bug-map-public-page.md](<plans/2026-09-27-snes-compiler-bug-map-public-page.md>) | dated record | 2 | 0 |
 | [docs/plans/cpu6502-fullscreen-mockup.html](<plans/cpu6502-fullscreen-mockup.html>) | reference | 0 | 1 |
 | [docs/plans/cpu6502-mockup-cpudiag.html](<plans/cpu6502-mockup-cpudiag.html>) | reference | 0 | 0 |
 | [docs/plans/cpu6502-mockup.html](<plans/cpu6502-mockup.html>) | reference | 0 | 1 |
