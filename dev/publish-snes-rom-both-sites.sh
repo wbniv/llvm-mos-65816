@@ -71,6 +71,8 @@ BIO_PREVIEW="$BIOHACK/public/play/preview/$SLUG.png"
 BIO_MANIFEST="$BIOHACK/public/play/roms/manifest.json"
 BIO_META="$BIOHACK/src/content/snes/$SLUG.json"
 BUG_PAGES="$ROOT/docs/snes-demo-compiler-bug-pages.json"
+BUG_PUBLIC="$ROOT/docs/snes-demo-compiler-bug-public.json"
+BIO_BUG_PUBLIC="$BIOHACK/src/data/snes-compiler-bug-pages.json"
 INDRI_ROM="$INDRI/public/apps/llvm-mos-65816/play/roms/$SLUG.sfc"
 INDRI_PREVIEW="$INDRI/public/apps/llvm-mos-65816/play/preview/$SLUG.png"
 INDRI_MANIFEST="$INDRI/public/apps/llvm-mos-65816/play/roms/manifest.json"
@@ -82,6 +84,14 @@ done
 for file in "$BIO_MANIFEST" "$BIO_META" "$INDRI_MANIFEST" "$INDRI_META"; do
   [ -f "$file" ] || { echo "FATAL: missing publication metadata: $file" >&2; exit 1; }
 done
+python3 "$ROOT/dev/export-snes-compiler-bug-public.py"
+[ -f "$BIO_BUG_PUBLIC" ] || { echo "FATAL: missing biohack compiler-bug map: $BIO_BUG_PUBLIC" >&2; exit 1; }
+if [ "$PUBLISH" -eq 1 ]; then
+  cp "$BUG_PUBLIC" "$BIO_BUG_PUBLIC"
+elif ! cmp -s "$BUG_PUBLIC" "$BIO_BUG_PUBLIC"; then
+  echo "FATAL: biohack compiler-bug map is stale; run with --publish to stage the generated export" >&2
+  exit 1
+fi
 if [ -f "$BUG_PAGES" ] && jq -e --arg slug "$SLUG" '.records[] | select(.slug == $slug)' "$BUG_PAGES" >/dev/null; then
   jq -e '.compilerBug == true' "$BIO_META" >/dev/null || {
     echo "FATAL: $SLUG is a registered compiler-defect discovery but its biohack page lacks compilerBug metadata" >&2
@@ -116,6 +126,7 @@ for file in "$BIO_ROM" "$INDRI_ROM"; do
 done
 
 echo "PAIR: PASS — $SLUG exists on both sites at SHA-256 $SOURCE_SHA"
+echo "COMPILER-BUG MAP: PASS — biohack copy matches the generated public export"
 [ "$PUBLISH" -eq 1 ] || {
   echo "biohack page: https://biohack.net/snes/$SLUG/"
   echo "biohack ROM:  https://biohack.net/play/roms/$SLUG.sfc"
@@ -129,7 +140,8 @@ pnpm --dir "$INDRI" build
 
 git -C "$BIOHACK" add \
   "public/play/roms/$SLUG.sfc" "public/play/preview/$SLUG.png" \
-  public/play/roms/manifest.json "src/content/snes/$SLUG.json"
+  public/play/roms/manifest.json "src/content/snes/$SLUG.json" \
+  src/data/snes-compiler-bug-pages.json
 git -C "$INDRI" add \
   "public/apps/llvm-mos-65816/play/roms/$SLUG.sfc" \
   "public/apps/llvm-mos-65816/play/preview/$SLUG.png" \
