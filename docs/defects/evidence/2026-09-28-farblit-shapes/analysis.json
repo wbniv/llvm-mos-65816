@@ -1,0 +1,222 @@
+{
+  "a16": {
+    "accesses": [
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 82,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc8],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 134,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\tmos24(tbl),x"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 246,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc20]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 338,
+        "accumulator_bits": 16,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 453,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc28]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 511,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 587,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 629,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "sta\t[__rc4],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 693,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "sta\t[__rc4]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 795,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 812,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "sta\t[__rc4],y"
+      }
+    ],
+    "counts": {
+      "native": {
+        "b7": 2,
+        "97": 2,
+        "a7": 5,
+        "87": 1,
+        "bf": 1
+      },
+      "split_control": {
+        "b7": 3,
+        "97": 2,
+        "a7": 5,
+        "87": 1,
+        "bf": 1
+      }
+    },
+    "debug_disassembly_matches_plain": true,
+    "plain_disassembly_matches_september_27": true
+  },
+  "xy16": {
+    "accesses": [
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 82,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc8],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 134,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\tmos24(tbl),x"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 225,
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "instruction": "lda\t[__rc20],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 326,
+        "accumulator_bits": 16,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4]"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 419,
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "instruction": "lda\t[__rc24],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 469,
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "instruction": "lda\tmos24(tbl),x"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 537,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "lda\t[__rc4],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 579,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "sta\t[__rc4],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 651,
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "instruction": "sta\t[__rc8],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 721,
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "instruction": "lda\t[__rc8],y"
+      },
+      {
+        "probe": "readback",
+        "source_line": 0,
+        "assembly_line": 725,
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "instruction": "sta\t[__rc4],y"
+      }
+    ],
+    "counts": {
+      "native": {
+        "b7": 5,
+        "97": 3,
+        "a7": 1,
+        "87": 0,
+        "bf": 2
+      },
+      "split_control": {
+        "b7": 7,
+        "97": 3,
+        "a7": 0,
+        "87": 0,
+        "bf": 2
+      }
+    },
+    "debug_disassembly_matches_plain": true,
+    "plain_disassembly_matches_september_27": true
+  }
+}

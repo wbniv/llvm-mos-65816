@@ -16,7 +16,7 @@ The [preserved-build timing](investigations/2026-09-27-mos-carry-timing.md) reco
 **Separate diagnostic-only validation issue:** MOS had no null target streamer for `-filetype=null`; patch 0068 supplies it, and the retained IR now passes the diagnostic and normal-object checks on the patched downstream build. A [standalone extraction](pr-preparations/2026-09-27/0068-validation.md) is now validated on upstream `26d7c2c1eebf` (21 matching-input null-output repairs, 24 byte-identical ordinary outputs, 133 MOS passes and one unsupported). Independent review and upstream submission remain pending; the historical 0064 extraction remains unchanged. See the [investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 [Farblit legalization is repaired locally by 0066](investigations/2026-09-27-farblit-byte-load.md):
 the original input and direct MIR pass, as do eight emulator assertions. The
-combined-stack opcode-count gate remains qualified. Publication
+combined-stack opcode-count deficit is reconciled: native `rdw` replaces indexed byte loads. The unchanged gate still fails; per-probe expectations remain follow-up work. Publication
 of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
 scheduler entry points and carry-class membership are unchanged. Test results

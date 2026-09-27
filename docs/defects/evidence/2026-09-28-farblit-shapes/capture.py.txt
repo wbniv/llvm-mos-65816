@@ -1,0 +1,129 @@
+import gzip
+import hashlib
+import json
+from pathlib import Path
+import re
+import subprocess
+
+root = Path.cwd()
+scratch = root / '.scratch/farblit-shapes'
+evidence = root / 'docs/defects/evidence/2026-09-28-farblit-shapes'
+evidence.mkdir(parents=True, exist_ok=True)
+tool = root / '.scratch/farblit-t4/candidate-install/bin'
+source = root / 'examples/65816/farblit.c'
+runs = []
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def run(args):
+    result = subprocess.run([str(x) for x in args], capture_output=True, text=True)
+    runs.append({'command': [str(x) for x in args], 'exit_code': result.returncode,
+                 'stderr': result.stderr})
+    assert result.returncode == 0, result.stderr
+    return result.stdout
+
+
+probes = {}
+current = None
+for line_number, line in enumerate(source.read_text().split('#else')[0].splitlines(), 1):
+    match = re.match(r'static (?:uint32_t|void) (\w+)\(void\)', line)
+    if match:
+        current = match[1]
+    if current:
+        probes[line_number] = current
+    if line == '}':
+        current = None
+
+analysis = {}
+for mode in ['a16', 'xy16']:
+    flags = ['--target=mos', '-mcpu=mosw65816', '-Xclang', '-target-feature',
+             '-Xclang', '+mos-a16', '-Os', '-mllvm', '-verify-machineinstrs']
+    if mode == 'xy16':
+        flags += ['-Xclang', '-target-feature', '-Xclang', '+mos-xy16']
+    for name, extra in [('plain', []), ('debug', ['-gline-tables-only'])]:
+        obj = scratch / f'{mode}-{name}.o'
+        run([tool / 'mos-clang', *flags, *extra, '-c', source, '-o', obj])
+        dis = run([tool / 'llvm-objdump', '-dr', '--mcpu=mosw65816', obj])
+        (scratch / f'{mode}-{name}.dis').write_text(dis)
+    plain = (scratch / f'{mode}-plain.dis').read_text().splitlines()[3:]
+    debug = (scratch / f'{mode}-debug.dis').read_text().splitlines()[3:]
+    assert plain == debug
+    historical = root / f'docs/defects/evidence/2026-09-27-farblit-byte-load/farblit-{mode}.dis'
+    assert plain == historical.read_text().splitlines()[3:]
+    run([tool / 'mos-clang', *flags, '-gline-tables-only', '-S', source,
+         '-o', scratch / f'{mode}.s'])
+    for stage in ['before', 'after']:
+        run([tool / 'mos-clang', *flags, '-mllvm', f'-stop-{stage}=legalizer',
+             '-S', source, '-o', scratch / f'{mode}-{stage}.mir'])
+    pre = (scratch / f'{mode}-before.mir').read_text()
+    old = '    %66:_(s32) = G_ZEXTLOAD %63(p2) :: (invariant load (s16) from %ir.50, align 1, !tbaa !2, addrspace 2)'
+    new = '''    %306:_(s8) = G_LOAD %63(p2) :: (invariant load (s8) from %ir.50, addrspace 2)
+    %307:_(p2) = G_PTR_ADD %63, %292(s32)
+    %308:_(s8) = G_LOAD %307(p2) :: (invariant load (s8) from %ir.50 + 1, addrspace 2)
+    %309:_(s16) = G_MERGE_VALUES %306(s8), %308(s8)
+    %66:_(s32) = G_ZEXT %309(s16)'''
+    assert pre.count(old) == 1
+    split = scratch / f'{mode}-split.mir'
+    split.write_text(pre.replace(old, new))
+    split_obj = scratch / f'{mode}-split.o'
+    run([tool / 'llc', '-mtriple=mos', '-mcpu=mosw65816',
+         '-mattr=+mos-a16' + (',+mos-xy16' if mode == 'xy16' else ''),
+         '-start-before=legalizer', '-verify-machineinstrs', '-filetype=obj',
+         split, '-o', split_obj])
+    split_dis = run([tool / 'llvm-objdump', '-dr', '--mcpu=mosw65816', split_obj])
+    (scratch / f'{mode}-split.dis').write_text(split_dis)
+    rows = []
+    location = 0
+    accum = index = 8
+    for number, line in enumerate((scratch / f'{mode}.s').read_text().splitlines(), 1):
+        match = re.search(r'\.loc\s+0\s+(\d+)', line)
+        if match:
+            location = int(match[1])
+        match = re.match(r'\s*(rep|sep)\s+#(\d+)', line)
+        if match:
+            mask = int(match[2])
+            width = 16 if match[1] == 'rep' else 8
+            if mask & 32:
+                accum = width
+            if mask & 16:
+                index = width
+        if re.match(r'\s*(lda|sta)\s+(\[|mos24\()', line):
+            rows.append({'probe': probes.get(location, 'readback'), 'source_line': location,
+                         'assembly_line': number, 'accumulator_bits': accum,
+                         'index_bits': index, 'instruction': line.strip()})
+    counts = {}
+    for label, dis in [('native', '\n'.join(plain)), ('split_control', split_dis)]:
+        counts[label] = {op: len(re.findall(r'^\s*[0-9a-f]+:\s+' + op + r'\b', dis, re.M))
+                         for op in ['b7', '97', 'a7', '87', 'bf']}
+    analysis[mode] = {'accesses': rows, 'counts': counts,
+                      'debug_disassembly_matches_plain': True,
+                      'plain_disassembly_matches_september_27': True}
+
+run([tool / 'mos-clang', '--target=mos', '-mcpu=mosw65816', '-E', source,
+     '-o', scratch / 'source.i'])
+identity = {
+    'attribution': 'OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e529-62c6-7fc2-a0c6-357800272c63',
+    'root_head': run(['git', 'rev-parse', 'HEAD']).strip(),
+    'working_directory': str(root),
+    'source_sha256': digest(source),
+    'toolchain_identity_reference': 'docs/defects/evidence/2026-09-27-farblit-byte-load/identity.json',
+    'tools': {name: {'path': str(tool / name), 'sha256': digest(tool / name)}
+              for name in ['clang-23', 'llc', 'lld', 'llvm-objdump']},
+    'control': 'Reconstructed MIR: replace only rdw extending word load with two byte loads, merge and zero extension; all other pre-legalizer MIR is unchanged. This is an instruction-shape control, not a historical compiler or timed/runtime-validated alternative.',
+    'runtime_command': 'dev/container.sh -- env MOS_TOOLCHAIN=/work/.scratch/farblit-t4/candidate-install bash dev/farblit.sh',
+    'runtime_exit_code': 1,
+}
+for mode in ['a16', 'xy16']:
+    for suffix in ['.s', '-before.mir', '-after.mir', '-split.mir', '-plain.dis', '-split.dis']:
+        name = mode + suffix
+        (evidence / (name + '.gz')).write_bytes(gzip.compress((scratch / name).read_bytes(), mtime=0))
+(evidence / 'source.c.txt').write_bytes(source.read_bytes())
+(evidence / 'source.i.gz').write_bytes(gzip.compress((scratch / 'source.i').read_bytes(), mtime=0))
+(evidence / 'analysis.json').write_text(json.dumps(analysis, indent=2) + '\n')
+(evidence / 'identity.json').write_text(json.dumps(identity, indent=2) + '\n')
+(evidence / 'commands.json').write_text(json.dumps(runs, indent=2) + '\n')
+(evidence / 'capture.py.txt').write_bytes(Path(__file__).read_bytes())
+print(json.dumps({mode: value['counts'] for mode, value in analysis.items()}, indent=2))

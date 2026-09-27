@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="ea1c68c4af31c2a181097037cc386697bb23225f241b51a9ab75905f46e8adc2"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="d18e854bd6da4122748ee66a24b6acce9161033820058fdbb88d6a4ad1317954"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
@@ -17,7 +17,7 @@ The <a href="investigations/2026-09-27-mos-carry-timing.md">preserved-build timi
 <p><strong>Separate diagnostic-only validation issue:</strong> MOS had no null target streamer for <code>-filetype=null</code>; patch 0068 supplies it, and the retained IR now passes the diagnostic and normal-object checks on the patched downstream build. A <a href="pr-preparations/2026-09-27/0068-validation.md">standalone extraction</a> is now validated on upstream <code>26d7c2c1eebf</code> (21 matching-input null-output repairs, 24 byte-identical ordinary outputs, 133 MOS passes and one unsupported). Independent review and upstream submission remain pending; the historical 0064 extraction remains unchanged. See the <a href="investigations/2026-09-27-mos-null-output-streamer.md">investigation</a>.
 <a href="investigations/2026-09-27-farblit-byte-load.md">Farblit legalization is repaired locally by 0066</a>:
 the original input and direct MIR pass, as do eight emulator assertions. The
-combined-stack opcode-count gate remains qualified. Publication
+combined-stack opcode-count deficit is reconciled: native <code>rdw</code> replaces indexed byte loads. The unchanged gate still fails; per-probe expectations remain follow-up work. Publication
 of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at <code>26d7c2c1eebf</code>;
 scheduler entry points and carry-class membership are unchanged. Test results
@@ -948,7 +948,7 @@ fixed-IR census repeats 39 distinct 6502 configurations; see the
 <p><strong>Separate diagnostic-only validation issue:</strong> MOS had no null target streamer for <code>-filetype=null</code>; patch 0068 supplies it, and the retained IR now passes the diagnostic and normal-object checks on the patched downstream build. A <a href="pr-preparations/2026-09-27/0068-validation.md">standalone extraction</a> is now validated on upstream <code>26d7c2c1eebf</code> (21 matching-input null-output repairs, 24 byte-identical ordinary outputs, 133 MOS passes and one unsupported). Independent review and upstream submission remain pending; the historical 0064 extraction remains unchanged. See the <a href="investigations/2026-09-27-mos-null-output-streamer.md">investigation</a>.
 <a href="investigations/2026-09-27-farblit-byte-load.md">Farblit legalization is repaired locally by 0066</a>:
 the original input and direct MIR pass, as do eight emulator assertions. The
-combined-stack opcode-count gate remains qualified. Publication
+combined-stack opcode-count deficit is reconciled: native <code>rdw</code> replaces indexed byte loads. The unchanged gate still fails; per-probe expectations remain follow-up work. Publication
 of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at <code>26d7c2c1eebf</code>;
 scheduler entry points and carry-class membership are unchanged. Test results

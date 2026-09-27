@@ -1,0 +1,48 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e529-62c6-7fc2-a0c6-357800272c63",
+  "root_head": "ff3cc764759923b8c08a9a4db142bb9b550c1b67",
+  "working_directory": "/home/will/llvm-mos-65816",
+  "source_sha256": "85e06d857f328458d8cf32667a5c186e99e0d5419607b2aa3e5e9595d0569b79",
+  "toolchain_identity_reference": "docs/defects/evidence/2026-09-27-farblit-byte-load/identity.json",
+  "tools": {
+    "clang-23": {
+      "path": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/clang-23",
+      "sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5"
+    },
+    "llc": {
+      "path": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "sha256": "21c7bfe4341465753816a4ea29884d16d09d0e279e332471e1a2054a03e0a70d"
+    },
+    "lld": {
+      "path": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/lld",
+      "sha256": "5142afb30cfa2d9725ea8f537d2155b86292691eb467301a6f814916e8a895e2"
+    },
+    "llvm-objdump": {
+      "path": "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "sha256": "8fa52335b6be0fc780f910a5d18610b57b17d0302561373b32708de1b227278f"
+    }
+  },
+  "control": "Reconstructed MIR: replace only rdw extending word load with two byte loads, merge and zero extension; all other pre-legalizer MIR is unchanged. This is an instruction-shape control, not a historical compiler or timed/runtime-validated alternative.",
+  "runtime_command": "dev/container.sh -- env MOS_TOOLCHAIN=/work/.scratch/farblit-t4/candidate-install bash dev/farblit.sh",
+  "runtime_exit_code": 1,
+  "runtime_artifacts": {
+    "build/farblit_a16.sfc": "20bbb635d3819131505f311d9fe1fce6bac7c30c8dd2840f9f068d1fa08cd7d1",
+    "build/farblit_press_a16.sfc": "48e35b378b9c2bb85896b35402ccaf0e1db0dddab9cbf60f730b102ddc4821d5",
+    "build/farblit_press_xy16.sfc": "a4d7db3ab1e5a36922337acffca12aa1aa91d0d47c4f5f9636b9f56b7e579328",
+    "build/farblit_xy16.sfc": "c9a705fd23beb6d09571f1908bb89df50ccb33c269055edad66360a61fab8277",
+    "build/farblit_a16.map": "259c3be88028e7c790897637732147c30dcbec83d6cb9df6e992d226b14f84e6",
+    "build/farblit_press_a16.map": "1d7aa9d4488f2eb43d07fd53a03aa40fbcba142104ea10739203ff8c1446e1da",
+    "build/farblit_press_xy16.map": "d4a5533e2436d23248c61d2e71525c042259b5cc7cc7e65925e8d6edb458c10e",
+    "build/farblit_xy16.map": "27d5d98f2e9cf7a18ec03dd2e160d9434f95b2f37060711d0e46ea29422bf6d2"
+  },
+  "runtime_matches_september_27": {
+    "build/farblit_a16.sfc": true,
+    "build/farblit_press_a16.sfc": true,
+    "build/farblit_press_xy16.sfc": true,
+    "build/farblit_xy16.sfc": true,
+    "build/farblit_a16.map": false,
+    "build/farblit_press_a16.map": true,
+    "build/farblit_press_xy16.map": true,
+    "build/farblit_xy16.map": false
+  }
+}

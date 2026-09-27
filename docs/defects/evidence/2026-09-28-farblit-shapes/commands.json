@@ -1,0 +1,348 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-c",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-plain.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-plain.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-gline-tables-only",
+      "-c",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-debug.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-debug.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-gline-tables-only",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16.s"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-mllvm",
+      "-stop-before=legalizer",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-before.mir"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-mllvm",
+      "-stop-after=legalizer",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-after.mir"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-split.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-split.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/a16-split.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-c",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-plain.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-plain.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-gline-tables-only",
+      "-c",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-debug.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-debug.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-gline-tables-only",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16.s"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-mllvm",
+      "-stop-before=legalizer",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-before.mir"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-mllvm",
+      "-stop-after=legalizer",
+      "-S",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-after.mir"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-split.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-split.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/xy16-split.o"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-t4/candidate-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-E",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-shapes/source.i"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  },
+  {
+    "command": [
+      "git",
+      "rev-parse",
+      "HEAD"
+    ],
+    "exit_code": 0,
+    "stderr": ""
+  }
+]

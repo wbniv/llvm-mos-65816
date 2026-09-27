@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "6d3820501bf49ed3629833a247c20a401fed8f645be2b83ea881ecc08910e769",
+  "sourceHash": "9aaa8c5df4828b116ebb87ffd1bf94b99d75afa298dd12044cd9c37f1f4e9e49",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -133,7 +133,7 @@
       "summary": "Patch 0066 repairs the farblit byte-load legalization failure: 0061 eagerly selects an extending far byte load after queuing its generic G_LOAD, and the in-place absolute rewrite leaves that target pseudo on the generic worklist. Build-and-erase removes the queued instruction. The unchanged historical source fails on the preserved baseline and passes with the repair; eight farblit/pressure emulator runs pass.",
       "localStatus": "fixed",
       "publicationStatus": "unposted",
-      "nextStep": "0066 repairs the retained legalization failure. Reconcile the separate farblit opcode-count gate; retain this repair with the far-address/native-width series.",
+      "nextStep": "0066 repairs the retained legalization failure. Instruction shapes are reconciled; replace aggregate counts with explicit per-probe coverage before claiming the farblit gate passes. Retain this repair with the far-address/native-width series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-farblit-byte-load-legalization.json"
       ],

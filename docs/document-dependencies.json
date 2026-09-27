@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "f2b7196f2257be940726c249786069be1ea6e2a7e46663aece78f2a77d30c05d",
+          "docs/upstream-dashboard-curation.json": "9979cd9f58af085f02b6d1a767c188538e6480ee914665cfcb112e37950eb338",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -85,7 +85,7 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "19945f5f5f15750b7fd8e7da3541966dfa725f38058bbcaae0034c80bb77e24d",
           "docs/defects/mos-coalescing-rc-undef.json": "17a8635cdbcb50795f93e4738e171b8432089e263e4228a87dfd10b7d21b88f0",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
@@ -103,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "152c68a5f9f0e431b9dc4f0ac4ac9815bff730fac04edefff8ec62e7ce03152d"
+          "docs/upstream-dashboard.json": "703711a8301454b221497c046887e292556721263f718b0d21b33f592103ff23"
         }
       }
     },
@@ -124,13 +124,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "b5a5526b7bf3f66fc8ce64cd5c484d2ba6b99c29ee4bfb809dc0be8aa7eea485",
+          "docs/upstream-pending-work.md": "b44793e93cc644870aa4dd3c6ca3df2832d87bf46bea9aff943bae33d382917a",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "152c68a5f9f0e431b9dc4f0ac4ac9815bff730fac04edefff8ec62e7ce03152d",
+          "docs/upstream-dashboard.json": "703711a8301454b221497c046887e292556721263f718b0d21b33f592103ff23",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "1d4087c62ef2932a9dda29d91e15a5eefac08e0b8d0c9d37646dcaacec82bc8f"
+          "docs/upstream-dashboard-graph.json": "83c932959e0ad6a75d0ef6bba3fc10a7f51d1afbda6fa3885efbcf3d3c157bc9"
         }
       }
     },
@@ -159,16 +159,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "b5a5526b7bf3f66fc8ce64cd5c484d2ba6b99c29ee4bfb809dc0be8aa7eea485",
-          "docs/upstream-contribution-status.md": "6ea4f1e44a73d3f03747370d82d5762577b1444ccd3db0db4ce6c45f7e2bb10a",
+          "docs/upstream-pending-work.md": "b44793e93cc644870aa4dd3c6ca3df2832d87bf46bea9aff943bae33d382917a",
+          "docs/upstream-contribution-status.md": "785106937ea29b33e1a1b43cba431a8284a745ce82cd7fa01cb7778ae6232efc",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "99574bbdd8a78bec6a69cfdc3862db467423d52bcf1266bf997e5652ae9c37aa",
-          "docs/mos-upstream-status-2026-09-21.html": "1dd021af3c5755e0fe4a57fa9ec9dbc44ed99b7ca9287c0f7566c8578f673ae7"
+          "docs/mos-upstream-flowchart.html": "fd59f30315facddb0518e6037bb83577089ee495faaa655b17c3ecc98e0d326b",
+          "docs/mos-upstream-status-2026-09-21.html": "4ead73047fa0ec3387cf9232bab0a8370bd91c067a5ccd73e52ce89960345ce7"
         }
       }
     },
@@ -452,16 +452,16 @@
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "b7e354f23e3b1bc85fbe439669221e6fbd559e9067a96bb2539ebefe8419023b",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:10:54.943226+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:09.579654+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -519,15 +519,15 @@
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:10:55.062078+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:09.676164+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -585,15 +585,15 @@
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:10:55.067557+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:09.680331+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -740,15 +740,15 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:10:55.473321+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:10.044847+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -795,7 +795,7 @@
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
           "docs/defects/mos-carry-scheduling-pressure.json": "19945f5f5f15750b7fd8e7da3541966dfa725f38058bbcaae0034c80bb77e24d",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47",
@@ -814,9 +814,9 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T23:11:03.764932+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:12.680018+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -877,13 +877,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "9588159c1abad65b3b54d16f108f29ee679e1ae809d3d43ca7e7a224f9a32656",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "7b9b1491dbbf6b1896b1ea5d445a21e6ce7096cbc459ffbbf72bedc0c01556ed",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
           "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a"
         },
-        "reviewed_at": "2026-09-27T05:34:52.861299+00:00",
-        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T23:35:12.876099+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -923,13 +923,13 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T10:21:50.696574+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T23:35:13.078779+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1723,9 +1723,9 @@
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T23:10:55.867212+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-27T23:35:14.173744+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1733,17 +1733,29 @@
       "sources": [
         "docs/defects/mos-farblit-byte-load-legalization.json",
         "patches/llvm-mos/0066-mos-far-extload-worklist.patch",
-        "dev/farblit.sh"
+        "dev/farblit.sh",
+        "examples/65816/farblit.c",
+        "patches/llvm-mos/0061-mos-far-global-long-x.patch",
+        "patches/llvm-mos/0062-mos-native-far-word.patch",
+        "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json",
+        "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json",
+        "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log"
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
           "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
-          "dev/farblit.sh": "10944f1328cc99cd6aad3219863709cf74ab40ba5d0eea4f55a987985748685f"
+          "dev/farblit.sh": "10944f1328cc99cd6aad3219863709cf74ab40ba5d0eea4f55a987985748685f",
+          "examples/65816/farblit.c": "85e06d857f328458d8cf32667a5c186e99e0d5419607b2aa3e5e9595d0569b79",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+          "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json": "9feb44ffe5673d03e02b65eb5e0d905fac79fcb606d99a4c533d251dea8f7b71",
+          "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json": "30388a0cf16e5f65f358cccaa52c3cdf74f5964959a43b0615b1f0f06292569f",
+          "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31"
         },
-        "reviewed_at": "2026-09-27T05:35:01.773280+00:00",
-        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T23:35:13.723461+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1786,12 +1798,12 @@
         "sources": {
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T13:13:48.184661+00:00",
-        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
-        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
+        "reviewed_at": "2026-09-27T23:35:13.723657+00:00",
+        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {

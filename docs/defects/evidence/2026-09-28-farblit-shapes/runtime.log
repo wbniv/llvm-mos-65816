@@ -1,0 +1,29 @@
+==> 0) generate the far table asm (tbl[i] = (i + (i>>16)) & 0xFFFF, 3 banks $C1..$C3)
+/work/build/farblit_tbl.s: 98304 entries (196608 bytes) -> .far_rodata (banks $C1..$C3)
+==> 1) -verify clean + the runtime-index fold fired
+  [a16] b7=2 97=2 a7=5 87=1 rep#$10=0
+  FAIL[a16]: want >= 3 b7 and >= 2 97
+  [xy16] b7=5 97=3 a7=1 87=0 rep#$10=5
+  FAIL[xy16]: want >= 6 b7, >= 3 97, <= 2 a7, 0 87, a rep #$10
+==> 2) host oracle
+  host oracle corpus_result=0x1E56EE65
+==> 3) [a16] build the HiROM ROM (far table) + checksum
+==> 4) [a16] MAME: corpus_result == 0x1E56EE65
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 120 ticks)
+==> 5) [a16] bsnes-jg: corpus_result == 0x1E56EE65 (independent confirmation)
+  SMOKE: PASS off=0x21F len=4 got=0x1E56EE65 (ran 240 frames, bsnes-jg)
+==> 3) [xy16] build the HiROM ROM (far table) + checksum
+==> 4) [xy16] MAME: corpus_result == 0x1E56EE65
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 120 ticks)
+==> 5) [xy16] bsnes-jg: corpus_result == 0x1E56EE65 (independent confirmation)
+  SMOKE: PASS off=0x21F len=4 got=0x1E56EE65 (ran 240 frames, bsnes-jg)
+==> 6) [press] 16-bit-Y far load under register pressure: host golden = 0xD695
+  [a16] MAME:
+SMOKE: PASS addr=0x7E020A len=2 got=0xD695 (ran 600 ticks)
+  SMOKE: PASS off=0x20A len=2 got=0xD695 (ran 900 frames, bsnes-jg)
+  PASS[xy16]: the 16-bit-Y fold fired (b7=1 in sample, 97=1 in fill)
+  [xy16] MAME:
+SMOKE: PASS addr=0x7E020A len=2 got=0xD695 (ran 600 ticks)
+  SMOKE: PASS off=0x20A len=2 got=0xD695 (ran 900 frames, bsnes-jg)
+
+RESULT: FAIL

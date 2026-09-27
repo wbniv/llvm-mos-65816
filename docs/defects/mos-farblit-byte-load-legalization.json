@@ -8,9 +8,10 @@
   "reproducer_origin": "original",
   "attribution": [
     "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994: observation during carry-scheduling validation and baseline capture. Original fixture attribution remains in the increment-2 plan.",
-    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Cause isolation, 0066 repair, direct MIR regression, preserved-input comparison and runtime validation."
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Cause isolation, 0066 repair, direct MIR regression, preserved-input comparison and runtime validation.",
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e529-62c6-7fc2-a0c6-357800272c63: instruction-shape reconciliation, reconstructed MIR control, and repeated runtime checks; no change to compiler or gate expectations."
   ],
-  "unknowns": "The unchanged farblit shell gate still exits 1 because its aggregate b7 minima are 3/6 while the combined stack emits 2/5. Its eight runtime checks pass. The a16 object is identical to the control with only 0061 eager selection removed; no repair of those opcode-count expectations or other optimization follow-up is claimed. No exact-upstream applicability or independent review is claimed.",
+  "unknowns": "The opcode-count deficit is reconciled in the September 28 investigation: native rdw replaces one/two indexed byte loads, while cp8 A16 remains outside the local range proof. The shell gate still exits 1 at unchanged minima 3/6 (observed 2/5); all eight runtime assertions pass on the preserved 0066 candidate. Replacing the aggregate gate and measuring indexed native-word/copy profitability remain separate work. No exact-upstream applicability or independent review is claimed.",
   "prior_work": {
     "disposition": "distinct_from_related",
     "search_terms": [
@@ -43,6 +44,13 @@
       "evidence": {
         "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/prior-work.json",
         "sha256": "231e6cee19740088dcdea90dd169af3f79b1ca4179a0b5f84f5c704a69029c33"
+      }
+    },
+    "reconciliation_2026_09_28": {
+      "decision": "Append to the existing legalization record as instruction-shape reconciliation; no new compiler defect or status change. 0002 contains runtime byte index folding, 0061 adds global long,X, 0062 native words, and 0066 repairs legalizer worklist handling. The tested binary is the preserved September 27 candidate, not the current installed toolchain. Fresh disassemblies and ROMs match the retained evidence. Reconstructed MIR control isolates rdw byte splitting; it is not a historical build.",
+      "evidence": {
+        "path": "docs/defects/evidence/2026-09-28-farblit-shapes/prior-work.json",
+        "sha256": "63b2ca579e5582f536e42aa1d33a72c803c4f0fcba65f171787859009b37aacd"
       }
     }
   },
@@ -294,6 +302,86 @@
     {
       "path": "docs/defects/evidence/2026-09-27-farblit-byte-load/vendor-before.diff.gz",
       "sha256": "6b4a02fc062b9332f57a56edbf87042030de085b1ac1be02bd3c2d3e7970f774"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16-after.mir.gz",
+      "sha256": "0c6a57b4b1c3a2182ba18cec1552987dc49ba82048ce9c101126d4f33a8c4cd2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16-before.mir.gz",
+      "sha256": "71056d3cf12e3bbb4f07b4f461eb5e15cf7de856cc90efb3b4e3cbd6ffb2b290"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16-plain.dis.gz",
+      "sha256": "9b459d9ee7731b8b8f222a2006bdecea33e6a2a350709cca39b8a389271a99eb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16-split.dis.gz",
+      "sha256": "e19890810fcc2415f413ece50175bf1c41bdafca5a21095152939c9697ea929d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16-split.mir.gz",
+      "sha256": "828a0ca37075508c0f9f9f3cb7f39a7bb2b570696df399c35303bb6cee3fcc9e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/a16.s.gz",
+      "sha256": "268a27d6c1bb551ba58870ff0b42b524290f0b48e91c6727cdcb0865a1290131"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json",
+      "sha256": "9feb44ffe5673d03e02b65eb5e0d905fac79fcb606d99a4c533d251dea8f7b71"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/capture.py.txt",
+      "sha256": "d230eccba4f77f408858360d8174c1d5a26404231995ce03dd66f4c41568720e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/commands.json",
+      "sha256": "f1856e1c6a845a384393a215247dea3b4062c292f94db322632571ba8b435b7d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json",
+      "sha256": "30388a0cf16e5f65f358cccaa52c3cdf74f5964959a43b0615b1f0f06292569f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/prior-work.json",
+      "sha256": "63b2ca579e5582f536e42aa1d33a72c803c4f0fcba65f171787859009b37aacd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log",
+      "sha256": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/source.c.txt",
+      "sha256": "85e06d857f328458d8cf32667a5c186e99e0d5419607b2aa3e5e9595d0569b79"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/source.i.gz",
+      "sha256": "dff5fdfa05db7628e9b719c1f6885152d215659ed20eb00bfb53787ba8455acf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16-after.mir.gz",
+      "sha256": "9ca0dd9c94fd45ce461f42b45fb4439e17003c77b76ca38fdd1846084e8c14b4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16-before.mir.gz",
+      "sha256": "129c7a059fb0adfc3c35c2312ff5009119de5a9bdc19b3d1b1f1705f3d328fdc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16-plain.dis.gz",
+      "sha256": "6edbde11a5a3fbc391e43cb42c0d2cc972905db55fa9102afbac9c95931674f0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16-split.dis.gz",
+      "sha256": "f90ecfe735533d13b4c3b240832898cd36c1e2fbfae38851d3a4c616f9a61205"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16-split.mir.gz",
+      "sha256": "d75f1ce457e61c84af5aeb8ce3e0a11ef17fa133a091eac65a2efced598fea53"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16.s.gz",
+      "sha256": "774f423abef2004b075557e99e49b63e49c6418b9aa66db333c0021f2cd0d705"
     }
   ],
   "baseline": {
