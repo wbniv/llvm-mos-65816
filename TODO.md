@@ -975,7 +975,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
 SNES is a separate platform track: prioritize reconciling #415, including the runtime
 contract of native mode, while independent fixes continue in parallel.
 
-- [T2] **Automate the live upstream dashboard.** Its [plan](docs/plans/2026-09-26-live-upstream-dashboard.md) leaves automated candidate review and cache invalidation from GitHub events as remaining work; the released dashboard does not depend on them. Reason for T2: bounded tooling with a written spec.
 - [wip T2] **Common SDK longjmp zero return — posted as [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450):** independent 6502 bug reproduced
   2026-09-20 against current upstream assembly. Candidate normalization passes 20/20
   integrated SDK CTest cases against freshly built current libraries/simulator; ready
@@ -1426,6 +1425,7 @@ revisit) rather than active work._
 
 ## Parked
 
+- **Automate the live upstream dashboard** — parked 2026‑09‑27 until next week’s token reset; was ranked T2. Its [plan](docs/plans/2026-09-26-live-upstream-dashboard.md) leaves automated candidate review and cache invalidation from GitHub events as remaining work; the released dashboard does not depend on them. Reason for T2: bounded tooling with a written spec.
 - **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
   folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
   case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
