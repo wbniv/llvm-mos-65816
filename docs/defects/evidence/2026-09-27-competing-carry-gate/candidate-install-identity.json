@@ -1,0 +1,10 @@
+{
+  "explanation": "candidate-identity.json identifies the build/bin tools. The frozen candidate install keeps the baseline analysis utilities; only clang, llc and lld were updated. Actual installed measurement utility identities are recorded here. Census-install instead matches all four original census tool hashes exactly.",
+  "tools": {
+    "clang-23": "3a46335aac9f3c4a3e2afa5d8a2e02cd2f5c157a997b5d848084cc37d85ba4eb",
+    "llc": "bc7194e4ee10bd6b86c9ae206d5c39186aa2f16193b4b9c8b5edc4d256f6b76f",
+    "lld": "9264f577bdaa789b03e2f9ba6110dbef16aa6982f9d1152709062e1cfc1cb175",
+    "llvm-size": "6c22048ce51c2f4ebfdcbc32f8c8309dbde5c6015af71ada513e892c185f98ee",
+    "llvm-objdump": "8fa52335b6be0fc780f910a5d18610b57b17d0302561373b32708de1b227278f"
+  }
+}

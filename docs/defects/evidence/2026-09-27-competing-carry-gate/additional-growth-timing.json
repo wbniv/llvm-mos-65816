@@ -1,0 +1,1077 @@
+[
+  {
+    "source": "examples/snes/avalanche.c",
+    "mode": "default",
+    "optimization": "Os",
+    "off": {
+      "samples": [
+        194399540
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Os.off.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.off.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e12",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e12",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "ca8ff11b9c78a4b927f41a118cf168513c0ae044e4e6d3fce6137337257c8a69"
+    },
+    "always": {
+      "samples": [
+        194399582
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Os.always.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.always.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e13",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e13",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "936f543336f440a914b9da5e630f0532360e717f029ddaa8ce0873a332cdf683"
+    },
+    "gated": {
+      "samples": [
+        194399582
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Os.gated.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.gated.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e13",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Os.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8e13",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "936f543336f440a914b9da5e630f0532360e717f029ddaa8ce0873a332cdf683"
+    }
+  },
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "Os",
+    "off": {
+      "samples": [
+        6015316
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Os.off.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.off.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x833d",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x833d",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "2647e9211ccf62c437fbaed36bd42d7b1e3d58df624e9a387c9f2e7a56544ca7"
+    },
+    "always": {
+      "samples": [
+        5999420
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Os.always.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.always.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x82fd",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x82fd",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "900f45809325f878c73cc1be90893cea978e2c97211fe77780991a69501842f8"
+    },
+    "gated": {
+      "samples": [
+        6018796
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Os.gated.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.gated.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x833d",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Os.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x833d",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "ad02fde82f2167ba0d11772f97cc433bcfc2c60714e5ae0ed6f98be28378ab9d"
+    }
+  },
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "O2",
+    "off": {
+      "samples": [
+        6015932
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.O2.off.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.off.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8340",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8340",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "3ac7bd39979fcc280275ebef40260f7d70a363e24fd9b10cbd9b7af8a473bab1"
+    },
+    "always": {
+      "samples": [
+        5999996
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.O2.always.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.always.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8300",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8300",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "101d5928a3d8421595f671554ae987c5d8d0a497e7ad5eb7bb1074856aa432cf"
+    },
+    "gated": {
+      "samples": [
+        6019372
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.O2.gated.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.gated.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8340",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.O2.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x8340",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "bf90a2bda6d7b38f95cdc2f38ccd2e691f2b1eec1746157567816b13c5ab9b55"
+    }
+  },
+  {
+    "source": "examples/snes/avalanche.c",
+    "mode": "default",
+    "optimization": "Oz",
+    "off": {
+      "samples": [
+        195115060
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Oz.off.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.off.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a83",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a83",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "500ada4a1ce3e6648cda66fadad929aca36bad3954d8f04aa790710b4dafa94a"
+    },
+    "always": {
+      "samples": [
+        195115058
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Oz.always.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.always.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a84",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a84",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "b0accda8e9802a570f9d42ddb1f6c92775628880665aec298b7e13d9dd63e3a0"
+    },
+    "gated": {
+      "samples": [
+        195115058
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_avalanche.c.default.Oz.gated.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.gated.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a84",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_avalanche.c.default.Oz.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802d",
+            "0x8a84",
+            "0xffffffff",
+            "0x210",
+            "2",
+            "0x27ea",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "b0accda8e9802a570f9d42ddb1f6c92775628880665aec298b7e13d9dd63e3a0"
+    }
+  },
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "Oz",
+    "off": {
+      "samples": [
+        6032318
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Oz.off.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.off.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.off.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x835f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.off.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x835f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "0d444520a24fa77b59ecf6afc42570c94fa911f7b2a756590c82a4819454f4c8"
+    },
+    "always": {
+      "samples": [
+        6016382
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Oz.always.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.always.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.always.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x831f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.always.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x831f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "9ea201980910089b44861c1a549f0a9f56a0e7cb14e4c00e1056c4d5ddc45800"
+    },
+    "gated": {
+      "samples": [
+        6035758
+      ],
+      "repeat_identical": true,
+      "commands": [
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+            "--config",
+            "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+            "-mcpu=mosw65816",
+            "-fno-lto",
+            "/home/will/llvm-mos-65816/build/carry-gate/census/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.o",
+            "-o",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.sfc"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+            "-t",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.sfc.elf"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x835f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+            "/home/will/llvm-mos-65816/build/carry-gate/additional-growth/examples_snes_corpus_matcascade_sim.c.default.Oz.gated.sfc",
+            "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+            "0x802a",
+            "0x835f",
+            "0xffffffff",
+            "0x200",
+            "2",
+            "0x8064",
+            "2000",
+            "1"
+          ],
+          "exit_code": 0
+        }
+      ],
+      "rom_sha256": "58f6780ab6c02339a8a2105747bd02b88f69fc40219d1cf65b3f01cbbb305b27"
+    }
+  }
+]

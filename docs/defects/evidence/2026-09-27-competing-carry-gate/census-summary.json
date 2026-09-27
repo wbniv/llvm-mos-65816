@@ -1,0 +1,230 @@
+[
+  {
+    "mode": "6502",
+    "optimization": "O2",
+    "inputs": 13,
+    "paired": 13,
+    "unpaired": [],
+    "always": {
+      "delta": -941,
+      "smaller": 5,
+      "larger": 0,
+      "code_changes": 6
+    },
+    "gated": {
+      "delta": -941,
+      "smaller": 5,
+      "larger": 0,
+      "code_changes": 6
+    }
+  },
+  {
+    "mode": "6502",
+    "optimization": "Os",
+    "inputs": 13,
+    "paired": 13,
+    "unpaired": [],
+    "always": {
+      "delta": -970,
+      "smaller": 5,
+      "larger": 1,
+      "code_changes": 7
+    },
+    "gated": {
+      "delta": -971,
+      "smaller": 5,
+      "larger": 0,
+      "code_changes": 6
+    }
+  },
+  {
+    "mode": "6502",
+    "optimization": "Oz",
+    "inputs": 13,
+    "paired": 13,
+    "unpaired": [],
+    "always": {
+      "delta": -996,
+      "smaller": 6,
+      "larger": 1,
+      "code_changes": 8
+    },
+    "gated": {
+      "delta": -997,
+      "smaller": 6,
+      "larger": 0,
+      "code_changes": 7
+    }
+  },
+  {
+    "mode": "a16",
+    "optimization": "O2",
+    "inputs": 409,
+    "paired": 406,
+    "unpaired": [],
+    "always": {
+      "delta": -13745,
+      "smaller": 73,
+      "larger": 3,
+      "code_changes": 78
+    },
+    "gated": {
+      "delta": -13021,
+      "smaller": 55,
+      "larger": 0,
+      "code_changes": 55
+    }
+  },
+  {
+    "mode": "a16",
+    "optimization": "Os",
+    "inputs": 409,
+    "paired": 408,
+    "unpaired": [],
+    "always": {
+      "delta": -8089,
+      "smaller": 64,
+      "larger": 6,
+      "code_changes": 71
+    },
+    "gated": {
+      "delta": -7943,
+      "smaller": 51,
+      "larger": 0,
+      "code_changes": 51
+    }
+  },
+  {
+    "mode": "a16",
+    "optimization": "Oz",
+    "inputs": 409,
+    "paired": 405,
+    "unpaired": [],
+    "always": {
+      "delta": -7496,
+      "smaller": 67,
+      "larger": 2,
+      "code_changes": 70
+    },
+    "gated": {
+      "delta": -7273,
+      "smaller": 48,
+      "larger": 0,
+      "code_changes": 48
+    }
+  },
+  {
+    "mode": "default",
+    "optimization": "O2",
+    "inputs": 409,
+    "paired": 373,
+    "unpaired": [],
+    "always": {
+      "delta": -59861,
+      "smaller": 230,
+      "larger": 2,
+      "code_changes": 234
+    },
+    "gated": {
+      "delta": -54994,
+      "smaller": 220,
+      "larger": 1,
+      "code_changes": 222
+    }
+  },
+  {
+    "mode": "default",
+    "optimization": "Os",
+    "inputs": 409,
+    "paired": 372,
+    "unpaired": [],
+    "always": {
+      "delta": -45809,
+      "smaller": 230,
+      "larger": 4,
+      "code_changes": 237
+    },
+    "gated": {
+      "delta": -41370,
+      "smaller": 217,
+      "larger": 2,
+      "code_changes": 220
+    }
+  },
+  {
+    "mode": "default",
+    "optimization": "Oz",
+    "inputs": 409,
+    "paired": 372,
+    "unpaired": [],
+    "always": {
+      "delta": -47479,
+      "smaller": 232,
+      "larger": 6,
+      "code_changes": 239
+    },
+    "gated": {
+      "delta": -44150,
+      "smaller": 218,
+      "larger": 2,
+      "code_changes": 221
+    }
+  },
+  {
+    "mode": "xy16",
+    "optimization": "O2",
+    "inputs": 409,
+    "paired": 404,
+    "unpaired": [],
+    "always": {
+      "delta": -13198,
+      "smaller": 71,
+      "larger": 4,
+      "code_changes": 77
+    },
+    "gated": {
+      "delta": -12692,
+      "smaller": 53,
+      "larger": 1,
+      "code_changes": 54
+    }
+  },
+  {
+    "mode": "xy16",
+    "optimization": "Os",
+    "inputs": 409,
+    "paired": 408,
+    "unpaired": [],
+    "always": {
+      "delta": -7983,
+      "smaller": 61,
+      "larger": 6,
+      "code_changes": 69
+    },
+    "gated": {
+      "delta": -7855,
+      "smaller": 49,
+      "larger": 0,
+      "code_changes": 49
+    }
+  },
+  {
+    "mode": "xy16",
+    "optimization": "Oz",
+    "inputs": 409,
+    "paired": 405,
+    "unpaired": [],
+    "always": {
+      "delta": -7299,
+      "smaller": 63,
+      "larger": 4,
+      "code_changes": 68
+    },
+    "gated": {
+      "delta": -7102,
+      "smaller": 46,
+      "larger": 0,
+      "code_changes": 46
+    }
+  }
+]

@@ -1,0 +1,2224 @@
+{
+  "scope": "Static sequence counts; CMP #1 candidates are not proven carry restores.",
+  "input_hashes": {
+    "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
+    "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-disassembly.tar.gz": "ec976a94852fee79889c12832a089c3029aceea540563c104addb545ee61e390"
+  },
+  "controls": [
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/sum-a16/normal.o.dis",
+      "sha256": "217cb920d50460fe4c9a6ff75855e2e35a43db5d6d06c736dc04c13c01779af0",
+      "materializations": 17,
+      "cmp1_candidates": 18,
+      "materialization_addresses": [
+        "0x4",
+        "0x13",
+        "0x23",
+        "0x35",
+        "0x45",
+        "0x56",
+        "0x7e",
+        "0x89",
+        "0x9b",
+        "0xa9",
+        "0xbb",
+        "0xcc",
+        "0x13a",
+        "0x14d",
+        "0x15b",
+        "0x16e",
+        "0x17c"
+      ],
+      "cmp1_addresses": [
+        "0x20",
+        "0x31",
+        "0x42",
+        "0x52",
+        "0x63",
+        "0x6c",
+        "0x98",
+        "0xa5",
+        "0xb8",
+        "0xc8",
+        "0xdb",
+        "0xe2",
+        "0x149",
+        "0x157",
+        "0x16a",
+        "0x178",
+        "0x18b",
+        "0x191"
+      ]
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline/rot-a16/normal.o.dis",
+      "sha256": "033e676ec2715c15311cfbf410971c2c1e49a94973cf95e2e4a08dc585ce9b6b",
+      "materializations": 12,
+      "cmp1_candidates": 12,
+      "materialization_addresses": [
+        "0x4",
+        "0x13",
+        "0x23",
+        "0x35",
+        "0x45",
+        "0x56",
+        "0x7e",
+        "0x89",
+        "0x9b",
+        "0xa9",
+        "0xbb",
+        "0xcc"
+      ],
+      "cmp1_addresses": [
+        "0x20",
+        "0x31",
+        "0x42",
+        "0x52",
+        "0x63",
+        "0x6c",
+        "0x98",
+        "0xa5",
+        "0xb8",
+        "0xc8",
+        "0xdb",
+        "0xe2"
+      ]
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/sum-a16/normal.o.dis",
+      "sha256": "e67f4300080432d2004612f29aca4f2edff404df3871a998e6d1d6c421553fe8",
+      "materializations": 0,
+      "cmp1_candidates": 0,
+      "materialization_addresses": [],
+      "cmp1_addresses": []
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/dynamic/rot-a16/normal.o.dis",
+      "sha256": "c88a415cce29d91d9de5d7f32787cdc60376b476e33791217ed5684498c04e75",
+      "materializations": 0,
+      "cmp1_candidates": 0,
+      "materialization_addresses": [],
+      "cmp1_addresses": []
+    }
+  ],
+  "rows": [
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 3,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.a16.Os.before.dis",
+          "sha256": "d303f9e6ce8c9734388701bd0a8fcadc4084cc3a91c10579565c310009f40a5c"
+        },
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.a16.Os.after.dis",
+          "sha256": "106764a9c9fc0b98d008891ca24fec8901a4e6d899221c19463827f5e27fedfc"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 3,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 17,
+            "materialization_addresses": [
+              "0xc5",
+              "0x38b",
+              "0x3c5",
+              "0x3d3",
+              "0x65b",
+              "0x679",
+              "0x685",
+              "0x6b6",
+              "0x6e4",
+              "0x6ef",
+              "0x72a",
+              "0x74a"
+            ],
+            "cmp1_addresses": [
+              "0xe2",
+              "0x106",
+              "0x117",
+              "0x217",
+              "0x243",
+              "0x2b2",
+              "0x2de",
+              "0x371",
+              "0x387",
+              "0x39a",
+              "0x3b2",
+              "0x3df",
+              "0x439",
+              "0x699",
+              "0x6ad",
+              "0x714",
+              "0x737"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 17,
+            "materialization_addresses": [
+              "0xc5",
+              "0x38b",
+              "0x3c5",
+              "0x3d3",
+              "0x64c",
+              "0x67a",
+              "0x688",
+              "0x6b9",
+              "0x6e7",
+              "0x6f2",
+              "0x72d",
+              "0x74d"
+            ],
+            "cmp1_addresses": [
+              "0xe2",
+              "0x106",
+              "0x117",
+              "0x217",
+              "0x243",
+              "0x2b2",
+              "0x2de",
+              "0x371",
+              "0x387",
+              "0x39a",
+              "0x3b2",
+              "0x3df",
+              "0x439",
+              "0x69a",
+              "0x6b0",
+              "0x717",
+              "0x73a"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 6,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.a16.Os.before.dis",
+          "sha256": "c05969d4980e0e59b4b68f3a396f75e0c2996382fca4d51f975549a54c91f708"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.a16.Os.after.dis",
+          "sha256": "8546bfe2d1464a2b052710f4075605c06f8039362e04e999448032077a1bf455"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 6,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x758"
+            ],
+            "cmp1_addresses": [
+              "0x22a"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x76b"
+            ],
+            "cmp1_addresses": [
+              "0x22a"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 5,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.a16.Os.before.dis",
+          "sha256": "d394a1680953fd22e71e437a050b25cddcf11436b91a2a238dfc228269c94da3"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.a16.Os.after.dis",
+          "sha256": "fd240411051e7080b6b8cb4e76452eb488a5d9a5f9d0f259abc9e0d45101039a"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 5,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xa0",
+              "0x380",
+              "0x3c3",
+              "0x3d1",
+              "0x683",
+              "0x6a1",
+              "0x6ad",
+              "0x6e0",
+              "0x70f",
+              "0x71a",
+              "0x75f",
+              "0x782"
+            ],
+            "cmp1_addresses": [
+              "0xbd",
+              "0xe1",
+              "0xf2",
+              "0x22b",
+              "0x2bd",
+              "0x366",
+              "0x37c",
+              "0x392",
+              "0x3b0",
+              "0x3dd",
+              "0x438",
+              "0x6c1",
+              "0x6d6",
+              "0x74d",
+              "0x76d"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xa0",
+              "0x380",
+              "0x3c3",
+              "0x3d1",
+              "0x674",
+              "0x6a2",
+              "0x6b0",
+              "0x6e5",
+              "0x714",
+              "0x71f",
+              "0x764",
+              "0x787"
+            ],
+            "cmp1_addresses": [
+              "0xbd",
+              "0xe1",
+              "0xf2",
+              "0x22b",
+              "0x2bd",
+              "0x366",
+              "0x37c",
+              "0x392",
+              "0x3b0",
+              "0x3dd",
+              "0x438",
+              "0x6c2",
+              "0x6db",
+              "0x752",
+              "0x772"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 4,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.a16.Os.before.dis",
+          "sha256": "6033436aff1163507522678720e6fd85a0d1d34a88b3023ff865033084bda804"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.a16.Os.after.dis",
+          "sha256": "d9c7c139f6ddb127c7f7f9b621e1c5df594e209c09f5cc30cf1d13f1821dec67"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "fill_cell",
+          "size_delta": 4,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1dd"
+            ]
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1e1"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/lsystem.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 5,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_lsystem.c.a16.Os.before.dis",
+          "sha256": "ee8acddd6bb8a746cbbf8bb4c88ac12d6ae49b857d7904f8c5c95ab36d966d55"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_lsystem.c.a16.Os.after.dis",
+          "sha256": "a687dadf4fc35f10f872e3ef9bc97ecb2cd320c2efa5dbef6c33242721f1c0cf"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 5,
+          "before": {
+            "materializations": 13,
+            "cmp1_candidates": 30,
+            "materialization_addresses": [
+              "0x503",
+              "0x7b9",
+              "0x7fd",
+              "0x80b",
+              "0xb8f",
+              "0xbad",
+              "0xbb9",
+              "0xbec",
+              "0xc10",
+              "0xc1b",
+              "0xc58",
+              "0xc7d",
+              "0x1120"
+            ],
+            "cmp1_addresses": [
+              "0x351",
+              "0x420",
+              "0x520",
+              "0x544",
+              "0x555",
+              "0x684",
+              "0x719",
+              "0x79f",
+              "0x7b5",
+              "0x7cf",
+              "0x7e6",
+              "0x817",
+              "0x8af",
+              "0xbcd",
+              "0xbe2",
+              "0xc46",
+              "0xc66",
+              "0xd65",
+              "0xe41",
+              "0xef7",
+              "0x108f",
+              "0x1134",
+              "0x115d",
+              "0x1180",
+              "0x118f",
+              "0x11b3",
+              "0x11c2",
+              "0x11e6",
+              "0x11f5",
+              "0x122d"
+            ]
+          },
+          "after": {
+            "materializations": 13,
+            "cmp1_candidates": 30,
+            "materialization_addresses": [
+              "0x503",
+              "0x7b9",
+              "0x7fd",
+              "0x80b",
+              "0xb80",
+              "0xbae",
+              "0xbbc",
+              "0xbf1",
+              "0xc15",
+              "0xc20",
+              "0xc5d",
+              "0xc82",
+              "0x1125"
+            ],
+            "cmp1_addresses": [
+              "0x351",
+              "0x420",
+              "0x520",
+              "0x544",
+              "0x555",
+              "0x684",
+              "0x719",
+              "0x79f",
+              "0x7b5",
+              "0x7cf",
+              "0x7e6",
+              "0x817",
+              "0x8af",
+              "0xbce",
+              "0xbe7",
+              "0xc4b",
+              "0xc6b",
+              "0xd6a",
+              "0xe46",
+              "0xefc",
+              "0x1094",
+              "0x1139",
+              "0x1162",
+              "0x1185",
+              "0x1194",
+              "0x11b8",
+              "0x11c7",
+              "0x11eb",
+              "0x11fa",
+              "0x1232"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/spirograph.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 11,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_spirograph.c.a16.Os.before.dis",
+          "sha256": "c115e6580d569f671a14accfe992150c5ca45008e8e683d7823e50085e0bb947"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_spirograph.c.a16.Os.after.dis",
+          "sha256": "f9afc068d76adf49a983acbb0ee89822e002ad6be6301c5dd1fc753ff783f97f"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "hud_update",
+          "size_delta": 11,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 3,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Os.before.dis",
+          "sha256": "af5533f4f62b902b505d7da294dd8f1f5983e054589293737af090c9542adfff"
+        },
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Os.after.dis",
+          "sha256": "29e16af622ad8beb95191b8a5ca395dc39c217a1b6f25e8280d11e2d03d0a25d"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 3,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 13,
+            "materialization_addresses": [
+              "0xd5",
+              "0x354",
+              "0x38e",
+              "0x39c",
+              "0x610",
+              "0x62e",
+              "0x63a",
+              "0x66b",
+              "0x699",
+              "0x6a4",
+              "0x6df",
+              "0x6ff"
+            ],
+            "cmp1_addresses": [
+              "0x105",
+              "0x11d",
+              "0x12e",
+              "0x33a",
+              "0x350",
+              "0x363",
+              "0x37b",
+              "0x3a8",
+              "0x402",
+              "0x64e",
+              "0x662",
+              "0x6c9",
+              "0x6ec"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 13,
+            "materialization_addresses": [
+              "0xd5",
+              "0x354",
+              "0x38e",
+              "0x39c",
+              "0x60b",
+              "0x62f",
+              "0x63d",
+              "0x66e",
+              "0x69c",
+              "0x6a7",
+              "0x6e2",
+              "0x702"
+            ],
+            "cmp1_addresses": [
+              "0x105",
+              "0x11d",
+              "0x12e",
+              "0x33a",
+              "0x350",
+              "0x363",
+              "0x37b",
+              "0x3a8",
+              "0x402",
+              "0x64f",
+              "0x665",
+              "0x6cc",
+              "0x6ef"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 6,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.xy16.Os.before.dis",
+          "sha256": "026b5a614489a1d5696f98a7aa66c29143df9c4bf3fee44d9a5d8b5f8d08fc61"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.xy16.Os.after.dis",
+          "sha256": "4119fa85fb9f1a448c7fa46a85deda6897afaa8bddd37228cff0f7582b5bd05b"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 6,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x746"
+            ],
+            "cmp1_addresses": [
+              "0x22a"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x759"
+            ],
+            "cmp1_addresses": [
+              "0x22a"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 8,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Os.before.dis",
+          "sha256": "ea29eda666915ec53f63f13f27a2650dd4ec78b418ce083282e32daa2f09ab1b"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Os.after.dis",
+          "sha256": "081c925691402c3812dffa2e777b71d9ee60623808276605b357bbe70a16cff6"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 8,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xc2",
+              "0x3f1",
+              "0x434",
+              "0x442",
+              "0x6e0",
+              "0x6fe",
+              "0x70a",
+              "0x73d",
+              "0x76c",
+              "0x777",
+              "0x7bc",
+              "0x7df"
+            ],
+            "cmp1_addresses": [
+              "0x103",
+              "0x11b",
+              "0x12c",
+              "0x26f",
+              "0x32e",
+              "0x3d7",
+              "0x3ed",
+              "0x403",
+              "0x421",
+              "0x44e",
+              "0x4a9",
+              "0x71e",
+              "0x733",
+              "0x7aa",
+              "0x7ca"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xc2",
+              "0x3f1",
+              "0x438",
+              "0x446",
+              "0x6df",
+              "0x703",
+              "0x711",
+              "0x746",
+              "0x775",
+              "0x780",
+              "0x7c5",
+              "0x7e8"
+            ],
+            "cmp1_addresses": [
+              "0x103",
+              "0x11b",
+              "0x12c",
+              "0x26f",
+              "0x32e",
+              "0x3d7",
+              "0x3ed",
+              "0x407",
+              "0x425",
+              "0x452",
+              "0x4ad",
+              "0x723",
+              "0x73c",
+              "0x7b3",
+              "0x7d3"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 4,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Os.before.dis",
+          "sha256": "1c205dcd143f3b8845d09a48cbad5ae1ff6e6a3cae1a9a5f1dd06dcc25612ab9"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Os.after.dis",
+          "sha256": "5f518da4cc51f92c8d89cdd4afdc3b9be3aa95cd6aa8f3b047a70cda8e10b33c"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "fill_cell",
+          "size_delta": 4,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x201"
+            ]
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x205"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/lsystem.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 9,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_lsystem.c.xy16.Os.before.dis",
+          "sha256": "29cbc54965ee25211e44b62d81c24ed373ee42c2d0b095474079991bee7382b1"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_lsystem.c.xy16.Os.after.dis",
+          "sha256": "444f80a4c87861e489772182d72bead7a1af7dad087c125779b088044d5a4fba"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 9,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 25,
+            "materialization_addresses": [
+              "0x4f1",
+              "0x85e",
+              "0x89d",
+              "0x8ab",
+              "0xbc9",
+              "0xbe7",
+              "0xbf3",
+              "0xc26",
+              "0xc55",
+              "0xc60",
+              "0xca5",
+              "0xcca"
+            ],
+            "cmp1_addresses": [
+              "0x321",
+              "0x3f0",
+              "0x532",
+              "0x54a",
+              "0x55b",
+              "0x6a2",
+              "0x762",
+              "0x844",
+              "0x85a",
+              "0x876",
+              "0x892",
+              "0x8b7",
+              "0x914",
+              "0xc07",
+              "0xc1c",
+              "0xc93",
+              "0xcb3",
+              "0xdb3",
+              "0xe8f",
+              "0xf45",
+              "0x10c8",
+              "0x11a1",
+              "0x11be",
+              "0x11db",
+              "0x120b"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 25,
+            "materialization_addresses": [
+              "0x4f1",
+              "0x85e",
+              "0x8a1",
+              "0x8af",
+              "0xbc8",
+              "0xbec",
+              "0xbfa",
+              "0xc2f",
+              "0xc5e",
+              "0xc69",
+              "0xcae",
+              "0xcd3"
+            ],
+            "cmp1_addresses": [
+              "0x321",
+              "0x3f0",
+              "0x532",
+              "0x54a",
+              "0x55b",
+              "0x6a2",
+              "0x762",
+              "0x844",
+              "0x85a",
+              "0x876",
+              "0x892",
+              "0x8bb",
+              "0x918",
+              "0xc0c",
+              "0xc25",
+              "0xc9c",
+              "0xcbc",
+              "0xdbc",
+              "0xe98",
+              "0xf4e",
+              "0x10d1",
+              "0x11aa",
+              "0x11c7",
+              "0x11e4",
+              "0x1214"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/spirograph.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 15,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_spirograph.c.xy16.Os.before.dis",
+          "sha256": "2d0e8954f82434686225c88b99fe19511ea3c8a73901c9fe47a703c2adf56623"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_spirograph.c.xy16.Os.after.dis",
+          "sha256": "6d182f64c6c7ffa72b52990c0ce8c969c981177ae28ab798ee2f6890b8f95670"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "hud_update",
+          "size_delta": 15,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Os.before.dis",
+          "sha256": "463e7bd2c59b8b64f4f58d3dc5e9f26f2e2bc808f74472efeace96499945b8fe"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Os.after.dis",
+          "sha256": "7bbe2a5e967d959599cefc2580d04f52ac3451d3d5d6de0e06f9bc71d1e43a01"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x170"
+            ],
+            "cmp1_addresses": [
+              "0x1a5"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x171"
+            ],
+            "cmp1_addresses": [
+              "0x1a6"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/rotkal_sim.c",
+      "mode": "default",
+      "optimization": "Os",
+      "census": "carry-dynamic-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Os.before.dis",
+          "sha256": "f71de3a357acc149bdb7af5d72f0fcaa1334486facd2883390719e1e456fd99b"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Os.after.dis",
+          "sha256": "0cc320789eb0949f662b5f91245ef89904b2ec1451521e3b15e33973a0ddc383"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "a16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 11,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.a16.Oz.before.dis",
+          "sha256": "2380fc7be7fe7faac56d0968e076f6a76f93184d46744181d828f9957563fdc9"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.a16.Oz.after.dis",
+          "sha256": "9ddc43fb592c13674cf316bda078eb1a07117db9e4bd1eb9c96dbcfb8bfaf9c5"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 11,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x5e5"
+            ],
+            "cmp1_addresses": [
+              "0x149"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x5f4"
+            ],
+            "cmp1_addresses": [
+              "0x149"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 4,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.a16.Oz.before.dis",
+          "sha256": "f13ae9af36eab6e701c19c84e01d12e1736ab63e04b6ccd45203d8b4fe3991cb"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.a16.Oz.after.dis",
+          "sha256": "5e7e27f43f3488fee640228aebcf6d9cf20524d82bfa66049958183e9f4d7fd6"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "fill_cell",
+          "size_delta": 4,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1e6"
+            ]
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1ea"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 17,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Oz.before.dis",
+          "sha256": "bbed7fa9a1bbab62582b7fef88c14f232b84aaf64040da7118e31f0ba985365d"
+        },
+        {
+          "member": "carry-dynamic-census/examples_65816_rcundef2.c.xy16.Oz.after.dis",
+          "sha256": "8d0e2936ec961ea972d5c99c77eb4eebf2fbceb6cdd11fe7e89747c63b56be0a"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 17,
+          "before": {
+            "materializations": 11,
+            "cmp1_candidates": 10,
+            "materialization_addresses": [
+              "0x1cc",
+              "0x20e",
+              "0x21c",
+              "0x4a8",
+              "0x4c6",
+              "0x4d2",
+              "0x4fe",
+              "0x52c",
+              "0x537",
+              "0x572",
+              "0x591"
+            ],
+            "cmp1_addresses": [
+              "0x1b6",
+              "0x1c8",
+              "0x1d6",
+              "0x1f7",
+              "0x228",
+              "0x284",
+              "0x4e6",
+              "0x4fa",
+              "0x55c",
+              "0x57f"
+            ]
+          },
+          "after": {
+            "materializations": 11,
+            "cmp1_candidates": 10,
+            "materialization_addresses": [
+              "0x1cc",
+              "0x204",
+              "0x212",
+              "0x4b1",
+              "0x4d5",
+              "0x4e3",
+              "0x50f",
+              "0x53d",
+              "0x548",
+              "0x583",
+              "0x5a2"
+            ],
+            "cmp1_addresses": [
+              "0x1b6",
+              "0x1c8",
+              "0x1d6",
+              "0x1ed",
+              "0x21e",
+              "0x27a",
+              "0x4f5",
+              "0x50b",
+              "0x56d",
+              "0x590"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 11,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.xy16.Oz.before.dis",
+          "sha256": "ec2468364ae4b36dea1eef5f4445371d92048c0cd44d9c014c89305687b8d075"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_avalanche.c.xy16.Oz.after.dis",
+          "sha256": "c1218dc47856d643e36298593b39647705f5bc18c329bfd41e7c89f8abbf2551"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 11,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x5d1"
+            ],
+            "cmp1_addresses": [
+              "0x149"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0x5e0"
+            ],
+            "cmp1_addresses": [
+              "0x149"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 41,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Oz.before.dis",
+          "sha256": "cc9f4b5b1f2726e8fd54d23ce6ba65a175a937afc93d7297b77db0d6d486466b"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_lsystem_sim.c.xy16.Oz.after.dis",
+          "sha256": "3905786440c9979f66d338a52975efd2b128f0f60193504562d4957c444f883d"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 41,
+          "before": {
+            "materializations": 10,
+            "cmp1_candidates": 11,
+            "materialization_addresses": [
+              "0x1fc",
+              "0x208",
+              "0x4bc",
+              "0x4d6",
+              "0x4e2",
+              "0x50a",
+              "0x534",
+              "0x53f",
+              "0x584",
+              "0x5a0"
+            ],
+            "cmp1_addresses": [
+              "0x1a4",
+              "0x1ae",
+              "0x1bc",
+              "0x214",
+              "0x273",
+              "0x4f6",
+              "0x506",
+              "0x572",
+              "0x592",
+              "0x684",
+              "0x729"
+            ]
+          },
+          "after": {
+            "materializations": 10,
+            "cmp1_candidates": 11,
+            "materialization_addresses": [
+              "0x213",
+              "0x21f",
+              "0x4cf",
+              "0x4f3",
+              "0x501",
+              "0x530",
+              "0x55f",
+              "0x56a",
+              "0x5af",
+              "0x5cf"
+            ],
+            "cmp1_addresses": [
+              "0x1c6",
+              "0x1d0",
+              "0x1de",
+              "0x22b",
+              "0x286",
+              "0x513",
+              "0x52c",
+              "0x59d",
+              "0x5bd",
+              "0x6cc",
+              "0x76f"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 4,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Oz.before.dis",
+          "sha256": "52f3db21508ab10d21a30b6587c91428d9be990d34117aaf2998101ae985f4e2"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_dctbloom.c.xy16.Oz.after.dis",
+          "sha256": "16b31714766fe5fa57f1917fe66f4d1cb9e941488196b24c3d181a052cd6de7d"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "fill_cell",
+          "size_delta": 4,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1fa"
+            ]
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [],
+            "cmp1_addresses": [
+              "0x1fe"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Oz.before.dis",
+          "sha256": "f6100ec028827eea1fe99b8d8efc93e32ebfd46965658fc4b37c5f87a359be08"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_bf_vm_sim.c.default.Oz.after.dis",
+          "sha256": "aa6581ce6338dbe66ca9f2410216dd2b672c5ad3865eee8c4294ed8fdea747b4"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0xea"
+            ],
+            "cmp1_addresses": [
+              "0x11e"
+            ]
+          },
+          "after": {
+            "materializations": 1,
+            "cmp1_candidates": 1,
+            "materialization_addresses": [
+              "0xea"
+            ],
+            "cmp1_addresses": [
+              "0x11e"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/rotkal_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Oz.before.dis",
+          "sha256": "6a9dc400d4a9fa8e1d42abec9057be5d0d62ffa3c6f8f7e0054f8b0251379931"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_rotkal_sim.c.default.Oz.after.dis",
+          "sha256": "4abf9a86b65bc563a2aae477da7a2be89c7099818e989c61f77c931977d9e596"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/seqvm_sim.c",
+      "mode": "default",
+      "optimization": "Oz",
+      "census": "carry-dynamic-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_seqvm_sim.c.default.Oz.before.dis",
+          "sha256": "3d845c237f34615e7d7d23c946a0980d172c1fd1825c658e7e7cc447083fb10b"
+        },
+        {
+          "member": "carry-dynamic-census/examples_snes_corpus_seqvm_sim.c.default.Oz.after.dis",
+          "sha256": "771c015852d96e8963c88423072938831d0fae6e043d10b94817e93ba07163a1"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/bf_vm_sim.c",
+      "mode": "default",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_snes_corpus_bf_vm_sim.c.default.O2.before.dis",
+          "sha256": "1e216a12a0701abd5d9421bdad84049ac8cb34980c8a0afa9affcbf81dfde25e"
+        },
+        {
+          "member": "carry-O2-census/examples_snes_corpus_bf_vm_sim.c.default.O2.after.dis",
+          "sha256": "fea452cb9ff9bf78f540c14628f3ea59a6ce2d81175dd63bdcb3df79ca75bada"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 3,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_65816_rcundef2.c.a16.O2.before.dis",
+          "sha256": "94eb3ac9845c3e34311e3ab9a1b87c9fed904b83dd88763fce7d876f7ed2bbce"
+        },
+        {
+          "member": "carry-O2-census/examples_65816_rcundef2.c.a16.O2.after.dis",
+          "sha256": "a323d2b3feedc63bce8449b61b2c44a098b30592732154ca9e306426ee4bfd93"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 3,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 17,
+            "materialization_addresses": [
+              "0x10b",
+              "0x1f6",
+              "0x230",
+              "0x23e",
+              "0x4cc",
+              "0x4ea",
+              "0x4f6",
+              "0x527",
+              "0x555",
+              "0x560",
+              "0x59b",
+              "0x5bb"
+            ],
+            "cmp1_addresses": [
+              "0x128",
+              "0x14c",
+              "0x15d",
+              "0x1dc",
+              "0x1f2",
+              "0x205",
+              "0x21d",
+              "0x24a",
+              "0x2a4",
+              "0x50a",
+              "0x51e",
+              "0x585",
+              "0x5a8",
+              "0x655",
+              "0x681",
+              "0x6f0",
+              "0x71c"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 17,
+            "materialization_addresses": [
+              "0x10b",
+              "0x1f6",
+              "0x230",
+              "0x23e",
+              "0x4bd",
+              "0x4eb",
+              "0x4f9",
+              "0x52a",
+              "0x558",
+              "0x563",
+              "0x59e",
+              "0x5be"
+            ],
+            "cmp1_addresses": [
+              "0x128",
+              "0x14c",
+              "0x15d",
+              "0x1dc",
+              "0x1f2",
+              "0x205",
+              "0x21d",
+              "0x24a",
+              "0x2a4",
+              "0x50b",
+              "0x521",
+              "0x588",
+              "0x5ab",
+              "0x658",
+              "0x684",
+              "0x6f3",
+              "0x71f"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 5,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_snes_corpus_lsystem_sim.c.a16.O2.before.dis",
+          "sha256": "dfb1b0991abe52c6d1db66c4754ed02280e160d46bebbc6393158a785a1f278c"
+        },
+        {
+          "member": "carry-O2-census/examples_snes_corpus_lsystem_sim.c.a16.O2.after.dis",
+          "sha256": "9c3810ed929db1f9ef26d1d4f008048972b1a4af69a11a016eedfd4d1fa31608"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 5,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xe8",
+              "0x1df",
+              "0x222",
+              "0x230",
+              "0x4ec",
+              "0x50a",
+              "0x516",
+              "0x549",
+              "0x578",
+              "0x583",
+              "0x5c8",
+              "0x5eb"
+            ],
+            "cmp1_addresses": [
+              "0x105",
+              "0x129",
+              "0x13a",
+              "0x1c5",
+              "0x1db",
+              "0x1f1",
+              "0x20f",
+              "0x23c",
+              "0x297",
+              "0x52a",
+              "0x53f",
+              "0x5b6",
+              "0x5d6",
+              "0x6b3",
+              "0x745"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0xe8",
+              "0x1df",
+              "0x222",
+              "0x230",
+              "0x4dd",
+              "0x50b",
+              "0x519",
+              "0x54e",
+              "0x57d",
+              "0x588",
+              "0x5cd",
+              "0x5f0"
+            ],
+            "cmp1_addresses": [
+              "0x105",
+              "0x129",
+              "0x13a",
+              "0x1c5",
+              "0x1db",
+              "0x1f1",
+              "0x20f",
+              "0x23c",
+              "0x297",
+              "0x52b",
+              "0x544",
+              "0x5bb",
+              "0x5db",
+              "0x6b8",
+              "0x74a"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/lsystem.c",
+      "mode": "a16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 5,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_snes_lsystem.c.a16.O2.before.dis",
+          "sha256": "62ce53705bec92955c5bb1e407ce3d6d7f34644302621aa498e24f2761edbe8e"
+        },
+        {
+          "member": "carry-O2-census/examples_snes_lsystem.c.a16.O2.after.dis",
+          "sha256": "3501e0b30332c29821f5237f15504a82bd9b1b7864ded814b408338c5182c5f8"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 5,
+          "before": {
+            "materializations": 14,
+            "cmp1_candidates": 30,
+            "materialization_addresses": [
+              "0x1ee",
+              "0x62a",
+              "0x9e0",
+              "0x9fe",
+              "0xa0a",
+              "0xa3d",
+              "0xa61",
+              "0xa6c",
+              "0xab7",
+              "0xadc",
+              "0xcf0",
+              "0xd34",
+              "0xd42",
+              "0x1158"
+            ],
+            "cmp1_addresses": [
+              "0x42a",
+              "0x4fc",
+              "0x647",
+              "0x66b",
+              "0x67c",
+              "0x6fe",
+              "0xa1e",
+              "0xa33",
+              "0xaa5",
+              "0xac5",
+              "0xb9b",
+              "0xc30",
+              "0xcd6",
+              "0xcec",
+              "0xd06",
+              "0xd1d",
+              "0xd4e",
+              "0xe59",
+              "0xf3b",
+              "0xff5",
+              "0x116c",
+              "0x1195",
+              "0x11b8",
+              "0x11c7",
+              "0x11eb",
+              "0x11fa",
+              "0x121e",
+              "0x122d",
+              "0x1265",
+              "0x12ec"
+            ]
+          },
+          "after": {
+            "materializations": 14,
+            "cmp1_candidates": 30,
+            "materialization_addresses": [
+              "0x1ee",
+              "0x62a",
+              "0x9d1",
+              "0x9ff",
+              "0xa0d",
+              "0xa42",
+              "0xa66",
+              "0xa71",
+              "0xabc",
+              "0xae1",
+              "0xcf5",
+              "0xd39",
+              "0xd47",
+              "0x115d"
+            ],
+            "cmp1_addresses": [
+              "0x42a",
+              "0x4fc",
+              "0x647",
+              "0x66b",
+              "0x67c",
+              "0x6fe",
+              "0xa1f",
+              "0xa38",
+              "0xaaa",
+              "0xaca",
+              "0xba0",
+              "0xc35",
+              "0xcdb",
+              "0xcf1",
+              "0xd0b",
+              "0xd22",
+              "0xd53",
+              "0xe5e",
+              "0xf40",
+              "0xffa",
+              "0x1171",
+              "0x119a",
+              "0x11bd",
+              "0x11cc",
+              "0x11f0",
+              "0x11ff",
+              "0x1223",
+              "0x1232",
+              "0x126a",
+              "0x12f1"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 3,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_65816_rcundef2.c.xy16.O2.before.dis",
+          "sha256": "92f8362ad885f919ee5a9b21bead940f48b85a76e7ed828f59538aa8918bfb11"
+        },
+        {
+          "member": "carry-O2-census/examples_65816_rcundef2.c.xy16.O2.after.dis",
+          "sha256": "0e7b8992572a9426ec239d36ffc9bb67630ee8075e592ddbc793eec960d1b15d"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 3,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 13,
+            "materialization_addresses": [
+              "0x11d",
+              "0x20f",
+              "0x249",
+              "0x257",
+              "0x4d1",
+              "0x4ef",
+              "0x4fb",
+              "0x52c",
+              "0x55a",
+              "0x565",
+              "0x5a0",
+              "0x5c0"
+            ],
+            "cmp1_addresses": [
+              "0x14d",
+              "0x165",
+              "0x176",
+              "0x1f5",
+              "0x20b",
+              "0x21e",
+              "0x236",
+              "0x263",
+              "0x2bd",
+              "0x50f",
+              "0x523",
+              "0x58a",
+              "0x5ad"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 13,
+            "materialization_addresses": [
+              "0x11d",
+              "0x20f",
+              "0x249",
+              "0x257",
+              "0x4cc",
+              "0x4f0",
+              "0x4fe",
+              "0x52f",
+              "0x55d",
+              "0x568",
+              "0x5a3",
+              "0x5c3"
+            ],
+            "cmp1_addresses": [
+              "0x14d",
+              "0x165",
+              "0x176",
+              "0x1f5",
+              "0x20b",
+              "0x21e",
+              "0x236",
+              "0x263",
+              "0x2bd",
+              "0x510",
+              "0x526",
+              "0x58d",
+              "0x5b0"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 8,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_snes_corpus_lsystem_sim.c.xy16.O2.before.dis",
+          "sha256": "a8159347a3ca74be72830a84ffdb592a0a5c141b1272e212b77221b3f9f1b456"
+        },
+        {
+          "member": "carry-O2-census/examples_snes_corpus_lsystem_sim.c.xy16.O2.after.dis",
+          "sha256": "5ec5e0d6e5eb7a3e5137c703be9b462049577011b7f55b08bec9cf8107854985"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 8,
+          "before": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0x10d",
+              "0x21c",
+              "0x25f",
+              "0x26d",
+              "0x515",
+              "0x533",
+              "0x53f",
+              "0x572",
+              "0x5a1",
+              "0x5ac",
+              "0x5f1",
+              "0x614"
+            ],
+            "cmp1_addresses": [
+              "0x14e",
+              "0x166",
+              "0x177",
+              "0x202",
+              "0x218",
+              "0x22e",
+              "0x24c",
+              "0x279",
+              "0x2d4",
+              "0x553",
+              "0x568",
+              "0x5df",
+              "0x5ff",
+              "0x6e3",
+              "0x7a2"
+            ]
+          },
+          "after": {
+            "materializations": 12,
+            "cmp1_candidates": 15,
+            "materialization_addresses": [
+              "0x10d",
+              "0x21c",
+              "0x263",
+              "0x271",
+              "0x514",
+              "0x538",
+              "0x546",
+              "0x57b",
+              "0x5aa",
+              "0x5b5",
+              "0x5fa",
+              "0x61d"
+            ],
+            "cmp1_addresses": [
+              "0x14e",
+              "0x166",
+              "0x177",
+              "0x202",
+              "0x218",
+              "0x232",
+              "0x250",
+              "0x27d",
+              "0x2d8",
+              "0x558",
+              "0x571",
+              "0x5e8",
+              "0x608",
+              "0x6eb",
+              "0x7aa"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "examples/snes/lsystem.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "census": "carry-O2-census",
+      "delta": 9,
+      "inputs": [
+        {
+          "member": "carry-O2-census/examples_snes_lsystem.c.xy16.O2.before.dis",
+          "sha256": "cad29a62e75fb01e28fc5aecfa3743505346cf525abbaf43cf36fd4b19ac4cb8"
+        },
+        {
+          "member": "carry-O2-census/examples_snes_lsystem.c.xy16.O2.after.dis",
+          "sha256": "351462c53910309f84af283404da2501ed839e76740dbc34a727390350ad081a"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 9,
+          "before": {
+            "materializations": 13,
+            "cmp1_candidates": 25,
+            "materialization_addresses": [
+              "0x1ed",
+              "0x629",
+              "0x738",
+              "0x777",
+              "0x785",
+              "0xa9f",
+              "0xabd",
+              "0xac9",
+              "0xafc",
+              "0xb2b",
+              "0xb36",
+              "0xb7b",
+              "0xba0"
+            ],
+            "cmp1_addresses": [
+              "0x40a",
+              "0x4dc",
+              "0x66a",
+              "0x682",
+              "0x693",
+              "0x71e",
+              "0x734",
+              "0x750",
+              "0x76c",
+              "0x791",
+              "0x7ee",
+              "0xadd",
+              "0xaf2",
+              "0xb69",
+              "0xb89",
+              "0xc6b",
+              "0xd2b",
+              "0xe99",
+              "0xf7b",
+              "0x1035",
+              "0x11cb",
+              "0x11e8",
+              "0x1205",
+              "0x1235",
+              "0x12c9"
+            ]
+          },
+          "after": {
+            "materializations": 13,
+            "cmp1_candidates": 25,
+            "materialization_addresses": [
+              "0x1ed",
+              "0x629",
+              "0x738",
+              "0x77b",
+              "0x789",
+              "0xa9e",
+              "0xac2",
+              "0xad0",
+              "0xb05",
+              "0xb34",
+              "0xb3f",
+              "0xb84",
+              "0xba9"
+            ],
+            "cmp1_addresses": [
+              "0x40a",
+              "0x4dc",
+              "0x66a",
+              "0x682",
+              "0x693",
+              "0x71e",
+              "0x734",
+              "0x750",
+              "0x76c",
+              "0x795",
+              "0x7f2",
+              "0xae2",
+              "0xafb",
+              "0xb72",
+              "0xb92",
+              "0xc74",
+              "0xd34",
+              "0xea2",
+              "0xf84",
+              "0x103e",
+              "0x11d4",
+              "0x11f1",
+              "0x120e",
+              "0x123e",
+              "0x12d2"
+            ]
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "build/carry-6502-src/rotkal_sim.c",
+      "mode": "6502",
+      "optimization": "Os",
+      "census": "carry-6502-adapted-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Os.before.dis",
+          "sha256": "8935e367b6a7795c031ef31da3e6a4eb7276901bd89db1df86ba3663f1b567b5"
+        },
+        {
+          "member": "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Os.after.dis",
+          "sha256": "1743080ebd0f2a8714659f20e61e2fa45b3c6ead4fe4669f241f35337cef628d"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    },
+    {
+      "source": "build/carry-6502-src/rotkal_sim.c",
+      "mode": "6502",
+      "optimization": "Oz",
+      "census": "carry-6502-adapted-census",
+      "delta": 1,
+      "inputs": [
+        {
+          "member": "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Oz.before.dis",
+          "sha256": "6aa916da5ce56d58d71e832bca7bc88002d517957788c8201b38589fa1695186"
+        },
+        {
+          "member": "carry-6502-adapted-census/build_carry-6502-src_rotkal_sim.c.6502.Oz.after.dis",
+          "sha256": "01ca8aa8bdad0d85a32d92ea228cbd801eb6bde586a1a9774dadfed4ada25dd1"
+        }
+      ],
+      "growing_functions": [
+        {
+          "name": "main",
+          "size_delta": 1,
+          "before": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "after": {
+            "materializations": 0,
+            "cmp1_candidates": 0,
+            "materialization_addresses": [],
+            "cmp1_addresses": []
+          },
+          "materializations_removed": 0
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "configurations": 32,
+    "growing_functions": 32,
+    "size_growth_bytes": 208,
+    "functions_with_fewer_materializations": 0
+  }
+}

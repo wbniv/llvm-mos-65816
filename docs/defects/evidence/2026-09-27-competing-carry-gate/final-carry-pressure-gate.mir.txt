@@ -1,0 +1,96 @@
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -verify-machineinstrs %s -o %t.default
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=always -verify-machineinstrs %s -o %t.always
+# RUN: diff %t.default %t.always
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=off -verify-machineinstrs %s -o %t.off
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=gated -verify-machineinstrs %s -o %t.gated
+# RUN: diff %t.off %t.gated
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -mos-carry-sched=off -verify-machineinstrs %s -o %t.top-off
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -mos-carry-sched=gated -verify-machineinstrs %s -o %t.top-gated
+# RUN: diff %t.top-off %t.top-gated
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -mos-carry-sched=off -verify-machineinstrs %s -o %t.bottom-off
+# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -mos-carry-sched=gated -verify-machineinstrs %s -o %t.bottom-gated
+# RUN: diff %t.bottom-off %t.bottom-gated
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -mos-carry-sched=off -verify-machineinstrs %s -o %t.native-off
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -mos-carry-sched=gated -verify-machineinstrs %s -o %t.native-gated
+# RUN: diff %t.native-off %t.native-gated
+
+# Constant initializers need no saved byte. Their interleaved users must keep
+# the ordinary register-pressure schedule, including two-address definitions.
+---
+name: constant_carries
+tracksRegLiveness: true
+body: |
+  bb.0:
+    liveins: $rc2, $rc3
+    %0:ac = LDAbs 1000
+    %1:ac = LDAbs 1001
+    %2:imag8 = COPY $rc2
+    %3:imag8 = COPY $rc3
+    %4:cc = LDCImm -1
+    %5:cc = LDCImm -1
+    %0:ac, dead %5:cc, dead %7:vc = SBCImag8 %0, %2, %5
+    %6:cc = LDCImm 0
+    %0:ac, dead %8:cc, dead %9:vc = ADCImag8 %0, %3, %6
+    %1:ac, dead %4:cc, dead %10:vc = SBCImag8 %1, %3, %4
+    %1:ac, dead %6:cc, dead %11:vc = ADCImm %1, 4, %6
+    STAbs %0, 2000
+    STAbs %1, 2001
+    RTS
+...
+
+# Each carry is consumed before the next can be defined, as required by the
+# accumulator dependency. Several carry definitions do not imply competition.
+---
+name: serial_computed_carries
+tracksRegLiveness: true
+body: |
+  bb.0:
+    %0:ac = LDAbs 1000
+    %1:cc = LDImm1 0
+    %0:ac, %2:cc, dead %3:vc = ADCImm %0, 1, %1
+    %0:ac, %4:cc, dead %5:vc = ADCImm %0, 2, %2
+    %0:ac, dead %6:cc, dead %7:vc = ADCImm %0, 3, %4
+    STAbs %0, 2000
+    RTS
+...
+
+# A carry used by a successor block is outside the local lifetime model. The
+# region's complete chain can therefore use the ordinary pressure schedule.
+---
+name: live_out_carry
+tracksRegLiveness: true
+body: |
+  bb.0:
+    successors: %bb.1
+    %0:ac = LDAbs 1000
+    %1:ac = LDAbs 1001
+    %2:cc = CMPImm %0, 128
+    %3:cc = CMPImm %1, 128
+    %1:ac, %3:cc = ROR %1, %3
+    %1:ac, dead %3:cc = ROR %1, %3
+    STAbs %1, 2001
+    BRA %bb.1
+  bb.1:
+    %0:ac, dead %2:cc = ROR %0, %2
+    STAbs %0, 2000
+    RTS
+...
+
+# Frame layout can turn address pseudos into copies or constant carry loads.
+# Their provisional carry cannot establish a computed-carry competition.
+---
+name: frame_address_carry
+tracksRegLiveness: true
+stack:
+  - { id: 0, size: 16, alignment: 1 }
+body: |
+  bb.0:
+    %0:ac, %1:cc, dead %2:vc = AddrLostk %stack.0, 0
+    %3:cc = LDImm1 0
+    %0:ac, %3:cc, dead %4:vc = ADCImm %0, 8, %3
+    %5:ac, dead %6:cc, dead %7:vc = AddrHistk %stack.0, 0, %1
+    %5:ac, dead %3:cc, dead %8:vc = ADCImm %5, 0, %3
+    STAbs %0, 2000
+    STAbs %5, 2001
+    RTS
+...

@@ -10,8 +10,7 @@ shrinks 133 → 59 bytes. The September 27 rebuilt-upstream-Clang run passes
 disassembly and objects excluding compiler-version metadata. The earlier
 fixed-IR census repeats 39 distinct 6502 configurations; see the
 [coverage correction and new evidence](pr-preparations/2026-09-26/0064-validation.md).
-Downstream 1–41-byte losses remain documented. [Downstream timing](investigations/2026-09-27-mos-carry-timing.md) shows sum/rotate improvements of 30.45%/17.61%, but a 2.80% XY16 Oz L-system interpreter regression. The zero-cycle-regression criterion is not met. Independent review and compiler overhead remain unclaimed. The [generic pressure contract](defects/mos-carry-scheduling-pressure.json) and
-unisolated all-XY16 driver observation remain separate follow-ups.
+The [preserved-build timing](investigations/2026-09-27-mos-carry-timing.md) records sum/rotate gains of 30.45%/17.61% and a 2.80% XY16 Oz interpreter regression for that build pair. The later [competing-carry gate evaluation](investigations/2026-09-27-competing-carry-gate.md) recovers all 32 original growth cases and their measured costs, but loses 6.81% of aggregate savings and leaves four growing configurations without fewer carry materializations. Patch 0067 retains `always` as default and exposes experimental `gated`. Bounded compile-time measurements are complete, with overlapping sample ranges and no speed claim. Independent review, the [generic pressure contract](defects/mos-carry-scheduling-pressure.json), profitability, and unresolved all-XY16/VLA runtime observations remain separate follow-ups.
 [Farblit legalization is repaired locally by 0066](investigations/2026-09-27-farblit-byte-load.md):
 the original input and direct MIR pass, as do eight emulator assertions. The
 combined-stack opcode-count gate remains qualified. Publication
@@ -20,7 +19,7 @@ The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
 scheduler entry points and carry-class membership are unchanged. Test results
 remain tied to `7bd67c0ae4e8`; no rebuild at the newer revision is claimed.
 
-Farblit repair and carry-timing update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+Farblit repair, carry timing and competing-gate evaluation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
 
 Current near-decoder and withdrawal update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 

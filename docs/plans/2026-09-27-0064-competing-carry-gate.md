@@ -1,16 +1,20 @@
 # Gate 0064 to regions with competing carries
 
-**Status (2026‑09‑27):** planned, not started. Code work waits until Fable is available again.
-Ranked **T4** in [TODO.md](../../TODO.md): a scheduler gate whose misclassification would
-regress shipped codegen.
+**Status (2026-09-27):** implementation and evaluation complete; **default promotion rejected**. Patch 0067 exposes `off`, `always` and experimental `gated`, with `always` retained as the default. The [report](../investigations/2026-09-27-competing-carry-gate.md) explains [why the gate removes the original incidental costs](../investigations/2026-09-27-competing-carry-gate.md#why-the-gate-removes-the-incidental-regressions), and why that is insufficient for general profitability.
 
-**Measurement follow-up (2026-09-27):** the [preserved-build timing comparison](../investigations/2026-09-27-mos-carry-timing.md) measures 0064 execution time. Sum and rotate improve by 30.45% and 17.61%, while the XY16 Oz L-system interpreter regresses by 2.80%; smaller HUD and DCT costs are also retained. The original zero-cycle-regression criterion is not met. Compiler overhead, ordinary-6502 timing and timing of the exact upstream extraction remain unmeasured. The region-gate hypothesis below remains untested; byte-size recovery alone would not establish that these execution-time regressions are resolved.
+The 3,720-configuration census has 3,592 successful three-way comparisons and zero policy-specific compile failures. The gate recovers all 32 original growing configurations and their measured timing costs, but relinquishes 6.81% of the existing aggregate size saving (limit: 5%) and leaves four growing configurations without fewer carry materializations. The 181 supported MOS tests pass. Runtime has one XY16 VLA mismatch reproduced on the preserved baseline and every policy; no gate-specific mismatch was found. Sequential compile-time measurements are recorded without a speed claim.
+
+This finishes the proposed experiment with a rejected default change. The original plan below remains dated context, including its intended default and acceptance criteria. Further default promotion needs a better profitability model; PR #609 remains withdrawn.
+
+Completion: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+
+**Earlier preserved-build measurement follow-up (2026-09-27):** the [preserved-build timing comparison](../investigations/2026-09-27-mos-carry-timing.md) measures 0064 execution time. Sum and rotate improve by 30.45% and 17.61%, while the XY16 Oz L-system interpreter regresses by 2.80%; smaller HUD and DCT costs are also retained. The original zero-cycle-regression criterion is not met. That report did not measure compiler overhead, ordinary-6502 timing or timing of the exact upstream extraction; the later gate report adds bounded current-stack compile-time and kernel timing. At the time of that measurement, the region-gate hypothesis below was untested; byte-size recovery alone would not establish that these execution-time regressions were resolved. The implementation report records the subsequent gated comparison.
 
 The separate [farblit legalization repair](../investigations/2026-09-27-farblit-byte-load.md) is established by matching-input red/green evidence for patch 0066. Its aggregate opcode-count gate remains a separate follow-up. The original scope notes below describe the evidence available when this plan was written.
 
 Follow-up and merge review: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`. The original plan and its attribution are retained below.
 
-## Context
+## Original plan — context
 
 [Patch 0064](../../patches/llvm-mos/0064-mos-computed-carry-scheduling.patch) makes the MOS
 pre-RA scheduler count live computed carry (`Cc`) values and prefer orders that keep at most

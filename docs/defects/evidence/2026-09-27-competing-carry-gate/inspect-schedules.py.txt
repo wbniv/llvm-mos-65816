@@ -1,0 +1,19 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import json,subprocess,difflib
+root=Path.cwd();old=root/'.scratch/carry-scheduling';out=root/'build/carry-gate/schedules';out.mkdir(exist_ok=True)
+rows=json.loads((old/'build/carry-dynamic-census/report.json').read_text())
+cases=[('examples/65816/rcundef2.c','a16','Os'),('examples/snes/corpus/lsystem_sim.c','xy16','Oz'),('examples/snes/corpus/rotkal_sim.c','default','Os'),('examples/snes/corpus/bf_vm_sim.c','default','Os'),('examples/snes/corpus/seqvm_sim.c','default','Oz')]
+def one(case):
+ row=next(r for r in rows if (r['source'],r['mode'],r['optimization'])==case)
+ stem=Path(case[0]).stem+'.'+case[1]+'.'+case[2];pre=out/(stem+'.pre.mir')
+ cmd=row['before']['command'][:];cmd[cmd.index('-c')]='-S';cmd[-1]=str(pre);cmd+=['-mllvm','-stop-before=machine-scheduler']
+ subprocess.run(cmd,check=True,capture_output=True)
+ for policy in ('off','gated'):
+  flags={'default':[],'a16':['-mattr=+mos-a16'],'xy16':['-mattr=+mos-a16,+mos-xy16']}[case[1]]
+  cmd=[str(root/'build/llvm-mos/bin/llc'),'-mtriple=mos','-mcpu=mosw65816',*flags,'-run-pass=machine-scheduler','-verify-machineinstrs','-mos-carry-sched='+policy,str(pre),'-o',str(out/(stem+'.'+policy+'.mir'))]
+  subprocess.run(cmd,check=True,capture_output=True)
+ a=(out/(stem+'.off.mir')).read_text().splitlines(True);b=(out/(stem+'.gated.mir')).read_text().splitlines(True)
+ (out/(stem+'.diff')).write_text(''.join(difflib.unified_diff(a,b,fromfile='off',tofile='gated')))
+ print(stem,flush=True)
+with ThreadPoolExecutor(max_workers=3) as pool:list(pool.map(one,cases))

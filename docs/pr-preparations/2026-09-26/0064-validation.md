@@ -1,5 +1,7 @@
 # 0064: exact upstream validation
 
+**Later downstream gate evaluation (2026-09-27):** [0067 is experimental](../../investigations/2026-09-27-competing-carry-gate.md). It recovers the 32 original growth cases and their measured timing costs, but fails default-promotion criteria: 6.81% of aggregate savings lost and four growth cases without fewer carry saves. The existing default and this dated upstream packet are retained. Current-stack compile-time and kernel timing are measured; they do not retime the exact upstream extraction. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+
 **Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
 Preparation and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model

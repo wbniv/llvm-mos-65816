@@ -1,0 +1,282 @@
+{
+  "runs": [
+    {
+      "policy": "off",
+      "start_offset": 335,
+      "marker": "e220a2c08a",
+      "rom_sha256": "61fbf44cce291e55a7f5f536644516ac60d6881b33058a5594292b509639e3ec",
+      "samples": [
+        17336362
+      ],
+      "repeat_identical": true,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ]
+    },
+    {
+      "policy": "always",
+      "start_offset": 335,
+      "marker": "e220a2c08a",
+      "rom_sha256": "6f53fe10f4bead50a2947a5a94cede3078bc7e26087cd9002886e2740d870343",
+      "samples": [
+        17109190
+      ],
+      "repeat_identical": true,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87ea",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ]
+    },
+    {
+      "policy": "gated",
+      "start_offset": 335,
+      "marker": "e220a2c08a",
+      "rom_sha256": "61fbf44cce291e55a7f5f536644516ac60d6881b33058a5594292b509639e3ec",
+      "samples": [
+        17336362
+      ],
+      "repeat_identical": true,
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ]
+    }
+  ],
+  "commands": [
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+        "--config",
+        "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-fno-lto",
+        "/home/will/llvm-mos-65816/build/carry-gate/focused/examples_snes_corpus_lsystem_sim.c.xy16.Oz.off.o",
+        "-o",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-t",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-d",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/off.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+        "--config",
+        "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-fno-lto",
+        "/home/will/llvm-mos-65816/build/carry-gate/focused/examples_snes_corpus_lsystem_sim.c.xy16.Oz.always.o",
+        "-o",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-t",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-d",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87ea",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/always.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87ea",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/mos-clang",
+        "--config",
+        "/home/will/llvm-mos-65816/.scratch/carry-scheduling/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-fno-lto",
+        "/home/will/llvm-mos-65816/build/carry-gate/focused/examples_snes_corpus_lsystem_sim.c.xy16.Oz.gated.o",
+        "-o",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "python3",
+        "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-t",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/build/carry-gate/candidate-install/bin/llvm-objdump",
+        "-d",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc.elf"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": [
+        "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles",
+        "/home/will/llvm-mos-65816/build/carry-gate/interpreter/gated.sfc",
+        "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+        "0x8179",
+        "0x87d9",
+        "0xffffffff",
+        "0x200",
+        "2",
+        "0x8073",
+        "2000",
+        "1"
+      ],
+      "exit_code": 0
+    }
+  ]
+}

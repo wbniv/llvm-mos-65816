@@ -1,0 +1,16 @@
+from pathlib import Path
+import shutil,hashlib,json,difflib,tempfile,subprocess
+root=Path.cwd();src=root/'vendor/llvm-mos';trial=root/'build/carry-gate/trials-constant-avoidable'
+for name in ('MOSMachineScheduler.cpp','MOSMachineScheduler.h'):
+ p=src/'llvm/lib/Target/MOS'/name;shutil.copy2(p,trial/name);shutil.copy2(root/'build/carry-gate/trial-local-ranges'/name,p)
+(trial/'identity.json').write_text(json.dumps({n:hashlib.sha256((root/'build/llvm-mos/bin'/n).read_bytes()).hexdigest() for n in ('clang-23','llc','lld','llvm-size','llvm-objdump')},indent=2)+'\n')
+p=src/'llvm/lib/Target/MOS/MOSMachineScheduler.cpp';s=p.read_text().replace('cl::init(CarrySchedMode::Gated)','cl::init(CarrySchedMode::Always)');p.write_text(s)
+p=src/'llvm/test/CodeGen/MOS/carry-pressure-gate.mir';s=p.read_text().replace('-run-pass=machine-scheduler -verify-machineinstrs %s -o %t.gated','-run-pass=machine-scheduler -mos-carry-sched=gated -verify-machineinstrs %s -o %t.gated',1);s='# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -verify-machineinstrs %s -o %t.default\n# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=always -verify-machineinstrs %s -o %t.always\n# RUN: diff %t.default %t.always\n'+s;p.write_text(s)
+paths=['llvm/lib/Target/MOS/MOSMachineScheduler.cpp','llvm/lib/Target/MOS/MOSMachineScheduler.h','llvm/test/CodeGen/MOS/carry-pressure-gate.mir'];chunks=[];out=Path(tempfile.mkdtemp(prefix='carry-gate-final-patch-',dir='/tmp'))
+for rel in paths:
+ before=(root/'build/carry-gate'/('baseline-'+Path(rel).name)).read_text() if rel in paths[:2] else '';after=(src/rel).read_text();chunks.append('diff --git a/'+rel+' b/'+rel+'\n')
+ if not before:chunks.append('new file mode 100644\n')
+ chunks.extend(difflib.unified_diff(before.splitlines(True),after.splitlines(True),fromfile='a/'+rel if before else '/dev/null',tofile='b/'+rel))
+ if before:p=out/rel;p.parent.mkdir(parents=True,exist_ok=True);p.write_text(before)
+patch=root/'patches/llvm-mos/0067-mos-competing-carry-gate.patch';patch.write_text(''.join(chunks));subprocess.run(['git','apply','--check',str(patch)],cwd=out,check=True);subprocess.run(['git','apply',str(patch)],cwd=out,check=True);assert all((out/rel).read_bytes()==(src/rel).read_bytes() for rel in paths)
+(root/'build/carry-gate/patch-roundtrip/final-receipt.json').write_text(json.dumps({'patch_sha256':hashlib.sha256(patch.read_bytes()).hexdigest(),'source_matches':{rel:hashlib.sha256((out/rel).read_bytes()).hexdigest() for rel in paths},'directory':str(out),'default':'always','gated_algorithm':'Identical to the frozen local-ranges candidate; only the default selection changes.'},indent=2)+'\n')

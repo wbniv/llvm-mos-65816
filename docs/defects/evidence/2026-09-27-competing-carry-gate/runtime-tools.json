@@ -1,0 +1,18 @@
+{
+  "python": "3.14.4 (main, Aug 20 2026, 10:41:58) [GCC 15.2.0]",
+  "scope": "Runtime tools identified after the runs; these emulator binaries were not rebuilt or replaced during this task. The cycle probe identity and calibration are separately retained.",
+  "mame": {
+    "path": "/usr/games/mame",
+    "sha256": "b8de871c99effd28e90c426b811694811bcb533741189f93ad63a962621ae40c",
+    "version": "MAME v0.285 (unknown)",
+    "version_command_exit": 0
+  },
+  "jgxcheck": {
+    "path": "/work/build/jgxcheck",
+    "sha256": "4d4531d9355f60b70f98bbbba67c17615e04eaf0fe18157163bd1ecb43e4075d"
+  },
+  "jgxcycles": {
+    "path": "/work/.scratch/carry-timing/jgxcycles",
+    "sha256": "e294aed948506ab5b131afa983b6c82d838707949f84e1f6720e9cfea3e114ba"
+  }
+}

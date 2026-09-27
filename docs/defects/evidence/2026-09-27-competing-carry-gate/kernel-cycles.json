@@ -1,0 +1,38 @@
+[
+  {
+    "policy": "off",
+    "command": [
+      "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+      "--cycles",
+      "--profile",
+      "/home/will/llvm-mos-65816/build/carry-gate/kernel/off.simg"
+    ],
+    "repeat_identical": true,
+    "cycles": 179472,
+    "sim_sha256": "e7bf3477fc14e12603bed35963fbcd38cfba8a50b8901529429f3f6eee441593"
+  },
+  {
+    "policy": "always",
+    "command": [
+      "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+      "--cycles",
+      "--profile",
+      "/home/will/llvm-mos-65816/build/carry-gate/kernel/always.simg"
+    ],
+    "repeat_identical": true,
+    "cycles": 145659,
+    "sim_sha256": "e7bf3477fc14e12603bed35963fbcd38cfba8a50b8901529429f3f6eee441593"
+  },
+  {
+    "policy": "gated",
+    "command": [
+      "/home/will/llvm-mos-65816/build/utils/sim/mos-sim",
+      "--cycles",
+      "--profile",
+      "/home/will/llvm-mos-65816/build/carry-gate/kernel/gated.simg"
+    ],
+    "repeat_identical": true,
+    "cycles": 145659,
+    "sim_sha256": "e7bf3477fc14e12603bed35963fbcd38cfba8a50b8901529429f3f6eee441593"
+  }
+]

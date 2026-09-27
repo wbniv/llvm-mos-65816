@@ -1,0 +1,43 @@
+from pathlib import Path
+import json,shutil,gzip,hashlib,tarfile,re
+root=Path.cwd();base=root/'build/carry-gate';out=root/'docs/defects/evidence/2026-09-27-competing-carry-gate';out.mkdir(parents=True,exist_ok=True)
+def copy(source,name=None):
+ source=base/source;dest=out/(name or source.name);shutil.copy2(source,dest)
+def gz(source,name):
+ with gzip.GzipFile(filename=str(out/name),mode='wb',mtime=0) as stream:stream.write((base/source).read_bytes())
+def archive(name,items,anchor=base):
+ with tarfile.open(out/name,'w:gz',compresslevel=6) as tar:
+  for p in sorted(set(items)):
+   if p.is_file():tar.add(p,arcname=str(p.relative_to(anchor)),recursive=False)
+for f in ['baseline-identity.json','candidate-identity.json','candidate-install-identity.json','final-identity.json','prior-work-audit.json','growth-counts.json','growth-final.json','runtime-summary.json','final-lit.json','final-lit.log']:
+ copy(f)
+for source,name in [('census/summary.json','census-summary.json'),('census/identity.json','census-identity.json'),('controls/report.json','controls.json'),('focused/report.json','focused.json'),('always-control/results.json','always-control.json'),('final-equivalence/results.json','final-equivalence.json'),('patch-roundtrip/final-receipt.json','patch-roundtrip.json'),('runtime/results.json','runtime-initial.json'),('runtime-recheck/results.json','runtime-rechecks.json'),('vlastack/results.json','vlastack-observation.json'),('timing/results.json','timing.json'),('timing/identity.json','timing-identity.json'),('interpreter/results.json','interpreter.json'),('kernel/results.json','kernel.json'),('kernel/cycles.json','kernel-cycles.json'),('additional-growth/results.json','additional-growth-timing.json'),('compile-time/summary.json','compile-time.json')]:copy(source,name)
+for source,name in [('baseline-source.diff','baseline-source.diff.txt.gz'),('census/report.json','census.json.gz'),('trials/report.json','trials.json.gz'),('trials-constant-avoidable/report.json','trials-extra.json.gz'),('compile-time/runs.json','compile-time-runs.json.gz'),('farblit/results.json','farblit-timing.json.gz')]:gz(source,name)
+for p in base.glob('*.py'):copy(p.name,p.name+'.txt')
+for name in ('MOSMachineScheduler.cpp','MOSMachineScheduler.h'):
+ copy('baseline-'+name,'baseline-'+name+'.txt');shutil.copy2(root/'vendor/llvm-mos/llvm/lib/Target/MOS'/name,out/('final-'+name+'.txt'))
+archive('controls-and-focused.tar.gz',[p for d in ['controls','focused','kernel','gate-test','trial-constants','trial-local-ranges','final-equivalence'] for p in (base/d).rglob('*') if p.suffix in ('.o','.dis','.mir','.cpp','.h','.json','.log','.simg','.elf')])
+for directory,name in [('trials','trials-artifacts.tar.gz'),('trials-constant-avoidable','trials-extra-artifacts.tar.gz')]:
+ archive(name,[p for p in (base/directory).rglob('*') if p.suffix in ('.o','.dis','.mir','.cpp','.h','.json','.log')])
+archive('timing-roms-and-profiles.tar.gz',[p for d in ['timing','interpreter','farblit','additional-growth'] for p in (base/d).rglob('*') if p.name!='host'])
+archive('runtime-and-vlastack.tar.gz',[p for d in ['runtime','runtime-recheck','vlastack'] for p in (base/d).rglob('*') if '/mame/' not in str(p) and '/triage/' not in str(p)])
+# Corpus diagnostics and growing objects preserve both common failures and
+# the complete instruction streams behind the remaining size exceptions.
+rows=json.loads((base/'census/report.json').read_text());growth=json.loads((base/'growth-final.json').read_text());stems={r['source'].replace('/','_')+'.'+r['mode']+'.'+r['optimization'] for r in growth};items=[p for p in (base/'census').glob('*.log') if p.stat().st_size]
+items += [p for p in (base/'census').iterdir() if any(p.name.startswith(stem+'.') for stem in stems)]
+archive('census-diagnostics-and-growth.tar.gz',items)
+# Preserve quoted project includes recursively, alongside the exact C inputs.
+inputs=set();missing=set();search=[]
+for r in rows:
+ cmd=r['off']['command'];p=Path(cmd[cmd.index('-c')+1]);inputs.add(p);search.extend(Path(a[2:]) for a in cmd if a.startswith('-I'))
+search=list(dict.fromkeys(search));pending=list(inputs)
+while pending:
+ p=pending.pop()
+ for include in re.findall(r'^\s*#\s*include\s*"([^"\n]+)"',p.read_text(errors='replace'),re.M):
+  candidates=[p.parent/include,*(d/include for d in search)];found=next((q.resolve() for q in candidates if q.is_file()),None)
+  if found and found not in inputs:inputs.add(found);pending.append(found)
+  elif not found:missing.add(str(p)+': '+include)
+archive('census-inputs.tar.gz',inputs,root)
+(out/'source-inputs.json').write_text(json.dumps({'files':{str(p):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(inputs)},'unresolved_quoted_includes':sorted(missing),'system_headers':'Provided by the identified frozen compiler resources and SDK; compiler commands retain --config and include roots.'},indent=2)+'\n')
+receipt={'schema':1,'attribution':'OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96','decision':'Experimental gated option retained; default remains always because the gate loses 6.81% of the aggregate saving and has four growing configurations without fewer carry materializations.','artifacts':{p.name:hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(out.iterdir()) if p.is_file() and p.name!='receipt.json'}}
+(out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n');print('Captured',len(receipt['artifacts']),'artifacts;',len(inputs),'source/include files;',len(missing),'unresolved quoted includes')

@@ -1,0 +1,14 @@
+{
+  "patch_sha256": "86db849b6f81fb0eb52be5f80191adef1abaae7b77057eec5d45dd0301f1bd33",
+  "source_matches": {
+    "llvm/lib/Target/MOS/MOSMachineScheduler.cpp": "7291ef78c41ea7154e49d76b7f618d41401823f6dc1fb701c825292fd43471e6",
+    "llvm/lib/Target/MOS/MOSMachineScheduler.h": "c0053645bbf9082a5823fa62c86cfb2c14197f9d862bf3f3f3595d1bf78f9307",
+    "llvm/test/CodeGen/MOS/carry-pressure-gate.mir": "b5d2dccf1de34e44656b357cbe3f43396aa10583243cf3e6bb6710e7bac0fddf",
+    "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir": "2a0f6deb35eca5001282a3ae8ee7c4f02c645e46a7095ae4ac756509b2370b1d"
+  },
+  "directory": "/tmp/carry-gate-final-check-80kkbd5d",
+  "default": "always",
+  "gated_algorithm": "Identical to the frozen local-ranges candidate; only the default selection changes.",
+  "positive_test": "Existing computed-carry MIR now runs explicitly under gated in all six configurations, in addition to its default-policy commands.",
+  "formatting": "Blank context lines use the repository patch-bundle convention; applying the patch reproduces all four final files byte for byte."
+}

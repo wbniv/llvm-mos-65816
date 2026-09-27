@@ -1,0 +1,22 @@
+from pathlib import Path
+import subprocess,time,resource,statistics,json,hashlib,platform,os
+root=Path.cwd();out=root/'build/carry-gate/compile-time';out.mkdir(exist_ok=True);tool=root/'build/carry-gate/final-install/bin/mos-clang'
+rows=json.loads((root/'build/carry-gate/census/report.json').read_text())
+selected=[('examples/65816/farblit.c','xy16','O2'),('examples/65816/rcundef2.c','xy16','Os'),('examples/snes/corpus/lsystem_sim.c','xy16','Oz'),('examples/snes/dctbloom.c','a16','Os'),('examples/snes/avalanche.c','default','Os'),('examples/snes/corpus/arith.c','default','Os')]
+cases=[next(r for r in rows if (r['source'],r['mode'],r['optimization'])==key) for key in selected];policies=['off','always','gated'];results=[]
+for repeat in range(-1,7):
+ for index,row in enumerate(cases):
+  rotation=(repeat+index)%3
+  for policy in policies[rotation:]+policies[:rotation]:
+   cmd=row[policy]['command'][:];cmd[0]=str(tool);cmd[cmd.index('-o')+1]=str(out/'sample.o');before=resource.getrusage(resource.RUSAGE_CHILDREN);start=time.perf_counter();p=subprocess.run(cmd,capture_output=True,text=True);elapsed=time.perf_counter()-start;after=resource.getrusage(resource.RUSAGE_CHILDREN);assert not p.returncode,p.stderr
+   results.append({'source':row['source'],'mode':row['mode'],'optimization':row['optimization'],'policy':policy,'repeat':repeat,'warmup':repeat<0,'wall_seconds':elapsed,'cpu_seconds':after.ru_utime+after.ru_stime-before.ru_utime-before.ru_stime,'command':cmd})
+ (out/'runs.json').write_text(json.dumps(results,indent=2)+'\n');print('round',repeat,'complete',flush=True)
+summary=[]
+for row in cases:
+ entry={k:row[k] for k in ('source','mode','optimization')}
+ for policy in policies:
+  samples=[r for r in results if r['source']==row['source'] and r['policy']==policy and not r['warmup']]
+  entry[policy]={metric:{'median':statistics.median(r[metric] for r in samples),'min':min(r[metric] for r in samples),'max':max(r[metric] for r in samples)} for metric in ('wall_seconds','cpu_seconds')}
+ summary.append(entry)
+(out/'summary.json').write_text(json.dumps({'compiler_sha256':hashlib.sha256(tool.read_bytes()).hexdigest(),'platform':platform.platform(),'cpu':Path('/proc/cpuinfo').read_text().split('model name')[1].split('\n')[0],'method':'Sequential process launches, one warmup and seven measured rounds per arm/input; policy order rotated each round/input. Machine is shared. Both wall and child CPU time are retained.','cases':summary},indent=2)+'\n')
+print(json.dumps(summary,indent=2))

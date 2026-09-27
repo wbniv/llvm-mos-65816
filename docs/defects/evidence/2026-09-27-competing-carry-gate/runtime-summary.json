@@ -1,0 +1,27 @@
+{
+  "cases": 129,
+  "corpus_cases": 79,
+  "s32_fuzz_cases": 50,
+  "initial_statuses": {
+    "FAIL": 11,
+    "PASS": 118
+  },
+  "short_window_cases_rechecked": 10,
+  "recheck_assertions": 40,
+  "effective_passes": 128,
+  "unresolved": [
+    {
+      "name": "vlastack_sim",
+      "source": "corpus/vlastack_sim.c",
+      "expected": "0xD77B",
+      "status": "FAIL",
+      "message": "mismatch: host=0xD77B, default@MAME=0xD77B, a16@MAME=0xD77B, xy16@MAME=0xD3BD, a16@bsnes=0xD77B",
+      "environment": {
+        "SMOKE_SETTLE": "1000",
+        "BSNES_FRAMES": "1200",
+        "MOS_TOOLCHAIN": "/work/build/carry-gate/candidate-install"
+      }
+    }
+  ],
+  "vlastack": "Same 0xD3BD vs 0xD77B mismatch on preserved baseline and off/always/gated in both emulators; no gate-specific runtime mismatch observed. Mechanism remains unisolated."
+}

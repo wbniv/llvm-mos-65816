@@ -1,0 +1,26 @@
+import json,subprocess,re,hashlib
+from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
+root=Path.cwd();out=root/'build/carry-gate/additional-growth';out.mkdir(exist_ok=True);tool=root/'build/carry-gate/candidate-install/bin';reference=json.loads((root/'docs/defects/evidence/2026-09-27-mos-carry-timing/results.json').read_text());expected={}
+for line in (root/'examples/snes/corpus/expected.tsv').read_text().splitlines():
+ p=line.split()
+ if len(p)>2 and p[1]=='corpus_result':expected['examples/snes/'+p[0]]=int(p[2],16)
+for r in reference:
+ if 'source' in r:expected[r['source']]=r['baseline']['expected']
+host=out/'matcascade-host'
+subprocess.run(['cc','-O2',str(root/'tools/matcascade-sim.c'),'-o',str(host)],check=True)
+host_text=subprocess.check_output([str(host)],text=True);(out/'matcascade-host.log').write_text(host_text)
+expected['examples/snes/corpus/matcascade_sim.c']=int(re.search(r'0x[0-9A-Fa-f]+',host_text)[0],16)
+rows=[json.loads(x) for x in (root/'build/carry-gate/census/results.jsonl').read_text().splitlines()];cases=[r for r in rows if all('text' in r[p] for p in ('off','always','gated')) and r['gated']['text']>r['off']['text'] and 'farblit' not in r['source']];results=[]
+def one(r):
+ stem=r['source'].replace('/','_')+'.'+r['mode']+'.'+r['optimization'];row={k:r[k] for k in ('source','mode','optimization')}
+ for policy in ('off','always','gated'):
+  label=stem+'.'+policy;obj=root/'build/carry-gate/census'/(label+'.o');rom=out/(label+'.sfc');commands=[]
+  def run(cmd,tag):
+   cmd=list(map(str,cmd));p=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/(label+'.'+tag+'.log')).write_text(p.stdout+p.stderr);commands.append({'command':cmd,'exit_code':p.returncode});assert not p.returncode,p.stderr;return p.stdout
+  run([tool/'mos-clang','--config',root/'.scratch/carry-scheduling/build/install/bin/mos-snes.cfg','-mcpu=mosw65816','-fno-lto',obj,'-o',rom],'link');run(['python3',root/'tools/snes-checksum.py',rom],'checksum')
+  symbols={p[-1]:(int(p[0],16),int(p[-2],16)) for line in run([tool/'llvm-objdump','-t',str(rom)+'.elf'],'symbols').splitlines() if len(p:=line.split())>=5 and re.fullmatch('[0-9a-f]{8}',p[0])};start,size=symbols['main'];offset,length=symbols['corpus_result']
+  cmd=[root/'.scratch/carry-timing/jgxcycles',rom,root/'vendor/bsnes-jg/Database',hex(start),hex(start+size),'0xffffffff',hex(offset),length,hex(expected[r['source']]),2000,1];runs=[json.loads(run(cmd,'timing-'+str(n))) for n in range(2)];assert runs[0]==runs[1] and runs[0]['pass'];row[policy]={'samples':runs[0]['samples'],'repeat_identical':True,'commands':commands,'rom_sha256':hashlib.sha256(rom.read_bytes()).hexdigest()}
+ print(stem,{p:row[p]['samples'] for p in ('off','always','gated')},flush=True);return row
+with ThreadPoolExecutor(max_workers=2) as pool:
+ for r in pool.map(one,cases):results.append(r);(out/'results.json').write_text(json.dumps(results,indent=2)+'\n')

@@ -1,0 +1,17 @@
+import os,sys,json,hashlib
+from pathlib import Path
+root=Path('/work');sys.path.insert(0,str(root/'tools'));import a16_fuzz as af
+out=root/'build/carry-gate/runtime-recheck';out.mkdir(exist_ok=True)
+os.environ['SMOKE_SETTLE']='1000';os.environ['BSNES_FRAMES']='1200'
+results=[]
+for result in sorted((root/'build/carry-gate/runtime').glob('*/result.json')):
+ row=json.loads(result.read_text())
+ if row['status']!='FAIL' or 'seed' in row:continue
+ af.SCRATCH=out/row['name'];af.SCRATCH.mkdir(exist_ok=True)
+ for event in json.loads((result.parent/'emulators.json').read_text()):
+  args=event['arguments'];args=[Path(args[0]),*map(int,args[1:])]
+  got,log=getattr(af,event['function'])(*args)
+  expected=args[2] if event['function']=='run_mame' else args[3]
+  entry={'name':row['name'],'function':event['function'],'arguments':event['arguments'],'rom_sha256':hashlib.sha256(args[0].read_bytes()).hexdigest(),'got':got,'expected':expected,'pass':got==expected,'log':log,'environment':{'SMOKE_SETTLE':'1000','BSNES_FRAMES':'1200'}}
+  results.append(entry);(out/'results.json').write_text(json.dumps(results,indent=2)+'\n');print(json.dumps(entry),flush=True)
+assert all(r['pass'] for r in results)

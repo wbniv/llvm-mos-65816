@@ -1,0 +1,259 @@
+//===-- MOSMachineScheduler.cpp - MOS Instruction Scheduler ---------------===//
+//
+// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
+// See https://llvm.org/LICENSE.txt for license information.
+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+//
+//===----------------------------------------------------------------------===//
+//
+// This file defines the MOS machine instruction scheduler.
+//
+// The 6502 has no cache in any of its common configurations. This means that
+// every instruction is loaded from memory before being executed. Essentially,
+// this means that its pipeline stalls after every instruction. Accordingly, it
+// doesn't matter one bit for throughput what order instructions execute in, so
+// most instruction scheduling concerns are totally irrelevant.
+//
+// There is one important exception: register pressure. The order of
+// instructions can make enormous differences in the number of registers
+// required to execute a basic block. For example, it's often possible to order
+// arthmetic in such a way that temporaries are threaded through the
+// instructions entirely in the A register. Order the instructions differently,
+// and the live ranges may begin to overlap, requiring a huge number of
+// additional temporary locations.
+//
+// Thus, the MOS scheduling strategy more or less copies just the register
+// pressure parts of the standard Machine Scheduler.
+//
+//===----------------------------------------------------------------------===//
+
+#include "MOSMachineScheduler.h"
+#include "MCTargetDesc/MOSMCTargetDesc.h"
+#include "MOSRegisterInfo.h"
+#include "llvm/CodeGen/MachineInstr.h"
+#include "llvm/CodeGen/MachineOperand.h"
+#include "llvm/CodeGen/MachineRegisterInfo.h"
+#include "llvm/CodeGen/MachineScheduler.h"
+#include "llvm/Support/CommandLine.h"
+
+using namespace llvm;
+
+namespace {
+enum class CarrySchedMode { Off, Gated, Always };
+cl::opt<CarrySchedMode> CarryScheduling(
+    "mos-carry-sched", cl::Hidden, cl::init(CarrySchedMode::Always),
+    cl::desc("MOS computed-carry scheduling policy"),
+    cl::values(clEnumValN(CarrySchedMode::Off, "off", "Disable carry pressure"),
+               clEnumValN(CarrySchedMode::Gated, "gated",
+                          "Track competing computed carries"),
+               clEnumValN(CarrySchedMode::Always, "always",
+                          "Track all non-LDImm1 carry definitions")));
+} // namespace
+
+MOSSchedStrategy::MOSSchedStrategy(const MachineSchedContext *C)
+    : GenericScheduler(C) {}
+
+void MOSSchedStrategy::initialize(ScheduleDAGMI *DAG) {
+  GenericScheduler::initialize(DAG);
+  Carries.clear();
+  CarryRefs.clear();
+  TopNodes.clear();
+  BottomNodes.clear();
+  TopNodes.insert(&DAG->EntrySU);
+  BottomNodes.insert(&DAG->ExitSU);
+  TopCarries = BottomCarries = 0;
+  TrackCarries = false;
+  if (CarryScheduling == CarrySchedMode::Off)
+    return;
+
+  // A computed carry needs preservation when another carry becomes live.
+  // Constant carry initializers can instead be rematerialized with CLC/SEC.
+  // Frame-address pseudos may become copies or constants after frame layout.
+  const MachineRegisterInfo &MRI = DAG->MF.getRegInfo();
+  for (SUnit &SU : DAG->SUnits) {
+    unsigned Opcode = SU.getInstr()->getOpcode();
+    if (Opcode == MOS::LDImm1 ||
+        (CarryScheduling == CarrySchedMode::Gated &&
+         (Opcode == MOS::LDCImm || Opcode == MOS::AddrLostk ||
+          Opcode == MOS::AddrHistk)))
+      continue;
+    CarryValue Value{&SU, {}};
+    for (const SDep &Dep : SU.Succs) {
+      if (Dep.getKind() != SDep::Data)
+        continue;
+      Register Reg = Dep.getReg();
+      if (!Reg.isVirtual() || MRI.getRegClass(Reg) != &MOS::CcRegClass)
+        continue;
+      if (!llvm::is_contained(Value.Users, Dep.getSUnit()))
+        Value.Users.push_back(Dep.getSUnit());
+    }
+    if (Value.Users.empty())
+      continue;
+    // A region-local model needs all users to be represented in the DAG.
+    // Boundary uses can require preservation independently of this schedule.
+    if (CarryScheduling == CarrySchedMode::Gated &&
+        llvm::any_of(Value.Users,
+                     [](const SUnit *User) { return User->isBoundaryNode(); }))
+      continue;
+    unsigned ID = Carries.size();
+    CarryRefs[&SU].push_back(ID);
+    for (const SUnit *User : Value.Users)
+      CarryRefs[User].push_back(ID);
+    Carries.push_back(std::move(Value));
+  }
+  TrackCarries = CarryScheduling == CarrySchedMode::Always ||
+                 hasCompetingCarries(DAG);
+  if (!TrackCarries)
+    return;
+  for (const CarryValue &Value : Carries) {
+    TopCarries += isCarryLive(Value, true);
+    BottomCarries += isCarryLive(Value, false);
+  }
+}
+
+bool MOSSchedStrategy::hasCompetingCarries(ScheduleDAGMI *DAG) const {
+  // Two values cannot overlap if every use of either one must precede the
+  // other's definition. A use at the definition ends the first live range.
+  auto EndsBefore = [&](const CarryValue &A, const CarryValue &B) {
+    return llvm::all_of(A.Users, [&](SUnit *User) {
+      return User == B.Def ||
+             (!User->isBoundaryNode() && DAG->IsReachable(B.Def, User));
+    });
+  };
+  for (unsigned I = 0; I < Carries.size(); ++I)
+    for (unsigned J = I + 1; J < Carries.size(); ++J)
+      if (!EndsBefore(Carries[I], Carries[J]) &&
+          !EndsBefore(Carries[J], Carries[I]))
+        return true;
+  return false;
+}
+
+bool MOSSchedStrategy::isCarryLive(const CarryValue &Value, bool AtTop,
+                                   const SUnit *Trial) const {
+  // A value crosses the top frontier after its definition and before its last
+  // user. At the bottom frontier, a scheduled user needs an unscheduled def.
+  const auto &Nodes = AtTop ? TopNodes : BottomNodes;
+  auto Scheduled = [&](const SUnit *SU) {
+    return SU == Trial || Nodes.contains(SU);
+  };
+  if (AtTop)
+    return Scheduled(Value.Def) &&
+           llvm::any_of(Value.Users,
+                        [&](const SUnit *SU) { return !Scheduled(SU); });
+  return !Scheduled(Value.Def) && llvm::any_of(Value.Users, Scheduled);
+}
+
+int MOSSchedStrategy::carryPressureDiff(const SUnit *SU, bool AtTop) const {
+  auto It = CarryRefs.find(SU);
+  if (It == CarryRefs.end())
+    return 0;
+  int Diff = 0;
+  for (unsigned ID : It->second)
+    Diff += int(isCarryLive(Carries[ID], AtTop, SU)) -
+            int(isCarryLive(Carries[ID], AtTop));
+  return Diff;
+}
+
+int MOSSchedStrategy::carryExcessDiff(const SUnit *SU, bool AtTop) const {
+  int Before = AtTop ? TopCarries : BottomCarries;
+  int After = Before + carryPressureDiff(SU, AtTop);
+  return std::max(0, After - 1) - std::max(0, Before - 1);
+}
+
+void MOSSchedStrategy::schedNode(SUnit *SU, bool IsTopNode) {
+  if (TrackCarries) {
+    int &Pressure = IsTopNode ? TopCarries : BottomCarries;
+    Pressure += carryPressureDiff(SU, IsTopNode);
+    (IsTopNode ? TopNodes : BottomNodes).insert(SU);
+  }
+  GenericScheduler::schedNode(SU, IsTopNode);
+}
+
+bool MOSSchedStrategy::tryCandidate(SchedCandidate &Cand,
+                                    SchedCandidate &TryCand,
+                                    SchedBoundary *Zone) const {
+
+  // Initialize the candidate if needed.
+  if (!Cand.isValid()) {
+    TryCand.Reason = NodeOrder;
+    return true;
+  }
+
+  if (TrackCarries &&
+      tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
+              carryExcessDiff(Cand.SU, Cand.AtTop), TryCand, Cand, RegExcess))
+    return TryCand.Reason != NoCand;
+
+  if (tryLess(
+          registerClassPressureDiff(MOS::AcRegClass, TryCand.SU, TryCand.AtTop),
+          registerClassPressureDiff(MOS::AcRegClass, Cand.SU, Cand.AtTop),
+          TryCand, Cand, PhysReg))
+    return TryCand.Reason != NoCand;
+
+  if (tryLess(
+          registerClassPressureDiff(MOS::XYRegClass, TryCand.SU, TryCand.AtTop),
+          registerClassPressureDiff(MOS::XYRegClass, Cand.SU, Cand.AtTop),
+          TryCand, Cand, PhysReg))
+    return TryCand.Reason != NoCand;
+
+  if (tryLess(
+          registerClassPressureDiff(MOS::Imag8RegClass, TryCand.SU,
+                                    TryCand.AtTop),
+          registerClassPressureDiff(MOS::Imag8RegClass, Cand.SU, Cand.AtTop),
+          TryCand, Cand, PhysReg))
+    return TryCand.Reason != NoCand;
+
+  // Avoid exceeding the target's limit.
+  if (DAG->isTrackingPressure() &&
+      tryPressure(TryCand.RPDelta.Excess, Cand.RPDelta.Excess, TryCand, Cand,
+                  RegExcess, TRI, DAG->MF))
+    return TryCand.Reason != NoCand;
+
+  // Avoid increasing the max critical pressure in the scheduled region.
+  if (DAG->isTrackingPressure() &&
+      tryPressure(TryCand.RPDelta.CriticalMax, Cand.RPDelta.CriticalMax,
+                  TryCand, Cand, RegCritical, TRI, DAG->MF))
+    return TryCand.Reason != NoCand;
+
+  // Avoid increasing the max pressure of the entire region.
+  if (DAG->isTrackingPressure() &&
+      tryPressure(TryCand.RPDelta.CurrentMax, Cand.RPDelta.CurrentMax, TryCand,
+                  Cand, RegMax, TRI, DAG->MF))
+    return TryCand.Reason != NoCand;
+
+  // We only compare a subset of features when comparing nodes between
+  // Top and Bottom boundary. Some properties are simply incomparable, in many
+  // other instances we should only override the other boundary if something
+  // is a clear good pick on one boundary. Skip heuristics that are more
+  // "tie-breaking" in nature.
+  bool SameBoundary = Zone != nullptr;
+  if (SameBoundary) {
+    // Fall through to original instruction order.
+    if ((Zone->isTop() && TryCand.SU->NodeNum < Cand.SU->NodeNum) ||
+        (!Zone->isTop() && TryCand.SU->NodeNum > Cand.SU->NodeNum)) {
+      TryCand.Reason = NodeOrder;
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Returns the change in pressure in a SU for a physical register.
+int MOSSchedStrategy::registerClassPressureDiff(const TargetRegisterClass &RC,
+                                                const SUnit *SU,
+                                                bool IsTop) const {
+  const MachineInstr *MI = SU->getInstr();
+
+  int PressureDiff = 0;
+  for (const MachineOperand &MO : MI->operands()) {
+    if (!MO.isReg() || !MO.getReg().isPhysical() || !RC.contains(MO.getReg()))
+      continue;
+    if (MO.isDef()) {
+      PressureDiff += IsTop ? 1 : -1;
+    } else {
+      PressureDiff += IsTop ? -1 : 1;
+    }
+  }
+  return PressureDiff;
+}

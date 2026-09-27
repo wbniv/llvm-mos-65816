@@ -1,0 +1,762 @@
+[
+  {
+    "name": "avalanche_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/avalanche_sim/work/chk_default.sfc",
+      "8258048",
+      "10218",
+      "2"
+    ],
+    "rom_sha256": "21e6305fb22e0b244dbad616d3b1537ad9b94006641a06a946b47efdef99efe7",
+    "got": 10218,
+    "expected": 10218,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x27EA (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "avalanche_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/avalanche_sim/work/chk_a16.sfc",
+      "8258048",
+      "10218",
+      "2"
+    ],
+    "rom_sha256": "72a5f5af48f78aff57c36c1127b5f0983a49827e13437cf85873d9df4b059d79",
+    "got": 10218,
+    "expected": 10218,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x27EA (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "avalanche_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/avalanche_sim/work/chk_xy16.sfc",
+      "8258048",
+      "10218",
+      "2"
+    ],
+    "rom_sha256": "72a5f5af48f78aff57c36c1127b5f0983a49827e13437cf85873d9df4b059d79",
+    "got": 10218,
+    "expected": 10218,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x27EA (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "avalanche_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/avalanche_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "10218"
+    ],
+    "rom_sha256": "72a5f5af48f78aff57c36c1127b5f0983a49827e13437cf85873d9df4b059d79",
+    "got": 10218,
+    "expected": 10218,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x27EA (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "boids_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/boids_sim/work/chk_default.sfc",
+      "8258048",
+      "43179",
+      "2"
+    ],
+    "rom_sha256": "c421d12e216f3c59f882f28ebae1bb885f8acd3a9d7a54b23ed69a2a529c9478",
+    "got": 43179,
+    "expected": 43179,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xA8AB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "boids_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/boids_sim/work/chk_a16.sfc",
+      "8258048",
+      "43179",
+      "2"
+    ],
+    "rom_sha256": "825c550beafbce859873078c39fc8bbddf8dd2ccfff600811671cce964b4f991",
+    "got": 43179,
+    "expected": 43179,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xA8AB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "boids_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/boids_sim/work/chk_xy16.sfc",
+      "8258048",
+      "43179",
+      "2"
+    ],
+    "rom_sha256": "82e3d59864d56c8a352d23b06153ea25a90460bc8725c76b4c381d75144da3cc",
+    "got": 43179,
+    "expected": 43179,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xA8AB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "boids_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/boids_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "43179"
+    ],
+    "rom_sha256": "825c550beafbce859873078c39fc8bbddf8dd2ccfff600811671cce964b4f991",
+    "got": 43179,
+    "expected": 43179,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0xA8AB (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "harmonograph_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/harmonograph_sim/work/chk_default.sfc",
+      "8258048",
+      "3771",
+      "2"
+    ],
+    "rom_sha256": "15d5deff684da6a1f60acf873b489b60507b27891466d397b5f9d5e46f8fb1bb",
+    "got": 3771,
+    "expected": 3771,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x0EBB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "harmonograph_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/harmonograph_sim/work/chk_a16.sfc",
+      "8258048",
+      "3771",
+      "2"
+    ],
+    "rom_sha256": "05dd63b7dc345f6e939d829572c04d5c183b9839abf08d079332c746623c557d",
+    "got": 3771,
+    "expected": 3771,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x0EBB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "harmonograph_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/harmonograph_sim/work/chk_xy16.sfc",
+      "8258048",
+      "3771",
+      "2"
+    ],
+    "rom_sha256": "bbf71de309985a193cf19e1ae3508fa0622a284223633d4db0a025c352315fa9",
+    "got": 3771,
+    "expected": 3771,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x0EBB (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "harmonograph_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/harmonograph_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "3771"
+    ],
+    "rom_sha256": "05dd63b7dc345f6e939d829572c04d5c183b9839abf08d079332c746623c557d",
+    "got": 3771,
+    "expected": 3771,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x0EBB (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "julia_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/julia_sim/work/chk_default.sfc",
+      "8258048",
+      "13456",
+      "2"
+    ],
+    "rom_sha256": "a2ff30110cc149582409ef2c940cb66cf20de4de2d0f8f725761acf5a4be9d30",
+    "got": 13456,
+    "expected": 13456,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x3490 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "julia_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/julia_sim/work/chk_a16.sfc",
+      "8258048",
+      "13456",
+      "2"
+    ],
+    "rom_sha256": "a45e3e713a1d08a79e39f369647eab18ca29744ea492d9ccee543aeb493161df",
+    "got": 13456,
+    "expected": 13456,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x3490 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "julia_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/julia_sim/work/chk_xy16.sfc",
+      "8258048",
+      "13456",
+      "2"
+    ],
+    "rom_sha256": "a45e3e713a1d08a79e39f369647eab18ca29744ea492d9ccee543aeb493161df",
+    "got": 13456,
+    "expected": 13456,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x3490 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "julia_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/julia_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "13456"
+    ],
+    "rom_sha256": "a45e3e713a1d08a79e39f369647eab18ca29744ea492d9ccee543aeb493161df",
+    "got": 13456,
+    "expected": 13456,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x3490 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "life_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/life_sim/work/chk_default.sfc",
+      "8258048",
+      "56817",
+      "2"
+    ],
+    "rom_sha256": "bd9e0604cc972e7c178625960af23d13edfe754e598f14a5d3823ee3a2920970",
+    "got": 56817,
+    "expected": 56817,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xDDF1 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "life_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/life_sim/work/chk_a16.sfc",
+      "8258048",
+      "56817",
+      "2"
+    ],
+    "rom_sha256": "97b2dea4f383aff2345890843cfe8411dded7727e3851672356ffd775f2b5d9b",
+    "got": 56817,
+    "expected": 56817,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xDDF1 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "life_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/life_sim/work/chk_xy16.sfc",
+      "8258048",
+      "56817",
+      "2"
+    ],
+    "rom_sha256": "97b2dea4f383aff2345890843cfe8411dded7727e3851672356ffd775f2b5d9b",
+    "got": 56817,
+    "expected": 56817,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xDDF1 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "life_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/life_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "56817"
+    ],
+    "rom_sha256": "97b2dea4f383aff2345890843cfe8411dded7727e3851672356ffd775f2b5d9b",
+    "got": 56817,
+    "expected": 56817,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0xDDF1 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "lsystem_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/lsystem_sim/work/chk_default.sfc",
+      "8258048",
+      "32883",
+      "2"
+    ],
+    "rom_sha256": "835a69fd19577fe7f960405c01d67f22a6bff43f579cb0a1d61d1ba402610091",
+    "got": 32883,
+    "expected": 32883,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x8073 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "lsystem_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/lsystem_sim/work/chk_a16.sfc",
+      "8258048",
+      "32883",
+      "2"
+    ],
+    "rom_sha256": "d982c0a192f1621d3f29c8b62a216f565ed0fca2087892a122835e3208d15de0",
+    "got": 32883,
+    "expected": 32883,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x8073 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "lsystem_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/lsystem_sim/work/chk_xy16.sfc",
+      "8258048",
+      "32883",
+      "2"
+    ],
+    "rom_sha256": "c06743f8c44cf1b7dde9896778748131d5b978d19c24cf6f0d51c65fd5d78f0d",
+    "got": 32883,
+    "expected": 32883,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x8073 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "lsystem_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/lsystem_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "32883"
+    ],
+    "rom_sha256": "d982c0a192f1621d3f29c8b62a216f565ed0fca2087892a122835e3208d15de0",
+    "got": 32883,
+    "expected": 32883,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x8073 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "mandel-float_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/mandel-float_sim/work/chk_default.sfc",
+      "8258048",
+      "16745",
+      "2"
+    ],
+    "rom_sha256": "0145922ee3ac91088d849dd633e9a87bf8527097e2c3af556e4401bbbcc95995",
+    "got": 16745,
+    "expected": 16745,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4169 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "mandel-float_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/mandel-float_sim/work/chk_a16.sfc",
+      "8258048",
+      "16745",
+      "2"
+    ],
+    "rom_sha256": "b01d8b814df97582b79718e3ca480e517507c686456f9a5b23b6580ee731aa71",
+    "got": 16745,
+    "expected": 16745,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4169 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "mandel-float_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/mandel-float_sim/work/chk_xy16.sfc",
+      "8258048",
+      "16745",
+      "2"
+    ],
+    "rom_sha256": "7ce516ac80390ac5efc9e255ef89856366762a7a8ba58367f2860bf4bd0d64de",
+    "got": 16745,
+    "expected": 16745,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4169 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "mandel-float_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/mandel-float_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "16745"
+    ],
+    "rom_sha256": "b01d8b814df97582b79718e3ca480e517507c686456f9a5b23b6580ee731aa71",
+    "got": 16745,
+    "expected": 16745,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x4169 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "newton_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/newton_sim/work/chk_default.sfc",
+      "8258048",
+      "19851",
+      "2"
+    ],
+    "rom_sha256": "78881c932bc0b5113798c33717c8bc51a5c6842b207b8fb1784335db635893df",
+    "got": 19851,
+    "expected": 19851,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4D8B (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "newton_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/newton_sim/work/chk_a16.sfc",
+      "8258048",
+      "19851",
+      "2"
+    ],
+    "rom_sha256": "49293b769778a82b0aa33f2fe331572ff39fd2f4514ea5939439e75e097c9de0",
+    "got": 19851,
+    "expected": 19851,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4D8B (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "newton_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/newton_sim/work/chk_xy16.sfc",
+      "8258048",
+      "19851",
+      "2"
+    ],
+    "rom_sha256": "49293b769778a82b0aa33f2fe331572ff39fd2f4514ea5939439e75e097c9de0",
+    "got": 19851,
+    "expected": 19851,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x4D8B (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "newton_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/newton_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "19851"
+    ],
+    "rom_sha256": "49293b769778a82b0aa33f2fe331572ff39fd2f4514ea5939439e75e097c9de0",
+    "got": 19851,
+    "expected": 19851,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x4D8B (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "rdiff_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/rdiff_sim/work/chk_default.sfc",
+      "8258048",
+      "21845",
+      "2"
+    ],
+    "rom_sha256": "5e629fa4fcefaf01997dc04486a0985f187771bf0283c6a4bdc8c66f9bea2f54",
+    "got": 21845,
+    "expected": 21845,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x5555 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "rdiff_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/rdiff_sim/work/chk_a16.sfc",
+      "8258048",
+      "21845",
+      "2"
+    ],
+    "rom_sha256": "ad604b6945ee250de2753fa3d44b28e18582ce26f51be9873d284e5117da6ac7",
+    "got": 21845,
+    "expected": 21845,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x5555 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "rdiff_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/rdiff_sim/work/chk_xy16.sfc",
+      "8258048",
+      "21845",
+      "2"
+    ],
+    "rom_sha256": "ad604b6945ee250de2753fa3d44b28e18582ce26f51be9873d284e5117da6ac7",
+    "got": 21845,
+    "expected": 21845,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0x5555 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "rdiff_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/rdiff_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "21845"
+    ],
+    "rom_sha256": "ad604b6945ee250de2753fa3d44b28e18582ce26f51be9873d284e5117da6ac7",
+    "got": 21845,
+    "expected": 21845,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0x5555 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "truchet_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/truchet_sim/work/chk_default.sfc",
+      "8258048",
+      "46054",
+      "2"
+    ],
+    "rom_sha256": "3fea850d0c1b866faf6a4ef80d2bdbc00ad8d0f3090d459ce7a34e7c1b0d433d",
+    "got": 46054,
+    "expected": 46054,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xB3E6 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "truchet_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/truchet_sim/work/chk_a16.sfc",
+      "8258048",
+      "46054",
+      "2"
+    ],
+    "rom_sha256": "5f23305f60252858614e6884459d1491d9ba692d3a62fbf4f7a3cc30f17ee72a",
+    "got": 46054,
+    "expected": 46054,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xB3E6 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "truchet_sim",
+    "function": "run_mame",
+    "arguments": [
+      "/work/build/carry-gate/runtime/truchet_sim/work/chk_xy16.sfc",
+      "8258048",
+      "46054",
+      "2"
+    ],
+    "rom_sha256": "b8b2ce22d6133726eb63199e388e76e45491e68836cdba1731aa908f3b0af595",
+    "got": 46054,
+    "expected": 46054,
+    "pass": true,
+    "log": "SMOKE: PASS addr=0x7E0200 len=2 got=0xB3E6 (ran 1000 ticks)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  },
+  {
+    "name": "truchet_sim",
+    "function": "run_bsnes",
+    "arguments": [
+      "/work/build/carry-gate/runtime/truchet_sim/work/chk_a16.sfc",
+      "512",
+      "2",
+      "46054"
+    ],
+    "rom_sha256": "5f23305f60252858614e6884459d1491d9ba692d3a62fbf4f7a3cc30f17ee72a",
+    "got": 46054,
+    "expected": 46054,
+    "pass": true,
+    "log": "SMOKE: PASS off=0x200 len=2 got=0xB3E6 (ran 1200 frames, bsnes-jg)",
+    "environment": {
+      "SMOKE_SETTLE": "1000",
+      "BSNES_FRAMES": "1200"
+    }
+  }
+]

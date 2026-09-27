@@ -1,0 +1,15 @@
+from pathlib import Path
+import subprocess,json,hashlib
+from concurrent.futures import ThreadPoolExecutor
+root=Path.cwd();out=root/'build/carry-gate/final-equivalence';out.mkdir(exist_ok=True);tool=root/'build/carry-gate/final-install/bin';rows=json.loads((root/'build/carry-gate/focused/report.json').read_text());results=[]
+old=(root/'build/carry-gate/trial-local-ranges/MOSMachineScheduler.cpp').read_text();new=(root/'vendor/llvm-mos/llvm/lib/Target/MOS/MOSMachineScheduler.cpp').read_text();assert old.replace('cl::init(CarrySchedMode::Gated)','cl::init(CarrySchedMode::Always)')==new
+assert (root/'build/carry-gate/trial-local-ranges/MOSMachineScheduler.h').read_bytes()==(root/'vendor/llvm-mos/llvm/lib/Target/MOS/MOSMachineScheduler.h').read_bytes()
+def one(r):
+ result={k:r[k] for k in ('source','mode','optimization')};stem=r['source'].replace('/','_')+'.'+r['mode']+'.'+r['optimization']
+ for mode in ('default','gated'):
+  reference=r['always' if mode=='default' else 'gated'];cmd=reference['command'][:];cmd[0]=str(tool/'mos-clang');obj=out/(stem+'.'+mode+'.o');cmd[cmd.index('-o')+1]=str(obj)
+  if mode=='default':i=cmd.index('-mos-carry-sched=always');del cmd[i-1:i+1]
+  p=subprocess.run(cmd,capture_output=True,text=True,timeout=120);assert not p.returncode,p.stderr;dis=subprocess.check_output([str(tool/'llvm-objdump'),'-dr',str(obj)],text=True);digest=hashlib.sha256('\n'.join(dis.splitlines()[3:]).encode()).hexdigest();assert digest==reference['code'],stem+' '+mode;result[mode]={'command':cmd,'code':digest,'equals_measured_policy':True}
+ return result
+with ThreadPoolExecutor(max_workers=3) as pool:results=list(pool.map(one,rows))
+(out/'results.json').write_text(json.dumps({'source_difference':'Only default mode Gated -> Always; complete scheduler source equality checked after replacing that initializer.','runs':results},indent=2)+'\n');print('64 final compiler comparisons match frozen default/gated controls')

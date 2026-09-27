@@ -1,0 +1,110 @@
+[
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "O2",
+    "delta": 4,
+    "functions": [
+      {
+        "name": "mat_mul",
+        "off_bytes": 832,
+        "gated_bytes": 836,
+        "materializations": {
+          "off": 2,
+          "always": 2,
+          "gated": 2
+        }
+      }
+    ]
+  },
+  {
+    "source": "examples/65816/farblit.c",
+    "mode": "xy16",
+    "optimization": "O2",
+    "delta": 45,
+    "functions": [
+      {
+        "name": "main",
+        "off_bytes": 3166,
+        "gated_bytes": 3211,
+        "materializations": {
+          "off": 27,
+          "always": 5,
+          "gated": 5
+        }
+      }
+    ]
+  },
+  {
+    "source": "examples/snes/avalanche.c",
+    "mode": "default",
+    "optimization": "Os",
+    "delta": 1,
+    "functions": [
+      {
+        "name": "main",
+        "off_bytes": 3557,
+        "gated_bytes": 3558,
+        "materializations": {
+          "off": 1,
+          "always": 0,
+          "gated": 0
+        }
+      }
+    ]
+  },
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "Os",
+    "delta": 4,
+    "functions": [
+      {
+        "name": "mat_mul",
+        "off_bytes": 832,
+        "gated_bytes": 836,
+        "materializations": {
+          "off": 2,
+          "always": 2,
+          "gated": 2
+        }
+      }
+    ]
+  },
+  {
+    "source": "examples/snes/avalanche.c",
+    "mode": "default",
+    "optimization": "Oz",
+    "delta": 1,
+    "functions": [
+      {
+        "name": "main",
+        "off_bytes": 2646,
+        "gated_bytes": 2647,
+        "materializations": {
+          "off": 1,
+          "always": 1,
+          "gated": 1
+        }
+      }
+    ]
+  },
+  {
+    "source": "examples/snes/corpus/matcascade_sim.c",
+    "mode": "default",
+    "optimization": "Oz",
+    "delta": 4,
+    "functions": [
+      {
+        "name": "mat_mul",
+        "off_bytes": 832,
+        "gated_bytes": 836,
+        "materializations": {
+          "off": 2,
+          "always": 2,
+          "gated": 2
+        }
+      }
+    ]
+  }
+]

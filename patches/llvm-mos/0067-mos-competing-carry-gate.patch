@@ -1,0 +1,252 @@
+diff --git a/llvm/lib/Target/MOS/MOSMachineScheduler.cpp b/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
+--- a/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
++++ b/llvm/lib/Target/MOS/MOSMachineScheduler.cpp
+@@ -34,8 +34,21 @@
+ #include "llvm/CodeGen/MachineOperand.h"
+ #include "llvm/CodeGen/MachineRegisterInfo.h"
+ #include "llvm/CodeGen/MachineScheduler.h"
++#include "llvm/Support/CommandLine.h"
+
+ using namespace llvm;
++
++namespace {
++enum class CarrySchedMode { Off, Gated, Always };
++cl::opt<CarrySchedMode> CarryScheduling(
++    "mos-carry-sched", cl::Hidden, cl::init(CarrySchedMode::Always),
++    cl::desc("MOS computed-carry scheduling policy"),
++    cl::values(clEnumValN(CarrySchedMode::Off, "off", "Disable carry pressure"),
++               clEnumValN(CarrySchedMode::Gated, "gated",
++                          "Track competing computed carries"),
++               clEnumValN(CarrySchedMode::Always, "always",
++                          "Track all non-LDImm1 carry definitions")));
++} // namespace
+
+ MOSSchedStrategy::MOSSchedStrategy(const MachineSchedContext *C)
+     : GenericScheduler(C) {}
+@@ -49,12 +62,20 @@
+   TopNodes.insert(&DAG->EntrySU);
+   BottomNodes.insert(&DAG->ExitSU);
+   TopCarries = BottomCarries = 0;
++  TrackCarries = false;
++  if (CarryScheduling == CarrySchedMode::Off)
++    return;
+
+   // A computed carry needs preservation when another carry becomes live.
+   // Constant carry initializers can instead be rematerialized with CLC/SEC.
++  // Frame-address pseudos may become copies or constants after frame layout.
+   const MachineRegisterInfo &MRI = DAG->MF.getRegInfo();
+   for (SUnit &SU : DAG->SUnits) {
+-    if (SU.getInstr()->getOpcode() == MOS::LDImm1)
++    unsigned Opcode = SU.getInstr()->getOpcode();
++    if (Opcode == MOS::LDImm1 ||
++        (CarryScheduling == CarrySchedMode::Gated &&
++         (Opcode == MOS::LDCImm || Opcode == MOS::AddrLostk ||
++          Opcode == MOS::AddrHistk)))
+       continue;
+     CarryValue Value{&SU, {}};
+     for (const SDep &Dep : SU.Succs) {
+@@ -68,16 +89,43 @@
+     }
+     if (Value.Users.empty())
+       continue;
++    // A region-local model needs all users to be represented in the DAG.
++    // Boundary uses can require preservation independently of this schedule.
++    if (CarryScheduling == CarrySchedMode::Gated &&
++        llvm::any_of(Value.Users,
++                     [](const SUnit *User) { return User->isBoundaryNode(); }))
++      continue;
+     unsigned ID = Carries.size();
+     CarryRefs[&SU].push_back(ID);
+     for (const SUnit *User : Value.Users)
+       CarryRefs[User].push_back(ID);
+     Carries.push_back(std::move(Value));
+   }
++  TrackCarries = CarryScheduling == CarrySchedMode::Always ||
++                 hasCompetingCarries(DAG);
++  if (!TrackCarries)
++    return;
+   for (const CarryValue &Value : Carries) {
+     TopCarries += isCarryLive(Value, true);
+     BottomCarries += isCarryLive(Value, false);
+   }
++}
++
++bool MOSSchedStrategy::hasCompetingCarries(ScheduleDAGMI *DAG) const {
++  // Two values cannot overlap if every use of either one must precede the
++  // other's definition. A use at the definition ends the first live range.
++  auto EndsBefore = [&](const CarryValue &A, const CarryValue &B) {
++    return llvm::all_of(A.Users, [&](SUnit *User) {
++      return User == B.Def ||
++             (!User->isBoundaryNode() && DAG->IsReachable(B.Def, User));
++    });
++  };
++  for (unsigned I = 0; I < Carries.size(); ++I)
++    for (unsigned J = I + 1; J < Carries.size(); ++J)
++      if (!EndsBefore(Carries[I], Carries[J]) &&
++          !EndsBefore(Carries[J], Carries[I]))
++        return true;
++  return false;
+ }
+
+ bool MOSSchedStrategy::isCarryLive(const CarryValue &Value, bool AtTop,
+@@ -113,9 +161,11 @@
+ }
+
+ void MOSSchedStrategy::schedNode(SUnit *SU, bool IsTopNode) {
+-  int &Pressure = IsTopNode ? TopCarries : BottomCarries;
+-  Pressure += carryPressureDiff(SU, IsTopNode);
+-  (IsTopNode ? TopNodes : BottomNodes).insert(SU);
++  if (TrackCarries) {
++    int &Pressure = IsTopNode ? TopCarries : BottomCarries;
++    Pressure += carryPressureDiff(SU, IsTopNode);
++    (IsTopNode ? TopNodes : BottomNodes).insert(SU);
++  }
+   GenericScheduler::schedNode(SU, IsTopNode);
+ }
+
+@@ -129,7 +179,8 @@
+     return true;
+   }
+
+-  if (tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
++  if (TrackCarries &&
++      tryLess(carryExcessDiff(TryCand.SU, TryCand.AtTop),
+               carryExcessDiff(Cand.SU, Cand.AtTop), TryCand, Cand, RegExcess))
+     return TryCand.Reason != NoCand;
+
+diff --git a/llvm/lib/Target/MOS/MOSMachineScheduler.h b/llvm/lib/Target/MOS/MOSMachineScheduler.h
+--- a/llvm/lib/Target/MOS/MOSMachineScheduler.h
++++ b/llvm/lib/Target/MOS/MOSMachineScheduler.h
+@@ -24,14 +24,16 @@
+   // Track the defining node rather than the virtual register: two-address
+   // carry chains may redefine the same register at each arithmetic step.
+   struct CarryValue {
+-    const SUnit *Def;
+-    SmallVector<const SUnit *, 4> Users;
++    SUnit *Def;
++    SmallVector<SUnit *, 4> Users;
+   };
+   SmallVector<CarryValue, 16> Carries;
+   DenseMap<const SUnit *, SmallVector<unsigned, 2>> CarryRefs;
+   SmallPtrSet<const SUnit *, 32> TopNodes, BottomNodes;
+   int TopCarries = 0, BottomCarries = 0;
++  bool TrackCarries = false;
+
++  bool hasCompetingCarries(ScheduleDAGMI *DAG) const;
+   bool isCarryLive(const CarryValue &Value, bool AtTop,
+                    const SUnit *Trial = nullptr) const;
+   int carryPressureDiff(const SUnit *SU, bool AtTop) const;
+diff --git a/llvm/test/CodeGen/MOS/carry-pressure-gate.mir b/llvm/test/CodeGen/MOS/carry-pressure-gate.mir
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/carry-pressure-gate.mir
+@@ -0,0 +1,96 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -verify-machineinstrs %s -o %t.default
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=always -verify-machineinstrs %s -o %t.always
++# RUN: diff %t.default %t.always
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=off -verify-machineinstrs %s -o %t.off
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -mos-carry-sched=gated -verify-machineinstrs %s -o %t.gated
++# RUN: diff %t.off %t.gated
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -mos-carry-sched=off -verify-machineinstrs %s -o %t.top-off
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -mos-carry-sched=gated -verify-machineinstrs %s -o %t.top-gated
++# RUN: diff %t.top-off %t.top-gated
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -mos-carry-sched=off -verify-machineinstrs %s -o %t.bottom-off
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -mos-carry-sched=gated -verify-machineinstrs %s -o %t.bottom-gated
++# RUN: diff %t.bottom-off %t.bottom-gated
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -mos-carry-sched=off -verify-machineinstrs %s -o %t.native-off
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -mos-carry-sched=gated -verify-machineinstrs %s -o %t.native-gated
++# RUN: diff %t.native-off %t.native-gated
++
++# Constant initializers need no saved byte. Their interleaved users must keep
++# the ordinary register-pressure schedule, including two-address definitions.
++---
++name: constant_carries
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rc2, $rc3
++    %0:ac = LDAbs 1000
++    %1:ac = LDAbs 1001
++    %2:imag8 = COPY $rc2
++    %3:imag8 = COPY $rc3
++    %4:cc = LDCImm -1
++    %5:cc = LDCImm -1
++    %0:ac, dead %5:cc, dead %7:vc = SBCImag8 %0, %2, %5
++    %6:cc = LDCImm 0
++    %0:ac, dead %8:cc, dead %9:vc = ADCImag8 %0, %3, %6
++    %1:ac, dead %4:cc, dead %10:vc = SBCImag8 %1, %3, %4
++    %1:ac, dead %6:cc, dead %11:vc = ADCImm %1, 4, %6
++    STAbs %0, 2000
++    STAbs %1, 2001
++    RTS
++...
++
++# Each carry is consumed before the next can be defined, as required by the
++# accumulator dependency. Several carry definitions do not imply competition.
++---
++name: serial_computed_carries
++tracksRegLiveness: true
++body: |
++  bb.0:
++    %0:ac = LDAbs 1000
++    %1:cc = LDImm1 0
++    %0:ac, %2:cc, dead %3:vc = ADCImm %0, 1, %1
++    %0:ac, %4:cc, dead %5:vc = ADCImm %0, 2, %2
++    %0:ac, dead %6:cc, dead %7:vc = ADCImm %0, 3, %4
++    STAbs %0, 2000
++    RTS
++...
++
++# A carry used by a successor block is outside the local lifetime model. The
++# region's complete chain can therefore use the ordinary pressure schedule.
++---
++name: live_out_carry
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    %0:ac = LDAbs 1000
++    %1:ac = LDAbs 1001
++    %2:cc = CMPImm %0, 128
++    %3:cc = CMPImm %1, 128
++    %1:ac, %3:cc = ROR %1, %3
++    %1:ac, dead %3:cc = ROR %1, %3
++    STAbs %1, 2001
++    BRA %bb.1
++  bb.1:
++    %0:ac, dead %2:cc = ROR %0, %2
++    STAbs %0, 2000
++    RTS
++...
++
++# Frame layout can turn address pseudos into copies or constant carry loads.
++# Their provisional carry cannot establish a computed-carry competition.
++---
++name: frame_address_carry
++tracksRegLiveness: true
++stack:
++  - { id: 0, size: 16, alignment: 1 }
++body: |
++  bb.0:
++    %0:ac, %1:cc, dead %2:vc = AddrLostk %stack.0, 0
++    %3:cc = LDImm1 0
++    %0:ac, %3:cc, dead %4:vc = ADCImm %0, 8, %3
++    %5:ac, dead %6:cc, dead %7:vc = AddrHistk %stack.0, 0, %1
++    %5:ac, dead %3:cc, dead %8:vc = ADCImm %5, 0, %3
++    STAbs %0, 2000
++    STAbs %5, 2001
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir b/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+--- a/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
++++ b/llvm/test/CodeGen/MOS/carry-pressure-schedule.mir
+@@ -1,3 +1,9 @@
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=machine-scheduler -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=machine-scheduler -verify-machineinstrs -o - %s | FileCheck %s
++# RUN: llc -mos-carry-sched=gated -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=machine-scheduler -verify-machineinstrs -o /dev/null %s
+ # RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -verify-machineinstrs -o - %s | FileCheck %s
+ # RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=topdown -verify-machineinstrs -o - %s | FileCheck %s
+ # RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=machine-scheduler -misched-prera-direction=bottomup -verify-machineinstrs -o - %s | FileCheck %s

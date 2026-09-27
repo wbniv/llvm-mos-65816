@@ -1,0 +1,15 @@
+import sys,os,json,hashlib,subprocess,shutil
+from pathlib import Path
+root=Path('/work');sys.path.insert(0,str(root/'tools'));import a16_fuzz as af
+out=root/'build/carry-gate/vlastack';out.mkdir(exist_ok=True);os.environ['SMOKE_SETTLE']='1000';os.environ['BSNES_FRAMES']='1200';results=[]
+for name,install,policy in [('baseline','baseline-install',None),('off','candidate-install','off'),('always','candidate-install','always'),('gated','candidate-install','gated')]:
+ af.TOOL=root/'build/carry-gate'/install/'bin';directory=out/name;directory.mkdir(exist_ok=True);af.SCRATCH=directory/'mame';af.SCRATCH.mkdir(exist_ok=True);rom=directory/'rom.sfc';mapf=directory/'rom.map';commands=[];orig=af._run
+ def logged(cmd,*args,**kwargs):
+  p=orig(cmd,*args,**kwargs);commands.append({'command':list(map(str,cmd)),'exit_code':p.returncode,'stdout':p.stdout,'stderr':p.stderr});return p
+ af._run=logged
+ flags=[] if policy is None else ['-mllvm','-mos-carry-sched='+policy,'-Wl,-mllvm,-mos-carry-sched='+policy]
+ af.compile_rom(root/'examples/snes/corpus/vlastack_sim.c',rom,mapf,af.XY16,[*flags,'-Wl,--save-temps'])
+ vma,length=af.map_lookup(mapf,'corpus_result');m=af.run_mame(rom,0x7e0000+vma,0xd77b,length);b=af.run_bsnes(rom,vma,length,0xd77b)
+ result={'name':name,'mame':m,'bsnes':b,'rom_sha256':hashlib.sha256(rom.read_bytes()).hexdigest(),'commands':commands,'compiler_sha256':hashlib.sha256((af.TOOL/'clang-23').read_bytes()).hexdigest(),'linker_sha256':hashlib.sha256((af.TOOL/'lld').read_bytes()).hexdigest()};results.append(result);(out/'results.json').write_text(json.dumps(results,indent=2)+'\n');print(name,m,b,flush=True);af._run=orig
+for source in ['examples/snes/corpus/vlastack_sim.c','examples/65816/vlastack.h']:
+ shutil.copy2(root/source,out/(Path(source).name+'.txt'))

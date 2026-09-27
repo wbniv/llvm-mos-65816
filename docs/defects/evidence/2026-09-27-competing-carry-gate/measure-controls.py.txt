@@ -1,0 +1,21 @@
+from pathlib import Path
+import json,subprocess,hashlib
+root=Path.cwd();out=root/'build/carry-gate/controls';out.mkdir(exist_ok=True)
+evidence=root/'docs/defects/evidence/2026-09-26-mos-carry-scheduling';tool=root/'build/llvm-mos/bin';rows=[]
+for shape in ('sum','rot'):
+ for mode in ('a16','xy16'):
+  src=evidence/('p_'+shape+'.c.txt')
+  row={'shape':shape,'mode':mode,'input':str(src),'input_sha256':hashlib.sha256(src.read_bytes()).hexdigest()}
+  for policy in ('off','always','gated'):
+   obj=out/(shape+'.'+mode+'.'+policy+'.o')
+   flags=['-Xclang','-target-feature','-Xclang','+mos-a16']
+   if mode=='xy16':flags+=['-Xclang','-target-feature','-Xclang','+mos-xy16']
+   cmd=[str(tool/'mos-clang'),'--target=mos','-mcpu=mosw65816','-Os',*flags,'-mllvm','-verify-machineinstrs','-mllvm','-mos-carry-sched='+policy,'-x','c',str(src),'-c','-o',str(obj)]
+   p=subprocess.run(cmd,capture_output=True,text=True);obj.with_suffix('.log').write_text(p.stdout+p.stderr)
+   assert p.returncode==0,p.stderr
+   size=subprocess.check_output([str(tool/'llvm-size'),'-A',str(obj)],text=True)
+   dis=subprocess.check_output([str(tool/'llvm-objdump'),'-dr',str(obj)],text=True);obj.with_suffix('.dis').write_text(dis)
+   row[policy]={'command':cmd,'text':sum(int(x.split()[1]) for x in size.splitlines() if x.startswith('.text')),'object_sha256':hashlib.sha256(obj.read_bytes()).hexdigest()}
+  rows.append(row)
+(out/'report.json').write_text(json.dumps(rows,indent=2)+'\n')
+for row in rows:print(row['shape'],row['mode'],{p:row[p]['text'] for p in ('off','always','gated')})

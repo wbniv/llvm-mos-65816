@@ -1,0 +1,23 @@
+from pathlib import Path
+import subprocess,json,hashlib
+from concurrent.futures import ThreadPoolExecutor
+root=Path.cwd();out=root/'build/carry-gate/trials-constant-avoidable';out.mkdir(exist_ok=True);tool=root/'build/llvm-mos/bin'
+focused=json.loads((root/'build/carry-gate/focused/report.json').read_text());census=[json.loads(s) for s in (root/'build/carry-gate/census/results.jsonl').read_text().splitlines()];paired=[r for r in census if all('text' in r[p] for p in ('off','always','gated'))]
+def key(r):return tuple(r[k] for k in ('source','mode','optimization'))
+cases={key(r):r for r in focused}
+for r in sorted(paired,key=lambda r:r['gated']['text']-r['always']['text'],reverse=True)[:100]:cases[key(r)]=r
+for r in paired:
+ if r['gated']['text'] > r['off']['text']:cases[key(r)]=r
+rows=[]
+def one(r):
+ name=r['source'].replace('/','_')+'.'+r['mode']+'.'+r['optimization'];entry={k:r[k] for k in ('source','mode','optimization')};entry['off']=r['off'];entry['always']=r['always'];entry['local']=r['gated'];entry['focused']=key(r) in {key(x) for x in focused}
+ for trial in (4,5,6):
+  obj=out/(name+'.trial'+str(trial)+'.o');cmd=r['gated']['command'][:];cmd[0]=str(tool/'mos-clang');cmd[cmd.index('-o')+1]=str(obj);cmd+=['-mllvm','-mos-carry-gate-trial='+str(trial)];p=subprocess.run(cmd,capture_output=True,text=True,timeout=120);obj.with_suffix('.log').write_text(p.stdout+p.stderr);assert not p.returncode,p.stderr
+  sizes=subprocess.check_output([str(tool/'llvm-size'),'-A',str(obj)],text=True);text=sum(int(line.split()[1]) for line in sizes.splitlines() if line.startswith('.text'));dis=subprocess.check_output([str(tool/'llvm-objdump'),'-dr',str(obj)],text=True);dis='\n'.join(dis.splitlines()[3:]);obj.with_suffix('.dis').write_text(dis);entry[str(trial)]={'text':text,'code':hashlib.sha256(dis.encode()).hexdigest(),'command':cmd}
+ return entry
+with ThreadPoolExecutor(max_workers=3) as pool:
+ for r in pool.map(one,cases.values()):
+  rows.append(r);(out/'report.json').write_text(json.dumps(rows,indent=2)+'\n')
+for trial in ('4','5','6'):
+ print('trial',trial,'focused changed',[(r['source'],r['mode'],r['optimization'],r[trial]['text']-r['off']['text']) for r in rows if r['focused'] and r[trial]['code']!=r['off']['code']])
+ print('recovered bytes',sum(r['local']['text']-r[trial]['text'] for r in rows if not r['focused']))

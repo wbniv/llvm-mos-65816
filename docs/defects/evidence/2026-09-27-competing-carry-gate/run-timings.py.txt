@@ -1,0 +1,47 @@
+from concurrent.futures import ThreadPoolExecutor
+import hashlib,json,re,subprocess,threading
+from pathlib import Path
+root=Path.cwd();old=root/'.scratch/carry-scheduling';out=root/'build/carry-gate/timing';out.mkdir(exist_ok=True)
+tool=root/'build/carry-gate/candidate-install/bin';probe=root/'.scratch/carry-timing/jgxcycles';database=root/'vendor/bsnes-jg/Database';lock=threading.Lock();results=[];commands=[]
+reference=json.loads((root/'docs/defects/evidence/2026-09-27-mos-carry-timing/results.json').read_text())
+focused=json.loads((root/'build/carry-gate/focused/report.json').read_text())
+def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
+def run(command,name):
+ command=[str(x) for x in command];p=subprocess.run(command,capture_output=True,text=True,timeout=300)
+ (out/(name+'.log')).write_text(p.stdout+p.stderr)
+ with lock:
+  commands.append({'command':command,'exit_code':p.returncode,'log':name+'.log'})
+  (out/'commands.json').write_text(json.dumps(commands,indent=2)+'\n')
+ if p.returncode:raise RuntimeError(name+': '+p.stderr[-2000:])
+ return p.stdout
+
+def measure(rom,name,ref):
+ text=run([tool/'llvm-objdump','-t',str(rom)+'.elf'],name+'-symbols')
+ symbols={p[-1]:(int(p[0],16),int(p[-2],16)) for line in text.splitlines() if len(p:=line.split())>=5 and re.fullmatch('[0-9a-f]{8}',p[0])}
+ function=ref['baseline']['function'];start,size=symbols[function];offset,length=symbols['corpus_result']
+ command=[probe,rom,database,hex(start),hex(start+size),hex(ref['baseline']['stop']),hex(offset),length,hex(ref['baseline']['expected']),2000,ref['baseline']['sample_count']]
+ runs=[json.loads(run(command,name+'-timing-'+str(i))) for i in range(2)]
+ assert runs[0]==runs[1] and runs[0]['pass'],name
+ return {'rom_sha256':sha(rom),'samples':runs[0]['samples'],'master_clocks':sum(runs[0]['samples']),'exclusive_master_clocks':runs[0]['exclusive_master_clocks'],'expected':ref['baseline']['expected'],'repeat_identical':True,'function':function,'start':start,'end':start+size}
+
+def one(ref):
+ name=ref['name'];result={k:ref[k] for k in ('name','mode','optimization','scope')};original='source' not in ref
+ if not original:result['source']=ref['source']
+ for policy in ('off','always','gated'):
+  label=name+'.'+policy;rom=out/(label+'.sfc')
+  if original:
+   shape=name.split('-')[0];obj=root/'build/carry-gate/controls'/(shape+'.'+ref['mode']+'.'+policy+'.o')
+   driver=old/'build/carry-original-runtime-a16-driver'/(shape+'-candidate-a16.driver.o')
+   table=old/'build/carry-original-runtime-a16-driver/table.s'
+   config=old/'build/install/bin/mos-snes-hirom.cfg';inputs=[driver,obj,table]
+  else:
+   obj=root/'build/carry-gate/focused'/(name+'.'+policy+'.o');config=old/'build/install/bin/mos-snes.cfg';inputs=[obj]
+  run([tool/'mos-clang','--config',config,'-mcpu=mosw65816','-Os','-fno-lto',*inputs,'-Wl,-Map='+str(out/(label+'.map')),'-o',rom],label+'-link')
+  run(['python3',root/'tools/snes-checksum.py',*(['--hirom'] if original else []),rom],label+'-checksum')
+  result[policy]=measure(rom,label,ref);result[policy]['object_sha256']=sha(obj)
+ with lock:
+  results.append(result);(out/'results.json').write_text(json.dumps(results,indent=2)+'\n')
+ print(name,{p:result[p]['master_clocks'] for p in ('off','always','gated')},flush=True)
+
+with ThreadPoolExecutor(max_workers=2) as pool:list(pool.map(one,reference))
+(out/'identity.json').write_text(json.dumps({'probe_sha256':sha(probe),'compiler_sha256':sha(tool/'clang-23'),'linker_sha256':sha(tool/'lld'),'reference_sha256':sha(root/'docs/defects/evidence/2026-09-27-mos-carry-timing/results.json')},indent=2)+'\n')

@@ -1,0 +1,20 @@
+from pathlib import Path
+import subprocess,json,hashlib,re
+root=Path.cwd();out=root/'build/carry-gate/farblit';out.mkdir(exist_ok=True);tool=root/'build/carry-gate/candidate-install/bin';rows=[]
+def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
+def run(cmd,name):
+ cmd=list(map(str,cmd));p=subprocess.run(cmd,capture_output=True,text=True,timeout=300);(out/(name+'.log')).write_text(p.stdout+p.stderr);commands.append({'command':cmd,'exit_code':p.returncode});assert p.returncode==0,p.stderr;return p.stdout
+commands=[]
+run(['cc','-DHOST','-O2',root/'examples/65816/farblit.c','-o',out/'host'],'host-build');expected=int(run([out/'host'],'host'),16)
+run(['python3',root/'tools/gen-farindex-lut-asm.py',out/'table.s'], 'table')
+# The generated table covers the HiROM banks crossed by the runtime probes.
+table=out/'table.s'
+for policy in ('off','always','gated'):
+ obj=root/'build/carry-gate/census'/('examples_65816_farblit.c.xy16.O2.'+policy+'.o');rom=out/(policy+'.sfc')
+ run([tool/'mos-clang','--config',root/'.scratch/carry-scheduling/build/install/bin/mos-snes-hirom.cfg','-mcpu=mosw65816','-fno-lto',obj,table,'-o',rom],policy+'-link')
+ run(['python3',root/'tools/snes-checksum.py','--hirom',rom],policy+'-checksum')
+ symbols={p[-1]:(int(p[0],16),int(p[-2],16)) for line in run([tool/'llvm-objdump','-t',str(rom)+'.elf'],policy+'-symbols').splitlines() if len(p:=line.split())>=5 and re.fullmatch('[0-9a-f]{8}',p[0])}
+ start,size=symbols['main'];offset,length=symbols['corpus_result'];cmd=[root/'.scratch/carry-timing/jgxcycles',rom,root/'vendor/bsnes-jg/Database',hex(start),hex(start+size),'0xffffffff',hex(offset),length,hex(expected),2000,1]
+ runs=[json.loads(run(cmd,policy+'-timing-'+str(i))) for i in range(2)];assert runs[0]==runs[1] and runs[0]['pass']
+ row={'policy':policy,'timing':runs[0],'rom_sha256':sha(rom),'object_sha256':sha(obj),'repeat_identical':True};rows.append(row);print(json.dumps(row),flush=True)
+(out/'results.json').write_text(json.dumps({'runs':rows,'commands':commands,'source_sha256':sha(root/'examples/65816/farblit.c'),'expected':expected},indent=2)+'\n')

@@ -1,0 +1,254 @@
+{
+  "compiler_sha256": "6e004a8a8c9b095013d1e6e786822e9d930b20691749413a3a2ca312d5bb1fd5",
+  "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+  "cpu": "\t: 11th Gen Intel(R) Core(TM) i7-1185G7 @ 3.00GHz",
+  "method": "Sequential process launches, one warmup and seven measured rounds per arm/input; policy order rotated each round/input. Machine is shared. Both wall and child CPU time are retained.",
+  "cases": [
+    {
+      "source": "examples/65816/farblit.c",
+      "mode": "xy16",
+      "optimization": "O2",
+      "off": {
+        "wall_seconds": {
+          "median": 0.18482373002916574,
+          "min": 0.16922231600619853,
+          "max": 0.22813451098045334
+        },
+        "cpu_seconds": {
+          "median": 0.17980799999999908,
+          "min": 0.16878800000000016,
+          "max": 0.2253270000000005
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.189728923025541,
+          "min": 0.1709612919948995,
+          "max": 0.20294608600670472
+        },
+        "cpu_seconds": {
+          "median": 0.1889619999999923,
+          "min": 0.1704420000000011,
+          "max": 0.19884100000000116
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 0.1856168580125086,
+          "min": 0.16601939097745344,
+          "max": 0.22416517202509567
+        },
+        "cpu_seconds": {
+          "median": 0.18202999999999658,
+          "min": 0.1654639999999995,
+          "max": 0.22362300000000435
+        }
+      }
+    },
+    {
+      "source": "examples/65816/rcundef2.c",
+      "mode": "xy16",
+      "optimization": "Os",
+      "off": {
+        "wall_seconds": {
+          "median": 0.21806930098682642,
+          "min": 0.1903829330112785,
+          "max": 0.2606685860082507
+        },
+        "cpu_seconds": {
+          "median": 0.21360800000000058,
+          "min": 0.1847310000000002,
+          "max": 0.25621399999999706
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.20973307301755995,
+          "min": 0.18229549698298797,
+          "max": 0.35284796298947185
+        },
+        "cpu_seconds": {
+          "median": 0.20806700000000067,
+          "min": 0.18171699999999913,
+          "max": 0.30114000000000196
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 0.20669741102028638,
+          "min": 0.19387753499904647,
+          "max": 0.25223366398131475
+        },
+        "cpu_seconds": {
+          "median": 0.20097600000000182,
+          "min": 0.19146199999999935,
+          "max": 0.25071199999999605
+        }
+      }
+    },
+    {
+      "source": "examples/snes/corpus/lsystem_sim.c",
+      "mode": "xy16",
+      "optimization": "Oz",
+      "off": {
+        "wall_seconds": {
+          "median": 0.21479492000071332,
+          "min": 0.177054793050047,
+          "max": 0.31295121199218556
+        },
+        "cpu_seconds": {
+          "median": 0.20896399999999815,
+          "min": 0.1765550000000008,
+          "max": 0.3057539999999974
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.2031181959901005,
+          "min": 0.19576705002691597,
+          "max": 0.268741921056062
+        },
+        "cpu_seconds": {
+          "median": 0.2000909999999998,
+          "min": 0.18868200000000224,
+          "max": 0.26334899999999406
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 0.21993312099948525,
+          "min": 0.1990009589935653,
+          "max": 0.2593117560027167
+        },
+        "cpu_seconds": {
+          "median": 0.21434700000000584,
+          "min": 0.1961869999999996,
+          "max": 0.25782200000000177
+        }
+      }
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "optimization": "Os",
+      "off": {
+        "wall_seconds": {
+          "median": 1.005338290007785,
+          "min": 0.8632639510324225,
+          "max": 1.2502586859627627
+        },
+        "cpu_seconds": {
+          "median": 0.9927429999999994,
+          "min": 0.8626569999999947,
+          "max": 1.2407860000000066
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.9794304430251941,
+          "min": 0.8715185350156389,
+          "max": 1.4721623809891753
+        },
+        "cpu_seconds": {
+          "median": 0.967783000000001,
+          "min": 0.8615060000000012,
+          "max": 1.3267930000000008
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 1.0116646609967574,
+          "min": 0.8875237029860727,
+          "max": 1.4200907269841991
+        },
+        "cpu_seconds": {
+          "median": 0.9822869999999981,
+          "min": 0.8851530000000043,
+          "max": 1.388651000000002
+        }
+      }
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "default",
+      "optimization": "Os",
+      "off": {
+        "wall_seconds": {
+          "median": 0.5298283820156939,
+          "min": 0.476069041993469,
+          "max": 0.9170192940509878
+        },
+        "cpu_seconds": {
+          "median": 0.5280350000000014,
+          "min": 0.4745330000000032,
+          "max": 0.8281939999999999
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.5615992599632591,
+          "min": 0.47078176005743444,
+          "max": 0.6756343040033244
+        },
+        "cpu_seconds": {
+          "median": 0.5482160000000049,
+          "min": 0.468129000000002,
+          "max": 0.6143619999999994
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 0.5134203509660438,
+          "min": 0.49244880402693525,
+          "max": 0.6689317270065658
+        },
+        "cpu_seconds": {
+          "median": 0.5024720000000008,
+          "min": 0.49198199999999814,
+          "max": 0.6604309999999987
+        }
+      }
+    },
+    {
+      "source": "examples/snes/corpus/arith.c",
+      "mode": "default",
+      "optimization": "Os",
+      "off": {
+        "wall_seconds": {
+          "median": 0.04678894701646641,
+          "min": 0.04076798300957307,
+          "max": 0.06777526595396921
+        },
+        "cpu_seconds": {
+          "median": 0.041989000000000054,
+          "min": 0.04022300000000012,
+          "max": 0.05965299999999907
+        }
+      },
+      "always": {
+        "wall_seconds": {
+          "median": 0.04307142301695421,
+          "min": 0.03896870999597013,
+          "max": 0.06458425702294335
+        },
+        "cpu_seconds": {
+          "median": 0.0420869999999991,
+          "min": 0.03841300000000558,
+          "max": 0.062088999999998506
+        }
+      },
+      "gated": {
+        "wall_seconds": {
+          "median": 0.040107302949763834,
+          "min": 0.03878670296398923,
+          "max": 0.06256680999649689
+        },
+        "cpu_seconds": {
+          "median": 0.03942399999999957,
+          "min": 0.037727999999995765,
+          "max": 0.06061400000000372
+        }
+      }
+    }
+  ]
+}

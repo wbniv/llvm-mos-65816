@@ -1,0 +1,13 @@
+from pathlib import Path
+import json,subprocess,hashlib
+root=Path.cwd();out=root/'build/carry-gate/kernel';out.mkdir(exist_ok=True);tool=root/'build/carry-gate/candidate-install/bin';src=root/'docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/runtime';results=[]
+def run(cmd,label):
+ cmd=list(map(str,cmd));p=subprocess.run(cmd,capture_output=True,text=True);(out/(label+'.log')).write_text(p.stdout+p.stderr);assert not p.returncode,p.stderr;return {'command':cmd,'exit_code':p.returncode,'stdout':p.stdout}
+for policy in ('off','always','gated'):
+ obj=out/(policy+'.o');rom=out/(policy+'.simg');row={'policy':policy,'input_sha256':hashlib.sha256((src/'kernel.mir').read_bytes()).hexdigest()}
+ row['compile']=run([tool/'llc','-mtriple=mos','-mcpu=mos6502','-start-before=machine-scheduler','-verify-machineinstrs','-filetype=obj','-mos-carry-sched='+policy,src/'kernel.mir','-o',obj],policy+'-compile')
+ row['sections']=run([tool/'llvm-size','-A',obj],policy+'-sections');row['disassembly']=run([tool/'llvm-objdump','-dr',obj],policy+'-disassembly')
+ row['link']=run([tool/'mos-clang','--config',root/'build/install/bin/mos-sim.cfg','-mcpu=mos6502','-fno-lto',src/'driver.o',obj,'-o',rom],policy+'-link')
+ row['execute']=run([root/'build/utils/sim/mos-sim',rom],policy+'-execute');assert row['execute']['stdout']=='P'
+ row['rom_sha256']=hashlib.sha256(rom.read_bytes()).hexdigest();results.append(row);print(policy,row['sections']['stdout'])
+(out/'results.json').write_text(json.dumps(results,indent=2)+'\n')

@@ -1,0 +1,199 @@
+[
+  {
+    "name": "baseline",
+    "mame": [
+      54205,
+      "SMOKE: FAIL addr=0x7E0200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "bsnes": [
+      54205,
+      "SMOKE: FAIL off=0x200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "rom_sha256": "cf07749d309debc6a3948022fda2838b966ac7f219dc40be27416b77d473cb39",
+    "commands": [
+      {
+        "command": [
+          "/work/build/carry-gate/baseline-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes.cfg",
+          "-mcpu=mosw65816",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-Wl,--save-temps",
+          "-Os",
+          "-Wl,-Map=/work/build/carry-gate/vlastack/baseline/rom.map",
+          "-o",
+          "/work/build/carry-gate/vlastack/baseline/rom.sfc",
+          "/work/examples/snes/corpus/vlastack_sim.c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/bin/python3",
+          "/work/tools/snes-checksum.py",
+          "/work/build/carry-gate/vlastack/baseline/rom.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-gate/vlastack/baseline/rom.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xAF6F complement=0x5090\n",
+        "stderr": ""
+      }
+    ],
+    "compiler_sha256": "ff61df1d0569ff3a5cf58a8d67e67c57b5a5fee4024adb2dae5e1b1fbcb7f8d5",
+    "linker_sha256": "5142afb30cfa2d9725ea8f537d2155b86292691eb467301a6f814916e8a895e2"
+  },
+  {
+    "name": "off",
+    "mame": [
+      54205,
+      "SMOKE: FAIL addr=0x7E0200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "bsnes": [
+      54205,
+      "SMOKE: FAIL off=0x200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "rom_sha256": "cf07749d309debc6a3948022fda2838b966ac7f219dc40be27416b77d473cb39",
+    "commands": [
+      {
+        "command": [
+          "/work/build/carry-gate/candidate-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes.cfg",
+          "-mcpu=mosw65816",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-mllvm",
+          "-mos-carry-sched=off",
+          "-Wl,-mllvm,-mos-carry-sched=off",
+          "-Wl,--save-temps",
+          "-Os",
+          "-Wl,-Map=/work/build/carry-gate/vlastack/off/rom.map",
+          "-o",
+          "/work/build/carry-gate/vlastack/off/rom.sfc",
+          "/work/examples/snes/corpus/vlastack_sim.c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/bin/python3",
+          "/work/tools/snes-checksum.py",
+          "/work/build/carry-gate/vlastack/off/rom.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-gate/vlastack/off/rom.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xAF6F complement=0x5090\n",
+        "stderr": ""
+      }
+    ],
+    "compiler_sha256": "3a46335aac9f3c4a3e2afa5d8a2e02cd2f5c157a997b5d848084cc37d85ba4eb",
+    "linker_sha256": "9264f577bdaa789b03e2f9ba6110dbef16aa6982f9d1152709062e1cfc1cb175"
+  },
+  {
+    "name": "always",
+    "mame": [
+      54205,
+      "SMOKE: FAIL addr=0x7E0200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "bsnes": [
+      54205,
+      "SMOKE: FAIL off=0x200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "rom_sha256": "cf07749d309debc6a3948022fda2838b966ac7f219dc40be27416b77d473cb39",
+    "commands": [
+      {
+        "command": [
+          "/work/build/carry-gate/candidate-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes.cfg",
+          "-mcpu=mosw65816",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-mllvm",
+          "-mos-carry-sched=always",
+          "-Wl,-mllvm,-mos-carry-sched=always",
+          "-Wl,--save-temps",
+          "-Os",
+          "-Wl,-Map=/work/build/carry-gate/vlastack/always/rom.map",
+          "-o",
+          "/work/build/carry-gate/vlastack/always/rom.sfc",
+          "/work/examples/snes/corpus/vlastack_sim.c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/bin/python3",
+          "/work/tools/snes-checksum.py",
+          "/work/build/carry-gate/vlastack/always/rom.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-gate/vlastack/always/rom.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xAF6F complement=0x5090\n",
+        "stderr": ""
+      }
+    ],
+    "compiler_sha256": "3a46335aac9f3c4a3e2afa5d8a2e02cd2f5c157a997b5d848084cc37d85ba4eb",
+    "linker_sha256": "9264f577bdaa789b03e2f9ba6110dbef16aa6982f9d1152709062e1cfc1cb175"
+  },
+  {
+    "name": "gated",
+    "mame": [
+      54205,
+      "SMOKE: FAIL addr=0x7E0200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "bsnes": [
+      54205,
+      "SMOKE: FAIL off=0x200 len=2 got=0xD3BD want=0xD77B"
+    ],
+    "rom_sha256": "cf07749d309debc6a3948022fda2838b966ac7f219dc40be27416b77d473cb39",
+    "commands": [
+      {
+        "command": [
+          "/work/build/carry-gate/candidate-install/bin/mos-clang",
+          "--config",
+          "/work/build/install/bin/mos-snes.cfg",
+          "-mcpu=mosw65816",
+          "-Xclang",
+          "-target-feature",
+          "-Xclang",
+          "+mos-xy16",
+          "-mllvm",
+          "-mos-carry-sched=gated",
+          "-Wl,-mllvm,-mos-carry-sched=gated",
+          "-Wl,--save-temps",
+          "-Os",
+          "-Wl,-Map=/work/build/carry-gate/vlastack/gated/rom.map",
+          "-o",
+          "/work/build/carry-gate/vlastack/gated/rom.sfc",
+          "/work/examples/snes/corpus/vlastack_sim.c"
+        ],
+        "exit_code": 0,
+        "stdout": "",
+        "stderr": ""
+      },
+      {
+        "command": [
+          "/usr/bin/python3",
+          "/work/tools/snes-checksum.py",
+          "/work/build/carry-gate/vlastack/gated/rom.sfc"
+        ],
+        "exit_code": 0,
+        "stdout": "/work/build/carry-gate/vlastack/gated/rom.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xAF6F complement=0x5090\n",
+        "stderr": ""
+      }
+    ],
+    "compiler_sha256": "3a46335aac9f3c4a3e2afa5d8a2e02cd2f5c157a997b5d848084cc37d85ba4eb",
+    "linker_sha256": "9264f577bdaa789b03e2f9ba6110dbef16aa6982f9d1152709062e1cfc1cb175"
+  }
+]

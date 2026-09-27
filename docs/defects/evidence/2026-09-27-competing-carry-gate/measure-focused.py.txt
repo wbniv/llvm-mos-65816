@@ -1,0 +1,30 @@
+import concurrent.futures,hashlib,json,subprocess,time
+from pathlib import Path
+root=Path(__file__).resolve().parents[2];old=root/'.scratch/carry-scheduling';out=root/'build/carry-gate/focused';out.mkdir(exist_ok=True)
+review=json.loads((root/'docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json').read_text())['rows']
+reports={}
+for case in review:
+ census=case['census']
+ if census not in reports:reports[census]=json.loads((old/'build'/census/'report.json').read_text())
+tool=root/'build/llvm-mos/bin'
+def run(case):
+ row=next(r for r in reports[case['census']] if all(r[k]==case[k] for k in ('source','mode','optimization')))
+ stem=case['source'].replace('/','_')+'.'+case['mode']+'.'+case['optimization']
+ result={k:case[k] for k in ('source','mode','optimization','delta')}
+ for mode in ('off','always','gated'):
+  cmd=row['after']['command'][:];cmd[0]=str(tool/'mos-clang');cmd[-1]=str(out/(stem+'.'+mode+'.o'));cmd+=['-mllvm','-mos-carry-sched='+mode]
+  t=time.monotonic();p=subprocess.run(cmd,capture_output=True,text=True,timeout=120);elapsed=time.monotonic()-t
+  (out/(stem+'.'+mode+'.log')).write_text(p.stdout+p.stderr)
+  value={'command':cmd,'exit_code':p.returncode,'elapsed_seconds':elapsed};result[mode]=value
+  if p.returncode:continue
+  obj=Path(cmd[-3]);value['sha256']=hashlib.sha256(obj.read_bytes()).hexdigest()
+  sizes=subprocess.check_output([str(tool/'llvm-size'),'-A',str(obj)],text=True)
+  value['text']=sum(int(s.split()[1]) for s in sizes.splitlines() if s.startswith('.text'))
+  dis=subprocess.check_output([str(tool/'llvm-objdump'),'-dr',str(obj)],text=True)
+  dis='\n'.join(dis.splitlines()[3:]);value['code']=hashlib.sha256(dis.encode()).hexdigest();(out/(stem+'.'+mode+'.dis')).write_text(dis)
+ return result
+with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
+ results=list(pool.map(run,review))
+(out/'report.json').write_text(json.dumps(results,indent=2)+'\n')
+for row in results:
+ print(row['source'],row['mode'],row['optimization'],{m:row[m].get('text',row[m]['exit_code']) for m in ('off','always','gated')})

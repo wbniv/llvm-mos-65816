@@ -1,0 +1,7 @@
+from pathlib import Path
+import sys,json,hashlib,subprocess,shutil
+root=Path('/work');result={'python':sys.version,'scope':'Runtime tools identified after the runs; these emulator binaries were not rebuilt or replaced during this task. The cycle probe identity and calibration are separately retained.'}
+for name,p in [('mame',Path(shutil.which('mame'))),('jgxcheck',root/'build/jgxcheck'),('jgxcycles',root/'.scratch/carry-timing/jgxcycles')]:result[name]={'path':str(p),'sha256':hashlib.sha256(p.read_bytes()).hexdigest()}
+p=subprocess.run(['mame','-help'],capture_output=True,text=True);result['mame']['version']=p.stdout.splitlines()[0];result['mame']['version_command_exit']=p.returncode
+(root/'build/carry-gate/runtime-tools.json').write_text(json.dumps(result,indent=2)+'\n')
+print(json.dumps(result,indent=2))

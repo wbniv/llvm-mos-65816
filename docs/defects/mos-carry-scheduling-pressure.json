@@ -3,15 +3,16 @@
   "id": "mos-carry-scheduling-pressure",
   "title": "Fine-grained carry pressure is lost before register pressure set pruning",
   "status": "workaround",
-  "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met.",
+  "summary": "Patch 0064 models computed Cc values directly in the MOS pre-RA scheduler and removes avoidable carry saves on the recovered sum/rotate inputs: 409 to 248 bytes and 385 to 285 bytes. The generic TableGen fine-grained pressure-set contract remains uncorrected; its broader repair was rejected after corpus regressions. The scheduler mitigation passes matching-input MIR checks and runtime validation. September 27 emulator timing: original sum/rotate use 30.45%/17.61% fewer master clocks, while the isolated XY16 Oz L-system interpreter uses 2.80% more. The zero-cycle-regression criterion is not met. Patch 0067 implements an experimental region gate. It recovers the 32 original growth cases and their measured costs, but fails default-promotion criteria: 6.81% of the aggregate saving is lost and four growing configurations remove no materializations. Always remains the default.",
   "report": "docs/plans/2026-09-26-mos-carry-scheduling.md",
   "reproducer_origin": "reduced",
   "attribution": [
     "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994: reconciliation, baseline capture, diagnosis, implementation, and validation.",
     "Claude Code 2.1.278, model claude-opus-5, high reasoning effort; session 65695418-7e9b-45bd-92e3-2ecfd88ecf0b, agent a35017d73ff4d881d: original sum/rotate inputs and September 25 scheduling measurements.",
-    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Execution-time instrumentation, calibration, preserved-input timing and documentation."
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Execution-time instrumentation, calibration, preserved-input timing and documentation.",
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Competing-carry gate implementation, rejected refinements, full census, runtime and compile-time measurements, baseline VLA observation, and documentation."
   ],
-  "unknowns": "The original September 25 compiler was not recovered. Original C inputs were recovered byte-for-byte; preprocessing and pass captures are from the identified September 26 reconstruction. Default-mode far i32 input fails legalization before scheduling and is not treated as a scheduling regression. Individual corpus size losses are retained in growth-review.json; execution-time measurements are scoped to the preserved downstream build and include regressions; compiler-time overhead, upstream timing and two adapted 6502 cases remain unmeasured. An all-XY16 runtime driver fails on baseline and candidate; the cause is unisolated. The original functions pass with a common a16 driver in both function modes. Farblit legalization is tracked separately.",
+  "unknowns": "The original September 25 compiler was not recovered. Original C inputs were recovered byte-for-byte; preprocessing and pass captures are from the identified September 26 reconstruction. Default-mode far i32 input fails legalization before scheduling and is not treated as a scheduling regression. Individual corpus size losses are retained in growth-review.json; execution-time measurements are scoped to the preserved downstream build and include regressions; compiler-time overhead, upstream timing and two adapted 6502 cases remain unmeasured. An all-XY16 runtime driver fails on baseline and candidate; the cause is unisolated. The original functions pass with a common a16 driver in both function modes. Farblit legalization is tracked separately. September 27 gate evaluation: bounded current-stack compiler-time samples and the ordinary-6502 kernel are now measured; they do not cover the original build pair or exact upstream extraction. The gate remains experimental. Vlastack XY16 returns 0xD3BD versus 0xD77B on the preserved pre-gate compiler and off/always/gated in both emulators; the mechanism is unisolated and is retained as an observation, without a new causal-defect or closure claim.",
   "prior_work": {
     "disposition": "historical_migration",
     "search_terms": [
@@ -19,25 +20,32 @@
       "IsPressureFineGrained",
       "IsFineGrained",
       "pruneUnitSets",
-      "MOSSchedStrategy"
+      "MOSSchedStrategy",
+      "LDCImm",
+      "AddrLostk",
+      "AddrHistk",
+      "competing carries"
     ],
     "related_records": [],
     "related_reports": [
       "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
-      "docs/pr-preparations/2026-09-26/0064-review.md"
+      "docs/pr-preparations/2026-09-26/0064-review.md",
+      "docs/investigations/2026-09-27-competing-carry-gate.md"
     ],
     "related_changes": [
       "patches/llvm-mos/0002-321-accum16.patch",
       "patches/llvm-mos/0029-llvm-twoaddr-physreg-reschedule.patch",
-      "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch"
+      "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+      "patches/llvm-mos/0067-mos-competing-carry-gate.patch"
     ],
-    "source_assessment": "The preserved baseline includes runtime indexed increment 2 and 0049-0063. TableGen reads the register-class flag but does not transfer it to initial pressure sets; no local repair was found. Reference 742d554 also omits the assignment. September 26 upstream preparation: exact llvm-mos main 7bd67c0ae4e8 retains the scheduler entry guards and missing TableGen flag propagation. Standalone 0064 changes only MOS scheduling; the original grouped MIR passes this baseline, while a constructed interleaving yields matching-input scheduling red/green and 133 to 59 byte code. See the author review and additional receipt; no generic repair or new causal defect is claimed.",
+    "source_assessment": "The preserved baseline includes runtime indexed increment 2 and 0049-0063. TableGen reads the register-class flag but does not transfer it to initial pressure sets; no local repair was found. Reference 742d554 also omits the assignment. September 26 upstream preparation: exact llvm-mos main 7bd67c0ae4e8 retains the scheduler entry guards and missing TableGen flag propagation. Standalone 0064 changes only MOS scheduling; the original grouped MIR passes this baseline, while a constructed interleaving yields matching-input scheduling red/green and 133 to 59 byte code. See the author review and additional receipt; no generic repair or new causal defect is claimed. September 27 competing-gate reconciliation confirms 0064 is present and no gate exists in the preserved pre-gate source. Constants, provisional frame carries and boundary users require separate eligibility decisions; see the appended prior-work audit.",
     "binary_assessment": "Freshly rebuilt baseline from captured dirty source; independently copied tools and resources with hashes in baseline-identity.json.",
     "decision": "First canonical record for the historical carry-pressure performance report. Native shift clobber and two-address CSR dependencies are distinct correctness defects.",
     "evidence": {
       "path": "docs/defects/evidence/2026-09-26-mos-carry-scheduling/prior-work-audit.json",
       "sha256": "febc452013a7664ed09e1ecde04cc79e9c223331bc524b0b95725a5357b47067"
-    }
+    },
+    "followup_evidence": "docs/defects/evidence/2026-09-27-competing-carry-gate/prior-work-audit.json"
   },
   "observations": [
     {
@@ -1347,6 +1355,274 @@
     {
       "path": "docs/defects/evidence/2026-09-27-mos-carry-timing/timing-runs.tar.gz",
       "sha256": "0040ccc3313ea1ed517fddd4fc498a06b2d19fda54df2d68896703163b22d958"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/additional-growth-timing.json",
+      "sha256": "0bc92c3bd83af3c530d3f1146abdedf7ea8448f2f26a36971468174165522909"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/always-control.json",
+      "sha256": "46fcfa8a44e091fb4e59e81782c6841e23777d33412330ea342b1332628662cc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/baseline-MOSMachineScheduler.cpp.txt",
+      "sha256": "2cb31a424acce1504c1d34b12d68df856b376c92791e2d3708724f0b84e5f03d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/baseline-MOSMachineScheduler.h.txt",
+      "sha256": "193fe2b10de90e15ccfa5faeaaba1cd103145c668271c9310a31880015db61e8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/baseline-identity.json",
+      "sha256": "3b69562b5446646c9a05027da7fdb9bfc7d8122dceb88815fc2892a57382341f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/baseline-source.diff.txt.gz",
+      "sha256": "cb73308639236c7ac3c32e2d23c85ef519bd45a5fb3fac92b085e28c7a36f97d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/candidate-identity.json",
+      "sha256": "06e07b4956de882102fe5541541940039be577b1e5ea7fe562cfeb7f485c53fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/candidate-install-identity.json",
+      "sha256": "4de5d2176ba0b9762ee5f5f1deffe676c9f29b8c434221d1696881a522308aae"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/capture-evidence.py.txt",
+      "sha256": "e5d1596b4dbf61b74abac5b16d2170196ff8ad6d61eb97542fb019e1b0eaa35f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census-diagnostics-and-growth.tar.gz",
+      "sha256": "d15e428df59d9285d74e3dfe77fa0630b1d1d2a6012e8f18b9962bb9180ee393"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census-identity.json",
+      "sha256": "e79d2e24085c1e83a799c3d00b6ef2d517095392d9ace88e06ec0f8e3522cee5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census-inputs.tar.gz",
+      "sha256": "21f6855af9b9469600070d23b224047246977bd233ceb8da1aea2e2994edf414"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census-summary.json",
+      "sha256": "7adc81f32e0ee6e3fca546c2fa0210b5bc8a3e200b8718ac093d3fe696a2d16c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/census.json.gz",
+      "sha256": "faad18dc8d1d29225e0df9d026b4e35cd26173c48ea7263c36270fab0305af19"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/compile-time-runs.json.gz",
+      "sha256": "bef12e4d7420713a022fd2e0a300592cbaf5437c83e175fe5ca6300f86143147"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/compile-time.json",
+      "sha256": "dcc831bfaa92bb9ba48112d6a3c7007f4c5e9c793f1c83d670e306145ae93ab9"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/controls-and-focused.tar.gz",
+      "sha256": "7a2df0ac49ea0930c7fd60a330a9b39963b358830cc3346c4aa9ccb14036cd83"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/controls.json",
+      "sha256": "838664db9d04839c805614303886ce9238e4523eb91ce6c7701bcdefd7545e3a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/farblit-timing.json.gz",
+      "sha256": "e26c0d0ff1ce82f21d6a4c58c58123b2e173a74b44f42e2b2941ba50a04f8941"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-MOSMachineScheduler.cpp.txt",
+      "sha256": "7291ef78c41ea7154e49d76b7f618d41401823f6dc1fb701c825292fd43471e6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-MOSMachineScheduler.h.txt",
+      "sha256": "c0053645bbf9082a5823fa62c86cfb2c14197f9d862bf3f3f3595d1bf78f9307"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-carry-pressure-gate.mir.txt",
+      "sha256": "b5d2dccf1de34e44656b357cbe3f43396aa10583243cf3e6bb6710e7bac0fddf"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-carry-pressure-schedule.mir.txt",
+      "sha256": "2a0f6deb35eca5001282a3ae8ee7c4f02c645e46a7095ae4ac756509b2370b1d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-equivalence.json",
+      "sha256": "eb559fe124fd2c578214137753e21a8da4b5485662d022beac64a83a39657743"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-equivalence.py.txt",
+      "sha256": "53dbd4e9288e6221677a54f2f0f8a10bbe41b907383d3eba5a7b85bd7f9a3903"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-identity.json",
+      "sha256": "cbdf9075c177c8ad9daf0b06388211ee4541891a0c0754b8d6b85980af2213e2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-lit.json",
+      "sha256": "f1c8672534a2773b96a7378563bd3f228835632687ff14f7b1bcd6531200103d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/final-lit.log",
+      "sha256": "be7e70c8fcf7579e414da3560b2c0e64b42aa48d496384cc243c7909620322dd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/finalize-patch.py.txt",
+      "sha256": "fdcfe8e2d70b07b4113eb55a53c29cadad6dfddd7bac3b9439b4f59f92a2aa75"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/focused.json",
+      "sha256": "476e377895710e6f4c6be8166e4fdcf235827cdb1b35ca5d8d11666301a1a807"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/growth-counts.json",
+      "sha256": "2e004fafcd12cc0eb047d1d8cb88e0afe84b58b219b886c4b8399cbb69a74eb7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/growth-final.json",
+      "sha256": "9029dd6e1d923dddba4ed5b8154aa6095d59679a91f587dd854c49282cdd7a05"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/inspect-schedules.py.txt",
+      "sha256": "af14e6cba2a005015e861e248c655ec8e9a30f3fb402ca381724956783d9dbea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/interpreter.json",
+      "sha256": "a24152b0133ca855961762a7a995d30032ac34b5170fce068500bd6e85160109"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/kernel-cycles.json",
+      "sha256": "611be6c16997c7bd508cbf2da340e7ce18ed088e0b8b0f726478478be47c52a5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/kernel.json",
+      "sha256": "bb920cd5e009c87c44c349e3e353a7b483c0894a99db02239ead78721b138e25"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-additional-growth.py.txt",
+      "sha256": "47827baebf3cebb1b987df596c90fd379b6efa999dd4541b713dcf067d8dcc4f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-compile-time.py.txt",
+      "sha256": "38e2f13c62ca4b8259b9ad8904beea5935f24ca9bf60071e69a55b8571c042a2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-controls.py.txt",
+      "sha256": "699f49dc25f1defde1db9fbd762bd2446b206419f5849efde9441224e7aa4c81"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-farblit.py.txt",
+      "sha256": "1f3d370ad77ddf1c72c44530301d447e0f664a7d151d81de4b65b2b96dade200"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-focused.py.txt",
+      "sha256": "9e18777fc1f0b6a2a9d1457fdd34d241b077138e2fc6555a79033d3ea9685ba0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-interpreter.py.txt",
+      "sha256": "bde7fa3803f98ed0e0da83eb1487495db5cd98959878f859aed0872631606a0c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-kernel.py.txt",
+      "sha256": "638d42eb6a62d8f4be1d359854fb1dea59f06146d7ef0a2dcff67103aa2ace5a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-trials-extra.py.txt",
+      "sha256": "b26c39ea850877c4d934af0187c769b5cbd9240958237443c1dfadc759bf32f6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/measure-trials.py.txt",
+      "sha256": "05217dce7677d7a1fa338d10978a144cd3ec3db4ff56779e4073fdd711400f0e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/patch-roundtrip.json",
+      "sha256": "0539a8d804ad6736a7cdb5bf8e301f4aad53d7c03e92258c4a2401ea01f7d754"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/prior-work-audit.json",
+      "sha256": "7009057e0ef1cad313425516cca570aec388591720fa57b2d3abb337a743b3be"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/probe-vlastack.py.txt",
+      "sha256": "eaa063e0b6ad570fb4c84819f4cb3e796fecc9610288229683c6410d33bea2a2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/receipt.json",
+      "sha256": "31ebd540a76a048b618ab948a13994d940e5ea9e6b098c1550d015d1a64d0b55"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/recheck-runtime.py.txt",
+      "sha256": "7a4cdeb5b47fc454c0cba4de9fbb4f6d6673c78192ea78179aab98e95241282a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/record-runtime-identity.py.txt",
+      "sha256": "187b5130edf7ad8f57366caa6458500f2384e0a685ff9de08a37a4b240da1820"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/run-runtime.py.txt",
+      "sha256": "0a51af0ec48ebe08ef3f6f06ac30469c22129b1a8001a6d6d37dc92d6329787f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/run-timings.py.txt",
+      "sha256": "1715224b025e65ee562ce5789d1221ef95c6bff9dc888c7b606b0da3137cab31"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/runtime-and-vlastack.tar.gz",
+      "sha256": "ec2748113425f874c049c060685db8d7505e6c7c475debd7a1ec68562023a3d8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/runtime-initial.json",
+      "sha256": "a4369671bb3fba11b05675c595be6083be1bf7fa227852c4ae946e8b90070a11"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/runtime-rechecks.json",
+      "sha256": "43a9f2b968ce031951cba3c383b561dd50c3b96bcbf3160fbda0c037014e0a6b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/runtime-summary.json",
+      "sha256": "c476f49c0de9aa4f432082f2b9ec309a82bd3facb916f675a4d6f032e15a3f86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/runtime-tools.json",
+      "sha256": "67814d7d1070a2466fd195b31b7c0e53703f9ec313955b294f696556415625e5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/source-inputs.json",
+      "sha256": "3e3d5f77d099cce98e28316e7b9b6a90337b1adf93ee4d40da62a85cacc827fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/timing-identity.json",
+      "sha256": "35e03ac254e42f5b27b0307c49c79c2e186a4c59100a68e9c8f2f191831b3cdd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/timing-roms-and-profiles.tar.gz",
+      "sha256": "1424d69a0ad68c3c03f1b612503fac21e97a1958e9099e2ee3bee56db222a26a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/timing.json",
+      "sha256": "5f988ccb4d582be36ac6d76692c5989526113c8ee0f05223a3fa92490b647f75"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/trials-artifacts.tar.gz",
+      "sha256": "5f4b81f407fd640f938225e1369a750ff027f9a930fce0faf66f35a246d62bb7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/trials-extra-artifacts.tar.gz",
+      "sha256": "0e9369c3c301b7ff14a7c1fa737275aa47e0b3c0f2d19f5c4ab985aac79050f5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/trials-extra.json.gz",
+      "sha256": "8ebeee007877a7196f68426a93c8f592667798ef0bb69416b02b0c9ce7220846"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/trials.json.gz",
+      "sha256": "7933175037da8afaf9517ec8e51145e683ae00d07237713cd5c4ab015634821e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/vlastack-observation.json",
+      "sha256": "8bd88380ee3dc6adc231c79f85e6033ffdb0e3bafb7dfade249feb89b53cb63b"
     }
   ],
   "baseline": {
@@ -1379,6 +1655,26 @@
       "report": "docs/investigations/2026-09-27-mos-carry-timing.md",
       "evidence": "docs/defects/evidence/2026-09-27-mos-carry-timing/receipt.json",
       "acceptance": "Zero measured-cycle regressions is not satisfied; targeted gains coexist with a 2.80% L-system interpreter regression."
+    },
+    "gate_evaluation": {
+      "change": "patches/llvm-mos/0067-mos-competing-carry-gate.patch",
+      "report": "docs/investigations/2026-09-27-competing-carry-gate.md",
+      "default": "always",
+      "experimental_policy": "gated",
+      "acceptance": "Rejected for default promotion: 6.81% aggregate-saving loss versus the 5% limit; four growth configurations without removed carry materializations. All 32 original growth cases match off, with matching timing for the 30 SNES cases.",
+      "evidence": "docs/defects/evidence/2026-09-27-competing-carry-gate/receipt.json"
     }
-  }
+  },
+  "additional_runs": [
+    {
+      "date": "2026-09-27",
+      "kind": "competing-carry-gate-evaluation",
+      "report": "docs/investigations/2026-09-27-competing-carry-gate.md",
+      "runtime_observation": "vlastack_sim XY16 gives 0xD3BD instead of 0xD77B on the preserved pre-gate baseline and all three policies in both emulators. Reconciliation inspected the original Round 8 report, TODO, structured records, standalone patches and live G_DYN_STACKALLOC path. No prior matching structured causal record was identified; mechanism remains unisolated, so this remains an additional observation rather than a separate causal-defect claim.",
+      "prior_reports": [
+        "docs/plans/2026-09-16-round8-unentered-backend-paths.md"
+      ],
+      "evidence": "docs/defects/evidence/2026-09-27-competing-carry-gate/vlastack-observation.json"
+    }
+  ]
 }

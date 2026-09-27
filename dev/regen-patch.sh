@@ -81,9 +81,11 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0064-mos-computed-carry-scheduling.patch"
   "$PATCHES/0065-mos-near-store-profitability.patch"
   "$PATCHES/0066-mos-far-extload-worklist.patch"
+  "$PATCHES/0067-mos-competing-carry-gate.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
+  "llvm/test/CodeGen/MOS/carry-pressure-gate.mir"
   "llvm/test/CodeGen/MOS/anyext-wide.mir"
   "llvm/test/CodeGen/MOS/anyext-masked-byte.ll"
   "llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll"
