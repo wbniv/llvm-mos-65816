@@ -41,7 +41,7 @@ under the user's explicit presentation hold. Feature-held work is listed below.
 | 0058 | llvm/llvm-project, stacked on 0057 | Ready as dependent PR: 19 focused RUNs and 169 filtered suite passes / three existing XFAILs; independently reviewed |
 | 0059 | llvm/llvm-project, stacked on 0057 | Ready as dependent PR: 24 focused RUNs and 169 filtered suite passes / three existing XFAILs; independently reviewed |
 | 0060 | llvm-mos, upstream guard backport | Ready: valid-input crash/diagnostic comparison, nine focused RUNs and 180 reducer-suite passes / 27 unsupported; not a new LLVM bug |
-| 0064 | llvm-mos, standalone | Posted as [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609): author-reviewed extraction, ten focused RUNs, 132 suite passes / one unsupported, 512 stock-6502 oracle vectors; targeted kernel 133 → 59 B; 117 neutral ordinary corpus comparisons. No independent-review claim |
+| 0064 | llvm-mos, standalone | Posted as [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609): author-reviewed extraction, ten focused RUNs, 132 suite passes / one unsupported, 512 stock-6502 oracle vectors; targeted kernel 133 → 59 B; 117 neutral C-to-object pairs with rebuilt upstream Clang across 6502, 65C02 and stock 65816. No independent-review claim |
 | 0028 | llvm/llvm-project source + X86 MIR | Selected refactor validated on exact LLVM main: two focused RUNs and 102 filtered suite passes / one existing XFAIL; #320/#321 publication hold retained |
 
 Each numbered `*-pr-body.md` is a local draft. A corresponding `*-llvm-mos.patch`
@@ -160,7 +160,10 @@ Compiler commit `155e209c4cee` is based on llvm-mos main `7bd67c0ae4e8` and
 is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling). [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. The destination was rechecked at `26d7c2c1eebf`; the recorded tests remain on `7bd67c0ae4e8`.
 The exact patch passes ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build. The targeted MIR kernel
-shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.
+shrinks 133 → 59 bytes. The [September 27 upstream Clang run](0064-validation.md#full-upstream-clang-validation--september-27)
+has 117 unchanged C-to-object pairs across three verified CPU selections.
+The original fixed-IR census remains retained as 39 distinct 6502 configurations
+repeated in 117 invocations; its IR CPU attributes overrode the backend CPU flag.
 Downstream size losses remain documented. Author review is complete; no
 independent review, cycle-speed or compiler-overhead claim is made.
 

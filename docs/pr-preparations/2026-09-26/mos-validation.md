@@ -99,8 +99,14 @@ new frontend driver, native runtime, GitHub CI, or publication check is implied.
 The [standalone extraction](0064-llvm-mos.patch) on the same exact base is
 validated separately: **ten focused commands; 132 MOS CodeGen/MC passes, one
 unsupported; 512 stock-6502 Python-oracle vectors on each build**. Kernel text
-shrinks **133 → 59 bytes**. The fixed-frontend ordinary-MOS census has 117
-identical object disassemblies. See the [receipt](validation/runs/carry-0064-upstream/receipt.json)
+shrinks **133 → 59 bytes**. The original fixed-frontend census has 117
+identical object disassemblies, with its coverage corrected to 39 distinct
+6502 configurations repeated three times. The September 27 full upstream
+Clang run separately passes 117 C-to-object pairs across 6502, 65C02, and
+stock 65816; all CPU attributes match, and all pairs have identical disassembly
+and object bytes excluding compiler-version metadata. See the
+[Clang receipt](validation/runs/carry-0064-upstream-clang/receipt.json),
+[original receipt](validation/runs/carry-0064-upstream/receipt.json)
 and [validation scope](0064-validation.md); earlier downstream size losses are
 retained in the [author review](0064-review.md). No independent review is claimed.
 

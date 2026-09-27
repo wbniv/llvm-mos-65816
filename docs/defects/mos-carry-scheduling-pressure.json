@@ -1290,6 +1290,10 @@
     {
       "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
       "sha256": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json",
+      "sha256": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03"
     }
   ],
   "baseline": {

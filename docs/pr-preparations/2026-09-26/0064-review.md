@@ -70,9 +70,19 @@ absent. Full verification is linked in the [validation record](0064-validation.m
 ## Profitability decision
 
 The exact upstream interleaved MIR improves **133 → 59 bytes**, with six carry
-materializations removed. All **117** ordinary-MOS corpus comparisons are
-byte-identical. These establish a targeted improvement and neutral controls;
-they do not establish widespread upstream application gains.
+materializations removed. The original **117** corpus comparisons have
+identical disassembly. Their scope was corrected on September 27: the fixed
+IR's function attributes select 6502 in every run, so this repeats **39
+distinct 6502 configurations**. These establish a targeted improvement and
+neutral 6502 controls; they do not establish widespread upstream application gains.
+
+The September 27 [full upstream Clang run](0064-validation.md#full-upstream-clang-validation--september-27)
+adds 117 direct C-to-object pairs, with the CPU selected and verified separately
+for 6502, 65C02, and stock 65816. All pairs pass machine verification and have
+identical disassembly and object bytes after removing `.comment`. This supplies
+the broader CPU coverage that the original census did not establish. The
+profitability conclusion remains a targeted MIR improvement with neutral C
+controls; cycles and compiler overhead remain unmeasured.
 
 The earlier downstream census remains separately identified in the
 [plan](../../plans/2026-09-26-mos-carry-scheduling.md#8-completed-validation-and-packaging) and

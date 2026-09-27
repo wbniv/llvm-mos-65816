@@ -20,10 +20,17 @@ Validation uses standalone llvm-mos main
 
 - Ten focused commands pass; five scheduling checks fail on the matching baseline.
 - Full MOS CodeGen/MC suites: **132 passed, one unsupported, zero failures**.
-- Thirteen near-code fixtures, at `-Os`, `-Oz`, and `-O2` for 6502, 65C02, and
-  stock 65816: **117 paired object comparisons with identical disassembly**.
-  These hold a downstream Clang frontend fixed and compare the current upstream
-  backends; they are not measurements of a rebuilt upstream frontend.
+- Upstream Clang built with and without this patch compiled thirteen C fixtures
+  at `-Os`, `-Oz`, and `-O2` for 6502, 65C02, and stock 65816: **all 117 pairs
+  passed machine verification and produced identical disassembly**. Objects
+  also match byte-for-byte after removing compiler-version metadata. Both builds
+  used the same SDK headers with LTO disabled; the generated IR confirms the
+  requested CPU in every case. [Commands and compiler identities](https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json).
+- Earlier backend comparison: our fork's Clang generated LLVM IR for thirteen
+  near-code fixtures at `-Os`, `-Oz`, and `-O2`. Both upstream backends consumed
+  identical IR: **117 paired invocations produced identical disassembly**.
+  The IR pins functions to `mos6502`, overriding the requested backend CPU;
+  these are **39 distinct 6502 configurations repeated three times**.
 
 Separate downstream measurements show aggregate code-size gains, with retained
 individual losses of **1–41 bytes**. The largest loss changes frame traffic in
@@ -35,19 +42,14 @@ claim. Published [BankWalk](https://biohack.net/snes/bankwalk/) and
 [Dual-LFSR](https://biohack.net/snes/lfsr2/) demos provide downstream integration
 context; they are not benchmarks of this exact upstream extraction.
 
-The patch changes only the MOS scheduler and its ordinary-MOS regression. The
-generic TableGen pressure-contract repair, inherited farblit legalization
-failure, and unisolated all-XY16 driver observation remain separate follow-ups.
+The patch changes only the MOS scheduler and its regression test.
 
 This preparation has author review; no independent review is claimed.
 
 Implementation, extraction, author review and validation: OpenAI Codex CLI
-0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified
-session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`. Original downstream sum/rotate
-inputs and measurements: Claude Code 2.1.278, model `claude-opus-5`, `high`
-reasoning effort; session `65695418-7e9b-45bd-92e3-2ecfd88ecf0b`,
-agent `a35017d73ff4d881d`.
+0.157.1, model `gpt-6-astra`, `xhigh` reasoning effort.
+Original downstream sum/rotate inputs and measurements: Claude Code 2.1.278,
+model `claude-opus-5`, `high`
+reasoning effort.
 
-Submission check: upstream main is now `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`. The two commits since the tested base add DWARF register definitions, CFI MIR serialization, and LLDB support; they leave the MOS scheduler, its entry-point guards/callers, and carry-class membership unchanged. The local test results above remain tied to `7bd67c0ae4e8`; they do not claim a rebuild at the newer revision.
-
-[Retained validation](https://github.com/wbniv/llvm-mos-65816/blob/cbd1cd5b75f767f8b1c4bd3b6571e237be83103d/docs/pr-preparations/2026-09-26/0064-validation.md) and [profitability review](https://github.com/wbniv/llvm-mos-65816/blob/cbd1cd5b75f767f8b1c4bd3b6571e237be83103d/docs/pr-preparations/2026-09-26/0064-review.md).
+[Retained validation](https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-validation.md) and [profitability review](https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-review.md).

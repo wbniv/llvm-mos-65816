@@ -1,0 +1,100 @@
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+import hashlib
+import json
+import re
+import resource
+import subprocess
+import sys
+
+resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+work = Path(__file__).resolve().parent
+root = work.parents[1]
+output = work / "measure"
+output.mkdir(exist_ok=True)
+config = root / "build/install/bin/mos-sim.cfg"
+objdump = root / ".scratch/carry-pr/build/bin/llvm-objdump"
+objcopy = root / ".scratch/carry-pr/build/bin/llvm-objcopy"
+labels = [sys.argv[1]] if len(sys.argv) > 1 else ["baseline", "candidate"]
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def run(command, log):
+    command = list(map(str, command))
+    process = subprocess.run(command, capture_output=True, text=True, timeout=180)
+    log.write_text("$ " + " ".join(command) + "\nexit=" + str(process.returncode)
+                   + "\n" + process.stdout + process.stderr)
+    return {"command": command, "exit": process.returncode,
+            "log": str(log.relative_to(work)), "log_sha256": digest(log)}
+
+
+def measure(job):
+    source, optimization, cpu = job
+    folder = output / (source.stem + "." + optimization + "." + cpu)
+    folder.mkdir(exist_ok=True)
+    row = {"source": str(source.relative_to(work)), "source_sha256": digest(source),
+           "optimization": optimization, "cpu": cpu}
+    for label in labels:
+        compiler = work / label / "bin/clang"
+        common = [compiler, "--config", config, "-mcpu=" + cpu,
+                  "-" + optimization, "-fno-lto", "-I" + str(root / "examples/snes/corpus")]
+        obj = folder / (label + ".o")
+        entry = {"compile": run(common + ["-mllvm", "-verify-machineinstrs", "-c",
+                                         source, "-o", obj], folder / (label + ".compile.log"))}
+        ir = folder / (label + ".ll")
+        entry["ir"] = run(common + ["-emit-llvm", "-S", source, "-o", ir],
+                          folder / (label + ".ir.log"))
+        preprocessed = folder / (label + ".i")
+        entry["preprocess"] = run(common + ["-E", source, "-o", preprocessed],
+                                  folder / (label + ".preprocess.log"))
+        entry["driver"] = run(common + ["-mllvm", "-verify-machineinstrs", "-c", source,
+                                       "-o", obj, "-###"], folder / (label + ".driver.log"))
+        if entry["compile"]["exit"] == 0:
+            entry["object_sha256"] = digest(obj)
+            sections = subprocess.check_output([objdump, "-h", obj], text=True)
+            (folder / (label + ".sections")).write_text(sections)
+            entry["text_bytes"] = sum(int(parts[2], 16) for line in sections.splitlines()
+                                      if len(parts := line.split()) > 2 and parts[1].startswith(".text"))
+            disassembly = subprocess.check_output([objdump, "-dr", obj], text=True)
+            (folder / (label + ".dis")).write_text(disassembly)
+            normalized_disassembly = "\n".join(line for line in disassembly.splitlines()
+                                               if "file format" not in line).strip()
+            entry["disassembly_sha256"] = hashlib.sha256(normalized_disassembly.encode()).hexdigest()
+            normalized_object = folder / (label + ".without-comment.o")
+            entry["normalize_object"] = run([objcopy, "--remove-section=.comment", obj,
+                                             normalized_object], folder / (label + ".normalize.log"))
+            if entry["normalize_object"]["exit"] == 0:
+                entry["object_without_comment_sha256"] = digest(normalized_object)
+        if ir.exists():
+            entry["ir_sha256"] = digest(ir)
+            entry["ir_target_cpus"] = sorted(set(re.findall(r'"target-cpu"="([^"]+)"', ir.read_text())))
+            entry["ir_cpu_matches_driver"] = entry["ir_target_cpus"] == [cpu]
+            semantic_ir = re.sub(r'!"clang version [^"\n]*"', '!"clang version <recorded separately>"',
+                                 ir.read_text())
+            entry["ir_without_version_sha256"] = hashlib.sha256(semantic_ir.encode()).hexdigest()
+        if preprocessed.exists():
+            entry["preprocessed_sha256"] = digest(preprocessed)
+        row[label] = entry
+    (folder / ("-".join(labels) + ".json")).write_text(json.dumps(row, indent=2) + "\n")
+    return row
+
+
+jobs = [(source, optimization, cpu)
+        for source in sorted((work / "inputs").glob("*.c"))
+        for optimization in ["Os", "Oz", "O2"]
+        for cpu in ["mos6502", "mos65c02", "mosw65816"]]
+with ThreadPoolExecutor(max_workers=4) as pool:
+    rows = list(pool.map(measure, jobs))
+result = output / ("-".join(labels) + "-results.json")
+result.write_text(json.dumps(rows, indent=2) + "\n")
+for label in labels:
+    counts = {kind: sum(row[label][kind]["exit"] != 0 for row in rows)
+              for kind in ["compile", "ir", "preprocess", "driver"]}
+    print(label, len(rows), "configurations; failures:", counts)
+    wrong_cpu = sum(not row[label].get("ir_cpu_matches_driver", False) for row in rows)
+    print(label, "IR CPU mismatches:", wrong_cpu)
+    if any(counts.values()) or wrong_cpu:
+        raise SystemExit(1)

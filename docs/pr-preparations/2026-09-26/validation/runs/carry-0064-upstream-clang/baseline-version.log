@@ -1,0 +1,5 @@
+clang version 24.0.0git (git@github.com:wbniv/llvm-mos.git 7bd67c0ae4e8bb65a3f980912bf201df22131e34)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/will/llvm-mos-65816/.scratch/carry-clang-upstream/baseline/bin
+Build config: +assertions

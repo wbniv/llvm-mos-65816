@@ -1,0 +1,92 @@
+{
+  "pairs": 117,
+  "compile_failures": 0,
+  "ir_cpu_mismatches": 0,
+  "text_delta": 0,
+  "changed_disassemblies": 0,
+  "changed_objects_without_comment": 0,
+  "changed_ir_without_version": 0,
+  "groups": [
+    {
+      "cpu": "mos6502",
+      "optimization": "Os",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mos6502",
+      "optimization": "Oz",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mos6502",
+      "optimization": "O2",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mos65c02",
+      "optimization": "Os",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mos65c02",
+      "optimization": "Oz",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mos65c02",
+      "optimization": "O2",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mosw65816",
+      "optimization": "Os",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mosw65816",
+      "optimization": "Oz",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    },
+    {
+      "cpu": "mosw65816",
+      "optimization": "O2",
+      "pairs": 13,
+      "text_delta": 0,
+      "changed_disassemblies": 0,
+      "changed_objects_without_comment": 0,
+      "changed_ir_without_version": 0
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+from pathlib import Path
+import hashlib
+import json
+import shutil
+import subprocess
+import sys
+
+work = Path(__file__).resolve().parent
+label = sys.argv[1]
+expected = {"baseline": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+            "candidate": "155e209c4cee8eeac01397aac3542e76841a9856"}[label]
+source = work / "source"
+revision = subprocess.check_output(["git", "-C", source, "rev-parse", "HEAD"], text=True).strip()
+status = subprocess.check_output(["git", "-C", source, "status", "--porcelain"], text=True)
+assert revision == expected and not status, (revision, status)
+destination = work / label
+assert not destination.exists(), destination
+(destination / "bin").mkdir(parents=True)
+shutil.copy2((work / "build/bin/clang").resolve(), destination / "bin/clang")
+shutil.copytree(work / "build/lib/clang", destination / "lib/clang", symlinks=True)
+shutil.copy2(work / "build/CMakeCache.txt", work / (label + "-CMakeCache.txt"))
+compiler = destination / "bin/clang"
+version = subprocess.check_output([compiler, "--version"], text=True)
+(work / (label + "-version.log")).write_text(version)
+resource_dir = subprocess.check_output([compiler, "-print-resource-dir"], text=True).strip()
+headers = [{"path": str(p.relative_to(destination)),
+            "sha256": hashlib.sha256(p.read_bytes()).hexdigest()}
+           for p in sorted((destination / "lib/clang").rglob("*")) if p.is_file()]
+identity = {"source_revision": revision, "source_dirty": False,
+            "compiler": str(compiler), "compiler_sha256": hashlib.sha256(compiler.read_bytes()).hexdigest(),
+            "version": version, "resource_dir": resource_dir, "resource_files": headers}
+(work / (label + "-identity.json")).write_text(json.dumps(identity, indent=2) + "\n")
+print(label, revision, identity["compiler_sha256"])
+print(version)

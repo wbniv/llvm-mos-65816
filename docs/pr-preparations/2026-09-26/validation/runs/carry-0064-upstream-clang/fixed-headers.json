@@ -1,0 +1,770 @@
+[
+  {
+    "path": "build/install/bin/mos-sim.cfg",
+    "sha256": "5d41be974550974589354b338f150c269935f9232e35b15bb54e5f6083a7889a"
+  },
+  {
+    "path": "build/install/bin/mos-common.cfg",
+    "sha256": "bc1174409cd1a5c76f5bb290f673bfa53b4023456b8e93cd264e4772190c0ea8"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/6502.h",
+    "sha256": "c425c2c4d35104a9dc93b9620935769f58aa979ada331ca175608ff645c4647b"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/__internal.h",
+    "sha256": "71527689807c806024d03f73262df9c759393e61110508e06a3b88846fe7bc00"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/__type-traits-impl.h",
+    "sha256": "ecb9de289a66abeec3aff67b0e95916562e46ad7f641f667cf1a0516b353eb7a"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/algorithm",
+    "sha256": "30ef93aa97c2c5ba2dc7e88a271b22bf5f22034a7c3ad9d7db25b26a455af39c"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/alloca.h",
+    "sha256": "b5fd4b8d726da1eab5f9b27c4d073b86a8b052486bfd5372533d4abf2c7b3984"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/array",
+    "sha256": "4323407b685a7028dfb63cfe8d01d4a46e9d85a920d69f60aab70e848711a3dc"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/assert.h",
+    "sha256": "dd596055ec86fbd447425cd226636ed5b7101075a758adc33445441ec7be2be2"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/climits",
+    "sha256": "a2c3c26632c4ff210e861ac01e4c67f386459ffbca3651bdac974854cb2a948b"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/cstdarg",
+    "sha256": "e78ecee518a24aa1a6e75675c41f584a8aa33a8b93c4f3f6256d4cb899183e2c"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/cstddef",
+    "sha256": "89e6bef82eb0b5e2119eb74635d1aac596df93217f27d215fced493485a40365"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/cstdint",
+    "sha256": "f60df65e9528824a870552b847458c450b52c4905efc3a5c477133ff61931f62"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/cstdio",
+    "sha256": "ffd0112cbef2165f2afe6013a3a6c8e3b47b819ec3720f0fb16e3a46a40a735c"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/cstdlib",
+    "sha256": "9efbab2cf044054e6b18a9e1d6c207eac7c909af024584dd6238a145cb24b78a"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/ctype.h",
+    "sha256": "cc7ab6dce5363b7264aa39236a5f8bebbf8a99a5f5533876bee113f3eb14bde4"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/errno.h",
+    "sha256": "42913f97563c3558ab2f83bd3bdf99aa53aec29b55ab6b5937a60091cc51e767"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/exception",
+    "sha256": "cc46bf191d71ba6bba6374ffa0ce58a2c52e17599a8f63d3e3b60d74a00ac1fa"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/fcntl.h",
+    "sha256": "28b4fe69227dbd8680d4b65ab84afe09028bd32035cdf9a819bf54f8fc4647f0"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/fixed_point.h",
+    "sha256": "9553cd6d57f3c8591fb8422f10c6248e15aecdc215876ac370a67be4fef81ee4"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/initializer_list",
+    "sha256": "0ad4799152dd2ed32f80a281897220cfdec7fceedff49a5030c1409580178f3a"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/inttypes.h",
+    "sha256": "851184a2a37d17d55fd42cd86e46359e467b793bfcd122d7ff2e48fb561a870e"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/iterator",
+    "sha256": "ec5d81d24538fcf53db834a5335cb502fd6e6a2c2f3b4c5dbc589fd54beb1255"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/limits",
+    "sha256": "56f4f937bc3c68fa40a6b4e1f590d85992af3712e6fb94f9d33fd6f6e4f30da7"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/math.h",
+    "sha256": "b05b4d03e51672b5b365a675f9a10bffec519fd91867ab274c5ad55e07ecfeeb"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/new",
+    "sha256": "059fa5da1ec58b09347c0520c100d211db19848486f3c8530bffce78e751d302"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/peekpoke.h",
+    "sha256": "8ffbd607cb8217c71e3b2d6e6e8eec30fad4dcf25a7e60b038e745d15f85d317"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/setjmp.h",
+    "sha256": "4b176c48fb2ba59c82c2cdd7da0d5a7d92da013f5b370179953682146d9ace31"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/signal.h",
+    "sha256": "0ca06ffe230a8c22abb01c5eebae799d8b7e3414fb9fc6d10af51a6c88a631e0"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/soa-struct.inc",
+    "sha256": "59e87cf2a5a3b2748f1758450a83b17d1585ca35eae301319933c43600c39ac7"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/soa.h",
+    "sha256": "e2d0eb5f241c977b7ab96441d900ed702766736d6f86d8857d98b8a2d7dd0720"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/stdio.h",
+    "sha256": "90de8777479012b3898f7a7df536f9eb82def76a01b4a6697bf0a2c64a64c9a9"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/stdlib.h",
+    "sha256": "dbcea039f760bd2b476cf8c84b54abb76633be5a5444800a56baebaf29e1e950"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/string.h",
+    "sha256": "f836cbd1ddee1ef27b0924a68477571dcd5f821bd2d5a40966ac0102decff767"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/time.h",
+    "sha256": "b16fc0732dc5c05cb6dc188ae5812be608df2938996a98bba289a7afa47f8fc5"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/type_traits",
+    "sha256": "07e2d0d329c4a24c1b2ed53c6a05effabba0e12a9a5a23a1f7e502184fbd33a4"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/typeinfo",
+    "sha256": "9deaa02ef73823ac6b09908350edeef1cd6cd88126f537b82850492f04cea5c0"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/unistd.h",
+    "sha256": "3f89e10773aba133251f55e9e991cb91ededcb101016db33b60068bf61bd7a07"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/utility",
+    "sha256": "9ecc67572005bdbfc7e3648ac9a659033e1e7b112f8335001e5b7f93ff35cc71"
+  },
+  {
+    "path": "build/install/mos-platform/common/include/wchar.h",
+    "sha256": "133676620093446226e8ffc7806e78895afa584ca24d7b297ead74bc5667915b"
+  },
+  {
+    "path": "build/install/mos-platform/sim/include/stdlib.h",
+    "sha256": "e3442ea061a83996cf83f8b10d95688ca0e1845e4797ae0e690626cd1ab1052e"
+  },
+  {
+    "path": "examples/65816/absdiff.h",
+    "sha256": "5153599b7413242c5dea3032b077a66dd4fff3756440bc0d2c7eefb7cc1450b7"
+  },
+  {
+    "path": "examples/65816/adpcm.h",
+    "sha256": "e4feae3b08de3fd2a920e19cd12c1295f90ea3da474474c8ef2f9c539362e01e"
+  },
+  {
+    "path": "examples/65816/asmisland.h",
+    "sha256": "2da720b63ddd6a7622007d881871dc72d7896bd2ed1225790b20cd9371f191a9"
+  },
+  {
+    "path": "examples/65816/avalanche.h",
+    "sha256": "0da789833dc9f60db5468d121d78b59ceb84698f71015519607c6228a3342ce0"
+  },
+  {
+    "path": "examples/65816/backtrack.h",
+    "sha256": "42657871707368f0558c46c8924b74d67ab42b8fe0a1dd340e9b7f5339d03d13"
+  },
+  {
+    "path": "examples/65816/bankwalk.h",
+    "sha256": "5de425d8cddad66282c6df172eea55655476345649d03cc31081ec01218cd349"
+  },
+  {
+    "path": "examples/65816/bf_vm.h",
+    "sha256": "7fcb71c812409e24f9162ff6760feef555c68afa9d31775344cd755fa7fa5c42"
+  },
+  {
+    "path": "examples/65816/bhut.h",
+    "sha256": "cc8bb1fd826cdbfeaba1fd260e5dcfdba923ab65e6faf8792812ea391ea8434a"
+  },
+  {
+    "path": "examples/65816/bigbyval.h",
+    "sha256": "df31918685049184a00555646f02dae5b5fcdceb59771d23ea2f75e12a22f23b"
+  },
+  {
+    "path": "examples/65816/bitboard64.h",
+    "sha256": "cc137f12b2ce4d7f19ce7f051d81bde8049cc2365874e3adf427907d221ea84a"
+  },
+  {
+    "path": "examples/65816/bitcensus.h",
+    "sha256": "ff77652853901bcdf0c5e4fc3dede0d4b78c3bda6fc7c9480f3180b49fa19363"
+  },
+  {
+    "path": "examples/65816/bitshuffle.h",
+    "sha256": "1a1ae35d3788691e4c7619d2644b30fc0f9500f6f5de34030377d8bb01958720"
+  },
+  {
+    "path": "examples/65816/bitweave.h",
+    "sha256": "e9e3382a86091ec2865eebbde96833d49785dba0170e0fbd316444d16c0a450d"
+  },
+  {
+    "path": "examples/65816/boids.h",
+    "sha256": "16f0401064a904635ff506aa28920a93d9a8aa998fd4242d8b314a2e28ac6efa"
+  },
+  {
+    "path": "examples/65816/borrowlad.h",
+    "sha256": "ea1c8cfd376a8f798b9bd075291312297d678a0e46bf870334f8d4b4c5e31f3c"
+  },
+  {
+    "path": "examples/65816/borrowov.h",
+    "sha256": "c5f24f01dea820ee7306604a2275fb38ec445539bb95b3c6cd3506ec2764ed4e"
+  },
+  {
+    "path": "examples/65816/brkcop.h",
+    "sha256": "9a37d1d34a3a1aabf64f5b3b3d82732705af3ac2a352b6b9c181ab5cf098e5af"
+  },
+  {
+    "path": "examples/65816/bsearchviz.h",
+    "sha256": "120e7e669e6fb25cb32c562453c4f94911ff059ff61759fd553e30eb2ae57345"
+  },
+  {
+    "path": "examples/65816/buddha.h",
+    "sha256": "3f6ac44a3b6dfeb47c12d61bdaaf1ec7c85a3bd5e9956f1d4fd5c4c44026d48f"
+  },
+  {
+    "path": "examples/65816/burning_ship.h",
+    "sha256": "e1e9a28325c4a5e60b49fde442aa13e14efb14efa9a49c277ad9781a6936a562"
+  },
+  {
+    "path": "examples/65816/byvaledge.h",
+    "sha256": "57751898afbf877293074854fe2909999766c2bb2b55128e96f743c15dcd7baa"
+  },
+  {
+    "path": "examples/65816/ca1d.h",
+    "sha256": "c2405d29624745687eb4bfd1d4acef743bb214a32c575125287e2487ed98e7fd"
+  },
+  {
+    "path": "examples/65816/cardioid.h",
+    "sha256": "9dc75d2fb8b7aae2df8ea98e19f279f1dbc5443b81dcaad082e6b9b01faeda2f"
+  },
+  {
+    "path": "examples/65816/cgrade.h",
+    "sha256": "a58f469115bf60c1e966634bbd40b5e54b377b82c52c658d08f7ab9bab2fac75"
+  },
+  {
+    "path": "examples/65816/compass.h",
+    "sha256": "661cd233d0db7ac995fa656b745bff663c0928134cc9b4482b36ef504281ad88"
+  },
+  {
+    "path": "examples/65816/cordic.h",
+    "sha256": "d7664106307668887046fa73bee7f648d8321e9e55b724f497f38290a0688a7a"
+  },
+  {
+    "path": "examples/65816/cordic16.h",
+    "sha256": "1f8a3eb3ebac4f526ea51d696a732587c3765319d31e2f8537b87bd60a65e90b"
+  },
+  {
+    "path": "examples/65816/cordic16_tables.h",
+    "sha256": "54282ede208dc11443204d55171b2b2df6de159aa11c2341c0ded15b65a4c4c8"
+  },
+  {
+    "path": "examples/65816/cosmzoom.h",
+    "sha256": "595eb3bdcea4d95e76dd51791d905ea850f8a1ee88781e0e031d3b6ae1676013"
+  },
+  {
+    "path": "examples/65816/cpu6502.h",
+    "sha256": "1a26528e1c256bdc462143224728549310574ffb904cd6a084d318a0531a7025"
+  },
+  {
+    "path": "examples/65816/crctex.h",
+    "sha256": "e5d8e2e8d9417f8108e96971c8eaa4cbad58a06ca9711741f6e986e40fc76bca"
+  },
+  {
+    "path": "examples/65816/crcwall.h",
+    "sha256": "54b4e41f474b703974294f7a4a09455f83155333617e314488c6298256d8ea12"
+  },
+  {
+    "path": "examples/65816/critters.h",
+    "sha256": "a6d77da8c3d33eabf1ca6365a28fe34db12052d05a89e5a1c35371a1211d7179"
+  },
+  {
+    "path": "examples/65816/csrjmp.h",
+    "sha256": "8a8f3f6c650fb12aa58dcb3577293e83b6167c64019212b34ed11b5b7f14b6df"
+  },
+  {
+    "path": "examples/65816/dblbridge.h",
+    "sha256": "882eb76ff1a1293353bda346d22d66d2b4038d349ad0665bdeb74b5be0377121"
+  },
+  {
+    "path": "examples/65816/dctbloom.h",
+    "sha256": "053e607d002f9f5d4443aa6b380935848da6581d5d7088529b72cfb96b980e26"
+  },
+  {
+    "path": "examples/65816/dhmix.h",
+    "sha256": "34157ae7e4c771587ad8b57fb85172ded4f1ca090b87de3b2a9d2296f0ef7842"
+  },
+  {
+    "path": "examples/65816/disbits.h",
+    "sha256": "0114834cb7b961ff5dfd7a64ab658d1d58990754c9c2e5a3f6e5c58ae457e8e3"
+  },
+  {
+    "path": "examples/65816/dither.h",
+    "sha256": "ae7e7c9a775f688c79125821130bec112c86b40201f118fe86f5e85878016139"
+  },
+  {
+    "path": "examples/65816/divclock.h",
+    "sha256": "628a574a7b88b1022b727fa17090286736a6af4cd926e46a4c2313cb0ceea3de"
+  },
+  {
+    "path": "examples/65816/domcol.h",
+    "sha256": "c22477b2aa4cadccf5a4bb96dad45bb3290a266e1a5721ca29d8e6339527cce1"
+  },
+  {
+    "path": "examples/65816/doom-fire.h",
+    "sha256": "1c4d39b680a3ff71595bf72875ce77e08209d5936269ed32c92bd569f6571651"
+  },
+  {
+    "path": "examples/65816/dpbank.h",
+    "sha256": "ebc90a92c63750360d2b9a7603da230efaf0c65b41e2876e9d92d1cbbe3bc1b3"
+  },
+  {
+    "path": "examples/65816/dpend.h",
+    "sha256": "54f1734911a0c0aca1462fef25245533fdbbf9ce0709f8248bea35f8ae1fdcc3"
+  },
+  {
+    "path": "examples/65816/duff.h",
+    "sha256": "dc4cd49807d497bafc64f185e24feabe77c1e2b0c78f299f210b1caa6f70dad5"
+  },
+  {
+    "path": "examples/65816/editdist.h",
+    "sha256": "c4c63fcb6a0a045f1a0587c3704b086842643bc8110ddc85ad5737055f2324f5"
+  },
+  {
+    "path": "examples/65816/epicycles.h",
+    "sha256": "91126fa0ad4d75e8bf9256ca6e012c0be379ac396c30061f09aa90547af99a5f"
+  },
+  {
+    "path": "examples/65816/epicycles_tables.h",
+    "sha256": "bb6cfcd6c512e0a0ed9d3ebd0f844f38654b1e7502e4861b8d0df34201c3122e"
+  },
+  {
+    "path": "examples/65816/fabsridge.h",
+    "sha256": "53e9a816efbeffb6168e3777cffb39fc6126ea0cc826cfb14613b563cd8f4787"
+  },
+  {
+    "path": "examples/65816/factorial.h",
+    "sha256": "c1ed086584c5238618bf834ed65fe04bfc2f9fbc212a2f191c96f3a3b41361ab"
+  },
+  {
+    "path": "examples/65816/farptrcmp.h",
+    "sha256": "a58e5853d3a05bc96508f2c5dda25ef78f135e2ab49bf0a964b3902b5db18f5d"
+  },
+  {
+    "path": "examples/65816/farspill.h",
+    "sha256": "64e89c3d3e739d014ec109554e82040e0b97f3ebe59118f336bdc3d5589a95de"
+  },
+  {
+    "path": "examples/65816/fenwick.h",
+    "sha256": "e91585bcc78fd0e0052945c767e5c68a94c78316c8e7c319c30e64f566991277"
+  },
+  {
+    "path": "examples/65816/fft.h",
+    "sha256": "856243253f5b15156e9c0d41e0761a4b07a6f27984a6ec059f4a507d3c6c75a3"
+  },
+  {
+    "path": "examples/65816/fn_plot.h",
+    "sha256": "fa81e5ed6c0b1eb072bad98dcc13f9318a460c6ed4ba83b7c53bfd6a50220f81"
+  },
+  {
+    "path": "examples/65816/funnelkal.h",
+    "sha256": "27f1ee09dbf3405b17494d3ce73ae9bcb63c4c657badf048dff9b6724c3d5d4c"
+  },
+  {
+    "path": "examples/65816/gf256.h",
+    "sha256": "dbf73468a6378569377d19e337997b16e4f2a59985b19939574ac0c6045dfd20"
+  },
+  {
+    "path": "examples/65816/gouraud.h",
+    "sha256": "ca471eed0c1ee86959727a9e148f17900ef91f065dff201fdee6369ea3b00c6b"
+  },
+  {
+    "path": "examples/65816/grid3d.h",
+    "sha256": "6aab636aa5d4245d75b03edf18eccae7f553bbc2e97d8d7ac58397cfca3c2486"
+  },
+  {
+    "path": "examples/65816/harmonograph.h",
+    "sha256": "8abb5cf73bbc5b172b89957ca92b8d1a0101ab7e6615ad9bfb7f8fb2513b1319"
+  },
+  {
+    "path": "examples/65816/hdr_bloom.h",
+    "sha256": "7156e5fd3a62442f71269d5bb6e77b1dfd59c17c69ad4349ce54658007a9973c"
+  },
+  {
+    "path": "examples/65816/hilbert.h",
+    "sha256": "7724ff30be126930ed07db87cd252adcd56ba4f274b530f70eba40aaeeb1e2ed"
+  },
+  {
+    "path": "examples/65816/hopalong.h",
+    "sha256": "803778a7db9eb9c60745ee2f818781b8afdfb8e4886bde70cdb6159700f79c16"
+  },
+  {
+    "path": "examples/65816/huffman.h",
+    "sha256": "beb9dd2a7d7d9525c537f337fb98a5b04de0cf60416b629cb9a7cbb535919aaa"
+  },
+  {
+    "path": "examples/65816/hull.h",
+    "sha256": "8254b27ea3009fd414f1fc4516643cc2b63b14f1c4a05c6a25a687c8c8f796ce"
+  },
+  {
+    "path": "examples/65816/iir_scope.h",
+    "sha256": "530449f05c1a7a6a64e19e79a94033fa71ccda336727269816a099d4065f96d1"
+  },
+  {
+    "path": "examples/65816/irqgate.h",
+    "sha256": "59149800429f1810f0726c2167760b317d534ebe9327e2a11fbbe465197cb390"
+  },
+  {
+    "path": "examples/65816/isrbracket.h",
+    "sha256": "d895271355a53f42f1031219b6a19a07aa49c134b928b2e1d0924293298747a6"
+  },
+  {
+    "path": "examples/65816/jt256.h",
+    "sha256": "abd30742e9243f00c501247f9b0b6cb39aec06d8027cc372965473d2c8e10d91"
+  },
+  {
+    "path": "examples/65816/jtedge.h",
+    "sha256": "bc223ca1a885b38e576eef78fb6603db9c75a9c5eb18f70b0d4a2fa2b163f9c8"
+  },
+  {
+    "path": "examples/65816/jtsparse.h",
+    "sha256": "61f9da833dffa763ad11395704c521d6bdc2e5b9c226076b3a7a338219fa92de"
+  },
+  {
+    "path": "examples/65816/julia.h",
+    "sha256": "090b73b8385da45c2a105a444f48ccd6d8595571df462a8b8c3e7e3a74e3dcc0"
+  },
+  {
+    "path": "examples/65816/keycmp64.h",
+    "sha256": "5be1b777c35f440ff7901dbf184ab98bcae300874fee48d1d4115e66488b72dc"
+  },
+  {
+    "path": "examples/65816/lfsr2.h",
+    "sha256": "40fa98c9b7dc5e8414b029194846e92a31ce437e5152e48698de551915343259"
+  },
+  {
+    "path": "examples/65816/life.h",
+    "sha256": "ffe6a44014d4e8495d3b8abadc1a4c141b5bc608416f57f99f08788aa43fdc2f"
+  },
+  {
+    "path": "examples/65816/llabs64.h",
+    "sha256": "fcd0a64efe0dba2edaf31a7152f35f5e1d91389e773d8240f89b6626a1502702"
+  },
+  {
+    "path": "examples/65816/lsystem.h",
+    "sha256": "fe5f6b4950a427e7cc267b74d7f908742b83fbcc2afbdbc26fe381f5bbaccf55"
+  },
+  {
+    "path": "examples/65816/lzdec.h",
+    "sha256": "a49ca5a01089501825a2b6373b616654b151aaee14e9ada6a5dcae19340a38dc"
+  },
+  {
+    "path": "examples/65816/lzss.h",
+    "sha256": "240d4253e21001a17deec7e9b7d745c7330c182fd44ad5da6f1649931e2e0754"
+  },
+  {
+    "path": "examples/65816/mandel-double.h",
+    "sha256": "239d706e694d3e9254c1e285082b516e84e3ef603435dc09b01bbdad556c2cde"
+  },
+  {
+    "path": "examples/65816/mandel-float.h",
+    "sha256": "e62229a46b74de82ec30d58123d7a02a712da3c5572f8c57a14bd47ce8b79286"
+  },
+  {
+    "path": "examples/65816/mandel.h",
+    "sha256": "ea8be525795c1038d1d7672bdc8b5b18ae4de34914d2950152c8b3d5de8cb9c2"
+  },
+  {
+    "path": "examples/65816/matcascade.h",
+    "sha256": "6f61496696905a39d9ba6f66644e551e2108a14863bea399fbe5abbc1c5fc1fc"
+  },
+  {
+    "path": "examples/65816/maze.h",
+    "sha256": "f26430a163f647ad03003e165590e23df3eb44101c07eaa302537f170b543c3f"
+  },
+  {
+    "path": "examples/65816/medfilt.h",
+    "sha256": "0824d67d4b7749059ce7e1c6985db5bb4eb6e5e8b8d4718d48e650f155dffd5d"
+  },
+  {
+    "path": "examples/65816/metaball.h",
+    "sha256": "ee099cbf7f2753182eb259966ef9ac4935ec49ee7db3170cce9b15a3e740d1e8"
+  },
+  {
+    "path": "examples/65816/mixedwidth.h",
+    "sha256": "ab7f439f635532221ff355c7836bf1db62b0de6b8528a1ba52e1d3fdd85fc7a6"
+  },
+  {
+    "path": "examples/65816/modethread.h",
+    "sha256": "d357c065e634067bd1758b1afe650da1de4c5568817fad37cc32a9f3f8ba21cd"
+  },
+  {
+    "path": "examples/65816/modexp256.h",
+    "sha256": "d126afbfe08a640317328a2b7c6fcc822fa3a22e4ab4b7038abad16289e48858"
+  },
+  {
+    "path": "examples/65816/montorbit.h",
+    "sha256": "60e2ece87bd2397d47ff140f50fb7bbfc4908beffa98aad441f5eb7f4805f8eb"
+  },
+  {
+    "path": "examples/65816/msquares.h",
+    "sha256": "45ba7f2c46e14e0dd2b7e19f57f7630a72d45f0d9c56995da016f3e500d20246"
+  },
+  {
+    "path": "examples/65816/mulov64.h",
+    "sha256": "9787b0b4354b9b8e1ea4cd893aab0c86513eb2465651043c369c07ccb124bbc0"
+  },
+  {
+    "path": "examples/65816/multibase.h",
+    "sha256": "1c2a98f40fd331ebec95fbbcdfdc54acd989f9b208c90a1e163ff0936e41c1f8"
+  },
+  {
+    "path": "examples/65816/mvscrl.h",
+    "sha256": "407f6ace81ede47efacfb8350ac4013a585f9545f19449932c1e32fabc56f2cc"
+  },
+  {
+    "path": "examples/65816/n-body.h",
+    "sha256": "6385200df1fb97b47be39bdcc3a1ab9afbcab3ba6fd2a406ac006fc70f42e4a5"
+  },
+  {
+    "path": "examples/65816/newton.h",
+    "sha256": "119be41472ddacdee426540139538dbb950416fed4425181a0e4a4c22d3c2419"
+  },
+  {
+    "path": "examples/65816/nmitally.h",
+    "sha256": "f41fafafeaa3b9992dc93d09d3a3856cb56f3321a81cbfa1e187e9ab7e8274b0"
+  },
+  {
+    "path": "examples/65816/nrecip.h",
+    "sha256": "e562d9307af3e3cfb9b649b04ceffcba93be3205c2f326d8bcaa40c3d9ba1da5"
+  },
+  {
+    "path": "examples/65816/oddmask.h",
+    "sha256": "151462da10dbdd83c44c5ce7e9be32c4909f0c3536adadb2406d2d076ebc3847"
+  },
+  {
+    "path": "examples/65816/ovmatrix.h",
+    "sha256": "7eb9d2daffd7c646e9403c59e6cac1edff2acbe75a83973006bf5ceccca3f178"
+  },
+  {
+    "path": "examples/65816/ovmove.h",
+    "sha256": "7b14226d5655b8a23b070bffacb1293eb8e87321eb2065577930e9b3d0d0ac6a"
+  },
+  {
+    "path": "examples/65816/packrec.h",
+    "sha256": "29efaf60632e22647c7e1e3222ee32d2414c0296897ebbe3ed98601d342f5049"
+  },
+  {
+    "path": "examples/65816/pcooker.h",
+    "sha256": "b6d9e89cc5a4e5484da69710c9e58dacd186edc1dc6ad1422c999fe2665b51a8"
+  },
+  {
+    "path": "examples/65816/percol.h",
+    "sha256": "fd104e5e6ff948a21f22e42f76bb652da0d9b9ebeb39aeeef023e3f5ca1d2d76"
+  },
+  {
+    "path": "examples/65816/perlin.h",
+    "sha256": "f1cb6bf65f5291ef2b46eb74245d9660e3763edff11befcebdf73039a4756b66"
+  },
+  {
+    "path": "examples/65816/permscat.h",
+    "sha256": "55fc6a9cec110e35195a2067cebb27373fd61dea6fb20bbb0fa4224b13176b63"
+  },
+  {
+    "path": "examples/65816/pi_spigot.h",
+    "sha256": "eddddd125c9591aeb828ce2362acb269f07927d1b1b178ed159795a075978db2"
+  },
+  {
+    "path": "examples/65816/plyoracle.h",
+    "sha256": "ec20b3af3d6866648c5597cefbc09037ccbbc182d02bbb1d91e69afc9114855f"
+  },
+  {
+    "path": "examples/65816/polyfill.h",
+    "sha256": "67c9951d3cc6ae823933c005dd4a44253c6aa9eabc78a744e93a1e724a6094ad"
+  },
+  {
+    "path": "examples/65816/poolfx.h",
+    "sha256": "30f1a5ab2829a625ebcaa83f394509aae0602197da06dcc60a12fdcf404a2c1a"
+  },
+  {
+    "path": "examples/65816/qsortviz.h",
+    "sha256": "f12dfdc7770dac4ee596056910ea514724135ba2ae116503865075708c739364"
+  },
+  {
+    "path": "examples/65816/radix.h",
+    "sha256": "a4e00181232a6fc86f3a6d96d5c8cacf9ad70a8e8e57a4edb9f242711b7a29c1"
+  },
+  {
+    "path": "examples/65816/rangecode.h",
+    "sha256": "8ed66eab7f4e1d6d92d4170a4d60ff5cd4d046172cbb7857105a5b2d36142e68"
+  },
+  {
+    "path": "examples/65816/raycaster.h",
+    "sha256": "0b134b2beae1923a718aac4737c7edb59582fd798b098bb40c6e2e66d4db85a9"
+  },
+  {
+    "path": "examples/65816/rdiff.h",
+    "sha256": "8281ed6cde0d6bc55fd4b5e2ca72fd68f1c07b41018f5d5a926768ed215de909"
+  },
+  {
+    "path": "examples/65816/retryjmp.h",
+    "sha256": "c0c074958d3da0b270ff1ac7db2ebae3d5ed4533e8761be1a1c762785d561709"
+  },
+  {
+    "path": "examples/65816/ropeedit.h",
+    "sha256": "016702015a57b8a790b2c969c4dc68c2272c9b8b7825019d572c21710959a6df"
+  },
+  {
+    "path": "examples/65816/rotkal.h",
+    "sha256": "c458d43c16331bf090f85b8060e8f33011ca1e214ec11409d98d26dd0f2c344d"
+  },
+  {
+    "path": "examples/65816/rotozoom.h",
+    "sha256": "aa2ee988b3b8436b643b49edc949626295c4227a28e9af4958b7dab70224ba91"
+  },
+  {
+    "path": "examples/65816/rotslab.h",
+    "sha256": "b8d81838f401c9b40f8aabb591fbb649ad15a836a745168b92459027ce2e5840"
+  },
+  {
+    "path": "examples/65816/satcast.h",
+    "sha256": "c4bd60fc428d0e4163c1a03b5e8a716d66ae32923d17def033f960f5454268d8"
+  },
+  {
+    "path": "examples/65816/satcomet.h",
+    "sha256": "24c471525d74ea8835f459d849e2594d71454e37defeb18531e520ff6f35ebc1"
+  },
+  {
+    "path": "examples/65816/sbitfld.h",
+    "sha256": "5a2bcd22915f8c537d25ff561433a6ca4f692b6237e839ea018cbebb382d3a13"
+  },
+  {
+    "path": "examples/65816/scopeguard.h",
+    "sha256": "bfecc5bf643476d91e8d70074012b4823af94cc58dc7e1c121e4d6d97ecf825d"
+  },
+  {
+    "path": "examples/65816/seamdemo_atlas.h",
+    "sha256": "21f152c1203870b708ef2cc165c77393a4dd9cf8f7a283b5622990a184c8b983"
+  },
+  {
+    "path": "examples/65816/seamdemo_graph.h",
+    "sha256": "1c6e02b46bd17cac3d01a1aa848b36c279a16f8e7cc9c7c30c98d8e877cc036d"
+  },
+  {
+    "path": "examples/65816/seamdemo_vm.h",
+    "sha256": "a8e9aaeaf11d4415f060364c49570fbc4209ffe61eadfcbb2f90efed331d6338"
+  },
+  {
+    "path": "examples/65816/seqvm.h",
+    "sha256": "1f6d93a212ec189177edb65e347df9c0553eaed45ea204f1382faac3409a411b"
+  },
+  {
+    "path": "examples/65816/shift64seam.h",
+    "sha256": "57ac178f36aa52ef293d0d0d7d5ba72ed9c45d33677c0208fd14ac35e0e8f4f2"
+  },
+  {
+    "path": "examples/65816/sjcompat.h",
+    "sha256": "1fd76dec1758b3fee83c6eadd2566d9beed11f902ed1c14fc25736860c601c45"
+  },
+  {
+    "path": "examples/65816/smulorbit.h",
+    "sha256": "f4edd5980b845882cf66fe8ede89579b96aa0e3831772348ff55cddd43fdc50e"
+  },
+  {
+    "path": "examples/65816/sobel.h",
+    "sha256": "a62f2d9dbf812a17a554035385e432e3a9e0e58c2c4a70da75d9d1a52e997c91"
+  },
+  {
+    "path": "examples/65816/sodo.h",
+    "sha256": "a8951d7346d3383be26e820a29a9b96f6a07e864d9e3dee42ab7d905086b51b6"
+  },
+  {
+    "path": "examples/65816/sort-race.h",
+    "sha256": "005dc5dd9942be1a670079019e88bcfb794e31687a5604bcd70293711c347e70"
+  },
+  {
+    "path": "examples/65816/spaceship.h",
+    "sha256": "a4f77ab4b8232cbbce655123d72706da7f3ea84924f0a63e7f86aea7d35ddcfd"
+  },
+  {
+    "path": "examples/65816/speedcap.h",
+    "sha256": "96a9c2496038d5b8438d123b11cc1f86d9a94c1ec66e8c2f6445e69e9dff45d4"
+  },
+  {
+    "path": "examples/65816/spiro.h",
+    "sha256": "70363fddb195dd06d8e783dfe6aca31c33e29aa47007aa0e1e06bdfa48d5f939"
+  },
+  {
+    "path": "examples/65816/strcmprace.h",
+    "sha256": "cd86e79aa0e298eb60009834ac44ff23a58657b28c703cbe86bbec6d8281f91a"
+  },
+  {
+    "path": "examples/65816/tea.h",
+    "sha256": "c4b590f78d651a84ca41ef412755ecc6fa6280b6d357a6b556a2dfad8dbc1580"
+  },
+  {
+    "path": "examples/65816/trapguard.h",
+    "sha256": "58453642720bebfd1535c9d7b8d12b49247e9a1ae21dcca4bb627e1429274fe9"
+  },
+  {
+    "path": "examples/65816/trimerge.h",
+    "sha256": "d36b871c766d2ef1d1b5ef0d66721c07d0e7540f0cf0318f67cdec0b9d160784"
+  },
+  {
+    "path": "examples/65816/truchet.h",
+    "sha256": "a647f860025d9c340c40c26c6d5dba479589b373ac5d3c6c6c810bdbf0c00878"
+  },
+  {
+    "path": "examples/65816/truncstair.h",
+    "sha256": "dcaf5aa83d9fd15c7f6768cfdf715998419ed2dfccb5c8ca8bfeab86fd4efe7c"
+  },
+  {
+    "path": "examples/65816/turtle_vm.h",
+    "sha256": "2d686b3a23a40121bb17df7560163af4f0bbc8c4f15dd7fbe8aa9d5bc3c5167b"
+  },
+  {
+    "path": "examples/65816/uarteye.h",
+    "sha256": "9693d3e22100eb8253bccd51960b1b034b9f8e59494a48ddc1dd2c07099b40ed"
+  },
+  {
+    "path": "examples/65816/ucmprank.h",
+    "sha256": "c0018e865bc479d8a4a64df48444c4502dfa311661089a0140a46a99400ae566"
+  },
+  {
+    "path": "examples/65816/ulam.h",
+    "sha256": "bac7253045376be6d6d6f72e4286988b74bc85208f09707535bd961adb0abc52"
+  },
+  {
+    "path": "examples/65816/vaprintf.h",
+    "sha256": "723011c41ed594a0cdd02c98b48a43842e9512f0a059eb4f01636119d8750a97"
+  },
+  {
+    "path": "examples/65816/vlanest.h",
+    "sha256": "45bf869efdef2c276899bd8a174a5a50f842cd86d6139edc8d4c0a457a7fa48a"
+  },
+  {
+    "path": "examples/65816/vlastack.h",
+    "sha256": "1b18ec2fd1039f0cd9da8a0d850728b289b584d7bac3e9e51fd2f131aa7c84b3"
+  },
+  {
+    "path": "examples/65816/wire3d.h",
+    "sha256": "03ee2875128bead90a157de23a357e1681d17a6d944339098d358fae86c8d3f0"
+  }
+]

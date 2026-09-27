@@ -13,6 +13,18 @@ PR creation was not authorized. The user subsequently directed that it remain
 open for their review. Further changes to that PR require explicit authorization;
 the current commit/push instruction covers the remaining repository work.
 
+**September 27 validation update:** the user subsequently authorized updating
+the PR body. Rebuilt upstream Clang at parent `7bd67c0ae4e8` and head
+`155e209c4cee` passes 117 direct C-to-object pairs across three verified CPU
+selections; paired disassembly and objects excluding `.comment` are identical.
+The [validation record](pr-preparations/2026-09-26/0064-validation.md) also
+corrects the original fixed-IR census to 39 distinct 6502 configurations.
+Documentation and retained evidence are prepared on
+`carry-upstream-clang-validation` in `.scratch/carry-clang-docs`; isolated
+builds are in `.scratch/carry-clang-upstream`. Independent review remains
+pending. Validation and documentation: OpenAI Codex CLI 0.157.1, model
+`gpt-6-astra`, `xhigh` reasoning effort.
+
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
 three governing lessons, and commit discipline are in the auto-loaded project
 [`CLAUDE.md`](../CLAUDE.md) — read that first; this file is the mechanics it points to. (Per-task specifics

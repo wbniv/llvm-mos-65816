@@ -1,0 +1,18 @@
+ninja: Entering directory `build/0029-cross-target-build'
+[1/17] Generating VCSRevision.h
+[2/17] Generating VCSVersion.inc
+[3/17] Building CXX object tools/clang/lib/Basic/CMakeFiles/obj.clangBasic.dir/Version.cpp.o
+[4/17] Building CXX object lib/MC/CMakeFiles/LLVMMC.dir/DXContainerInfo.cpp.o
+[5/17] Linking CXX static library lib/libLLVMMC.a
+[6/17] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSMachineScheduler.cpp.o
+[7/17] Building CXX object lib/Object/CMakeFiles/LLVMObject.dir/IRSymtab.cpp.o
+[8/17] Linking CXX static library lib/libLLVMObject.a
+[9/17] Linking CXX static library lib/libclangBasic.a
+[10/17] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSTargetMachine.cpp.o
+[11/17] Building CXX object lib/CodeGen/AsmPrinter/CMakeFiles/LLVMAsmPrinter.dir/AsmPrinter.cpp.o
+[12/17] Linking CXX static library lib/libLLVMAsmPrinter.a
+[13/17] Building CXX object lib/LTO/CMakeFiles/LLVMLTO.dir/LTO.cpp.o
+[14/17] Linking CXX static library lib/libLLVMLTO.a
+[15/17] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[16/17] Linking CXX executable bin/clang-24
+[17/17] Creating executable symlink bin/clang

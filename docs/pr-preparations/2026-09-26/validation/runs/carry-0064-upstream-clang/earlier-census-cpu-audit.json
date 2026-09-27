@@ -1,0 +1,246 @@
+{
+  "files": [
+    {
+      "path": ".scratch/carry-pr/measure/arith.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/arith.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/arith.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/arrays.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/arrays.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/arrays.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitshuffle_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitshuffle_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitshuffle_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitweave_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitweave_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/bitweave_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/control.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/control.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/control.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/cordic_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 3
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/cordic_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 3
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/cordic_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 3
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/funcs.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/funcs.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/funcs.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/globals.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/globals.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/globals.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/lsystem_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/lsystem_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/lsystem_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/ovmatrix_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/ovmatrix_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 3
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/ovmatrix_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 3
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/rotkal_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/rotkal_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/rotkal_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/structs.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/structs.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/structs.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/uarteye_sim.O2.ll",
+      "cpu_attributes": {
+        "mos6502": 1
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/uarteye_sim.Os.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    },
+    {
+      "path": ".scratch/carry-pr/measure/uarteye_sim.Oz.ll",
+      "cpu_attributes": {
+        "mos6502": 2
+      }
+    }
+  ],
+  "total_cpu_attributes": {
+    "mos6502": 64
+  },
+  "source_contract": {
+    "path": ".scratch/carry-pr/source/llvm/lib/Target/MOS/MOSTargetMachine.cpp",
+    "function": "MOSTargetMachine::getSubtargetImpl",
+    "rule": "A nonempty function target-cpu attribute overrides the target machine CPU selected by llc -mcpu."
+  }
+}

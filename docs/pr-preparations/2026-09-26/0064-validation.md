@@ -24,7 +24,7 @@ Preparation and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
 | Added MIR test | Fails computed-carry ordering checks | Passes; full candidate total 132 |
 | NMOS 6502 kernel text | 133 bytes; six carry materializations | 59 bytes; zero materializations |
 | 512 frozen Python-oracle vectors | `P`, exit 0 | `P`, exit 0 |
-| 13 ordinary fixtures × three optimizations × three CPUs | 117 verified objects | 117 identical disassemblies; zero unmatched outcomes |
+| 13 ordinary fixtures × three optimizations, repeated with three backend CPU flags | 117 verified objects | 117 identical disassemblies; zero unmatched outcomes; 39 distinct 6502 configurations |
 
 Baseline top-down scheduling and all four full-lowering controls already pass.
 The five failing checks are default/bottom-up 6502 and default 65C02, 65CE02,
@@ -63,10 +63,15 @@ followed by `build/register-exhaustion-src/llvm/test/CodeGen/MOS` and
 `build/register-exhaustion-src/llvm/test/MC/MOS`. The baseline suite excludes
 `carry-pressure-schedule`; its ten commands are measured separately.
 
-The census emits IR once with an identified downstream Clang, using the sim
-configuration and ordinary 6502 near pointers. Both exact-current backends
+The original census emits IR once with an identified downstream Clang, using
+the sim configuration and ordinary 6502 near pointers. Both upstream backends
 consume those same bytes; `llc` uses `-O=2` with the frontend's Os/Oz/O2
-attributes. Only the terminal WAI in the original thirteen fixtures had been
+attributes. **Scope correction, September 27:** the retained function
+attributes pin `target-cpu` to `mos6502`. `MOSTargetMachine::getSubtargetImpl`
+uses that attribute in preference to the CPU passed to `llc`, so the three
+backend CPU flags repeat 39 distinct 6502 configurations. The original
+receipts and logs are preserved; this census does not establish 65C02 or
+65816 corpus coverage. Only the terminal WAI in the original thirteen fixtures had been
 adapted to empty volatile assembly. The runtime holds the driver, linker and
 SDK fixed while replacing the kernel object. Python supplies 512 exact expected
 results, including zero, all-ones and sign-bit boundaries; target C compares
@@ -81,6 +86,53 @@ Cycles and compiler overhead are unmeasured. Earlier native-width results and
 their growing cases remain downstream evidence, summarized in the
 [profitability review](0064-review.md); they are not relabeled as current
 upstream results. The validation pass itself did not perform independent review or publication.
+
+## Full upstream Clang validation — September 27
+
+**PASS — 117 direct C-to-object comparisons.** Clang 24.0.0git was built from
+the clean upstream parent `7bd67c0ae4e8bb65a3f980912bf201df22131e34` and the
+clean PR head `155e209c4cee8eeac01397aac3542e76841a9856`. The isolated build
+enabled `LLVM_ENABLE_PROJECTS=clang` and built `clang` and
+`clang-resource-headers`; Release mode and assertions remained enabled.
+The installed downstream compiler and the original retained llc binaries were
+unchanged.
+
+Each compiler processes the original thirteen C fixtures directly with
+`-c -fno-lto -mllvm -verify-machineinstrs`, for each requested CPU and
+optimization level. Both use the same sim SDK configuration and headers.
+Compiler resource headers also match exactly. The captured IR explicitly
+selects the requested CPU in all 234 compilations; there are no CPU-attribute
+mismatches.
+
+| CPU | Optimization levels | Baseline / candidate pairs | Changed disassemblies | Changed objects excluding `.comment` |
+|---|---|---:|---:|---:|
+| 6502 | Os, Oz, O2 | 39 | 0 | 0 |
+| 65C02 | Os, Oz, O2 | 39 | 0 | 0 |
+| Stock 65816 | Os, Oz, O2 | 39 | 0 | 0 |
+
+All compiles, preprocessing commands, IR emissions, and driver inspections
+exit successfully. Text size is unchanged in every pair. The object comparison
+removes only `.comment`, which contains the compiler version; all remaining
+bytes match. IR also matches after normalizing the Clang version string in
+`llvm.ident`. This extends ordinary-MOS compilation coverage through upstream
+Clang's frontend, IR optimizations, and backend. The existing MIR runtime
+result, downstream profitability evidence, and unmeasured cycle/compiler-time
+claims retain their separate scopes.
+
+- [Receipt and compiler identities](validation/runs/carry-0064-upstream-clang/receipt.json).
+- [Summary](validation/runs/carry-0064-upstream-clang/summary.json) and
+  [all commands and comparisons](validation/runs/carry-0064-upstream-clang/results.json).
+- [Sources, preprocessed inputs, IR, objects, logs, and disassemblies](validation/runs/carry-0064-upstream-clang/census-artifacts.tar.gz),
+  with a [per-file hash index](validation/runs/carry-0064-upstream-clang/archive-index.json).
+- [Earlier census CPU audit](validation/runs/carry-0064-upstream-clang/earlier-census-cpu-audit.json)
+  and the [source contract](validation/runs/carry-0064-upstream-clang/MOSTargetMachine.cpp.txt)
+  substantiate the correction above. The original 39 IR files and 117 backend
+  invocations remain immutable dated evidence.
+
+Full Clang validation, CPU audit, documentation, and author review: OpenAI
+Codex CLI 0.157.1, model `gpt-6-astra`, `xhigh` reasoning effort. Independent
+review remains pending. These builds compare the exact PR parent and head;
+they do not extend the results to newer upstream main revisions.
 
 ## Publication update
 

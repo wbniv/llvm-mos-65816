@@ -342,7 +342,7 @@ Completion update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`,
 `xhigh` reasoning effort; original discovery attribution is retained.
 
 The [standalone 0064 packet](../pr-preparations/2026-09-26/README.md) is now
-published on its fork branch; no PR has been opened.
+published as [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609).
 
 **8a. Default-build isolation** (agent-handoff "Gating discipline — the fuzzer guards the DEFAULT
 build too"). Every `examples/65816/*.c` recompiled `-c -Os` with **no** `+mos-a16`, old vs new

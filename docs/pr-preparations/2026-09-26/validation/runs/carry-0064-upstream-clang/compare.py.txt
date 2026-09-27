@@ -1,0 +1,42 @@
+from pathlib import Path
+import json
+
+work = Path(__file__).resolve().parent
+output = work / "measure"
+key = lambda row: (row["source"], row["optimization"], row["cpu"])
+baseline = {key(row): row for row in json.loads((output / "baseline-results.json").read_text())}
+candidate = {key(row): row for row in json.loads((output / "candidate-results.json").read_text())}
+assert baseline.keys() == candidate.keys() and len(baseline) == 117
+rows = []
+for identity in sorted(baseline):
+    before, after = baseline[identity], candidate[identity]
+    assert before["source_sha256"] == after["source_sha256"]
+    row = dict(before, candidate=after["candidate"])
+    for label in ["baseline", "candidate"]:
+        assert row[label]["ir_cpu_matches_driver"]
+        for action in ["compile", "ir", "preprocess", "driver", "normalize_object"]:
+            assert row[label][action]["exit"] == 0, (identity, label, action)
+    row["text_delta"] = row["candidate"]["text_bytes"] - row["baseline"]["text_bytes"]
+    for name, field in [("same_disassembly", "disassembly_sha256"),
+                        ("same_object_without_comment", "object_without_comment_sha256"),
+                        ("same_ir_without_version", "ir_without_version_sha256")]:
+        row[name] = row["baseline"][field] == row["candidate"][field]
+    rows.append(row)
+groups = []
+for cpu in ["mos6502", "mos65c02", "mosw65816"]:
+    for optimization in ["Os", "Oz", "O2"]:
+        group = [row for row in rows if row["cpu"] == cpu and row["optimization"] == optimization]
+        groups.append({"cpu": cpu, "optimization": optimization, "pairs": len(group),
+                       "text_delta": sum(row["text_delta"] for row in group),
+                       "changed_disassemblies": sum(not row["same_disassembly"] for row in group),
+                       "changed_objects_without_comment": sum(not row["same_object_without_comment"] for row in group),
+                       "changed_ir_without_version": sum(not row["same_ir_without_version"] for row in group)})
+summary = {"pairs": len(rows), "compile_failures": 0, "ir_cpu_mismatches": 0,
+           "text_delta": sum(row["text_delta"] for row in rows),
+           "changed_disassemblies": sum(not row["same_disassembly"] for row in rows),
+           "changed_objects_without_comment": sum(not row["same_object_without_comment"] for row in rows),
+           "changed_ir_without_version": sum(not row["same_ir_without_version"] for row in rows),
+           "groups": groups}
+(output / "results.json").write_text(json.dumps(rows, indent=2) + "\n")
+(output / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+print(json.dumps(summary, indent=2))

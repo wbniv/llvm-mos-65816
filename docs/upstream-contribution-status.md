@@ -5,7 +5,11 @@ is author-reviewed and validated on llvm-mos `7bd67c0ae4e8`. Compiler commit
 `155e209c4cee` is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling);
 [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. Ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
-shrinks 133 → 59 bytes; 117 ordinary-MOS corpus comparisons are unchanged.
+shrinks 133 → 59 bytes. The September 27 rebuilt-upstream-Clang run passes
+117 C-to-object pairs across 6502, 65C02 and stock 65816, with identical
+disassembly and objects excluding compiler-version metadata. The earlier
+fixed-IR census repeats 39 distinct 6502 configurations; see the
+[coverage correction and new evidence](pr-preparations/2026-09-26/0064-validation.md).
 Downstream 1–41-byte losses remain documented. Independent review, cycles and
 compiler overhead remain unclaimed. The [generic pressure contract](defects/mos-carry-scheduling-pressure.json),
 [farblit legalization](defects/mos-farblit-byte-load-legalization.json), and the

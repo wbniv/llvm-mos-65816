@@ -1,10 +1,22 @@
 | Date | Change |
 |------|--------|
+| [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cbd1cd5b) | Publish computed-carry scheduler implementation and upstream PR packet |
+| [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/6065ebec) | fix(mos): finish defect review, near-store fixes, and evidence enforcement |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/e1a4adad) | docs(321): record the last three verification legs in the [dp],Y plan |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/dbb84e16) | test(321): farbank gate — [dp],y (b7) across a bank boundary |
 | [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/2689b74d) | feat(321): select [dp],Y (b7/97) for a small constant far displacement |
 
 <!--history-meta v1
+cbd1cd5b	author	Will Norris
+cbd1cd5b	added	13
+cbd1cd5b	deleted	6
+cbd1cd5b	files	1
+cbd1cd5b	body	Retain downstream 0064, its canonical qualified pressure record, separate\ninherited farblit observation, corpus costs and immutable validation evidence.\nAdd only the carry patch/test to toolchain application and regeneration.\n\nInclude the standalone 7bd67c0ae4e8 upstream extraction and author review:\nten focused commands, 132 MOS suite passes and one unsupported test,\n512 Python-oracle vectors per compiler, and 117 neutral ordinary-MOS\ncomparisons. The targeted MIR kernel shrinks from 133 to 59 bytes.\nThe compiler commit 155e209c4cee is pushed to the llvm-mos fork branch.\nNo PR is opened; cycle and compiler-time claims remain unmeasured.\n\nPrepare this commit in an isolated worktree from b3938bda so the shared\ncheckout, other staged changes and unrelated PR packets are preserved.\nRefresh the scoped plans, original reports, current summaries and document\ndependency receipts. Preserve existing attribution and failing baselines.\n\nImplementation, extraction, author review, validation and publication:\nOpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning\neffort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994.\nOriginal downstream sum/rotate inputs and measurements: Claude Code\n2.1.278, model claude-opus-5, high reasoning effort; session\n65695418-7e9b-45bd-92e3-2ecfd88ecf0b, agent a35017d73ff4d881d.
+6065ebec	author	Will Norris
+6065ebec	added	19
+6065ebec	deleted	16
+6065ebec	files	1
+6065ebec	body	Extend the inline-asm physical-register width guard to named registers,\ncheck the fixup-table length at compile time, and keep symbolic addr-asciz\nhandling scoped to directive text output. Refresh all required lit tools\nand make missing rcundef witnesses fail with useful diagnostics.\n\nKeep byte-built absolute argument stores and narrowly gated plain indirect\nA:X stores on their profitable byte paths. Preserve atomic word stores,\nnative consumers, and call-preserved contexts. Add lit/runtime regressions,\nbefore/after corpus measurements, plans, and reproduction scripts. Setters\nshrink 14 to 7 bytes absolute and 13 to 8 bytes indirect, with no measured\ncorpus growth. Regenerate and round-trip-check patch 0002.\n\nRecheck the three older reports without claiming unsupported closure.\nNarrow-count shifts and inline-bitboard register pressure remain not\nreproduced with historical baseline gaps; reentrant remains a contract\nclarification. Retain current-build observations, original attributions,\nand follow-up work. Require structured defect records and immutable\nbaseline evidence through agent instructions and the staged commit hook.\nDocument how to activate the repository hooks in each clone.\n\nValidation: 132 older-report verifier compiles and runtime differentials\npass; both store regressions and native-copy controls pass on MAME and\nbsnes-jg. Final MOS lit: 162 pass, 2 unsupported, the same 4 existing\nfailures. Evidence checker: 12 tests pass. Comment-history, staged evidence,\nSNES display-quality, and whitespace checks pass.\n\nOpenAI Codex performed the independent review, follow-up implementations,\nreproduction audit, evidence enforcement, and documentation reconciliation.\nInclude Claude Sonnet 5's initial PR drafts and pinned-base validation with\ntheir original credits and explicit limits for the revised artifacts.\nPreserve the original Claude implementation credits in the review record.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nCo-Authored-By: OpenAI Codex <noreply@openai.com>
 e1a4adad	author	Will Norris
 e1a4adad	added	23
 e1a4adad	deleted	5

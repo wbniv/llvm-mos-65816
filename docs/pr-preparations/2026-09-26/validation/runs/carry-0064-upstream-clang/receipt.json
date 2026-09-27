@@ -1,0 +1,284 @@
+{
+  "schema": 1,
+  "date_utc": "2026-09-26T23:40:08.336614+00:00",
+  "scope": "Direct non-LTO C-to-object compilation through upstream llvm-mos Clang, its IR optimizations, and its integrated backend, with and without 0064. The SDK headers and configuration are held constant.",
+  "baseline": {
+    "revision": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
+    "clean_source": true,
+    "compiler_sha256": "418350c900852604f3daa8f783a143932a8ea7667617b124918064cba6928c26",
+    "identity": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-identity.json"
+  },
+  "candidate": {
+    "revision": "155e209c4cee8eeac01397aac3542e76841a9856",
+    "clean_source": true,
+    "compiler_sha256": "a804b20ad4ff39c64b8240afac9130b01db87cf2261d82180fb4a1bbaabc78cf",
+    "identity": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-identity.json",
+    "patch": "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+    "patch_sha256": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983"
+  },
+  "build": {
+    "image": "sha256:eeecfab76840167d9f16982b1efddae90d4969c5d7891ec16e87e46150ac94c1",
+    "network": "none",
+    "build_type": "Release",
+    "assertions": true,
+    "projects": [
+      "clang"
+    ],
+    "targets": [
+      "MOS",
+      "X86",
+      "ARM",
+      "AArch64"
+    ],
+    "configure": [
+      "cmake",
+      "-S",
+      "build/register-exhaustion-src/llvm",
+      "-B",
+      "build/0029-cross-target-build",
+      "-DLLVM_ENABLE_PROJECTS=clang"
+    ],
+    "command": [
+      "ninja",
+      "-C",
+      "build/0029-cross-target-build",
+      "-j",
+      "6",
+      "clang",
+      "clang-resource-headers"
+    ],
+    "source_mount": "/work/build/register-exhaustion-src",
+    "build_mount": "/work/build/0029-cross-target-build",
+    "baseline_exit": 0,
+    "candidate_exit": 0,
+    "baseline_monitor_note": "The original host command monitor exited 143 while its container continued. The complete container log and docker wait exit status 0 are retained."
+  },
+  "configuration": {
+    "source_count": 13,
+    "optimization": [
+      "Os",
+      "Oz",
+      "O2"
+    ],
+    "cpus": [
+      "mos6502",
+      "mos65c02",
+      "mosw65816"
+    ],
+    "lto": false,
+    "machine_verifier": true,
+    "headers": "fixed-headers.json",
+    "resource_headers_identical": true,
+    "input_source_origin": "Exact copies of the thirteen sources retained by the original 0064 census; only its previously recorded WAI-to-empty-volatile-asm adaptation is present."
+  },
+  "results": {
+    "pairs": 117,
+    "compile_failures": 0,
+    "ir_cpu_mismatches": 0,
+    "text_delta": 0,
+    "changed_disassemblies": 0,
+    "changed_objects_without_comment": 0,
+    "changed_ir_without_version": 0,
+    "groups": [
+      {
+        "cpu": "mos6502",
+        "optimization": "Os",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mos6502",
+        "optimization": "Oz",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mos6502",
+        "optimization": "O2",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mos65c02",
+        "optimization": "Os",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mos65c02",
+        "optimization": "Oz",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mos65c02",
+        "optimization": "O2",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mosw65816",
+        "optimization": "Os",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mosw65816",
+        "optimization": "Oz",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      },
+      {
+        "cpu": "mosw65816",
+        "optimization": "O2",
+        "pairs": 13,
+        "text_delta": 0,
+        "changed_disassemblies": 0,
+        "changed_objects_without_comment": 0,
+        "changed_ir_without_version": 0
+      }
+    ]
+  },
+  "normalization": {
+    "disassembly": "Remove the object-path/file-format heading only.",
+    "object": "Remove only .comment, which contains the compiler version. All remaining object bytes match.",
+    "ir": "Replace the clang version string in llvm.ident metadata; all remaining IR bytes match."
+  },
+  "earlier_census_correction": {
+    "audit": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/earlier-census-cpu-audit.json",
+    "source_contract": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/MOSTargetMachine.cpp.txt",
+    "result": "All 39 retained IR files pin functions to mos6502. MOSTargetMachine::getSubtargetImpl prefers that function attribute over the llc CPU flag. The original 117 invocations repeat 39 source/optimization configurations for 6502; they do not establish 65C02/65816 corpus coverage. Original receipts and inputs are unchanged."
+  },
+  "limits": {
+    "runtime": "The existing 512-vector MIR runtime check remains separate; this new run compares compilation results.",
+    "cycles": "unmeasured",
+    "compile_time": "unmeasured",
+    "independent_review": "pending",
+    "newer_upstream_base": "No build of 26d7c2c1eebf is claimed; these builds compare the exact PR parent and head."
+  },
+  "attribution": {
+    "tool": "OpenAI Codex CLI",
+    "tool_version": "0.157.1",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh",
+    "work": "Full Clang validation, CPU-coverage audit, documentation, and author review."
+  },
+  "artifacts": [
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/MOSTargetMachine.cpp.txt",
+      "sha256": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/archive-index.json",
+      "sha256": "8956a07be676036eedd8cb0a2e6e16a5f09585abdd8a98d513f8d3e7b511546b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-CMakeCache.txt",
+      "sha256": "effd576704c99cae5f3f62b0304605bb0483eb7bfdbe5e765da96a5e99bc16f5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-build-container.log",
+      "sha256": "15a840082e12b4db9887fb36a09d57d3793205f347103f393127c202acc28a05"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-build-exit.txt",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-configure.log",
+      "sha256": "3790d208aa3843faafa9eefc775fff82683eb03938292b3b149dffba219ed6d1"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-identity.json",
+      "sha256": "eb9d63fedc88eea4aa66879cd23eee7eb8ebeba0f32449dffc79fec188bad8dc"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-measure.log",
+      "sha256": "45123ea346a08959eb231832f9ad4d0be5f8014849db0e97e31aff9d4c86c134"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/baseline-version.log",
+      "sha256": "ea12e6476177e99fabd0ef50ca019458df45c323c22698d57cf0a8c99727a606"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-CMakeCache.txt",
+      "sha256": "effd576704c99cae5f3f62b0304605bb0483eb7bfdbe5e765da96a5e99bc16f5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-build.log",
+      "sha256": "f3a19413bc73ddcfee4f405a794bdee8383326b9dc0daf3e71a40fab95ebd2d3"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-configure.log",
+      "sha256": "89c26497ec59f71ecf736e5dcd84f382f177c4430441c75d0b7a5f2466d2739b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-identity.json",
+      "sha256": "652c0869afb59e88c594658a18bf0a01fd064aaddd0269d23480844611bfc42a"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-measure.log",
+      "sha256": "abb9efe0fbde51e8fe0d85c7aa134fdc7ef79aa48792293dfe26627de1fee68f"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/candidate-version.log",
+      "sha256": "38f3a977447efbe4367b0a20b44066b818d7db379b493379e697197e8c79d6dd"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/census-artifacts.tar.gz",
+      "sha256": "fdd7988e40065ba66d07c2ede618d10413143420eb660e12f71e54e9de78d6d5"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/compare.py.txt",
+      "sha256": "11a7163302634d8644f5ab9e5ada6557beaf4fe17f8e81cf5e9d72a115dd351a"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/earlier-census-cpu-audit.json",
+      "sha256": "694129a29af6cbb6095829356af7eeaeb9548700aa030fec5bf72a53e203171d"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/fixed-headers.json",
+      "sha256": "10e20fcf81c11c1e23cdff79546ee4a41ff11c218436dd7037208f54e4302878"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/freeze.py.txt",
+      "sha256": "4dde6413ebc5c208f91ab39b0dc008e9ccda41486e1272b88cc3ec9e90cb3162"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/measure.py.txt",
+      "sha256": "5278c21cdc902e793f5cf702a6fa574fb9fe07f8bf3af7a358343e8649876775"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/results.json",
+      "sha256": "ba9a0df0106b056ba6627ffee8caa347ff77729a2d26f309d8769c20c947fc3c"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/summary.json",
+      "sha256": "cf8141c35682d534b27cdfdff5e70c9fbe395952f2cd8482b2325f0a65227086"
+    }
+  ]
+}

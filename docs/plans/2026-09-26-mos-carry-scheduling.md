@@ -403,9 +403,11 @@ this extraction from the earlier downstream stack.
 - The 6502 kernel shrinks **133 → 59 bytes**, removing six materializations.
   Baseline and candidate each pass **512 frozen Python-oracle vectors** in
   mos-sim. Full candidate MOS suites: **132 passed / one unsupported**.
-- With a fixed downstream frontend, 13 ordinary near-code fixtures across
-  three CPUs and Os/Oz/O2 give **117 identical object disassemblies**. This is
-  neutral current-upstream backend coverage, not a broad upstream size gain.
+- The fixed-downstream-frontend census recorded **117 identical object
+  disassemblies**. Its scope was corrected on September 27: the IR pins
+  functions to 6502, so this repeats **39 distinct 6502 configurations**
+  across three requested backend CPU flags. See the
+  [validation correction](../pr-preparations/2026-09-26/0064-validation.md).
 - The recorded downstream 1–41-byte losses remain accepted in the proposal.
   Extra loop frame traffic and the HUD mode transition are explicit costs;
   neither cycles nor compiler overhead was measured.
@@ -456,3 +458,35 @@ Further changes to the PR require explicit authorization. The subsequent
 commit/push request covers the remaining repository records.
 
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+
+## 12. Full upstream Clang validation and PR wording — September 27
+
+The user requested compilation through rebuilt upstream Clang and explicitly
+authorized updating PR #609 after validation. The baseline and candidate
+Clang 24.0.0git binaries are built from clean source at the exact PR parent
+`7bd67c0ae4e8` and head `155e209c4cee`, with assertions enabled.
+
+**PASS — 117 direct C-to-object pairs.** Thirteen fixtures, three optimization
+levels, and three CPUs (6502, 65C02, stock 65816) compile successfully with
+machine verification. Generated IR selects the requested CPU in every case.
+All paired disassemblies match; all object bytes match after removing only
+the compiler-version `.comment` section. SDK/configuration/helper headers are
+held constant. The [validation record](../pr-preparations/2026-09-26/0064-validation.md#full-upstream-clang-validation--september-27)
+links compiler identities, build logs, exact commands, and archived inputs and
+outputs.
+
+The original census is retained with a scope correction: its IR pins functions
+to `mos6502`, overriding the backend CPU flag. Its 117 invocations repeat 39
+source/optimization configurations for 6502. The new Clang run supplies actual
+coverage of all three CPUs. The existing MIR regressions have no such CPU
+attribute and retain their recorded multi-CPU coverage.
+
+The public PR text omits internal follow-up names, session UUIDs, and internal
+agent IDs. Tool/version, model, and reasoning-effort credits remain. Internal
+follow-ups in section 10 remain open. Independent review is still pending;
+replace the author-review qualification only after an independently attributed
+review and any required fixes are complete. Cycles and compiler overhead remain
+unmeasured, and no newer-upstream-base rebuild is claimed.
+
+Validation, CPU audit, documentation, and author review: OpenAI Codex CLI
+0.157.1, model `gpt-6-astra`, `xhigh` reasoning effort.

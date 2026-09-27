@@ -1,0 +1,53 @@
+-- bolt project is disabled
+-- clang project is enabled
+-- clang-tools-extra project is disabled
+-- cross-project-tests project is disabled
+-- lld project is disabled
+-- lldb project is disabled
+-- mlir project is disabled
+-- polly project is disabled
+-- flang project is disabled
+-- libc project is disabled
+-- compiler-rt project is disabled
+-- Doxygen disabled.
+-- Could NOT find LibXml2 (missing: LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR) (found version "")
+-- Could NOT find LibEdit (missing: LibEdit_INCLUDE_DIRS LibEdit_LIBRARIES) 
+-- LLVM host triple: x86_64-unknown-linux-gnu
+-- Native target architecture is X86
+-- Threads enabled.
+-- Ninja version: 1.13.2
+-- Could NOT find OCaml (missing: OCAMLFIND OCAML_VERSION OCAML_STDLIB_PATH) 
+-- Could NOT find OCaml (missing: OCAMLFIND OCAML_VERSION OCAML_STDLIB_PATH) 
+-- OCaml bindings disabled.
+-- LLVM default target triple: x86_64-unknown-linux-gnu
+-- Building with -fPIC
+-- Precompiled headers enabled.
+-- Targeting X86
+-- Targeting ARM
+-- Targeting AArch64
+-- Targeting MOS
+-- Looking for sys/resource.h
+-- Looking for sys/resource.h - found
+-- Looking for dlfcn.h
+-- Looking for dlfcn.h - found
+-- Looking for dladdr
+-- Looking for dladdr - found
+-- Clang version: 24.0.0git
+-- Looking for include file sys/inotify.h
+-- Looking for include file sys/inotify.h - found
+-- Performing Test HAVE_LINKER_FLAG_LONG_PLT
+-- Performing Test HAVE_LINKER_FLAG_LONG_PLT - Success
+-- Found Perl: /usr/bin/perl (found version "5.40.1")
+-- Found Python3: /usr/bin/python3 (found version "3.14.4") found components: Interpreter
+-- Not building llvm-mt because libxml2 is not available
+-- Registering ExampleIRTransforms as a pass plugin (static build: OFF)
+-- Registering Bye as a pass plugin (static build: OFF)
+-- Failed to find LLVM FileCheck
+-- Google Benchmark version: v1.9.5, normalized to 1.9.5
+CMake Warning at /work/build/register-exhaustion-src/third-party/benchmark/CMakeLists.txt:329 (message):
+  Using std::regex with exceptions disabled is not fully supported
+
+
+-- Configuring done (11.0s)
+-- Generating done (8.7s)
+-- Build files have been written to: /work/build/0029-cross-target-build

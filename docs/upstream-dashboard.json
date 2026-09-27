@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-26",
-  "sourceHash": "123806428199dc9b34e5d10c92088d8b106758932393a230a2070ce416864c70",
+  "sourceHash": "c0671727c1d4c3a38d4cb45faa4dc415e24d6ab8ec39a627db784c7427625cc2",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -391,7 +391,7 @@
       "id": "opt:carry-scheduler",
       "kind": "optimization",
       "title": "0064 computed-carry scheduling",
-      "summary": "Standalone PR packet ready for upstream review on 7bd67c0ae4e8: targeted 6502 kernel 133 to 59 bytes, 132 MOS tests and 512 oracle vectors pass; 117 ordinary corpus comparisons identical. Downstream 1–41 byte losses retained. Author review only.",
+      "summary": "Standalone PR packet ready for upstream review on 7bd67c0ae4e8: targeted 6502 kernel 133 to 59 bytes, 132 MOS tests and 512 oracle vectors pass; 117 C-to-object pairs with rebuilt upstream Clang across three CPUs are identical excluding compiler-version metadata. Downstream 1–41 byte losses retained. Author review only.",
       "localStatus": "ready",
       "publicationStatus": "posted",
       "nextStep": "Follow PR #609 review and CI. Validated on 7bd67c0ae4e8; destination rechecked at 26d7c2c1eebf without a new-base rebuild. Author review only; cycles and compile time are unmeasured.",

@@ -1,0 +1,43 @@
+-- bolt project is disabled
+-- clang project is enabled
+-- clang-tools-extra project is disabled
+-- cross-project-tests project is disabled
+-- lld project is disabled
+-- lldb project is disabled
+-- mlir project is disabled
+-- polly project is disabled
+-- flang project is disabled
+-- libc project is disabled
+-- compiler-rt project is disabled
+-- Doxygen disabled.
+-- Found Python3: /usr/bin/python3 (found suitable version "3.14.4", minimum required is "3.8") found components: Interpreter
+-- Could NOT find LibXml2 (missing: LIBXML2_LIBRARY LIBXML2_INCLUDE_DIR) (found version "")
+-- Could NOT find LibEdit (missing: LibEdit_INCLUDE_DIRS LibEdit_LIBRARIES) 
+-- LLVM host triple: x86_64-unknown-linux-gnu
+-- Native target architecture is X86
+-- Threads enabled.
+-- Ninja version: 1.13.2
+-- Could NOT find OCaml (missing: OCAMLFIND OCAML_VERSION OCAML_STDLIB_PATH) 
+-- Could NOT find OCaml (missing: OCAMLFIND OCAML_VERSION OCAML_STDLIB_PATH) 
+-- OCaml bindings disabled.
+-- LLVM default target triple: x86_64-unknown-linux-gnu
+-- Building with -fPIC
+-- Precompiled headers enabled.
+-- Targeting X86
+-- Targeting ARM
+-- Targeting AArch64
+-- Targeting MOS
+-- Clang version: 24.0.0git
+-- Found Python3: /usr/bin/python3 (found version "3.14.4") found components: Interpreter
+-- Not building llvm-mt because libxml2 is not available
+-- Registering ExampleIRTransforms as a pass plugin (static build: OFF)
+-- Registering Bye as a pass plugin (static build: OFF)
+-- Failed to find LLVM FileCheck
+-- Google Benchmark version: v1.9.5, normalized to 1.9.5
+CMake Warning at /work/build/register-exhaustion-src/third-party/benchmark/CMakeLists.txt:329 (message):
+  Using std::regex with exceptions disabled is not fully supported
+
+
+-- Configuring done (10.3s)
+-- Generating done (9.1s)
+-- Build files have been written to: /work/build/0029-cross-target-build
