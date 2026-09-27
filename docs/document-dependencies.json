@@ -302,11 +302,11 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
-          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T23:48:07.908065+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:33:17.545946+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
@@ -350,11 +350,11 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T23:48:08.263430+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:33:17.969527+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
@@ -398,11 +398,11 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T23:48:08.608300+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:33:18.471011+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
@@ -490,12 +490,12 @@
       ],
       "receipt": {
         "sources": {
-          "AGENTS.md": "fe47f7ab1798ffc9565e939f6e5d31f708e5fed7e23cdd5495aaa78fd2d9f352",
+          "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32"
         },
-        "reviewed_at": "2026-09-26T22:34:23.031937+00:00",
-        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+        "reviewed_at": "2026-09-27T00:33:18.635675+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
     {
@@ -537,11 +537,11 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
-          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T23:48:09.172568+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:33:19.189961+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
@@ -735,7 +735,8 @@
         "docs/pr-preparations/2026-09-26/0057-pr-body.md",
         "docs/pr-preparations/2026-09-26/0058-pr-body.md",
         "docs/pr-preparations/2026-09-26/0059-pr-body.md",
-        "docs/pr-preparations/2026-09-26/0060-pr-body.md"
+        "docs/pr-preparations/2026-09-26/0060-pr-body.md",
+        "AGENTS.md"
       ],
       "receipt": {
         "sources": {
@@ -745,27 +746,28 @@
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
-          "docs/pr-preparations/2026-09-26/0028-pr-body.md": "7462030392a4cb5884f4d328233fbab3c0f107c13c7c585b8b0aae22ed8920e0",
-          "docs/pr-preparations/2026-09-26/0037-pr-body.md": "7643920465ea700d024d393ade2489a3596cfcf3c24abc3cecef90913820cf67",
-          "docs/pr-preparations/2026-09-26/0038-pr-body.md": "6e1f9d39b51f5095a25a32d8766c941ee60f70a9715b7ba3df719b6f3611f093",
-          "docs/pr-preparations/2026-09-26/0039-pr-body.md": "57b5b2995c6852de5d96e122732d1e370f8f5ff8a5027954461c99c4454c562a",
-          "docs/pr-preparations/2026-09-26/0040-pr-body.md": "b0bf7fb7a2b89582a3e0ef4e17edf1ea93c788814622551bd6037e2ae36a46c6",
-          "docs/pr-preparations/2026-09-26/0041-pr-body.md": "ae302068f8737764c4a9da7e8f2adabc5620fe7e395c936466cd482ce371a034",
-          "docs/pr-preparations/2026-09-26/0043-pr-body.md": "2802959935125144dc42f23641f28eb7a6657c1e4fc37cc1d9080a80c0ae6390",
-          "docs/pr-preparations/2026-09-26/0044-pr-body.md": "044b448b36b0ac90455a398264839f0b2f456c6e3fa09b7e5a8c4e9a7de530ee",
-          "docs/pr-preparations/2026-09-26/0045-pr-body.md": "30b14ab971acae059b013e53e8ccbdef9e98cb1925b2a8e53c802238c87dc118",
-          "docs/pr-preparations/2026-09-26/0046-pr-body.md": "a7f7803e6915a3ebf988d227f63de77609d04f5089d926819dd5e02fd40deb17",
-          "docs/pr-preparations/2026-09-26/0047-pr-body.md": "4b05bebbdb58c25bf26532d6f0e995555288495cc4d7c6e2d65e42e611b335cd",
-          "docs/pr-preparations/2026-09-26/0050-pr-body.md": "b13f01bb90a6a69df3d39eccb8d1eeaf9554be68a038d41edda0c9938b853c2c",
-          "docs/pr-preparations/2026-09-26/0054-pr-body.md": "9108a4f216e5381c6d1df3d582b1f2d39453043502fcb6619abbc0afcb997865",
-          "docs/pr-preparations/2026-09-26/0056-pr-body.md": "5f34057ba7aad775514643463e9ef2e70c3ed041ced68ecbe8150f21bfe4661b",
-          "docs/pr-preparations/2026-09-26/0057-pr-body.md": "6b44d920e86df0b89bd0621edddfe9a84b5de61a21db684e1003d45670725017",
-          "docs/pr-preparations/2026-09-26/0058-pr-body.md": "a0e089f639768fd00328530514bd5ecb4184804eabe5f2cf2617942cd0a9d794",
-          "docs/pr-preparations/2026-09-26/0059-pr-body.md": "6d209a6d918aaf5c1243c15f23aad43675cab480530395bf17b8008bd76282a4",
-          "docs/pr-preparations/2026-09-26/0060-pr-body.md": "a26fbe356394f2cc4ae495b677899c02a5a0b6f59ee1f315910f2d587889b288"
+          "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
+          "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
+          "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
+          "docs/pr-preparations/2026-09-26/0039-pr-body.md": "37662a7be2ef9e255f2c98add0456e164cf481da36b9bbfd3c850a14f230b480",
+          "docs/pr-preparations/2026-09-26/0040-pr-body.md": "438d683b945d671e90aa08d25415fdeab59b6a859122373cbabe2a98bcf9627f",
+          "docs/pr-preparations/2026-09-26/0041-pr-body.md": "cd76c646fc305036c584db3218f9c167a0e6477ff6828f1f43a705c89ebdfbb5",
+          "docs/pr-preparations/2026-09-26/0043-pr-body.md": "6052d018cb2fe2f02d09ad52df8d3a893350bcdd114bdb894de1aead90ea5784",
+          "docs/pr-preparations/2026-09-26/0044-pr-body.md": "9f9c44857c7137ea5ac457ac2aa174912dafab97d9645608135c1e5952df0c2b",
+          "docs/pr-preparations/2026-09-26/0045-pr-body.md": "3d73fb1bdb8bdca4497e4634c30732e1b5438c2f92386af25511a9ea179fdb89",
+          "docs/pr-preparations/2026-09-26/0046-pr-body.md": "f239eeb295669ab012a4b1d60727cea44c92e4e916a01a9a1c42f48a85d251c7",
+          "docs/pr-preparations/2026-09-26/0047-pr-body.md": "d91643dbf57c5cc62bb93941e0e3bbf25e4d786043f70c2cd8d3e9203f8bcae5",
+          "docs/pr-preparations/2026-09-26/0050-pr-body.md": "daadca91560ee7cd033ffb98eb4aaa08a7a34c81bee9b9f433be3d3e6223b482",
+          "docs/pr-preparations/2026-09-26/0054-pr-body.md": "bc551306289f0b8c83677878ceb14712b4ff2057204b44624e127e270f65f0c9",
+          "docs/pr-preparations/2026-09-26/0056-pr-body.md": "6fca3cd4bb0f6088adde9830b9e19019a1bf598bbea04b3ffe747434f12c5958",
+          "docs/pr-preparations/2026-09-26/0057-pr-body.md": "261d7060d8e0093bdb11d5b7e015b68eaa5b366e6b1458af70dbe69b391f0f48",
+          "docs/pr-preparations/2026-09-26/0058-pr-body.md": "0c29068a3519e94d54906346a00906e55d99f2287e452c18bb98c0098aa3df9a",
+          "docs/pr-preparations/2026-09-26/0059-pr-body.md": "67156908578347424e84bc44697db61789bb1824a586889ef3909228d1cadc1e",
+          "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
+          "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b"
         },
-        "reviewed_at": "2026-09-27T00:23:36.132285+00:00",
-        "note": "Reviewed the 0064 packet after whitespace-only reflow of its public PR description. GitHub rendered 33 source newlines as line-break tags. Paragraphs and list items now occupy single source lines; token sequence, links, attribution, validation results, profitability limits, and independent-review status are unchanged. The packet summary and linked plans remain accurate.",
+        "reviewed_at": "2026-09-27T00:33:21.217347+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
@@ -1257,13 +1259,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T23:48:15.543926+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "reviewed_at": "2026-09-27T00:33:21.517475+00:00",
+        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
         "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     }

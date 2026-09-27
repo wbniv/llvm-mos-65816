@@ -1,57 +1,15 @@
 # [GlobalISel] Store indirect register outputs after inline assembly
 
-An indirect register output such as `"=*r"` defines a register, then writes its
-value through a pointer argument. It does not produce a direct result of the
-inline-asm call. GlobalISel currently counts that operand as a direct result and
-does not emit the store, so lowering rejects the call. The tied `"=*imr,0"`
-constraint emitted for the C `+g` idiom reaches the same path.
+An indirect register output such as `"=*r"` defines a register, then writes its value through a pointer argument. It does not produce a direct result of the inline-asm call. GlobalISel currently counts that operand as a direct result and does not emit the store, so lowering rejects the call. The tied `"=*imr,0"` constraint emitted for the C `+g` idiom reaches the same path.
 
-Record the indirect operand's `elementtype`, collect indirect register outputs
-separately from direct outputs, and emit their stores after the `INLINEASM`.
-Copy the selected register into a typed generic value, truncating a wider
-register when needed. The memory operand identifies the destination pointer and
-uses the element type's ABI alignment, matching SelectionDAG's store contract.
-Tied inputs still refer to the original register definition.
+Record the indirect operand's `elementtype`, collect indirect register outputs separately from direct outputs, and emit their stores after the `INLINEASM`. Copy the selected register into a typed generic value, truncating a wider register when needed. The memory operand identifies the destination pointer and uses the element type's ABI alignment, matching SelectionDAG's store contract. Tied inputs still refer to the original register definition.
 
-The AArch64 regression checks both IR translation and full code generation at
-O0/O2 with the machine verifier and GlobalISel fallback disabled. It covers the
-tied optimization-barrier form and an i8 indirect output held in a 32-bit
-register. The existing MOS companion test remains downstream and is not part
-of this llvm/llvm-project submission.
+The AArch64 regression checks both IR translation and full code generation at O0/O2 with the machine verifier and GlobalISel fallback disabled. It covers the tied optimization-barrier form and an i8 indirect output held in a 32-bit register. The existing MOS companion test remains downstream and is not part of this llvm/llvm-project submission.
 
-This is the previously reviewed 0037 repair, not a new defect report. It applies
-standalone to LLVM main `e59a0c697552ae7d1c3aeed5774e829cdc5e16b5`; the current
-extraction preserves LLVM's existing output-mismatch diagnostics. It neither
-requires 0041 nor adds support for multi-register indirect outputs, indirect
-register inputs, or GlobalISel `callbr`.
+This is the previously reviewed 0037 repair, not a new defect report. It applies standalone to LLVM main `e59a0c697552ae7d1c3aeed5774e829cdc5e16b5`; the current extraction preserves LLVM's existing output-mismatch diagnostics. It neither requires 0041 nor adds support for multi-register indirect outputs, indirect register inputs, or GlobalISel `callbr`.
 
-Historical isolated validation used llvm-mos `742d554bf08042b8df93d791c335260fadd16643`
-with assertions enabled: 915 MOS/AArch64 GlobalISel suite passes, one unsupported
-test, and all twelve focused C-torture compilations passed. The separate stacked
-corpus comparison repaired ten compilations, retained 4,109 identical successful
-assembly pairs, and retained 51 shared failures. These are dated results, not a
-fresh LLVM-main suite run. The extended four-RUN AArch64 test also passes on the
-preserved isolated 0037-only binary and fails on its preserved pristine control.
+Historical isolated validation used llvm-mos `742d554bf08042b8df93d791c335260fadd16643` with assertions enabled: 915 MOS/AArch64 GlobalISel suite passes, one unsupported test, and all twelve focused C-torture compilations passed. The separate stacked corpus comparison repaired ten compilations, retained 4,109 identical successful assembly pairs, and retained 51 shared failures. These are dated results, not a fresh LLVM-main suite run. The extended four-RUN AArch64 test also passes on the preserved isolated 0037-only binary and fails on its preserved pristine control.
 
-The exact standalone package (`c82dcc45750d99a0848634d18ce84df34ee90bf072f1c254e47ee1b3925c7d12`)
-now passes a clean Release/assertion-enabled build on that LLVM main pin.
-The matching baseline fails to translate the indirect-output call in `barrier`;
-all four candidate O0/O2 translation/full-codegen RUNs pass. Filtered
-AArch64/X86 inline-asm suites pass 168 tests with three unchanged expected
-failures and zero unexpected failures. These are filtered suites, not the
-historical full-suite or runtime totals above. The
-local preparation receipt and final independent audit retain and verify
-the patch/input/compiler/log identities. The package is ready to post but
-nothing has been posted.
+The exact standalone package (`c82dcc45750d99a0848634d18ce84df34ee90bf072f1c254e47ee1b3925c7d12`) now passes a clean Release/assertion-enabled build on that LLVM main pin. The matching baseline fails to translate the indirect-output call in `barrier`; all four candidate O0/O2 translation/full-codegen RUNs pass. Filtered AArch64/X86 inline-asm suites pass 168 tests with three unchanged expected failures and zero unexpected failures. These are filtered suites, not the historical full-suite or runtime totals above. The local preparation receipt and final independent audit retain and verify the patch/input/compiler/log identities. The package is ready to post but nothing has been posted.
 
-Earlier implementation and validation: Claude Code CLI 2.1.278, model
-`claude-fable-5-1`, `high` reasoning effort. Earlier independent review and
-standalone validation: OpenAI Codex CLI 0.155.1, model `gpt-6-astra`, `xhigh`
-reasoning effort. These credits are preserved from the September 23 records.
-Current-source extraction, review, and historical-snapshot replay: OpenAI Codex
-CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified
-session `01a0db96-a6cd-7800-82a5-6b871eb7e177`.
-Current LLVM build/test execution: OpenAI Codex CLI 0.157.0 (`codex-tui`), model
-`gpt-6-astra`, `xhigh` reasoning effort; verified coordinator session
-`01a0db16-f6a0-7e32-ada6-0c8098813933`. Final receipt audit uses the current
-reviewer identity above; it performed no separate compiler rebuild.
+Earlier implementation and validation: Claude Code CLI 2.1.278, model `claude-fable-5-1`, `high` reasoning effort. Earlier independent review and standalone validation: OpenAI Codex CLI 0.155.1, model `gpt-6-astra`, `xhigh` reasoning effort. These credits are preserved from the September 23 records. Current-source extraction, review, and historical-snapshot replay: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0db96-a6cd-7800-82a5-6b871eb7e177`. Current LLVM build/test execution: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified coordinator session `01a0db16-f6a0-7e32-ada6-0c8098813933`. Final receipt audit uses the current reviewer identity above; it performed no separate compiler rebuild.

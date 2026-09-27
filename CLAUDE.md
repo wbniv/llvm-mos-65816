@@ -105,3 +105,4 @@ bypass it. Its checks do not replace reviewing the trigger or replaying evidence
   every PR / issue / design-note we draft for `llvm-mos`(-sdk), split ready-to-post vs future/blocked, each with its exact
   `gh` command. Posting is **user-triggered**. **Keep it current in the same commit** whenever you draft a new upstream
   artifact, push a PR branch, or post one (mirror the one-line pointer in TODO's *Upstream / Contribution* section).
+- Follow [AGENTS.md's PR Markdown requirements](AGENTS.md#upstream-submissions-and-published-demos) when generating or revising pending PR descriptions: one physical line per prose paragraph and list-item paragraph, with structural newlines preserved. Formatting maintenance leaves posted PRs and their retained body copies unchanged unless explicitly requested.

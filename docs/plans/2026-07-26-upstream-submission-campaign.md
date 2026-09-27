@@ -126,7 +126,7 @@ For each artifact, at posting time and **only after user go-ahead**:
    soak test).
 4. **Mint the branch** on `wbniv/llvm-mos` (named per the status-doc row), commit with a body derived
    from the drafted `docs/*-pr.md`, push the branch.
-5. **Open the PR / issue** with the row's `gh` command (strip the doc's status preamble).
+5. **Prepare the body, then open the PR / issue** with the row's `gh` command (strip the doc's status preamble). Follow the [PR Markdown requirements](../../AGENTS.md#upstream-submissions-and-published-demos): each prose paragraph and list-item paragraph occupies one physical line; preserve blank paragraph separators, code fences, diffs, tables, and other structural newlines. Check the final body before posting. Formatting maintenance covers current unposted drafts; already-posted PRs and their retained copies require an explicit user request to change them.
 6. **Link the live SNES demos** (standing rule, user-directed 2026-07-26): every PR body links the
    playable biohack.net demo(s) that exercise the fix — the in-browser bsnes-jg pages whose
    "Verify fidelity" button re-runs the WRAM self-check live. It turns the "soak-tested" claim into

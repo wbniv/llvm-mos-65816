@@ -89,6 +89,15 @@ checks do not replace reviewing whether the test actually exercises the defect.
 
 # Upstream submissions and published demos
 
+Write PR descriptions with each prose paragraph on one physical line. Keep each
+list-item paragraph on one physical line too, with blank lines between separate
+paragraphs. GitHub PR descriptions display source newlines as visible line breaks;
+let the browser wrap prose to the available width. Preserve required newlines in
+code fences, diffs, tables, and other Markdown structures. Apply this format when
+generating or revising pending PR drafts, and check the final body before posting.
+Formatting maintenance must leave already-posted PRs and their retained body
+copies unchanged unless the user explicitly requests an update to those PRs.
+
 Cite published SNES ROM demos as supporting evidence when relevant, and link to
 their actual published web pages. Mentioning SNES and citing those demos is
 encouraged; do not remove that evidence merely because the platform work has

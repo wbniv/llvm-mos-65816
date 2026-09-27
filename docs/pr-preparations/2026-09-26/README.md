@@ -58,6 +58,8 @@ assertions-enabled exact-base receipt linked from `mos-validation.md`.
 
 ## Applying a package without publishing
 
+When preparing a PR body, follow the [PR Markdown requirements](../../../AGENTS.md#upstream-submissions-and-published-demos): use one physical line per prose paragraph and per list-item paragraph, leaving paragraph breaks and structural newlines intact. Check the final body before posting so GitHub can wrap prose naturally. Apply formatting updates to current unposted drafts; preserve posted descriptions and their retained copies unless the user requests those changes explicitly.
+
 Use an owned scratch checkout of the destination repository, detached at the
 exact base above. Do not apply the packet to the live fork or a captured baseline.
 For 0044, apply 0039 first; for 0058 or 0059, apply 0057 first. Other standalone

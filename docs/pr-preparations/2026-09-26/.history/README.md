@@ -1,10 +1,16 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/2871caab) | Validate carry scheduling through rebuilt upstream Clang |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/d8f798c8) | Finish pending fix preparation and retain validation evidence |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/f7a1e06e) | Record carry-scheduling PR receipt and submission status |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cbd1cd5b) | Publish computed-carry scheduler implementation and upstream PR packet |
 
 <!--history-meta v1
+2871caab	author	Will Norris
+2871caab	added	5
+2871caab	deleted	2
+2871caab	files	1
+2871caab	body	Build Clang at the exact PR parent and head, then retain 117 direct\nC-to-object comparisons across 6502, 65C02 and stock 65816. All machine\nverification passes; paired disassembly and objects excluding compiler\nversion metadata are identical. Archive commands, inputs, IR, logs,\nobjects, compiler identities and artifact hashes.\n\nCorrect the earlier fixed-IR census: its function CPU attributes pin\nall 117 paired invocations to 39 distinct 6502 configurations. Preserve\nthe original receipts and baseline evidence. Update current summaries,\nthe canonical observation, dependent views and substantive review receipts.\n\nPrepare the user-authorized PR body update with this full-pipeline result\nand remove public session IDs and unexplained internal follow-up names.\nIndependent review remains pending; no cycle or compile-time claim is made.\nPreserve the compact curation JSON layout.\n\nValidation and documentation: OpenAI Codex CLI 0.157.1,\nmodel gpt-6-astra, xhigh reasoning effort.
 d8f798c8	author	Will Norris
 d8f798c8	added	150
 d8f798c8	deleted	1

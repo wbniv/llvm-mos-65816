@@ -1,55 +1,13 @@
 # [llvm-reduce] Backport the upstream rejection of parallel MIR reduction
 
-Backport LLVM commit
-[`b1ba3d515a0238adbfc6c349ed3b33f9060cea72`](https://github.com/llvm/llvm-project/commit/b1ba3d515a0238adbfc6c349ed3b33f9060cea72)
-([PR #226225](https://github.com/llvm/llvm-project/pull/226225)), published
-September 24, 2026, to llvm-mos main
-`7bd67c0ae4e8bb65a3f980912bf201df22131e34`. This is an existing-upstream fix,
-not a new LLVM bug or new parallel-MIR implementation.
+Backport LLVM commit [`b1ba3d515a0238adbfc6c349ed3b33f9060cea72`](https://github.com/llvm/llvm-project/commit/b1ba3d515a0238adbfc6c349ed3b33f9060cea72) ([PR #226225](https://github.com/llvm/llvm-project/pull/226225)), published September 24, 2026, to llvm-mos main `7bd67c0ae4e8bb65a3f980912bf201df22131e34`. This is an existing-upstream fix, not a new LLVM bug or new parallel-MIR implementation.
 
-Parallel chunk processing transports work items through IR bitcode, which
-does not preserve machine functions. MOS currently allows `-j > 1` on MIR,
-then crashes when a MIR reduction pass receives a work item without
-MachineModuleInfo. LLVM main already rejects this combination at the CLI
-entry point. Copy that guard, its job-count accessor/declaration and include,
-and the original upstream regression without changing their implementation.
+Parallel chunk processing transports work items through IR bitcode, which does not preserve machine functions. MOS currently allows `-j > 1` on MIR, then crashes when a MIR reduction pass receives a work item without MachineModuleInfo. LLVM main already rejects this combination at the CLI entry point. Copy that guard, its job-count accessor/declaration and include, and the original upstream regression without changing their implementation.
 
-The result is a clean diagnostic and exit status 1 for parallel MIR requests.
-Users can run MIR reduction with `-j 1`; parallel IR reduction is unchanged.
-The package does not silently ignore the requested job count and does not
-claim thread-safe parallel MIR cloning.
+The result is a clean diagnostic and exit status 1 for parallel MIR requests. Users can run MIR reduction with `-j 1`; parallel IR reduction is unchanged. The package does not silently ignore the requested job count and does not claim thread-safe parallel MIR cloning.
 
-An additional valid X86 MIR regression verifies input validity, successful
-single-worker instruction reduction, and rejection with both inferred and
-explicit MIR modes. It also runs an existing parallel-IR reduction fixture.
-On retained current MOS binaries, the valid input passes serially and crashes
-at `-j 2` and `-j 4`; current LLVM rejects both parallel requests cleanly.
-All seven companion RUNs already pass on the preserved current LLVM binary.
-The exact MOS backport is now validated in a Release build with assertions
-enabled: all nine focused RUNs pass, and the complete llvm-reduce suite has
-180 passes, 27 existing unsupported tests, and no failures (baseline: 178
-passes and the same 27 unsupported tests). The preserved valid-input baseline
-crashes before the patch; the candidate emits the intended rejection. Exact
-patch, input, binary, container and log identities accompany the review.
+An additional valid X86 MIR regression verifies input validity, successful single-worker instruction reduction, and rejection with both inferred and explicit MIR modes. It also runs an existing parallel-IR reduction fixture. On retained current MOS binaries, the valid input passes serially and crashes at `-j 2` and `-j 4`; current LLVM rejects both parallel requests cleanly. All seven companion RUNs already pass on the preserved current LLVM binary. The exact MOS backport is now validated in a Release build with assertions enabled: all nine focused RUNs pass, and the complete llvm-reduce suite has 180 passes, 27 existing unsupported tests, and no failures (baseline: 178 passes and the same 27 unsupported tests). The preserved valid-input baseline crashes before the patch; the candidate emits the intended rejection. Exact patch, input, binary, container and log identities accompany the review.
 
-This supersedes the local, unposted LLVM Delta-only serial-fallback attempt.
-That attempt did not account for LLVM's existing CLI guard and cannot be
-submitted as a current LLVM repair. Its patch, failed preparation receipt,
-and draft are retained separately in the local preparation archive.
-The earlier parallel-cloning candidate and its specific matching-input
-red/green evidence remain preserved, without a general thread-safety claim.
-The local preparation archive retains the independent reconciliation.
+This supersedes the local, unposted LLVM Delta-only serial-fallback attempt. That attempt did not account for LLVM's existing CLI guard and cannot be submitted as a current LLVM repair. Its patch, failed preparation receipt, and draft are retained separately in the local preparation archive. The earlier parallel-cloning candidate and its specific matching-input red/green evidence remain preserved, without a general thread-safety claim. The local preparation archive retains the independent reconciliation.
 
-Original upstream commit author: Matt Arsenault. Its recorded AI co-author
-is Claude Opus 5; actual tool/version, exact model ID/version and reasoning
-effort are unknown from the published commit metadata, and are not guessed.
-Earlier local witness investigation: OpenAI Codex CLI 0.157.0 (`codex-tui`),
-model `gpt-6-astra`, `xhigh` reasoning effort. Earlier local parallel candidate:
-OpenAI Codex API (tool version unknown), GPT-6 (exact model ID/version unknown),
-reasoning effort unknown, as retained in the canonical record.
-Independent reconciliation, test preparation and backport extraction:
-OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning
-effort; verified session `01a0db97-39fe-7452-bbab-73d26f1d19a9`.
-Local coordination and isolated builds: OpenAI Codex CLI 0.157.0 (`codex-tui`),
-model `gpt-6-astra`, `xhigh` reasoning effort; verified parent session
-`01a0db16-f6a0-7e32-ada6-0c8098813933`. Nothing has been posted.
+Original upstream commit author: Matt Arsenault. Its recorded AI co-author is Claude Opus 5; actual tool/version, exact model ID/version and reasoning effort are unknown from the published commit metadata, and are not guessed. Earlier local witness investigation: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort. Earlier local parallel candidate: OpenAI Codex API (tool version unknown), GPT-6 (exact model ID/version unknown), reasoning effort unknown, as retained in the canonical record. Independent reconciliation, test preparation and backport extraction: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0db97-39fe-7452-bbab-73d26f1d19a9`. Local coordination and isolated builds: OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified parent session `01a0db16-f6a0-7e32-ada6-0c8098813933`. Nothing has been posted.
