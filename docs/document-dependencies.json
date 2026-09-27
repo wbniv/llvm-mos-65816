@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "fd26e8c08928d66f736600c3a27080c83a41f764109b0d0ec514f5bdb7c79457",
+          "docs/upstream-dashboard-curation.json": "e3cee9238fc37ccc1b65a6bc21baabe85f6f203fdfa7d37008b137b5c4549173",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -55,7 +55,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "b02fa725b4b61aed2d8f0c50b06451b6cc5ac8d49291e5a6c5628737ff4caff6"
+          "docs/upstream-dashboard.json": "dd8b17c0cd488b1b2b5bde7a396b4cbdb69db16eef731e9df5023c2893387490"
         }
       }
     },
@@ -78,11 +78,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "b02fa725b4b61aed2d8f0c50b06451b6cc5ac8d49291e5a6c5628737ff4caff6",
+          "docs/upstream-dashboard.json": "dd8b17c0cd488b1b2b5bde7a396b4cbdb69db16eef731e9df5023c2893387490",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "e542e55a48c909f4a40c129ac3413212540733112e2eb785d45ea9ddfaa0a9f3"
+          "docs/upstream-dashboard-graph.json": "7afe46a5811262cc76680083e00e2c7303d65bdbfde3775c582a7953f18bf7e0"
         }
       }
     },
@@ -226,11 +226,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "6106f437ee91b2548f2e313fc7b70d23f94a8f8c330d125fdab4eb6cded210d2",
-          "dev/render-snes-demo-compiler-bug-map.py": "cb48122f019ba7841da974b371854d8cb7d101320c3b8c508ea01ed5c8b8d986"
+          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
+          "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-map.md": "7071a599506d8da0a4ee727d34d8007299445730b8ae75892c61a1c1eb1ae398"
+          "docs/snes-demo-compiler-bug-map.md": "a8db65fec7ab4e3f5b1a98ff548872834513eed62803b9a075838834916b666e"
         }
       }
     },
@@ -272,11 +272,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "6106f437ee91b2548f2e313fc7b70d23f94a8f8c330d125fdab4eb6cded210d2",
+          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
           "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-public.json": "b8ddef3ceb398b79d6f65b41882d71269f8774dd608deefe059e02552bded3ab"
+          "docs/snes-demo-compiler-bug-public.json": "00ce2d42aad91ce64957aaa7403e734ba0f0e061e3a7025aae52adbf5492ce77"
         }
       }
     }
@@ -327,11 +327,11 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
-          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd"
         },
-        "reviewed_at": "2026-09-27T01:53:44.627133+00:00",
-        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "reviewed_at": "2026-09-27T02:34:40.875576+00:00",
+        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -377,12 +377,12 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T01:53:45.364674+00:00",
-        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "reviewed_at": "2026-09-27T02:28:23.784460+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -428,12 +428,12 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T01:53:45.883962+00:00",
-        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "reviewed_at": "2026-09-27T02:28:24.223373+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -570,13 +570,13 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
-          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
         },
-        "reviewed_at": "2026-09-27T01:56:20.482330+00:00",
-        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "reviewed_at": "2026-09-27T02:28:23.350970+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -637,10 +637,10 @@
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/0064-review.md": "e65ae1500f34aa7fb6e79c5a395697ab983b07b6a88dd4ef05ffc53bb59e75c6",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
         },
-        "reviewed_at": "2026-09-27T01:56:22.614582+00:00",
-        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "reviewed_at": "2026-09-27T02:28:22.683504+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -803,7 +803,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3d397d63db10bf5b6e222462c66d182e4e46244a611bb61f21d67c1132dfccc7",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -825,8 +825,8 @@
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T01:53:52.833922+00:00",
-        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "reviewed_at": "2026-09-27T02:28:20.418022+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -1293,7 +1293,8 @@
         "docs/pr-preparations/2026-09-26/native-optimization-review.md",
         "docs/pr-preparations/2026-09-26/reducer-feature-review.md",
         "docs/pr-preparations/2026-09-26/0028-review.md",
-        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json"
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
       ],
       "receipt": {
         "sources": {
@@ -1301,11 +1302,12 @@
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
           "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9",
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
-          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834"
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65"
         },
-        "reviewed_at": "2026-09-26T22:34:39.859020+00:00",
-        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+        "reviewed_at": "2026-09-27T02:28:18.485554+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -1319,14 +1321,14 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
+          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3d397d63db10bf5b6e222462c66d182e4e46244a611bb61f21d67c1132dfccc7",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
         },
-        "reviewed_at": "2026-09-27T01:56:23.020710+00:00",
-        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "reviewed_at": "2026-09-27T02:28:20.775113+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
@@ -1338,7 +1340,10 @@
         "examples/65816/near-y-decode.c",
         "examples/65816/near-index-wrap.c",
         "dev/near-y-decode.sh",
-        "docs/pr-preparations/2026-09-26/0064-submission.json"
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/upstream-late-opt-nongpr-ldimm-pr.md",
+        "docs/upstream-zp-alloc-deterministic-pr.md"
       ],
       "receipt": {
         "sources": {
@@ -1347,10 +1352,73 @@
           "examples/65816/near-y-decode.c": "d7d5d6cdb7f698b30d7ebb2ec06d9339b91e4142ab38603267b954537136c684",
           "examples/65816/near-index-wrap.c": "a80d4d8340228d6399af9d23d755a1d46c38ec2d4a0734d98a52538a52ce0055",
           "dev/near-y-decode.sh": "c965eba687c474e2d7908e1a3d850bdc5e14e8a86b590e00967a4e7b43ac7f01",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
+          "docs/upstream-late-opt-nongpr-ldimm-pr.md": "21daa88239609e10c3e047eaecefa7b064b8365363b707beff121c85acf10620",
+          "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8"
+        },
+        "reviewed_at": "2026-09-27T02:28:18.053103+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+      "sources": [
+        "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+        "docs/defects/mos-near-index-bank-wrap.json",
+        "patches/llvm-mos/0002-321-accum16.patch",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
+          "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "patches/llvm-mos/0002-321-accum16.patch": "1df78787935143745820fe9075520a949dca6348a541a8e1f4f371bf7ccf8faa",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T01:56:19.716025+00:00",
-        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "reviewed_at": "2026-09-27T02:28:17.054929+00:00",
+        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+      }
+    },
+    {
+      "document": "docs/snes-demo-compiler-bug-pages.json",
+      "sources": [
+        "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+        "docs/defects/mos-near-index-bank-wrap.json",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/investigations/2026-09-27-near-y-decoder.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
+          "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
+        },
+        "reviewed_at": "2026-09-27T02:34:41.206804+00:00",
+        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-27-snes-compiler-bug-map-public-page.md",
+      "sources": [
+        "docs/snes-demo-compiler-bug-pages.json",
+        "dev/render-snes-demo-compiler-bug-map.py",
+        "dev/export-snes-compiler-bug-public.py",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/snes-demo-compiler-bug-pages.json": "7163e26e6792240a4078a065b02b8641d578af1a6a6fb15b365d460f73d65bbf",
+          "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9",
+          "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65"
+        },
+        "reviewed_at": "2026-09-27T02:34:41.531502+00:00",
+        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     }

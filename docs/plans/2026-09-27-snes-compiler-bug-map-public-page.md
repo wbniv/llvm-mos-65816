@@ -98,6 +98,14 @@ Start this phase only after the public page above is deployed and its initial so
 
 This phase provides the ongoing update guarantee: a newly discovered or fixed defect changes the compiler source of truth, regenerates the public export, and receives a reviewable site-sync PR. It deliberately does not use a runtime `raw.githubusercontent.com` fetch.
 
+### Per-defect rows and later discoveries
+
+The canonical registry also carries the website's PR status snapshot and optional `lines` array. Each line binds one defect to its technical record, optional upstream PR, and internal simulation. A line may override `discovered`; otherwise it inherits the ROM's original discovery date. Both rendered maps sort by the effective line date. The September 25 split-Y report and September 27 bank-wrap isolation therefore appear after the gallery's earlier July 27 discoveries, with their own evidence and no upstream PR assigned.
+
+The [near-decoder simulation](../pr-preparations/2026-09-27/near-y-pr-simulation.md) covers the two published downstream repairs and their remaining #321 submission gates. PR status metadata for #577, #578, #584, #588 and #590 was checked through the GitHub API on September 27. The gallery explanation distinguishes the archived XY16 regression's `0x5CF0` result from the existing browser cartridge's `0x839F` display benchmark.
+
+Registry reconciliation and near-decoder follow-up: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 ### Recorded planning checks
 
 - PASS — 2026-09-27: the registry renderer accepted the chronological registry and the documentation dependency refresh passed.

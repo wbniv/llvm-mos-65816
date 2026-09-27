@@ -4,6 +4,8 @@ The unchanged 62-work XY16 gallery benchmark now returns `0x5CF0`. Two independe
 
 The published [SNES LZSS gallery](https://biohack.net/snes/lzss-gallery/) shows the workload's integration context. The validation below uses the preserved local regression input; this work does not update the published ROM.
 
+The repair is committed as [e370e031](https://github.com/wbniv/llvm-mos-65816/commit/e370e03153109aee2bef7b48b5917d870dec3744). The [simulated PR packet](../pr-preparations/2026-09-27/near-y-pr-simulation.md) presents its proposed review body and remaining native-width submission gates.
+
 Implementation, isolation and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`. Earlier reports retain their original attribution.
 
 ## Reconciliation and preserved builds
@@ -45,3 +47,7 @@ The permanent gate is `dev/container.sh -- bash dev/near-y-decode.sh`: decoder a
 ## PR #609
 
 At the user's explicit request, computed-carry PR #609 was closed on September 27 at `01:38:15Z`; its branch remains at `155e209c4cee`. The [submission record](../pr-preparations/2026-09-26/0064-submission.json) preserves its earlier publication history. These near-address defects are separate from that scheduling PR.
+
+## Earlier gallery discoveries
+
+The gallery also exposed the [non-GPR LDImm late-optimization crash](../upstream-late-opt-nongpr-ldimm-pr.md), submitted as [PR #584](https://github.com/llvm-mos/llvm-mos/pull/584), and [zero-page allocation nondeterminism](../upstream-zp-alloc-deterministic-pr.md), submitted as [PR #590](https://github.com/llvm-mos/llvm-mos/pull/590). Their earlier packets retain their original mechanisms, dates and attribution. The discovery map keeps the gallery's original July 27 discovery date; the near-decoder repair and bank-wrap isolation above were completed on September 27.

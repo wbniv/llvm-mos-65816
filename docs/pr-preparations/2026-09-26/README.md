@@ -105,6 +105,8 @@ OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning e
 
 ## Work that cannot yet be labeled ready to open
 
+**September 27 follow-up:** the [near-Y and bank-wrap simulated PR](../2026-09-27/near-y-pr-simulation.md) records the published downstream repair and full gallery proof. Its #321 extraction and independent-review gates remain in the [feature-held ledger](feature-held-packages.md).
+
 The [feature-held ledger](feature-held-packages.md) covers 0013, 0051, 0052,
 0055, and 0061–0063, plus 0028's explicit presentation hold. Their implementations
 are reviewed, but unresolved #320/#321 compiler/ABI extraction is not merely a

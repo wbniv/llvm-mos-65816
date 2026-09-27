@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "0ae78682fd18d9ded0a6be803583fca61b531c04ad57e352453a440ab18c10e8",
+  "sourceHash": "42f045d0eab189b813ffa2769057cdc5192354596739b44c232082fdaad78d8c",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -169,12 +169,15 @@
         "platform:321"
       ],
       "nextStep": "Carry the verified near-address wrap guard with the native-width feature series.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-index-bank-wrap.json"
+      "demoUrls": [
+        "https://biohack.net/snes/lzss-gallery/"
       ],
-      "evidenceNote": "",
-      "upstreamUrl": null,
-      "demoUrls": []
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-index-bank-wrap.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md"
+      ],
+      "evidenceNote": "Detailed evidence awaits publication.",
+      "upstreamUrl": null
     },
     {
       "id": "defect:mos-trunc-imag8-i1",
@@ -219,12 +222,15 @@
         "platform:321"
       ],
       "nextStep": "Carry the verified Y-fusion and near-address wrap repairs with the native-width feature series.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-xy16-near-indirect-y-clobber.json"
+      "demoUrls": [
+        "https://biohack.net/snes/lzss-gallery/"
       ],
-      "evidenceNote": "",
-      "upstreamUrl": null,
-      "demoUrls": []
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-xy16-near-indirect-y-clobber.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-y-decoder.md"
+      ],
+      "evidenceNote": "Detailed evidence awaits publication.",
+      "upstreamUrl": null
     },
     {
       "id": "defect:mos-zp-index-same-width-trunc",

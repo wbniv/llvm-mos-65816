@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_source": "docs/snes-demo-compiler-bug-pages.json",
-  "records_sha256": "07adc4f1c6c3c2bd28557c262113123ec129661f6fe5d16574649138bcc55f50",
+  "records_sha256": "20c98cbbbcda4c2ccd59c9fd91fcc0bca53aa3cc79e27efb2d45e57386f0996d",
   "records": [
     {
       "slug": "blossom",
@@ -34,7 +34,8 @@
       "prs": [
         {
           "label": "PR #577",
-          "url": "https://github.com/llvm-mos/llvm-mos/pull/577"
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/577",
+          "status": "merged"
         }
       ],
       "pr_simulations": [
@@ -61,7 +62,8 @@
       "prs": [
         {
           "label": "PR #578",
-          "url": "https://github.com/llvm-mos/llvm-mos/pull/578"
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/578",
+          "status": "merged"
         }
       ],
       "pr_simulations": [
@@ -110,7 +112,8 @@
       "prs": [
         {
           "label": "PR #588",
-          "url": "https://github.com/llvm-mos/llvm-mos/pull/588"
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/588",
+          "status": "open"
         }
       ],
       "pr_simulations": [
@@ -121,21 +124,60 @@
       "slug": "lzss-gallery",
       "page": "https://biohack.net/snes/lzss-gallery/",
       "discovered": "2026-07-27",
-      "defect": "late-optimization crash and zero-page allocation nondeterminism",
-      "evidence": "docs/upstream-late-opt-nongpr-ldimm-pr.md",
+      "defect": "late-optimization crash, zero-page allocation nondeterminism, split Y index and near-address bank wrapping",
+      "evidence": "docs/investigations/2026-09-27-near-y-decoder.md",
       "prs": [
         {
           "label": "PR #584",
-          "url": "https://github.com/llvm-mos/llvm-mos/pull/584"
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
+          "status": "open"
         },
         {
           "label": "PR #590",
-          "url": "https://github.com/llvm-mos/llvm-mos/pull/590"
+          "url": "https://github.com/llvm-mos/llvm-mos/pull/590",
+          "status": "merged"
         }
       ],
       "pr_simulations": [
         "docs/upstream-late-opt-nongpr-ldimm-pr.md",
-        "docs/upstream-zp-alloc-deterministic-pr.md"
+        "docs/upstream-zp-alloc-deterministic-pr.md",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+      ],
+      "lines": [
+        {
+          "defect": "late-optimization crash",
+          "evidence": "docs/upstream-late-opt-nongpr-ldimm-pr.md",
+          "pr": {
+            "label": "PR #584",
+            "url": "https://github.com/llvm-mos/llvm-mos/pull/584",
+            "status": "open"
+          },
+          "pr_simulation": "docs/upstream-late-opt-nongpr-ldimm-pr.md"
+        },
+        {
+          "defect": "zero-page allocation nondeterminism",
+          "evidence": "docs/upstream-zp-alloc-deterministic-pr.md",
+          "pr": {
+            "label": "PR #590",
+            "url": "https://github.com/llvm-mos/llvm-mos/pull/590",
+            "status": "merged"
+          },
+          "pr_simulation": "docs/upstream-zp-alloc-deterministic-pr.md"
+        },
+        {
+          "discovered": "2026-09-25",
+          "defect": "split Y index loses its high byte",
+          "evidence": "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+          "pr": null,
+          "pr_simulation": "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        },
+        {
+          "discovered": "2026-09-27",
+          "defect": "near-address indexed addition carries into the next bank",
+          "evidence": "docs/defects/mos-near-index-bank-wrap.json",
+          "pr": null,
+          "pr_simulation": "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        }
       ]
     },
     {
