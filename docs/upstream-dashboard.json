@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "3214cde844f90e871ab86aba7360ef66e0c4df68a2258a13347ece69c2b43724",
+  "sourceHash": "b9163f73e9f4c93d67acb1e4f3a8e7bf5311a80b60ef54ca76f5e7cff4f3ea59",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -182,7 +182,7 @@
     },
     {
       "id": "defect:mos-near-index-overflow-proofs",
-      "kind": "defect",
+      "kind": "optimization",
       "title": "Loop strength reduction loses near-index unsigned-overflow proofs",
       "summary": "Recover a proven no-unsigned-wrap flag on scalar near byte GEPs immediately after LSR, before its ScalarEvolution facts are invalidated. This repairs a missed optimization; the independent near bank-wrap correctness guard remains required.",
       "localStatus": "fixed",
@@ -227,14 +227,16 @@
       "title": "MOS llc crashes during null output when the assembler printer expects a target streamer",
       "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass.",
       "localStatus": "fixed",
-      "publicationStatus": "unknown",
+      "publicationStatus": "unposted",
+      "nextStep": "Extract and review patch 0068 against the upstream destination; the historical 0064 candidate has not been rebuilt with this repair.",
       "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-null-output-streamer-crash.json"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-null-output-streamer-crash.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-mos-null-output-streamer.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0068-mos-null-output-streamer.patch"
       ],
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
-      "nextStep": "",
       "demoUrls": []
     },
     {

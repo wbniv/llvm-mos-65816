@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "d3790df4f1c61b231f285857bbe7db27d7badfaf0b3d52d131ef546a2683a218",
+          "docs/upstream-dashboard-curation.json": "47f8f002bb71e9e67bdcafa17ec7c00be3916707346a06d3f82220e18807bc7d",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -103,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "b9babc4c839e21ecf70eba979a7d077b6b7180b46d711bb708b90678b92dd895"
+          "docs/upstream-dashboard.json": "63a6dc867cfe0b5e8edd9dfb686ec579bed0d18eacc196b9f7e151f9e476f8ce"
         }
       }
     },
@@ -126,11 +126,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "4cf9fd79d3981a6ccf19a28f89bbf05daf64518869337a59b14d6667c5cd892c",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "b9babc4c839e21ecf70eba979a7d077b6b7180b46d711bb708b90678b92dd895",
+          "docs/upstream-dashboard.json": "63a6dc867cfe0b5e8edd9dfb686ec579bed0d18eacc196b9f7e151f9e476f8ce",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "a275eb6d6b7454326259500658663300f457dfcde5e1dc914b6a10450d904ef4"
+          "docs/upstream-dashboard-graph.json": "98f5412bc39083cd121dabe2c742d230fbd7d47fdb053fc4e95ca0aa4ef475c5"
         }
       }
     },
@@ -1701,7 +1701,9 @@
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        "docs/defects/mos-near-index-overflow-proofs.json",
+        "docs/defects/mos-null-output-streamer-crash.json"
       ],
       "receipt": {
         "sources": {
@@ -1709,11 +1711,13 @@
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
+          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c"
         },
-        "reviewed_at": "2026-09-27T10:31:49.175155+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:44:07.903167+00:00",
+        "note": "Reviewed proof recovery as a missed optimization with the native-width series gate, and patch 0068 as a locally fixed, unposted independent repair whose upstream extraction remains unvalidated. Added explicit publication and next-action metadata and linked retained evidence. Existing carry-policy and broader near-store claims remain as previously reviewed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
