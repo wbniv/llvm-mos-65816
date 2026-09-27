@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/624f4006) | Preserve separate BRK and COP discovery links in the canonical registry |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/489b62df) | Publish near-decoder simulated PR and discovery metadata |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/7894c870) | docs(snes): add discovery-map screenshots |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/afec07f0) | docs(snes): restore compiler-bug map automation |
@@ -7,6 +8,11 @@
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/de844568) | docs(snes): automate compiler-bug map updates |
 
 <!--history-meta v1
+624f4006	author	Will Norris
+624f4006	added	3
+624f4006	deleted	1
+624f4006	files	1
+624f4006	body	Reconcile biohack commit 458290e with the published gallery follow-up. Associate BRK with PR 586, COP with PR 588, and QSort only with PR 577. Regenerate the discovery map and public export, review dependent summaries, and refresh the document inventory.\n\nValidation: live GitHub PR 586 identity checked; gallery dates, per-defect links, website registry hash, tests, and 166-page production build verified.\n\nAI assistance: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85.
 489b62df	author	Will Norris
 489b62df	added	8
 489b62df	deleted	0

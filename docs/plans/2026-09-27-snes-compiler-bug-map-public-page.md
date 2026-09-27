@@ -1,10 +1,10 @@
-# Public SNES compiler-bug discovery map
+# Public SNES compiler contributions map
 
 ## Goal
 
-Publish the compiler-defect discovery map at `https://biohack.net/snes/compiler-bugs/` and link to it from the bottom of the SNES gallery. The public view must be derived from the compiler repository's canonical `docs/snes-demo-compiler-bug-pages.json`, not maintained as a second hand-authored table.
+Publish the compiler contributions map at `https://biohack.net/snes/compiler-contributions/` and link to it from the bottom of the SNES gallery. The public view must be derived from the compiler repository's canonical `docs/snes-compiler-contributions.json`, not maintained as a second hand-authored table.
 
-It is a provenance index, not a defect dashboard: each row identifies the original published ROM, the discovery date, the technical record, any upstream PR, and the internal simulated PR packet. Later ROMs that merely guard an earlier defect do not appear.
+It is a provenance index, not a defect dashboard: each row identifies the original published ROM or compiler-only contribution, the discovery date, the linked contribution statement and technical evidence, any upstream PR, and the internal simulated PR packet. Later ROMs that merely guard an earlier defect do not appear.
 
 ## Mockups
 
@@ -14,16 +14,16 @@ It is a provenance index, not a defect dashboard: each row identifies the origin
 ┌────────────────────────────────────────────────────────────────────────────────────────────┐
 │ ← SNES demos                                                                                │
 │                                                                                            │
-│ COMPILER BUG DISCOVERIES                                                                    │
-│ Published SNES ROMs that originally exposed compiler or compiler-runtime defects.          │
+│ COMPILER CONTRIBUTIONS                                                                      │
+│ Published SNES ROMs and compiler work that improved the toolchain.                          │
 │                                                                                            │
 │ ┌────────────┬──────────────────────────────┬──────────────┬──────────┬────────┬─────────┐ │
-│ │ DISCOVERED │ DEFECT                       │ ROM          │ RECORD   │ PR     │ SIM     │ │
-│ ├────────────┼──────────────────────────────┼──────────────┼──────────┼────────┼─────────┤ │
-│ │ 2026-06-25 │ rotate coalescing miscompile │ CRC Wall     │ evidence │ #578   │ packet  │ │
-│ │ 2026-06-26 │ far memset picks near runtime│ Blossom      │ evidence │ —      │ packet  │ │
-│ │ 2026-06-30 │ G_SCMP/G_UCMP abort          │ QSort Visual │ evidence │ #577   │ packet  │ │
-│ └────────────┴──────────────────────────────┴──────────────┴──────────┴────────┴─────────┘ │
+│ │ DISCOVERED │ CONTRIBUTION (linked evidence) │ SOURCE    │ UPSTREAM          │
+│ ├────────────┼───────────────────────────────┼───────────┼───────────────────┤ │
+│ │ 2026-06-25 │ rotate coalescing miscompile  │ CRC Wall  │ #578 · MERGED     │ │
+│ │ 2026-06-26 │ far memset picks near runtime │ Blossom   │ internal PR sim   │ │
+│ │ 2026-06-30 │ G_SCMP/G_UCMP abort           │ QSort Viz │ #577 · MERGED     │ │
+│ └────────────┴───────────────────────────────┴───────────┴───────────────────┘ │
 └────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -33,15 +33,14 @@ It is a provenance index, not a defect dashboard: each row identifies the origin
 ┌──────────────────────────────┐
 │ ← SNES demos                 │
 │                              │
-│ COMPILER BUG DISCOVERIES     │
-│ Published ROM discovery map. │
+│ COMPILER CONTRIBUTIONS       │
+│ Published contribution map.  │
 │                              │
 │ ┌──────────────────────────┐ │
 │ │ 2026-06-25               │ │
-│ │ rotate coalescing         │ │
+│ │ [rotate coalescing]       │ │
 │ │ [CRC Wall]                │ │
-│ │ [evidence] [PR #578]      │ │
-│ │ [internal simulation]     │ │
+│ │ [PR #578] · MERGED        │ │
 │ └──────────────────────────┘ │
 │                              │
 │ ← horizontally scrollable    │
@@ -50,7 +49,9 @@ It is a provenance index, not a defect dashboard: each row identifies the origin
 └──────────────────────────────┘
 ```
 
-Use the initial responsive table implementation: it preserves a compact chronological comparison on desktop and permits horizontal scrolling on narrow screens. Revisit the card alternative if mobile testing shows the six columns are hard to scan.
+Use the responsive table implementation: it preserves a compact chronological comparison on desktop and renders cards on narrow screens. The contribution title, including its type icon, is the evidence link; do not duplicate it in a separate Record column or mobile field.
+
+The Upstream field is mutually exclusive: show the upstream PR and its current state when it has been posted; otherwise show the internal PR simulation. Do not add a second simulation column or field.
 
 ## Rendered screenshots
 
@@ -64,24 +65,25 @@ Desktop capture:
 
 ## Data and synchronization contract
 
-1. Keep `docs/snes-demo-compiler-bug-pages.json` as the canonical source. Its required fields are `slug`, `page`, `discovered`, `defect`, `evidence`, `prs`, and `pr_simulations`.
-2. Commit the generated public export at `biohack.net/src/data/snes-compiler-bug-pages.json`; the Astro route imports this copy at build time. The export contains a semantic SHA-256 of its canonical records.
+1. Keep `docs/snes-compiler-contributions.json` as the canonical source. Its required fields are `slug`, `discovered`, `defect`, `evidence`, `prs`, and `pr_simulations`; a record has either a public `page` or a compiler-only `source_label`.
+2. Commit the generated public export at `biohack.net/src/data/snes-compiler-contributions.json`; the Astro route imports this copy at build time. The export contains a semantic SHA-256 of its canonical records.
 3. Extend `dev/publish-snes-rom-both-sites.sh` to compare the compiler public export with the biohack copy before publication, fail with an actionable message when they differ, and copy/stage the export during `--publish`.
 4. Keep `dev/render-snes-demo-compiler-bug-map.py` as the compiler-side Markdown renderer and make it validate dates, artifact paths, PR links, and the rule that a recorded upstream PR has an internal simulation.
 
 ## Page implementation
 
-1. Add `src/pages/snes/compiler-bugs.astro` in biohack.net.
+1. Add the `src/pages/snes/compiler-contributions.astro` route in biohack.net and redirect the previous `/snes/compiler-bugs/` path.
 2. Sort records by `discovered`, then `slug`; never rely on JSON order for display order.
-3. Link ROM names to their public `/snes/<slug>/` pages.
-4. Link technical evidence and simulation artifacts to their paths on the public compiler repository; link PRs to their canonical upstream URLs.
+3. Make every Source value a link. Public demo names link to their published `/snes/<slug>/` page; compiler-only source labels link to their technical evidence until they have a dedicated public source page.
+4. Make each contribution title link directly to its technical evidence; link simulations to their paths on the public compiler repository and PRs to their canonical upstream URLs.
 5. Add one low-emphasis `Compiler bug discovery map` link to the gallery footer after the emulator-verification sentence. Do not add another gallery badge or filter.
 6. Preserve normal site typography, keyboard focus styles, horizontal overflow containment, and a descriptive title/canonical URL.
+7. Give desktop table rows a more prominent hover state: brighten the full row with a clearly visible accent-tinted surface, add an inset accent rule at the left edge, and slightly lift the contribution/source link contrast. The change must not move column geometry, obscure status badges, or rely on color as the sole focus indicator. Apply the same treatment through `:focus-within` so keyboard users receive equivalent context; keep transitions short and disable nonessential motion for `prefers-reduced-motion`.
 
 ## Verification and publication
 
 1. Run the compiler renderer and `python3 dev/docs-deps.py --impact docs/snes-demo-compiler-bug-pages.json`, then refresh dependencies and review the affected publishing guidance.
-2. Build and test biohack.net; assert that `/snes/compiler-bugs/index.html` is emitted and that the gallery HTML contains the footer link.
+2. Build and test biohack.net; assert that `/snes/compiler-contributions/index.html` is emitted, contribution links point to evidence, and the gallery HTML contains the footer link.
 3. Run the paired publication script in read-only mode against a registered demo to prove the registry-copy check.
 4. Commit compiler and site changes separately, push both, deploy biohack.net, and fetch both `/snes/` and `/snes/compiler-bugs/` to confirm the live footer link and table.
 

@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "34d01310d338979dc1ec7fa999bea589006f2279b6b38da220dbaa3fe1370569",
+          "docs/upstream-dashboard-curation.json": "d624542e05a0a9be9f0c905800f6de74b57c655c64f562c27d6424d93148ac6f",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -56,7 +56,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "011dd651240886b3794b28c30e060f4b25273ae2f668be3c8a70c1eb26ebe21c"
+          "docs/upstream-dashboard.json": "9be905ebd62b6f8d52757a2ed4d99ed419ec6309cf0ea3f8cad1232eb4f137ac"
         }
       }
     },
@@ -77,13 +77,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "957dd33dc72a310857ea25a9b92cef6946d5cbb620441bb3b09cc7d46ff9e888",
+          "docs/upstream-pending-work.md": "8636b14346581a86fc98d274514356f076247856597aac6fce455d634769ef5a",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "011dd651240886b3794b28c30e060f4b25273ae2f668be3c8a70c1eb26ebe21c",
+          "docs/upstream-dashboard.json": "9be905ebd62b6f8d52757a2ed4d99ed419ec6309cf0ea3f8cad1232eb4f137ac",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "9ad5e1a8cf16ea093d8d75974ade5fe92cd497248d604d5876a210979fbaa098"
+          "docs/upstream-dashboard-graph.json": "5ddeec9b14dc4e9d9ef3bc40d07b717f6d66650b9c8d633a423f3f74490ad884"
         }
       }
     },
@@ -112,16 +112,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "957dd33dc72a310857ea25a9b92cef6946d5cbb620441bb3b09cc7d46ff9e888",
-          "docs/upstream-contribution-status.md": "9b5141244238bd606d556bd95add82f73621e3037824412601c8df302ec88a24",
+          "docs/upstream-pending-work.md": "8636b14346581a86fc98d274514356f076247856597aac6fce455d634769ef5a",
+          "docs/upstream-contribution-status.md": "2c688c5839236f02b289d0f1d33894f14c1af23da007f98e5acf9f54aac7f4db",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "370c23850e9a496d9b70a8334533dfa48a136e8a90ef77000611d3de861b60a1",
-          "docs/mos-upstream-status-2026-09-21.html": "d72f2ed3887f408d495b4181840a02c118f016086e3b27017891de590363ec8d"
+          "docs/mos-upstream-flowchart.html": "5718932821c74fd05853a9ff10d3f4378a2e7cf12fdbee9befa002fdba600d23",
+          "docs/mos-upstream-status-2026-09-21.html": "8c00e5cfffa525c2642075d03ddc04d6b56eda28abb5cd3fb031d02dee77a722"
         }
       }
     },
@@ -334,12 +334,12 @@
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
         },
-        "reviewed_at": "2026-09-27T05:43:59.469426+00:00",
-        "note": "Reviewed the final timing report wording and data: baseline and candidate census objects are distinct preserved inputs to the emulator comparison; their source configurations match. Sum and rotate improve 30.45 and 17.61 percent, the isolated XY16 Oz interpreter regresses 2.80 percent, and HUD/DCT costs remain explicit. The original zero-cycle-regression criterion is not met and the dashboard marks needs-work. Preserve earlier evidence, posted PR text and the independent farblit gate qualification.",
+        "reviewed_at": "2026-09-27T05:44:33.033500+00:00",
+        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -392,12 +392,12 @@
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
         },
-        "reviewed_at": "2026-09-27T05:44:01.453362+00:00",
-        "note": "Reviewed the final timing report wording and data: baseline and candidate census objects are distinct preserved inputs to the emulator comparison; their source configurations match. Sum and rotate improve 30.45 and 17.61 percent, the isolated XY16 Oz interpreter regresses 2.80 percent, and HUD/DCT costs remain explicit. The original zero-cycle-regression criterion is not met and the dashboard marks needs-work. Preserve earlier evidence, posted PR text and the independent farblit gate qualification.",
+        "reviewed_at": "2026-09-27T05:44:38.672644+00:00",
+        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -450,12 +450,12 @@
           "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
         },
-        "reviewed_at": "2026-09-27T05:44:02.247481+00:00",
-        "note": "Reviewed the final timing report wording and data: baseline and candidate census objects are distinct preserved inputs to the emulator comparison; their source configurations match. Sum and rotate improve 30.45 and 17.61 percent, the isolated XY16 Oz interpreter regresses 2.80 percent, and HUD/DCT costs remain explicit. The original zero-cycle-regression criterion is not met and the dashboard marks needs-work. Preserve earlier evidence, posted PR text and the independent farblit gate qualification.",
+        "reviewed_at": "2026-09-27T05:44:40.887384+00:00",
+        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -599,12 +599,12 @@
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
         },
-        "reviewed_at": "2026-09-27T05:44:00.505114+00:00",
-        "note": "Reviewed the final timing report wording and data: baseline and candidate census objects are distinct preserved inputs to the emulator comparison; their source configurations match. Sum and rotate improve 30.45 and 17.61 percent, the isolated XY16 Oz interpreter regresses 2.80 percent, and HUD/DCT costs remain explicit. The original zero-cycle-regression criterion is not met and the dashboard marks needs-work. Preserve earlier evidence, posted PR text and the independent farblit gate qualification.",
+        "reviewed_at": "2026-09-27T05:44:36.448245+00:00",
+        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -862,10 +862,10 @@
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T05:34:58.529581+00:00",
-        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim.",
+        "reviewed_at": "2026-09-27T05:35:20.909185+00:00",
+        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim. Shared working-tree near-store delivery notes remain separate from this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1344,10 +1344,10 @@
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T04:17:12.764492+00:00",
-        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "reviewed_at": "2026-09-27T04:34:06.965004+00:00",
+        "note": "Verified downstream implementation commit 4d7136cb15cf85a676b624a5892e5e8ce7ae0217 and its successful push to origin/main. Updated the completion plan, TODO, handoff, pending-work and contribution summaries, and dashboard delivery note. Reviewed the preparation README, feature-held ledger and ready-to-post plan: their #321 extraction, exact-destination reconciliation and independent-review gates remain accurate; downstream delivery does not post a compiler PR. Retained measurements, baseline artifacts, original reviews and unrelated publication statuses are unchanged.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
@@ -1368,10 +1368,10 @@
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
           "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T05:35:01.288297+00:00",
-        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim.",
+        "reviewed_at": "2026-09-27T05:35:29.746868+00:00",
+        "note": "Reviewed 0066 matching-input legalization repair, 180 MOS passes and eight runtime assertions; retain the separate opcode-count failure. Reviewed preserved-0064 master-clock results: 34 repeated pairs, sum/rotate improvements, isolated L-system interpreter regression of 2.80 percent, and HUD/DCT costs. Current summaries state that zero cycle regressions is not met and retain generic-pressure, compiler-overhead, ordinary-6502 and exact-upstream timing limits. Original baselines, dated reviews and posted PR body remain unchanged. Upstream packet claims still refer to their exact earlier tools and validation; these downstream timing results add no upstream or independent-review claim. Shared working-tree near-store delivery notes remain separate from this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1500,8 +1500,8 @@
           "dev/a16storebroad.sh": "5865b0d6c8d91c51c13a38398e24c1085f707f33cce9f85e62b87c8e00f5ae62",
           "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json": "02e215b42f575a60dabb7a774bc02560843d780b6853f07d7b5058842028af13"
         },
-        "reviewed_at": "2026-09-27T04:16:56.302432+00:00",
-        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "reviewed_at": "2026-09-27T04:33:50.931762+00:00",
+        "note": "Verified downstream implementation commit 4d7136cb15cf85a676b624a5892e5e8ce7ae0217 and its successful push to origin/main. Updated the completion plan, TODO, handoff, pending-work and contribution summaries, and dashboard delivery note. Reviewed the preparation README, feature-held ledger and ready-to-post plan: their #321 extraction, exact-destination reconciliation and independent-review gates remain accurate; downstream delivery does not post a compiler PR. Retained measurements, baseline artifacts, original reviews and unrelated publication statuses are unchanged.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
@@ -1537,15 +1537,17 @@
       "document": "docs/upstream-dashboard-curation.json",
       "sources": [
         "docs/defects/mos-near-store-profitability.json",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
         },
-        "reviewed_at": "2026-09-27T05:44:05.705794+00:00",
-        "note": "Reviewed the final timing report wording and data: baseline and candidate census objects are distinct preserved inputs to the emulator comparison; their source configurations match. Sum and rotate improve 30.45 and 17.61 percent, the isolated XY16 Oz interpreter regresses 2.80 percent, and HUD/DCT costs remain explicit. The original zero-cycle-regression criterion is not met and the dashboard marks needs-work. Preserve earlier evidence, posted PR text and the independent farblit gate qualification.",
+        "reviewed_at": "2026-09-27T05:44:50.271056+00:00",
+        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },

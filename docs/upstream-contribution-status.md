@@ -194,7 +194,7 @@ review confirms that exact 0061 requires #321 index-width machinery as well as
 #320. It qualifies 0063 to increment-only; decrement uses the verified native
 fallback. Historical opportunity measurements are not fresh compiler savings.
 
-The September 27 [0065 completion record](plans/2026-09-27-broader-near-store-profitability.md) extends near-store profitability beyond 0063. All 486 reduced comparisons and the 412-input corpus have no size increases or new failures; the new runtime fixture agrees with the host on both emulator cores. Loaded destination pointers retain their measured native preference. This local implementation still requires #321 extraction, destination reconciliation and independent review before submission. The September 26 review above remains evidence for the original 0063 artifact.
+The September 27 [0065 completion record](plans/2026-09-27-broader-near-store-profitability.md) extends near-store profitability beyond 0063 and is committed and pushed to downstream `main` as [4d7136cb](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217). All 486 reduced comparisons and the 412-input corpus have no size increases or new failures; the new runtime fixture agrees with the host on both emulator cores. Loaded destination pointers retain their measured native preference. This local implementation still requires #321 extraction, destination reconciliation and independent review before submission. The September 26 review above remains evidence for the original 0063 artifact.
 
 The [HTML overview](mos-upstream-status-2026-09-21.html) keeps its original filename
 for existing bookmarks. Regenerate it and the [zoomable flowchart](mos-upstream-flowchart.html)

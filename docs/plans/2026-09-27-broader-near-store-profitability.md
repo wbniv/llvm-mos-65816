@@ -1,12 +1,31 @@
 # Broader near-store profitability (T3)
 
-Date: September 27, 2026. Status: complete locally; upstream extraction and independent review remain separate.
+Date: September 27, 2026. Status: complete, committed and pushed to downstream `main`; upstream extraction and independent review remain separate.
 
 Requested by the user to finish the [T3 item](../../TODO.md#M2--Optimizing-Payoff).
 Plan and subsequent work: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
 `gpt-6-astra`, `xhigh` reasoning effort; verified session
 `01a0e0ee-df60-7d80-8629-5ad167a8c407`. Earlier contributors retain the credits
 in the linked records.
+
+## Repository delivery and remaining upstream work
+
+The implementation, regression tests, retained evidence and current summaries
+were committed as [4d7136cb](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217)
+and pushed to `wbniv/llvm-mos-65816` branch `main` on September 27. The commit
+passed the comment-history, defect-evidence, document-dependency and SNES
+display-quality hooks. T3 implementation and validation are complete.
+
+Before submitting 0065 to the compiler upstream:
+
+1. Extract it with the #321 native-width prerequisites and 0063.
+2. Reconcile and validate the extracted change against the exact destination
+   revision, including its guards, callers, tests and history.
+3. Obtain independent review of 0065; the retained 0063 review covers its own
+   artifact.
+
+The compiler PR remains unposted. The downstream push does not change these
+submission prerequisites or the separate SNES platform track.
 
 ## Outcome and completion rule
 

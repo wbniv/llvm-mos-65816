@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="456966e35d2dd79be09ecf2ae08483440eabe8126c730ef1e728759d95c573a0"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="7f5079d74eec2246ccd0ddc562b1478493a28cc9777a8a6a7824af342ce439aa"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
@@ -813,7 +813,7 @@ See <a href="415-snes-target-reconciliation.md">reconciliation strategy</a> and 
 <tr>
 <td>Broader near-store profitability (<code>0065</code>)</td>
 <td><a href="plans/2026-09-27-broader-near-store-profitability.md">Measured implementation</a>: indirect unit arithmetic, call results, zero-extended bytes and absolute decrement improve; loaded pointers retain native lowering</td>
-<td><strong>Implemented and validated locally; unposted</strong></td>
+<td><strong>Committed and pushed downstream</strong> (<a href="https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217">4d7136cb</a>); <strong>compiler PR unposted</strong></td>
 <td>Complete #321 extraction, destination reconciliation and independent review</td>
 <td>Compiler #321 and 0063; no SDK platform merge dependency</td>
 </tr>
@@ -1106,7 +1106,7 @@ tracks its separate submission and compiler prerequisites. The September 26
 review confirms that exact 0061 requires #321 index-width machinery as well as
 #320. It qualifies 0063 to increment-only; decrement uses the verified native
 fallback. Historical opportunity measurements are not fresh compiler savings.</p>
-<p>The September 27 <a href="plans/2026-09-27-broader-near-store-profitability.md">0065 completion record</a> extends near-store profitability beyond 0063. All 486 reduced comparisons and the 412-input corpus have no size increases or new failures; the new runtime fixture agrees with the host on both emulator cores. Loaded destination pointers retain their measured native preference. This local implementation still requires #321 extraction, destination reconciliation and independent review before submission. The September 26 review above remains evidence for the original 0063 artifact.</p>
+<p>The September 27 <a href="plans/2026-09-27-broader-near-store-profitability.md">0065 completion record</a> extends near-store profitability beyond 0063 and is committed and pushed to downstream <code>main</code> as <a href="https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217">4d7136cb</a>. All 486 reduced comparisons and the 412-input corpus have no size increases or new failures; the new runtime fixture agrees with the host on both emulator cores. Loaded destination pointers retain their measured native preference. This local implementation still requires #321 extraction, destination reconciliation and independent review before submission. The September 26 review above remains evidence for the original 0063 artifact.</p>
 <p>The <a href="mos-upstream-status-2026-09-21.html">HTML overview</a> keeps its original filename
 for existing bookmarks. Regenerate it and the <a href="mos-upstream-flowchart.html">zoomable flowchart</a>
 with <code>python3 dev/docs-deps.py --refresh</code>; run <code>python3 dev/docs-deps.py</code> to detect
