@@ -188,14 +188,6 @@ is required before opening another compiler defect or fix plan.
   a 20-second MAME backstop, and forwards `SMOKE_SECONDS` through `dev/run.sh`. Negative control at 60
   ticks: 42/63 (all ROMs present, the same 21 late kernels fail); acceptance: plain corpus 63/63; paired
   `corpus-a16` 62/62, 0 xfail. [plan](docs/plans/2026-08-06-corpus-mame-settle-and-build-freshness.md).
-- [T2] **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
-  folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
-  case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
-  costs +512 B font8, +2048 B font16 in the near-code window (`mandel-double` already needs
-  `TITLE_FONT16_FAR` at 4 KB), and widens the title's VRAM CHR footprint by 5 KB — check no demo's
-  VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
-  extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
-  folding lines is the whole render-side change.
 
 - [x] ~~**`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** — FIXED in `MOSInsertREPSEP::placeIntraBlock`: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads 16-bit X) zeroed X's high byte; fix inserts a clone of the last X-writer after the subsequent `rep #$10` to restore the correct value. Repro `examples/65816/xy16-inplace-memmove-repro.c` CAP=1700: `xy16=0x90AA` (was `0x1CC6`). Unblocked #23 L-system 5-way-green. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md))~~
 
@@ -280,12 +272,6 @@ _M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
   post the upstream note (C1 + pow2 + census) — user-triggered.
   [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
   [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
-- [T5] **#320 post design note upstream** (user-triggered). Post the drafted note
-  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
-  llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
-  Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
-  section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
-  SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 - [x] **`[dp],Y` increment 2 published downstream in `a4eb416c` (2026-09-26).** The range-gated runtime index implementation and verification are retained in the [increment-2 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md). Preserve scaled-offset width checks and narrow-add wrapping.
 - [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing is covered by the separate increment-2 item above.
 - [x] **Native 16-bit far loads and stores — implemented locally in patch 0062.** `M=0` long absolute, long,X, `[dp]`, and `[dp],Y` accesses select native word operations when the value contract permits it; ABI byte-return and byte-argument paths retain their byte operations. The focused lit checks, `farindex`/`farbank` emulator gates, and machine verifier pass. [Patch](patches/llvm-mos/0062-mos-native-far-word.patch) · [measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
@@ -1435,6 +1421,20 @@ revisit) rather than active work._
 
 ## Parked
 
+- **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
+  folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
+  case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
+  costs +512 B font8, +2048 B font16 in the near-code window (`mandel-double` already needs
+  `TITLE_FONT16_FAR` at 4 KB), and widens the title's VRAM CHR footprint by 5 KB — check no demo's
+  VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
+  extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
+  folding lines is the whole render-side change.
+- **#320 post design note upstream** (user-triggered). Post the drafted note
+  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
+  llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
+  Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
+  section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
+  SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
 - **Coherent a16 16-bit lane-model widening (option A from the G_ADD/G_SUB lanes verdict)** — the
   1.48% prize (20 corpus slices improve, best −929 B) is real but unreachable by changing `G_ADD`
   alone: with `G_LOAD`/`G_STORE`/`G_PHI`/shifts/`G_SELECT` still byte-lane, a 16-bit add is a
