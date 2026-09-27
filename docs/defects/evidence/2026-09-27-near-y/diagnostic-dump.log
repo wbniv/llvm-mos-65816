@@ -1,0 +1,1 @@
+SMOKE: FAIL off=0x25 len=2 got=0x0004 want=0x5CF0

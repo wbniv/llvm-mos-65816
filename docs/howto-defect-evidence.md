@@ -193,6 +193,8 @@ runner must compare the observed value with the oracle and fail on mismatch;
 successful compilation alone is not a green correctness test. Populate the
 configuration with every relevant target feature and pass setting.
 
+Put observed output beside `exit_code` in the run object. Some immutable schema-1 baselines retain `configuration.observed`; the checker excludes that result field when comparing compiler settings. All other configuration fields, including the expected oracle result, must match. Compatibility update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 `fixed` additionally requires `resolution.change`, `causal_explanation`,
 `trigger_check`, a hashed `regression` artifact, and a `candidate` run. The hook
 requires a nonzero baseline exit with the expected signature, a zero candidate

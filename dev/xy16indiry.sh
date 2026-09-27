@@ -1,16 +1,10 @@
 #!/usr/bin/env bash
 # dev/xy16indiry.sh — #321 xy16 (zp),Y16 16-bit-index indirect-indexed GATE (B2: G_LOAD_INDIR_IDX16).
 #
-# Sibling to dev/xy16ops.sh (which gates the abs,X16 B2 path, G_LOAD_ABS_IDX16). This
-# gates the (zp),Y16 path that was wired but unexercised: a runtime zp pointer + an
-# unmasked volatile u16 offset (no 8-bit compile-time proof) must, under +mos-xy16,
-# trigger G_LOAD_INDIR_IDX16 and select LDYImag16 + LDIndirYIdx16 (rep #$30; lda (dp),Y
-# in 16-bit M/X — opcode B1, no 8-bit iny/dey byte-walk). The offset is 0x102 (>255), so
-# a wrongly-8-bit Y reads the wrong address and the differential catches the miscompile.
-# Expected corpus_result: 0x7E5A (host == default == +mos-a16 == +mos-xy16, both emulators).
-#
-# Runs INSIDE the dev container; drive: dev/run.sh xy16indiry. Prereqs: from-source
-# toolchain + SDK. bsnes-jg cross-check reuses build/jgxcheck.
+# A runtime pointer and unmasked 16-bit offset select a fused Y load/access.
+# The offset 0x102 distinguishes a full-width Y access from an 8-bit index.
+# Expected corpus_result: 0x7E5A in all three width modes on both emulators.
+# Run inside the development container with dev/run.sh xy16indiry.
 set -euo pipefail
 
 usage() { echo "Usage: dev/run.sh xy16indiry   # xy16 (zp),Y16 B2: G_LOAD_INDIR_IDX16 fires; corpus_result==0x7E5A"; exit 0; }
@@ -41,16 +35,15 @@ else
   echo "  FAIL: backend rejected the build:"; grep -iE "Scavenger|Flag register|SelectImm|fatal|Bad machine|ran out of registers" "$BUILD/xy16indiry.vlog" | head -4; rc=1
 fi
 
-echo "==> 2) the indexed access must use G_LOAD_INDIR_IDX16 → LDYImag16+LDIndirYIdx16 (B2 (zp),Y16 gate)"
+echo "==> 2) the indexed access must use G_LOAD_INDIR_IDX16 → LDIndirYIdx16Fused (B2 (zp),Y16 gate)"
 leg="$("$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${XY16[@]}" -Os -mllvm -print-after=legalizer -c -o /dev/null "$SRC" 2>&1 || true)"
 mir="$("$TOOL/mos-clang" --target=mos -mcpu=mosw65816 "${XY16[@]}" -Os -mllvm -print-after=instruction-select -c -o /dev/null "$SRC" 2>&1 || true)"
 nidx16=$(printf '%s\n' "$leg" | grep -ciE 'G_LOAD_INDIR_IDX16' || true)
-nldy=$(printf '%s\n' "$mir"  | grep -ciE 'LDYImag16' || true)
-nidx=$(printf '%s\n' "$mir"  | grep -ciE 'LDIndirYIdx16' || true)
-if [ "$nidx16" -ge 1 ] && [ "$nldy" -ge 1 ] && [ "$nidx" -ge 1 ]; then
-  echo "  PASS: $nidx16 G_LOAD_INDIR_IDX16 (legalizer) + $nldy LDYImag16 + $nidx LDIndirYIdx16 (selector) — (zp),Y16 B2 gate fires"
+nidx=$(printf '%s\n' "$mir"  | grep -ciE 'LDIndirYIdx16Fused.*implicit-def \$y16' || true)
+if [ "$nidx16" -ge 1 ] && [ "$nidx" -ge 1 ]; then
+  echo "  PASS: $nidx16 G_LOAD_INDIR_IDX16 (legalizer) + $nidx LDIndirYIdx16Fused (selector) — (zp),Y16 B2 gate fires"
 else
-  echo "  FAIL: expected G_LOAD_INDIR_IDX16+LDYImag16+LDIndirYIdx16 (nidx16=$nidx16 nldy=$nldy nidx=$nidx) — (zp),Y16 B2 regressed"; rc=1
+  echo "  FAIL: expected G_LOAD_INDIR_IDX16+LDIndirYIdx16Fused (nidx16=$nidx16 nidx=$nidx) — (zp),Y16 B2 regressed"; rc=1
 fi
 
 echo "==> 3) disasm corroboration: native lda (dp),Y (B1) under rep — no 8-bit iny/dey byte-walk"
@@ -87,5 +80,5 @@ else
 fi
 
 echo
-emu_verdict "$rc" "G_LOAD_INDIR_IDX16+LDYImag16+LDIndirYIdx16 (zp),Y16 B2 path under +mos-xy16; corpus_result==$WANT; host==default==+mos-a16==+mos-xy16, both emulators"
+emu_verdict "$rc" "G_LOAD_INDIR_IDX16+LDIndirYIdx16Fused (zp),Y16 B2 path under +mos-xy16; corpus_result==$WANT; host==default==+mos-a16==+mos-xy16, both emulators"
 exit $rc

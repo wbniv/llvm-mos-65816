@@ -1,0 +1,243 @@
+--- |
+  ; ModuleID = 'build/near-y-fix/candidate/near-wrap-nonlto.ll'
+  source_filename = "/work/build/near-y-fix/near-wrap.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  module asm ".text"
+  module asm ".global wrap_bank7e"
+  module asm "wrap_bank7e:"
+  module asm "php"
+  module asm ".byte $8b"
+  module asm ".byte $f4,$7e,$7e"
+  module asm ".byte $ab,$ab"
+  module asm "jsr near_wrap"
+  module asm ".byte $ab"
+  module asm "plp"
+  module asm "rts"
+  
+  @corpus_result = dso_local global i16 0, align 1
+  @llvm.compiler.used = appending global [1 x ptr] [ptr @near_wrap], section "llvm.metadata"
+  
+  ; Function Attrs: minsize mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: read)
+  define dso_local zeroext i8 @near_wrap(ptr noundef readonly captures(none) %0, i16 noundef %1) #0 {
+    %3 = getelementptr inbounds i8, ptr %0, i16 %1
+    %4 = load i8, ptr %3, align 1, !tbaa !6
+    ret i8 %4
+  }
+  
+  ; Function Attrs: minsize noreturn nounwind optsize
+  define dso_local noundef i16 @main() local_unnamed_addr #1 {
+    store volatile i8 90, ptr addrspace(2) inttoptr (i32 8300546 to ptr addrspace(2)), align 2, !tbaa !6
+    store volatile i8 -61, ptr addrspace(2) inttoptr (i32 8366082 to ptr addrspace(2)), align 2, !tbaa !6
+    %1 = tail call zeroext i8 @wrap_bank7e(ptr noundef nonnull inttoptr (i16 -22522 to ptr), i16 noundef -4) #3
+    %2 = icmp eq i8 %1, 90
+    br i1 %2, label %6, label %3
+  
+  3:                                                ; preds = %0
+    %4 = zext i8 %1 to i16
+    %5 = or disjoint i16 %4, -23296
+    br label %6
+  
+  6:                                                ; preds = %3, %0
+    %7 = phi i16 [ %5, %3 ], [ 23792, %0 ]
+    store volatile i16 %7, ptr @corpus_result, align 1, !tbaa !2
+    br label %8
+  
+  8:                                                ; preds = %8, %6
+    tail call void asm sideeffect "wai", ""() #4, !srcloc !7
+    br label %8
+  }
+  
+  ; Function Attrs: minsize optsize
+  declare dso_local zeroext i8 @wrap_bank7e(ptr noundef, i16 noundef) local_unnamed_addr #2
+  
+  attributes #0 = { minsize mustprogress nofree noinline norecurse nosync nounwind optsize willreturn memory(argmem: read) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #1 = { minsize noreturn nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #2 = { minsize optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #3 = { minsize nounwind optsize }
+  attributes #4 = { nounwind }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!4, !4, i64 0}
+  !7 = !{i64 678}
+...
+---
+name:            near_wrap
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    $rc4 = STImag8 $a
+    $rc5 = STImag8 $x
+    REP_Immediate 16
+    renamable $a = LDIndirYIdxFused killed renamable $rs1, killed renamable $rs2, implicit-def dead $y16 :: (load (s8) from %ir.3, !tbaa !6)
+    SEP_Immediate 16
+    RTS implicit killed $a
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x40000000), %bb.2(0x40000000)
+  
+    $x = LDImm 6
+    $rc2 = STImag8 $x
+    $x = LDImm 168
+    $rc3 = STImag8 $x
+    renamable $a = LDImm 90
+    STAbsLong killed renamable $a, 8300546 :: (volatile store (s8) into `ptr addrspace(2) inttoptr (i32 8300546 to ptr addrspace(2))`, align 2, !tbaa !6, addrspace 2)
+    renamable $a = LDImm -61
+    STAbsLong killed renamable $a, 8366082 :: (volatile store (s8) into `ptr addrspace(2) inttoptr (i32 8366082 to ptr addrspace(2))`, align 2, !tbaa !6, addrspace 2)
+    renamable $a = LDImm -4
+    renamable $x = LDImm -1
+    JSR @wrap_bank7e, mos_csr, implicit killed $rs1, implicit killed $a, implicit killed $x, implicit-def $a
+    dead $c = CMPImm renamable $a, 90, implicit-def dead $c, implicit-def $z
+    BR %bb.2, killed $z, 0
+  
+  bb.1:
+    successors: %bb.3(0x80000000)
+  
+    renamable $x = LDImm 92
+    renamable $y = LDImm -16
+    $rc2 = STImag8 $y
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    BRA %bb.3
+  
+  bb.2 (%ir-block.3):
+    successors: %bb.3(0x80000000)
+    liveins: $a
+  
+    renamable $rc3 = STZImag8
+    $rc2 = STImag8 $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = ORAImm16 killed renamable $a16, 42240
+    renamable $rs1 = STAImag16 killed renamable $a16
+  
+  bb.3 (%ir-block.6):
+    successors: %bb.4(0x80000000)
+    liveins: $rs1
+  
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    STAbs16 killed renamable $a16, @corpus_result :: (volatile store (s16) into @corpus_result, align 1, !tbaa !2)
+    SEP_Immediate 32
+  
+  bb.4 (%ir-block.8):
+    successors: %bb.4(0x80000000)
+  
+    INLINEASM &wai, sideeffect attdialect, !7
+    BRA %bb.4
+...

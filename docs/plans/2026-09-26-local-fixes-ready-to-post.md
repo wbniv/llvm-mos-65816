@@ -1,5 +1,7 @@
 # Prepare locally fixed work for posting — 2026-09-26
 
+**Current 0064 status (2026-09-27):** PR #609 was withdrawn at the user's request; its branch and validated packet are retained for later revision. The native-width near-decoder repairs remain local to `0002`. [Current investigation](../investigations/2026-09-27-near-y-decoder.md). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 Will requested moving all locally fixed work to ready-to-post status, explicitly
 without posting anything. This pass may prepare local patches, branches, drafts,
 tests, and review records. It must not push branches, create PRs or issues, post

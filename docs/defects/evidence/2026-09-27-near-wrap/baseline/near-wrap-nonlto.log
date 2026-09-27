@@ -1,0 +1,14 @@
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -fno-lto -E -x c /work/build/near-y-fix/near-wrap.c -o /work/build/near-y-fix/candidate/near-wrap-nonlto.i
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -fno-lto -S -emit-llvm -x c /work/build/near-y-fix/near-wrap.c -o /work/build/near-y-fix/candidate/near-wrap-nonlto.ll
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -fno-lto -S -fno-lto -x c /work/build/near-y-fix/near-wrap.c -o /work/build/near-y-fix/candidate/near-wrap-nonlto.s
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -fno-lto -Wl,--save-temps -Wl,-Map=/work/build/near-y-fix/candidate/near-wrap-nonlto.map -x c /work/build/near-y-fix/near-wrap.c -o /work/build/near-y-fix/candidate/near-wrap-nonlto.sfc
+EXIT: 0
+COMMAND: python3 /work/tools/snes-checksum.py /work/build/near-y-fix/candidate/near-wrap-nonlto.sfc
+/work/build/near-y-fix/candidate/near-wrap-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x5F90 complement=0xA06F
+EXIT: 0
+COMMAND: /work/build/jgxcheck /work/build/near-y-fix/candidate/near-wrap-nonlto.sfc /work/vendor/bsnes-jg/Database 0x200 2 0x5CF0 180
+SMOKE: FAIL off=0x200 len=2 got=0xA5C3 want=0x5CF0
+EXIT: 1

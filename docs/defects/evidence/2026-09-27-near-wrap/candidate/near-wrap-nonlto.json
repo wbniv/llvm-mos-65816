@@ -1,0 +1,24 @@
+{
+  "command": [
+    "/work/build/near-y-fix/final/bin/clang",
+    "--config",
+    "/work/build/install/bin/mos-snes.cfg",
+    "-mcpu=mosw65816",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-a16",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-xy16",
+    "-Oz",
+    "-fno-lto"
+  ],
+  "input": "/work/build/near-y-fix/near-wrap.c",
+  "input_sha256": "1039a2c92f5250a0131977d6de989a0e5d4e3b155fc90cceb6149b80f280b1df",
+  "compiler_sha256": "be9d0fa4025965ba6c588d4aa1c2c47f845d6256b8a3a7920498e5400e8a019a",
+  "linker_sha256": "4a27408597bba6fed6b767fe30ec96f60c95432e995158b6438ddae21c89c3fd",
+  "rom_sha256": "074f0f43902c68c22e1e3101c1d578611da94306c40bb2eab1f93d88bc5ca279",
+  "exit": 0
+}

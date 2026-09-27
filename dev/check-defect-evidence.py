@@ -152,7 +152,12 @@ def validate(record, read, previous=None):
         check_run(candidate, read, red=False)
         require(baseline['input']['sha256'] == candidate['input']['sha256']
                 == regression['sha256'], 'red, green, and regression inputs must match')
-        require(baseline['configuration'] == candidate['configuration'],
+        # Observed output describes the run result, not its compiler settings.
+        # Immutable schema-1 baselines may carry that value inside configuration.
+        def settings(run):
+            return {k: v for k, v in run['configuration'].items() if k != 'observed'}
+
+        require(settings(baseline) == settings(candidate),
                 'red/green target, optimization, and pass configuration must match')
         require(baseline['toolchain_sha256'] != candidate['toolchain_sha256'],
                 'identify distinct baseline and candidate toolchains')

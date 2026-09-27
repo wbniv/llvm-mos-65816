@@ -1,0 +1,1027 @@
+--- |
+  ; ModuleID = 'build/near-y-fix/baseline/near.ll'
+  source_filename = "/work/build/near-y-fix/near-decode.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @source = internal global ptr @compressed, align 1
+  @destination = internal global ptr @output, align 1
+  @output = internal global [672 x i8] zeroinitializer, align 1
+  @expected = internal unnamed_addr constant [672 x i8] c"\00\0D\1A'4AN[hu\82\8F\9C\A9\B6\C3\D0\DD\EA\F7\04\11\1E+8ER_ly\86\93\A0\AD\BA\C7\D4\E1\EE\FB\08\15\22/<IVcp}\8A\97\A4\B1\BE\CB\D8\E5\F2\FF\0C\19&3@MZgt\81\8E\9B\A8\B5\C2\CF\DC\E9\F6\03\10\1D*7DQ^kx\85\92\9F\AC\B9\C6\D3\E0\ED\FA\07\14!.;HUbo|\89\96\A3\B0\BD\CA\D7\E4\F1\FE\0B\18%2?LYfs\80\8D\9A\A7\B4\C1\CE\DB\E8\F5\02\0F\1C)6CP]jw\84\91\9E\AB\B8\C5\D2\DF\EC\F9\06\13 -:GTan{\88\95\A2\AF\BC\C9\D6\E3\F0\FD\0A\17$1>KXer\7F\8C\99\A6\B3\C0\CD\DA\E7\F4\01\0E\1B(5BO\\iv\83\90\9D\AA\B7\C4\D1\DE\EB\F8\05\12\1F,9FS`mz\87\94\A1\AE\BB\C8\D5\E2\EF\FC\09\16#0=JWdq~\8B\98\A5\B2\BF\CC\D9\E6\F3+8ER_ly\86\93\A0\AD\BA\C7\D4\E1\EE\FB\08\15\22/<IVcp}\8A\97\A4\B1\BE\CB\D8\E5\F2\FF\0C\19&3@MZgt\81\8E\9B\A8\B5\C2\CF\DC\E9\F6\03\10\1D*7DQ^kx\85\92\9F\AC\B9\C6\D3\E0\ED\FA\07\14!.;HUbo|\89\96\A3\B0\BD\CA\D7\E4\F1\FE\0B\18%2?LYfs\80\8D\9A\A7\B4\C1\CE\DB\E8\F5\02\0F\1C)6CP]jw\84\91\9Es\80\8D\9A\A7\B4\C1\CE\DB\E8\F5\02\0F\1C)6CP]jw\84\91\9E\AB\B8\C5\D2\DF\EC\F9\06\13 -:GTan{\88\95\A2\AF\BC\C9\D6\E3\F0\FD\0A\17$1>KXer\7F\8C\99\A6\B3\C0\CD\DA\E7\F4\01\0E\1B(5BO\\iv\83\90\9D\AA\B7\C4\D1\DE\EB\F8\05\12\1F,9FS`mz\87\94\A1\AE\BB\C8\D5\E2\EF\FC\09\16#0=JWdq~\8B\98\A5\B2\BF\CC\D9\E6\F3+8ER_ly\86\93\A0\AD\BA\C7\D4\E1\EE\FB\08\15\22/<IVcp}\8A\97\A4\B1\BE\CB\D8\E5\F2\FF\0C\19&3@MZgt\81\8E\9B\A8\B5\C2\CF\DC\E9\F6\03\10\1D*7DQ^kx\85\92\9F\AC\B9\C6\D3\E0\ED\FA\07\14!.;HUbo|\89\96\A3\B0\BD\CA\D7\E4\F1\FE\0B\18%2?LYfs\80\8D\9A\A7\B4\C1\CE\DB\E8\F5\02\0F\1C)6CP]jw\84\91\9Es\80\8D\9A\A7\B4\C1\CE\DB\E8\F5\02\0F\1C)6CP]jw\84\91\9E\AB\B8\C5\D2\DF\EC\F9", align 1
+  @corpus_result = dso_local global i16 0, align 1
+  @compressed = internal constant [466 x i8] c"\00\00\0D\1A'4AN[\00hu\82\8F\9C\A9\B6\C3\00\D0\DD\EA\F7\04\11\1E+\008ER_ly\86\93\00\A0\AD\BA\C7\D4\E1\EE\FB\00\08\15\22/<IVc\00p}\8A\97\A4\B1\BE\CB\00\D8\E5\F2\FF\0C\19&3\00@MZgt\81\8E\9B\00\A8\B5\C2\CF\DC\E9\F6\03\00\10\1D*7DQ^k\00x\85\92\9F\AC\B9\C6\D3\00\E0\ED\FA\07\14!.;\00HUbo|\89\96\A3\00\B0\BD\CA\D7\E4\F1\FE\0B\00\18%2?LYfs\00\80\8D\9A\A7\B4\C1\CE\DB\00\E8\F5\02\0F\1C)6C\00P]jw\84\91\9E\AB\00\B8\C5\D2\DF\EC\F9\06\13\00 -:GTan{\00\88\95\A2\AF\BC\C9\D6\E3\00\F0\FD\0A\17$1>K\00Xer\7F\8C\99\A6\B3\00\C0\CD\DA\E7\F4\01\0E\1B\00(5BO\\iv\83\00\90\9D\AA\B7\C4\D1\DE\EB\00\F8\05\12\1F,9FS\00`mz\87\94\A1\AE\BB\00\C8\D5\E2\EF\FC\09\16#\000=JWdq~\8B\00\98\A5\B2\BF\CC\D9\E6\F3\00+8ER_ly\86\00\93\A0\AD\BA\C7\D4\E1\EE\00\FB\08\15\22/<IV\00cp}\8A\97\A4\B1\BE\00\CB\D8\E5\F2\FF\0C\19&\003@MZgt\81\8E\00\9B\A8\B5\C2\CF\DC\E9\F6\00\03\10\1D*7DQ^\00kx\85\92\9F\AC\B9\C6\00\D3\E0\ED\FA\07\14!.\00;HUbo|\89\96\00\A3\B0\BD\CA\D7\E4\F1\FE\00\0B\18%2?LYf\00s\80\8D\9A\A7\B4\C1\CE\00\DB\E8\F5\02\0F\1C)6\00CP]jw\84\91\9E\FF\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F\FF\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F\01\1F", align 1
+  @llvm.compiler.used = appending global [1 x ptr] [ptr @decode_near], section "llvm.metadata"
+  @static_stack = private global [22 x i8] undef
+  
+  @decode_near_sstk = private alias [22 x i8], ptr @static_stack
+  
+  ; Function Attrs: minsize nofree noinline norecurse nosync nounwind optsize memory(argmem: readwrite)
+  define dso_local noundef i16 @decode_near(ptr noundef readonly captures(none) %0, i16 noundef %1, ptr noundef captures(none) %2, i16 noundef %3) #0 {
+    br label %5
+  
+  5:                                                ; preds = %16, %22, %4
+    %6 = phi i16 [ 0, %4 ], [ %18, %22 ], [ %18, %16 ]
+    %7 = phi i16 [ 0, %4 ], [ %19, %22 ], [ %19, %16 ]
+    %8 = icmp ult i16 %7, %1
+    br i1 %8, label %9, label %72
+  
+  9:                                                ; preds = %5
+    %10 = icmp ult i16 %6, %3
+    br i1 %10, label %11, label %72
+  
+  11:                                               ; preds = %9
+    %12 = add nuw i16 %7, 1
+    %13 = getelementptr inbounds nuw i8, ptr %0, i16 %7
+    %14 = load i8, ptr %13, align 1, !tbaa !8
+    %15 = zext i8 %14 to i16
+    br label %16
+  
+  16:                                               ; preds = %67, %11
+    %17 = phi i8 [ 0, %11 ], [ %71, %67 ]
+    %18 = phi i16 [ %6, %11 ], [ %68, %67 ]
+    %19 = phi i16 [ %12, %11 ], [ %69, %67 ]
+    %20 = zext nneg i8 %17 to i16
+    %21 = icmp eq i8 %17, 8
+    br i1 %21, label %5, label %22, !llvm.loop !9
+  
+  22:                                               ; preds = %16
+    %23 = icmp ult i16 %18, %3
+    br i1 %23, label %24, label %5, !llvm.loop !9
+  
+  24:                                               ; preds = %22
+    %25 = shl nuw nsw i16 1, %20
+    %26 = and i16 %25, %15
+    %27 = icmp eq i16 %26, 0
+    br i1 %27, label %59, label %28
+  
+  28:                                               ; preds = %24
+    %29 = add i16 %19, 2
+    %30 = icmp ugt i16 %29, %1
+    br i1 %30, label %75, label %31
+  
+  31:                                               ; preds = %28
+    %32 = getelementptr inbounds nuw i8, ptr %0, i16 %19
+    %33 = load i8, ptr %32, align 1, !tbaa !8
+    %34 = getelementptr i8, ptr %32, i16 1
+    %35 = load i8, ptr %34, align 1, !tbaa !8
+    %36 = zext i8 %33 to i16
+    %37 = zext i8 %35 to i16
+    %38 = shl nuw nsw i16 %37, 4
+    %39 = and i16 %38, 3840
+    %40 = or disjoint i16 %39, %36
+    %41 = icmp eq i16 %40, 0
+    br i1 %41, label %75, label %42
+  
+  42:                                               ; preds = %31
+    %43 = icmp ugt i16 %40, %18
+    br i1 %43, label %75, label %44
+  
+  44:                                               ; preds = %42
+    %45 = and i8 %35, 15
+    %46 = add nuw nsw i8 %45, 3
+    %47 = getelementptr i8, ptr %2, i16 %18
+    %48 = or disjoint i16 %39, %36
+    %49 = sub nsw i16 0, %48
+    br label %50
+  
+  50:                                               ; preds = %56, %44
+    %lsr.iv = phi ptr [ %scevgep, %56 ], [ %47, %44 ]
+    %51 = phi i16 [ %58, %56 ], [ %18, %44 ]
+    %52 = phi i8 [ %math, %56 ], [ %46, %44 ]
+    %53 = call { i8, i1 } @llvm.uadd.with.overflow.i8(i8 %52, i8 -1)
+    %math = extractvalue { i8, i1 } %53, 0
+    %ov = extractvalue { i8, i1 } %53, 1
+    %54 = icmp ult i16 %51, %3
+    %.frozen = freeze i1 %ov
+    br i1 %.frozen, label %select.end, label %select.false
+  
+  select.false:                                     ; preds = %50
+    br label %select.end
+  
+  select.end:                                       ; preds = %50, %select.false
+    %55 = phi i1 [ %54, %50 ], [ false, %select.false ]
+    br i1 %55, label %56, label %67
+  
+  56:                                               ; preds = %select.end
+    %scevgep2 = getelementptr i8, ptr %lsr.iv, i16 %49
+    %57 = load i8, ptr %scevgep2, align 1, !tbaa !8
+    store i8 %57, ptr %lsr.iv, align 1, !tbaa !8
+    %58 = add nuw i16 %51, 1
+    %scevgep = getelementptr i8, ptr %lsr.iv, i16 1
+    br label %50, !llvm.loop !11
+  
+  59:                                               ; preds = %24
+    %60 = icmp ult i16 %19, %1
+    br i1 %60, label %61, label %75
+  
+  61:                                               ; preds = %59
+    %62 = add nuw i16 %19, 1
+    %63 = getelementptr inbounds nuw i8, ptr %0, i16 %19
+    %64 = load i8, ptr %63, align 1, !tbaa !8
+    %65 = add nuw i16 %18, 1
+    %66 = getelementptr inbounds nuw i8, ptr %2, i16 %18
+    store i8 %64, ptr %66, align 1, !tbaa !8
+    br label %67
+  
+  67:                                               ; preds = %select.end, %61
+    %68 = phi i16 [ %65, %61 ], [ %51, %select.end ]
+    %69 = phi i16 [ %62, %61 ], [ %29, %select.end ]
+    %70 = trunc i16 %20 to i8
+    %71 = add nuw nsw i8 %70, 1
+    br label %16, !llvm.loop !12
+  
+  72:                                               ; preds = %9, %5
+    %73 = icmp eq i16 %6, %3
+    br i1 %73, label %74, label %75
+  
+  74:                                               ; preds = %72
+    br label %75
+  
+  75:                                               ; preds = %59, %42, %31, %28, %74, %72
+    %76 = phi i16 [ 0, %72 ], [ %3, %74 ], [ 0, %28 ], [ 0, %31 ], [ 0, %42 ], [ 0, %59 ]
+    ret i16 %76
+  }
+  
+  ; Function Attrs: minsize noreturn nounwind optsize
+  define dso_local noundef i16 @main() local_unnamed_addr #1 {
+    %1 = load volatile ptr, ptr @source, align 1, !tbaa !13
+    %2 = load volatile ptr, ptr @destination, align 1, !tbaa !13
+    %3 = tail call i16 @decode_near(ptr noundef %1, i16 noundef 466, ptr noundef %2, i16 noundef 672) #3
+    %4 = icmp eq i16 %3, 672
+    %5 = zext i1 %4 to i16
+    br label %6
+  
+  6:                                                ; preds = %17, %0
+    %lsr.iv3 = phi i16 [ %lsr.iv.next, %17 ], [ 672, %0 ]
+    %lsr.iv1 = phi ptr [ %scevgep2, %17 ], [ @output, %0 ]
+    %lsr.iv = phi ptr [ %scevgep, %17 ], [ @expected, %0 ]
+    %7 = phi i16 [ %18, %17 ], [ %5, %0 ]
+    %8 = icmp eq i16 %lsr.iv3, 0
+    br i1 %8, label %9, label %12
+  
+  9:                                                ; preds = %6
+    %.frozen = freeze i16 %7
+    %10 = icmp eq i16 %.frozen, 0
+    br i1 %10, label %select.end, label %select.false
+  
+  select.false:                                     ; preds = %9
+    br label %select.end
+  
+  select.end:                                       ; preds = %9, %select.false
+    %11 = phi i16 [ -23281, %9 ], [ 23792, %select.false ]
+    store volatile i16 %11, ptr @corpus_result, align 1, !tbaa !4
+    br label %19
+  
+  12:                                               ; preds = %6
+    %13 = load i8, ptr %lsr.iv1, align 1, !tbaa !8
+    %14 = load i8, ptr %lsr.iv, align 1, !tbaa !8
+    %15 = icmp eq i8 %13, %14
+    br i1 %15, label %17, label %16
+  
+  16:                                               ; preds = %12
+    br label %17
+  
+  17:                                               ; preds = %16, %12
+    %18 = phi i16 [ 0, %16 ], [ %7, %12 ]
+    %scevgep = getelementptr i8, ptr %lsr.iv, i16 1
+    %scevgep2 = getelementptr i8, ptr %lsr.iv1, i16 1
+    %lsr.iv.next = add nsw i16 %lsr.iv3, -1
+    br label %6, !llvm.loop !16
+  
+  19:                                               ; preds = %19, %select.end
+    tail call void asm sideeffect "wai", ""() #4, !srcloc !17
+    br label %19
+  }
+  
+  ; Function Attrs: nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none)
+  declare { i8, i1 } @llvm.uadd.with.overflow.i8(i8, i8) #2
+  
+  attributes #0 = { minsize nofree noinline norecurse nosync nounwind optsize memory(argmem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #1 = { minsize noreturn nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16,+mos-a16,+mos-xy16" }
+  attributes #2 = { nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none) }
+  attributes #3 = { minsize optsize }
+  attributes #4 = { nounwind }
+  
+  !llvm.module.flags = !{!0, !1, !2}
+  !llvm.ident = !{!3}
+  !llvm.errno.tbaa = !{!4}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{i32 1, !"ThinLTO", i32 0}
+  !2 = !{i32 1, !"EnableSplitLTOUnit", i32 1}
+  !3 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !4 = !{!5, !5, i64 0}
+  !5 = !{!"int", !6, i64 0}
+  !6 = !{!"omnipotent char", !7, i64 0}
+  !7 = !{!"Simple C/C++ TBAA"}
+  !8 = !{!6, !6, i64 0}
+  !9 = distinct !{!9, !10}
+  !10 = !{!"llvm.loop.mustprogress"}
+  !11 = distinct !{!11, !10}
+  !12 = distinct !{!12, !10}
+  !13 = !{!14, !14, i64 0}
+  !14 = !{!"p1 omnipotent char", !15, i64 0}
+  !15 = !{!"any pointer", !6, i64 0}
+  !16 = distinct !{!16, !10}
+  !17 = !{i64 5411}
+...
+---
+name:            decode_near
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 2, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 4, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 6, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 8, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 10, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: spill-slot, offset: 12, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: spill-slot, offset: 13, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 14, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc24', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 15, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc25', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 16, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc26', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 17, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc27', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 18, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc28', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: spill-slot, offset: 19, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc29', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: spill-slot, offset: 20, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc30', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: spill-slot, offset: 21, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc31', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.4):
+    successors: %bb.1(0x80000000)
+    liveins: $a, $x, $rc6, $rc7, $rs1, $rs2, $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31
+  
+    $y = LDImag8 $rc20
+    frame-setup PH killed $y
+    $y = LDImag8 $rc21
+    frame-setup PH killed $y
+    $y = LDImag8 $rc22
+    frame-setup PH killed $y
+    $y = LDImag8 $rc23
+    frame-setup PH killed $y
+    $y = LDImag8 $rc24
+    frame-setup STAbs killed $y, @decode_near_sstk + 14 :: (store (s8) into %stack.9)
+    $y = LDImag8 $rc25
+    frame-setup STAbs killed $y, @decode_near_sstk + 15 :: (store (s8) into %stack.10)
+    $y = LDImag8 $rc26
+    frame-setup STAbs killed $y, @decode_near_sstk + 16 :: (store (s8) into %stack.11)
+    $y = LDImag8 $rc27
+    frame-setup STAbs killed $y, @decode_near_sstk + 17 :: (store (s8) into %stack.12)
+    $y = LDImag8 $rc28
+    frame-setup STAbs killed $y, @decode_near_sstk + 18 :: (store (s8) into %stack.13)
+    $y = LDImag8 $rc29
+    frame-setup STAbs killed $y, @decode_near_sstk + 19 :: (store (s8) into %stack.14)
+    $y = LDImag8 $rc30
+    frame-setup STAbs killed $y, @decode_near_sstk + 20 :: (store (s8) into %stack.15)
+    $y = LDImag8 $rc31
+    frame-setup STAbs killed $y, @decode_near_sstk + 21 :: (store (s8) into %stack.16)
+    $rc28 = STImag8 $a
+    $rc29 = STImag8 $x
+    $x = LDImag8 $rc6
+    $a = LDImag8 $rc7
+    $y = LDImag8 $rc2
+    STAbs killed renamable $y, @decode_near_sstk :: (store (s8) into %stack.0)
+    $y = LDImag8 $rc3
+    STAbs killed renamable $y, @decode_near_sstk + 1 :: (store (s8) into %stack.0 + 1)
+    $y = LDImag8 $rc4
+    STAbs killed renamable $y, @decode_near_sstk + 8 :: (store (s8) into %stack.4)
+    $y = LDImag8 $rc5
+    STAbs killed renamable $y, @decode_near_sstk + 9 :: (store (s8) into %stack.4 + 1)
+    $y = LDImag8 $rc6
+    STAbs killed renamable $y, @decode_near_sstk + 12 :: (store (s8) into %stack.6)
+    $rc30 = STImag8 $x
+    $x = LDImag8 $rc7
+    STAbs killed renamable $x, @decode_near_sstk + 13 :: (store (s8) into %stack.7)
+    $rc31 = STImag8 $a
+    renamable $rc25 = STZImag8
+    $x = LDImm 0
+    $rc2 = STImag8 $x
+    $x = LDImm 0
+    $rc3 = STImag8 $x
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @decode_near_sstk + 10 :: (store (s8) into %stack.5)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @decode_near_sstk + 11 :: (store (s8) into %stack.5 + 1)
+    renamable $x = LDImm 1
+    $rc22 = STImag8 $x
+    $rc26 = STZImag8
+    $rc27 = STZImag8
+    $rc20 = STZImag8
+    $rc21 = STZImag8
+  
+  bb.1 (%ir-block.5):
+    successors: %bb.2(0x7c000000), %bb.30(0x04000000)
+    liveins: $rc22, $rc25, $rs15, $rs13, $rs14, $rs10
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs14
+    BR %bb.30, killed renamable $c, 1, implicit-def dead $c
+  
+  bb.2 (%ir-block.9):
+    successors: %bb.3(0x7c000000), %bb.30(0x04000000)
+    liveins: $rc22, $rc25, $rs15, $rs13, $rs14, $rs10
+  
+    renamable $a16 = LDAImag16 renamable $rs13
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs15
+    BR %bb.30, killed renamable $c, 1, implicit-def dead $c
+  
+  bb.3 (%ir-block.11):
+    successors: %bb.4(0x80000000)
+    liveins: $rc22, $rc25, $rs15, $rs13, $rs14, $rs10
+  
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $a16 = INCAcc16 killed renamable $a16
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @decode_near_sstk + 4 :: (store (s8) into %stack.2)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @decode_near_sstk + 5 :: (store (s8) into %stack.2 + 1)
+    renamable $x = LDAbs @decode_near_sstk :: (load (s8) from %stack.0)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    $rc3 = STImag8 $x
+    REP_Immediate 16
+    renamable $a = LDIndirYIdxFused killed renamable $rs1, killed renamable $rs10, implicit-def dead $y16 :: (load (s8) from %ir.13, !tbaa !8)
+    STAbs killed $a, @decode_near_sstk + 2 :: (store (s8) into %stack.1)
+    SEP_Immediate 16
+    $x = LDImm 0
+    STAbs killed renamable $x, @decode_near_sstk + 3 :: (store (s8) into %stack.1 + 1)
+    renamable $x = LDImm 0
+    renamable $y = LDAbs @decode_near_sstk + 4 :: (load (s8) from %stack.2)
+    $rc20 = STImag8 $y
+    dead renamable $y = LDAbs @decode_near_sstk + 5 :: (load (s8) from %stack.2 + 1)
+    dead renamable $y = LDAbs @decode_near_sstk + 4 :: (load (s8) from %stack.2)
+    renamable $y = LDAbs @decode_near_sstk + 5 :: (load (s8) from %stack.2 + 1)
+    $rc21 = STImag8 $y
+  
+  bb.4 (%ir-block.16):
+    successors: %bb.1(0x04000000), %bb.5(0x7c000000)
+    liveins: $rc22, $rc25, $rs10, $rs13, $rs14, $rs15, $x
+  
+    dead $c = CMPImm renamable $x, 8, implicit-def dead $c, implicit-def $z
+    BR %bb.1, killed $z, 1
+  
+  bb.5 (%ir-block.22):
+    successors: %bb.6(0x7c000000), %bb.1(0x04000000)
+    liveins: $rc22, $rc25, $x, $rs15, $rs14, $rs13, $rs10
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs13
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs15
+    BR %bb.1, killed renamable $c, 1, implicit-def dead $c
+  
+  bb.6 (%ir-block.24):
+    successors: %bb.7(0x30000000), %bb.8(0x50000000)
+    liveins: $x, $rc22, $rc25, $rs10, $rs13, $rs14, $rs15
+  
+    SEP_Immediate 32
+    $rc23 = STImag8 $x
+    $rc2 = STImag8 $x
+    $x = LDImm 0
+    $a = LDImag8 $rc22
+    JSR &__ashlhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    renamable $x = LDAbs @decode_near_sstk + 2 :: (load (s8) from %stack.1)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 3 :: (load (s8) from %stack.1 + 1)
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = ANDImag16 killed renamable $a16, killed renamable $rs1
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    dead $a = LDImag8 $rc3, implicit-def $nz
+    BR %bb.8, killed $z, 0
+  
+  bb.7 (%ir-block.24):
+    successors: %bb.25(0x30000000), %bb.8(0x50000000)
+    liveins: $rc2, $rc22, $rc23, $rc25, $rs10, $rs13, $rs14, $rs15
+  
+    dead $a = LDImag8 $rc2, implicit-def $nz
+    BR %bb.25, killed $z, 1
+  
+  bb.8 (%ir-block.28):
+    successors: %bb.9(0x40000000), %bb.10(0x40000000)
+    liveins: $rc25, $rc23, $rs15, $rs10, $rs14, $rs13
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $c = LDCImm 0
+    SEP_Immediate 32
+    $x = LDImm 1
+    BR %bb.10, $c, 1
+  
+  bb.9 (%ir-block.28):
+    successors: %bb.10(0x80000000)
+    liveins: $rc25, $c, $rc23, $rs15, $rs10, $rs14, $rs13, $a16
+  
+    $x = LDImm 0
+  
+  bb.10 (%ir-block.28):
+    successors: %bb.28(0x04000000), %bb.11(0x7c000000)
+    liveins: $rc25, $c, $rc23, $rs15, $rs10, $rs14, $rs13, $a16, $x
+  
+    $rc10 = STImag8 killed $x
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs14
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs1
+    BR %bb.28, killed renamable $c, 0
+  
+  bb.11 (%ir-block.31):
+    successors: %bb.27(0x04000000), %bb.12(0x7c000000)
+    liveins: $rc2, $rc3, $rc10, $rc23, $rc25, $rs10, $rs13, $rs14, $rs15
+  
+    SEP_Immediate 32
+    renamable $x = LDAbs @decode_near_sstk :: (load (s8) from %stack.0)
+    $rc4 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    $rc5 = STImag8 $x
+    $y = LDImag8 $rc4
+    $rc6 = STImag8 killed $y
+    $rc7 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed $rs2
+    SEP_Immediate 32
+    $x = LDImag8 $rc10
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs10, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    REP_Immediate 16
+    renamable $a = LDIndirYIdxFused killed renamable $rs3, killed renamable $rs10, implicit-def dead $y16 :: (load (s8) from %ir.32, !tbaa !8)
+    $rc24 = STImag8 $a
+    SEP_Immediate 16
+    renamable $y = LDImm 1
+    renamable $x = TX $y
+    renamable $a = LDIndirIdx killed renamable $rs2, killed renamable $y :: (load (s8) from %ir.34, !tbaa !8)
+    $rc12 = STImag8 $a
+    $rc4 = STImag8 $a
+    $rc5 = STZImag8
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ANDImm16 killed renamable $a16, 3840
+    renamable $rs3 = STAImag16 renamable $a16
+    renamable $a16 = ORAImag16 killed renamable $a16, renamable $rs12
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    dead $a = LDImag8 $rc5, implicit-def $nz
+    BR %bb.27, killed $z, 1
+  
+  bb.12 (%ir-block.42):
+    successors: %bb.28(0x04000000), %bb.13(0x7c000000)
+    liveins: $rc2, $rc3, $rc23, $rs15, $rc12, $rs3, $rs14, $rs13, $rs12, $x, $rs2
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs13
+    renamable $c = CMPImag16 killed renamable $a16, killed renamable $rs2
+    BR %bb.28, killed renamable $c, 0, implicit-def dead $c
+  
+  bb.13 (%ir-block.44):
+    successors: %bb.14(0x80000000)
+    liveins: $rc2, $rc3, $rc23, $rs15, $rc12, $rs3, $rs14, $rs13, $rs12, $x
+  
+    SEP_Immediate 32
+    $rc22 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 8 :: (load (s8) from %stack.4)
+    $rc4 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 9 :: (load (s8) from %stack.4 + 1)
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs13, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs3
+    renamable $a16 = ORAImag16 killed renamable $a16, renamable $rs12
+    renamable $rs3 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $x = LDAbs @decode_near_sstk + 10 :: (load (s8) from %stack.5)
+    $rc10 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 11 :: (load (s8) from %stack.5 + 1)
+    $rc11 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs5
+    renamable $c = LDCImm -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs3, killed renamable $c
+    renamable $rs3 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc12
+    renamable $a = ANDImm killed renamable $a, 15
+    renamable $c = nuw nsw LDCImm 0
+    renamable $a, dead renamable $c, dead renamable $v = nuw nsw ADCImm killed renamable $a, 3, killed renamable $c
+    $rc10 = STImag8 $a
+  
+  bb.14 (%ir-block.50):
+    successors: %bb.16(0x40000000), %bb.15(0x40000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $rc10
+  
+    REP_Immediate 32
+    SEP_Immediate 16
+    renamable $a16 = LDAImag16 renamable $rs13
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs15
+    SEP_Immediate 32
+    $x = LDImm 0
+    BR %bb.16, killed renamable $c, 1
+  
+  bb.15 (%ir-block.50):
+    successors: %bb.16(0x80000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $rc10
+  
+    $x = LDImm 1
+  
+  bb.16 (%ir-block.50):
+    successors: %bb.18(0x40000000), %bb.17(0x40000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $xlsb, $rc10
+  
+    $a = LDImag8 $rc10
+    renamable $c = LDCImm 0
+    renamable $a, renamable $c, dead renamable $v = ADCImm killed renamable $a, 255, killed renamable $c
+    BR %bb.18, killed renamable $c, 1
+  
+  bb.17.select.false:
+    successors: %bb.18(0x80000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $a
+  
+    $x = LDImm 0
+  
+  bb.18.select.end:
+    successors: %bb.19(0x7c000000), %bb.22(0x04000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $a, $xlsb
+  
+    dead $y = TX $x, implicit-def $nz
+    BR %bb.22, killed $z, 1
+  
+  bb.19 (%ir-block.56):
+    successors: %bb.14(0x40000000), %bb.20(0x40000000)
+    liveins: $rc2, $rc3, $rc22, $rc23, $rc25, $rs15, $rs3, $rs2, $rs14, $rs13, $a
+  
+    REP_Immediate 16
+    $rc10 = STImag8 $a
+    renamable $a = LDIndirYIdxFused renamable $rs2, renamable $rs3, implicit-def dead $y16 :: (load (s8) from %ir.scevgep2, !tbaa !8)
+    STIndir killed renamable $a, renamable $rs2 :: (store (s8) into %ir.lsr.iv, !tbaa !8)
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs13
+    renamable $a16 = INCAcc16 killed renamable $a16
+    renamable $rs13 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $rc4 = INC $rc4, implicit-def $z
+    BR %bb.14, $z, 0
+  
+  bb.20 (%ir-block.56):
+    successors: %bb.14(0x80000000)
+    liveins: $rc2, $rc3, $rc5, $rc10, $rc22, $rc23, $rc25, $rs2, $rs3, $rs13, $rs14, $rs15
+  
+    $rc5 = INC $rc5
+    BRA %bb.14
+  
+  bb.22:
+    successors: %bb.23(0x80000000)
+    liveins: $rc22, $rc25, $rc3, $rc23, $rs13, $rs14, $rs15, $rc2
+  
+    $x = LDImag8 $rc2
+    $rc20 = STImag8 killed $x
+    $x = LDImag8 $rc3
+  
+  bb.23 (%ir-block.67):
+    successors: %bb.4(0x80000000)
+    liveins: $rc22, $rc25, $rc20, $rc23, $rs13, $rs14, $rs15, $x
+  
+    $rc21 = STImag8 killed $x
+    $x = LDImag8 $rc23
+    renamable $x = nuw nsw INC killed renamable $x
+    BRA %bb.4
+  
+  bb.25 (%ir-block.59):
+    successors: %bb.26(0x7c000000), %bb.28(0x04000000)
+    liveins: $rc22, $rc25, $rc23, $rs15, $rs14, $rs13, $rs10
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs14
+    BR %bb.28, killed renamable $c, 1, implicit-def dead $c
+  
+  bb.26 (%ir-block.61):
+    successors: %bb.23(0x80000000)
+    liveins: $rc22, $rc25, $rc23, $rs15, $rs14, $rs13, $rs10
+  
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $a16 = INCAcc16 killed renamable $a16
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @decode_near_sstk + 4 :: (store (s8) into %stack.2)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @decode_near_sstk + 5 :: (store (s8) into %stack.2 + 1)
+    renamable $x = LDAbs @decode_near_sstk :: (load (s8) from %stack.0)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    $rc3 = STImag8 $x
+    REP_Immediate 16
+    renamable $a = LDIndirYIdxFused killed renamable $rs1, killed renamable $rs10, implicit-def dead $y16 :: (load (s8) from %ir.63, !tbaa !8)
+    $rc4 = STImag8 $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs13
+    renamable $a16 = INCAcc16 killed renamable $a16
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 48
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @decode_near_sstk + 6 :: (store (s8) into %stack.3)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @decode_near_sstk + 7 :: (store (s8) into %stack.3 + 1)
+    renamable $x = LDAbs @decode_near_sstk + 8 :: (load (s8) from %stack.4)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 9 :: (load (s8) from %stack.4 + 1)
+    $rc3 = STImag8 $x
+    $a = LDImag8 $rc4
+    REP_Immediate 16
+    STIndirYIdxFused killed renamable $a, killed renamable $rs1, killed renamable $rs13, implicit-def dead $y16 :: (store (s8) into %ir.66, !tbaa !8)
+    SEP_Immediate 16
+    renamable $x = LDAbs @decode_near_sstk + 6 :: (load (s8) from %stack.3)
+    $rc26 = STImag8 $x
+    dead renamable $x = LDAbs @decode_near_sstk + 7 :: (load (s8) from %stack.3 + 1)
+    dead renamable $x = LDAbs @decode_near_sstk + 6 :: (load (s8) from %stack.3)
+    renamable $x = LDAbs @decode_near_sstk + 7 :: (load (s8) from %stack.3 + 1)
+    $rc27 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 4 :: (load (s8) from %stack.2)
+    $rc20 = STImag8 $x
+    dead renamable $x = LDAbs @decode_near_sstk + 5 :: (load (s8) from %stack.2 + 1)
+    dead renamable $x = LDAbs @decode_near_sstk + 4 :: (load (s8) from %stack.2)
+    renamable $x = LDAbs @decode_near_sstk + 5 :: (load (s8) from %stack.2 + 1)
+    BRA %bb.23
+  
+  bb.27 (%ir-block.31):
+    successors: %bb.28(0x04000000), %bb.12(0x7c000000)
+    liveins: $x, $rc2, $rc3, $rc12, $rc23, $rs2, $rs3, $rs12, $rs13, $rs14, $rs15
+  
+    dead $a = LDImag8 $rc4, implicit-def $nz
+    BR %bb.12, killed $z, 0
+  
+  bb.28:
+    successors: %bb.29(0x80000000)
+    liveins: $rc25
+  
+    SEP_Immediate 32
+    $x = LDImm 0
+  
+  bb.29 (%ir-block.75):
+    liveins: $x, $rc25
+  
+    SEP_Immediate 32
+    $a = LDImag8 $rc25
+    $y = frame-destroy LDAbs @decode_near_sstk + 21 :: (load (s8) from %stack.16)
+    $rc31 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 20 :: (load (s8) from %stack.15)
+    $rc30 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 19 :: (load (s8) from %stack.14)
+    $rc29 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 18 :: (load (s8) from %stack.13)
+    $rc28 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 17 :: (load (s8) from %stack.12)
+    $rc27 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 16 :: (load (s8) from %stack.11)
+    $rc26 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 15 :: (load (s8) from %stack.10)
+    $rc25 = STImag8 $y
+    $y = frame-destroy LDAbs @decode_near_sstk + 14 :: (load (s8) from %stack.9)
+    $rc24 = STImag8 $y
+    $y = frame-destroy PL
+    $rc23 = STImag8 $y
+    $y = frame-destroy PL
+    $rc22 = STImag8 $y
+    $y = frame-destroy PL
+    $rc21 = STImag8 $y
+    $y = frame-destroy PL
+    $rc20 = STImag8 $y
+    RTS implicit killed $a, implicit killed $x, implicit $rc20, implicit $rc21, implicit $rc22, implicit $rc23, implicit $rc24, implicit $rc25, implicit $rc26, implicit $rc27, implicit $rc28, implicit $rc29, implicit $rc30, implicit $rc31
+  
+  bb.30 (%ir-block.72):
+    successors: %bb.31(0x40000000), %bb.29(0x40000000)
+    liveins: $rc25, $rs13, $rs15
+  
+    SEP_Immediate 32
+    $x = LDImm 0
+    REP_Immediate 32
+    $a16 = LDAImag16 killed renamable $rs13
+    dead $c = CMPImag16 $a16, killed renamable $rs15, implicit-def $z
+    BR %bb.29, killed $z, 0
+  
+  bb.31 (%ir-block.74):
+    successors: %bb.29(0x80000000)
+  
+    SEP_Immediate 32
+    renamable $x = LDAbs @decode_near_sstk + 12 :: (load (s8) from %stack.6)
+    $rc25 = STImag8 $x
+    renamable $x = LDAbs @decode_near_sstk + 13 :: (load (s8) from %stack.7)
+    BRA %bb.29
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x40000000), %bb.3(0x40000000)
+  
+    REP_Immediate 32
+    renamable $a16 = LDAbs16 @source :: (volatile dereferenceable load (p0) from @source, align 1, !tbaa !13)
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAbs16 @destination :: (volatile dereferenceable load (p0) from @destination, align 1, !tbaa !13)
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $a = LDImm -46
+    renamable $y = LDImm -96
+    renamable $x = LDImm 2
+    $rc6 = STImag8 $y
+    $rc7 = STImag8 $x
+    renamable $x = DEC killed $x
+    JSR @decode_near, mos_csr, implicit killed $rs1, implicit killed $a, implicit killed $x, implicit killed $rs2, implicit killed $rc6, implicit killed $rc7, implicit-def $a, implicit-def $x
+    dead $c = CMPImm killed renamable $x, 2, implicit-def dead $c, implicit-def $z
+    BR %bb.3, killed $z, 0
+  
+  bb.1 (%ir-block.0):
+    successors: %bb.2(0x40000000), %bb.3(0x40000000)
+    liveins: $a
+  
+    dead $c = CMPImm killed renamable $a, 160, implicit-def dead $c, implicit-def $z
+    BR %bb.3, killed $z, 0
+  
+  bb.2 (%ir-block.0):
+    successors: %bb.4(0x80000000)
+  
+    renamable $x = LDImm 1
+    BRA %bb.4
+  
+  bb.3 (%ir-block.0):
+    successors: %bb.4(0x80000000)
+  
+    renamable $x = LDImm 0
+  
+  bb.4 (%ir-block.0):
+    successors: %bb.5(0x80000000)
+    liveins: $x
+  
+    $y = LDImm target-flags(lo) @expected
+    $rc2 = STImag8 $y
+    $y = LDImm target-flags(hi) @expected
+    $rc3 = STImag8 $y
+    $y = LDImm target-flags(lo) @output
+    $rc4 = STImag8 $y
+    $y = LDImm target-flags(hi) @output
+    $rc5 = STImag8 $y
+    renamable $rc6 = STZImag8
+    renamable $y = LDImm 2
+    renamable $a = LDImm -96
+    $rc8 = STImag8 $a
+    $rc9 = STImag8 $y
+  
+  bb.5 (%ir-block.6):
+    successors: %bb.14(0x04000000), %bb.11(0x7c000000)
+    liveins: $x, $rc6, $rs1, $rs2, $rs4
+  
+    dead $a = LDImag8 $rc9, implicit-def $nz
+    BR %bb.14, killed $z, 1
+  
+  bb.11 (%ir-block.12):
+    successors: %bb.13(0x40000000), %bb.12(0x40000000)
+    liveins: $x, $rc6, $rs2, $rs4, $rs1
+  
+    renamable $a = LDIndir renamable $rs2 :: (load (s8) from %ir.lsr.iv1, !tbaa !8)
+    dead $c = CMPIndir killed renamable $a, renamable $rs1, implicit-def dead $c, implicit-def $z
+    BR %bb.13, killed $z, 1
+  
+  bb.12 (%ir-block.16):
+    successors: %bb.13(0x80000000)
+    liveins: $rs2, $rs4, $rs1
+  
+    renamable $x = LDImm 0
+    renamable $rc6 = STZImag8
+  
+  bb.13 (%ir-block.17):
+    successors: %bb.16(0x40000000), %bb.17(0x40000000)
+    liveins: $x, $rc6, $rs2, $rs4, $rs1
+  
+    $rc2 = INC $rc2, implicit-def $z
+    BR %bb.16, $z, 0
+  
+  bb.17 (%ir-block.17):
+    successors: %bb.16(0x80000000)
+    liveins: $x, $rc3, $rc4, $rc5, $rc6, $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31, $rs1, $rs4
+  
+    $rc3 = INC $rc3
+  
+  bb.16 (%ir-block.17):
+    successors: %bb.18(0x40000000), %bb.19(0x40000000)
+    liveins: $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31, $x, $rc6, $rs1, $rs4, $rc4, $rc5
+  
+    $rc4 = INC $rc4, implicit-def $z
+    BR %bb.18, $z, 0
+  
+  bb.19 (%ir-block.17):
+    successors: %bb.18(0x80000000)
+    liveins: $x, $rc5, $rc6, $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31, $rs1, $rs2, $rs4
+  
+    $rc5 = INC $rc5
+  
+  bb.18 (%ir-block.17):
+    successors: %bb.5(0x80000000)
+    liveins: $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29, $rc30, $rc31, $x, $rc6, $rs1, $rs2, $rs4
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs4
+    renamable $a16 = DECAcc16 killed renamable $a16
+    renamable $rs4 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    BRA %bb.5
+  
+  bb.14 (%ir-block.6):
+    successors: %bb.6(0x04000000), %bb.11(0x7c000000)
+    liveins: $x, $rc6, $rs1, $rs2, $rs4
+  
+    dead $a = LDImag8 $rc8, implicit-def $nz
+    BR %bb.11, killed $z, 0
+  
+  bb.6 (%ir-block.9):
+    successors: %bb.15(0x30000000), %bb.8(0x50000000)
+    liveins: $x, $rc6
+  
+    dead $a = LDImag8 $rc6, implicit-def $nz
+    BR %bb.8, killed $z, 0
+  
+  bb.15 (%ir-block.9):
+    successors: %bb.7(0x30000000), %bb.8(0x50000000)
+    liveins: $x
+  
+    dead $a = T_A $x, implicit-def $nz
+    BR %bb.7, killed $z, 1
+  
+  bb.8.select.false:
+    successors: %bb.9(0x80000000)
+  
+    renamable $x = LDImm 92
+    renamable $y = LDImm -16
+  
+  bb.9.select.end:
+    successors: %bb.10(0x80000000)
+    liveins: $x, $y
+  
+    $rc2 = STImag8 $y
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    STAbs16 killed renamable $a16, @corpus_result :: (volatile store (s16) into @corpus_result, align 1, !tbaa !4)
+    SEP_Immediate 32
+  
+  bb.10 (%ir-block.19):
+    successors: %bb.10(0x80000000)
+  
+    INLINEASM &wai, sideeffect attdialect, !17
+    BRA %bb.10
+  
+  bb.7:
+    successors: %bb.9(0x80000000)
+  
+    renamable $x = LDImm -91
+    renamable $y = LDImm 15
+    BRA %bb.9
+...

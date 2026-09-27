@@ -1,0 +1,160 @@
+--- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
++++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+@@ -176,13 +176,26 @@
+ }
+ 
+ void MOSAsmPrinter::emitInstruction(const MachineInstr *MI) {
+-  // #321 Phase 2 inc 2: the FUSED 16-bit-Y indirect-long indexed access —
+-  // `ldy $idx ; lda [$addr],y` (load) / `ldy $idx ; sta [$addr],y` (store) —
+-  // kept as one MachineInstr through register allocation and MOSInsertREPSEP
+-  // so nothing (a spill reload's `sep #$10`) can land between the 16-bit `ldy`
+-  // and its use. Operands: load (dst, addr, idx), store (src, addr, idx).
+-  if (MI->getOpcode() == MOS::LDIndirLongYIdx ||
+-      MI->getOpcode() == MOS::STIndirLongYIdx) {
++  // Keep each 16-bit Y load adjacent to its access through allocation and
++  // width insertion. Near and far forms share the same Imag16 index operand.
++  unsigned IndexedOpcode = 0;
++  switch (MI->getOpcode()) {
++  case MOS::LDIndirYIdxFused:
++  case MOS::LDIndirYIdx16Fused:
++    IndexedOpcode = MOS::LDA_IndirectIndexed;
++    break;
++  case MOS::STIndirYIdxFused:
++  case MOS::STIndirYIdx16Fused:
++    IndexedOpcode = MOS::STA_IndirectIndexed;
++    break;
++  case MOS::LDIndirLongYIdx:
++    IndexedOpcode = MOS::LDA_IndirectIndexedLong;
++    break;
++  case MOS::STIndirLongYIdx:
++    IndexedOpcode = MOS::STA_IndirectIndexedLong;
++    break;
++  }
++  if (IndexedOpcode) {
+     MCOperand Idx, Addr;
+     lowerOperand(MI->getOperand(2), Idx);
+     lowerOperand(MI->getOperand(1), Addr);
+@@ -191,9 +204,7 @@
+     LdY.addOperand(Idx);
+     EmitToStreamer(*OutStreamer, LdY);
+     MCInst Mem;
+-    Mem.setOpcode(MI->getOpcode() == MOS::LDIndirLongYIdx
+-                      ? MOS::LDA_IndirectIndexedLong
+-                      : MOS::STA_IndirectIndexedLong);
++    Mem.setOpcode(IndexedOpcode);
+     Mem.addOperand(Addr);
+     EmitToStreamer(*OutStreamer, Mem);
+     return;
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -644,6 +644,28 @@
+   dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
+ }
+ 
++// The index stays in Imag16 until emission. Loading Y and using it in one
++// instruction prevents X8 spill code from clearing Y's high byte between them.
++// The full Y16 definition also prevents allocation of another live value in Y.
++let Defs = [Y16], Size = 4, Predicates = [HasW65816, HasIndex16], XLow = 1 in {
++def LDIndirYIdxFused : MOSLoad {
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins Imag16:$addr, Imag16:$idx);
++}
++def STIndirYIdxFused : MOSStore {
++  dag InOperandList = (ins Ac:$src, Imag16:$addr, Imag16:$idx);
++}
++let MLow = 1 in {
++def LDIndirYIdx16Fused : MOSLoad {
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$addr, Imag16:$idx);
++}
++def STIndirYIdx16Fused : MOSStore {
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr, Imag16:$idx);
++}
++}
++}
++
+ // #320: STA long ($xxxxxx) — far (24-bit absolute) store, accumulator only.
+ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+   let Predicates = [HasW65816];
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -3051,26 +3051,26 @@
+     Register IdxReg = MI.getOperand(2).getReg();
+     LLT ValTy = MRI.getType(ValOrDst);
+     SmallVector<MachineInstrBuilder, 3> New;
+-    // If the index is in Imag16 (or is an unclassed s16 vreg), move it into Y16.
+-    Register YIdx = IdxReg;
+-    {
+-      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
+-      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
+-          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
+-        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
+-        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
+-      }
+-    }
++    // Keep Imag16 indices in zero page until the fused access loads Y.
++    // A value already assigned to Yc16 uses the register-indexed form.
++    const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++    bool FuseYLoad = !RC || RC->hasSuperClassEq(&MOS::Imag16RegClass);
+     if (ValTy == LLT::scalar(16)) {
+-      // 16-bit data, 16-bit Y: rep #$30; lda (zp),Y; sep #$30 → A16 → Imag16
+       Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
+-      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx16).addDef(A16).addUse(BasePtr).addUse(YIdx);
++      auto Ld = Builder.buildInstr(FuseYLoad ? MOS::LDIndirYIdx16Fused
++                                           : MOS::LDIndirYIdx16)
++                    .addDef(A16)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
+       Ld.cloneMemRefs(MI);
+       New.push_back(Ld);
+       New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
+     } else {
+-      // 8-bit data, 16-bit Y: rep #$10; lda (zp),Y; sep #$10 → Ac
+-      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx).addDef(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      auto Ld = Builder.buildInstr(FuseYLoad ? MOS::LDIndirYIdxFused
++                                           : MOS::LDIndirYIdx)
++                    .addDef(ValOrDst)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
+       Ld.cloneMemRefs(MI);
+       New.push_back(Ld);
+     }
+@@ -3119,24 +3119,25 @@
+     LLT ValTy = MRI.getType(ValOrDst);
+     SmallVector<MachineInstrBuilder, 3> New;
+     MachineInstr *FoldedLoad = nullptr;
+-    Register YIdx = IdxReg;
+-    {
+-      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
+-      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
+-          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
+-        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
+-        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
+-      }
+-    }
++    // Keep Imag16 indices in zero page until the fused access loads Y.
++    // A value already assigned to Yc16 uses the register-indexed form.
++    const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++    bool FuseYLoad = !RC || RC->hasSuperClassEq(&MOS::Imag16RegClass);
+     if (ValTy == LLT::scalar(16)) {
+-      // 16-bit data, 16-bit Y: Imag16 → A16; rep #$30; sta (zp),Y; sep #$30
+       Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
+-      auto St = Builder.buildInstr(MOS::STIndirYIdx16).addUse(A16).addUse(BasePtr).addUse(YIdx);
++      auto St = Builder.buildInstr(FuseYLoad ? MOS::STIndirYIdx16Fused
++                                           : MOS::STIndirYIdx16)
++                    .addUse(A16)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
+       St.cloneMemRefs(MI);
+       New.push_back(St);
+     } else {
+-      // 8-bit data, 16-bit Y: rep #$10; sta (zp),Y; sep #$10
+-      auto St = Builder.buildInstr(MOS::STIndirYIdx).addUse(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      auto St = Builder.buildInstr(FuseYLoad ? MOS::STIndirYIdxFused
++                                           : MOS::STIndirYIdx)
++                    .addUse(ValOrDst)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
+       St.cloneMemRefs(MI);
+       New.push_back(St);
+     }

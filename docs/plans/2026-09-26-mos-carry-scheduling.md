@@ -1,5 +1,7 @@
 # MOS carry-chain scheduling: diagnosis, optimization, and acceptance plan
 
+**Current status (2026-09-27):** PR #609 was withdrawn at the user's explicit request; its branch remains available. The near-decoder investigation separately repairs Y lifetime and near bank wrapping; the [original gallery now passes](../investigations/2026-09-27-near-y-decoder.md). This does not resolve the generic pressure-contract or farblit reports. Earlier publication and validation passages below are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 **Date:** 2026-09-26. **Priority:** T4; selected as the next optimization.
 **Status:** implemented and validated locally as patch **0064**.
 The carry-saving optimization is complete; the generic TableGen pressure-contract
@@ -431,7 +433,7 @@ separate qualified status below.
 
 ## 10. Remaining work
 
-Follow maintainer review and CI on [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609). The generic TableGen pressure-contract repair, inherited
+Retain the closed [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) and its branch for later revision. The generic TableGen pressure-contract repair, inherited
 farblit legalization failure, and unisolated all-XY16 driver observation remain
 separate follow-ups. Cycle and compile-time measurements are needed before
 making speed or compiler-overhead claims. The upstream validation record also

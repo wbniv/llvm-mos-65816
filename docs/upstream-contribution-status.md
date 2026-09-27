@@ -3,7 +3,7 @@
 **Computed-carry scheduling (0064):** the [standalone PR packet](pr-preparations/2026-09-26/0064-pr-body.md)
 is author-reviewed and validated on llvm-mos `7bd67c0ae4e8`. Compiler commit
 `155e209c4cee` is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling);
-[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. Ten focused commands, 132 MOS tests (one unsupported),
+[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) was withdrawn at the user's request on September 27; the branch is retained. Ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
 shrinks 133 → 59 bytes. The September 27 rebuilt-upstream-Clang run passes
 117 C-to-object pairs across 6502, 65C02 and stock 65816, with identical
@@ -19,14 +19,11 @@ The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
 scheduler entry points and carry-class membership are unchanged. Test results
 remain tied to `7bd67c0ae4e8`; no rebuild at the newer revision is claimed.
 
+Current near-decoder and withdrawal update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
 
-The inherited [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json)
-is now recorded with a preserved failing committed-main baseline. The full
-benchmark returns `0xA50F` instead of `0x5CF0`; the precise LTO cause remains
-qualified. Existing X-index repairs do not repair the split near-Y sequence.
-This remains open within the downstream native-width series; increment 2's
-far-pointer fold does not fix or submit it.
+The [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json) is fixed locally in `0002`. Fused byte/word Y accesses preserve the index across allocation; a [separate address-wrap guard](defects/mos-near-index-bank-wrap.json) prevents negative near offsets from carrying into DBR+1. The unchanged 62-work benchmark now returns `0x5CF0`. [Causal comparison and regression evidence](investigations/2026-09-27-near-y-decoder.md) retain the baseline and fusion-only failures. Both repairs belong to the native-width feature series.
 
 **Local verification (2026-09-26):** [`[dp],Y` increment 2](plans/2026-09-25-dpy-indexed-phase2-increment2.md)
 is complete on `8c19c703`; its three full-lit failures match the exact baseline,

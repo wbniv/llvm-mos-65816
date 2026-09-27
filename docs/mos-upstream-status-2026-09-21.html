@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="f3d8f3258d6386bc7ec5ac889ed6d5bf6276e1b340e31d7eeaa18037df724ea2"><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>MOS upstream work — 2026-09-26</title><meta name="source-sha256" content="a0f19fa21a1c02bb56f16cc7c696e683f1821d7513ddd98963295bb748350c8d"><style>
 body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;padding:0 28px;color:#202b3c;background:#f8fafc}h1,h2,h3{line-height:1.25;color:#12223e}h2{margin-top:40px}a{color:#165ac4}table{border-collapse:collapse;width:100%;background:white;font-size:14px;margin:22px 0}th,td{border:1px solid #d9e0eb;padding:12px;text-align:left;vertical-align:top}th{background:#e9eff9}tr:nth-child(even){background:#f7f9fc}pre{overflow:auto;background:#eaf0f7;padding:18px;border-radius:8px}code{font-size:.9em}nav{display:flex;gap:22px;flex-wrap:wrap;padding:16px;background:#e9eff9;border-radius:8px}.mermaid{background:white;overflow:auto}hr{margin:60px 0;border:0;border-top:2px solid #cad5e6}@media(max-width:800px){body{padding:0 12px}table{display:block;overflow:auto}}@media print{body{background:white}nav{display:none}}
 </style></head><body><nav><a href="#what-remains-to-post">Unposted queue</a><a href="#recommended-order">Recommended order</a><a href="mos-upstream-flowchart.html">Zoomable flowchart</a><a href="#current-pr-progress">Posted PR status</a></nav>
 <p>Local work: 2026-09-26 · Recorded GitHub snapshot: 2026-09-25. This is a generated view of the repository trackers; its filename is retained for bookmarks.</p>
@@ -6,7 +6,7 @@ body{font:16px/1.65 system-ui,sans-serif;max-width:1280px;margin:36px auto;paddi
 <p><strong>Computed-carry scheduling (0064):</strong> the <a href="pr-preparations/2026-09-26/0064-pr-body.md">standalone PR packet</a>
 is author-reviewed and validated on llvm-mos <code>7bd67c0ae4e8</code>. Compiler commit
 <code>155e209c4cee</code> is <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">pushed to the fork branch</a>;
-<a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a> is open. Ten focused commands, 132 MOS tests (one unsupported),
+<a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a> was withdrawn at the user's request on September 27; the branch is retained. Ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
 shrinks 133 → 59 bytes. The September 27 rebuilt-upstream-Clang run passes
 117 C-to-object pairs across 6502, 65C02 and stock 65816, with identical
@@ -21,13 +21,9 @@ of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at <code>26d7c2c1eebf</code>;
 scheduler entry points and carry-class membership are unchanged. Test results
 remain tied to <code>7bd67c0ae4e8</code>; no rebuild at the newer revision is claimed.</p>
+<p>Current near-decoder and withdrawal update: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0e061-3427-74a1-90ad-c0ee84b01b85</code>.</p>
 <p>Publication: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</p>
-<p>The inherited <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a>
-is now recorded with a preserved failing committed-main baseline. The full
-benchmark returns <code>0xA50F</code> instead of <code>0x5CF0</code>; the precise LTO cause remains
-qualified. Existing X-index repairs do not repair the split near-Y sequence.
-This remains open within the downstream native-width series; increment 2's
-far-pointer fold does not fix or submit it.</p>
+<p>The <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a> is fixed locally in <code>0002</code>. Fused byte/word Y accesses preserve the index across allocation; a <a href="defects/mos-near-index-bank-wrap.json">separate address-wrap guard</a> prevents negative near offsets from carrying into DBR+1. The unchanged 62-work benchmark now returns <code>0x5CF0</code>. <a href="investigations/2026-09-27-near-y-decoder.md">Causal comparison and regression evidence</a> retain the baseline and fusion-only failures. Both repairs belong to the native-width feature series.</p>
 <p>The <a href="plans/2026-09-25-dpy-indexed-phase2-increment2.md">runtime <code>[dp],Y</code> increment 2</a>
 is implemented and verified locally on top of <code>8c19c703</code>. Its new checks and
 runtime gates pass; the three full-lit failures reproduce on the exact baseline.
@@ -932,7 +928,7 @@ statements describe the research stage. MVN/MVP is now also published as <a href
 <p><strong>Computed-carry scheduling (0064):</strong> the <a href="pr-preparations/2026-09-26/0064-pr-body.md">standalone PR packet</a>
 is author-reviewed and validated on llvm-mos <code>7bd67c0ae4e8</code>. Compiler commit
 <code>155e209c4cee</code> is <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">pushed to the fork branch</a>;
-<a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a> is open. Ten focused commands, 132 MOS tests (one unsupported),
+<a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a> was withdrawn at the user's request on September 27; the branch is retained. Ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build pass. The targeted MIR kernel
 shrinks 133 → 59 bytes. The September 27 rebuilt-upstream-Clang run passes
 117 C-to-object pairs across 6502, 65C02 and stock 65816, with identical
@@ -947,13 +943,9 @@ of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at <code>26d7c2c1eebf</code>;
 scheduler entry points and carry-class membership are unchanged. Test results
 remain tied to <code>7bd67c0ae4e8</code>; no rebuild at the newer revision is claimed.</p>
+<p>Current near-decoder and withdrawal update: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0e061-3427-74a1-90ad-c0ee84b01b85</code>.</p>
 <p>Publication: OpenAI Codex CLI 0.157.1 (<code>codex-tui</code>), model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort; verified session <code>01a0dd01-d72e-76f2-bf27-a796e0f7d994</code>.</p>
-<p>The inherited <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a>
-is now recorded with a preserved failing committed-main baseline. The full
-benchmark returns <code>0xA50F</code> instead of <code>0x5CF0</code>; the precise LTO cause remains
-qualified. Existing X-index repairs do not repair the split near-Y sequence.
-This remains open within the downstream native-width series; increment 2's
-far-pointer fold does not fix or submit it.</p>
+<p>The <a href="defects/mos-xy16-near-indirect-y-clobber.json">XY16 gallery / near-Y failure</a> is fixed locally in <code>0002</code>. Fused byte/word Y accesses preserve the index across allocation; a <a href="defects/mos-near-index-bank-wrap.json">separate address-wrap guard</a> prevents negative near offsets from carrying into DBR+1. The unchanged 62-work benchmark now returns <code>0x5CF0</code>. <a href="investigations/2026-09-27-near-y-decoder.md">Causal comparison and regression evidence</a> retain the baseline and fusion-only failures. Both repairs belong to the native-width feature series.</p>
 <p><strong>Local verification (2026-09-26):</strong> <a href="plans/2026-09-25-dpy-indexed-phase2-increment2.md"><code>[dp],Y</code> increment 2</a>
 is complete on <code>8c19c703</code>; its three full-lit failures match the exact baseline,
 and focused tests, runtime gates, corpus and round trips pass. It belongs in the

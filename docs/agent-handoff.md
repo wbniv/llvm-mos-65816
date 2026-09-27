@@ -1,17 +1,18 @@
 # llvm-mos-65816 — agent handoff: build/test mechanics & backend navigation
 
+**Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](pr-preparations/2026-09-26/0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
+**Current local compiler:** the [near-decoder repair](investigations/2026-09-27-near-y-decoder.md) is carried in `0002` and installed in `build/llvm-mos-install`. Fused Y accesses and a separate near-address wrap guard pass the original 62-work gallery, twelve runtime configurations, and 178 MOS tests (two unsupported). Preserved baseline, fusion-only, and final binaries remain in `build/near-y-fix/`.
+
 ## Carry-scheduling publication
 
 Compiler branch `mos-computed-carry-scheduling` is pushed at `155e209c4cee`.
 The [0064 packet](pr-preparations/2026-09-26/README.md) retains exact upstream
 validation, downstream costs and separate open follow-ups. The downstream
 publication branch is `carry-scheduling-preparation`, based on `b3938bda`, in
-`.scratch/carry-publish`. The shared checkout and installed compiler remain
-unchanged. [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open at compiler commit `155e209c4cee`. The destination recheck is `26d7c2c1eebf`; local validation remains on `7bd67c0ae4e8`. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+`.scratch/carry-publish`. That publication left the shared checkout and installed compiler unchanged. [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) was closed at the user's request on September 27; its branch is retained at compiler commit `155e209c4cee`. The destination recheck is `26d7c2c1eebf`; local validation remains on `7bd67c0ae4e8`. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
 
-PR creation was not authorized. The user subsequently directed that it remain
-open for their review. Further changes to that PR require explicit authorization;
-the current commit/push instruction covers the remaining repository work.
+Publication history: PR creation was not authorized. The user subsequently directed that it remain open for their review and separately authorized the remaining repository commit/push work. The September 27 withdrawal request supersedes that earlier instruction to keep the PR open. Further publication requires user direction.
 
 **September 27 validation update:** the user subsequently authorized updating
 the PR body. Rebuilt upstream Clang at parent `7bd67c0ae4e8` and head

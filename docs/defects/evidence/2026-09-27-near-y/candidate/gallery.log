@@ -1,0 +1,14 @@
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -DGALLERY_BENCH_ONLY=1 -I/work/examples/snes -E -x c /work/docs/defects/evidence/2026-09-26-dpy-near-y/lzss-gallery.c.txt -o /work/build/near-y-fix/candidate/gallery.i
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -DGALLERY_BENCH_ONLY=1 -I/work/examples/snes -S -emit-llvm -x c /work/docs/defects/evidence/2026-09-26-dpy-near-y/lzss-gallery.c.txt -o /work/build/near-y-fix/candidate/gallery.ll
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -DGALLERY_BENCH_ONLY=1 -I/work/examples/snes -S -fno-lto -x c /work/docs/defects/evidence/2026-09-26-dpy-near-y/lzss-gallery.c.txt -o /work/build/near-y-fix/candidate/gallery.s
+EXIT: 0
+COMMAND: /work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -DGALLERY_BENCH_ONLY=1 -I/work/examples/snes -Wl,--save-temps -Wl,-Map=/work/build/near-y-fix/candidate/gallery.map -x c /work/docs/defects/evidence/2026-09-26-dpy-near-y/lzss-gallery.c.txt -o /work/build/near-y-fix/candidate/gallery.sfc
+EXIT: 0
+COMMAND: python3 /work/tools/snes-checksum.py /work/build/near-y-fix/candidate/gallery.sfc
+/work/build/near-y-fix/candidate/gallery.sfc: lorom size=1024KiB devices=8Mbit map_mode=0x20 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0x89F1 complement=0x760E
+EXIT: 0
+COMMAND: /work/build/jgxcheck /work/build/near-y-fix/candidate/gallery.sfc /work/vendor/bsnes-jg/Database 0x24 2 0x5CF0 30000
+SMOKE: FAIL off=0x24 len=2 got=0xA50F want=0x5CF0
+EXIT: 1

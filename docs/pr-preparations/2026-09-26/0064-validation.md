@@ -1,5 +1,7 @@
 # 0064: exact upstream validation
 
+**Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 Preparation and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
 `gpt-6-astra`, `xhigh` reasoning effort; verified session
 `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
@@ -138,5 +140,5 @@ they do not extend the results to newer upstream main revisions.
 
 The tested compiler commit `155e209c4cee` is now [on the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling).
 Publication did not change the tested patch or its retained evidence.
-[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. Its destination was rechecked at `26d7c2c1eebf`;
+[PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) was closed at the user's request on September 27; its branch is retained. Its destination was rechecked at `26d7c2c1eebf`;
 the tests above remain tied to `7bd67c0ae4e8`, with no new-base rebuild claimed. Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.

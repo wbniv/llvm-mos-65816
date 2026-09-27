@@ -1,0 +1,19 @@
+==> 1) +mos-xy16 -verify-machineinstrs must compile CLEAN (unmasked 16-bit (zp) offset)
+  PASS: clean (exit 0)
+==> 2) the indexed access must use G_LOAD_INDIR_IDX16 → LDIndirYIdx16Fused (B2 (zp),Y16 gate)
+  PASS: 1 G_LOAD_INDIR_IDX16 (legalizer) + 1 LDIndirYIdx16Fused (selector) — (zp),Y16 B2 gate fires
+==> 3) disasm corroboration: native lda (dp),Y (B1) under rep — no 8-bit iny/dey byte-walk
+  PASS: 1 lda (dp),Y (B1) — native indirect-indexed load
+  PASS: no iny/dey (no 8-bit byte-walk)
+==> 4) build default + +mos-a16 + +mos-xy16 ROMs
+==> 5) MAME: host == default == +mos-a16 == +mos-xy16 (corpus_result == 0x7E5A)
+  default:
+SMOKE: PASS addr=0x7E0344 len=2 got=0x7E5A (ran 60 ticks)
+  +mos-a16:
+SMOKE: PASS addr=0x7E0344 len=2 got=0x7E5A (ran 60 ticks)
+  +mos-xy16:
+SMOKE: PASS addr=0x7E0344 len=2 got=0x7E5A (ran 60 ticks)
+==> 6) bsnes-jg: +mos-xy16 corpus_result == 0x7E5A (independent confirmation)
+  SMOKE: PASS off=0x344 len=2 got=0x7E5A (ran 180 frames, bsnes-jg)
+
+RESULT: PASS — G_LOAD_INDIR_IDX16+LDIndirYIdx16Fused (zp),Y16 B2 path under +mos-xy16; corpus_result==0x7E5A; host==default==+mos-a16==+mos-xy16, both emulators

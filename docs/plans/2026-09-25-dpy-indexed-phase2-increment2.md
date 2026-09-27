@@ -1,5 +1,7 @@
 # `[dp],Y` Phase 2 — increment 2: fold a **range-proven runtime index** into `b7`/`97`
 
+**Near-decoder resolution (2026-09-27):** the retained September 25–26 near-Y failure below is now repaired by fused Y accesses and a separate near-address bank-wrap guard. The unchanged 62-work XY16 benchmark passes at `0x5CF0`; fusion alone still fails that benchmark. See the [causal investigation](../investigations/2026-09-27-near-y-decoder.md), [near-Y record](../defects/mos-xy16-near-indirect-y-clobber.json), and [bank-wrap record](../defects/mos-near-index-bank-wrap.json). The following increment-2 results remain dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 **Current build qualification (2026-09-26):** the runtime and code-generation
 results below describe the increment-2 build tested here. The later combined
 increment-2 plus 0049–0063 baseline rejects `farblit.c` before scheduling on an

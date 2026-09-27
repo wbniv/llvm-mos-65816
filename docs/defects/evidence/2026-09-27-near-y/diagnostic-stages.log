@@ -1,0 +1,4 @@
+/work/build/near-y-fix/candidate/bin/clang --config /work/build/install/bin/mos-snes-gallery.cfg -mcpu=mosw65816 -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -Oz -DGALLERY_BENCH_ONLY=1 -I/work/examples/snes -Wl,--save-temps -Wl,-Map=/work/build/near-y-fix/diagnostic/stages.map /work/build/near-y-fix/diagnostic/gallery.c -o /work/build/near-y-fix/diagnostic/stages.sfc
+/work/build/near-y-fix/diagnostic/stages.sfc: lorom size=1024KiB devices=8Mbit map_mode=0x20 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0xBA95 complement=0x456A
+/work/build/jgxcheck /work/build/near-y-fix/diagnostic/stages.sfc /work/vendor/bsnes-jg/Database 0x25 2 0x5cf0 1500
+SMOKE: FAIL off=0x25 len=2 got=0x0004 want=0x5CF0

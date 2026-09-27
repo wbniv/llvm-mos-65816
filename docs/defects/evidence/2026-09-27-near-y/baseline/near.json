@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/work/build/near-y-fix/baseline/bin/clang",
+    "--config",
+    "/work/build/install/bin/mos-snes.cfg",
+    "-mcpu=mosw65816",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-a16",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-xy16",
+    "-Oz"
+  ],
+  "input": "/work/build/near-y-fix/near-decode.c",
+  "input_sha256": "85e0e7c1168a2aaecb6b9a11725d83ed5bb9ebec1c4e6268759b3771a8d93286",
+  "compiler_sha256": "2f9053c0e9ebecf94fd73d7348339dd7b8e48c4fbdb80ac009eae617a1020893",
+  "linker_sha256": "cad010078fdc1b419cd3fad6b426d49e9497ba34a0c20c9df531d4b493c2218e",
+  "rom_sha256": "0542eebffcd711b8abc532f1e97ed720adc4c035efd5570c1460734fb650af33",
+  "exit": 1
+}

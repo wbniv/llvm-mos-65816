@@ -1,0 +1,13 @@
+/work/build/near-y-decode/default-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xC0BB complement=0x3F44
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-y-decode/default-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xDC09 complement=0x23F6
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-y-decode/a16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xBA91 complement=0x456E
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-y-decode/a16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF588 complement=0x0A77
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-y-decode/xy16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xB3F5 complement=0x4C0A
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-y-decode/xy16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF0EC complement=0x0F13
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+RESULT: PASS — near decoder, three width modes, with and without LTO

@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "90e18bef0d72dac190cee7884c36013ffcedd8e324c657243e53e34e6174bee7",
+          "docs/upstream-dashboard-curation.json": "fd26e8c08928d66f736600c3a27080c83a41f764109b0d0ec514f5bdb7c79457",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -42,9 +42,10 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-farblit-byte-load-legalization.json": "5beedb323d372e49a354ea4aac3d8859860aeb3e4a0b2a022db0d6ac2fa905f1",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
+          "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
-          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "8f26597892f57db4c7df8c4476f9c955c5fda4e31a1680c75e312b6b5d515ff8",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
           "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "b58ad1cc26c6cee550e6b4f2b3677a7b7e3d9d004ad5d9c94cf77fcc6a09d2cd",
@@ -54,7 +55,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "7fa92ed773dc2bbd17b873f282ca9304998743b0424615795e932bb2a4eabd13"
+          "docs/upstream-dashboard.json": "b02fa725b4b61aed2d8f0c50b06451b6cc5ac8d49291e5a6c5628737ff4caff6"
         }
       }
     },
@@ -75,13 +76,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "2dd0f537fe26d962c5baa0abec977e98ba9b9655c9e0d232258e0eb5b928a596",
+          "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "7fa92ed773dc2bbd17b873f282ca9304998743b0424615795e932bb2a4eabd13",
+          "docs/upstream-dashboard.json": "b02fa725b4b61aed2d8f0c50b06451b6cc5ac8d49291e5a6c5628737ff4caff6",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "9d600c4795428d777d2620c417642646efde4141e7536803cac5813c401e82fb"
+          "docs/upstream-dashboard-graph.json": "e542e55a48c909f4a40c129ac3413212540733112e2eb785d45ea9ddfaa0a9f3"
         }
       }
     },
@@ -110,16 +111,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "2dd0f537fe26d962c5baa0abec977e98ba9b9655c9e0d232258e0eb5b928a596",
-          "docs/upstream-contribution-status.md": "513701f4c18e44d35187601b010f17940d084cd6c6aea8f8f191f2d6bb639ed2",
+          "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
+          "docs/upstream-contribution-status.md": "a7a5fadb1b44563bbabed2c1c4d948ec3c84a2f002bd2ead8edfd82adc9bfec1",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "e9811262ccc78f099e4d11f04074c276bfb06ceb0738836e9bd2f7702837037c",
-          "docs/mos-upstream-status-2026-09-21.html": "b6db402a7315a355cd9c70eb876734812ee2fcd22fe2b0b6a7caf162409ab0c7"
+          "docs/mos-upstream-flowchart.html": "388f2a3b1943d92a58e461967c485d5916490031acfa7370aca8dce16f88f81b",
+          "docs/mos-upstream-status-2026-09-21.html": "1981108045e8859f1b82b106cbb015fd0576f1e03c2884cbccea8ed40f10cb0c"
         }
       }
     },
@@ -248,11 +249,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
           "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
         },
         "outputs": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.html": "402858c9c08d274a39ca35b013b9b8577b69c9d404dd8a9180207e6c061722dc"
+          "docs/plans/2026-09-26-mos-carry-scheduling.html": "dae8855f3bec88167e42e9705216f9fd1f5ab31e6f99ec90aded518376019bee"
         }
       }
     },
@@ -312,9 +313,10 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
-          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -323,14 +325,14 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
-          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
+          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd"
         },
-        "reviewed_at": "2026-09-27T00:33:17.545946+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:44.627133+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -349,7 +351,8 @@
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/pr-preparations/2026-09-26/README.md",
-        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
       ],
       "receipt": {
         "sources": {
@@ -362,9 +365,10 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
-          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -373,12 +377,13 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T00:33:17.969527+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:45.364674+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -397,7 +402,8 @@
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/pr-preparations/2026-09-26/README.md",
-        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
       ],
       "receipt": {
         "sources": {
@@ -410,9 +416,10 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
-          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "a13b80c2723fb527fdd3b0e98e6c456ff790af60d6c875d6ae79b8e98451cb8a",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -421,12 +428,13 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T00:33:18.471011+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:45.883962+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -462,13 +470,13 @@
       ],
       "receipt": {
         "sources": {
-          "dev/check-defect-evidence.py": "a8b61b5c65f293f32d62bfeff919c9001dc82247744ede96887ef8eee698eeb7",
-          "dev/test-defect-evidence.py": "ab3f87929f1c732316852187ce43ebd6f070bd4d1bc7c24e40a6ef489b44f8fb",
+          "dev/check-defect-evidence.py": "8872857ac0e69767fdf05be257af47f82178ab26e7d19b4b344174924106ca81",
+          "dev/test-defect-evidence.py": "ca931578fe0cfe097826b65e9f1dbb10e2b8209b10fb3d4d33b25f53ae932dbd",
           ".github/workflows/defect-evidence.yml": "9e5bd9ed772d5e41fe18ee9e5d87a95235d178fdcf7f84e9e5adc8844ce2995f"
         },
-        "reviewed_at": "2026-09-26T01:56:52.716065+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-27T01:56:16.926889+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -479,12 +487,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
+          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/howto-document-dependencies.md": "543649b41577a10e8976e58fd32cfeaa267e1d26bb9737ff01f5461e89132ef1"
         },
-        "reviewed_at": "2026-09-26T22:34:22.773091+00:00",
-        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+        "reviewed_at": "2026-09-27T01:56:16.472897+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -514,11 +522,11 @@
       "receipt": {
         "sources": {
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
-          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32"
+          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1"
         },
-        "reviewed_at": "2026-09-27T00:33:18.635675+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:16.659461+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -551,21 +559,25 @@
         },
         "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
         "docs/pr-preparations/2026-09-26/README.md",
-        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/investigations/2026-09-27-near-y-decoder.md"
       ],
       "receipt": {
         "sources": {
-          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
+          "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
-          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
+          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
         },
-        "reviewed_at": "2026-09-27T00:33:19.189961+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:20.482330+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -595,12 +607,13 @@
         "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
         "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
         "docs/pr-preparations/2026-09-26/0064-review.md",
-        "docs/pr-preparations/2026-09-26/0064-validation.md"
+        "docs/pr-preparations/2026-09-26/0064-validation.md",
+        "docs/investigations/2026-09-27-near-y-decoder.md"
       ],
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "091070de090b7bec391c90d9b8a36930106fab222f6bfb8f3022201edf2c34f0",
-          "patches/llvm-mos/0002-321-accum16.patch": "d384989ded4ef0541b4e190ea4cc2168dde97548cc0bdb7f25f58b1888ca2afb",
+          "patches/llvm-mos/0002-321-accum16.patch": "1df78787935143745820fe9075520a949dca6348a541a8e1f4f371bf7ccf8faa",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -622,12 +635,13 @@
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749"
+          "docs/pr-preparations/2026-09-26/0064-review.md": "e65ae1500f34aa7fb6e79c5a395697ab983b07b6a88dd4ef05ffc53bb59e75c6",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
         },
-        "reviewed_at": "2026-09-26T23:48:11.010627+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:22.614582+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -663,15 +677,33 @@
             "mitigation.change",
             "unknowns"
           ]
+        },
+        {
+          "glob": "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change"
+          ]
+        },
+        {
+          "glob": "docs/defects/mos-near-index-bank-wrap.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change"
+          ]
         }
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "22cec3a47f473aab3c4559d8d30e48c3616e4e216bafd41c33c327a25af74d60"
+          "docs/defects/mos-farblit-byte-load-legalization.json": "22cec3a47f473aab3c4559d8d30e48c3616e4e216bafd41c33c327a25af74d60",
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
+          "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a"
         },
-        "reviewed_at": "2026-09-26T12:16:54.363834+00:00",
-        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+        "reviewed_at": "2026-09-27T01:53:47.034271+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -682,12 +714,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749"
+          "docs/pr-preparations/2026-09-26/0064-review.md": "e65ae1500f34aa7fb6e79c5a395697ab983b07b6a88dd4ef05ffc53bb59e75c6",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544"
         },
-        "reviewed_at": "2026-09-26T23:48:11.152821+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:17.109346+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -705,13 +737,13 @@
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
-          "docs/pr-preparations/2026-09-26/0064-submission.json": "3edb848f29ab5362a8cd565ad723eae512f372072e34d0123c1aaef04f0a0086",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03"
         },
-        "reviewed_at": "2026-09-26T23:48:11.570974+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:50.357317+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -719,17 +751,19 @@
       "sources": [
         "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
         "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
-        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json"
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
       ],
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
-          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03"
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-26T23:48:11.769421+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:50.691761+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -759,13 +793,14 @@
         "docs/pr-preparations/2026-09-26/0058-pr-body.md",
         "docs/pr-preparations/2026-09-26/0059-pr-body.md",
         "docs/pr-preparations/2026-09-26/0060-pr-body.md",
-        "AGENTS.md"
+        "AGENTS.md",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
       ],
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "e65ae1500f34aa7fb6e79c5a395697ab983b07b6a88dd4ef05ffc53bb59e75c6",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
@@ -787,11 +822,12 @@
           "docs/pr-preparations/2026-09-26/0058-pr-body.md": "0c29068a3519e94d54906346a00906e55d99f2287e452c18bb98c0098aa3df9a",
           "docs/pr-preparations/2026-09-26/0059-pr-body.md": "67156908578347424e84bc44697db61789bb1824a586889ef3909228d1cadc1e",
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
-          "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b"
+          "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
         },
-        "reviewed_at": "2026-09-27T00:33:21.217347+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:53:52.833922+00:00",
+        "note": "Checked the unchanged gallery red/green input, preserved committed and fusion-only binaries, separate DBR+1 witness, twelve width/LTO runtime passes, 178 MOS passes with two unsupported, installed binary and 0002 roundtrip. Updated original near-Y report and current summaries to both identified repairs; dated baselines and earlier attribution remain intact. PR 609 is closed at the user request with its branch retained; posting history and scheduling validation remain dated evidence. The carry pressure and farblit reports remain open. Reviewed the evidence workflow: observed output is a result, while all compiler settings and immutable baselines remain checked.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -864,12 +900,12 @@
           "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4"
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "e65ae1500f34aa7fb6e79c5a395697ab983b07b6a88dd4ef05ffc53bb59e75c6"
         },
-        "reviewed_at": "2026-09-26T23:48:15.247901+00:00",
-        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:19.205296+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     },
     {
@@ -1278,18 +1314,44 @@
         "docs/pr-preparations/2026-09-26/README.md",
         "docs/pr-preparations/2026-09-26/feature-held-packages.md",
         "docs/investigations/2026-09-26-r2-baseline-backup.md",
-        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/investigations/2026-09-27-near-y-decoder.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "905e622b23ecbc439dbf5dcb4597058bc14b0feaff923733024b629212cf80b7",
+          "docs/pr-preparations/2026-09-26/README.md": "4f7494ffdc69d2ae8a09ea5bcbc85eb57ac18e915950632373a5c44891116ef2",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "07d61d946e3c46e9933d4686dd48639d8fa4fc51d59b01ae9c57c45ba55ad463"
         },
-        "reviewed_at": "2026-09-27T00:33:21.517475+00:00",
-        "note": "Reviewed 28 current unposted PR drafts after paragraph/list-item reflow: 248 paragraphs and 953 source newlines, with rendered content, literal code/HTML blocks, links, and prior attribution preserved. Reconciled the selected drafts against all 15 authored upstream PRs returned by the live read-only search; posted bodies, retained posted copies, and superseded historical drafts are excluded. Preparation instructions now require one physical line per prose paragraph and list-item paragraph and preserve structural newlines. Current summaries, held-feature gates, validation claims, and independent-review statuses are unchanged; existing previews retain equivalent rendered content. This formatting pass changes no upstream PR.",
-        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+        "reviewed_at": "2026-09-27T01:56:23.020710+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-27-near-y-decoder.md",
+      "sources": [
+        "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+        "docs/defects/mos-near-index-bank-wrap.json",
+        "examples/65816/near-y-decode.c",
+        "examples/65816/near-index-wrap.c",
+        "dev/near-y-decode.sh",
+        "docs/pr-preparations/2026-09-26/0064-submission.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
+          "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "examples/65816/near-y-decode.c": "d7d5d6cdb7f698b30d7ebb2ec06d9339b91e4142ab38603267b954537136c684",
+          "examples/65816/near-index-wrap.c": "a80d4d8340228d6399af9d23d755a1d46c38ec2d4a0734d98a52538a52ce0055",
+          "dev/near-y-decode.sh": "c965eba687c474e2d7908e1a3d850bdc5e14e8a86b590e00967a4e7b43ac7f01",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
+        },
+        "reviewed_at": "2026-09-27T01:56:19.716025+00:00",
+        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
       }
     }
   ]

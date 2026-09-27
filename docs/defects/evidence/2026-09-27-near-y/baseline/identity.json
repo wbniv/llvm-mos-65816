@@ -1,0 +1,14 @@
+{
+  "project_revision": "a9bedfae31b95be6251d1df0209931511ea65f99",
+  "vendor_revision": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "side": "baseline",
+  "binaries": {
+    "clang-23": "2f9053c0e9ebecf94fd73d7348339dd7b8e48c4fbdb80ac009eae617a1020893",
+    "llc": "acd85a89a2f73f76cb1c5eb36369d1b2b2ee6b3042438cbb837be02b5351ec9f",
+    "lld": "cad010078fdc1b419cd3fad6b426d49e9497ba34a0c20c9df531d4b493c2218e"
+  },
+  "source_contract": "Committed dev/toolchain.sh stack at project_revision; candidate adds near-y-fix.patch. All patched compiler source files independently reconstructed and compared; only the three candidate MOS files differ.",
+  "retained_toolchain": "build/near-y-fix/baseline",
+  "resource_headers": "build/near-y-fix/baseline/lib/clang/23",
+  "build_command": "dev/container.sh -- ninja -C build/llvm-mos -j 6 clang llc lld"
+}

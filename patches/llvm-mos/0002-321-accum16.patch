@@ -51,7 +51,7 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
-index dd5b16b80..f9efa9d98 100644
+index dd5b16b80..ea200c1c5 100644
 --- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 +++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 @@ -59,6 +59,9 @@ public:
@@ -119,17 +119,30 @@ index dd5b16b80..f9efa9d98 100644
  void MOSAsmPrinter::EmitToStreamer(MCStreamer &S, MCInst &Inst) {
    MOSAsmBackend::translateOpcodeToSubtarget(Inst, MF->getSubtarget());
    // If this instruction contains an out-of-range immediate address, perform an
-@@ -125,6 +176,29 @@ void MOSAsmPrinter::EmitToStreamer(MCStreamer &S, MCInst &Inst) {
+@@ -125,6 +176,40 @@ void MOSAsmPrinter::EmitToStreamer(MCStreamer &S, MCInst &Inst) {
  }
 
  void MOSAsmPrinter::emitInstruction(const MachineInstr *MI) {
-+  // #321 Phase 2 inc 2: the FUSED 16-bit-Y indirect-long indexed access —
-+  // `ldy $idx ; lda [$addr],y` (load) / `ldy $idx ; sta [$addr],y` (store) —
-+  // kept as one MachineInstr through register allocation and MOSInsertREPSEP
-+  // so nothing (a spill reload's `sep #$10`) can land between the 16-bit `ldy`
-+  // and its use. Operands: load (dst, addr, idx), store (src, addr, idx).
-+  if (MI->getOpcode() == MOS::LDIndirLongYIdx ||
-+      MI->getOpcode() == MOS::STIndirLongYIdx) {
++  // Keep each 16-bit Y load adjacent to its access through allocation and
++  // width insertion. Near and far forms share the same Imag16 index operand.
++  unsigned IndexedOpcode = 0;
++  switch (MI->getOpcode()) {
++  case MOS::LDIndirYIdxFused:
++  case MOS::LDIndirYIdx16Fused:
++    IndexedOpcode = MOS::LDA_IndirectIndexed;
++    break;
++  case MOS::STIndirYIdxFused:
++  case MOS::STIndirYIdx16Fused:
++    IndexedOpcode = MOS::STA_IndirectIndexed;
++    break;
++  case MOS::LDIndirLongYIdx:
++    IndexedOpcode = MOS::LDA_IndirectIndexedLong;
++    break;
++  case MOS::STIndirLongYIdx:
++    IndexedOpcode = MOS::STA_IndirectIndexedLong;
++    break;
++  }
++  if (IndexedOpcode) {
 +    MCOperand Idx, Addr;
 +    lowerOperand(MI->getOperand(2), Idx);
 +    lowerOperand(MI->getOperand(1), Addr);
@@ -138,9 +151,7 @@ index dd5b16b80..f9efa9d98 100644
 +    LdY.addOperand(Idx);
 +    EmitToStreamer(*OutStreamer, LdY);
 +    MCInst Mem;
-+    Mem.setOpcode(MI->getOpcode() == MOS::LDIndirLongYIdx
-+                      ? MOS::LDA_IndirectIndexedLong
-+                      : MOS::STA_IndirectIndexedLong);
++    Mem.setOpcode(IndexedOpcode);
 +    Mem.addOperand(Addr);
 +    EmitToStreamer(*OutStreamer, Mem);
 +    return;
@@ -2022,7 +2033,7 @@ index a71519559..b080bc3c6 100644
 
  } // Predicates = [HasW65816]
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index 715766180..a6f0a7d7d 100644
+index 715766180..ff015ada5 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -2072,7 +2083,35 @@ index 715766180..a6f0a7d7d 100644
  // STA (zp)
  def STIndir : MOSStore, PseudoInstExpansion<(STA_Indirect addr8:$addr)> {
    let Predicates = [Has65C02];
-@@ -610,21 +643,6 @@ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+@@ -604,27 +637,34 @@ def STIndirIdx : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)
+   dag InOperandList = (ins Ac:$src, Imag16:$addr, Yc:$offset);
+ }
+
++// The index stays in Imag16 until emission. Loading Y and using it in one
++// instruction prevents X8 spill code from clearing Y's high byte between them.
++// The full Y16 definition also prevents allocation of another live value in Y.
++let Defs = [Y16], Size = 4, Predicates = [HasW65816, HasIndex16], XLow = 1 in {
++def LDIndirYIdxFused : MOSLoad {
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins Imag16:$addr, Imag16:$idx);
++}
++def STIndirYIdxFused : MOSStore {
++  dag InOperandList = (ins Ac:$src, Imag16:$addr, Imag16:$idx);
++}
++let MLow = 1 in {
++def LDIndirYIdx16Fused : MOSLoad {
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$addr, Imag16:$idx);
++}
++def STIndirYIdx16Fused : MOSStore {
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr, Imag16:$idx);
++}
++}
++}
++
+ // #320: STA long ($xxxxxx) — far (24-bit absolute) store, accumulator only.
+ def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
+   let Predicates = [HasW65816];
    dag InOperandList = (ins Ac:$src, addr24:$dst);
  }
 
@@ -2094,7 +2133,7 @@ index 715766180..a6f0a7d7d 100644
  // #320 far runtime: LDA [dp] — runtime far-pointer indirect-long load. The ZP
  // address operand is an Imag32 quad holding the 24-bit far address (lo,hi,bank
  // in its first 3 bytes, byte 3 = pad); `lda [dp]` reads bytes dp..dp+2. The
-@@ -640,6 +658,391 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
+@@ -640,6 +680,391 @@ def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)>
    dag InOperandList = (ins Ac:$src, Imag32:$addr);
  }
 
@@ -2486,7 +2525,7 @@ index 715766180..a6f0a7d7d 100644
  //===---------------------------------------------------------------------===//
  // HuC Block Copy Instructions
  //===---------------------------------------------------------------------===//
-@@ -687,3 +1090,156 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
+@@ -687,3 +1112,156 @@ def : Pat<(i8 (trunc Imag16:$s)), (EXTRACT_SUBREG Imag16:$s, sublo)>;
 
  def : Pat<(i1 imm:$s), (LDImm1 imm:$s)>;
  def : Pat<(i8 imm:$s), (LDImm imm:$s)>;
@@ -2701,7 +2740,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index 9712a96e9..29287394a 100644
+index 9712a96e9..8306f4264 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -3290,7 +3329,7 @@ index 9712a96e9..29287394a 100644
    Register A = MI.getOperand(0).getReg();
    Register N = MI.getOperand(2).getReg();
    Register V = MI.getOperand(3).getReg();
-@@ -2047,6 +2532,813 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+@@ -2047,6 +2532,814 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
    }
    return selectGeneric(MI);
  }
@@ -3764,26 +3803,26 @@ index 9712a96e9..29287394a 100644
 +    Register IdxReg = MI.getOperand(2).getReg();
 +    LLT ValTy = MRI.getType(ValOrDst);
 +    SmallVector<MachineInstrBuilder, 3> New;
-+    // If the index is in Imag16 (or is an unclassed s16 vreg), move it into Y16.
-+    Register YIdx = IdxReg;
-+    {
-+      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
-+      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
-+          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
-+        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
-+        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
-+      }
-+    }
++    // Keep Imag16 indices in zero page until the fused access loads Y.
++    // A value already assigned to Yc16 uses the register-indexed form.
++    const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++    bool FuseYLoad = !RC || RC->hasSuperClassEq(&MOS::Imag16RegClass);
 +    if (ValTy == LLT::scalar(16)) {
-+      // 16-bit data, 16-bit Y: rep #$30; lda (zp),Y; sep #$30 → A16 → Imag16
 +      Register A16 = MRI.createVirtualRegister(&MOS::Ac16RegClass);
-+      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx16).addDef(A16).addUse(BasePtr).addUse(YIdx);
++      auto Ld = Builder.buildInstr(FuseYLoad ? MOS::LDIndirYIdx16Fused
++                                           : MOS::LDIndirYIdx16)
++                    .addDef(A16)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
 +      Ld.cloneMemRefs(MI);
 +      New.push_back(Ld);
 +      New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(ValOrDst).addUse(A16));
 +    } else {
-+      // 8-bit data, 16-bit Y: rep #$10; lda (zp),Y; sep #$10 → Ac
-+      auto Ld = Builder.buildInstr(MOS::LDIndirYIdx).addDef(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      auto Ld = Builder.buildInstr(FuseYLoad ? MOS::LDIndirYIdxFused
++                                           : MOS::LDIndirYIdx)
++                    .addDef(ValOrDst)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
 +      Ld.cloneMemRefs(MI);
 +      New.push_back(Ld);
 +    }
@@ -3832,24 +3871,25 @@ index 9712a96e9..29287394a 100644
 +    LLT ValTy = MRI.getType(ValOrDst);
 +    SmallVector<MachineInstrBuilder, 3> New;
 +    MachineInstr *FoldedLoad = nullptr;
-+    Register YIdx = IdxReg;
-+    {
-+      const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
-+      if ((RC && RC->hasSuperClassEq(&MOS::Imag16RegClass)) ||
-+          (!RC && MRI.getType(IdxReg) == LLT::scalar(16))) {
-+        YIdx = MRI.createVirtualRegister(&MOS::Yc16RegClass);
-+        New.push_back(Builder.buildInstr(MOS::LDYImag16).addDef(YIdx).addUse(IdxReg));
-+      }
-+    }
++    // Keep Imag16 indices in zero page until the fused access loads Y.
++    // A value already assigned to Yc16 uses the register-indexed form.
++    const TargetRegisterClass *RC = MRI.getRegClassOrNull(IdxReg);
++    bool FuseYLoad = !RC || RC->hasSuperClassEq(&MOS::Imag16RegClass);
 +    if (ValTy == LLT::scalar(16)) {
-+      // 16-bit data, 16-bit Y: Imag16 → A16; rep #$30; sta (zp),Y; sep #$30
 +      Register A16 = loadStoreValueIntoA16(Builder, MI, ValOrDst, New, FoldedLoad);
-+      auto St = Builder.buildInstr(MOS::STIndirYIdx16).addUse(A16).addUse(BasePtr).addUse(YIdx);
++      auto St = Builder.buildInstr(FuseYLoad ? MOS::STIndirYIdx16Fused
++                                           : MOS::STIndirYIdx16)
++                    .addUse(A16)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
 +      St.cloneMemRefs(MI);
 +      New.push_back(St);
 +    } else {
-+      // 8-bit data, 16-bit Y: rep #$10; sta (zp),Y; sep #$10
-+      auto St = Builder.buildInstr(MOS::STIndirYIdx).addUse(ValOrDst).addUse(BasePtr).addUse(YIdx);
++      auto St = Builder.buildInstr(FuseYLoad ? MOS::STIndirYIdxFused
++                                           : MOS::STIndirYIdx)
++                    .addUse(ValOrDst)
++                    .addUse(BasePtr)
++                    .addUse(IdxReg);
 +      St.cloneMemRefs(MI);
 +      New.push_back(St);
 +    }
@@ -4104,7 +4144,7 @@ index 9712a96e9..29287394a 100644
 
  bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    unsigned Opcode;
-@@ -2055,8 +3347,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+@@ -2055,8 +3348,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    // its upstream inttoptr/merge COPY chain coalesces to the single Imag32 quad
    // that `lda [dp]`/`sta [dp]` reads — otherwise a class-less bridge COPY is left
    // behind (the operand constraint inserts a bridge it never re-constrains).
@@ -4118,7 +4158,7 @@ index 9712a96e9..29287394a 100644
      MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
      Register Ptr = MI.getOperand(1).getReg();
      if (Ptr.isVirtual() && !MRI.getRegClassOrNull(Ptr))
-@@ -2086,6 +3382,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+@@ -2086,6 +3383,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    case MOS::G_LOAD_FAR_INDIR: // #320 far runtime: runtime far load -> LDA [dp].
      Opcode = MOS::LDIndirLong;
      break;
@@ -4128,7 +4168,7 @@ index 9712a96e9..29287394a 100644
    case MOS::G_LOAD_ABS_IDX:
      Opcode = MOS::LDAbsIdx;
      break;
-@@ -2110,6 +3409,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+@@ -2110,6 +3410,9 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
    case MOS::G_STORE_FAR_INDIR: // #320 far runtime: runtime far store -> STA [dp].
      Opcode = MOS::STIndirLong;
      break;
@@ -4271,7 +4311,7 @@ index d13429a71..0e357b030 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa587..dd19f49c0 100644
+index 6356fa587..4592a1194 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,7 +25,10 @@
@@ -5315,10 +5355,27 @@ index 6356fa587..dd19f49c0 100644
 
    MachineIRBuilder &Builder = Helper.MIRBuilder;
    auto ValueType = MRI.getType(MI.getValueReg());
-@@ -1685,6 +2442,150 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+@@ -1685,6 +2442,169 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
    return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
  }
 
++// Native 65816 indexed addressing carries out of the 16-bit address into
++// DBR. A near G_PTR_ADD wraps at 16 bits, so folding it into an index requires
++// proof that its unsigned sum cannot wrap. Inbounds alone permits subtraction.
++static bool canFoldNearIndex(const GPtrAdd &PtrAdd, LegalizerHelper &Helper) {
++  const auto &STI = Helper.MIRBuilder.getMF().getSubtarget<MOSSubtarget>();
++  if (!STI.hasW65816() || PtrAdd.getFlag(MachineInstr::NoUWrap))
++    return true;
++  auto *VT = Helper.getValueTracking();
++  KnownBits Offset = VT->getKnownBits(PtrAdd.getOffsetReg());
++  if (PtrAdd.getFlag(MachineInstr::NoUSWrap) && Offset.isNonNegative())
++    return true;
++  KnownBits Base = VT->getKnownBits(PtrAdd.getBaseReg());
++  bool Overflow;
++  (void)Base.getMaxValue().uadd_ov(Offset.getMaxValue(), Overflow);
++  return !Overflow;
++}
++
 +bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
 +                                              MachineRegisterInfo &MRI,
 +                                              GLoadStore &MI) const {
@@ -5390,6 +5447,8 @@ index 6356fa587..dd19f49c0 100644
 +    // becomes VarIndex (first one wins; a second means we can't fold both).
 +    if (const auto *PtrAdd =
 +            cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++      if (!canFoldNearIndex(*PtrAdd, Helper))
++        return false;
 +      Addr = PtrAdd->getBaseReg();
 +      Register Off = PtrAdd->getOffsetReg();
 +      if (auto C = getIConstantVRegValWithLookThrough(Off, MRI)) {
@@ -5466,7 +5525,7 @@ index 6356fa587..dd19f49c0 100644
  bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
                                              MachineRegisterInfo &MRI,
                                              GLoadStore &MI) const {
-@@ -1709,6 +2610,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+@@ -1709,6 +2629,10 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
      // long (`lda [dp]`) through a ZP Imag32 quad.
      if (tryFarAbsoluteAddressing(Helper, MRI, MI))
        return true;
@@ -5477,7 +5536,7 @@ index 6356fa587..dd19f49c0 100644
      return tryFarIndirectAddressing(Helper, MRI, MI);
    }
    default:
-@@ -1823,6 +2728,245 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
+@@ -1823,6 +2747,245 @@ bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5723,7 +5782,16 @@ index 6356fa587..dd19f49c0 100644
  bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                                                      MachineRegisterInfo &MRI,
                                                      GLoadStore &MI,
-@@ -1913,7 +3057,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+@@ -1887,6 +3050,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+     }
+     if (const auto *PtrAddAddr =
+             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++      if (!ZP && !canFoldNearIndex(*PtrAddAddr, Helper))
++        return false;
+       Addr = PtrAddAddr->getBaseReg();
+       Register NewOffset = PtrAddAddr->getOffsetReg();
+       if (auto ConstOffset =
+@@ -1913,7 +3078,75 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
                .countMaxActiveBits() <= 8) {
          if (Index)
            return false;
@@ -5800,7 +5868,17 @@ index 6356fa587..dd19f49c0 100644
          continue;
        }
      }
-@@ -1996,6 +3208,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -1972,7 +3205,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+       isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX : MOS::G_STORE_INDIR_IDX;
+
+   if (const auto *PtrAddAddr =
+-          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI));
++      PtrAddAddr && canFoldNearIndex(*PtrAddAddr, Helper)) {
+     Register Base = PtrAddAddr->getBaseReg();
+     Register Offset = PtrAddAddr->getOffsetReg();
+     if (auto ConstOffset = getIConstantVRegValWithLookThrough(Offset, MRI)) {
+@@ -1996,6 +3230,11 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
                     .countMaxActiveBits() <= 8) {
        Index = Builder.buildZExtOrTrunc(S8, Offset).getReg(0);
        Addr = Base;
@@ -5812,7 +5890,7 @@ index 6356fa587..dd19f49c0 100644
      }
    }
 
-@@ -2020,6 +3237,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+@@ -2020,6 +3259,106 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
    return true;
  }
 
@@ -5919,7 +5997,7 @@ index 6356fa587..dd19f49c0 100644
  bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
                                       MachineRegisterInfo &MRI, MachineInstr &MI,
                                       LostDebugLocObserver &LocObserver) const {
-@@ -2065,6 +3382,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+@@ -2065,6 +3404,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
      return true;
    }
 
@@ -7060,7 +7138,7 @@ index 000000000..d9c2a6452
 +}
 diff --git a/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
 new file mode 100644
-index 000000000..9f22e668b
+index 000000000..91b7adc66
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
 @@ -0,0 +1,187 @@
@@ -7140,7 +7218,7 @@ index 000000000..9f22e668b
 +  ret void
 +}
 +
-+; Indexed addressing retains its native-width store.
++; A non-wrapping offset retains its indexed native-width store.
 +define void @store_offset(ptr %p, i16 %value) {
 +; NATIVE-LABEL: store_offset:
 +; NATIVE: rep #32
@@ -7149,7 +7227,7 @@ index 000000000..9f22e668b
 +; DEFAULT-LABEL: store_offset:
 +; DEFAULT-NOT: rep
 +; DEFAULT: rts
-+  %q = getelementptr i16, ptr %p, i16 1
++  %q = getelementptr nuw i16, ptr %p, i16 1
 +  store i16 %value, ptr %q, align 1
 +  ret void
 +}
@@ -7253,10 +7331,10 @@ index 000000000..9f22e668b
 +attributes #0 = { "target-features"="+mos-a16" }
 diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 new file mode 100644
-index 000000000..9701eda67
+index 000000000..641b6f34e
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
-@@ -0,0 +1,517 @@
+@@ -0,0 +1,513 @@
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,A16
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
 +; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
@@ -7452,14 +7530,14 @@ index 000000000..9701eda67
 +  ret void
 +}
 +
-+; The customer (dev/dpy-shapes loop, pointer form): the loop counter IS the
-+; index, so it lives in Y and the whole body is lda [dp],y / sta abs,y / iny /
-+; cpy / bne — no per-iteration 32-bit add.
++; The loop counter indexes the far source directly. The near destination
++; forms its 16-bit address separately when loop strength reduction does not
++; retain the unsigned-wrap proof needed for native near indexed addressing.
 +define void @far_rt_blit(i32 %a, ptr %dst) {
 +; CHECK-LABEL: far_rt_blit:
 +; CHECK: .LBB{{[0-9_]+}}:
 +; CHECK: lda [__rc{{[0-9]+}}],y
-+; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: sta (__rc{{[0-9]+}})
 +; CHECK-NEXT: iny
 +; CHECK-NEXT: cpy #64
 +; CHECK-NEXT: bne
@@ -7500,18 +7578,14 @@ index 000000000..9701eda67
 +}
 +
 +
-+; Y CONTENDED: inside the loop Y is wanted both for the loop counter (the near
-+; `nearbuf[j]` store) and for the loop-invariant far index %m. Register
-+; allocation has to shuffle the two, but the fold still removes the 32-bit add
-+; from the loop, and the code must verify (-verify-machineinstrs above).
++; The far index and loop counter need separate values. The far access keeps
++; its indexed mode while the near store computes a wrapping 16-bit address.
 +@nearbuf = global [64 x i8] zeroinitializer
 +define void @far_rt_y_contended(i32 %a, i8 %m) {
 +; CHECK-LABEL: far_rt_y_contended:
-+; CHECK-NOT: adc
 +; CHECK: .LBB{{[0-9_]+}}:
-+; CHECK-NOT: adc
 +; CHECK: lda [__rc{{[0-9]+}}],y
-+; CHECK-NOT: adc
++; CHECK: sta (__rc{{[0-9]+}})
 +; CHECK: rts
 +entry:
 +  %p = inttoptr i32 %a to ptr addrspace(2)
@@ -7885,6 +7959,132 @@ index 000000000..13d1aa2e1
 +    $rs0 = COPY %7(s16)
 +    RTS implicit $rs0
 +...
+diff --git a/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
+new file mode 100644
+index 000000000..079715374
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
+@@ -0,0 +1,120 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -stop-after=instruction-select -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=MIR
++
++; A 16-bit runtime index in an Imag16 pair must become one fused operation.
++; The fusion keeps an X8 spill or reload from clearing the high byte of Y
++; between its load and the near (zp),Y access.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define i8 @near_load(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load
++; MIR: LDIndirYIdxFused {{.*}}implicit-def $y16 :: (load (s8)
++; CHECK-LABEL: near_load:
++; CHECK: rep #16
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
++; CHECK-NEXT: sep #16
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define void @near_store(ptr %p, i16 %i, i8 %v) {
++; MIR-LABEL: name: near_store
++; MIR: STIndirYIdxFused {{.*}}implicit-def $y16 :: (store (s8)
++; CHECK-LABEL: near_store:
++; CHECK: rep #16
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK-NEXT: sep #16
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  store i8 %v, ptr %q
++  ret void
++}
++
++; Word accesses require M=16 as well as X=16. The Y load must remain adjacent
++; to the access while the value enters or leaves the accumulator separately.
++define i16 @near_load_word(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_word
++; MIR: LDIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile load (s16)
++; CHECK-LABEL: near_load_word:
++; CHECK: rep #48
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
++; CHECK: sep #48
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  %v = load volatile i16, ptr %q, align 1
++  ret i16 %v
++}
++
++define void @near_store_word(ptr %p, i16 %i, i16 %v) {
++; MIR-LABEL: name: near_store_word
++; MIR: STIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile store (s16)
++; CHECK-LABEL: near_store_word:
++; CHECK: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: sep #48
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  store volatile i16 %v, ptr %q, align 1
++  ret void
++}
++
++; Near pointer arithmetic truncates the address to 16 bits. Inbounds permits a
++; negative offset, while native (dp),Y carries an unsigned sum into DBR.
++; Form the full near address before the access when unsigned wrap is possible.
++define i8 @near_load_wrapping(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_wrapping
++; MIR-NOT: LDIndirYIdx
++; MIR: LDIndir {{.*}} :: (load (s8)
++; CHECK-LABEL: near_load_wrapping:
++; CHECK-NOT: ),y
++; CHECK: lda (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr inbounds i8, ptr %p, i16 %i
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define void @near_store_wrapping(ptr %p, i16 %i, i8 %v) {
++; MIR-LABEL: name: near_store_wrapping
++; MIR-NOT: STIndirYIdx
++; MIR: STIndir {{.*}} :: (store (s8)
++; CHECK-LABEL: near_store_wrapping:
++; CHECK-NOT: ),y
++; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr i8, ptr %p, i16 %i
++  store i8 %v, ptr %q
++  ret void
++}
++
++define i16 @near_load_word_wrapping(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_word_wrapping
++; MIR-NOT: LDIndirYIdx
++; MIR: LDAIndir16 {{.*}} :: (volatile load (s16)
++; CHECK-LABEL: near_load_word_wrapping:
++; CHECK-NOT: ),y
++; CHECK: lda (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr inbounds i8, ptr %p, i16 %i
++  %v = load volatile i16, ptr %q, align 1
++  ret i16 %v
++}
++
++define void @near_store_word_wrapping(ptr %p, i16 %i, i16 %v) {
++; MIR-LABEL: name: near_store_word_wrapping
++; MIR-NOT: STIndirYIdx
++; MIR: STAIndir16 {{.*}} :: (volatile store (s16)
++; CHECK-LABEL: near_store_word_wrapping:
++; CHECK-NOT: ),y
++; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr i8, ptr %p, i16 %i
++  store volatile i16 %v, ptr %q, align 1
++  ret void
++}
 diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
 index cc766817e..270c169d1 100644
 --- a/llvm/test/MC/MOS/all-65816-opcodes.s

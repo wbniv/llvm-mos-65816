@@ -1,0 +1,7 @@
+ninja: Entering directory `build/llvm-mos'
+[1/6] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSInstructionSelector.cpp.o
+[2/6] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[3/6] Linking CXX executable bin/lld
+[4/6] Linking CXX executable bin/clang-23
+[5/6] Creating executable symlink bin/clang
+[6/6] Linking CXX executable bin/llc

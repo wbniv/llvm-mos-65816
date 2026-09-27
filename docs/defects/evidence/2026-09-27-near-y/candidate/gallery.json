@@ -1,0 +1,25 @@
+{
+  "command": [
+    "/work/build/near-y-fix/candidate/bin/clang",
+    "--config",
+    "/work/build/install/bin/mos-snes-gallery.cfg",
+    "-mcpu=mosw65816",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-a16",
+    "-Xclang",
+    "-target-feature",
+    "-Xclang",
+    "+mos-xy16",
+    "-Oz",
+    "-DGALLERY_BENCH_ONLY=1",
+    "-I/work/examples/snes"
+  ],
+  "input": "/work/docs/defects/evidence/2026-09-26-dpy-near-y/lzss-gallery.c.txt",
+  "input_sha256": "478523c3cc18a3d974869fb814f8807b0a1708e3bf048b4500fb78ad6966d827",
+  "compiler_sha256": "dc5c274264d2cce20c7d7f1000409996b10c093a104ca3e138b7be512482c911",
+  "linker_sha256": "83b1cba826164af281a2144a445ae3e690f25b3c72b91569dd7b338cfde0e366",
+  "rom_sha256": "f58f0b8df68d0eec3fe45934e2ffff73ac4067f741773a433054b836fcd6cae9",
+  "exit": 1
+}

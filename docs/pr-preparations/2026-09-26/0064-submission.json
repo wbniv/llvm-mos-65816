@@ -4,9 +4,16 @@
   "draft": false,
   "head": "155e209c4cee8eeac01397aac3542e76841a9856",
   "mergeable": true,
-  "state": "open",
+  "state": "closed",
   "url": "https://github.com/llvm-mos/llvm-mos/pull/609",
   "tested_base": "7bd67c0ae4e8bb65a3f980912bf201df22131e34",
   "attribution": "OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.",
-  "authorization_note": "PR creation was not authorized. The user subsequently directed that it remain open for their review. Further PR changes require explicit authorization; the subsequent commit/push request covers remaining repository work."
+  "authorization_note": "PR creation was not authorized. The user subsequently directed that it remain open for their review. Further PR changes require explicit authorization; the subsequent commit/push request covers remaining repository work.",
+  "closed_at": "2026-09-27T01:38:15Z",
+  "withdrawal": {
+    "reason": "Withdrawn for the moment at the user's explicit request identifying PR 609.",
+    "branch_retained": true,
+    "verified_state": "CLOSED",
+    "attribution": "OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`."
+  }
 }

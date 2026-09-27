@@ -159,6 +159,21 @@ class EvidenceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'configuration must match'):
             self.check()
 
+    def test_observed_output_is_separate_from_settings(self):
+        self.record['baseline']['configuration']['observed'] = '0xA50F'
+        previous = copy.deepcopy(self.record)
+        self.record['resolution']['candidate']['observed'] = '0x5CF0'
+        self.check(previous)
+        self.assertEqual(self.record['baseline'], previous['baseline'])
+
+    def test_result_difference_does_not_hide_changed_settings(self):
+        self.record['baseline']['configuration']['observed'] = '0xA50F'
+        candidate = self.record['resolution']['candidate']
+        candidate['observed'] = '0x5CF0'
+        candidate['configuration']['lto'] = True
+        with self.assertRaisesRegex(ValueError, 'configuration must match'):
+            self.check()
+
     def test_failing_candidate_cannot_close(self):
         self.record['resolution']['candidate']['exit_code'] = 1
         with self.assertRaisesRegex(ValueError, 'candidate regression must pass'):

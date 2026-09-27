@@ -323,7 +323,7 @@ Targets:
   xy16ops    #321 xy16 B2 legalizer gate: unmasked volatile 16-bit index triggers
              G_LOAD_ABS_IDX16 → LDXImag16+LDAbsXIdx16; corpus_result==0x2A42 both emus.
   xy16indiry #321 xy16 B2 (zp),Y16 gate: runtime zp pointer + unmasked 16-bit offset
-             triggers G_LOAD_INDIR_IDX16 → LDYImag16+LDIndirYIdx16 (lda (dp),Y, no
+             triggers G_LOAD_INDIR_IDX16 → LDIndirYIdx16Fused (lda (dp),Y, no
              byte-walk); corpus_result==0x7E5A host==default==+mos-a16==+mos-xy16 both emus.
   xy16call   #321 xy16 CROSS-CALL boundary gate: a genuine 16-bit index held live across a
              clobbering noinline call (survives in a callee-saved ZP pair, reloaded LDXImag16

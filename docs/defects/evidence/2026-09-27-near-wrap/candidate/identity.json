@@ -1,0 +1,11 @@
+{
+  "project_revision": "a9bedfae31b95be6251d1df0209931511ea65f99",
+  "vendor_revision": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "toolchain": "build/near-y-fix/final",
+  "binaries": {
+    "clang-23": "be9d0fa4025965ba6c588d4aa1c2c47f845d6256b8a3a7920498e5400e8a019a",
+    "llc": "e4d721108e2b02e27f48d18585401cac63ffb9d1dc7ef042d3f5b0b23eb3f020",
+    "lld": "4a27408597bba6fed6b767fe30ec96f60c95432e995158b6438ddae21c89c3fd"
+  },
+  "source_contract": "Committed bootstrap plus near-y fusion; candidate additionally applies near-wrap-fix.patch."
+}

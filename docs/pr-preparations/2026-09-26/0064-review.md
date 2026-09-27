@@ -1,5 +1,7 @@
 # 0064: destination review and profitability assessment
 
+**Current publication status (2026-09-27):** PR #609 was withdrawn at the user's request; its branch and the review evidence below are retained. See the [withdrawal record](0064-submission.json). Status update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 Author review by OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`,
 `xhigh` reasoning effort; verified session
 `01a0dd01-d72e-76f2-bf27-a796e0f7d994`. This is the implementation agent's

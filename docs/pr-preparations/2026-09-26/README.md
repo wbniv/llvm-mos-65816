@@ -1,5 +1,7 @@
 # Local posting preparation — September 26, 2026
 
+**Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
+
 The original seventeen-packet preparation pass posted, pushed, and deployed
 nothing. The later 0064 publication is recorded in its separate section below.
 The original pass authorized local preparation and independent reviewers.
@@ -159,7 +161,7 @@ This publication contains the standalone 0064 preparation:
 - [Validation and retained evidence](0064-validation.md).
 
 Compiler commit `155e209c4cee` is based on llvm-mos main `7bd67c0ae4e8` and
-is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling). [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) is open. The destination was rechecked at `26d7c2c1eebf`; the recorded tests remain on `7bd67c0ae4e8`.
+is [pushed to the fork branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling). [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) was closed at the user's request on September 27; its branch is retained. The destination was rechecked at `26d7c2c1eebf`; the recorded tests remain on `7bd67c0ae4e8`.
 The exact patch passes ten focused commands, 132 MOS tests (one unsupported),
 and 512 Python-oracle runtime vectors per build. The targeted MIR kernel
 shrinks 133 → 59 bytes. The [September 27 upstream Clang run](0064-validation.md#full-upstream-clang-validation--september-27)

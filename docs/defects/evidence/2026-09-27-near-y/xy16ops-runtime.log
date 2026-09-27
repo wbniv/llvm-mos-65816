@@ -1,0 +1,14 @@
+==> 1) +mos-xy16 -verify-machineinstrs must compile CLEAN (unmasked 16-bit index under +mos-xy16)
+  PASS: clean (exit 0)
+==> 2) the indexed access must use G_LOAD_ABS_IDX16 → LDXImag16+LDAbsXIdx16 (B2 gate)
+  PASS: 1 G_LOAD_ABS_IDX16 (legalizer) + 1 LDXImag16 + 1 LDAbsXIdx16 (selector) — B2 gate fires
+==> 3) build default + +mos-xy16 ROMs
+==> 4) MAME: host == default == +mos-xy16 (corpus_result == 0x2A42)
+  default:
+SMOKE: PASS addr=0x7E0202 len=2 got=0x2A42 (ran 60 ticks)
+  +mos-xy16:
+SMOKE: PASS addr=0x7E0202 len=2 got=0x2A42 (ran 60 ticks)
+==> 5) bsnes-jg: +mos-xy16 corpus_result == 0x2A42 (independent confirmation)
+  SMOKE: PASS off=0x202 len=2 got=0x2A42 (ran 180 frames, bsnes-jg)
+
+RESULT: PASS — G_LOAD_ABS_IDX16+LDXImag16+LDAbsXIdx16 B2 path under +mos-xy16; corpus_result==0x2A42; both emulators agree
