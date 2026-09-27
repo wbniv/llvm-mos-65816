@@ -443,6 +443,7 @@
       "nextStep": "PR #609 is withdrawn at the user's request; retain the branch for later revision. Validated on 7bd67c0ae4e8; destination rechecked at 26d7c2c1eebf without a new-base rebuild. Author review only. Downstream timing shows sum/rotate gains but a 2.80% L-system interpreter regression; the zero-cycle-regression criterion is not met. Compiler time remains unmeasured.",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/pull/609",
       "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-mos-carry-timing.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-26-mos-carry-scheduling.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-carry-scheduling-pressure.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
@@ -450,7 +451,7 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-review.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-validation.md"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "dependsOn": [],
       "demoUrls": []
     },

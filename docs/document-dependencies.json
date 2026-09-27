@@ -56,7 +56,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "9be905ebd62b6f8d52757a2ed4d99ed419ec6309cf0ea3f8cad1232eb4f137ac"
+          "docs/upstream-dashboard.json": "e21ea26712062d12b23b9918b9e11e8b9623d36fd00a46ca2aa9d5de9182d79b"
         }
       }
     },
@@ -79,7 +79,7 @@
         "sources": {
           "docs/upstream-pending-work.md": "8636b14346581a86fc98d274514356f076247856597aac6fce455d634769ef5a",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "9be905ebd62b6f8d52757a2ed4d99ed419ec6309cf0ea3f8cad1232eb4f137ac",
+          "docs/upstream-dashboard.json": "e21ea26712062d12b23b9918b9e11e8b9623d36fd00a46ca2aa9d5de9182d79b",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
@@ -304,7 +304,8 @@
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-farblit-byte-load.md",
-        "docs/investigations/2026-09-27-mos-carry-timing.md"
+        "docs/investigations/2026-09-27-mos-carry-timing.md",
+        "docs/plans/2026-09-27-0064-competing-carry-gate.md"
       ],
       "receipt": {
         "sources": {
@@ -336,10 +337,11 @@
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
-          "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75"
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75",
+          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "8044bee181efce2705abc273012bda8b943493e002c9832910e5ade8c6a5f4a4"
         },
-        "reviewed_at": "2026-09-27T05:44:33.033500+00:00",
-        "note": "Reviewed the final preserved-object timing comparison, calibration and retained patch packaging. Sum/rotate improve 30.45/17.61 percent; the isolated XY16 Oz L-system interpreter regresses 2.80 percent, violating the zero-cycle-regression criterion. Dashboard needs-work status and linked timing evidence reflect that conclusion. Current summaries retain compiler-overhead, ordinary-6502 and exact-upstream timing limits, generic-pressure workaround, and the separate farblit opcode-count qualification. Shared near-store delivery edits remain outside this commit.",
+        "reviewed_at": "2026-09-27T06:30:51.930947+00:00",
+        "note": "Reviewed the merged TODO and competing-carry plan against the retained timing report and farblit repair evidence. Keep the remote scheduler proposal and parked-item triage, 0065 downstream delivery, measured sum/rotate gains of 30.45/17.61 percent, the 2.80 percent XY16 Oz interpreter regression, and the separate farblit opcode-count qualification. The new plan remains unimplemented and its original scope notes and author attribution remain dated evidence; byte-size recovery would not prove speed regressions resolved. Compiler overhead and ordinary-6502/exact-upstream timing remain open.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     },
@@ -1592,6 +1594,24 @@
         },
         "reviewed_at": "2026-09-27T05:36:48.377597+00:00",
         "note": "Reviewed the unchanged 34 timing comparisons and interpreter regression against the final receipt. The raw emulator patch is losslessly gzip-compressed; calibration, matching-input identities and limits are unchanged. The current report continues to reject the zero-cycle-regression claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-27-0064-competing-carry-gate.md",
+      "sources": [
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/investigations/2026-09-27-mos-carry-timing.md",
+        "docs/investigations/2026-09-27-farblit-byte-load.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "4e1eb27989d8a25fb11b902c4d36b29b0c50c4b054d1c73ee48c18869c783f68",
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "5cf91a9d39e9faf170fc02103a1ddbcf8b1f5019d7dfe8e5fae823fb66eecd75",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685"
+        },
+        "reviewed_at": "2026-09-27T06:30:52.654935+00:00",
+        "note": "Reviewed the merged TODO and competing-carry plan against the retained timing report and farblit repair evidence. Keep the remote scheduler proposal and parked-item triage, 0065 downstream delivery, measured sum/rotate gains of 30.45/17.61 percent, the 2.80 percent XY16 Oz interpreter regression, and the separate farblit opcode-count qualification. The new plan remains unimplemented and its original scope notes and author attribution remain dated evidence; byte-size recovery would not prove speed regressions resolved. Compiler overhead and ordinary-6502/exact-upstream timing remain open.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
       }
     }
