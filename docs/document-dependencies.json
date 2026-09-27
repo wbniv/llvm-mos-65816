@@ -103,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "9d1887ba3b802539348cb6dc0da105da01e2271b4746d9925687dae2dddf71e8"
+          "docs/upstream-dashboard.json": "b9babc4c839e21ecf70eba979a7d077b6b7180b46d711bb708b90678b92dd895"
         }
       }
     },
@@ -124,13 +124,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "f643e4fa649c241562e55ed476169580a2b892a1da8a24a7586af68a647cead1",
-          "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "9d1887ba3b802539348cb6dc0da105da01e2271b4746d9925687dae2dddf71e8",
+          "docs/upstream-pending-work.md": "4cf9fd79d3981a6ccf19a28f89bbf05daf64518869337a59b14d6667c5cd892c",
+          "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
+          "docs/upstream-dashboard.json": "b9babc4c839e21ecf70eba979a7d077b6b7180b46d711bb708b90678b92dd895",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "57d9bfd17226d4587fcd6829cffb90060f484c721a8ccf35e544746c76d58676"
+          "docs/upstream-dashboard-graph.json": "a275eb6d6b7454326259500658663300f457dfcde5e1dc914b6a10450d904ef4"
         }
       }
     },
@@ -159,7 +159,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "f643e4fa649c241562e55ed476169580a2b892a1da8a24a7586af68a647cead1",
+          "docs/upstream-pending-work.md": "4cf9fd79d3981a6ccf19a28f89bbf05daf64518869337a59b14d6667c5cd892c",
           "docs/upstream-contribution-status.md": "bffb0fb3ca61be87c27f566c7ac76d4eddb914e4ddc6c1b6fef66c980fb05457",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
@@ -167,8 +167,8 @@
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "d15442f9bb4e60cb154d888f966815855ccad737e6976c933566ce69a8d9b739",
-          "docs/mos-upstream-status-2026-09-21.html": "3373336318df9dd68162de6232b45d59a625260e0014a41e987bd57d1dffe6f0"
+          "docs/mos-upstream-flowchart.html": "7e09d04695579afcef80d6c61cb352f66dbe4f30aec43c65203744811f82cfe2",
+          "docs/mos-upstream-status-2026-09-21.html": "3927790ddf261343aa01eafbcd2c3bc302d370676e971a97411bb0f91acf23ad"
         }
       }
     },
@@ -308,7 +308,7 @@
     {
       "id": "snes-demo-compiler-bug-public-export",
       "sources": [
-        "docs/snes-demo-compiler-bug-pages.json",
+        "docs/snes-compiler-contributions.json",
         "dev/export-snes-compiler-bug-public.py"
       ],
       "outputs": [
@@ -320,11 +320,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
-          "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a"
+          "docs/snes-compiler-contributions.json": "1d728d071358f0794cdf341b1c6c25596ee1f62cc0aee02ece71bfd48493e2a7",
+          "dev/export-snes-compiler-bug-public.py": "f7fe74ee3046ac0b45a07c84035500ab6cf627349ecbb0187ecdabb0fe9e565c"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-public.json": "8ae947005b15bb6bac79d6d9c5ce4ecb44767890b65f303fec0b5b145c04cd8f"
+          "docs/snes-demo-compiler-bug-public.json": "1b76a4521347d481be58b298c46d95ab686529283751c9562ef0634875f54806"
         }
       }
     },
@@ -1610,17 +1610,19 @@
         "docs/snes-demo-compiler-bug-pages.json",
         "dev/render-snes-demo-compiler-bug-map.py",
         "dev/export-snes-compiler-bug-public.py",
-        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/snes-compiler-contributions.json"
       ],
       "receipt": {
         "sources": {
           "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9",
-          "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee"
+          "dev/export-snes-compiler-bug-public.py": "f7fe74ee3046ac0b45a07c84035500ab6cf627349ecbb0187ecdabb0fe9e565c",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee",
+          "docs/snes-compiler-contributions.json": "1d728d071358f0794cdf341b1c6c25596ee1f62cc0aee02ece71bfd48493e2a7"
         },
-        "reviewed_at": "2026-09-27T14:25:10.328861+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T14:39:41.454462+00:00",
+        "note": "Recovered the canonical contribution registry from biohack ac04a89, retaining optimization and documentation provenance. Reconciled gallery line dates against the defect registry; added the verified proof-recovery optimization and null-output repair with their existing evidence and unposted states. Reviewed the export and paired-publication data paths against the Astro import. The original defect-only registry still governs ROM defect metadata; automated cross-repository synchronization remains a follow-up.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -1907,6 +1909,26 @@
         },
         "reviewed_at": "2026-09-27T14:25:10.689995+00:00",
         "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+      }
+    },
+    {
+      "document": "docs/snes-compiler-contributions.json",
+      "sources": [
+        "docs/snes-demo-compiler-bug-pages.json",
+        "docs/defects/mos-near-index-overflow-proofs.json",
+        "docs/defects/mos-null-output-streamer-crash.json",
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
+          "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
+          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee"
+        },
+        "reviewed_at": "2026-09-27T14:39:41.170564+00:00",
+        "note": "Recovered the canonical contribution registry from biohack ac04a89, retaining optimization and documentation provenance. Reconciled gallery line dates against the defect registry; added the verified proof-recovery optimization and null-output repair with their existing evidence and unposted states. Reviewed the export and paired-publication data paths against the Astro import. The original defect-only registry still governs ROM defect metadata; automated cross-repository synchronization remains a follow-up.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     }

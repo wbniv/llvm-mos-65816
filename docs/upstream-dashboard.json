@@ -194,8 +194,11 @@
       "demoUrls": [
         "https://biohack.net/snes/lzss-gallery/"
       ],
-      "evidenceUrls": [],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-index-overflow-proofs.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+      ],
+      "evidenceNote": "",
       "upstreamUrl": null
     },
     {

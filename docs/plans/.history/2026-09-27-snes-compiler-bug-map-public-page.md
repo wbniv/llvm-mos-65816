@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/42512bff) | docs: record near-store delivery and contributions page plan |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/624f4006) | Preserve separate BRK and COP discovery links in the canonical registry |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/489b62df) | Publish near-decoder simulated PR and discovery metadata |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/7894c870) | docs(snes): add discovery-map screenshots |
@@ -8,6 +9,11 @@
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/de844568) | docs(snes): automate compiler-bug map updates |
 
 <!--history-meta v1
+42512bff	author	Will Norris
+42512bff	added	25
+42512bff	deleted	23
+42512bff	files	1
+42512bff	body	Record downstream delivery of 0065, retain its upstream extraction and review gates, and synchronize current summaries and generated dashboard views. Preserve the pending public contributions-page design and earlier contributor credits.\n\nIntegration review: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96.
 624f4006	author	Will Norris
 624f4006	added	3
 624f4006	deleted	1

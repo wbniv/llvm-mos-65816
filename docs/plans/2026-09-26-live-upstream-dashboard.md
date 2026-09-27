@@ -8,6 +8,12 @@ The site refreshes the published compiler manifest from this repository and
 retains a matching bundled copy as a fallback. The page labels the manifest
 source separately from its live GitHub check.
 
+## September 27 tracking follow-up
+
+The current compiler export includes near-index overflow proof recovery and the null-output streamer repair. The dependency graph marks the near-Y index preservation and bank-wrap repairs as fixed locally and carries proof recovery into the #321 native-width submission track. The independent null-output repair still requires destination extraction and review. The September 26 release and 49/50-item snapshots below are dated evidence, not the current queue. Publish the refreshed manifest and graph together through `task open-source:publish`.
+
+Tracking review: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`.
+
 ## Release record
 
 - `../wald3n.com/src/components/CompilerDashboard.astro` adds the scrolling,

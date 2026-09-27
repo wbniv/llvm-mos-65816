@@ -7,7 +7,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SOURCE = ROOT / "docs/snes-demo-compiler-bug-pages.json"
+SOURCE = ROOT / "docs/snes-compiler-contributions.json"
 OUTPUT = ROOT / "docs/snes-demo-compiler-bug-public.json"
 
 
@@ -17,9 +17,17 @@ def main() -> None:
     if registry.get("schema") != 1 or not isinstance(registry.get("records"), list):
         raise SystemExit(f"{SOURCE}: expected schema 1 with records")
     for record in registry["records"]:
-        for field in ("slug", "page", "discovered", "defect", "evidence", "prs", "pr_simulations"):
+        for field in ("slug", "discovered", "defect", "evidence", "prs", "pr_simulations"):
             if field not in record:
                 raise SystemExit(f"{SOURCE}: record is missing {field}")
+        if not record.get("page") and not record.get("source_label"):
+            raise SystemExit(f"{SOURCE}: record needs page or source_label")
+        paths = [record["evidence"], *record["pr_simulations"]]
+        for line in record.get("lines", []):
+            paths.extend([line["evidence"], line["pr_simulation"]])
+        for path in paths:
+            if not (ROOT / path).is_file():
+                raise SystemExit(f"{SOURCE}: missing artifact: {path}")
     records = registry["records"]
     records_bytes = json.dumps(records, sort_keys=True, separators=(",", ":")).encode("utf-8")
     public = {

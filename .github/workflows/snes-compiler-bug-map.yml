@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'docs/snes-demo-compiler-bug-pages.json'
+      - 'docs/snes-compiler-contributions.json'
       - 'dev/export-snes-compiler-bug-public.py'
       - 'dev/render-snes-demo-compiler-bug-map.py'
       - 'docs/snes-demo-compiler-bug-map.md'
@@ -12,6 +13,7 @@ on:
     branches: [main]
     paths:
       - 'docs/snes-demo-compiler-bug-pages.json'
+      - 'docs/snes-compiler-contributions.json'
       - 'dev/export-snes-compiler-bug-public.py'
       - 'dev/render-snes-demo-compiler-bug-map.py'
       - 'docs/snes-demo-compiler-bug-map.md'

@@ -135,7 +135,19 @@
     },
     "NEARY": {
       "workId": "defect:mos-xy16-near-indirect-y-clobber",
-      "label": "Open near Y16 clobber"
+      "label": "Near Y16 index preservation"
+    },
+    "NEARBANK": {
+      "workId": "defect:mos-near-index-bank-wrap",
+      "label": "Near-address bank wrapping"
+    },
+    "NEARPROOF": {
+      "workId": "defect:mos-near-index-overflow-proofs",
+      "label": "Near-index overflow proof recovery"
+    },
+    "NULLSTREAM": {
+      "workId": "defect:mos-null-output-streamer-crash",
+      "label": "0068 null-output streamer"
     }
   },
   "tracks": [
@@ -172,7 +184,8 @@
         "sub:0057",
         "sub:0058",
         "sub:0059",
-        "sub:0060"
+        "sub:0060",
+        "defect:mos-null-output-streamer-crash"
       ]
     },
     {
@@ -201,7 +214,9 @@
         "sub:0051",
         "opt:0061",
         "opt:dpy-runtime-index",
-        "defect:mos-xy16-near-indirect-y-clobber"
+        "defect:mos-xy16-near-indirect-y-clobber",
+        "defect:mos-near-index-bank-wrap",
+        "defect:mos-near-index-overflow-proofs"
       ]
     },
     {

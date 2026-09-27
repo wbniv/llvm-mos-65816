@@ -506,6 +506,7 @@ flowchart TD
     ASMMULTI[Multi-register inline asm 0041: ready locally] --> PREP
     MCWIDTH[MC and constraint fixes 0039 / 0043 / 0044 / 0046 / 0047: ready locally] --> APPROVED
     MOSFIX[Floating vectors 0050: ready locally] --> APPROVED
+    NULLSTREAM[Null-output streamer 0068: fixed locally] --> NULLREVIEW[Extract and review against upstream destination] --> APPROVED
     VECTORBASE[0049: prerequisites already in current upstream] -.-> MOSFIX
     NATIVEPRINT[Immediate printing 0045: ready with stock-opcode test] --> APPROVED
     SAVERANGE[Status-save range 0054: ready with stock scavenger test] --> APPROVED
@@ -534,7 +535,9 @@ flowchart TD
     BANKOFFSET[0052: downstream section policy repair] --> FAR
     NATIVEPRINT[Native immediate printing 0045: fixed locally] --> WIDTH
     DPY[Far DP Y runtime index: verified locally] --> WIDTH
-    NEARY[Near Y16 high-byte clobber: gallery fails] --> NEARREPAIR[Isolate LTO witness and fix near indexing]
+    NEARY[Near Y16 index preservation: fixed locally] --> WIDTH
+    NEARBANK[Near-address bank wrapping: fixed locally] --> WIDTH
+    NEARPROOF[Near-index overflow proofs: recovered locally] --> WIDTH
     FARDONE --> FARSDK[Integrate far SDK support]
     SDKMERGE --> FARSDK
     WIDTHDONE --> WIDTHSDK[Integrate native-width SDK opt-ins]
@@ -551,8 +554,7 @@ flowchart TD
   end
   classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
   classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
-  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY fixed
-  class NEARY openDefect
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY,NEARY,NEARBANK,NEARPROOF,NULLSTREAM fixed
 ```
 
 ## Independent simulator discussion

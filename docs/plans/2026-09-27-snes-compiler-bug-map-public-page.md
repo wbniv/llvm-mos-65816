@@ -6,6 +6,12 @@ Publish the compiler contributions map at `https://biohack.net/snes/compiler-con
 
 It is a provenance index, not a defect dashboard: each row identifies the original published ROM or compiler-only contribution, the discovery date, the linked contribution statement and technical evidence, any upstream PR, and the internal simulated PR packet. Later ROMs that merely guard an earlier defect do not appear.
 
+## September 27 publication follow-up
+
+The canonical contribution registry has been recovered from the committed biohack.net copy at `ac04a89`. It preserves the existing optimization and documentation entries, reconciles per-finding gallery dates with the compiler's defect discovery registry, and adds the near-index proof recovery optimization and the null-output streamer repair. The proof recovery remains held with the native-width series; neither new contribution has an upstream PR. The export and paired-publication helper now use the contribution registry and the website's current data path. The original defect-only registry remains the source for ROM compiler-defect metadata and its historical discovery map.
+
+Publication preparation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`.
+
 ## Mockups
 
 ### Desktop

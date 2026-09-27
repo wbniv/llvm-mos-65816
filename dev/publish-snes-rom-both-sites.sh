@@ -72,7 +72,7 @@ BIO_MANIFEST="$BIOHACK/public/play/roms/manifest.json"
 BIO_META="$BIOHACK/src/content/snes/$SLUG.json"
 BUG_PAGES="$ROOT/docs/snes-demo-compiler-bug-pages.json"
 BUG_PUBLIC="$ROOT/docs/snes-demo-compiler-bug-public.json"
-BIO_BUG_PUBLIC="$BIOHACK/src/data/snes-compiler-bug-pages.json"
+BIO_BUG_PUBLIC="$BIOHACK/src/data/snes-compiler-contributions.json"
 INDRI_ROM="$INDRI/public/apps/llvm-mos-65816/play/roms/$SLUG.sfc"
 INDRI_PREVIEW="$INDRI/public/apps/llvm-mos-65816/play/preview/$SLUG.png"
 INDRI_MANIFEST="$INDRI/public/apps/llvm-mos-65816/play/roms/manifest.json"
@@ -141,7 +141,7 @@ pnpm --dir "$INDRI" build
 git -C "$BIOHACK" add \
   "public/play/roms/$SLUG.sfc" "public/play/preview/$SLUG.png" \
   public/play/roms/manifest.json "src/content/snes/$SLUG.json" \
-  src/data/snes-compiler-bug-pages.json
+  src/data/snes-compiler-contributions.json
 git -C "$INDRI" add \
   "public/apps/llvm-mos-65816/play/roms/$SLUG.sfc" \
   "public/apps/llvm-mos-65816/play/preview/$SLUG.png" \
