@@ -89,10 +89,23 @@ def oracle_tables(spec: dict):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--site", default=str(pathlib.Path.home() / "biohack.net"))
+    ap.add_argument("--manifest", help="manifest path (overrides --site's default)")
+    ap.add_argument("--rom-dir", help="published ROM directory (overrides --site's default)")
+    ap.add_argument("--symbol", action="append", default=[], metavar="SLUG=SYMBOL",
+                    help="override the self-check symbol for a slug whose manifest omits it")
     ap.add_argument("--check", action="store_true", help="report drift only, exit 1 if any")
     args = ap.parse_args()
 
-    manifest = pathlib.Path(args.site) / "public/play/roms/manifest.json"
+    manifest = pathlib.Path(args.manifest) if args.manifest else \
+        pathlib.Path(args.site) / "public/play/roms/manifest.json"
+    rom_dir = pathlib.Path(args.rom_dir) if args.rom_dir else \
+        pathlib.Path(args.site) / "public/play/roms"
+    symbol_overrides = {}
+    for item in args.symbol:
+        slug, sep, symbol = item.partition("=")
+        if not sep or not slug or not symbol:
+            raise SystemExit(f"FATAL: invalid --symbol {item!r}; expected SLUG=SYMBOL")
+        symbol_overrides[slug] = symbol
     data = json.loads(manifest.read_text())
 
     changed, missing, same, tables = [], [], 0, []
@@ -105,12 +118,12 @@ def main():
         # address that exists only in a ROM that does not exist. Only trust the map when the built
         # ROM is byte-identical to the one actually on the site.
         built = ROOT / "build" / f"{rom['id']}.sfc"
-        shipped = pathlib.Path(args.site) / "public/play/roms" / f"{rom['id']}.sfc"
+        shipped = rom_dir / f"{rom['id']}.sfc"
         if not (built.is_file() and shipped.is_file()
                 and built.read_bytes() == shipped.read_bytes()):
             missing.append(rom["id"])
             continue
-        symbol = sc.get("symbol", "corpus_result")
+        symbol = symbol_overrides.get(rom["id"], sc.get("symbol", "corpus_result"))
         addr = symbol_addr(ROOT / "build" / f"{rom['id']}.map", symbol)
         if addr is None:
             missing.append(rom["id"])

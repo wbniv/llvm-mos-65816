@@ -87,6 +87,11 @@ tasks:
     cmds:
       - dev/publish-snes-rom-both-sites.sh {{.CLI_ARGS}}
 
+  publish-all-web-roms:
+    desc: "Rebuild, verify, and deploy the paired SNES web ROM set to biohack.net and indri.studio"
+    cmds:
+      - dev/publish-all-web-roms.sh {{.CLI_ARGS}}
+
   smoke:
     desc: "Boot build/hello.sfc headless in MAME's snes driver, assert sentinel==0x42 in WRAM (needs the SPC700 IPL)"
     cmds:

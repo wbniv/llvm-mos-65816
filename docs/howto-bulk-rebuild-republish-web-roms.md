@@ -14,17 +14,9 @@ python3 tools/gen-font16.py > examples/snes/font16.h
 # 1. prove it on ONE representative demo with the full gate (host == +mos-a16 on MAME + bsnes-jg):
 dev/run.sh boids
 
-# 2. rebuild EVERY published ROM (one container, no gate) and sync into the site:
-dev/publish-web-roms.sh            # --site ~/biohack.net by default
-
-# 3. resync the manifest self-check offsets — REQUIRED whenever a shared struct changed size:
-dev/sync-manifest-offsets.py       # --check to report drift without writing
-
-# 4. verify EVERY ROM against the manifest (self-check + force-blank scan) before deploying:
-dev/verify-web-roms.sh             # must print ALL PASS
-
-# 5. commit the ROMs + manifest in the site repo, then deploy:
-cd ~/biohack.net && git add public/play/roms && git commit -m "…" && task bump
+# 2. rebuild, verify, and deploy EVERY paired ROM to both live sites:
+task publish-all-web-roms          # defaults to ~/biohack.net + ~/indri.studio
+# task publish-all-web-roms -- --biohack-site /path/to/biohack.net --indri-site /path/to/indri.studio
 ```
 
 ## Why it's fast (and still correct)
@@ -53,9 +45,10 @@ cd ~/biohack.net && git add public/play/roms && git commit -m "…" && task bump
 | Script | Runs | Does |
 |---|---|---|
 | `dev/rebuild-web-roms.sh` | **in-container** (via `dev/run.sh rebuild-web-roms …`) | compile `build/<slug>.sfc` + `build/<slug>.map` for each slug; fix SNES checksum. Args: slugs, or `@<listfile>`. |
-| `dev/publish-web-roms.sh` | **host** | list slugs from `<site>/public/play/roms/*.sfc` → build them all in one container → copy the fresh `.sfc` into the site. Syncs whatever built even if some demos failed, reports the gap, exits non-zero. Does **not** deploy. |
-| `dev/sync-manifest-offsets.py` | **host** | rewrite each demo's self-check `off` from `build/<slug>.map`. Only trusts a map when the built ROM is byte-identical to the shipped one — **a failed link still leaves a partial map behind**, and trusting it would aim the self-check at an address that exists only in a ROM that was never published. |
-| `dev/verify-web-roms.sh` | **host** | replay EVERY shipped ROM against its manifest self-check in bsnes-jg + scan for force-blank bleed. The deploy gate. |
+| `dev/publish-web-roms.sh` | **host** | legacy biohack.net staging helper: list slugs from its ROM directory, rebuild, and copy successful ROMs into that checkout. It does not deploy and is not the paired release command. |
+| `task publish-all-web-roms` | **host** | calls `dev/publish-all-web-roms.sh`: require matching clean site checkouts and ROM inventories, rebuild all ROMs, refresh each site's self-check offsets, verify every ROM in bsnes-jg, build both sites, commit the ROMs/manifests, trigger both deployments, then verify live ROM hashes. |
+| `dev/sync-manifest-offsets.py` | **host** | rewrite self-check `off` values from `build/<slug>.map`. It supports each site's own manifest and ROM directory; it only trusts a map when the candidate ROM matches the ROM in that site checkout. |
+| `dev/verify-web-roms.sh` | **host** | replay every ROM against a selected manifest in bsnes-jg and scan for force-blank bleed. The paired publish command runs it against both sites before deployment. |
 
 Slug→source is 1:1 except `3d-wireframe→wireframe`, `buddhabrot→buddha`, `space-invaders→invaders`
 (kept in `SRCMAP` in `dev/rebuild-web-roms.sh` — extend it if a new renamed slug appears).
@@ -76,20 +69,19 @@ Slug→source is 1:1 except `3d-wireframe→wireframe`, `buddhabrot→buddha`, `
 3. **Title capture** (optional visual proof): render an early frame of a built ROM with the bsnes-jg
    harness and eyeball the title, e.g. `~/waldo/waldofont build/boids.sfc 200 /tmp/t` → `/tmp/t.png`.
 
-## Deploy (site side)
+## Deploy
 
-`biohack.net` deploys via Cloudflare on a tagged push. After syncing + committing the ROMs:
-
-```
-cd ~/biohack.net
-git add public/play/roms                       # the fresh .sfc files only
-git commit -m "snes: rebuild demo ROMs (<what changed>)"
-task bump                                       # auto-bump patch tag + push → Cloudflare deploy
-```
+`task publish-all-web-roms` publishes by committing and tagging both site checkouts. It refuses dirty
+checkouts, mismatched ROM inventories, missing builds, failed emulator checks, or failed site builds.
+The two established site release tasks trigger their production deployments. The command then checks
+that every live ROM on both sites has the SHA-256 of the rebuilt candidate.
 
 The `.astro` pages cache-bust each ROM by content hash, so a changed `.sfc` rebuilds its page
-automatically — no page edits needed. **Publishing is user-triggered**; don't `task bump` without the
-go-ahead.
+automatically. A no-change rebuild exits without creating commits or tags.
+
+This release command verifies each published ROM's manifest self-check and force-blank scan in
+bsnes-jg. It does not run each demo's host/MAME/bsnes-jg differential gate; compiler changes must
+complete their required differential validation before this command is used to publish them.
 
 ## Per-demo specials (handled by `rebuild-web-roms.sh`)
 

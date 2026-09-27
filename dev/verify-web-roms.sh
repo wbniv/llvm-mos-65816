@@ -22,6 +22,7 @@
 #
 #   dev/verify-web-roms.sh                 # verify ~/biohack.net
 #   dev/verify-web-roms.sh --site DIR
+#   dev/verify-web-roms.sh --manifest FILE --rom-dir DIR
 #   dev/verify-web-roms.sh --only huffman,maze
 #
 # --title-entropy adds a second, OPT-IN leg: dev/title-entropy.sh (see that script's header) over
@@ -37,12 +38,14 @@ set -euo pipefail
 
 case "${1-}" in -h|--help)
   cat <<'USAGE'
-Usage: dev/verify-web-roms.sh [--site DIR] [--only slug[,slug...]] [--title-entropy]
+Usage: dev/verify-web-roms.sh [--site DIR] [--manifest FILE --rom-dir DIR] [--only slug[,slug...]] [--title-entropy]
 
 Replays every ROM in <site>/public/play/roms against its manifest.json self-check in bsnes-jg and
 scans each for force-blank bleed. Exits 1 if any demo mismatches or shows a black-band spike.
 
   --site DIR       site checkout (default: ~/biohack.net)
+  --manifest FILE  manifest path (overrides --site's default)
+  --rom-dir DIR    ROM directory (overrides --site's default)
   --only LIST      comma-separated slugs instead of the whole manifest
   --title-entropy  also run dev/title-entropy.sh over the same ROM set (3 frames × 8 runs each —
                    see the header comment). OFF by default: slow (100+ ROMs), run explicitly or
@@ -52,11 +55,15 @@ USAGE
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 SITE="$HOME/biohack.net"
+MANIFEST=""
+ROM_DIR=""
 ONLY=""
 TITLE_ENTROPY=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --site) SITE="$2"; shift 2;;
+    --manifest) MANIFEST="$2"; shift 2;;
+    --rom-dir) ROM_DIR="$2"; shift 2;;
     --only) ONLY="$2"; shift 2;;
     --title-entropy) TITLE_ENTROPY=1; shift;;
     *) echo "unknown arg: $1" >&2; exit 2;;
@@ -65,7 +72,8 @@ done
 
 JGX="$ROOT/build/jgxcheck"
 DB="$ROOT/vendor/bsnes-jg/Database"
-MANIFEST="$SITE/public/play/roms/manifest.json"
+MANIFEST="${MANIFEST:-$SITE/public/play/roms/manifest.json}"
+ROM_DIR="${ROM_DIR:-$SITE/public/play/roms}"
 
 [ -x "$JGX" ]      || { echo "FATAL: no jgxcheck at $JGX (run: dev/run.sh xcheck)"; exit 1; }
 [ -d "$DB" ]       || { echo "FATAL: no bsnes-jg Database at $DB"; exit 1; }
@@ -130,7 +138,7 @@ PY
 pass=0; fail=0; missing=0; failed=""
 while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   [ -n "$id" ] || continue
-  rom="$SITE/public/play/roms/$id.sfc"
+  rom="$ROM_DIR/$id.sfc"
   if [ ! -f "$rom" ]; then
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
   fi
@@ -193,7 +201,7 @@ if [ "$TITLE_ENTROPY" -eq 1 ]; then
   te_pass=0; te_fail=0; te_missing=0; te_failed=""
   while IFS=$'\t' read -r id _; do
     [ -n "$id" ] || continue
-    rom="$SITE/public/play/roms/$id.sfc"
+    rom="$ROM_DIR/$id.sfc"
     if [ ! -f "$rom" ]; then
       printf '  %-16s MISSING %s\n' "$id" "$rom"; te_missing=$((te_missing+1)); continue
     fi
