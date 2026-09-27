@@ -1,0 +1,75 @@
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
+index e99bd15951ab..7224c5f0ea31 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp
+@@ -93,6 +93,27 @@ static MCTargetStreamer *createMCAsmTargetStreamer(MCStreamer &S,
+   return new MOSTargetAsmStreamer(S, OS);
+ }
+ 
++class MOSNullTargetStreamer final : public MOSTargetStreamer {
++public:
++  explicit MOSNullTargetStreamer(MCStreamer &S) : MOSTargetStreamer(S) {}
++
++  void finish() override {}
++  bool emitDirectiveZeroPage(MCSymbol *Symbol) override { return true; }
++
++private:
++  bool hasBSS() override { return false; }
++  bool hasZPBSS() override { return false; }
++  bool hasData() override { return false; }
++  bool hasZPData() override { return false; }
++  bool hasInitArray() override { return false; }
++  bool hasFiniArray() override { return false; }
++  void stronglyReference(MCSymbol *Sym) override {}
++};
++
++static MCTargetStreamer *createMOSNullTargetStreamer(MCStreamer &S) {
++  return new MOSNullTargetStreamer(S);
++}
++
+ static MCInstrAnalysis *createMOSMCInstrAnalysis(const MCInstrInfo *Info) {
+   return new MOSMCInstrAnalysis(Info);
+ }
+@@ -135,6 +156,10 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTargetMC() {
+   TargetRegistry::RegisterAsmTargetStreamer(getTheMOSTarget(),
+                                             createMCAsmTargetStreamer);
+ 
++  // The asm printer and parser require a MOS streamer even for null output.
++  TargetRegistry::RegisterNullTargetStreamer(getTheMOSTarget(),
++                                             createMOSNullTargetStreamer);
++
+   // Register the asm backend (as little endian).
+   TargetRegistry::RegisterMCAsmBackend(getTheMOSTarget(), createMOSAsmBackend);
+ }
+diff --git a/llvm/test/CodeGen/MOS/filetype-null.ll b/llvm/test/CodeGen/MOS/filetype-null.ll
+new file mode 100644
+index 000000000000..10f1ae7eb82b
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/filetype-null.ll
+@@ -0,0 +1,10 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -debug-pass=Structure -filetype=null %s -o /dev/null 2>&1 | FileCheck %s --check-prefix=PASS
++; RUN: llc -mtriple=mos -mcpu=mos6502 -filetype=obj %s -o /dev/null
++
++; Null emission must provide the MOS target streamer used during asm-printer
++; initialization while discarding all emitted directives.
++; PASS: Free MachineFunction
++
++define void @f() {
++  ret void
++}
+diff --git a/llvm/test/MC/MOS/filetype-null.s b/llvm/test/MC/MOS/filetype-null.s
+new file mode 100644
+index 000000000000..fb883f5a0fb3
+--- /dev/null
++++ b/llvm/test/MC/MOS/filetype-null.s
+@@ -0,0 +1,10 @@
++# RUN: llvm-mc -triple=mos -filetype=null %s -o %t
++# RUN: test ! -s %t
++# RUN: llvm-mc -triple=mos -filetype=obj %s -o %t.o
++
++# The parser must accept target directives with a null output streamer.
++.zeropage external_zp
++.text
++.globl f
++f:
++  rts

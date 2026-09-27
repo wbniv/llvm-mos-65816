@@ -14,6 +14,8 @@ packet has author review; the earlier seventeen retain their recorded independen
 reviews. 0028 also passes validation but remains
 under the user's explicit presentation hold. Feature-held work is listed below.
 
+**Additional September 27 packet:** [0068 null-output streamer](../2026-09-27/0068-validation.md) has a standalone extraction author-validated on upstream `26d7c2c1eebf`, with no feature-series prerequisite. Independent review and posting remain pending. The original eighteen-packet counts above describe the earlier preparation cohort.
+
 ## Exact bases and scope
 
 - llvm-mos/llvm-mos main: `7bd67c0ae4e8bb65a3f980912bf201df22131e34`.

@@ -1,0 +1,314 @@
+Pass Arguments:  -targetlibinfo -runtime-library-info -targetpassconfig -machinemoduleinfo -tti -assumption-cache-tracker -libcall-lowering-info -tbaa -scoped-noalias-aa -collector-metadata -profile-summary-info -machine-branch-prob -regalloc-evict -regalloc-priority -domtree -basic-aa -aa -objc-arc-contract -pre-isel-intrinsic-lowering -expand-ir-insts -basiccg -mos-nonreentrant -verify -domtree -basic-aa -loops -loop-simplify -scalar-evolution -canon-freeze -iv-users -loop-reduce -gc-lowering -shadow-stack-gc-lowering -unreachableblockelim -cycles -postdomtree -branch-prob -block-freq -consthoist -replace-with-veclib -lazy-branch-prob -lazy-block-freq -opt-remark-emitter -partially-inline-libcalls -post-inline-ee-instrument -scalarize-masked-mem-intrin -expand-reductions -basic-aa -aa -cycles -lazy-branch-prob -lazy-block-freq -opt-remark-emitter -loops -postdomtree -branch-prob -block-freq -codegenprepare -lowerinvoke -unreachableblockelim -inline-asm-prepare -safe-stack -stack-protector -verify -cseinfo -domtree -cycles -postdomtree -branch-prob -basic-aa -aa -irtranslator -machineverifier -gisel-known-bits -machinedomtree -cseinfo -mos-combiner -machineverifier -mos-shift-rotate-chain -machineverifier -cseinfo -gisel-known-bits -legalizer -machineverifier -mos-internalize -machineverifier -gisel-known-bits -machinedomtree -cseinfo -domtree -basic-aa -aa -mos-combiner -machineverifier -mos-lower-select -machineverifier -reg-bank-select -machineverifier -localizer -machineverifier -gisel-known-bits -cycles -lazy-branch-prob -lazy-block-freq -instruction-select -machineverifier -finalize-isel -machineverifier -lazy-machine-block-freq -early-tailduplication -machineverifier -opt-phis -machineverifier -slotindexes -stack-coloring -machineverifier -localstackalloc -machineverifier -dead-mi-elimination -machineverifier -machinedomtree -machine-loops -machine-cycles -machine-block-freq -machine-register-class-info -early-machinelicm -machineverifier -machinedomtree -machine-cycles -machine-block-freq -machine-cse -machineverifier -machinepostdomtree -machine-sink -machineverifier -peephole-opt -machineverifier -dead-mi-elimination -machineverifier -mos-insert-copies -machineverifier -detect-dead-lanes -machineverifier -init-undef -machineverifier -processimpdefs -machineverifier -unreachable-mbb-elimination -machineverifier -livevars -machineverifier -machinedomtree -machine-loops -machineverifier -phi-node-elimination -machineverifier -twoaddressinstruction -machineverifier -slotindexes -liveintervals -machine-register-class-info -register-coalescer -machineverifier -register-coalescer -machineverifier -rename-independent-subregs -machineverifier -machine-cycles -machine-block-freq -machine-scheduler -machineverifier -machineverifier -livedebugvars -livestacks -virtregmap -liveregmatrix -edge-bundles -spill-code-placement -lazy-machine-block-freq -machine-opt-remark-emitter -greedy -machineverifier -virtregrewriter -machineverifier -regallocscoringpass -machineverifier -stack-slot-coloring -machineverifier -machine-cp -machineverifier -machinelicm -machineverifier -removeredundantdebugvalues -machineverifier -fixup-statepoint-caller-saved -machineverifier -postra-machine-sink -machineverifier -machine-cycles -machine-block-freq -machinedomtree -machinepostdomtree -lazy-machine-block-freq -machine-opt-remark-emitter -shrink-wrap -machineverifier -basiccg -mos-zero-page-alloc -machineverifier -lazy-machine-block-freq -machine-opt-remark-emitter -prolog-epilog -machineverifier -machine-latecleanup -machineverifier -machine-cycles -machine-block-freq -branch-folder -machineverifier -lazy-machine-block-freq -tailduplication -machineverifier -machine-cp -machineverifier -mos-copy-opt -machineverifier -postrapseudos -machineverifier -mos-scavenging -machineverifier -finalize-isel -machineverifier -postrapseudos -machineverifier -mos-scavenging -machineverifier -mos-late-opt -machineverifier -basiccg -mos-static-stack-alloc -machineverifier -gc-analysis -machineverifier -machine-cycles -machine-block-freq -machinepostdomtree -machinedomtree -machine-loops -block-placement -machineverifier -fentry-insert -machineverifier -xray-instrumentation -machineverifier -patchable-function -machineverifier -branch-relaxation -machineverifier -funclet-layout -machineverifier -remove-loads-into-fake-uses -machineverifier -stackmap-liveness -machineverifier -livedebugvalues -machineverifier -machine-sanmd -machineverifier -lazy-machine-block-freq -machine-opt-remark-emitter -stack-frame-layout
+Target Library Information
+Runtime Library Function Analysis
+Target Pass Configuration
+Machine Module Information
+Target Transform Information
+Assumption Cache Tracker
+Library Function Lowering Analysis
+Type-Based Alias Analysis
+Scoped NoAlias Alias Analysis
+Create Garbage Collector Module Metadata
+Profile summary info
+Machine Branch Probability Analysis
+Default Regalloc Eviction Advisor
+Default Regalloc Priority Advisor
+  ModulePass Manager
+    FunctionPass Manager
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      ObjC ARC contraction
+    Pre-ISel Intrinsic Lowering
+    FunctionPass Manager
+      Expand IR instructions
+    CallGraph Construction
+    Detect non-reentrant functions via detailed call graph analysis
+    FunctionPass Manager
+      Module Verifier
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Natural Loop Information
+      Canonicalize natural loops
+      Scalar Evolution Analysis
+      Loop Pass Manager
+        Canonicalize Freeze Instructions in Loops
+        Induction Variable Users
+        Loop Strength Reduction
+      Lower Garbage Collection Instructions
+      Shadow Stack GC Lowering
+      Remove unreachable blocks from the CFG
+      Cycle Info Analysis
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Block Frequency Analysis
+      Constant Hoisting
+      Replace intrinsics with calls to vector library
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      Optimization Remark Emitter
+      Partially inline calls to library functions
+      Instrument function entry/exit with calls to e.g. mcount() (post inlining)
+      Scalarize Masked Memory Intrinsics
+      Expand reduction intrinsics
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      Cycle Info Analysis
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      Optimization Remark Emitter
+      Unnamed pass: implement Pass::getPassName()
+      Natural Loop Information
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Block Frequency Analysis
+      CodeGen Prepare
+      Lower invoke and unwind, for unwindless code generators
+      Remove unreachable blocks from the CFG
+      Prepare inline asm insts
+      Safe Stack instrumentation pass
+      Insert stack protectors
+      Module Verifier
+      Analysis containing CSE Info
+      Dominator Tree Construction
+      Cycle Info Analysis
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      IRTranslator
+      Verify generated machine code
+      Analysis for ComputingKnownBits
+      MachineDominator Tree Construction
+      Analysis containing CSE Info
+      MOSCombiner
+      Verify generated machine code
+      MOS Shift/Rotate Chaining
+      Verify generated machine code
+      Analysis containing CSE Info
+      Analysis for ComputingKnownBits
+      Legalizer
+      Verify generated machine code
+    MOS internalize libcalls
+    FunctionPass Manager
+      Verify generated machine code
+      Analysis for ComputingKnownBits
+      MachineDominator Tree Construction
+      Analysis containing CSE Info
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      MOSCombiner
+      Verify generated machine code
+      Lower MOS Select pseudo-instruction
+      Verify generated machine code
+      RegBankSelect
+      Verify generated machine code
+      Localizer
+      Verify generated machine code
+      Analysis for ComputingKnownBits
+      Cycle Info Analysis
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      InstructionSelect
+      Verify generated machine code
+      ResetMachineFunction
+      Finalize ISel and expand pseudo-instructions
+      Verify generated machine code
+      Lazy Machine Block Frequency Analysis
+      Early Tail Duplication
+      Verify generated machine code
+      Optimize machine instruction PHIs
+      Verify generated machine code
+      Slot index numbering
+      Merge disjoint stack slots
+      Verify generated machine code
+      Local Stack Slot Allocation
+      Verify generated machine code
+      Remove dead machine instructions
+      Verify generated machine code
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      Machine Register Class Info Analysis
+      Early Machine Loop Invariant Code Motion
+      Verify generated machine code
+      MachineDominator Tree Construction
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      Machine Common Subexpression Elimination
+      Verify generated machine code
+      MachinePostDominator Tree Construction
+      Machine code sinking
+      Verify generated machine code
+      Peephole Optimizations
+      Verify generated machine code
+      Remove dead machine instructions
+      Verify generated machine code
+      MOS Copy Insertion
+      Verify generated machine code
+      Detect Dead Lanes
+      Verify generated machine code
+      Init Undef Pass
+      Verify generated machine code
+      Process Implicit Definitions
+      Verify generated machine code
+      Remove unreachable machine basic blocks
+      Verify generated machine code
+      Live Variable Analysis
+      Verify generated machine code
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Verify generated machine code
+      Eliminate PHI nodes for register allocation
+      Verify generated machine code
+      Two-Address instruction pass
+      Verify generated machine code
+      Slot index numbering
+      Live Interval Analysis
+      Machine Register Class Info Analysis
+      Register Coalescer
+      Verify generated machine code
+      Register Coalescer
+      Verify generated machine code
+      Rename Disconnected Subregister Components
+      Verify generated machine code
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      Machine Instruction Scheduler
+      Verify generated machine code
+      Verify generated machine code
+      Debug Variable Analysis
+      Live Stack Slot Analysis
+      Virtual Register Map
+      Live Register Matrix
+      Bundle Machine CFG Edges
+      Spill Code Placement Analysis
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Greedy Register Allocator
+      Verify generated machine code
+      Virtual Register Rewriter
+      Verify generated machine code
+      Register Allocation Pass Scoring
+      Verify generated machine code
+      Stack Slot Coloring
+      Verify generated machine code
+      Machine Copy Propagation Pass
+      Verify generated machine code
+      Machine Loop Invariant Code Motion
+      Verify generated machine code
+      Remove Redundant DEBUG_VALUE analysis
+      Verify generated machine code
+      Fixup Statepoint Caller Saved
+      Verify generated machine code
+      PostRA Machine Sink
+      Verify generated machine code
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      MachineDominator Tree Construction
+      MachinePostDominator Tree Construction
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Shrink Wrapping analysis
+      Verify generated machine code
+    CallGraph Construction
+    Allocate zero page
+      FunctionPass Manager
+        Dominator Tree Construction
+        Cycle Info Analysis
+        Post-Dominator Tree Construction
+        Branch Probability Analysis
+        Block Frequency Analysis
+    FunctionPass Manager
+      Verify generated machine code
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Prologue/Epilogue Insertion & Frame Finalization
+      Verify generated machine code
+      Machine Late Instructions Cleanup Pass
+      Verify generated machine code
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      Control Flow Optimizer
+      Verify generated machine code
+      Lazy Machine Block Frequency Analysis
+      Tail Duplication
+      Verify generated machine code
+      Machine Copy Propagation Pass
+      Verify generated machine code
+      Optimize copies for MOS
+      Verify generated machine code
+      Post-RA pseudo instruction expansion pass
+      Verify generated machine code
+      Scavenge virtual registers emitted by post-RA pseudos
+      Verify generated machine code
+      Finalize ISel and expand pseudo-instructions
+      Verify generated machine code
+      Post-RA pseudo instruction expansion pass
+      Verify generated machine code
+      Scavenge virtual registers emitted by post-RA pseudos
+      Verify generated machine code
+      MOS Late Optimizations
+      Verify generated machine code
+    CallGraph Construction
+    Allocate non-recursive stack to static memory
+    FunctionPass Manager
+      Verify generated machine code
+      Analyze Machine Code For Garbage Collection
+      Verify generated machine code
+      Machine Cycle Info Analysis
+      Machine Block Frequency Analysis
+      MachinePostDominator Tree Construction
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Branch Probability Basic Block Placement
+      Verify generated machine code
+      Insert fentry calls
+      Verify generated machine code
+      Insert XRay ops
+      Verify generated machine code
+      Implement the 'patchable-function' attribute
+      Verify generated machine code
+      Branch relaxation pass
+      Verify generated machine code
+      Contiguously Lay Out Funclets
+      Verify generated machine code
+      Remove Loads Into Fake Uses
+      Verify generated machine code
+      StackMap Liveness Analysis
+      Verify generated machine code
+      Live DEBUG_VALUE analysis
+      Verify generated machine code
+      Machine Sanitizer Binary Metadata
+      Verify generated machine code
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Stack Frame Layout Analysis
+      Unnamed pass: implement Pass::getPassName()
+      Free MachineFunction
+Pass Arguments:  -targetlibinfo -domtree -cycles -postdomtree -branch-prob -block-freq
+Target Library Information
+  FunctionPass Manager
+    Dominator Tree Construction
+    Cycle Info Analysis
+    Post-Dominator Tree Construction
+    Branch Probability Analysis
+    Block Frequency Analysis
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /work/build/null-output-upstream/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -filetype=null /work/docs/defects/evidence/2026-09-27-null-output-upstream/sections.ll -o /work/docs/defects/evidence/2026-09-27-null-output-upstream/baseline/sections-mosw65816-diagnostic.out -debug-pass=Structure
+ #0 0x000063c3bb32933b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/null-output-upstream/baseline/bin/llc+0x452d33b)
+ #1 0x000063c3bb3261c1 llvm::sys::RunSignalHandlers() (/work/build/null-output-upstream/baseline/bin/llc+0x452a1c1)
+ #2 0x000063c3bb32a14b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x0000746ec1356cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000063c3b98d2322 (anonymous namespace)::MOSAsmPrinter::emitStartOfAsmFile(llvm::Module&) MOSAsmPrinter.cpp:0:0
+ #5 0x000063c3b9cd1342 llvm::AsmPrinter::doInitialization(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x2ed5342)
+ #6 0x000063c3ba55e7f8 llvm::FPPassManager::doInitialization(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x37627f8)
+ #7 0x000063c3ba556e11 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x375ae11)
+ #8 0x000063c3b8f2844b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+ #9 0x000063c3b8f25713 main (/work/build/null-output-upstream/baseline/bin/llc+0x2129713)
+#10 0x0000746ec133b601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#11 0x0000746ec133b718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#12 0x000063c3b8f24925 _start (/work/build/null-output-upstream/baseline/bin/llc+0x2128925)

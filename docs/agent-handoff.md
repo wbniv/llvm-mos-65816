@@ -36,8 +36,7 @@ pending. Validation and documentation: OpenAI Codex CLI 0.157.1, model
 
 The separate null-emission crash recorded in the 0064 validation is fixed
 locally by patch 0068. Its preserved IR passes diagnostic null emission on the
-patched downstream build; the 0064 upstream extraction has not been rebuilt
-with that repair. See the [defect investigation](investigations/2026-09-27-mos-null-output-streamer.md).
+patched downstream build. The [standalone extraction](pr-preparations/2026-09-27/0068-validation.md) is now validated on upstream `26d7c2c1eebf`, with 21 null-output repairs, 24 identical ordinary outputs and 133 MOS passes / one unsupported. Independent review remains pending; the historical 0064 extraction is unchanged. See the [defect investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
 three governing lessons, and commit discipline are in the auto-loaded project

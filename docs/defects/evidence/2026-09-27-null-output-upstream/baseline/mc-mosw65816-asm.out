@@ -1,0 +1,5 @@
+	.zeropage	external_zp
+	.text
+	.globl	f
+f:
+	rts

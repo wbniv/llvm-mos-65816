@@ -1,0 +1,10 @@
+# RUN: llvm-mc -triple=mos -filetype=null %s -o %t
+# RUN: test ! -s %t
+# RUN: llvm-mc -triple=mos -filetype=obj %s -o %t.o
+
+# The parser must accept target directives with a null output streamer.
+.zeropage external_zp
+.text
+.globl f
+f:
+  rts

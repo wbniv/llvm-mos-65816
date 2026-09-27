@@ -1,0 +1,16 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /work/build/null-output-upstream/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -filetype=null /work/docs/defects/evidence/2026-09-27-null-output-upstream/sections.ll -o /work/docs/defects/evidence/2026-09-27-null-output-upstream/baseline/sections-mosw65816-null.out
+ #0 0x00005bbd67c8433b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/null-output-upstream/baseline/bin/llc+0x452d33b)
+ #1 0x00005bbd67c811c1 llvm::sys::RunSignalHandlers() (/work/build/null-output-upstream/baseline/bin/llc+0x452a1c1)
+ #2 0x00005bbd67c8514b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x0000704ba6cb1cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00005bbd6622d322 (anonymous namespace)::MOSAsmPrinter::emitStartOfAsmFile(llvm::Module&) MOSAsmPrinter.cpp:0:0
+ #5 0x00005bbd6662c342 llvm::AsmPrinter::doInitialization(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x2ed5342)
+ #6 0x00005bbd66eb97f8 llvm::FPPassManager::doInitialization(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x37627f8)
+ #7 0x00005bbd66eb1e11 llvm::legacy::PassManagerImpl::run(llvm::Module&) (/work/build/null-output-upstream/baseline/bin/llc+0x375ae11)
+ #8 0x00005bbd6588344b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+ #9 0x00005bbd65880713 main (/work/build/null-output-upstream/baseline/bin/llc+0x2129713)
+#10 0x0000704ba6c96601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#11 0x0000704ba6c96718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#12 0x00005bbd6587f925 _start (/work/build/null-output-upstream/baseline/bin/llc+0x2128925)

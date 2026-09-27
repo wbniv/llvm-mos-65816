@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "b9163f73e9f4c93d67acb1e4f3a8e7bf5311a80b60ef54ca76f5e7cff4f3ea59",
+  "sourceHash": "6d3820501bf49ed3629833a247c20a401fed8f645be2b83ea881ecc08910e769",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -225,14 +225,16 @@
       "id": "defect:mos-null-output-streamer-crash",
       "kind": "defect",
       "title": "MOS llc crashes during null output when the assembler printer expects a target streamer",
-      "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass.",
+      "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass. The standalone extraction is also validated on upstream 26d7c2c1eebf: 21 null-output failures become successes, 24 ordinary outputs remain byte-identical, and 133 MOS tests pass with one unsupported.",
       "localStatus": "fixed",
       "publicationStatus": "unposted",
-      "nextStep": "Extract and review patch 0068 against the upstream destination; the historical 0064 candidate has not been rebuilt with this repair.",
+      "nextStep": "Obtain independent review of the standalone extraction validated on upstream 26d7c2c1eebf, then submit when requested.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-null-output-streamer-crash.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-mos-null-output-streamer.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0068-mos-null-output-streamer.patch"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0068-mos-null-output-streamer.patch",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-27/0068-validation.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-27/0068-llvm-mos.patch"
       ],
       "evidenceNote": "",
       "dependsOn": [],

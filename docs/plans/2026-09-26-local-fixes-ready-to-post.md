@@ -99,3 +99,9 @@ publication and the user’s direction to leave it open are recorded in the
 [0064 plan](2026-09-26-mos-carry-scheduling.md#11-publication).
 Preparation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh`
 reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
+
+## Later 0068 validation
+
+The [standalone null-output extraction](../pr-preparations/2026-09-27/0068-validation.md) is validated on upstream `26d7c2c1eebf`, with 21 null-output red/green cases, 24 byte-identical ordinary outputs, and 133 passing MOS tests plus one unsupported. It has no feature-series prerequisite. Independent review and posting remain pending; earlier cohort counts are dated evidence.
+
+Validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`.

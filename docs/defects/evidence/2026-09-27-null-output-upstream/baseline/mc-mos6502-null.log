@@ -1,0 +1,18 @@
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /work/build/null-output-upstream/baseline/bin/llvm-mc -triple=mos -mcpu=mos6502 -filetype=null /work/docs/defects/evidence/2026-09-27-null-output-upstream/zeropage.s -o /work/docs/defects/evidence/2026-09-27-null-output-upstream/baseline/mc-mos6502-null.out
+ #0 0x000063d9dd16a7db llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xee27db)
+ #1 0x000063d9dd1676c1 llvm::sys::RunSignalHandlers() (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xedf6c1)
+ #2 0x000063d9dd16b5db SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x000072ee129eccb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000063d9dcf0f8bf llvm::MOSAsmParser::parseDirectiveZeroPage()::'lambda'()::operator()() const MOSAsmParser.cpp:0:0
+ #5 0x000063d9dd106b83 llvm::MCAsmParser::parseMany(llvm::function_ref<bool ()>, bool) (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xe7eb83)
+ #6 0x000063d9dcf08598 llvm::MOSAsmParser::ParseDirective(llvm::AsmToken) MOSAsmParser.cpp:0:0
+ #7 0x000063d9dd1074f5 llvm::MCTargetAsmParser::parseDirective(llvm::AsmToken) (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xe7f4f5)
+ #8 0x000063d9dd0e5f8f (anonymous namespace)::AsmParser::parseStatement((anonymous namespace)::ParseStatementInfo&, llvm::MCAsmParserSemaCallback*) AsmParser.cpp:0:0
+ #9 0x000063d9dd0df551 (anonymous namespace)::AsmParser::Run(bool, bool) AsmParser.cpp:0:0
+#10 0x000063d9dce67c45 AssembleInput(char const*, llvm::Target const*, llvm::SourceMgr&, llvm::MCContext&, llvm::MCStreamer&, llvm::MCAsmInfo&, llvm::MCSubtargetInfo&, llvm::MCInstrInfo&, llvm::MCTargetOptions const&) llvm-mc.cpp:0:0
+#11 0x000063d9dce669f2 main (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xbde9f2)
+#12 0x000072ee129d1601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#13 0x000072ee129d1718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#14 0x000063d9dce63c05 _start (/work/build/null-output-upstream/baseline/bin/llvm-mc+0xbdbc05)

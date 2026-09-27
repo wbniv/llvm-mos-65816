@@ -18,7 +18,7 @@
       "id": "mos-null-output-simulated-pr-preview",
       "sources": [
         "docs/pr-preparations/2026-09-27/0068-pr-body.md",
-        "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+        "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch",
         "docs/pr-preparations/2026-09-27/0068-simulated-pr.md",
         "dev/pr-preview.py",
         "docs/pr-preparations/2026-09-22/0029-pr-preview.html",
@@ -35,11 +35,11 @@
         "--md",
         "docs/pr-preparations/2026-09-27/0068-pr-body.md",
         "--patch",
-        "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+        "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch",
         "--number",
         "0068",
         "--notice",
-        "Local simulated PR; not submitted. The historical upstream candidate was not rebuilt with this patch.",
+        "Local PR preview; not submitted. Standalone upstream extraction validated; independent review pending.",
         "--aside",
         "docs/pr-preparations/2026-09-27/0068-pr-aside.html",
         "--out",
@@ -47,15 +47,15 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-27/0068-pr-body.md": "9cf345b4d99fc4123442d4322d06900ee02be940e83cc41ec510051bfe35deae",
-          "patches/llvm-mos/0068-mos-null-output-streamer.patch": "64a2595cc07a321e725e40a16aadaef2c156b8a63260e71f7fdc97591a6b1208",
-          "docs/pr-preparations/2026-09-27/0068-simulated-pr.md": "334b0d5bdc43cbcc8fdef1020423ce0d9b2c8a173d5bb93b44019df4beb23783",
+          "docs/pr-preparations/2026-09-27/0068-pr-body.md": "7e6f5a3d1f3ead10d230236ea631706b02ab5cb29c4cd7dbe7bfa5d10b7bdd9a",
+          "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch": "8e16858131ea6c35f47effd8444a9160eccf5beba1e809a5e70d59cd6310f8c1",
+          "docs/pr-preparations/2026-09-27/0068-simulated-pr.md": "1d5df343e3c7eaea7d8677f47a22252989b4e26693300e730ccb7c3f06b3d36d",
           "dev/pr-preview.py": "56162dd9ca0f6ca7ac55379d92751eccb09e4ddbf2e2df9fd184f90a48dec5ae",
           "docs/pr-preparations/2026-09-22/0029-pr-preview.html": "729944225d3ddade3ac87463e9889fc135d0f0a20e8c3970b513cb93b083858f",
-          "docs/pr-preparations/2026-09-27/0068-pr-aside.html": "647cc93d97ed5680121b0abfc2ac18ad50994d2013404aa79fbbd72d2e7b17fe"
+          "docs/pr-preparations/2026-09-27/0068-pr-aside.html": "357f7a66a4dde1eca28f272cf88309b7c60f875f60f55491556784b454ba8021"
         },
         "outputs": {
-          "docs/pr-preparations/2026-09-27/0068-pr-preview.html": "6f83491c902be1560dd7bf5b698844a001bb5d972872367e73b9a1b80505781e"
+          "docs/pr-preparations/2026-09-27/0068-pr-preview.html": "c40788701fc0668744a71564b06d71e4e12437579192892011c3b48b1879d317"
         }
       }
     },
@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "47f8f002bb71e9e67bdcafa17ec7c00be3916707346a06d3f82220e18807bc7d",
+          "docs/upstream-dashboard-curation.json": "f2b7196f2257be940726c249786069be1ea6e2a7e46663aece78f2a77d30c05d",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -90,7 +90,7 @@
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
-          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c",
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
@@ -103,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "63a6dc867cfe0b5e8edd9dfb686ec579bed0d18eacc196b9f7e151f9e476f8ce"
+          "docs/upstream-dashboard.json": "152c68a5f9f0e431b9dc4f0ac4ac9815bff730fac04edefff8ec62e7ce03152d"
         }
       }
     },
@@ -124,13 +124,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "4cf9fd79d3981a6ccf19a28f89bbf05daf64518869337a59b14d6667c5cd892c",
+          "docs/upstream-pending-work.md": "b5a5526b7bf3f66fc8ce64cd5c484d2ba6b99c29ee4bfb809dc0be8aa7eea485",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "63a6dc867cfe0b5e8edd9dfb686ec579bed0d18eacc196b9f7e151f9e476f8ce",
+          "docs/upstream-dashboard.json": "152c68a5f9f0e431b9dc4f0ac4ac9815bff730fac04edefff8ec62e7ce03152d",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "98f5412bc39083cd121dabe2c742d230fbd7d47fdb053fc4e95ca0aa4ef475c5"
+          "docs/upstream-dashboard-graph.json": "1d4087c62ef2932a9dda29d91e15a5eefac08e0b8d0c9d37646dcaacec82bc8f"
         }
       }
     },
@@ -159,16 +159,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "4cf9fd79d3981a6ccf19a28f89bbf05daf64518869337a59b14d6667c5cd892c",
-          "docs/upstream-contribution-status.md": "bffb0fb3ca61be87c27f566c7ac76d4eddb914e4ddc6c1b6fef66c980fb05457",
+          "docs/upstream-pending-work.md": "b5a5526b7bf3f66fc8ce64cd5c484d2ba6b99c29ee4bfb809dc0be8aa7eea485",
+          "docs/upstream-contribution-status.md": "6ea4f1e44a73d3f03747370d82d5762577b1444ccd3db0db4ce6c45f7e2bb10a",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "7e09d04695579afcef80d6c61cb352f66dbe4f30aec43c65203744811f82cfe2",
-          "docs/mos-upstream-status-2026-09-21.html": "3927790ddf261343aa01eafbcd2c3bc302d370676e971a97411bb0f91acf23ad"
+          "docs/mos-upstream-flowchart.html": "99574bbdd8a78bec6a69cfdc3862db467423d52bcf1266bf997e5652ae9c37aa",
+          "docs/mos-upstream-status-2026-09-21.html": "1dd021af3c5755e0fe4a57fa9ec9dbc44ed99b7ca9287c0f7566c8578f673ae7"
         }
       }
     },
@@ -435,7 +435,7 @@
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
-          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
+          "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -449,7 +449,7 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
-          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
@@ -459,8 +459,8 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T14:25:03.951862+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:10:54.943226+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -503,7 +503,7 @@
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
-          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
+          "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -515,7 +515,7 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
@@ -525,8 +525,8 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T14:25:04.064256+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:10:55.062078+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -569,7 +569,7 @@
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
-          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
+          "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -581,7 +581,7 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
@@ -591,8 +591,8 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T14:25:04.071385+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:10:55.067557+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -735,7 +735,7 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
-          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
@@ -746,8 +746,8 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T14:25:04.441954+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:10:55.473321+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -809,13 +809,13 @@
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T14:25:06.677786+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:11:03.764932+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -895,11 +895,11 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384"
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486"
         },
-        "reviewed_at": "2026-09-27T13:13:36.533461+00:00",
-        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
-        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
+        "reviewed_at": "2026-09-27T23:10:56.310881+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -939,7 +939,8 @@
         "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
         "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json",
         "docs/pr-preparations/2026-09-26/0064-submission.json",
-        "docs/investigations/2026-09-27-competing-carry-gate.md"
+        "docs/investigations/2026-09-27-competing-carry-gate.md",
+        "docs/pr-preparations/2026-09-27/0068-validation.md"
       ],
       "receipt": {
         "sources": {
@@ -947,11 +948,12 @@
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T10:21:51.867177+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T23:10:56.650108+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -984,13 +986,14 @@
         "AGENTS.md",
         "docs/pr-preparations/2026-09-26/0064-submission.json",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/pr-preparations/2026-09-27/0068-validation.md"
       ],
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
@@ -1015,10 +1018,11 @@
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T14:25:08.821858+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:10:59.007393+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -1092,12 +1096,12 @@
           "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099"
         },
-        "reviewed_at": "2026-09-27T13:13:47.935399+00:00",
-        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
-        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
+        "reviewed_at": "2026-09-27T23:11:01.478524+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1514,19 +1518,21 @@
         "docs/investigations/2026-09-26-r2-baseline-backup.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/investigations/2026-09-27-near-y-decoder.md",
-        "docs/plans/2026-09-27-broader-near-store-profitability.md"
+        "docs/plans/2026-09-27-broader-near-store-profitability.md",
+        "docs/pr-preparations/2026-09-27/0068-validation.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T14:25:09.445236+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "reviewed_at": "2026-09-27T23:11:03.864846+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -1703,7 +1709,8 @@
         "docs/investigations/2026-09-27-competing-carry-gate.md",
         "docs/investigations/2026-09-27-carry-profitability-model.md",
         "docs/defects/mos-near-index-overflow-proofs.json",
-        "docs/defects/mos-null-output-streamer-crash.json"
+        "docs/defects/mos-null-output-streamer-crash.json",
+        "docs/pr-preparations/2026-09-27/0068-validation.md"
       ],
       "receipt": {
         "sources": {
@@ -1713,10 +1720,11 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
-          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c"
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T14:44:07.903167+00:00",
-        "note": "Reviewed proof recovery as a missed optimization with the native-width series gate, and patch 0068 as a locally fixed, unposted independent repair whose upstream extraction remains unvalidated. Added explicit publication and next-action metadata and linked retained evidence. Existing carry-policy and broader near-store claims remain as previously reviewed.",
+        "reviewed_at": "2026-09-27T23:10:55.867212+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
@@ -1928,11 +1936,72 @@
         "sources": {
           "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
-          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c",
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee"
         },
-        "reviewed_at": "2026-09-27T14:39:41.170564+00:00",
-        "note": "Recovered the canonical contribution registry from biohack ac04a89, retaining optimization and documentation provenance. Reconciled gallery line dates against the defect registry; added the verified proof-recovery optimization and null-output repair with their existing evidence and unposted states. Reviewed the export and paired-publication data paths against the Astro import. The original defect-only registry still governs ROM defect metadata; automated cross-repository synchronization remains a follow-up.",
+        "reviewed_at": "2026-09-27T23:10:56.079577+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-27/0068-validation.md",
+      "sources": [
+        "docs/defects/mos-null-output-streamer-crash.json",
+        "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-27/0068-validate.py",
+        {
+          "glob": "docs/defects/evidence/2026-09-27-null-output-upstream/*.json"
+        },
+        "docs/defects/evidence/2026-09-27-null-output-upstream/baseline/receipt.json",
+        "docs/defects/evidence/2026-09-27-null-output-upstream/candidate/receipt.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch": "8e16858131ea6c35f47effd8444a9160eccf5beba1e809a5e70d59cd6310f8c1",
+          "docs/pr-preparations/2026-09-27/0068-validate.py": "e4f1d06fa1675af7732ac4f0d1371888bf49dd7c83561fb307229aba8bd7cf89",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/identity.json": "2aae89d0530d97e7bd32559ca38b528511ad3c55db92cb9d31e78afdd95dbe36",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/prior-work.json": "c8cad162dc51095a1f5c63dea659475af7056a0f238f0bbb4eee3c324f5dc62c",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/streamer-history.json": "8aaaf9851b7cbf6f914029d99a0de79d448e7b54e699eebe29dd62172be2ff93",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/upstream-issue-search.json": "f5085428e07f16696dcbbdd7244586af33c94dee2dadcbbd03d6993326009315",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/baseline/receipt.json": "b6fdf23c67585da38cac66dbff295282696a3466155ad36d62ac81df939be8c3",
+          "docs/defects/evidence/2026-09-27-null-output-upstream/candidate/receipt.json": "d2e6203ee8058fb7b0be78fb239d689fea2b0e667a8d06eead45fd082e2959f7"
+        },
+        "reviewed_at": "2026-09-27T23:11:04.372669+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-27/0068-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-27/0068-validation.md",
+        "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
+          "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch": "8e16858131ea6c35f47effd8444a9160eccf5beba1e809a5e70d59cd6310f8c1"
+        },
+        "reviewed_at": "2026-09-27T23:11:04.372737+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-27-mos-null-output-streamer.md",
+      "sources": [
+        "docs/defects/mos-null-output-streamer-crash.json",
+        "docs/pr-preparations/2026-09-27/0068-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
+        },
+        "reviewed_at": "2026-09-27T23:11:03.864908+00:00",
+        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     }

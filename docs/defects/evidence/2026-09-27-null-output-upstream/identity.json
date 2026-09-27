@@ -1,0 +1,79 @@
+{
+  "source_revision": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "container_image": "sha256:12d4d50d447cac8d6e3f9c6efe3cca676c60e8f8890638007c0cf2b73ad96482",
+  "build_type": "Release",
+  "assertions": true,
+  "targets": [
+    "X86",
+    "ARM",
+    "AArch64",
+    "MOS"
+  ],
+  "host_source_directory": "/tmp/null-output-upstream-src",
+  "host_build_directory": "/tmp/null-output-upstream-build",
+  "container_source_directory": "/work/build/register-exhaustion-src",
+  "container_build_directory": "/work/build/0029-cross-target-build",
+  "build_method": "An isolated copy of the warm build cache was reconfigured and rebuilt against an unpatched sparse checkout of the exact upstream revision. Timestamps were retained only for byte-identical source files. The baseline was frozen before applying the candidate. Candidate build recompiles MOSMCTargetDesc.cpp and relinks llc/llvm-mc. Neither saved baseline nor the working downstream source/install was modified.",
+  "patch": {
+    "path": "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch",
+    "sha256": "8e16858131ea6c35f47effd8444a9160eccf5beba1e809a5e70d59cd6310f8c1"
+  },
+  "runner": {
+    "path": "docs/pr-preparations/2026-09-27/0068-validate.py",
+    "sha256": "e4f1d06fa1675af7732ac4f0d1371888bf49dd7c83561fb307229aba8bd7cf89"
+  },
+  "baseline": {
+    "tools": {
+      "llc": {
+        "path": "build/null-output-upstream/baseline/bin/llc",
+        "sha256": "c19f871ea2354e1635998795b7f00ebf75272bf0516c186ccd989dcdb31644d8"
+      },
+      "llvm-mc": {
+        "path": "build/null-output-upstream/baseline/bin/llvm-mc",
+        "sha256": "17fb892afaf3155f1b61b929cb5e59dd52e3a1c0713190f4647d615777fc2bac"
+      }
+    },
+    "receipt": {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/baseline/receipt.json",
+      "sha256": "b6fdf23c67585da38cac66dbff295282696a3466155ad36d62ac81df939be8c3"
+    },
+    "suite_log": {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/baseline-suite.log",
+      "sha256": "8a5a2ffa5e140ad0010f59f5d63d39f66b84e64a634615e830b35000570ab578"
+    }
+  },
+  "candidate": {
+    "tools": {
+      "llc": {
+        "path": "build/null-output-upstream/candidate/bin/llc",
+        "sha256": "cecd9521010c8ed5a73c950f53ed80b71554848c9e92ad5cc514b221b28c50f6"
+      },
+      "llvm-mc": {
+        "path": "build/null-output-upstream/candidate/bin/llvm-mc",
+        "sha256": "35b43816196c830dfb90607caaea14f380ac0ab4e743f80d57b1a47f50292b23"
+      }
+    },
+    "receipt": {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/candidate/receipt.json",
+      "sha256": "d2e6203ee8058fb7b0be78fb239d689fea2b0e667a8d06eead45fd082e2959f7"
+    },
+    "suite_log": {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/candidate-suite.log",
+      "sha256": "44cf54030b5c942c1004c551db9b73ae3ae64e41da9e0f287508f58d8c7f4d28"
+    }
+  },
+  "results": {
+    "baseline_null_failures": 21,
+    "candidate_null_successes": 21,
+    "ordinary_output_pairs_identical": 24,
+    "baseline_suite": {
+      "passed": 131,
+      "unsupported": 1
+    },
+    "candidate_suite": {
+      "passed": 133,
+      "unsupported": 1
+    }
+  },
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+}

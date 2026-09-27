@@ -6,12 +6,13 @@
   "report": "docs/investigations/2026-09-27-mos-null-output-streamer.md",
   "reproducer_origin": "original",
   "attribution": [
-    "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata: diagnosis, patch, and matching-input validation."
+    "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata: diagnosis, patch, and matching-input validation.",
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9. Current-upstream reconciliation, isolated extraction, validation and documentation."
   ],
-  "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass.",
+  "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass. The standalone extraction is also validated on upstream 26d7c2c1eebf: 21 null-output failures become successes, 24 ordinary outputs remain byte-identical, and 133 MOS tests pass with one unsupported.",
   "unknowns": [
-    "The passing candidate was rebuilt from the current downstream source tree in the project container; a clean rebuild of the historical 0064 upstream candidate with only patch 0068 has not been performed.",
-    "The original candidate's diagnostic crash was retained in the validation log; the fresh baseline replay uses its preserved binary, while the fixed replay uses the current downstream build."
+    "Independent review and upstream submission remain pending.",
+    "Validation applies to upstream revision 26d7c2c1eebf plus the retained standalone patch; the historical carry-scheduling candidate was not rebuilt in this follow-up."
   ],
   "prior_work": {
     "disposition": "historical_migration",
@@ -36,12 +37,20 @@
       "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
       "patches/llvm-mos/0068-mos-null-output-streamer.patch"
     ],
-    "source_assessment": "The 0064 upstream baseline lacks MOS null target-streamer registration. MOSAsmPrinter::emitStartOfAsmFile unconditionally casts getTargetStreamer() to MOSTargetStreamer and emits zero-page directives; LLVM's generic null streamer has no target streamer unless the target registers a factory. MOSTargetStreamer::finish also assumes ELF semantics, so the null implementation overrides finish. No prior repair or related structured causal record was found.",
+    "source_assessment": "The 0064 upstream baseline lacks MOS null target-streamer registration. MOSAsmPrinter::emitStartOfAsmFile unconditionally casts getTargetStreamer() to MOSTargetStreamer and emits zero-page directives; LLVM's generic null streamer has no target streamer unless the target registers a factory. The null implementation discards finalization and all directives. The upstream follow-up confirms that generic finish dispatches through virtual section queries and symbol-reference methods. No prior repair or related structured causal record was found.",
     "binary_assessment": "The preserved 0064 baseline llc is identified by SHA256 f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331 and crashes with exit 139. The fixed build/llvm-mos/bin/llc is SHA256 a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb and completes the same IR input. It was rebuilt in container image sha256:47795d5a527f6b094edbfe58705cfd513e8f6f59f493d1c375b74b24c0c2bb18.",
     "decision": "The 0064 validation first recorded this diagnostic-only failure without isolation or a structured record. This is its first canonical record. It is a MOS MC target-streamer contract failure, separate from the carry-scheduling performance change.",
     "evidence": {
       "path": "docs/defects/evidence/2026-09-27-mos-null-output/prior-work-audit.json",
       "sha256": "6b683c8fa3a329c50ce2497e22e52413bdc5d370b45d27154ae9a02f0e294fbd"
+    },
+    "upstream_reconciliation": {
+      "revision": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+      "evidence": {
+        "path": "docs/defects/evidence/2026-09-27-null-output-upstream/prior-work.json",
+        "sha256": "c8cad162dc51095a1f5c63dea659475af7056a0f238f0bbb4eee3c324f5dc62c"
+      },
+      "decision": "The current destination still reaches the missing null target-streamer factory from both the asm printer and .zeropage parser. Validate the existing causal repair independently, without the carry-scheduling or native-width series."
     }
   },
   "baseline": {
@@ -77,7 +86,7 @@
   },
   "resolution": {
     "change": "patches/llvm-mos/0068-mos-null-output-streamer.patch",
-    "causal_explanation": "CodeGenFileType::Null asks Target::createNullStreamer for a generic MCNullStreamer. The MOS target had not registered a null target streamer, while MOSAsmPrinter::emitStartOfAsmFile immediately dereferenced the target-streamer pointer to emit zero-page directives. The new MOSNullTargetStreamer satisfies that interface with no-op directives and finalization; finish is overridden because the ordinary MOSTargetStreamer finalizer is ELF-specific.",
+    "causal_explanation": "CodeGenFileType::Null asks Target::createNullStreamer for a generic MCNullStreamer. The MOS target had not registered a null target streamer, while MOSAsmPrinter::emitStartOfAsmFile immediately dereferenced the target-streamer pointer to emit zero-page directives. The new MOSNullTargetStreamer satisfies that interface with no-op directives and finalization; finish is overridden to discard finalization work. On the inspected upstream revision the generic finalizer uses virtual section queries and symbol-reference methods; the ELF-specific behavior belongs to the ELF subclass.",
     "trigger_check": "The preserved baseline binary crashes on the exact retained arith.Os.ll input with exit 139. The rebuilt compiler with patch 0068 completes that same command with exit 0. The focused lit regression passes both null diagnostic emission and normal object emission.",
     "regression": {
       "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.ll",
@@ -139,6 +148,53 @@
       "path": "docs/defects/evidence/2026-09-27-mos-null-output/filetype-null.ll",
       "sha256": "60c8a3cb9b96d086920633e395da734f72cb94bfbe37f8c98cdc19c0a9b6f41c",
       "description": "Focused regression covering null diagnostic emission and normal object output."
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/prior-work.json",
+      "sha256": "c8cad162dc51095a1f5c63dea659475af7056a0f238f0bbb4eee3c324f5dc62c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/identity.json",
+      "sha256": "2aae89d0530d97e7bd32559ca38b528511ad3c55db92cb9d31e78afdd95dbe36"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/baseline/receipt.json",
+      "sha256": "b6fdf23c67585da38cac66dbff295282696a3466155ad36d62ac81df939be8c3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/candidate/receipt.json",
+      "sha256": "d2e6203ee8058fb7b0be78fb239d689fea2b0e667a8d06eead45fd082e2959f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/baseline-suite.log",
+      "sha256": "8a5a2ffa5e140ad0010f59f5d63d39f66b84e64a634615e830b35000570ab578"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-null-output-upstream/candidate-suite.log",
+      "sha256": "44cf54030b5c942c1004c551db9b73ae3ae64e41da9e0f287508f58d8c7f4d28"
+    }
+  ],
+  "additional_runs": [
+    {
+      "kind": "standalone_upstream_extraction",
+      "source_revision": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+      "patch": {
+        "path": "docs/pr-preparations/2026-09-27/0068-llvm-mos.patch",
+        "sha256": "8e16858131ea6c35f47effd8444a9160eccf5beba1e809a5e70d59cd6310f8c1"
+      },
+      "identity": {
+        "path": "docs/defects/evidence/2026-09-27-null-output-upstream/identity.json",
+        "sha256": "2aae89d0530d97e7bd32559ca38b528511ad3c55db92cb9d31e78afdd95dbe36"
+      },
+      "baseline_receipt": {
+        "path": "docs/defects/evidence/2026-09-27-null-output-upstream/baseline/receipt.json",
+        "sha256": "b6fdf23c67585da38cac66dbff295282696a3466155ad36d62ac81df939be8c3"
+      },
+      "candidate_receipt": {
+        "path": "docs/defects/evidence/2026-09-27-null-output-upstream/candidate/receipt.json",
+        "sha256": "d2e6203ee8058fb7b0be78fb239d689fea2b0e667a8d06eead45fd082e2959f7"
+      },
+      "result": "The same three IR inputs and .zeropage assembly input are run on mos6502, mos65c02 and mosw65816. All 21 null-emission commands terminate with SIGSEGV on the unpatched baseline and succeed with empty output on the candidate. All 24 object/assembly output pairs are byte-identical. MOS suites: baseline 131 pass/1 unsupported; candidate 133 pass/1 unsupported."
     }
   ]
 }

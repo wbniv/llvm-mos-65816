@@ -1,0 +1,5 @@
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/4] Building CXX object lib/Target/MOS/MCTargetDesc/CMakeFiles/LLVMMOSDesc.dir/MOSMCTargetDesc.cpp.o
+[2/4] Linking CXX static library lib/libLLVMMOSDesc.a
+[3/4] Linking CXX executable bin/llc
+[4/4] Linking CXX executable bin/llvm-mc

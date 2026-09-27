@@ -1,0 +1,27 @@
+{
+  "destination": "llvm-mos/llvm-mos main",
+  "revision": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "date": "2026-09-27",
+  "prior_local_change": "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+  "original_report": "docs/pr-preparations/2026-09-26/0064-validation.md",
+  "reconciliation": [
+    "The canonical null-output record already establishes the downstream repair. This run validates an independent extraction, without carry-scheduling or SNES/native-width patches.",
+    "GitHub main API and a depth-one upstream fetch both resolve to the exact destination revision. Streamer history and issue-search results are retained alongside this audit.",
+    "CodeGenTargetMachineImpl::createMCStreamer selects Target::createNullStreamer for CodeGenFileType::Null. A complete codegen pipeline still installs the asm printer.",
+    "Target::createNullStreamer invokes an optional registered null target-streamer factory. MOS registers assembly and object factories but no null factory.",
+    "MOSAsmPrinter::emitStartOfAsmFile dereferences the target streamer unconditionally before emitting __rc0 through __rc31 directives. No destination guard rejects null emission first.",
+    "MOSAsmParser::parseDirectiveZeroPage also dereferences that target streamer. The same registration repair covers this assembler entry point.",
+    "No null-output regression was found in upstream CodeGen/MOS or MC/MOS. The most recent streamer change supplies the DWARF PC register; it does not supply a null target streamer.",
+    "On this exact revision MOSTargetStreamer::finish calls virtual section queries and symbol-reference methods; it does not itself contain an unconditional MCELFStreamer cast. The null implementation explicitly discards finalization and directives."
+  ],
+  "inspected_files": [
+    "llvm/lib/CodeGen/CodeGenTargetMachineImpl.cpp",
+    "llvm/include/llvm/MC/TargetRegistry.h",
+    "llvm/lib/Target/MOS/MOSAsmPrinter.cpp",
+    "llvm/lib/Target/MOS/AsmParser/MOSAsmParser.cpp",
+    "llvm/lib/Target/MOS/MCTargetDesc/MOSMCTargetDesc.cpp",
+    "llvm/lib/Target/MOS/MCTargetDesc/MOSTargetStreamer.cpp",
+    "llvm/lib/Target/MOS/MCTargetDesc/MOSTargetStreamer.h"
+  ],
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+}
