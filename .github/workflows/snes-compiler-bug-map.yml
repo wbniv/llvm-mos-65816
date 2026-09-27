@@ -1,0 +1,33 @@
+name: snes-compiler-bug-map
+
+on:
+  pull_request:
+    paths:
+      - 'docs/snes-demo-compiler-bug-pages.json'
+      - 'dev/export-snes-compiler-bug-public.py'
+      - 'dev/render-snes-demo-compiler-bug-map.py'
+      - 'docs/snes-demo-compiler-bug-map.md'
+      - 'docs/snes-demo-compiler-bug-public.json'
+  push:
+    branches: [main]
+    paths:
+      - 'docs/snes-demo-compiler-bug-pages.json'
+      - 'dev/export-snes-compiler-bug-public.py'
+      - 'dev/render-snes-demo-compiler-bug-map.py'
+      - 'docs/snes-demo-compiler-bug-map.md'
+      - 'docs/snes-demo-compiler-bug-public.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generated-views:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Regenerate the discovery-map views
+        run: |
+          python3 dev/render-snes-demo-compiler-bug-map.py
+          python3 dev/export-snes-compiler-bug-public.py
+          git diff --exit-code -- docs/snes-demo-compiler-bug-map.md docs/snes-demo-compiler-bug-public.json
