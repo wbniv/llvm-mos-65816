@@ -234,25 +234,25 @@
       }
     },
     {
-      "id": "snes-demo-compiler-bug-public-export",
+      "id": "carry-scheduling-plan-preview",
       "sources": [
-        "docs/snes-demo-compiler-bug-pages.json",
-        "dev/export-snes-compiler-bug-public.py"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "dev/render-carry-plan.py"
       ],
       "outputs": [
-        "docs/snes-demo-compiler-bug-public.json"
+        "docs/plans/2026-09-26-mos-carry-scheduling.html"
       ],
       "command": [
         "python3",
-        "dev/export-snes-compiler-bug-public.py"
+        "dev/render-carry-plan.py"
       ],
       "receipt": {
         "sources": {
-          "docs/snes-demo-compiler-bug-pages.json": "6106f437ee91b2548f2e313fc7b70d23f94a8f8c330d125fdab4eb6cded210d2",
-          "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a"
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6",
+          "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
         },
         "outputs": {
-          "docs/snes-demo-compiler-bug-public.json": "b8ddef3ceb398b79d6f65b41882d71269f8774dd608deefe059e02552bded3ab"
+          "docs/plans/2026-09-26-mos-carry-scheduling.html": "402858c9c08d274a39ca35b013b9b8577b69c9d404dd8a9180207e6c061722dc"
         }
       }
     }
@@ -274,16 +274,20 @@
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/howto-defect-evidence.md",
-        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
-          "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+          "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -296,12 +300,14 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
+          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
+          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T08:36:20.885727+00:00",
-        "note": "Checked the status of the locally completed runtime [dp],Y increment and the still-open near-Y defect against the revised dashboard and flowchart; both TODO entries remain accurate.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T23:48:07.908065+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
     {
@@ -318,16 +324,20 @@
           ]
         },
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
-        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md"
+        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
-          "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+          "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -339,11 +349,13 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
-          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
+          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
+          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T08:36:02.228493+00:00",
-        "note": "Reviewed the completed runtime [dp],Y optimization and the separate open near-Y defect; the flowchart now shows both with their current status and #321 submission relationship.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T23:48:08.263430+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
     {
@@ -360,16 +372,20 @@
           ]
         },
         "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md",
-        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md"
+        "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
-          "docs/defects/llvm-reduce-parallel-mir-crash.json": "c5016d78e70bc0ad4b33b2638ad8881438f082311d5dc697d0f856b10d3ee132",
+          "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
+          "docs/defects/mos-carry-scheduling-pressure.json": "c5f0401c5de5fae38abe2a4b767153e390623cae2ac8352ce0c2ae59774cc3e3",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
@@ -381,11 +397,13 @@
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
-          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f"
+          "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
+          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T08:36:36.796494+00:00",
-        "note": "Confirmed this summary already records the local increment verification and separate near-Y issue; the graph and curation correction do not change its PR state.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T23:48:08.608300+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     },
     {
@@ -438,12 +456,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
           "docs/howto-document-dependencies.md": "543649b41577a10e8976e58fd32cfeaa267e1d26bb9737ff01f5461e89132ef1"
         },
-        "reviewed_at": "2026-09-26T06:29:30.576793+00:00",
-        "note": "Reviewed the defect triage and documentation workflow as affected by the new near-Y record and local increment status; no guidance change was needed.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T22:34:22.773091+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
       }
     },
     {
@@ -472,12 +490,12 @@
       ],
       "receipt": {
         "sources": {
-          "AGENTS.md": "04c5873c9e12ceec38b5f103bda053db822e18906bbde3e12802a81734588d67",
-          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958"
+          "AGENTS.md": "fe47f7ab1798ffc9565e939f6e5d31f708e5fed7e23cdd5495aaa78fd2d9f352",
+          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32"
         },
-        "reviewed_at": "2026-09-26T06:29:45.997849+00:00",
-        "note": "Reviewed the feature series and local-vendor workflow references after completing the increment; the isolated worktree and PR bundling guidance remain accurate.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T22:34:23.031937+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
       }
     },
     {
@@ -508,19 +526,745 @@
             "resolution.change"
           ]
         },
-        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md"
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
       ],
       "receipt": {
         "sources": {
-          "docs/howto-defect-evidence.md": "bb53f7363b64d9682774016699d6ec7bf2a354bdbc6eb39b1a1f2231c3579958",
+          "docs/howto-defect-evidence.md": "058f9bb9e385f0f10d1a87cf2e9baf1c3981ca036dee2630ca2596555d237e32",
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "5d0fc264340ba8b4961562e57b8426d785acb8b3e22a395962e1b3cf55e0e695"
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "639ea63510b97e6cd7ef5637a569e48e0131c06165af87c182b56fba7bc68405",
+          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
         },
-        "reviewed_at": "2026-09-26T06:36:18.459162+00:00",
-        "note": "Recorded the new local commit and final gate status; this increment is complete, but the full #321 feature series remains the PR unit.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0d891-2029-7483-8bd6-2d00806e2f5a."
+        "reviewed_at": "2026-09-26T23:48:09.172568+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-26-mos-carry-scheduling.md",
+      "sources": [
+        "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+        "patches/llvm-mos/0002-321-accum16.patch",
+        "patches/llvm-mos/0061-mos-far-global-long-x.patch",
+        "patches/llvm-mos/0062-mos-native-far-word.patch",
+        "patches/llvm-mos/0063-mos-near-shared-store.patch",
+        "examples/65816/farindex.c",
+        "dev/measure-near-store.py",
+        "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+        "dev/measure-carry-scheduling.py",
+        "docs/defects/mos-carry-scheduling-pressure.json",
+        "docs/defects/mos-farblit-byte-load-legalization.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/focused-runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/original-functions-runtime-results.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-lit.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log",
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "091070de090b7bec391c90d9b8a36930106fab222f6bfb8f3022201edf2c34f0",
+          "patches/llvm-mos/0002-321-accum16.patch": "d384989ded4ef0541b4e190ea4cc2168dde97548cc0bdb7f25f58b1888ca2afb",
+          "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
+          "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+          "examples/65816/farindex.c": "a30e67ce9c63b898b10eb891ecab30ebc36f455f55dd046be15f9da9caa6cd6d",
+          "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
+          "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
+          "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
+          "docs/defects/mos-carry-scheduling-pressure.json": "450cfa5fd83de51f4ec6fae6e88db3267cffac1b571924e4185fbbb9c9cce724",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "5beedb323d372e49a354ea4aac3d8859860aeb3e4a0b2a022db0d6ac2fa905f1",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/scheduler-red-green.json": "43a9055b8e3731b7dca0ce17cf7bc3f12250a77bd087b7535d54154f651e7495",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/runtime-results.json": "2a14829303577c92512146e5d24ebea007d23c81e5c685cbeea315dd4e2eab0f",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/focused-runtime-results.json": "b05a63eb54af07d832beac57dd3e78bc7d3cfeb33d38808641e79e4a3c930f6e",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/original-functions-runtime-results.json": "86d7d63b819b538402480df5d215673eb98bbc45287e5a44009360c09e2713e8",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/final-lit.json": "83c12b6f62683571a52c3a64628d151709307944d694add1b3e43728f096234d",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log": "b6f41458c3f1958994c1f5424573dc3cfb8165b75eb202620a23d982516e2e48",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749"
+        },
+        "reviewed_at": "2026-09-26T23:48:11.010627+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-carry-scheduling-pressure.json",
+          "fields": [
+            "status",
+            "summary",
+            "mitigation.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-carry-scheduling-pressure.json": "05912e89c4281a921d7b07436f3f2ef257a516a565395eb365c4406691176013"
+        },
+        "reviewed_at": "2026-09-26T23:48:15.617635+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
+      "sources": [
+        {
+          "glob": "docs/defects/mos-farblit-byte-load-legalization.json",
+          "fields": [
+            "status",
+            "summary",
+            "mitigation.change",
+            "unknowns"
+          ]
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-farblit-byte-load-legalization.json": "22cec3a47f473aab3c4559d8d30e48c3616e4e216bafd41c33c327a25af74d60"
+        },
+        "reviewed_at": "2026-09-26T12:16:54.363834+00:00",
+        "note": "Reviewed the isolated carry-only publication on b3938bda against the prepared 0064 packet. The compiler branch is pushed at 155e209c4cee; no PR was opened. Preserved exact 7bd67c0ae4e8 regression, suite, runtime and ordinary-MOS evidence and verified all 61 receipt artifact hashes. Updated original report entry points and current summaries, retaining dated baselines, downstream 1\u201341 byte costs, the generic TableGen workaround, farblit and all-XY16 follow-ups. Existing near-Y and unrelated defect records are unchanged. Only 0064 toolchain registrations are included; shared staged work and other posting packets are excluded. No new independent review, cycle, compiler-time or compiler rerun claim.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749"
+        },
+        "reviewed_at": "2026-09-26T23:48:11.152821+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-review.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json",
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/pr-preparations/2026-09-26/0064-destination-recheck.json",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "3edb848f29ab5362a8cd565ad723eae512f372072e34d0123c1aaef04f0a0086",
+          "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03"
+        },
+        "reviewed_at": "2026-09-26T23:48:11.570974+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0064-validation.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json",
+        "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
+          "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03"
+        },
+        "reviewed_at": "2026-09-26T23:48:11.769421+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/README.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0064-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0064-review.md",
+        "docs/pr-preparations/2026-09-26/0064-validation.md",
+        "docs/pr-preparations/2026-09-26/mos-validation.md",
+        "docs/pr-preparations/2026-09-26/llvm-validation.md",
+        "docs/pr-preparations/2026-09-26/feature-held-packages.md",
+        "docs/pr-preparations/2026-09-26/0028-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0037-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0038-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0039-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0040-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0041-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0043-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0044-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0045-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0046-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0047-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0050-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0054-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0056-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0057-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0058-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0059-pr-body.md",
+        "docs/pr-preparations/2026-09-26/0060-pr-body.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0064-pr-body.md": "3f156808a702f81f72bfc1146b8998f7e91b51ae9ceca70d228c0b5e48f39e71",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749",
+          "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
+          "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
+          "docs/pr-preparations/2026-09-26/0028-pr-body.md": "7462030392a4cb5884f4d328233fbab3c0f107c13c7c585b8b0aae22ed8920e0",
+          "docs/pr-preparations/2026-09-26/0037-pr-body.md": "7643920465ea700d024d393ade2489a3596cfcf3c24abc3cecef90913820cf67",
+          "docs/pr-preparations/2026-09-26/0038-pr-body.md": "6e1f9d39b51f5095a25a32d8766c941ee60f70a9715b7ba3df719b6f3611f093",
+          "docs/pr-preparations/2026-09-26/0039-pr-body.md": "57b5b2995c6852de5d96e122732d1e370f8f5ff8a5027954461c99c4454c562a",
+          "docs/pr-preparations/2026-09-26/0040-pr-body.md": "b0bf7fb7a2b89582a3e0ef4e17edf1ea93c788814622551bd6037e2ae36a46c6",
+          "docs/pr-preparations/2026-09-26/0041-pr-body.md": "ae302068f8737764c4a9da7e8f2adabc5620fe7e395c936466cd482ce371a034",
+          "docs/pr-preparations/2026-09-26/0043-pr-body.md": "2802959935125144dc42f23641f28eb7a6657c1e4fc37cc1d9080a80c0ae6390",
+          "docs/pr-preparations/2026-09-26/0044-pr-body.md": "044b448b36b0ac90455a398264839f0b2f456c6e3fa09b7e5a8c4e9a7de530ee",
+          "docs/pr-preparations/2026-09-26/0045-pr-body.md": "30b14ab971acae059b013e53e8ccbdef9e98cb1925b2a8e53c802238c87dc118",
+          "docs/pr-preparations/2026-09-26/0046-pr-body.md": "a7f7803e6915a3ebf988d227f63de77609d04f5089d926819dd5e02fd40deb17",
+          "docs/pr-preparations/2026-09-26/0047-pr-body.md": "4b05bebbdb58c25bf26532d6f0e995555288495cc4d7c6e2d65e42e611b335cd",
+          "docs/pr-preparations/2026-09-26/0050-pr-body.md": "b13f01bb90a6a69df3d39eccb8d1eeaf9554be68a038d41edda0c9938b853c2c",
+          "docs/pr-preparations/2026-09-26/0054-pr-body.md": "9108a4f216e5381c6d1df3d582b1f2d39453043502fcb6619abbc0afcb997865",
+          "docs/pr-preparations/2026-09-26/0056-pr-body.md": "5f34057ba7aad775514643463e9ef2e70c3ed041ced68ecbe8150f21bfe4661b",
+          "docs/pr-preparations/2026-09-26/0057-pr-body.md": "6b44d920e86df0b89bd0621edddfe9a84b5de61a21db684e1003d45670725017",
+          "docs/pr-preparations/2026-09-26/0058-pr-body.md": "a0e089f639768fd00328530514bd5ecb4184804eabe5f2cf2617942cd0a9d794",
+          "docs/pr-preparations/2026-09-26/0059-pr-body.md": "6d209a6d918aaf5c1243c15f23aad43675cab480530395bf17b8008bd76282a4",
+          "docs/pr-preparations/2026-09-26/0060-pr-body.md": "a26fbe356394f2cc4ae495b677899c02a5a0b6f59ee1f315910f2d587889b288"
+        },
+        "reviewed_at": "2026-09-26T23:48:13.465906+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/project-registry.md",
+      "sources": [
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip.log",
+        "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip.log": "ee36cdd46de41b7aa3b3eead593ca5d59f8c0184a054640858608e1407c03253",
+          "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-patch-roundtrip-retry.log": "b6f41458c3f1958994c1f5424573dc3cfb8165b75eb202620a23d982516e2e48"
+        },
+        "reviewed_at": "2026-09-26T12:31:14.421691+00:00",
+        "note": "Reviewed the regenerated carry dashboard and plan against current summaries. Exact upstream suite PASS is 132 passed and one unsupported; separate failure observations, measured size costs, author-only review and unmeasured cycles/compiler time stay qualified. The compiler fork branch is pushed; no PR is posted. Dashboard evidence links retain the repository generator main-branch convention and become available there upon merge of this preparation branch; no public dashboard deployment is part of this publication. Registry references are shared-hook audit output in the frozen roundtrip logs; the infrastructure note links the canonical contract without changing evidence.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/mos-validation.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/validate.py",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0038/receipt.json",
+        "docs/pr-preparations/2026-09-26/0038-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0039/receipt.json",
+        "docs/pr-preparations/2026-09-26/0039-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0040/receipt.json",
+        "docs/pr-preparations/2026-09-26/0040-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0043/receipt.json",
+        "docs/pr-preparations/2026-09-26/0043-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0044/receipt.json",
+        "docs/pr-preparations/2026-09-26/0044-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0045/receipt.json",
+        "docs/pr-preparations/2026-09-26/0045-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0046/receipt.json",
+        "docs/pr-preparations/2026-09-26/0046-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0047/receipt.json",
+        "docs/pr-preparations/2026-09-26/0047-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0050/receipt.json",
+        "docs/pr-preparations/2026-09-26/0050-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r3/0054/receipt.json",
+        "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json",
+        "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/0064-validation.md",
+        "docs/pr-preparations/2026-09-26/0064-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/validate.py": "14c6234b71e33dfd3aa01d0185b10887616a0f4484de8624e964eec1fcada8e5",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0038/receipt.json": "5b35d7562419c381ed270765c85de06ff06039c733e945fa9e0c053412808a0e",
+          "docs/pr-preparations/2026-09-26/0038-llvm-mos.patch": "0220a0f083728dca77bae8985a330e5a33a135b13d60fc580d5c604f253336a8",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0039/receipt.json": "cd7f3cc08a99e543e9cf6864af8e6ecb97dd51b3b4270165b6767d313e20393c",
+          "docs/pr-preparations/2026-09-26/0039-llvm-mos.patch": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0040/receipt.json": "817a6b5f1aaa41ecd884089a744ef28be97f0be5551027f04b4845d5fbd9dfe3",
+          "docs/pr-preparations/2026-09-26/0040-llvm-mos.patch": "08438234c2a52cc93ce9a14f513b65b3f41eb6ad5c212ba2ca83ba4e30075341",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0043/receipt.json": "fa15dd35cbdaf471da408142fff70db5d9b299c3c1d92ec58b07577cf215b323",
+          "docs/pr-preparations/2026-09-26/0043-llvm-mos.patch": "6567f94b72a8677d00eb9a542914be0da446d036d77dddac588c6bfeb5ea8bb5",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0044/receipt.json": "a8ce6f7dd07f5b109b11ffc4667e8a0ec8acae9d23377ec572a275539d67e17c",
+          "docs/pr-preparations/2026-09-26/0044-llvm-mos.patch": "6b48a04ae47c924af4cc777454985a6e2489596047edc2e6253fd188a36f4de1",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0045/receipt.json": "53c72e3cedae2ee6a573ecf6f11f6202c1d1f7d77c9c85be663adc6d0bde60f0",
+          "docs/pr-preparations/2026-09-26/0045-llvm-mos.patch": "ce595a69e81c2ec6732bd4d9cf8a5bf01aaa3c7ff4d254228188a678a9f9559c",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0046/receipt.json": "9448bbae56eb55f64be8cf417ff8f7c4a0ab031d2abe2ce9b0a664761f9fb7b5",
+          "docs/pr-preparations/2026-09-26/0046-llvm-mos.patch": "d42701fa045a3f4c4a3cf73807cfb50e0dc838e51b3bc1b06e95be61d935e442",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0047/receipt.json": "68e768f8366c6151dbf97f3c67df55bbffb920e77cab0a346888376651fd12de",
+          "docs/pr-preparations/2026-09-26/0047-llvm-mos.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0050/receipt.json": "1098f879e8807db7f6399d44d89da6fd44dc8707bd0f63b456b3fba826e48165",
+          "docs/pr-preparations/2026-09-26/0050-llvm-mos.patch": "ee387217ce29cd2d66598bf34edf142e643969e53394f513fcfb9b8b30ce72cf",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r3/0054/receipt.json": "45f4f23cdcdfaab7ad35c4a4584e3c808584a5af7e2680928495079a28fd628b",
+          "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
+          "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "a1b866598488fd346e6366137c0ab415f1e1c3bf835085156af779764fc73749",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "cf96c835b40ef59878ac179637921ae01c92a02b8835281decc5ac33dec3ece4"
+        },
+        "reviewed_at": "2026-09-26T23:48:15.247901+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/llvm-validation.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/validate.py",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
+        "docs/pr-preparations/2026-09-26/0028-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0037/receipt.json",
+        "docs/pr-preparations/2026-09-26/0037-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0041/receipt.json",
+        "docs/pr-preparations/2026-09-26/0041-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0056/receipt.json",
+        "docs/pr-preparations/2026-09-26/0056-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0057/receipt.json",
+        "docs/pr-preparations/2026-09-26/0057-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0058/receipt.json",
+        "docs/pr-preparations/2026-09-26/0058-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0059/receipt.json",
+        "docs/pr-preparations/2026-09-26/0059-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/0060-reconciliation.json",
+        "docs/pr-preparations/2026-09-26/0060-upstream-guard.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/validate.py": "14c6234b71e33dfd3aa01d0185b10887616a0f4484de8624e964eec1fcada8e5",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
+          "docs/pr-preparations/2026-09-26/0028-llvm-project.patch": "f312c1c59d31b7ee00fccbc21d529f449bf3938e9aa2f89c36c855bf0d15d8c2",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0037/receipt.json": "27a5d66dbc4166a500f8f5ab0d173ea348ab22c1dfc864873bd88fb2c66420f8",
+          "docs/pr-preparations/2026-09-26/0037-llvm-project.patch": "c82dcc45750d99a0848634d18ce84df34ee90bf072f1c254e47ee1b3925c7d12",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0041/receipt.json": "9dae5e95608489a101ae319d50981ff37cce76df27e95cee7cb8855f8d98c4b8",
+          "docs/pr-preparations/2026-09-26/0041-llvm-project.patch": "8819a60f6f7a51bfbc0a17609babc8c64db137e09ed28b8fa0f92f6a04014b7c",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0056/receipt.json": "bc58e2179356708d2e90dbeb49fcce904a8c2fb1cb704d66a7a26d62e7497a70",
+          "docs/pr-preparations/2026-09-26/0056-llvm-project.patch": "2407d97531303a071e4e7df3a3b9a45a3200fbafe8dae0a7cc9f8683fc0b058b",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0057/receipt.json": "7303993c78b46b1d4a642f2345b722e57b775c3d70e79356bf931683950bfcbf",
+          "docs/pr-preparations/2026-09-26/0057-llvm-project.patch": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0058/receipt.json": "a3e941245400722d739dce0aa36c1640724afbd7170fd02f227a55681e5a6885",
+          "docs/pr-preparations/2026-09-26/0058-llvm-project.patch": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0059/receipt.json": "f1cce16588b7ede579529c8a2b5a02cf44a2765e6607c042cb219a5b798f0fba",
+          "docs/pr-preparations/2026-09-26/0059-llvm-project.patch": "2a3f0424702a4e714b91b4336e8b992b984455f541739707396b6a5774706162",
+          "docs/pr-preparations/2026-09-26/0060-reconciliation.json": "6dad2fdfebef54b2478c2543f12e86fcb6aa4b2e2159f6d69ef38173ded8fac8",
+          "docs/pr-preparations/2026-09-26/0060-upstream-guard.json": "df30e3ec3f104e1b11041cfeb6bd07b39bdb81c4094fde46e29c9d64365317d0"
+        },
+        "reviewed_at": "2026-09-26T22:34:31.969372+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0028-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0028-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
+        "docs/pr-preparations/2026-09-26/0028-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0028-llvm-project.patch": "f312c1c59d31b7ee00fccbc21d529f449bf3938e9aa2f89c36c855bf0d15d8c2",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
+          "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18"
+        },
+        "reviewed_at": "2026-09-26T22:34:32.361235+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0037-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0037-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0037/receipt.json",
+        "docs/pr-preparations/2026-09-26/0037-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0037-llvm-project.patch": "c82dcc45750d99a0848634d18ce84df34ee90bf072f1c254e47ee1b3925c7d12",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0037/receipt.json": "27a5d66dbc4166a500f8f5ab0d173ea348ab22c1dfc864873bd88fb2c66420f8",
+          "docs/pr-preparations/2026-09-26/0037-review.md": "7e9efdbf49363b38cc4e3a934149d5c4cdaed43ca8f83074802e55f14b1ef48a"
+        },
+        "reviewed_at": "2026-09-26T22:34:32.745105+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0038-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0038-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0038/receipt.json",
+        "docs/pr-preparations/2026-09-26/0038-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0038-llvm-mos.patch": "0220a0f083728dca77bae8985a330e5a33a135b13d60fc580d5c604f253336a8",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0038/receipt.json": "5b35d7562419c381ed270765c85de06ff06039c733e945fa9e0c053412808a0e",
+          "docs/pr-preparations/2026-09-26/0038-review.md": "0a9098b9d0e3cbdf6b1ed28ec3dc840b7f258561e6db1e6fe91257c71be31373"
+        },
+        "reviewed_at": "2026-09-26T22:34:33.136535+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0039-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0039-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0039/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0039-llvm-mos.patch": "36a5787a07b72287ebbb98a49d1f2358407805483151d57fc50b91f2c8c2d909",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0039/receipt.json": "cd7f3cc08a99e543e9cf6864af8e6ecb97dd51b3b4270165b6767d313e20393c",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a"
+        },
+        "reviewed_at": "2026-09-26T22:34:33.514102+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0040-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0040-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0040/receipt.json",
+        "docs/pr-preparations/2026-09-26/0040-0041-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0040-llvm-mos.patch": "08438234c2a52cc93ce9a14f513b65b3f41eb6ad5c212ba2ca83ba4e30075341",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-older/0040/receipt.json": "817a6b5f1aaa41ecd884089a744ef28be97f0be5551027f04b4845d5fbd9dfe3",
+          "docs/pr-preparations/2026-09-26/0040-0041-review.md": "6793099151e718fa2cb680b6560b39b8aa5ba56b2aad7f3b6833349e405f83f5"
+        },
+        "reviewed_at": "2026-09-26T22:34:33.888926+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0041-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0041-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0041/receipt.json",
+        "docs/pr-preparations/2026-09-26/0041-review.md",
+        "docs/pr-preparations/2026-09-26/0040-0041-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0041-llvm-project.patch": "8819a60f6f7a51bfbc0a17609babc8c64db137e09ed28b8fa0f92f6a04014b7c",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0041/receipt.json": "9dae5e95608489a101ae319d50981ff37cce76df27e95cee7cb8855f8d98c4b8",
+          "docs/pr-preparations/2026-09-26/0041-review.md": "b9c6fa4b640396816b2be64541f1c3fdfc90661db6cbeea09f0ed7bd6d453826",
+          "docs/pr-preparations/2026-09-26/0040-0041-review.md": "6793099151e718fa2cb680b6560b39b8aa5ba56b2aad7f3b6833349e405f83f5"
+        },
+        "reviewed_at": "2026-09-26T22:34:34.393816+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0043-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0043-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0043/receipt.json",
+        "docs/pr-preparations/2026-09-26/0043-diagnostic-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0043-llvm-mos.patch": "6567f94b72a8677d00eb9a542914be0da446d036d77dddac588c6bfeb5ea8bb5",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0043/receipt.json": "fa15dd35cbdaf471da408142fff70db5d9b299c3c1d92ec58b07577cf215b323",
+          "docs/pr-preparations/2026-09-26/0043-diagnostic-review.md": "a7befc02abe9ee3c400a30e08004ec4536bb5d8db5af582eaec804f9abcb066c"
+        },
+        "reviewed_at": "2026-09-26T22:34:34.766456+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0044-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0044-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0044/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0044-llvm-mos.patch": "6b48a04ae47c924af4cc777454985a6e2489596047edc2e6253fd188a36f4de1",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0044/receipt.json": "a8ce6f7dd07f5b109b11ffc4667e8a0ec8acae9d23377ec572a275539d67e17c",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a"
+        },
+        "reviewed_at": "2026-09-26T22:34:35.171635+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0045-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0045-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0045/receipt.json",
+        "docs/pr-preparations/2026-09-26/native-fix-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0045-llvm-mos.patch": "ce595a69e81c2ec6732bd4d9cf8a5bf01aaa3c7ff4d254228188a678a9f9559c",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0045/receipt.json": "53c72e3cedae2ee6a573ecf6f11f6202c1d1f7d77c9c85be663adc6d0bde60f0",
+          "docs/pr-preparations/2026-09-26/native-fix-review.md": "ba16144231a8ef156a3596c587efbc91f50545c936a46b1f4ccbdf9933794fea"
+        },
+        "reviewed_at": "2026-09-26T22:34:35.534464+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0046-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0046-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0046/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0046-llvm-mos.patch": "d42701fa045a3f4c4a3cf73807cfb50e0dc838e51b3bc1b06e95be61d935e442",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos/0046/receipt.json": "9448bbae56eb55f64be8cf417ff8f7c4a0ab031d2abe2ce9b0a664761f9fb7b5",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a"
+        },
+        "reviewed_at": "2026-09-26T22:34:35.885075+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0047-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0047-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0047/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0047-llvm-mos.patch": "b641d19787bcf09329b8535190f09c0d924d51177a4273cb258bacd211dd9d61",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0047/receipt.json": "68e768f8366c6151dbf97f3c67df55bbffb920e77cab0a346888376651fd12de",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a"
+        },
+        "reviewed_at": "2026-09-26T22:34:36.245183+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0050-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0050-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0050/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0050-llvm-mos.patch": "ee387217ce29cd2d66598bf34edf142e643969e53394f513fcfb9b8b30ce72cf",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r2/0050/receipt.json": "1098f879e8807db7f6399d44d89da6fd44dc8707bd0f63b456b3fba826e48165",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a"
+        },
+        "reviewed_at": "2026-09-26T22:34:36.596680+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0054-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r3/0054/receipt.json",
+        "docs/pr-preparations/2026-09-26/mos-review.md",
+        "docs/pr-preparations/2026-09-26/reducer-feature-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-r3/0054/receipt.json": "45f4f23cdcdfaab7ad35c4a4584e3c808584a5af7e2680928495079a28fd628b",
+          "docs/pr-preparations/2026-09-26/mos-review.md": "dfa75129bcace5a3c883c11c96f6892c823375cc856cfc65edf5a039e5e4d04a",
+          "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9"
+        },
+        "reviewed_at": "2026-09-26T22:34:37.073380+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0056-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0056-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0056/receipt.json",
+        "docs/pr-preparations/2026-09-26/inline-asm-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0056-llvm-project.patch": "2407d97531303a071e4e7df3a3b9a45a3200fbafe8dae0a7cc9f8683fc0b058b",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0056/receipt.json": "bc58e2179356708d2e90dbeb49fcce904a8c2fb1cb704d66a7a26d62e7497a70",
+          "docs/pr-preparations/2026-09-26/inline-asm-review.md": "904285663dbb434d29c4c127421c7c68032f7a6a523f74bad2f82f900a2fdadb"
+        },
+        "reviewed_at": "2026-09-26T22:34:37.430282+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0057-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0057-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0057/receipt.json",
+        "docs/pr-preparations/2026-09-26/inline-asm-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0057-llvm-project.patch": "8c4213521cb578f7ff2c9acb331fa260087e286f943fcb2f775a841824bc5035",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0057/receipt.json": "7303993c78b46b1d4a642f2345b722e57b775c3d70e79356bf931683950bfcbf",
+          "docs/pr-preparations/2026-09-26/inline-asm-review.md": "904285663dbb434d29c4c127421c7c68032f7a6a523f74bad2f82f900a2fdadb"
+        },
+        "reviewed_at": "2026-09-26T22:34:37.777729+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0058-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0058-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0058/receipt.json",
+        "docs/pr-preparations/2026-09-26/inline-asm-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0058-llvm-project.patch": "87710e8424951a95f0a0f40a59b748817fbc46d76466c12b0f2ce0c92711251d",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0058/receipt.json": "a3e941245400722d739dce0aa36c1640724afbd7170fd02f227a55681e5a6885",
+          "docs/pr-preparations/2026-09-26/inline-asm-review.md": "904285663dbb434d29c4c127421c7c68032f7a6a523f74bad2f82f900a2fdadb"
+        },
+        "reviewed_at": "2026-09-26T22:34:38.161265+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0059-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0059-llvm-project.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0059/receipt.json",
+        "docs/pr-preparations/2026-09-26/inline-asm-review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0059-llvm-project.patch": "2a3f0424702a4e714b91b4336e8b992b984455f541739707396b6a5774706162",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0059/receipt.json": "f1cce16588b7ede579529c8a2b5a02cf44a2765e6607c042cb219a5b798f0fba",
+          "docs/pr-preparations/2026-09-26/inline-asm-review.md": "904285663dbb434d29c4c127421c7c68032f7a6a523f74bad2f82f900a2fdadb"
+        },
+        "reviewed_at": "2026-09-26T22:34:38.536571+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/0060-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json",
+        "docs/pr-preparations/2026-09-26/0060-backport-review.md",
+        "docs/pr-preparations/2026-09-26/0060-reconciliation.json",
+        "docs/pr-preparations/2026-09-26/0060-upstream-guard.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
+          "docs/pr-preparations/2026-09-26/0060-backport-review.md": "f3f5646429d6d2c253d27090f4995ec1a5ef452708914ecedc253f5261a01892",
+          "docs/pr-preparations/2026-09-26/0060-reconciliation.json": "6dad2fdfebef54b2478c2543f12e86fcb6aa4b2e2159f6d69ef38173ded8fac8",
+          "docs/pr-preparations/2026-09-26/0060-upstream-guard.json": "df30e3ec3f104e1b11041cfeb6bd07b39bdb81c4094fde46e29c9d64365317d0"
+        },
+        "reviewed_at": "2026-09-26T22:34:39.202019+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-26/feature-held-packages.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/native-fix-review.md",
+        "docs/pr-preparations/2026-09-26/native-optimization-review.md",
+        "docs/pr-preparations/2026-09-26/reducer-feature-review.md",
+        "docs/pr-preparations/2026-09-26/0028-review.md",
+        "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/native-fix-review.md": "ba16144231a8ef156a3596c587efbc91f50545c936a46b1f4ccbdf9933794fea",
+          "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
+          "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9",
+          "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
+          "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834"
+        },
+        "reviewed_at": "2026-09-26T22:34:39.859020+00:00",
+        "note": "Reviewed the retained exact-revision packet receipts and reviewer findings against current summaries and PR drafts: seventeen unpublished ready packets, the separately posted 0064 PR #609, the validated 0028 presentation hold, native/compiler/ABI extraction holds, 0060 as the existing upstream guard backport, and increment-only 0063 scope. Preserved dated evidence and contributor credits. Checked the policy documents against the destination-guard reconciliation workflow. Verified stored log and packet hashes; this integration review does not claim new compiler runs. The ancillary unexecuted 0038 test copy has only its narrative comment normalized; recorded replay inputs and logs are intact. No PR action is authorized or performed by this integration.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; session 01a0dd01-d72e-76f2-bf27-a796e0f7d994; integration and document review only"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-26-local-fixes-ready-to-post.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-26/README.md",
+        "docs/pr-preparations/2026-09-26/feature-held-packages.md",
+        "docs/investigations/2026-09-26-r2-baseline-backup.md",
+        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-26/README.md": "51d82006443d2c1ac91d920d79acff3fa4e4971ecc1644e19ab30a97fa3a73c1",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "dcdb1eebb9f35f12f3cdb3f3e35cb2ab17d2d1c022687784467ccc997c59d087",
+          "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "95784c4b1adb0e642c1c9ed6258703cb50ee48b30b777f3a8b28e9ac2230ecf6"
+        },
+        "reviewed_at": "2026-09-26T23:48:15.543926+00:00",
+        "note": "Reviewed full upstream-Clang validation on exact PR parent/head: 117 direct C-to-object pairs across three verified CPUs, identical disassembly and objects excluding compiler-version metadata. Corrected the original fixed-IR census to 39 distinct 6502 configurations repeated in 117 paired invocations; retained its immutable evidence. Canonical workaround status, downstream costs, open generic-pressure/farblit/XY16 follow-ups, and absent independent review remain qualified. Current summaries distinguish these runs and the open PR; public body removes internal follow-up jargon and session/agent identifiers under explicit user authorization. No newer-base, runtime, cycle-speed, or compiler-overhead result is inferred.",
+        "attribution": "OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort"
       }
     }
   ]
