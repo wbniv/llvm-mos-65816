@@ -1,0 +1,1467 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/build/near-store-broad/candidate/micro/indirect-Os-a16.ll'
+  source_filename = "/home/will/llvm-mos-65816/dev/near-store/indirect.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @g = dso_local global i16 0, align 1
+  @h = dso_local global i16 0, align 1
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local void @simple(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #0 {
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(argmem: readwrite, inaccessiblemem: readwrite)
+  define dso_local void @vol(ptr noundef %0, i16 noundef zeroext %1) local_unnamed_addr #1 {
+    store volatile i16 %1, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local noundef zeroext i16 @ret(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef returned zeroext %1) local_unnamed_addr #0 {
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    ret i16 %1
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(argmem: readwrite, inaccessiblemem: readwrite)
+  define dso_local void @twice(ptr noundef %0, ptr noundef %1, i16 noundef zeroext %2) local_unnamed_addr #1 {
+    store volatile i16 %2, ptr %0, align 1, !tbaa !6
+    store volatile i16 %2, ptr %1, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, argmem: write, target_mem: none)
+  define dso_local void @abs_and_indir(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #2 {
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    store volatile i16 %1, ptr @g, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local void @offset(ptr noundef writeonly captures(none) initializes((2, 4)) %0, i16 noundef zeroext %1) local_unnamed_addr #0 {
+    %3 = getelementptr inbounds nuw i8, ptr %0, i16 2
+    store i16 %1, ptr %3, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local void @indexed(ptr noundef writeonly captures(none) %0, i8 noundef zeroext %1, i16 noundef zeroext %2) local_unnamed_addr #0 {
+    %4 = zext i8 %1 to i16
+    %5 = getelementptr inbounds nuw [2 x i8], ptr %0, i16 %4
+    store i16 %2, ptr %5, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nounwind optsize
+  define dso_local void @call(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #3 {
+    tail call void @opaque() #7
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: optsize
+  declare dso_local void @opaque() local_unnamed_addr #4
+  
+  ; Function Attrs: nounwind optsize
+  define dso_local void @conditional(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1, i8 noundef zeroext %2) local_unnamed_addr #3 {
+    %4 = icmp eq i8 %2, 0
+    br i1 %4, label %6, label %5
+  
+  5:                                                ; preds = %3
+    tail call void @opaque() #7
+    br label %6
+  
+  6:                                                ; preds = %5, %3
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nounwind optsize
+  define dso_local void @result(ptr noundef writeonly captures(none) initializes((0, 2)) %0) local_unnamed_addr #3 {
+    %2 = tail call zeroext i16 @produce() #7
+    store i16 %2, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: optsize
+  declare dso_local zeroext i16 @produce() local_unnamed_addr #4
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local void @add(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #0 {
+    %3 = add i16 %1, 42
+    store i16 %3, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, target_mem: none)
+  define dso_local void @copy(ptr noundef %0) local_unnamed_addr #5 {
+    %2 = load volatile i16, ptr @g, align 1, !tbaa !6
+    store volatile i16 %2, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local noundef zeroext i16 @mixed(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #0 {
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    %3 = add i16 %1, 1
+    ret i16 %3
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, argmem: write, target_mem: none)
+  define dso_local void @native_context(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1) local_unnamed_addr #2 {
+    %3 = load volatile i16, ptr @h, align 1, !tbaa !6
+    %4 = add i16 %3, 42
+    store volatile i16 %4, ptr @h, align 1, !tbaa !6
+    store i16 %1, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(write, argmem: readwrite, inaccessiblemem: none, target_mem: none)
+  define dso_local void @loadptr(ptr noundef readonly captures(none) %0, i16 noundef zeroext %1) local_unnamed_addr #6 {
+    %3 = load ptr, ptr %0, align 1, !tbaa !8
+    store i16 %1, ptr %3, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write)
+  define dso_local void @byte_value(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i8 noundef zeroext %1) local_unnamed_addr #0 {
+    %3 = zext i8 %1 to i16
+    store i16 %3, ptr %0, align 1, !tbaa !6
+    ret void
+  }
+  
+  ; Function Attrs: nofree norecurse nounwind optsize memory(readwrite, argmem: write, target_mem: none)
+  define dso_local void @third(ptr noundef writeonly captures(none) initializes((0, 2)) %0, i16 noundef zeroext %1, i16 noundef zeroext %2) local_unnamed_addr #2 {
+    store i16 %2, ptr %0, align 1, !tbaa !6
+    store volatile i16 %1, ptr @g, align 1, !tbaa !6
+    ret void
+  }
+  
+  attributes #0 = { mustprogress nofree norecurse nosync nounwind optsize willreturn memory(argmem: write) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #1 = { nofree norecurse nounwind optsize memory(argmem: readwrite, inaccessiblemem: readwrite) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #2 = { nofree norecurse nounwind optsize memory(readwrite, argmem: write, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #3 = { nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #4 = { optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #5 = { nofree norecurse nounwind optsize memory(readwrite, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #6 = { mustprogress nofree norecurse nosync nounwind optsize willreturn memory(write, argmem: readwrite, inaccessiblemem: none, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-a16" }
+  attributes #7 = { nounwind optsize }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!7, !7, i64 0}
+  !7 = !{!"short", !4, i64 0}
+  !8 = !{!9, !9, i64 0}
+  !9 = !{!"p1 short", !10, i64 0}
+  !10 = !{!"any pointer", !4, i64 0}
+...
+---
+name:            simple
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    G_STORE_INDIR %2(s8), %0(p0) :: (store (s8) into %ir.0, !tbaa !6)
+    %8:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %3(s8), %0(p0), %8 :: (store (s8) into %ir.0 + 1, !tbaa !6)
+    RTS
+...
+---
+name:            vol
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    G_STORE_INDIR %2(s8), %0(p0) :: (volatile store (s8) into %ir.0, !tbaa !6)
+    %8:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %3(s8), %0(p0), %8 :: (volatile store (s8) into %ir.0 + 1, !tbaa !6)
+    RTS
+...
+---
+name:            ret
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    G_STORE_INDIR %2(s8), %0(p0) :: (store (s8) into %ir.0, !tbaa !6)
+    %10:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %3(s8), %0(p0), %10 :: (store (s8) into %ir.0 + 1, !tbaa !6)
+    $a = COPY %2(s8)
+    $x = COPY %3(s8)
+    RTS implicit $a, implicit $x
+...
+---
+name:            twice
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.3):
+    liveins: $a, $x, $rs1, $rs2
+  
+    %0:_(p0) = COPY $rs1
+    %1:_(p0) = COPY $rs2
+    %3:_(s8) = COPY $a
+    %4:_(s8) = COPY $x
+    %2:_(s16) = G_MERGE_VALUES %3(s8), %4(s8)
+    G_STORE16_INDIR %2(s16), %0(p0) :: (volatile store (s16) into %ir.0, align 1, !tbaa !6)
+    G_STORE16_INDIR %2(s16), %1(p0) :: (volatile store (s16) into %ir.1, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            abs_and_indir
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    G_STORE16_INDIR %1(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    G_STORE16_ABS %1(s16), @g :: (volatile store (s16) into @g, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            offset
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    %6:_(s8) = G_CONSTANT i8 2
+    G_STORE16_INDIR_IDX %1(s16), %0(p0), %6 :: (store (s16) into %ir.3, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            indexed
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+  - { id: 16, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.3):
+    liveins: $a, $x, $rc4, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %1:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %4:_(s8) = COPY $rc4
+    %2:_(s16) = G_MERGE_VALUES %3(s8), %4(s8)
+    %16:_(s8) = G_CONSTANT i8 0
+    %5:_(s16) = G_MERGE_VALUES %1(s8), %16(s8)
+    %14:_(s8) = G_CONSTANT i8 1
+    %7:_(s16) = nuw nsw G_SHL %5, %14(s8)
+    %11:_(s16) = G_PTRTOINT %0(p0)
+    %12:_(s16) = G_ADD %11, %7
+    %8:_(p0) = G_INTTOPTR %12(s16)
+    G_STORE16_INDIR %2(s16), %8(p0) :: (store (s16) into %ir.5, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            call
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @opaque, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    G_STORE16_INDIR %1(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            conditional
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.3):
+    successors: %bb.3(0x30000000), %bb.2(0x50000000)
+    liveins: $a, $x, $rc4, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %3:_(s8) = COPY $a
+    %4:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %3(s8), %4(s8)
+    %2:_(s8) = COPY $rc4
+    %5:_(s8) = G_CONSTANT i8 0
+    %7:_(s1) = G_CONSTANT i1 true
+    %8:_(s8), %9:_(s1), %10:_, %11:_, %12:_ = G_SBC %2, %5, %7
+    %6:_(s1) = COPY %12(s1)
+    G_BRCOND_IMM %6(s1), %bb.3, 1
+    G_BR %bb.2
+  
+  bb.2 (%ir-block.5):
+    successors: %bb.3(0x80000000)
+  
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @opaque, mos_csr
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+  
+  bb.3 (%ir-block.6):
+    G_STORE16_INDIR %1(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            result
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.1):
+    liveins: $rs1
+  
+    %0:_(p0) = COPY $rs1
+    ADJCALLSTACKDOWN 0, 0, implicit-def $rs0, implicit $rs0
+    JSR @produce, mos_csr, implicit-def $a, implicit-def $x
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    ADJCALLSTACKUP 0, 0, implicit-def $rs0, implicit $rs0
+    G_STORE_INDIR %2(s8), %0(p0) :: (store (s8) into %ir.0, !tbaa !6)
+    %8:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %3(s8), %0(p0), %8 :: (store (s8) into %ir.0 + 1, !tbaa !6)
+    RTS
+...
+---
+name:            add
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    %6:_(s8) = G_CONSTANT i8 42
+    %7:_(s8) = G_CONSTANT i8 0
+    %4:_(s16) = G_MERGE_VALUES %6(s8), %7(s8)
+    %5:_(s16) = G_ADD %1, %4
+    G_STORE16_INDIR %5(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            copy
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.1):
+    liveins: $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %1:_(s16) = G_LOAD16_ABS @g :: (volatile dereferenceable load (s16) from @g, align 1, !tbaa !6)
+    G_STORE16_INDIR %1(s16), %0(p0) :: (volatile store (s16) into %ir.0, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            mixed
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: _, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    G_STORE_INDIR %2(s8), %0(p0) :: (store (s8) into %ir.0, !tbaa !6)
+    %15:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %3(s8), %0(p0), %15 :: (store (s8) into %ir.0 + 1, !tbaa !6)
+    %10:_(s8), %11:_(s8) = G_INC %2(s8), %3(s8)
+    $a = COPY %10(s8)
+    $x = COPY %11(s8)
+    RTS implicit $a, implicit $x
+...
+---
+name:            native_context
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    %8:_(s8) = G_CONSTANT i8 42
+    %9:_(s8) = G_CONSTANT i8 0
+    %6:_(s16) = G_MERGE_VALUES %8(s8), %9(s8)
+    %4:_(s16) = G_LOAD16_ABS @h :: (volatile dereferenceable load (s16) from @h, align 1, !tbaa !6)
+    %7:_(s16) = G_ADD %4, %6
+    G_STORE16_ABS %7(s16), @h :: (volatile store (s16) into @h, align 1, !tbaa !6)
+    G_STORE16_INDIR %1(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            loadptr
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $x, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %2:_(s8) = COPY $a
+    %3:_(s8) = COPY $x
+    %1:_(s16) = G_MERGE_VALUES %2(s8), %3(s8)
+    %5:_(s16) = G_LOAD16_INDIR %0(p0) :: (load (p0) from %ir.0, align 1, !tbaa !8)
+    %4:_(p0) = G_INTTOPTR %5(s16)
+    G_STORE16_INDIR %1(s16), %4(p0) :: (store (s16) into %ir.3, align 1, !tbaa !6)
+    RTS
+...
+---
+name:            byte_value
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.2):
+    liveins: $a, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %1:_(s8) = COPY $a
+    %8:_(s8) = G_CONSTANT i8 0
+    G_STORE_INDIR %1(s8), %0(p0) :: (store (s8) into %ir.0, !tbaa !6)
+    %7:_(s8) = G_CONSTANT i8 1
+    G_STORE_INDIR_IDX %8(s8), %0(p0), %7 :: (store (s8) into %ir.0 + 1, !tbaa !6)
+    RTS
+...
+---
+name:            third
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: false
+selected:        false
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          false
+isSSA:           true
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.1 (%ir-block.3):
+    liveins: $a, $x, $rc4, $rc5, $rs1
+  
+    %0:_(p0) = COPY $rs1
+    %3:_(s8) = COPY $a
+    %4:_(s8) = COPY $x
+    %5:_(s8) = COPY $rc4
+    %6:_(s8) = COPY $rc5
+    %2:_(s16) = G_MERGE_VALUES %5(s8), %6(s8)
+    G_STORE16_INDIR %2(s16), %0(p0) :: (store (s16) into %ir.0, align 1, !tbaa !6)
+    G_STORE_ABS %3(s8), @g :: (volatile store (s8) into @g, !tbaa !6)
+    G_STORE_ABS %4(s8), @g + 1 :: (volatile store (s8) into @g + 1, !tbaa !6)
+    RTS
+...

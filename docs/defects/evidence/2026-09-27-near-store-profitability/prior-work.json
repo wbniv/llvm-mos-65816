@@ -1,0 +1,72 @@
+{
+  "searches": [
+    {
+      "command": [
+        "rg",
+        "-n",
+        "-i",
+        "near.?store|isByteBuiltStoreValue|isByteIndirectStore|near-shared-store",
+        "docs/defects/llvm-reduce-parallel-mir-crash.json",
+        "docs/defects/mos-xy16-near-indirect-y-clobber.json",
+        "docs/defects/gisel-inline-asm-register-bounds.json",
+        "docs/defects/selectiondag-inline-asm-nonstandard-integer.json",
+        "docs/defects/selectiondag-inline-asm-vector-parts.json",
+        "docs/defects/mos-far-memset-wrong-bank.json",
+        "docs/defects/mos-near-index-bank-wrap.json",
+        "docs/defects/shift64-narrow-count.json",
+        "docs/defects/mos-float-vector-legalization.json",
+        "docs/defects/reentrant-attribute-contract.json",
+        "docs/defects/mos-trunc-imag8-i1.json",
+        "docs/defects/selectiondag-inline-asm-register-bounds.json",
+        "docs/defects/mos-coalescing-rc-undef.json",
+        "docs/defects/mos-zp-index-same-width-trunc.json",
+        "docs/defects/mos-bank-relax-section-offset.json",
+        "docs/defects/bitboard-inline-register-pressure.json",
+        "docs/defects/mos-farblit-byte-load-legalization.json",
+        "docs/defects/mos-vector-o0-status-scavenge.json",
+        "docs/defects/mos-carry-scheduling-pressure.json"
+      ],
+      "exit_code": 1,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "log",
+        "--all",
+        "--oneline",
+        "--grep=near.*store"
+      ],
+      "exit_code": 0,
+      "stdout": "0bf5b688 docs: require and restore model, version, and effort attribution\n6065ebec fix(mos): finish defect review, near-store fixes, and evidence enforcement\n2ded248f todo: rank far-scalar Phase 2 (T4) and the near s16 A:X store regression (T3)\n94d1e434 todo: [far-scalar-split-measure] done (GO, gated); queue Phase 2 + near A:X store regression (unranked)\nff027262 #320 65816: near-global absolute access stays 16-bit (suppress abs->long bank-relax) [0007]\nb8585db6 #321 native s16: lock in load-fold (b) \u2014 single-use-non-store results (regression guard)\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "git",
+        "log",
+        "--oneline",
+        "-S",
+        "isByteIndirectStore",
+        "--",
+        "patches/llvm-mos"
+      ],
+      "exit_code": 0,
+      "stdout": "6065ebec fix(mos): finish defect review, near-store fixes, and evidence enforcement\n",
+      "stderr": ""
+    },
+    {
+      "command": [
+        "rg",
+        "-n",
+        "Broader near-store|Near store shared",
+        "TODO.md"
+      ],
+      "exit_code": 0,
+      "stdout": "296:- [x] **Near store shared with unit increment \u2014 implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1` consumer can remain in byte operations. The September 26 review confirms that ordinary decrement canonicalizes to `G_ADD -1` and retains correct native fallback, not this optimization. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch) \u00b7 [review](docs/pr-preparations/2026-09-26/native-optimization-review.md).\n297:- [T3] **Broader near-store profitability remains open.** Indirect store-and-arithmetic, call-result, loaded-pointer, and zero-extended-byte cases retain their measured native paths; measure each before widening the predicate. Values live across calls and atomic word stores retain their existing contracts. [Completion plan](docs/plans/2026-09-27-broader-near-store-profitability.md).\n",
+      "stderr": ""
+    }
+  ],
+  "assessment": "The absolute and plain indirect residency implementations are in 0002, and the increment-only shared absolute rule is in standalone 0063 and live source. This task measures their remaining profitability exclusions; it does not rediscover the existing setter work. No matching canonical near-store profitability defect record was found. Correctness defects in indexed Y lifetime and bank wrapping are distinct and already recorded."
+}

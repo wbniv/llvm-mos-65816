@@ -1,0 +1,11 @@
+{
+  "build/llvm-mos-install/bin/clang": "55ed2de7987a0785d8f960d9d304d89d0fff5801469e70832f27cad6d299c825",
+  "build/llvm-mos/bin/llc": "f3ad24a017971df874ee9d83cb4262e0a79121cac2e071ec0c7f362866bf4ade",
+  "patches/llvm-mos/0065-mos-near-store-profitability.patch": "000678601f84da4ba74e98542d69e33a629e0331518f1522d22e5380c9650e17",
+  "install_difference": {
+    "offset": 8142778,
+    "build_runpath": "$ORIGIN/../lib:",
+    "installed_runpath": "$ORIGIN/../lib",
+    "description": "The sole differing byte is the trailing colon in the ELF RUNPATH string, replaced by NUL during installation."
+  }
+}

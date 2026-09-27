@@ -1,0 +1,3 @@
+==> a16storebytes: differential default vs +mos-a16  (expected 0xDBA7; bsnes=yes)
+  [PASS] a16storebytes  0xDBA7 (all agree)
+RESULT: PASS — a16storebytes: default == +mos-a16 == host on both emulators

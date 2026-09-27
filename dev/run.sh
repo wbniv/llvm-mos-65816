@@ -283,6 +283,7 @@ Targets:
   a16indirectstore  Near indirect s16 argument stores: host/default/a16/xy16
                     on MAME plus a16 on bsnes-jg; includes page crossings.
   a16storebytes  Absolute s16 argument stores: host/default/a16/xy16 differential
+  a16storebroad  Near-store arithmetic, call results and byte sources: host/both cores
                 on MAME plus a16 on bsnes-jg (needs toolchain + SDK + xcheck).
   a16abs     #321 native s16 absolute load/store: g = gg uses one 16-bit lda abs/sta abs in M16
              (no X/Y byte shuffle); corpus_result==0x5A3D both emus

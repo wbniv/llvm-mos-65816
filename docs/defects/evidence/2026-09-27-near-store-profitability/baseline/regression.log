@@ -1,0 +1,385 @@
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,DEFAULT
+default: PASS
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -mattr=+mos-a16 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,NATIVE
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:14:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:41:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:28:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:60:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:47:11: error: NATIVE: expected string not found in input
+; NATIVE: dex
+          ^
+<stdin>:90:20: note: scanning from here
+ .size indirect_decrement, .Lfunc_end2-indirect_decrement
+                   ^
+<stdin>:90:49: note: possible intended match here
+ .size indirect_decrement, .Lfunc_end2-indirect_decrement
+                                                ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:63:14: error: BYTE-NEXT: is not on the line after the previous match
+; BYTE-NEXT: sta (__rc{{[0-9]+}})
+             ^
+<stdin>:109:2: note: 'next' match was here
+ sta (__rc20)
+ ^
+<stdin>:104:13: note: previous match ended here
+ jsr produce
+            ^
+<stdin>:105:1: note: non-matching line after previous match is here
+ sta __rc2
+^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:76:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:125:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:91:9: error: BYTE: expected string not found in input
+; BYTE: lda byte
+        ^
+<stdin>:135:24: note: scanning from here
+indirect_byte_absolute: ; @indirect_byte_absolute
+                       ^
+<stdin>:137:2: note: possible intended match here
+ ldx byte
+ ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:107:14: error: BYTE-NEXT: is not on the line after the previous match
+; BYTE-NEXT: sta (__rc2)
+             ^
+<stdin>:157:2: note: 'next' match was here
+ sta (__rc2)
+ ^
+<stdin>:152:13: note: previous match ended here
+ lda (__rc4)
+            ^
+<stdin>:153:1: note: non-matching line after previous match is here
+ stz __rc5
+^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           36:  .type absolute_decrement,@function 
+           37: absolute_decrement: ; @absolute_decrement 
+           38: ; %bb.0: 
+           39:  sta __rc2 
+           40:  stx __rc3 
+           41:  rep #32 
+not:14          !~~      error: no match expected
+           42:  lda __rc2 
+           43:  sta g 
+           44:  lda __rc2 
+           45:  dec 
+           46:  sta __rc2 
+            .
+            .
+            .
+           55:  .type indirect_increment,@function 
+           56: indirect_increment: ; @indirect_increment 
+           57: ; %bb.0: 
+           58:  sta __rc4 
+           59:  stx __rc5 
+           60:  rep #32 
+not:28          !~~      error: no match expected
+           61:  lda __rc4 
+           62:  sta (__rc2) 
+           63:  lda __rc4 
+           64:  inc 
+           65:  sta __rc2 
+            .
+            .
+            .
+           85:  sep #32 
+           86:  ldx __rc3 
+           87:  lda __rc2 
+           88:  rts 
+           89: .Lfunc_end2: 
+           90:  .size indirect_decrement, .Lfunc_end2-indirect_decrement 
+check:47'0                        X~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error: no match found
+check:47'1                                                     ?          possible intended match
+           91:  ; -- End function 
+check:47'0     ~~~~~~~~~~~~~~~~~~~
+           92:  .globl indirect_call_result ; -- Begin function indirect_call_result 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           93:  .type indirect_call_result,@function 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           94: indirect_call_result: ; @indirect_call_result 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~
+           95: ; %bb.0: 
+            .
+            .
+            .
+          104:  jsr produce 
+          105:  sta __rc2 
+          106:  stx __rc3 
+          107:  rep #32 
+          108:  lda __rc2 
+          109:  sta (__rc20) 
+next:63         !~~~~~~~~~~~  error: match on wrong line
+          110:  sep #32 
+          111:  plx 
+          112:  stx __rc21 
+          113:  plx 
+          114:  stx __rc20 
+            .
+            .
+            .
+          120:  .type indirect_byte_argument,@function 
+          121: indirect_byte_argument: ; @indirect_byte_argument 
+          122: ; %bb.0: 
+          123:  sta __rc4 
+          124:  stz __rc5 
+          125:  rep #32 
+not:76          !~~      error: no match expected
+          126:  lda __rc4 
+          127:  sta (__rc2) 
+          128:  sep #32 
+          129:  rts 
+          130: .Lfunc_end4: 
+          131:  .size indirect_byte_argument, .Lfunc_end4-indirect_byte_argument 
+          132:  ; -- End function 
+          133:  .globl indirect_byte_absolute ; -- Begin function indirect_byte_absolute 
+          134:  .type indirect_byte_absolute,@function 
+          135: indirect_byte_absolute: ; @indirect_byte_absolute 
+check:91'0                            X~~~~~~~~~~~~~~~~~~~~~~~~~~ error: no match found
+          136: ; %bb.0: 
+check:91'0     ~~~~~~~~~
+          137:  ldx byte 
+check:91'0     ~~~~~~~~~~
+check:91'1      ?         possible intended match
+          138:  stz __rc5 
+check:91'0     ~~~~~~~~~~~
+          139:  stx __rc4 
+check:91'0     ~~~~~~~~~~~
+          140:  rep #32 
+check:91'0     ~~~~~~~~~
+          141:  lda __rc4 
+check:91'0     ~~~~~~~~~~~
+          142:  sta (__rc2) 
+check:91'0     ~~~~~~~~~~~~~
+            .
+            .
+            .
+          152:  lda (__rc4) 
+          153:  stz __rc5 
+          154:  sta __rc4 
+          155:  rep #32 
+          156:  lda __rc4 
+          157:  sta (__rc2) 
+next:107        !~~~~~~~~~~  error: match on wrong line
+          158:  sep #32 
+          159:  rts 
+          160: .Lfunc_end6: 
+          161:  .size indirect_byte_pointer, .Lfunc_end6-indirect_byte_pointer 
+          162:  ; -- End function 
+            .
+            .
+            .
+>>>>>>
+a16: FAIL
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -mattr=+mos-a16,+mos-xy16 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,NATIVE
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:14:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:41:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:28:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:60:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:47:11: error: NATIVE: expected string not found in input
+; NATIVE: dex
+          ^
+<stdin>:90:20: note: scanning from here
+ .size indirect_decrement, .Lfunc_end2-indirect_decrement
+                   ^
+<stdin>:90:49: note: possible intended match here
+ .size indirect_decrement, .Lfunc_end2-indirect_decrement
+                                                ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:63:14: error: BYTE-NEXT: is not on the line after the previous match
+; BYTE-NEXT: sta (__rc{{[0-9]+}})
+             ^
+<stdin>:109:2: note: 'next' match was here
+ sta (__rc20)
+ ^
+<stdin>:104:13: note: previous match ended here
+ jsr produce
+            ^
+<stdin>:105:1: note: non-matching line after previous match is here
+ sta __rc2
+^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:76:13: error: BYTE-NOT: excluded string found in input
+; BYTE-NOT: rep
+            ^
+<stdin>:125:2: note: found here
+ rep #32
+ ^~~
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:91:9: error: BYTE: expected string not found in input
+; BYTE: lda byte
+        ^
+<stdin>:135:24: note: scanning from here
+indirect_byte_absolute: ; @indirect_byte_absolute
+                       ^
+<stdin>:137:2: note: possible intended match here
+ ldx byte
+ ^
+/home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll:107:14: error: BYTE-NEXT: is not on the line after the previous match
+; BYTE-NEXT: sta (__rc2)
+             ^
+<stdin>:157:2: note: 'next' match was here
+ sta (__rc2)
+ ^
+<stdin>:152:13: note: previous match ended here
+ lda (__rc4)
+            ^
+<stdin>:153:1: note: non-matching line after previous match is here
+ stz __rc5
+^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+            .
+            .
+            .
+           36:  .type absolute_decrement,@function 
+           37: absolute_decrement: ; @absolute_decrement 
+           38: ; %bb.0: 
+           39:  sta __rc2 
+           40:  stx __rc3 
+           41:  rep #32 
+not:14          !~~      error: no match expected
+           42:  lda __rc2 
+           43:  sta g 
+           44:  lda __rc2 
+           45:  dec 
+           46:  sta __rc2 
+            .
+            .
+            .
+           55:  .type indirect_increment,@function 
+           56: indirect_increment: ; @indirect_increment 
+           57: ; %bb.0: 
+           58:  sta __rc4 
+           59:  stx __rc5 
+           60:  rep #32 
+not:28          !~~      error: no match expected
+           61:  lda __rc4 
+           62:  sta (__rc2) 
+           63:  lda __rc4 
+           64:  inc 
+           65:  sta __rc2 
+            .
+            .
+            .
+           85:  sep #32 
+           86:  ldx __rc3 
+           87:  lda __rc2 
+           88:  rts 
+           89: .Lfunc_end2: 
+           90:  .size indirect_decrement, .Lfunc_end2-indirect_decrement 
+check:47'0                        X~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ error: no match found
+check:47'1                                                     ?          possible intended match
+           91:  ; -- End function 
+check:47'0     ~~~~~~~~~~~~~~~~~~~
+           92:  .globl indirect_call_result ; -- Begin function indirect_call_result 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           93:  .type indirect_call_result,@function 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           94: indirect_call_result: ; @indirect_call_result 
+check:47'0     ~~~~~~~~~~~~~~~~~~~~~
+           95: ; %bb.0: 
+            .
+            .
+            .
+          104:  jsr produce 
+          105:  sta __rc2 
+          106:  stx __rc3 
+          107:  rep #32 
+          108:  lda __rc2 
+          109:  sta (__rc20) 
+next:63         !~~~~~~~~~~~  error: match on wrong line
+          110:  sep #32 
+          111:  plx 
+          112:  stx __rc21 
+          113:  plx 
+          114:  stx __rc20 
+            .
+            .
+            .
+          120:  .type indirect_byte_argument,@function 
+          121: indirect_byte_argument: ; @indirect_byte_argument 
+          122: ; %bb.0: 
+          123:  sta __rc4 
+          124:  stz __rc5 
+          125:  rep #32 
+not:76          !~~      error: no match expected
+          126:  lda __rc4 
+          127:  sta (__rc2) 
+          128:  sep #32 
+          129:  rts 
+          130: .Lfunc_end4: 
+          131:  .size indirect_byte_argument, .Lfunc_end4-indirect_byte_argument 
+          132:  ; -- End function 
+          133:  .globl indirect_byte_absolute ; -- Begin function indirect_byte_absolute 
+          134:  .type indirect_byte_absolute,@function 
+          135: indirect_byte_absolute: ; @indirect_byte_absolute 
+check:91'0                            X~~~~~~~~~~~~~~~~~~~~~~~~~~ error: no match found
+          136: ; %bb.0: 
+check:91'0     ~~~~~~~~~
+          137:  ldx byte 
+check:91'0     ~~~~~~~~~~
+check:91'1      ?         possible intended match
+          138:  stz __rc5 
+check:91'0     ~~~~~~~~~~~
+          139:  stx __rc4 
+check:91'0     ~~~~~~~~~~~
+          140:  rep #32 
+check:91'0     ~~~~~~~~~
+          141:  lda __rc4 
+check:91'0     ~~~~~~~~~~~
+          142:  sta (__rc2) 
+check:91'0     ~~~~~~~~~~~~~
+            .
+            .
+            .
+          152:  lda (__rc4) 
+          153:  stz __rc5 
+          154:  sta __rc4 
+          155:  rep #32 
+          156:  lda __rc4 
+          157:  sta (__rc2) 
+next:107        !~~~~~~~~~~  error: match on wrong line
+          158:  sep #32 
+          159:  rts 
+          160: .Lfunc_end6: 
+          161:  .size indirect_byte_pointer, .Lfunc_end6-indirect_byte_pointer 
+          162:  ; -- End function 
+            .
+            .
+            .
+>>>>>>
+xy16: FAIL

@@ -1,5 +1,7 @@
 # Near s16 stores from byte-register values
 
+**September 27 follow-up:** the broader profitability work is implemented and measured in [0065 / the T3 completion record](2026-09-27-broader-near-store-profitability.md). The implementation and validation below remain the dated September 25 evidence.
+
 Owner: OpenAI Codex. Completed locally 2026-09-25 at the user’s request to take the next open defect.
 Source, tests, patch bundle, and installed main compiler are updated.
 Claude identified and measured the loss in the [far-scalar investigation](../investigations/2026-09-25-far-scalar-split-measurement.md#43-loss-vectors-governing-lesson-2--what-an-ungated-rule-would-do).

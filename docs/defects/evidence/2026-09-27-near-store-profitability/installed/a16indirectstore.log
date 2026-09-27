@@ -1,0 +1,3 @@
+==> a16indirectstore: differential default vs +mos-a16  (expected 0x8509; bsnes=yes)
+  [PASS] a16indirectstore  0x8509 (all agree)
+RESULT: PASS — a16indirectstore: default == +mos-a16 == host on both emulators

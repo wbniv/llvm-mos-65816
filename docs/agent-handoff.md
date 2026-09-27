@@ -2,7 +2,9 @@
 
 **Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](pr-preparations/2026-09-26/0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
-**Current local compiler:** the [near-decoder repair](investigations/2026-09-27-near-y-decoder.md) is carried in `0002` and installed in `build/llvm-mos-install`. Fused Y accesses and a separate near-address wrap guard pass the original 62-work gallery, twelve runtime configurations, and 178 MOS tests (two unsupported). Preserved baseline, fusion-only, and final binaries remain in `build/near-y-fix/`.
+**September 27 near-decoder validation:** the [near-decoder repair](investigations/2026-09-27-near-y-decoder.md) is carried in `0002` and installed in `build/llvm-mos-install`. Fused Y accesses and a separate near-address wrap guard pass the original 62-work gallery, twelve runtime configurations, and 178 MOS tests (two unsupported). Preserved baseline, fusion-only, and final binaries remain in `build/near-y-fix/`.
+
+**Current local compiler:** patch 0065 implements the [broader near-store profitability work](plans/2026-09-27-broader-near-store-profitability.md) on top of the near-decoder repair. Preserved baseline/candidate tools and measurements are in `build/near-store-broad/`; the installed compiler is refreshed. The current MOS suite has 179 passes and two unsupported tests. No new failures or size increases occurred in the 412-input corpus; the new fixture is the only changed object (-35 B per native mode). Upstream #321 extraction and independent review remain separate. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e0ee-df60-7d80-8629-5ad167a8c407`.
 
 ## Carry-scheduling publication
 

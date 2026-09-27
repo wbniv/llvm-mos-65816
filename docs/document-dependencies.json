@@ -32,7 +32,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "e3cee9238fc37ccc1b65a6bc21baabe85f6f203fdfa7d37008b137b5c4549173",
+          "docs/upstream-dashboard-curation.json": "df5eef602082a3140a16b1d894a775a7e1a3f640fed5fd8120a9b1c9927bdd69",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -43,6 +43,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "5beedb323d372e49a354ea4aac3d8859860aeb3e4a0b2a022db0d6ac2fa905f1",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
@@ -55,7 +56,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "6316b576195f51992dace748f9efc45748dfe3395cd7424d8a025e589331c076"
+          "docs/upstream-dashboard.json": "9ba8f103c1f291ecf39c0f5c4a362950c4dfb8fdcd8d14908f381b702000b282"
         }
       }
     },
@@ -76,13 +77,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
+          "docs/upstream-pending-work.md": "dd25e78b56beb9927691978144a948f1263fa7a2cb8974cd34f9e1d5c7f3851e",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "6316b576195f51992dace748f9efc45748dfe3395cd7424d8a025e589331c076",
+          "docs/upstream-dashboard.json": "9ba8f103c1f291ecf39c0f5c4a362950c4dfb8fdcd8d14908f381b702000b282",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "7afe46a5811262cc76680083e00e2c7303d65bdbfde3775c582a7953f18bf7e0"
+          "docs/upstream-dashboard-graph.json": "38da13ada79c855e40d70428a8cf33cb28af1a5ff881f98cd157be3c91b6ba78"
         }
       }
     },
@@ -111,16 +112,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "e369aec43ece2cee7c4e92471ef3bca5717d2fd53989cf231dad026cb71c2c5d",
-          "docs/upstream-contribution-status.md": "a7a5fadb1b44563bbabed2c1c4d948ec3c84a2f002bd2ead8edfd82adc9bfec1",
+          "docs/upstream-pending-work.md": "dd25e78b56beb9927691978144a948f1263fa7a2cb8974cd34f9e1d5c7f3851e",
+          "docs/upstream-contribution-status.md": "eab71266e3ca84b0c31289b9f48784b5e8121ddf9cc26fde8b371edfaa8a769a",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "388f2a3b1943d92a58e461967c485d5916490031acfa7370aca8dce16f88f81b",
-          "docs/mos-upstream-status-2026-09-21.html": "1981108045e8859f1b82b106cbb015fd0576f1e03c2884cbccea8ed40f10cb0c"
+          "docs/mos-upstream-flowchart.html": "0bcb3612d6e091575f7dd784065f0a8eec7b4992d4f11efea3371f16c4612f2f",
+          "docs/mos-upstream-status-2026-09-21.html": "bc1e35c3e47a7c74a3275f004246f23639584d8916618069740541d40dc4bbe0"
         }
       }
     },
@@ -300,7 +301,8 @@
         "docs/howto-defect-evidence.md",
         "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
         "docs/pr-preparations/2026-09-26/README.md",
-        "docs/plans/2026-09-26-mos-carry-scheduling.md"
+        "docs/plans/2026-09-26-mos-carry-scheduling.md",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -314,6 +316,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -327,12 +330,13 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
-          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd"
+          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:34:40.875576+00:00",
-        "note": "Reviewed the publication follow-up against the canonical near-Y and bank-wrap records and the new author-reviewed simulation. Reconciled existing website-only PR statuses and per-defect rows into the compiler registry, preserving PRs 577/578/584/588/590 and verifying their live state through GitHub API on September 27. New gallery rows use the retained September 25 near-Y report date and September 27 bank-wrap isolation date, each with its own canonical evidence and the internal simulation; neither inherits an earlier upstream PR. The renderer validates child dates and registered PR/simulation associations. The built website passes 47 tests with one existing skip, and desktop/mobile HTML contains four correctly associated gallery mechanisms. TODO completion evidence and feature submission gates remain accurate.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:16:58.690889+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -352,7 +356,8 @@
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/pr-preparations/2026-09-26/README.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
-        "docs/pr-preparations/2026-09-26/0064-submission.json"
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -366,6 +371,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -377,13 +383,14 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
+          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
-          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:23.784460+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:00.463495+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -403,7 +410,8 @@
         "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md",
         "docs/pr-preparations/2026-09-26/README.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
-        "docs/pr-preparations/2026-09-26/0064-submission.json"
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -417,6 +425,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "49dba3f5718044f24308ab7db76cc6b51bd6429baabc074da195a66b98333b96",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -428,13 +437,14 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
+          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
-          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:24.223373+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:02.127929+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -561,7 +571,8 @@
         "docs/pr-preparations/2026-09-26/README.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/pr-preparations/2026-09-26/0064-submission.json",
-        "docs/investigations/2026-09-27-near-y-decoder.md"
+        "docs/investigations/2026-09-27-near-y-decoder.md",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -570,14 +581,15 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "7495741f358ff443d511a83019d480cfa80a1a90a097b9b631f50f83299a4a3f",
-          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
+          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:23.350970+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:04.797015+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -794,7 +806,8 @@
         "docs/pr-preparations/2026-09-26/0059-pr-body.md",
         "docs/pr-preparations/2026-09-26/0060-pr-body.md",
         "AGENTS.md",
-        "docs/pr-preparations/2026-09-26/0064-submission.json"
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -803,7 +816,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "067c5fe43781cbfb821b859c2a8bc225ef66da4214002243b2ea4546ddb7c544",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3d397d63db10bf5b6e222462c66d182e4e46244a611bb61f21d67c1132dfccc7",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -823,11 +836,12 @@
           "docs/pr-preparations/2026-09-26/0059-pr-body.md": "67156908578347424e84bc44697db61789bb1824a586889ef3909228d1cadc1e",
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
-          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:20.418022+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:11.209005+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -1294,7 +1308,8 @@
         "docs/pr-preparations/2026-09-26/reducer-feature-review.md",
         "docs/pr-preparations/2026-09-26/0028-review.md",
         "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
-        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
@@ -1303,11 +1318,12 @@
           "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9",
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:18.485554+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:12.764492+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -1317,19 +1333,21 @@
         "docs/pr-preparations/2026-09-26/feature-held-packages.md",
         "docs/investigations/2026-09-26-r2-baseline-backup.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
-        "docs/investigations/2026-09-27-near-y-decoder.md"
+        "docs/investigations/2026-09-27-near-y-decoder.md",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "c10aef81a05c4be974a81c82469b3dc3a825d9dc2ddba6c80428e98c608551da",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3d397d63db10bf5b6e222462c66d182e4e46244a611bb61f21d67c1132dfccc7",
+          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "bc079b29a848ef06d70d6c2ee2b11108ae0b3a4a44717ebd44ea7ab2782531cd",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
+          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "1de31baa79e9f86e894f90473579e64cdfe2b23b104d1114aa18dd8e7f99189f"
         },
-        "reviewed_at": "2026-09-27T02:28:20.775113+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T04:17:14.095263+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     },
     {
@@ -1420,6 +1438,88 @@
         "reviewed_at": "2026-09-27T02:40:50.028908+00:00",
         "note": "Integrated the concurrent website BRK/COP split from biohack commit 458290e into the canonical registry while retaining all four gallery mechanisms and their dates. GitHub API confirms PR 586 is Accept an optional BRK signature operand, open on September 27; associate it with BRK and retain 588 for COP and 577 for QSort. The per-line PR objects and simulations match each parent record. This preserves the other website work during the publication merge and corrects its misplaced QSort PR association. No compiler status, ROM bytes, or native-width submission gate changes.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-27-broader-near-store-profitability.md",
+      "sources": [
+        "docs/plans/2026-09-25-near-s16-store-residency.md",
+        "docs/plans/2026-09-25-near-indirect-s16-store-residency.md",
+        "docs/pr-preparations/2026-09-26/native-optimization-review.md",
+        "patches/llvm-mos/0063-mos-near-shared-store.patch",
+        "dev/near-store/indirect.c",
+        "dev/measure-near-store.py",
+        "docs/defects/mos-near-store-profitability.json",
+        "patches/llvm-mos/0065-mos-near-store-profitability.patch",
+        "dev/near-store/broad.c",
+        "dev/measure-near-store-shapes.py",
+        "dev/check-near-store-profitability.py",
+        "examples/65816/a16storebroad.c",
+        "dev/a16storebroad.sh",
+        "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/plans/2026-09-25-near-s16-store-residency.md": "f29e75eb33bf497832c6c542ef8bd756d2312b9716ca4380eb8252e0814413cf",
+          "docs/plans/2026-09-25-near-indirect-s16-store-residency.md": "f6158a7e95b464bd35528dda5dfd00fece702eb40f5b1daaf1c84bdfb7b7ee9c",
+          "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
+          "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+          "dev/near-store/indirect.c": "6b32b412f588b332be11341971cc7a490088b28385f105586efb7c1484f5611c",
+          "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
+          "patches/llvm-mos/0065-mos-near-store-profitability.patch": "000678601f84da4ba74e98542d69e33a629e0331518f1522d22e5380c9650e17",
+          "dev/near-store/broad.c": "97e3330bc1ca16cdc71a64762b8724ed375f6cb174c7e34e89f2a93f473d4bc6",
+          "dev/measure-near-store-shapes.py": "f56de2773806058396a731db03fb9e31a7adcb02755a91a60a2128d3359fad75",
+          "dev/check-near-store-profitability.py": "fa875476dd4e4848adae11ab64dc408ac1335198b167e0e990375289b8230cb4",
+          "examples/65816/a16storebroad.c": "1317d7cb46e4bfef98777aee6aa496fc37030031c95270f3e88cbe88bbf33047",
+          "dev/a16storebroad.sh": "5865b0d6c8d91c51c13a38398e24c1085f707f33cce9f85e62b87c8e00f5ae62",
+          "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json": "02e215b42f575a60dabb7a774bc02560843d780b6853f07d7b5058842028af13"
+        },
+        "reviewed_at": "2026-09-27T04:16:56.302432+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-near-s16-store-residency.md",
+      "sources": [
+        "docs/defects/mos-near-store-profitability.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586"
+        },
+        "reviewed_at": "2026-09-27T04:16:56.542660+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-25-near-indirect-s16-store-residency.md",
+      "sources": [
+        "docs/defects/mos-near-store-profitability.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586"
+        },
+        "reviewed_at": "2026-09-27T04:16:56.774216+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
+      }
+    },
+    {
+      "document": "docs/upstream-dashboard-curation.json",
+      "sources": [
+        "docs/defects/mos-near-store-profitability.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586"
+        },
+        "reviewed_at": "2026-09-27T04:17:02.373594+00:00",
+        "note": "Reviewed the T3 completion against preserved baseline/candidate identities, matching-input code-generation checks, 486 reduced comparisons, the 412-input corpus, both emulator cores, installed-toolchain results and the patch round trip. Current summaries distinguish measured local 0065 completion from #321 extraction, destination reconciliation and independent review. The two original residency reports retain dated evidence and link to current scope. Dashboard curation reuses the existing optimization ID for its first canonical record. September 26 reviews and posted bodies retain their original artifact scope; unrelated defect and publication statuses are unchanged.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
       }
     }
   ]

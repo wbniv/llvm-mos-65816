@@ -1,0 +1,34 @@
+{
+  "clang": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/clang-23",
+    "sha256": "f78b40b726eaee8dce6fa0a471759b39c83fe7c5b88c83ef3452e6481217cffa"
+  },
+  "llc": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+    "sha256": "f3ad24a017971df874ee9d83cb4262e0a79121cac2e071ec0c7f362866bf4ade"
+  },
+  "llvm-size": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-size",
+    "sha256": "a63ded4056161679aad09295fa3935ab28558b8fe41a9ed41e09ffc81a272801"
+  },
+  "llvm-nm": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-nm",
+    "sha256": "db8fe0f88715374aaad905010da69a12c789fe8c94da59a6de581b6e0865030d"
+  },
+  "llvm-objdump": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-objdump",
+    "sha256": "1bfef2d624ce5320a70c0bb419ff53196c9d5f4a118ce3d929a2273d0d92ebf9"
+  },
+  "llvm-mc": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-mc",
+    "sha256": "743ba7d42e3537b7557677c3b02a4528edb20810b89360fecd93480d0f6c80e5"
+  },
+  "FileCheck": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+    "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d"
+  },
+  "ld.lld": {
+    "source": "/home/will/llvm-mos-65816/build/llvm-mos/bin/lld",
+    "sha256": "4a27408597bba6fed6b767fe30ec96f60c95432e995158b6438ddae21c89c3fd"
+  }
+}

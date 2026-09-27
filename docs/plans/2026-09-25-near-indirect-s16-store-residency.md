@@ -1,5 +1,7 @@
 # Near indirect s16 argument stores
 
+**September 27 follow-up:** the broader profitability work is implemented and measured in [0065 / the T3 completion record](2026-09-27-broader-near-store-profitability.md). The implementation and validation below remain the dated September 25 evidence.
+
 Owner: OpenAI Codex. Completed locally 2026-09-25.
 Source, tests, patch bundle, docs, and installed main compiler are updated.
 This is the next fix after the [absolute-store change](2026-09-25-near-s16-store-residency.md),

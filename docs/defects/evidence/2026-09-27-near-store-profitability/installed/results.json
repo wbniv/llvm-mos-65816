@@ -1,0 +1,42 @@
+[
+  {
+    "name": "a16indirectstore",
+    "command": [
+      "bash",
+      "/work/dev/a16indirectstore.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "a16storebytes",
+    "command": [
+      "bash",
+      "/work/dev/a16storebytes.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "a16abs",
+    "command": [
+      "bash",
+      "/work/dev/a16abs.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "a16storebroad",
+    "command": [
+      "bash",
+      "/work/dev/a16storebroad.sh"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "a16storebroad-xy16-bsnes",
+    "got": 64054,
+    "expected": 64054,
+    "address": 770,
+    "size": 2,
+    "rom_sha256": "49d0a6a0e094f14a0c2310f3647e563bbde959ce73bbcdbbf096b6d4ad23a3cb"
+  }
+]

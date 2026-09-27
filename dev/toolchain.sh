@@ -269,6 +269,7 @@ if [ ! -d "$SRC/.git" ]; then
   apply_patch 0061-mos-far-global-long-x
   apply_patch 0062-mos-native-far-word
   apply_patch 0063-mos-near-shared-store
+  apply_patch 0065-mos-near-store-profitability
 fi
 echo "    commit: $(git -C "$SRC" rev-parse --short HEAD 2>/dev/null || echo '?')$(git -C "$SRC" diff --quiet -- llvm/lib/Target/MOS 2>/dev/null || echo ' +patched')"
 # An EXISTING vendor/ tree is never re-cloned or reset (it is shared, edited in place, and

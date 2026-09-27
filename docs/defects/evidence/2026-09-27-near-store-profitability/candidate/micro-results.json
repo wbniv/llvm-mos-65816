@@ -1,0 +1,3890 @@
+[
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "volatile_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_add_two",
+    "bytes": 21,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_increment_result",
+    "bytes": 22,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_decrement_result",
+    "bytes": 25,
+    "path_cyc": 43
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_twice_increment",
+    "bytes": 25,
+    "path_cyc": 52
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_call_increment",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_native",
+    "bytes": 32,
+    "path_cyc": 51
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_call",
+    "bytes": 42,
+    "path_cyc": 83
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 36
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "loaded_pointer_byte",
+    "bytes": 19,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "loaded_pointer_increment",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "absolute_decrement_call",
+    "bytes": 37,
+    "path_cyc": 67
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "absolute_decrement_native",
+    "bytes": 47,
+    "path_cyc": 68
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "volatile_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_add_two",
+    "bytes": 21,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_increment_result",
+    "bytes": 22,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_decrement_result",
+    "bytes": 25,
+    "path_cyc": 43
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_twice_increment",
+    "bytes": 25,
+    "path_cyc": 52
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_call_increment",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_native",
+    "bytes": 32,
+    "path_cyc": 51
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_call",
+    "bytes": 42,
+    "path_cyc": 83
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 36
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "loaded_pointer_byte",
+    "bytes": 19,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "loaded_pointer_increment",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "absolute_decrement_call",
+    "bytes": 37,
+    "path_cyc": 67
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "absolute_decrement_native",
+    "bytes": 47,
+    "path_cyc": 68
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "volatile_decrement",
+    "bytes": 22,
+    "path_cyc": 42
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_add_two",
+    "bytes": 21,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_increment_result",
+    "bytes": 22,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_decrement_result",
+    "bytes": 25,
+    "path_cyc": 43
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_twice_increment",
+    "bytes": 25,
+    "path_cyc": 52
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_call_increment",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_native",
+    "bytes": 32,
+    "path_cyc": 51
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_call",
+    "bytes": 42,
+    "path_cyc": 83
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 36
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "loaded_pointer_byte",
+    "bytes": 19,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "loaded_pointer_increment",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "absolute_decrement_call",
+    "bytes": 37,
+    "path_cyc": 67
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "absolute_decrement_native",
+    "bytes": 47,
+    "path_cyc": 68
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "absolute_decrement",
+    "bytes": 14,
+    "path_cyc": 23
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "volatile_increment",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "volatile_decrement",
+    "bytes": 21,
+    "path_cyc": 39
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_add_two",
+    "bytes": 25,
+    "path_cyc": 47
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_increment_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_decrement_result",
+    "bytes": 20,
+    "path_cyc": 40
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_twice_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_return_call",
+    "bytes": 35,
+    "path_cyc": 70
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_call_increment",
+    "bytes": 37,
+    "path_cyc": 74
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_load",
+    "bytes": 13,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_pointer",
+    "bytes": 11,
+    "path_cyc": 25
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_native",
+    "bytes": 25,
+    "path_cyc": 45
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_return",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indirect_byte_twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "loaded_pointer_byte",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "loaded_pointer_increment",
+    "bytes": 26,
+    "path_cyc": 54
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "absolute_decrement_call",
+    "bytes": 39,
+    "path_cyc": 76
+  },
+  {
+    "source": "broad.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "absolute_decrement_native",
+    "bytes": 31,
+    "path_cyc": 49
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "across_call",
+    "bytes": 30,
+    "path_cyc": 58
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 37,
+    "path_cyc": 56
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 34,
+    "path_cyc": 63
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 34
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "across_call",
+    "bytes": 30,
+    "path_cyc": 58
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 37,
+    "path_cyc": 56
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 34,
+    "path_cyc": 63
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 34
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "across_call",
+    "bytes": 30,
+    "path_cyc": 58
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 37,
+    "path_cyc": 56
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 34,
+    "path_cyc": 63
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 34
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "across_call",
+    "bytes": 29,
+    "path_cyc": 59
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 22,
+    "path_cyc": 37
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "before_call",
+    "bytes": 9,
+    "path_cyc": 11
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 33,
+    "path_cyc": 64
+  },
+  {
+    "source": "context.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "through_pointer",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "abs_and_indir",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "offset",
+    "bytes": 26,
+    "path_cyc": 46
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "call",
+    "bytes": 50,
+    "path_cyc": 100
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 54,
+    "path_cyc": 105
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "add",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 30,
+    "path_cyc": 50
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "loadptr",
+    "bytes": 20,
+    "path_cyc": 42
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "third",
+    "bytes": 21,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "indexed",
+    "bytes": 31,
+    "path_cyc": 61
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 10,
+    "path_cyc": 23
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 55
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 16,
+    "path_cyc": 34
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "abs_and_indir",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "offset",
+    "bytes": 26,
+    "path_cyc": 46
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "call",
+    "bytes": 50,
+    "path_cyc": 100
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 54,
+    "path_cyc": 105
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "add",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 30,
+    "path_cyc": 50
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "loadptr",
+    "bytes": 20,
+    "path_cyc": 42
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "third",
+    "bytes": 21,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "indexed",
+    "bytes": 31,
+    "path_cyc": 61
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 10,
+    "path_cyc": 23
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 55
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 16,
+    "path_cyc": 34
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "abs_and_indir",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "offset",
+    "bytes": 26,
+    "path_cyc": 46
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 54
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "call",
+    "bytes": 50,
+    "path_cyc": 100
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "conditional",
+    "bytes": 54,
+    "path_cyc": 105
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "add",
+    "bytes": 19,
+    "path_cyc": 36
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 14,
+    "path_cyc": 28
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "native_context",
+    "bytes": 30,
+    "path_cyc": 50
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "loadptr",
+    "bytes": 20,
+    "path_cyc": 42
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "third",
+    "bytes": 21,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "indexed",
+    "bytes": 31,
+    "path_cyc": 61
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 10,
+    "path_cyc": 23
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "simple",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "vol",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "ret",
+    "bytes": 12,
+    "path_cyc": 26
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "twice",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "abs_and_indir",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "offset",
+    "bytes": 15,
+    "path_cyc": 30
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "indexed",
+    "bytes": 28,
+    "path_cyc": 55
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "call",
+    "bytes": 48,
+    "path_cyc": 98
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "conditional",
+    "bytes": 52,
+    "path_cyc": 103
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "result",
+    "bytes": 31,
+    "path_cyc": 64
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 17,
+    "path_cyc": 33
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 16,
+    "path_cyc": 34
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 18,
+    "path_cyc": 37
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "native_context",
+    "bytes": 23,
+    "path_cyc": 43
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "loadptr",
+    "bytes": 17,
+    "path_cyc": 38
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "byte_value",
+    "bytes": 9,
+    "path_cyc": 20
+  },
+  {
+    "source": "indirect.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "third",
+    "bytes": 16,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 61
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "add",
+    "bytes": 14,
+    "path_cyc": 24
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "bit",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "zero",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "default",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "iset",
+    "bytes": 43,
+    "path_cyc": 77
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "a16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 60
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Os",
+    "mode": "xy16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 61
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "add",
+    "bytes": 14,
+    "path_cyc": 24
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "bit",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "zero",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "default",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "iset",
+    "bytes": 43,
+    "path_cyc": 77
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "a16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 60
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "Oz",
+    "mode": "xy16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 61
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "add",
+    "bytes": 14,
+    "path_cyc": 24
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "bit",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "zero",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "default",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "iset",
+    "bytes": 43,
+    "path_cyc": 77
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "a16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "set",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "vset",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "pset",
+    "bytes": 8,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "iset",
+    "bytes": 33,
+    "path_cyc": 60
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "copy",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "add",
+    "bytes": 18,
+    "path_cyc": 32
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "bit",
+    "bytes": 17,
+    "path_cyc": 30
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "zero",
+    "bytes": 8,
+    "path_cyc": 17
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "multiple",
+    "bytes": 13,
+    "path_cyc": 22
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "mixed",
+    "bytes": 11,
+    "path_cyc": 20
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "passthrough",
+    "bytes": 7,
+    "path_cyc": 14
+  },
+  {
+    "source": "shapes.c",
+    "opt": "O2",
+    "mode": "xy16",
+    "name": "callresult",
+    "bytes": 10,
+    "path_cyc": 20
+  }
+]

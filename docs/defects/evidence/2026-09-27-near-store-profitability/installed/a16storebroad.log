@@ -1,0 +1,3 @@
+==> a16storebroad: differential default vs +mos-a16  (expected 0xFA36; bsnes=yes)
+  [PASS] a16storebroad  0xFA36 (all agree)
+RESULT: PASS — a16storebroad: default == +mos-a16 == host on both emulators

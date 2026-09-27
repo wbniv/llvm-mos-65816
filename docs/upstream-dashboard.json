@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "42f045d0eab189b813ffa2769057cdc5192354596739b44c232082fdaad78d8c",
+  "sourceHash": "4b96980283981226b9b4818cd334bfe8af3a119331c770baf80cbbca893f624f",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -179,6 +179,26 @@
       ],
       "evidenceNote": "",
       "upstreamUrl": null
+    },
+    {
+      "id": "opt:near-store-broad",
+      "kind": "optimization",
+      "title": "Broader near-store profitability",
+      "summary": "Patch 0065 completes the measured T3 extensions: indirect store-and-unit arithmetic, indirect call results, zero-extended bytes, and absolute store-and-decrement. The loaded-pointer case retains its smaller native path. This record concerns missed optimizations, not incorrect runtime values.",
+      "localStatus": "fixed",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "opt:0063"
+      ],
+      "nextStep": "Extract with #321 and 0063, reconcile the destination, and obtain independent review before submission.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-store-profitability.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-27-broader-near-store-profitability.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0065-mos-near-store-profitability.patch"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
     },
     {
       "id": "defect:mos-trunc-imag8-i1",
@@ -432,25 +452,6 @@
       ],
       "evidenceNote": "",
       "dependsOn": [],
-      "demoUrls": []
-    },
-    {
-      "id": "opt:near-store-broad",
-      "kind": "optimization",
-      "title": "Broader near-store profitability",
-      "summary": "Indirect stores, call results, loaded pointers, and zero-extended bytes need measured profitability before widening the byte-store predicate.",
-      "localStatus": "needs-work",
-      "publicationStatus": "unposted",
-      "dependsOn": [
-        "opt:0063"
-      ],
-      "nextStep": "Measure each source shape and retain the call-live and atomic word-store contracts.",
-      "evidenceUrls": [
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/TODO.md"
-      ],
-      "evidenceNote": "",
-      "upstreamUrl": null,
       "demoUrls": []
     },
     {

@@ -79,12 +79,14 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0062-mos-native-far-word.patch"
   "$PATCHES/0063-mos-near-shared-store.patch"
   "$PATCHES/0064-mos-computed-carry-scheduling.patch"
+  "$PATCHES/0065-mos-near-store-profitability.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
   "llvm/test/CodeGen/MOS/anyext-wide.mir"
   "llvm/test/CodeGen/MOS/anyext-masked-byte.ll"
   "llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll"
+  "llvm/test/CodeGen/MOS/a16-near-store-profit.ll"
   "llvm/test/CodeGen/MOS/a16-byte-store.ll"
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
   "llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir"

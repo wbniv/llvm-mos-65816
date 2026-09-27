@@ -1,0 +1,483 @@
+{
+  "default": {
+    "total": 412,
+    "paired": 375,
+    "smaller": 0,
+    "larger": 0,
+    "text_delta": 0,
+    "code_changes": 0,
+    "errors": [
+      {
+        "source": "examples/65816/far_arith.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %4:_(s32) = G_MERGE_VALUES %14:_(s8), %17:_(s8), %24:_(s8), %24:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_cast.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %11:_(s32) = G_MERGE_VALUES %20:_(s8), %21:_(s8), %22:_(s8), %22:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_fnptr.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %6:_(s8), %7:_(s8), %8:_(s8), %9:_(s8) = G_UNMERGE_VALUES %0:_(s32) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_indir.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %12:_(s8), %15:_(s8), %18:_(s8), %21:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_indir_tail.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %5:_(s8), %6:_(s8), %7:_(s8), %8:_(s8) = G_UNMERGE_VALUES %1:_(s32) (in function: far_outer)"
+      },
+      {
+        "source": "examples/65816/far_loop.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %30:_(s32) = G_MERGE_VALUES %31:_(s8), %155:_(s8), %156:_(s8), %31:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_memops.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %53:_(s32) = G_MERGE_VALUES %128:_(s8), %129:_(s8), %130:_(s8), %130:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_memset.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %1:_(s32) = G_MERGE_VALUES %91:_(s8), %93:_(s8), %94:_(s8), %91:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_sizeof.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %34:_(s32) = G_MERGE_VALUES %35:_(s8), %36:_(s8), %37:_(s8), %37:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/far_store.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %4:_(s32) = G_MERGE_VALUES %9:_(s8), %12:_(s8), %15:_(s8), %18:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/farbank.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %73:_(s8), %74:_(s8), %75:_(s8), %76:_(s8) = G_UNMERGE_VALUES %71:_(s32) (in function: main)"
+      },
+      {
+        "source": "examples/65816/farblit.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %352:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main)"
+      },
+      {
+        "source": "examples/65816/farblit_press.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %0:_(s32) = G_MERGE_VALUES %35:_(s8), %38:_(s8), %41:_(s8), %44:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/farcc_bench.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %0:_(s32) = G_MERGE_VALUES %1:_(s8), %2:_(s8), %3:_(s8), %4:_(s8) (in function: make_far_ptr)"
+      },
+      {
+        "source": "examples/65816/farcc_imag32.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %0:_(s32) = G_MERGE_VALUES %1:_(s8), %2:_(s8), %3:_(s8), %4:_(s8) (in function: make_far_ptr)"
+      },
+      {
+        "source": "examples/65816/farindex.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %207:_(s32) = G_MERGE_VALUES %216:_(s8), %218:_(s8), %220:_(s8), %222:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/farptrcmp-natural.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %9:_(s16) = G_TRUNC %117:_(s32) (in function: farptrcmp_natural)"
+      },
+      {
+        "source": "examples/65816/farspill-probe.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %21:_(s32) = G_MERGE_VALUES %794:_(s8), %797:_(s8), %800:_(s8), %803:_(s8) (in function: farspill_round)"
+      },
+      {
+        "source": "examples/65816/k_blossom_far.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear)"
+      },
+      {
+        "source": "examples/65816/k_buddha_far.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear)"
+      },
+      {
+        "source": "examples/65816/k_mandel_far.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %17:_(s32) = G_MERGE_VALUES %26:_(s8), %223:_(s8), %224:_(s8), %26:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/65816/zerobank_probe.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %4:_(s32) = G_MERGE_VALUES %5:_(s8), %6:_(s8), %7:_(s8), %7:_(s8) (in function: call_far_with_bank0)"
+      },
+      {
+        "source": "examples/snes/bankwalk.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %283:_(s32) = G_MERGE_VALUES %292:_(s8), %294:_(s8), %296:_(s8), %298:_(s8) (in function: bankwalk_run)"
+      },
+      {
+        "source": "examples/snes/blossom.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear)"
+      },
+      {
+        "source": "examples/snes/buddha.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %3:_(s32) = G_MERGE_VALUES %6:_(s8), %64:_(s8), %65:_(s8), %6:_(s8) (in function: grid_clear)"
+      },
+      {
+        "source": "examples/snes/cartsize-canary.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %61:_(s32) = G_MERGE_VALUES %940:_(s8), %943:_(s8), %946:_(s8), %949:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/dblbridge.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %1046:_(s32) = G_MERGE_VALUES %1055:_(s8), %1057:_(s8), %1059:_(s8), %1061:_(s8) (in function: _title_reserve)"
+      },
+      {
+        "source": "examples/snes/farptrcmp.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %2132:_(s32) = G_MERGE_VALUES %2141:_(s8), %2143:_(s8), %2145:_(s8), %2147:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/farspill.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %29:_(s32) = G_MERGE_VALUES %853:_(s8), %856:_(s8), %859:_(s8), %862:_(s8) (in function: farspill_round)"
+      },
+      {
+        "source": "examples/snes/julia.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %31:_(s32) = G_MERGE_VALUES %3:_(s8), %309:_(s8), %310:_(s8), %3:_(s8) (in function: wipe_in)"
+      },
+      {
+        "source": "examples/snes/lsystem.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %421:_(s32) = G_MERGE_VALUES %18:_(s8), %3474:_(s8), %3475:_(s8), %18:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/lzss-gallery.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %2446:_(s32) = G_MERGE_VALUES %2455:_(s8), %2457:_(s8), %2459:_(s8), %2461:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/mandel-display.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %377:_(s32) = G_MERGE_VALUES %17:_(s8), %359:_(s8), %2340:_(s8), %17:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/mandel-double.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %469:_(s32) = G_MERGE_VALUES %17:_(s8), %435:_(s8), %3359:_(s8), %17:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/mandel-float.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %448:_(s32) = G_MERGE_VALUES %17:_(s8), %421:_(s8), %2919:_(s8), %17:_(s8) (in function: main)"
+      },
+      {
+        "source": "examples/snes/mandel-oop.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %83:_(s32) = G_MERGE_VALUES %28:_(s8), %1810:_(s8), %1814:_(s8), %28:_(s8) (in function: _mandel_emit)"
+      },
+      {
+        "source": "examples/snes/seamdemo.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %15:_(s32) = G_MERGE_VALUES %4125:_(s8), %4127:_(s8), %4129:_(s8), %4131:_(s8) (in function: seamvm_step)"
+      }
+    ]
+  },
+  "a16": {
+    "total": 412,
+    "paired": 410,
+    "smaller": 1,
+    "larger": 0,
+    "text_delta": -35,
+    "code_changes": 1,
+    "errors": [
+      {
+        "source": "examples/65816/farblit.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %346:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main)"
+      },
+      {
+        "source": "examples/snes/lzss-gallery.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'"
+      }
+    ]
+  },
+  "xy16": {
+    "total": 412,
+    "paired": 410,
+    "smaller": 1,
+    "larger": 0,
+    "text_delta": -35,
+    "code_changes": 1,
+    "errors": [
+      {
+        "source": "examples/65816/farblit.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "fatal error: error in backend: unable to legalize instruction: %346:_(s8) = G_LOAD_FAR_ABS 8355871 :: (volatile load (s8) from `ptr addrspace(2) inttoptr (i32 8355871 to ptr addrspace(2))`, !tbaa !8, addrspace 2) (in function: main)"
+      },
+      {
+        "source": "examples/snes/lzss-gallery.c",
+        "before": {
+          "error": 1
+        },
+        "after": {
+          "error": 1
+        },
+        "diagnostics_identical": true,
+        "diagnostic": "error: <unknown>:0:0: ran out of registers during register allocation in function 'record_result'"
+      }
+    ]
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "schema": 1,
+  "id": "mos-near-store-profitability",
+  "title": "Near-store profitability misses local byte-resident value shapes",
+  "status": "fixed",
+  "summary": "Patch 0065 completes the measured T3 extensions: indirect store-and-unit arithmetic, indirect call results, zero-extended bytes, and absolute store-and-decrement. The loaded-pointer case retains its smaller native path. This record concerns missed optimizations, not incorrect runtime values.",
+  "report": "docs/plans/2026-09-27-broader-near-store-profitability.md",
+  "reproducer_origin": "reduced",
+  "attribution": [
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407: September 27 measurements, implementation, verification and record.",
+    "The September 25 plans retain the earlier setter implementation credits. Original broader cost finding: Claude; tool version unknown, exact model ID unknown, reasoning effort unknown in the metadata recovered for this task."
+  ],
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "near store",
+      "near-shared-store",
+      "isByteBuiltStoreValue",
+      "isByteIndirectStore",
+      "legalizeLoadStore16",
+      "legalizeAddSub"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/plans/2026-09-25-near-s16-store-residency.md",
+      "docs/plans/2026-09-25-near-indirect-s16-store-residency.md",
+      "docs/pr-preparations/2026-09-26/native-optimization-review.md"
+    ],
+    "related_changes": [
+      "6065ebec",
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0063-mos-near-shared-store.patch"
+    ],
+    "source_assessment": "The preserved source contains the absolute and plain-indirect setter rules in 0002 and the increment-only absolute shared-store rule in 0063. This record covers the remaining profitability exclusions, not a rediscovery or reclosure of those setters.",
+    "binary_assessment": "The preserved baseline was copied from the integrated build after ninja reported llc and clang up to date. Its source revision, vendor diff, original legalizer, patch hashes, tools and resource headers are retained under build/near-store-broad/baseline. Clang hash is be9d0fa4025965ba6c588d4aa1c2c47f845d6256b8a3a7920498e5400e8a019a.",
+    "decision": "First structured record for the historical T3 missed-optimization work. Its causal contract is selecting word operations for values that can be consumed more cheaply as bytes; the indexed Y-lifetime and bank-wrap correctness records are separate. Loaded-pointer widening was explicitly measured and rejected.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/prior-work.json",
+      "sha256": "dd64c2b26897ebd1dfaccb7fd54d2f7496da310d7be442dee40043cc0b513e27"
+    }
+  },
+  "baseline": {
+    "command": "python3 dev/check-near-store-profitability.py build/near-store-broad/baseline/bin docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "feature_modes": [
+        "default",
+        "+mos-a16",
+        "+mos-a16,+mos-xy16"
+      ],
+      "optimization": "llc default O2",
+      "lto": false,
+      "verify_machineinstrs": true,
+      "expected": "all three code-generation checks pass"
+    },
+    "toolchain_location": "build/near-store-broad/baseline/bin; retained identity in docs/defects/evidence/2026-09-27-near-store-profitability/baseline/identity.json",
+    "toolchain_sha256": "e4d721108e2b02e27f48d18585401cac63ffb9d1dc7ef042d3f5b0b23eb3f020",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll",
+      "sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/baseline/regression.log",
+      "sha256": "4053f32d318ba69504c49dfe4088ab078fda184d0c70a9859f736db2f12766ed"
+    },
+    "exit_code": 1,
+    "failure_signature": "a16: FAIL"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0065-mos-near-store-profitability.patch",
+    "causal_explanation": "Recognize canonical negative-one arithmetic for absolute stores, coordinate a plain indirect store with byte-returned unit arithmetic, ignore erased zero-size call-frame teardown after a call result, and recognize zero extension from an ABI byte or a near byte load. Retain a native store with byte decrement for the smaller indirect-decrement sequence. Keep atomic stores, call-live values, native consumers and loaded destination pointers on their guarded native paths.",
+    "trigger_check": "The same retained LLVM IR reaches store/arithmetic legalization on both binaries. FileCheck fails on the baseline native spill/width sequences and passes on the candidate in all three modes. The runtime fixture consumes stored and returned values, carry/borrow boundaries, call results, loaded bytes, aliases and adjacent sentinels. The failure being closed is the code-generation profitability expectation, not a runtime mismatch.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll",
+      "sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351"
+    },
+    "candidate": {
+      "command": "python3 dev/check-near-store-profitability.py build/near-store-broad/candidate/bin docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "feature_modes": [
+          "default",
+          "+mos-a16",
+          "+mos-a16,+mos-xy16"
+        ],
+        "optimization": "llc default O2",
+        "lto": false,
+        "verify_machineinstrs": true,
+        "expected": "all three code-generation checks pass"
+      },
+      "toolchain_location": "build/near-store-broad/candidate/bin; retained identity in docs/defects/evidence/2026-09-27-near-store-profitability/candidate/identity.json",
+      "toolchain_sha256": "f3ad24a017971df874ee9d83cb4262e0a79121cac2e071ec0c7f362866bf4ade",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll",
+        "sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-27-near-store-profitability/candidate/regression.log",
+        "sha256": "9930cfbc9f4bb2654644cd94f3fc2a398e48bb85606e80cb3f5f09ce2d049e0e"
+      },
+      "exit_code": 0
+    },
+    "additional_regression": {
+      "path": "examples/65816/a16storebroad.c",
+      "sha256": "1317d7cb46e4bfef98777aee6aa496fc37030031c95270f3e88cbe88bbf33047"
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/baseline/identity.json",
+      "sha256": "f24357eaa9d75b439fbd2172aa4c42f778e178f634ab585837a9dc97f43f6918"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/candidate/identity.json",
+      "sha256": "5927cb77dca463fea0bc778cb95ae0d74627bc2f9a2fcc91baa917387e22c79d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/baseline/micro-results.json",
+      "sha256": "5ff1769f04f9fae732658e07c60540705334619eaa4690715a3cd8d9d5f30163"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/candidate/micro-results.json",
+      "sha256": "86ad3f907372c1cedf051753dfe0582861b7d0d43ea438313433bd9224903de4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/baseline/lit.json",
+      "sha256": "d0c4245c626681ab8285d9b008a53f7cc0bd4d8a1c6bf3bf608ca8c702dd6b8b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/candidate/lit.json",
+      "sha256": "27c1cdf24b119723a6334b2e08d5fcf9f2fc4d45bd0bcb6b2435b6370d2932ad"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/loaded-pointer/results.json",
+      "sha256": "36c9582450a8f40d7950bf49137cbc97dd8232b209202380235f1adaee27ae8e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/runtime-broad.log",
+      "sha256": "b09da7fadb62b6b2522dbd968660391f0cfaf070681163a26c9428458459fdff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json",
+      "sha256": "02e215b42f575a60dabb7a774bc02560843d780b6853f07d7b5058842028af13"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/census.json",
+      "sha256": "bd82797022e5443b8a125d6bb2fd271ed55c9f2709c47eafc60a81597435cee8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/roundtrip.log",
+      "sha256": "6c2a95a311a8cf9b2b8043787be360638c11405fc78e6534a7bdcdda3f8d04aa"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/installed/identity.json",
+      "sha256": "61846ab8cc03a474625746d7ea84dfb6565f7a513abe9a64fc11a291e38838a8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/installed/results.json",
+      "sha256": "807f813d2f87dc9987c5be050075b83d256d2fd6e8d055a2b83ef3e0095a87ca"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-store-profitability/installed/lit.json",
+      "sha256": "f4e350500d259ba5866000e4002d542cc5345d269aaed946c29219773222ea1c"
+    }
+  ]
+}

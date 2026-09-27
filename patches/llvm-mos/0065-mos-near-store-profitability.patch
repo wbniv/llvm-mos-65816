@@ -1,0 +1,397 @@
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -898,12 +898,13 @@
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+   const LLT Ty = MRI.getType(Dst);
+   if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
+-    // When an ABI byte pair is stored before a one-step arithmetic use, the
+-    // byte increment/decrement can keep A:X live through the direct byte store.
+-    // No wide value needs to be materialized for this local sequence.
++    // An ABI byte pair stored before a byte-returned unit step can use byte
++    // arithmetic. Absolute stores and plain indirect increments also benefit
++    // from byte stores; indirect decrement retains its cheaper native store.
+     auto RHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+     const MachineInstr *Def = MRI.getVRegDef(Src);
+-    bool ByteSequence = RHS && RHS->Value.isOne() && Def &&
++    bool ByteSequence = RHS &&
++                        (RHS->Value.isOne() || RHS->Value.isAllOnes()) && Def &&
+                         Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
+                         Def->getParent() == MI.getParent() &&
+                         MRI.getType(Def->getOperand(1).getReg()) == S8;
+@@ -917,6 +918,7 @@
+                      isABIByte(Def->getOperand(2).getReg(), MOS::X);
+     }
+     unsigned Stores = 0;
++    bool IndirectStore = false;
+     if (ByteSequence) {
+       for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
+         if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
+@@ -928,22 +930,66 @@
+           break;
+         }
+         const auto &Store = cast<GStore>(Use);
+-        if (Store.isAtomic() ||
+-            !matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
++        if (Store.isAtomic()) {
+           ByteSequence = false;
+           break;
++        }
++        if (!matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
++          const MachineInstr *PtrDef =
++              getDefIgnoringCopies(Store.getPointerReg(), MRI);
++          if (MRI.getType(Store.getPointerReg()) != LLT::pointer(0, 16) ||
++              !PtrDef || !PtrDef->isCopy() ||
++              !MOS::Imag16RegClass.contains(PtrDef->getOperand(1).getReg())) {
++            ByteSequence = false;
++            break;
++          }
++          IndirectStore = true;
+         }
+         ++Stores;
+       }
+       if (Stores == 0)
+         ByteSequence = false;
++      if (IndirectStore &&
++          (Stores != 1 ||
++           !all_of(MRI.use_nodbg_instructions(Dst), [](const MachineInstr &Use) {
++             return Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES;
++           })))
++        ByteSequence = false;
+       for (auto I = std::next(Def->getIterator()); ByteSequence &&
+-           I != MI.getIterator(); ++I)
++           I != MI.getIterator(); ++I) {
+         if (I->isCall() || I->isInlineAsm())
+           ByteSequence = false;
++        if (IndirectStore && !I->isCopy() && !I->isDebugInstr() &&
++            I->getOpcode() != TargetOpcode::G_CONSTANT &&
++            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES &&
++            I->getOpcode() != TargetOpcode::G_STORE &&
++            !(I->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++              getIConstantVRegValWithLookThrough(I->getOperand(0).getReg(), MRI)) &&
++            !(I->getOpcode() == MOS::ADJCALLSTACKUP &&
++              I->getOperand(0).getImm() == 0))
++          ByteSequence = false;
++      }
+     }
+     if (!ByteSequence)
+       return true; // selected natively (selectAlu16Native)
++    const bool IsDecrement = MI.getOpcode() == TargetOpcode::G_ADD
++                                 ? RHS->Value.isAllOnes()
++                                 : RHS->Value.isOne();
++    if (IndirectStore && IsDecrement) {
++      // A native indirect store followed by byte decrement is smaller than
++      // splitting both operations. Keep that decision stable as uses legalize.
++      for (MachineInstr &Use :
++           make_early_inc_range(MRI.use_nodbg_instructions(Src))) {
++        if (Use.getOpcode() != TargetOpcode::G_STORE)
++          continue;
++        MachineIRBuilder StoreBuilder(Use, Helper.Observer);
++        StoreBuilder.buildInstr(MOS::G_STORE16_INDIR)
++            .add(Use.getOperand(0))
++            .add(Use.getOperand(1))
++            .addMemOperand(*Use.memoperands_begin());
++        Use.eraseFromParent();
++      }
++    }
+   }
+
+   auto RHSConst =
+@@ -2267,7 +2313,7 @@
+           return false;
+         auto Step = getIConstantVRegValWithLookThrough(
+             Use.getOperand(2).getReg(), MRI);
+-        return Step && Step->Value.isOne();
++        return Step && (Step->Value.isOne() || Step->Value.isAllOnes());
+       }
+       case MOS::G_STORE16_ABS:
+         return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
+@@ -2284,10 +2330,11 @@
+     });
+   };
+
+-  // A single plain indirect store can consume an A:X value directly. Imaginary
+-  // argument pairs and values shared with other stores can favor one wide load.
+-  // Allow only copies and byte splits between the merge and its consumers: other
+-  // work can clobber A:X or establish a native-width context with cheaper stores.
++  // One plain indirect store can consume A:X or a zero-extended byte directly.
++  // A unit increment may share the byte pair when its result is split into bytes.
++  // Other work can clobber A:X or establish a cheaper native-width context, so
++  // allow only byte copies/splits, constants, and erased zero-size call frames.
++  // Imaginary argument pairs and values shared with other stores stay native.
+   auto isByteIndirectStore = [&]() {
+     // Atomic stores must remain a single memory operation.
+     if (IsLoad || MI.isAtomic())
+@@ -2298,24 +2345,71 @@
+       return false;
+     Register Value = cast<GStore>(MI).getValueReg();
+     const MachineInstr *Def = MRI.getVRegDef(Value);
+-    if (!Def || Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
+-        Def->getNumOperands() != 3)
++    if (!Def)
+       return false;
++    const MachineInstr *Begin = Def;
+     auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
+       const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
+       return ByteDef && ByteDef->isCopy() &&
+              ByteDef->getOperand(1).getReg() == PhysReg;
+     };
+-    if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
+-        !isABIByte(Def->getOperand(2).getReg(), MOS::X))
++    if (Def->getOpcode() == TargetOpcode::G_ZEXT &&
++        MRI.getType(Def->getOperand(1).getReg()) == LLT::scalar(8)) {
++      Register Byte = Def->getOperand(1).getReg();
++      if (!isABIByte(Byte, MOS::A))
++        return false;
++      Begin = getDefIgnoringCopies(Byte, MRI);
++    } else if (Def->getOpcode() == TargetOpcode::G_ZEXTLOAD) {
++      const auto &Load = cast<GZExtLoad>(*Def);
++      if (Load.isAtomic() || Load.getMemSizeInBits() != 8 ||
++          MRI.getType(Load.getPointerReg()) != LLT::pointer(0, 16))
++        return false;
++    } else if (Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
++               Def->getNumOperands() != 3 ||
++               !isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
++               !isABIByte(Def->getOperand(2).getReg(), MOS::X)) {
++      return false;
++    }
++    if (Begin->getParent() != Def->getParent())
++      return false;
++    if (count_if(MRI.use_nodbg_instructions(Value),
++                 [](const MachineInstr &Use) {
++                   return Use.getOpcode() == TargetOpcode::G_ADD ||
++                          Use.getOpcode() == TargetOpcode::G_SUB;
++                 }) > 1)
+       return false;
+     return all_of(MRI.use_nodbg_instructions(Value), [&](const MachineInstr &Use) {
+-      if (Use.getParent() != Def->getParent() ||
+-          (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES))
++      if (Use.getParent() != Def->getParent())
+         return false;
+-      for (auto I = std::next(Def->getIterator()); I != Use.getIterator(); ++I)
+-        if (&*I != &MI && !I->isCopy() && !I->isDebugInstr() &&
+-            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES)
++      if (&Use != &MI && Use.getOpcode() != TargetOpcode::G_UNMERGE_VALUES) {
++        if (Def->getOpcode() != TargetOpcode::G_MERGE_VALUES ||
++            (Use.getOpcode() != TargetOpcode::G_ADD &&
++             Use.getOpcode() != TargetOpcode::G_SUB) ||
++            Use.getOperand(1).getReg() != Value)
++          return false;
++        auto Step = getIConstantVRegValWithLookThrough(
++            Use.getOperand(2).getReg(), MRI);
++        // Increment can share byte stores. Decrement's byte arithmetic is
++        // cheaper with the native indirect store, which preserves the low byte.
++        const bool IsIncrement = Step &&
++            (Use.getOpcode() == TargetOpcode::G_ADD ? Step->Value.isOne()
++                                                  : Step->Value.isAllOnes());
++        if (!IsIncrement ||
++            !all_of(MRI.use_nodbg_instructions(Use.getOperand(0).getReg()),
++                    [](const MachineInstr &Consumer) {
++                      return Consumer.getOpcode() ==
++                             TargetOpcode::G_UNMERGE_VALUES;
++                    }))
++          return false;
++      }
++      for (auto I = std::next(Begin->getIterator()); I != Use.getIterator(); ++I)
++        if (&*I != &MI && &*I != Def && !I->isCopy() && !I->isDebugInstr() &&
++            I->getOpcode() != TargetOpcode::G_UNMERGE_VALUES &&
++            I->getOpcode() != TargetOpcode::G_CONSTANT &&
++            !(I->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++              getIConstantVRegValWithLookThrough(I->getOperand(0).getReg(), MRI)) &&
++            !(I->getOpcode() == MOS::ADJCALLSTACKUP &&
++              I->getOperand(0).getImm() == 0))
+           return false;
+       return true;
+     });
+diff --git a/llvm/test/CodeGen/MOS/a16-near-store-profit.ll b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
+new file mode 100644
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-near-store-profit.ll
+@@ -0,0 +1,187 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++
++@g = global i16 0, align 1
++@byte = global i8 0
++declare i16 @produce()
++declare void @opaque()
++
++; Canonical subtraction by one must preserve the stored value and return its
++; decremented value, including borrow from the high byte.
++define i16 @absolute_decrement(i16 %value) {
++; BYTE-LABEL: absolute_decrement:
++; BYTE-NOT: rep
++; BYTE: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: dec
++; BYTE: dex
++; BYTE: rts
++  store volatile i16 %value, ptr @g, align 1
++  %result = sub i16 %value, 1
++  ret i16 %result
++}
++
++; A plain pointer argument and one byte-returned increment permit byte stores.
++define i16 @indirect_increment(ptr %p, i16 %value) {
++; BYTE-LABEL: indirect_increment:
++; BYTE-NOT: rep
++; BYTE: sta (__rc2)
++; BYTE: sta (__rc2),y
++; BYTE: inc
++; BYTE: bne
++; BYTE: inc
++; BYTE: rts
++  store volatile i16 %value, ptr %p, align 1
++  %result = add i16 %value, 1
++  ret i16 %result
++}
++
++; The native store preserves the low byte for the byte decrement sequence.
++define i16 @indirect_decrement(ptr %p, i16 %value) {
++; NATIVE-LABEL: indirect_decrement:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sep #32
++; NATIVE: dec
++; NATIVE: dex
++; NATIVE: rts
++; DEFAULT-LABEL: indirect_decrement:
++; DEFAULT-NOT: rep
++; DEFAULT: dec
++; DEFAULT: rts
++  store volatile i16 %value, ptr %p, align 1
++  %result = sub i16 %value, 1
++  ret i16 %result
++}
++
++; The returned A:X bytes are available after the zero-size call-frame pseudo.
++define void @indirect_call_result(ptr %p) {
++; BYTE-LABEL: indirect_call_result:
++; BYTE-NOT: rep
++; BYTE: jsr produce
++; BYTE-NEXT: sta (__rc{{[0-9]+}})
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: txa
++; BYTE-NEXT: sta (__rc{{[0-9]+}}),y
++; BYTE: rts
++  %value = call i16 @produce()
++  store volatile i16 %value, ptr %p, align 1
++  ret void
++}
++
++; A zero high byte needs one immediate byte value rather than a wide reload.
++define void @indirect_byte_argument(ptr %p, i8 %value) {
++; BYTE-LABEL: indirect_byte_argument:
++; BYTE-NOT: rep
++; BYTE: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: lda #0
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr %p, align 1
++  ret void
++}
++
++; The volatile byte source is read once, before the two ordered store bytes.
++define void @indirect_byte_absolute(ptr %p) {
++; BYTE-LABEL: indirect_byte_absolute:
++; BYTE-NOT: rep
++; BYTE: lda byte
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: lda #0
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  %value = load volatile i8, ptr @byte
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr %p, align 1
++  ret void
++}
++
++define void @indirect_byte_pointer(ptr %p, ptr %q) {
++; BYTE-LABEL: indirect_byte_pointer:
++; BYTE-NOT: rep
++; BYTE: lda (__rc4)
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: lda #0
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  %value = load volatile i8, ptr %q
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr %p, align 1
++  ret void
++}
++
++; Loading the destination pointer consumes A, so the word value stays native.
++define void @loaded_pointer(ptr %pp, i16 %value) {
++; NATIVE-LABEL: loaded_pointer:
++; NATIVE: rep #32
++; NATIVE: sta (__rc{{[0-9]+}})
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: loaded_pointer:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %p = load ptr, ptr %pp, align 1
++  store volatile i16 %value, ptr %p, align 1
++  ret void
++}
++
++; Values live across calls require preserved storage.
++define void @byte_across_call(ptr %p, i8 %value) {
++; NATIVE-LABEL: byte_across_call:
++; NATIVE: jsr opaque
++; NATIVE: rep #32
++; NATIVE: sta (__rc{{[0-9]+}})
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: byte_across_call:
++; DEFAULT: jsr opaque
++; DEFAULT: rts
++  call void @opaque()
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr %p, align 1
++  ret void
++}
++
++; A native consumer of the increment result retains native arithmetic and stores.
++define void @indirect_native_result(ptr %p, i16 %value) {
++; NATIVE-LABEL: indirect_native_result:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: inc
++; NATIVE: sta g
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: indirect_native_result:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store volatile i16 %value, ptr %p, align 1
++  %result = add i16 %value, 1
++  store volatile i16 %result, ptr @g, align 1
++  ret void
++}
++
++; Independent word arithmetic between the byte argument and store keeps the
++; profitable native context even when the extension is adjacent to the store.
++define void @byte_native_context(ptr %p, i8 %value) {
++; NATIVE-LABEL: byte_native_context:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE: sta g
++; NATIVE: sta (__rc2)
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: byte_native_context:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %old = load volatile i16, ptr @g, align 1
++  %sum = add i16 %old, 42
++  store volatile i16 %sum, ptr @g, align 1
++  %wide = zext i8 %value to i16
++  store volatile i16 %wide, ptr %p, align 1
++  ret void
++}

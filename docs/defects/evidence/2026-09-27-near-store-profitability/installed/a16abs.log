@@ -1,0 +1,19 @@
+==> compile+link /work/examples/65816/a16abs.c (+mos-a16) -> a16abs.sfc
+    a16abs.sfc    32768 bytes
+==> disasm gate: native 16-bit lda abs/sta abs under rep/sep — no X/Y byte shuffle
+       0: c2 20        	rep	#$20
+       2: ad 00 00     	lda	$0                      ; 0x0 <main>
+       5: 8d 00 00     	sta	$0                      ; 0x0 <main>
+       8: ad 00 00     	lda	$0                      ; 0x0 <main>
+       c: 8d 00 00     	sta	$0                      ; 0x0 <main>
+       f: e2 20        	sep	#$20
+  PASS: 1 rep #$20 bracket(s) — native 16-bit absolute access
+  PASS: 2 lda abs (16-bit absolute load)
+  PASS: 2 sta abs (16-bit absolute store)
+  PASS: no ldx/ldy/stx/sty byte shuffle (fully native 16-bit)
+==> MAME: assert corpus_result == 0x5A3D (0x5A3C copied via g, +1)
+SMOKE: PASS addr=0x7E0204 len=2 got=0x5A3D (ran 60 ticks)
+==> bsnes-jg: assert corpus_result == 0x5A3D (independent confirmation)
+  SMOKE: PASS off=0x204 len=2 got=0x5A3D (ran 180 frames, bsnes-jg)
+
+RESULT: PASS — native 16-bit absolute load/store (lda abs/sta abs) copies 0x5A3C; both emulators read 0x5A3D

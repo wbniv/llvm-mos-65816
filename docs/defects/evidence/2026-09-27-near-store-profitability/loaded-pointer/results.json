@@ -1,0 +1,70 @@
+[
+  {
+    "mode": "a16",
+    "candidate": "native",
+    "bytes": 17,
+    "command": [
+      "/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/a16-native.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/a16-native.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "mode": "a16",
+    "candidate": "bytes",
+    "bytes": 22,
+    "command": [
+      "/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/a16-bytes.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/a16-bytes.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "mode": "xy16",
+    "candidate": "native",
+    "bytes": 17,
+    "command": [
+      "/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/xy16-native.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/xy16-native.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "mode": "xy16",
+    "candidate": "bytes",
+    "bytes": 22,
+    "command": [
+      "/home/will/llvm-mos-65816/build/near-store-broad/baseline/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/xy16-bytes.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/near-store-broad/loaded-pointer/xy16-bytes.o"
+    ],
+    "exit_code": 0
+  }
+]
