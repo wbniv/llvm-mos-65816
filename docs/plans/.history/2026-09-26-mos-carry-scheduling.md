@@ -1,5 +1,6 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/86dbb3ee) | mos: investigate carry profitability and prototype size selection |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/b65bb853) | docs: present carry scheduling as an LLVM investigation |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/c3c1967c) | mos: add and measure experimental competing-carry gate |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/1c5e12fc) | fix(mos): repair far extload legalization and measure carry scheduling |
@@ -9,6 +10,11 @@
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cbd1cd5b) | Publish computed-carry scheduler implementation and upstream PR packet |
 
 <!--history-meta v1
+86dbb3ee	author	Will Norris
+86dbb3ee	added	1
+86dbb3ee	deleted	1
+86dbb3ee	files	1
+86dbb3ee	body	Screen three pre-allocation pressure models on 139 configurations. Each\nloses aggregate savings and increases total positive growth; preserve the\npatches and measurements without changing the shipped scheduler default.\n\nImplement complete-object size selection and inspect 3,592 frozen census\nconfigurations. Adding gated to off/always selects it in 55 configurations\nand saves another 220 bytes. Record writable-storage constraints and the\nlimits of object-level selection.\n\nMeasure 260 oracle-checked emulator executions and compilation overhead\non six inputs. The prototype takes 3.25-4.12 times single-always wall time;\nthis includes repeated compilation and evidence collection, not the cost\nof a proposed integrated LLVM implementation. Retain linked-section\nchecks, source and binary identities, MIR, objects and raw timing logs.\n\nBoth experimental builds pass 181 MOS tests with two unsupported. Four\nselector contract tests, relocated replay and patch roundtrips pass.\nUpdate the LLVM-facing investigation, canonical pressure record, current\nsummaries and document dependencies without an upstream default verdict.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
 b65bb853	author	Will Norris
 b65bb853	added	1
 b65bb853	deleted	1

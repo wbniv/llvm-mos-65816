@@ -1,0 +1,144 @@
+{
+  "schema": 1,
+  "id": "mos-null-output-streamer-crash",
+  "title": "MOS llc crashes during null output when the assembler printer expects a target streamer",
+  "status": "fixed",
+  "report": "docs/investigations/2026-09-27-mos-null-output-streamer.md",
+  "reproducer_origin": "original",
+  "attribution": [
+    "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata: diagnosis, patch, and matching-input validation."
+  ],
+  "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass.",
+  "unknowns": [
+    "The passing candidate was rebuilt from the current downstream source tree in the project container; a clean rebuild of the historical 0064 upstream candidate with only patch 0068 has not been performed.",
+    "The original candidate's diagnostic crash was retained in the validation log; the fresh baseline replay uses its preserved binary, while the fixed replay uses the current downstream build."
+  ],
+  "prior_work": {
+    "disposition": "historical_migration",
+    "search_terms": [
+      "debug-pass=Structure",
+      "filetype=null",
+      "null-emission",
+      "arith.Os.ll",
+      "emitStartOfAsmFile",
+      "MOSTargetStreamer",
+      "getTargetStreamer",
+      "createNullStreamer",
+      "RegisterNullTargetStreamer",
+      "MOSMCELFStreamer"
+    ],
+    "related_records": [],
+    "related_reports": [
+      "docs/pr-preparations/2026-09-26/0064-validation.md",
+      "docs/plans/2026-09-26-mos-carry-scheduling.md"
+    ],
+    "related_changes": [
+      "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch",
+      "patches/llvm-mos/0068-mos-null-output-streamer.patch"
+    ],
+    "source_assessment": "The 0064 upstream baseline lacks MOS null target-streamer registration. MOSAsmPrinter::emitStartOfAsmFile unconditionally casts getTargetStreamer() to MOSTargetStreamer and emits zero-page directives; LLVM's generic null streamer has no target streamer unless the target registers a factory. MOSTargetStreamer::finish also assumes ELF semantics, so the null implementation overrides finish. No prior repair or related structured causal record was found.",
+    "binary_assessment": "The preserved 0064 baseline llc is identified by SHA256 f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331 and crashes with exit 139. The fixed build/llvm-mos/bin/llc is SHA256 a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb and completes the same IR input. It was rebuilt in container image sha256:47795d5a527f6b094edbfe58705cfd513e8f6f59f493d1c375b74b24c0c2bb18.",
+    "decision": "The 0064 validation first recorded this diagnostic-only failure without isolation or a structured record. This is its first canonical record. It is a MOS MC target-streamer contract failure, separate from the carry-scheduling performance change.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/prior-work-audit.json",
+      "sha256": "6b683c8fa3a329c50ce2497e22e52413bdc5d370b45d27154ae9a02f0e294fbd"
+    }
+  },
+  "baseline": {
+    "command": ".scratch/carry-pr/baseline/bin/llc -mtriple=mos -mcpu=mos6502 -debug-pass=Structure -filetype=null .scratch/carry-pr/measure/arith.Os.ll",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "target": "mos-unknown-unknown",
+      "cpu": "mos6502",
+      "optimization": "Os in the retained IR; backend default -O2",
+      "output_type": "null",
+      "diagnostics": "-debug-pass=Structure"
+    },
+    "toolchain_location": ".scratch/carry-pr/baseline/bin/llc",
+    "toolchain_sha256": "f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.ll",
+      "sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba"
+    },
+    "source": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.c",
+      "sha256": "15bed5db1d9c405fdb26bcfc198fdbdd63bd7ab4a0f75cb0e8193138777fa97f"
+    },
+    "preprocessed_input": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.i",
+      "sha256": "6e76a730a5edb04900de5e625efd97dcaeed97fa93882550e788401fa5ce7b6b"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/baseline-replay.log",
+      "sha256": "c7c13e2a1729cbd68340c7cf758ecd9fe03aff1294b138246a91c9f11c560686"
+    },
+    "exit_code": 139,
+    "failure_signature": "AsmPrinter::doInitialization(llvm::Module&)"
+  },
+  "resolution": {
+    "change": "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+    "causal_explanation": "CodeGenFileType::Null asks Target::createNullStreamer for a generic MCNullStreamer. The MOS target had not registered a null target streamer, while MOSAsmPrinter::emitStartOfAsmFile immediately dereferenced the target-streamer pointer to emit zero-page directives. The new MOSNullTargetStreamer satisfies that interface with no-op directives and finalization; finish is overridden because the ordinary MOSTargetStreamer finalizer is ELF-specific.",
+    "trigger_check": "The preserved baseline binary crashes on the exact retained arith.Os.ll input with exit 139. The rebuilt compiler with patch 0068 completes that same command with exit 0. The focused lit regression passes both null diagnostic emission and normal object emission.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.ll",
+      "sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba"
+    },
+    "candidate": {
+      "command": "build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -debug-pass=Structure -filetype=null docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.ll -o /dev/null",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "target": "mos-unknown-unknown",
+        "cpu": "mos6502",
+        "optimization": "Os in the retained IR; backend default -O2",
+        "output_type": "null",
+        "diagnostics": "-debug-pass=Structure"
+      },
+      "toolchain_location": "build/llvm-mos/bin/llc",
+      "toolchain_sha256": "a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-27-mos-null-output/arith.Os.ll",
+        "sha256": "6389f9b2b3fff498af2c9bfcaa938920bcc9c304b460d9cb971a2b5ef27e74ba"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-27-mos-null-output/candidate-replay.log",
+        "sha256": "0618fe9ae6f84bb56811c92a7646f21f9dad272b82ebcbb0761f6cec95be00bd"
+      },
+      "exit_code": 0
+    },
+    "additional_checks": [
+      {
+        "command": "build/llvm-mos/bin/llvm-lit -s vendor/llvm-mos/llvm/test/CodeGen/MOS/filetype-null.ll",
+        "log": {
+          "path": "docs/defects/evidence/2026-09-27-mos-null-output/regression.log",
+          "sha256": "aa33bf0925a51cb9d4e1b11351021657c8d3ca81d8a149f43bacda162f6b15af"
+        },
+        "exit_code": 0
+      },
+      {
+        "command": "build/llvm-mos/bin/llc -mtriple=mos -mcpu=mos6502 -filetype=obj arith.Os.ll -o /dev/null",
+        "log": {
+          "path": "docs/defects/evidence/2026-09-27-mos-null-output/object-emission.log",
+          "sha256": "98793fda87c8228d498d7523d72723fc733d36f2ea8b2384f9a2a72e4e923610"
+        },
+        "exit_code": 0
+      }
+    ]
+  },
+  "observations": [
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/baseline-diagnostic-null.log",
+      "sha256": "73bf0969b7c728e7c379e2a0b2cedab849b1c2470b12bdef3397a0f784ff0836",
+      "description": "Original September 26 validation log for the diagnostic-only crash, preserved unchanged."
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/candidate-diagnostic-null.log",
+      "sha256": "3a9e020a01853a5b9ce7ad4732ea904c655b620965d6cef1899cbfe1903d21a5",
+      "description": "Original September 26 candidate log for the diagnostic-only crash, preserved unchanged."
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-mos-null-output/filetype-null.ll",
+      "sha256": "60c8a3cb9b96d086920633e395da734f72cb94bfbe37f8c98cdc19c0a9b6f41c",
+      "description": "Focused regression covering null diagnostic emission and normal object output."
+    }
+  ]
+}

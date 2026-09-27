@@ -1,0 +1,23 @@
+{
+  "date": "2026-09-27",
+  "searches": [
+    {
+      "terms": ["debug-pass=Structure", "filetype=null", "null-emission", "arith.Os.ll"],
+      "locations": ["docs/defects", "docs/investigations", "docs/plans", "docs/pr-preparations", "TODO.md"],
+      "finding": "The only prior report is the exploratory 0064 validation observation: both recorded builds crashed in AsmPrinter::doInitialization on arith.Os.ll, while normal object emission passed. No prior structured defect record exists."
+    },
+    {
+      "terms": ["emitStartOfAsmFile", "MOSTargetStreamer", "getTargetStreamer", "createNullStreamer", "RegisterNullTargetStreamer"],
+      "locations": ["vendor/llvm-mos/llvm/lib/Target/MOS", "patches/llvm-mos", "docs/defects"],
+      "finding": "MOSAsmPrinter::emitStartOfAsmFile statically casts MCStreamer::getTargetStreamer() to MOSTargetStreamer and emits 32 zero-page directives. MOS registers assembly and ELF target streamers, but the null-streamer registration is absent. LLVM's generic createNullStreamer returns an MCNullStreamer and invokes the optional target-streamer factory; without MOS registration the cast dereferences null. No prior repair was found."
+    },
+    {
+      "terms": ["MOSNullTargetStreamer", "NullTargetStreamer", "MOSMCELFStreamer"],
+      "locations": ["git history", "patches/llvm-mos", "vendor/llvm-mos/llvm/lib/Target/MOS"],
+      "finding": "No prior implementation or patch was found. The new null target streamer must also override finish because MOSTargetStreamer::finish implements ELF-specific finalization through an MCELFStreamer cast."
+    }
+  ],
+  "source_assessment": "The exact upstream validation baseline is unmodified llvm-mos main 7bd67c0ae4e8bb65a3f980912bf201df22131e34; the previously retained candidate contains carry-scheduling change 155e209c4cee8eeac01397aac3542e76841a9856. Neither had a MOS null target streamer. The current downstream vendor source now registers a no-output MOS target streamer for CodeGenFileType::Null.",
+  "binary_assessment": "The preserved upstream baseline llc hash is f215e4d24f07a5e6720de665f5fdbda4b6b537aac021c55bbe14678f53af8331 and replayed the crash with exit 139. The candidate llc rebuilt in the project container after the 0068 source change has hash a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb; it completes the identical retained IR command with exit 0. The candidate is a build of the current downstream tree, not a clean rebuild of the historical 0064 candidate.",
+  "decision": "Migrate the earlier unisolated diagnostic-only observation into its first canonical defect record. This is a null target-streamer contract failure in MOS MC/codegen integration, distinct from the carry-scheduling change being validated in 0064. Matching-input replay identifies the null target streamer as causal; the new regression covers the diagnostic path and confirms normal object emission remains available."
+}

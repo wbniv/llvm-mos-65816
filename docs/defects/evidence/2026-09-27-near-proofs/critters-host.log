@@ -1,0 +1,2 @@
+COMMAND: cc -O2 -I/work/examples/65816 /work/tools/critters-sim.c -o /work/build/near-proof-recovery/corpus-runtime-extra/critters-host
+critters gate_crc = 0xAD9F

@@ -1,5 +1,7 @@
 # 0064: exact upstream validation
 
+**Diagnostic follow-up (2026-09-27):** The null-emission crash is isolated and fixed by [patch 0068](../../../../patches/llvm-mos/0068-mos-null-output-streamer.patch). The preserved `arith.Os.ll` crashes on the baseline and completes on the patched downstream build; the focused null-output and ordinary-object regression passes. See the [canonical defect record](../../defects/mos-null-output-streamer-crash.json) and [investigation](../../investigations/2026-09-27-mos-null-output-streamer.md). The original validation evidence below is retained unchanged.
+
 **Later downstream investigation (2026-09-27):** [Three-policy measurements and implementation options](../../investigations/2026-09-27-competing-carry-gate.md) present the aggregate saving and individual-growth trade-offs for LLVM discussion, with no upstream default decision. The earlier local 5% threshold is dated planning context. The current compiler defaults to `always`; the dated upstream validation below remains specific to its recorded extraction. Current-stack compile-time and kernel timing do not retime that extraction. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
 
 **Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
@@ -81,10 +83,11 @@ SDK fixed while replacing the kernel object. Python supplies 512 exact expected
 results, including zero, all-ones and sign-bit boundaries; target C compares
 bytes. The retained images can be rerun directly with the identified mos-sim.
 
-An exploratory `-debug-pass=Structure -filetype=null` command on `arith.Os.ll`
-exits on signal 11 with **both** builds. Its logs are retained in the receipt;
-the cause is unisolated, no repair is claimed, and normal verified object
-emission passes. This diagnostic observation is not counted as a passing gate.
+**Historical observation at validation time:** An exploratory
+`-debug-pass=Structure -filetype=null` command on `arith.Os.ll` exited on signal
+11 with both builds. Its original logs remain in the receipt. The cause has
+since been isolated and fixed; see the current status update above. This
+diagnostic observation was not counted as a passing gate.
 
 Cycles and compiler overhead are unmeasured. Earlier native-width results and
 their growing cases remain downstream evidence, summarized in the

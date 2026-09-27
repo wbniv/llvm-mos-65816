@@ -1,0 +1,2 @@
+COMMAND: cc -O2 -I/work/examples/65816 /work/tools/lzdec-sim.c -o /work/build/near-proof-recovery/corpus-runtime-extra/lzdec-host
+lzdec gate_crc = 0x0100

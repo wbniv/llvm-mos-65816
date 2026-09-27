@@ -6,6 +6,8 @@
 
 **Current publication status:** PR #609 was withdrawn at the user's request at `2026-09-27T01:38:15Z`. Earlier review and validation results remain dated evidence. [Withdrawal record](pr-preparations/2026-09-26/0064-submission.json). Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
+**September 27 near-index optimization:** [proof recovery after LSR](investigations/2026-09-27-near-index-overflow-proofs.md) is implemented locally in `0002`. The corpus saves 33,159 B across 1,197 paired builds; nine configurations grow and no new compile failures appear. The final build is preserved under `build/near-proof-recovery/final` and installed in `build/llvm-mos-install`. All 48 affected-corpus runtime checks and twelve near checks pass; the report records the remaining scope.
+
 **September 27 near-decoder validation:** the [near-decoder repair](investigations/2026-09-27-near-y-decoder.md) is carried in `0002` and installed in `build/llvm-mos-install`. Fused Y accesses and a separate near-address wrap guard pass the original 62-work gallery, twelve runtime configurations, and 178 MOS tests (two unsupported). Preserved baseline, fusion-only, and final binaries remain in `build/near-y-fix/`.
 
 **Prior local compiler update (2026-09-27):** patch 0065 is committed and pushed to downstream `main` as [4d7136cb](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217) and implements the [broader near-store profitability work](plans/2026-09-27-broader-near-store-profitability.md) on top of the near-decoder repair. Preserved baseline/candidate tools and measurements are in `build/near-store-broad/`; the installed compiler is refreshed. The current MOS suite has 179 passes and two unsupported tests. No new failures or size increases occurred in the 412-input corpus; the new fixture is the only changed object (-35 B per native mode). Upstream #321 extraction and independent review remain separate. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e0ee-df60-7d80-8629-5ad167a8c407`.
@@ -31,6 +33,11 @@ Documentation and retained evidence are prepared on
 builds are in `.scratch/carry-clang-upstream`. Independent review remains
 pending. Validation and documentation: OpenAI Codex CLI 0.157.1, model
 `gpt-6-astra`, `xhigh` reasoning effort.
+
+The separate null-emission crash recorded in the 0064 validation is fixed
+locally by patch 0068. Its preserved IR passes diagnostic null emission on the
+patched downstream build; the 0064 upstream extraction has not been rebuilt
+with that repair. See the [defect investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 
 Verbose reference for doing codegen work on this repo. The high-level orientation, the `vendor/` model, the
 three governing lessons, and commit discipline are in the auto-loaded project

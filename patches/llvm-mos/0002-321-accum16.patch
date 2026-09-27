@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c..51f92653c 100644
+index 584cc0c4c8cd6e5a12769fe9010815dca989b47a..4a87ac655effda89aada43881e379e8fa6b5e92e 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
 @@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
@@ -10,6 +10,14 @@ index 584cc0c4c..51f92653c 100644
    MOSInstrCost.cpp
    MOSInstrInfo.cpp
    MOSInstructionSelector.cpp
+@@ -41,6 +42,7 @@ add_llvm_target(MOSCodeGen
+   MOSMCInstLower.cpp
+   MOSMachineScheduler.cpp
+   MOSNonReentrant.cpp
++  MOSRecoverNearNoWrap.cpp
+   MOSPostRAScavenging.cpp
+   MOSRegisterBankInfo.cpp
+   MOSRegisterInfo.cpp
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
 index 9389a4291..3b69550a7 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
@@ -39,10 +47,10 @@ index 9389a4291..3b69550a7 100644
  }
 
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe..e2cb062d6 100644
+index 66964b1fe0a07f899e2fdbe1b9985c796c0d5fa1..336c68b079402447738af1aae8ef28ba6417cc66 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
-@@ -23,6 +23,7 @@ void initializeMOSCombinerPass(PassRegistry &);
+@@ -23,10 +23,13 @@ void initializeMOSCombinerPass(PassRegistry &);
  void initializeMOSCopyOptPass(PassRegistry &);
  void initializeMOSIndexIVPass(PassRegistry &);
  void initializeMOSInsertCopiesPass(PassRegistry &);
@@ -50,6 +58,12 @@ index 66964b1fe..e2cb062d6 100644
  void initializeMOSInternalizePass(PassRegistry &);
  void initializeMOSLateOptimizationPass(PassRegistry &);
  void initializeMOSLowerSelectPass(PassRegistry &);
+ void initializeMOSNonReentrantPass(PassRegistry &);
++void initializeMOSRecoverNearNoWrapPass(PassRegistry &);
++Pass *createMOSRecoverNearNoWrapPass();
+ void initializeMOSPostRAScavengingPass(PassRegistry &);
+ void initializeMOSShiftRotateChainPass(PassRegistry &);
+ void initializeMOSStaticStackAllocPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 index dd5b16b80..ea200c1c5 100644
 --- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
@@ -6832,10 +6846,18 @@ index 6d303255c..870fb5200 100644
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index ceb0afe8a..a1319c6e2 100644
+index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8b79cdc28 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-@@ -39,6 +39,7 @@
+@@ -29,6 +29,7 @@
+ #include "llvm/Passes/PassBuilder.h"
+ #include "llvm/Support/CodeGen.h"
+ #include "llvm/Transforms/InstCombine/InstCombine.h"
++#include "llvm/Transforms/Scalar.h"
+ #include "llvm/Transforms/Scalar/IndVarSimplify.h"
+ #include "llvm/Transforms/Utils.h"
+
+@@ -39,6 +40,7 @@
  #include "MOSIndexIV.h"
  #include "MOSInsertCopies.h"
  #include "MOSInternalize.h"
@@ -6843,15 +6865,17 @@ index ceb0afe8a..a1319c6e2 100644
  #include "MOSLateOptimization.h"
  #include "MOSLowerSelect.h"
  #include "MOSMachineFunctionInfo.h"
-@@ -62,6 +63,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+@@ -61,7 +63,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeGlobalISel(PR);
    initializeMOSCombinerPass(PR);
    initializeMOSCopyOptPass(PR);
++  initializeMOSRecoverNearNoWrapPass(PR);
    initializeMOSInsertCopiesPass(PR);
 +  initializeMOSInsertREPSEPPass(PR);
    initializeMOSInternalizePass(PR);
    initializeMOSLateOptimizationPass(PR);
    initializeMOSLowerSelectPass(PR);
-@@ -72,11 +74,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+@@ -72,11 +76,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
    initializeMOSZeroPageAllocPass(PR);
  }
 
@@ -6869,7 +6893,17 @@ index ceb0afe8a..a1319c6e2 100644
 
  /// Processes a CPU name.
  static StringRef getCPU(StringRef CPU) {
-@@ -325,7 +329,13 @@ void MOSPassConfig::addPreSched2() {
+@@ -230,6 +236,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
+ }
+
+ void MOSPassConfig::addIRPasses() {
++  // Consume LSR's ScalarEvolution facts while its loop analysis is preserved.
++  std::unique_ptr<Pass> LSR(createLoopStrengthReducePass());
++  insertPass(LSR->getPassID(), createMOSRecoverNearNoWrapPass());
+   if (getOptLevel() != CodeGenOptLevel::None)
+     addPass(createMOSNonReentrantPass());
+   TargetPassConfig::addIRPasses();
+@@ -325,7 +334,13 @@ void MOSPassConfig::addPreSched2() {
      addPass(createMOSStaticStackAllocPass());
  }
 
@@ -7331,10 +7365,10 @@ index 000000000..91b7adc66
 +attributes #0 = { "target-features"="+mos-a16" }
 diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 new file mode 100644
-index 000000000..641b6f34e
+index 0000000000000000000000000000000000000000..3bfb2aacec899f526ec389e38aa6ded7ba4753ed
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
-@@ -0,0 +1,513 @@
+@@ -0,0 +1,512 @@
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,A16
 +; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
 +; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
@@ -7530,14 +7564,13 @@ index 000000000..641b6f34e
 +  ret void
 +}
 +
-+; The loop counter indexes the far source directly. The near destination
-+; forms its 16-bit address separately when loop strength reduction does not
-+; retain the unsigned-wrap proof needed for native near indexed addressing.
++; Both addresses retain their unsigned-wrap proofs through loop strength
++; reduction, so the same loop counter can index the source and destination.
 +define void @far_rt_blit(i32 %a, ptr %dst) {
 +; CHECK-LABEL: far_rt_blit:
 +; CHECK: .LBB{{[0-9_]+}}:
 +; CHECK: lda [__rc{{[0-9]+}}],y
-+; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: sta (__rc{{[0-9]+}}),y
 +; CHECK-NEXT: iny
 +; CHECK-NEXT: cpy #64
 +; CHECK-NEXT: bne
@@ -7578,14 +7611,14 @@ index 000000000..641b6f34e
 +}
 +
 +
-+; The far index and loop counter need separate values. The far access keeps
-+; its indexed mode while the near store computes a wrapping 16-bit address.
++; The far index and loop counter need separate registers. The near global's
++; unsigned-wrap proof permits an absolute indexed store using X.
 +@nearbuf = global [64 x i8] zeroinitializer
 +define void @far_rt_y_contended(i32 %a, i8 %m) {
 +; CHECK-LABEL: far_rt_y_contended:
 +; CHECK: .LBB{{[0-9_]+}}:
 +; CHECK: lda [__rc{{[0-9]+}}],y
-+; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: sta nearbuf,x
 +; CHECK: rts
 +entry:
 +  %p = inttoptr i32 %a to ptr addrspace(2)
@@ -8102,3 +8135,174 @@ index cc766817e..270c169d1 100644
 
  	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]
 +	cop #$5a                        ; CHECK: encoding: [0x02,0x5a]
+diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+new file mode 100644
+index 0000000000000000000000000000000000000000..0a219fb221bb6f69d51eee05d9107efcf4b3b489
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+@@ -0,0 +1,89 @@
++//===-- MOSRecoverNearNoWrap.cpp - Preserve near address proofs ------------===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++
++#include "MOS.h"
++#include "MOSTargetMachine.h"
++#include "llvm/Analysis/LoopInfo.h"
++#include "llvm/Analysis/LoopPass.h"
++#include "llvm/Analysis/ScalarEvolution.h"
++#include "llvm/Analysis/ScalarEvolutionExpressions.h"
++#include "llvm/CodeGen/TargetPassConfig.h"
++#include "llvm/IR/Instructions.h"
++#include "llvm/InitializePasses.h"
++#include "llvm/Support/CommandLine.h"
++
++using namespace llvm;
++
++static cl::opt<bool> RecoverNearNoWrap(
++    "mos-recover-near-nowrap", cl::Hidden, cl::init(true),
++    cl::desc("Recover unsigned no-wrap proofs for near byte GEPs after LSR"));
++
++namespace {
++class MOSRecoverNearNoWrap : public LoopPass {
++public:
++  static char ID;
++  MOSRecoverNearNoWrap() : LoopPass(ID) {
++    initializeMOSRecoverNearNoWrapPass(*PassRegistry::getPassRegistry());
++  }
++
++  void getAnalysisUsage(AnalysisUsage &AU) const override {
++    AU.addRequired<TargetPassConfig>();
++    AU.addRequired<ScalarEvolutionWrapperPass>();
++    AU.setPreservesAll();
++  }
++
++  bool runOnLoop(Loop *L, LPPassManager &) override {
++    if (!RecoverNearNoWrap || skipLoop(L))
++      return false;
++    const Function &F = *L->getHeader()->getParent();
++    const auto &TM = getAnalysis<TargetPassConfig>().getTM<MOSTargetMachine>();
++    if (!TM.getSubtargetImpl(F)->hasW65816())
++      return false;
++    auto &SE = getAnalysis<ScalarEvolutionWrapperPass>().getSE();
++    bool Changed = false;
++    for (BasicBlock *BB : L->blocks()) {
++      for (Instruction &I : *BB) {
++        auto *GEP = dyn_cast<GetElementPtrInst>(&I);
++        if (!GEP || !GEP->getType()->isPointerTy() ||
++            GEP->getAddressSpace() != 0 || GEP->hasNoUnsignedWrap() ||
++            !GEP->getSourceElementType()->isIntegerTy(8) ||
++            GEP->getNumIndices() != 1 ||
++            !GEP->getOperand(1)->getType()->isIntegerTy(16))
++          continue;
++
++        // A single byte index of pointer width has no scaling, truncation, or
++        // intermediate additions. Its unsigned sum cannot wrap exactly when
++        // the result is at least the base. Use LSR's preserved ScalarEvolution
++        // facts before another pass invalidates them.
++        const SCEV *Address = SE.getSCEV(GEP);
++        const SCEV *Base = SE.getSCEV(GEP->getPointerOperand());
++        const auto *AR = dyn_cast<SCEVAddRecExpr>(Address);
++        // A nuw recurrence never decreases from its start in unsigned order.
++        bool FromBase = AR && AR->hasNoUnsignedWrap() && AR->getStart() == Base;
++        if (FromBase || SE.isKnownPredicate(ICmpInst::ICMP_UGE, Address, Base)) {
++          GEP->setNoWrapFlags(GEP->getNoWrapFlags() |
++                              GEPNoWrapFlags::noUnsignedWrap());
++          Changed = true;
++        }
++      }
++    }
++    return Changed;
++  }
++};
++} // namespace
++
++char MOSRecoverNearNoWrap::ID = 0;
++INITIALIZE_PASS_BEGIN(MOSRecoverNearNoWrap, "mos-recover-near-nowrap",
++                      "MOS recover near address no-wrap proofs", false, false)
++INITIALIZE_PASS_DEPENDENCY(ScalarEvolutionWrapperPass)
++INITIALIZE_PASS_END(MOSRecoverNearNoWrap, "mos-recover-near-nowrap",
++                    "MOS recover near address no-wrap proofs", false, false)
++
++Pass *llvm::createMOSRecoverNearNoWrapPass() {
++  return new MOSRecoverNearNoWrap();
++}
+diff --git a/llvm/test/CodeGen/MOS/near-index-proofs.ll b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+new file mode 100644
+index 0000000000000000000000000000000000000000..bed35ca6844e7a6c27ea25cdee8e3433ec1c07a3
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+@@ -0,0 +1,70 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -mos-recover-near-nowrap=false -verify-machineinstrs < %s | FileCheck %s --check-prefix=DISABLED
++
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -stop-after=mos-recover-near-nowrap -o - %s | FileCheck %s --check-prefix=IR
++
++; RUN: llc -mtriple=mos -mcpu=mos6502 -stop-after=mos-recover-near-nowrap -o - %s | FileCheck %s --check-prefix=PLAIN
++
++; The inbounds byte loop has an unsigned no-wrap address recurrence. Its
++; destination index must retain that proof across loop strength reduction.
++; PLAIN-LABEL: define void @far_rt_blit
++; PLAIN: getelementptr i8, ptr %dst, i16
++; IR-LABEL: define void @far_rt_blit
++; IR: getelementptr nuw i8, ptr %dst, i16
++; CHECK-LABEL: far_rt_blit:
++; CHECK-NOT: adc
++; CHECK: lda [__rc{{[0-9]+}}],y
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: rts
++; DISABLED-LABEL: far_rt_blit:
++; DISABLED: adc
++; DISABLED: sta (__rc{{[0-9]+}})
++; DISABLED: rts
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define void @far_rt_blit(i32 %a, ptr %dst) {
++entry:
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:                                             ; preds = %loop, %entry
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %x = zext i8 %j to i32
++  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
++  %v = load i8, ptr addrspace(2) %q, align 1
++  %d = getelementptr inbounds i8, ptr %dst, i8 %j
++  store i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:                                             ; preds = %loop
++  ret void
++}
++
++; An unflagged near GEP permits wrapping even with a nonnegative loop index.
++; IR-LABEL: define void @wrapping_blit
++; IR: getelementptr i8, ptr %dst, i16
++; CHECK-LABEL: wrapping_blit:
++; CHECK: adc
++; CHECK: sta (__rc{{[0-9]+}}){{$}}
++; CHECK: rts
++define void @wrapping_blit(i32 %a, ptr %dst) {
++entry:
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:                                             ; preds = %loop, %entry
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %x = zext i8 %j to i32
++  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
++  %v = load i8, ptr addrspace(2) %q, align 1
++  %d = getelementptr i8, ptr %dst, i8 %j
++  store i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:                                             ; preds = %loop
++  ret void
++}

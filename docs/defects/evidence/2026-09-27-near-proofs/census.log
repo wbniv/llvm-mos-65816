@@ -1,0 +1,15 @@
+100/1236 configurations
+200/1236 configurations
+300/1236 configurations
+400/1236 configurations
+500/1236 configurations
+600/1236 configurations
+700/1236 configurations
+800/1236 configurations
+900/1236 configurations
+1000/1236 configurations
+1100/1236 configurations
+1200/1236 configurations
+default: 375/412 paired, 1950055 -> 1945851 bytes, delta -4204, 128 smaller, 7 larger
+a16: 411/412 paired, 2036818 -> 2022518 bytes, delta -14300, 141 smaller, 1 larger
+xy16: 411/412 paired, 2025991 -> 2011336 bytes, delta -14655, 145 smaller, 1 larger

@@ -15,6 +15,51 @@
   },
   "generated": [
     {
+      "id": "mos-null-output-simulated-pr-preview",
+      "sources": [
+        "docs/pr-preparations/2026-09-27/0068-pr-body.md",
+        "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+        "docs/pr-preparations/2026-09-27/0068-simulated-pr.md",
+        "dev/pr-preview.py",
+        "docs/pr-preparations/2026-09-22/0029-pr-preview.html",
+        "docs/pr-preparations/2026-09-27/0068-pr-aside.html"
+      ],
+      "outputs": [
+        "docs/pr-preparations/2026-09-27/0068-pr-preview.html"
+      ],
+      "command": [
+        "python3",
+        "dev/pr-preview.py",
+        "--template",
+        "docs/pr-preparations/2026-09-22/0029-pr-preview.html",
+        "--md",
+        "docs/pr-preparations/2026-09-27/0068-pr-body.md",
+        "--patch",
+        "patches/llvm-mos/0068-mos-null-output-streamer.patch",
+        "--number",
+        "0068",
+        "--notice",
+        "Local simulated PR; not submitted. The historical upstream candidate was not rebuilt with this patch.",
+        "--aside",
+        "docs/pr-preparations/2026-09-27/0068-pr-aside.html",
+        "--out",
+        "docs/pr-preparations/2026-09-27/0068-pr-preview.html"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-27/0068-pr-body.md": "9cf345b4d99fc4123442d4322d06900ee02be940e83cc41ec510051bfe35deae",
+          "patches/llvm-mos/0068-mos-null-output-streamer.patch": "64a2595cc07a321e725e40a16aadaef2c156b8a63260e71f7fdc97591a6b1208",
+          "docs/pr-preparations/2026-09-27/0068-simulated-pr.md": "334b0d5bdc43cbcc8fdef1020423ce0d9b2c8a173d5bb93b44019df4beb23783",
+          "dev/pr-preview.py": "56162dd9ca0f6ca7ac55379d92751eccb09e4ddbf2e2df9fd184f90a48dec5ae",
+          "docs/pr-preparations/2026-09-22/0029-pr-preview.html": "729944225d3ddade3ac87463e9889fc135d0f0a20e8c3970b513cb93b083858f",
+          "docs/pr-preparations/2026-09-27/0068-pr-aside.html": "647cc93d97ed5680121b0abfc2ac18ad50994d2013404aa79fbbd72d2e7b17fe"
+        },
+        "outputs": {
+          "docs/pr-preparations/2026-09-27/0068-pr-preview.html": "6f83491c902be1560dd7bf5b698844a001bb5d972872367e73b9a1b80505781e"
+        }
+      }
+    },
+    {
       "id": "public-upstream-dashboard",
       "sources": [
         "docs/upstream-dashboard-curation.json",
@@ -32,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "6bdb8960b2a38e8fb257fa3c223e6ab1fd7702a2603c7993308edebbc91bd61c",
+          "docs/upstream-dashboard-curation.json": "d3790df4f1c61b231f285857bbe7db27d7badfaf0b3d52d131ef546a2683a218",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -43,7 +88,9 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "7a41d041e7fe93d5faa697c94ed76f65847b04c461510793b8039ce735c14922",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
+          "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
+          "docs/defects/mos-null-output-streamer-crash.json": "4f04061cbb528c725d29f0258876f24915526ea58a40210d418e217e063d692c",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
@@ -56,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "4d857b8cd929a1b07a20ce414c8fb6a59a08c6394f1ae0cf037ec8204ea09b0c"
+          "docs/upstream-dashboard.json": "9d1887ba3b802539348cb6dc0da105da01e2271b4746d9925687dae2dddf71e8"
         }
       }
     },
@@ -77,13 +124,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "84c37c7d53f840893b9155d7dd67ca920e9f0f0d58397fd532247824a536fa7f",
+          "docs/upstream-pending-work.md": "f643e4fa649c241562e55ed476169580a2b892a1da8a24a7586af68a647cead1",
           "docs/upstream-dashboard-graph-map.json": "68afb919ac993c065e8016480a5c1ee0a97ccf7ea80aaca2fa102c3a17bc4554",
-          "docs/upstream-dashboard.json": "4d857b8cd929a1b07a20ce414c8fb6a59a08c6394f1ae0cf037ec8204ea09b0c",
+          "docs/upstream-dashboard.json": "9d1887ba3b802539348cb6dc0da105da01e2271b4746d9925687dae2dddf71e8",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "576a53f061af2f8eeea2813a798b03bb0256d69975cd7c7192e999957c7c9367"
+          "docs/upstream-dashboard-graph.json": "57d9bfd17226d4587fcd6829cffb90060f484c721a8ccf35e544746c76d58676"
         }
       }
     },
@@ -112,16 +159,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "84c37c7d53f840893b9155d7dd67ca920e9f0f0d58397fd532247824a536fa7f",
-          "docs/upstream-contribution-status.md": "a044bae4ee4e838888457526b6cc8895ffa4a9810551451b7fc8946f0b4009d6",
+          "docs/upstream-pending-work.md": "f643e4fa649c241562e55ed476169580a2b892a1da8a24a7586af68a647cead1",
+          "docs/upstream-contribution-status.md": "bffb0fb3ca61be87c27f566c7ac76d4eddb914e4ddc6c1b6fef66c980fb05457",
           "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
           "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
           "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
           "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
         },
         "outputs": {
-          "docs/mos-upstream-flowchart.html": "540a175f5c39586eaa3c1e8396f308f0ec0518623a9f45c412d9c833b0f43f30",
-          "docs/mos-upstream-status-2026-09-21.html": "e2e074072d6f1041de0a81dd00a0f79471a5bf85cd128192c7cb2bce01889e14"
+          "docs/mos-upstream-flowchart.html": "d15442f9bb4e60cb154d888f966815855ccad737e6976c933566ce69a8d9b739",
+          "docs/mos-upstream-status-2026-09-21.html": "3373336318df9dd68162de6232b45d59a625260e0014a41e987bd57d1dffe6f0"
         }
       }
     },
@@ -250,11 +297,11 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
         },
         "outputs": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.html": "72c24450e778ea07e2807fa100c5096ff64556a47db037decf5200de5a8f6bf8"
+          "docs/plans/2026-09-26-mos-carry-scheduling.html": "69f6eff1da37fb3a6be49e64ced09ce644f23ba123a8ed9ed7e6864f5f38af15"
         }
       }
     },
@@ -371,7 +418,8 @@
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/plans/2026-09-27-0064-competing-carry-gate.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -385,7 +433,9 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
+          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -399,18 +449,19 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
-          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "b7e354f23e3b1bc85fbe439669221e6fbd559e9067a96bb2539ebefe8419023b",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T10:31:37.368236+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:03.951862+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -435,7 +486,8 @@
         "docs/investigations/2026-09-27-farblit-byte-load.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -449,7 +501,9 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
+          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -461,18 +515,19 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T10:31:44.854922+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:04.064256+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -497,7 +552,8 @@
         "docs/investigations/2026-09-27-farblit-byte-load.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -511,7 +567,9 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
+          "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
+          "docs/defects/mos-null-output-streamer-crash.json": "90f71a376f983dfc62abea5d1272edc7ed59c8b50f18954d64f20bda2dffa7ca",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
@@ -523,18 +581,19 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T10:31:47.870285+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:04.071385+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -604,13 +663,13 @@
       ],
       "receipt": {
         "sources": {
-          "dev/docs-deps.py": "f17a2469961a96b0a48b2b8198e82fbc24bb10d0b0d7710c12128aa6ce8193cb",
+          "dev/docs-deps.py": "2e15654a861af55a937a6e5f51f8a9ff124fc817fd0fa39f91b1f759b490d6e2",
           "dev/test-docs-deps.py": "6f33ceeffb0e5ba24cb17292edee682f1c443eff9222ca2f035ff4fc220e0c9f",
           ".githooks/pre-commit": "549d721b3888d790580d965562376c518fbc6e7f548a3efc548a74f8adbe57ac"
         },
-        "reviewed_at": "2026-09-26T01:56:52.971323+00:00",
-        "note": "Reviewed the 15 canonical statuses against their retained resolutions: recovered bitboard and coalescing witnesses use existing 0028, narrow shifts use 0055, far memset uses existing 0013, the independent Imag8 diagnosis is invalid without closing the missing historical #320 trigger, and reentrant remains a contract clarification. Current TODO, handoff and upstream summaries distinguish local fixes from review/submission readiness; opcode implementation remains deferred and SNES compiler/ABI prerequisites remain. The graph now colors the repaired MIR reducer as fixed and dates local preparation September 26, while retaining the September 25 remote snapshot. Agent entry points retain the prior-work and immutable-baseline rules; document workflow matches registered generators and staged enforcement. The selector snapshot is published byte-identically as documentary text. Earlier review receipts remain in Git history and retained evidence; no new compiler or runtime validation is claimed by this publication review.",
-        "attribution": "OpenAI Codex CLI 0.157.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0db16-f6a0-7e32-ada6-0c8098813933."
+        "reviewed_at": "2026-09-27T13:13:29.408617+00:00",
+        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
+        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
       }
     },
     {
@@ -666,7 +725,8 @@
         "docs/investigations/2026-09-27-farblit-byte-load.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -675,19 +735,20 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
-          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T10:31:41.606619+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:04.441954+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -725,7 +786,7 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "6a1b21a1367b41aad9f2612d805db3767cd8b6e6c852083c588a4f74ac8a361a",
-          "patches/llvm-mos/0002-321-accum16.patch": "1df78787935143745820fe9075520a949dca6348a541a8e1f4f371bf7ccf8faa",
+          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -748,14 +809,14 @@
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T10:21:39.749161+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:06.677786+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -834,11 +895,11 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd"
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384"
         },
-        "reviewed_at": "2026-09-27T10:21:52.332936+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T13:13:36.533461+00:00",
+        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
+        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
       }
     },
     {
@@ -922,16 +983,17 @@
         "docs/pr-preparations/2026-09-26/0060-pr-body.md",
         "AGENTS.md",
         "docs/pr-preparations/2026-09-26/0064-submission.json",
-        "docs/plans/2026-09-27-broader-near-store-profitability.md"
+        "docs/plans/2026-09-27-broader-near-store-profitability.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -952,11 +1014,12 @@
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T10:21:58.965140+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:08.821858+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1029,12 +1092,12 @@
           "docs/pr-preparations/2026-09-26/0054-llvm-mos.patch": "a80b2ed392acfef33ff33b18934c9801721bbd62c4c2314bf1f4d30a3f30178f",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
-          "docs/pr-preparations/2026-09-26/0064-validation.md": "b8dd910a07a00b1daae5c4f80235056e14ae4b22394a1b9d2ca790a1554c5ffd",
+          "docs/pr-preparations/2026-09-26/0064-validation.md": "24fc83a41d80245b49bce37c6ba2d08ba5e0a8d0a1f17c5f2c9571236ef87384",
           "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099"
         },
-        "reviewed_at": "2026-09-27T10:22:04.861090+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T13:13:47.935399+00:00",
+        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
+        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
       }
     },
     {
@@ -1424,7 +1487,8 @@
         "docs/pr-preparations/2026-09-26/0028-review.md",
         "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
         "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
-        "docs/plans/2026-09-27-broader-near-store-profitability.md"
+        "docs/plans/2026-09-27-broader-near-store-profitability.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -1433,12 +1497,13 @@
           "docs/pr-preparations/2026-09-26/reducer-feature-review.md": "8cba47ddd695d7f001646dbb3b9ecbc0b48155a0831320b4e10d7a534fc6eef9",
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T04:34:06.965004+00:00",
-        "note": "Verified downstream implementation commit 4d7136cb15cf85a676b624a5892e5e8ce7ae0217 and its successful push to origin/main. Updated the completion plan, TODO, handoff, pending-work and contribution summaries, and dashboard delivery note. Reviewed the preparation README, feature-held ledger and ready-to-post plan: their #321 extraction, exact-destination reconciliation and independent-review gates remain accurate; downstream delivery does not post a compiler PR. Retained measurements, baseline artifacts, original reviews and unrelated publication statuses are unchanged.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e0ee-df60-7d80-8629-5ad167a8c407"
+        "reviewed_at": "2026-09-27T14:25:09.352786+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1453,16 +1518,16 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "787add30a3f556278654cb8c365573dd501e772246a2af3ad4dfdbfa1cb5af91",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "0c7e6997685839f0c137d37f7d07d8c4510adac24ef15888e94388a2f49c0d3c",
+          "docs/pr-preparations/2026-09-26/README.md": "5300d1e76e553ecace745cc0406aad7f623fc45aa4b9bee752f73d16a7532779",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868"
         },
-        "reviewed_at": "2026-09-27T10:22:06.344105+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T14:25:09.445236+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1476,7 +1541,8 @@
         "docs/pr-preparations/2026-09-26/0064-submission.json",
         "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
         "docs/upstream-late-opt-nongpr-ldimm-pr.md",
-        "docs/upstream-zp-alloc-deterministic-pr.md"
+        "docs/upstream-zp-alloc-deterministic-pr.md",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
@@ -1486,13 +1552,14 @@
           "examples/65816/near-index-wrap.c": "a80d4d8340228d6399af9d23d755a1d46c38ec2d4a0734d98a52538a52ce0055",
           "dev/near-y-decode.sh": "c965eba687c474e2d7908e1a3d850bdc5e14e8a86b590e00967a4e7b43ac7f01",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee",
           "docs/upstream-late-opt-nongpr-ldimm-pr.md": "21daa88239609e10c3e047eaecefa7b064b8365363b707beff121c85acf10620",
-          "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8"
+          "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T02:28:18.053103+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T14:25:10.061187+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1501,18 +1568,20 @@
         "docs/defects/mos-xy16-near-indirect-y-clobber.json",
         "docs/defects/mos-near-index-bank-wrap.json",
         "patches/llvm-mos/0002-321-accum16.patch",
-        "docs/pr-preparations/2026-09-26/0064-submission.json"
+        "docs/pr-preparations/2026-09-26/0064-submission.json",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "1df78787935143745820fe9075520a949dca6348a541a8e1f4f371bf7ccf8faa",
-          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b"
+          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
+          "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T02:28:17.054929+00:00",
-        "note": "Reviewed the near-decoder simulated PR against the two canonical records, e370e031 implementation and retained 62-work gallery, twelve runtime configurations and 178-test results. The packet is author-reviewed downstream preparation with exact-upstream extraction and independent review still pending. Updated the held-feature ledger and packet index. The gallery discovery entry retains its original July 27 date, PRs 584/590 and their earlier simulations, and adds the September 27 near-Y/bank-wrap mechanism and new simulation. The current investigation links all four gallery mechanisms. Public dashboard curation adds the actual gallery and packet URLs; PR 609 remains withdrawn. No ROM rebuild, upstream opening or new compiler validation is claimed by these documentation changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T14:25:10.061850+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1527,12 +1596,12 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65",
-          "docs/investigations/2026-09-27-near-y-decoder.md": "64fe8d5cdc43711e280da3bd9f73add198160f609012476ac4f5a76a40279e3d"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee",
+          "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb"
         },
-        "reviewed_at": "2026-09-27T02:40:49.630949+00:00",
-        "note": "Integrated the concurrent website BRK/COP split from biohack commit 458290e into the canonical registry while retaining all four gallery mechanisms and their dates. GitHub API confirms PR 586 is Accept an optional BRK signature operand, open on September 27; associate it with BRK and retain 588 for COP and 577 for QSort. The per-line PR objects and simulations match each parent record. This preserves the other website work during the publication merge and corrects its misplaced QSort PR association. No compiler status, ROM bytes, or native-width submission gate changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T14:25:10.061912+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1548,11 +1617,11 @@
           "docs/snes-demo-compiler-bug-pages.json": "a150121d975fd396eafe32f48c49d62ec6020ea454f9e250a1a0edbf1b1520b9",
           "dev/render-snes-demo-compiler-bug-map.py": "2211c5e97b9718ef49e8bb6a7c3670c9202b34abf98f2d789b4cef134a87eab9",
           "dev/export-snes-compiler-bug-public.py": "2b7e504636c235a8b5ed5c9be25e10bffb15fa2936bbd3bf2f5d21188f52c75a",
-          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "daccb3035efc1b97f991e2246be3cfadb8279d73c256be9837a918bdeed30b65"
+          "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee"
         },
-        "reviewed_at": "2026-09-27T02:40:50.028908+00:00",
-        "note": "Integrated the concurrent website BRK/COP split from biohack commit 458290e into the canonical registry while retaining all four gallery mechanisms and their dates. GitHub API confirms PR 586 is Accept an optional BRK signature operand, open on September 27; associate it with BRK and retain 588 for COP and 577 for QSort. The per-line PR objects and simulations match each parent record. This preserves the other website work during the publication merge and corrects its misplaced QSort PR association. No compiler status, ROM bytes, or native-width submission gate changes.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-27T14:25:10.328861+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     },
     {
@@ -1701,14 +1770,14 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "577da03a1df9b023996d53eb00fd16df43706fb17a27e7307aad3093224ec685",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T10:21:41.459937+00:00",
-        "note": "Reviewed the carry investigation and its current entry points after three measured pressure-model trials and implementation of complete-object selection. Checked the 139-case screening scope, 3592 frozen-object selections, optional writable-storage cap, 55 gated choices and 220-byte additional saving, 260 oracle-checked emulator executions, linked-section limits and measured prototype compilation overhead. Current summaries distinguish the prototype from an integrated backend and preserve the unchanged always default, open generic contract and baseline VLA qualification. Dated upstream extraction evidence, withdrawn PR body, independent-review status and prior baselines remain unchanged; this follow-up makes no new default or publication decision.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-27T13:13:48.184661+00:00",
+        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
+        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
       }
     },
     {
@@ -1817,6 +1886,28 @@
         "reviewed_at": "2026-09-27T10:31:51.762788+00:00",
         "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+      "sources": [
+        "docs/defects/mos-near-index-overflow-proofs.json",
+        "patches/llvm-mos/0002-321-accum16.patch",
+        "dev/check-near-index-proofs.py",
+        "dev/measure-near-index-proofs.py",
+        "docs/defects/evidence/2026-09-27-near-proofs/census.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
+          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
+          "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
+          "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
+          "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
+        },
+        "reviewed_at": "2026-09-27T14:25:10.689995+00:00",
+        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
       }
     }
   ]

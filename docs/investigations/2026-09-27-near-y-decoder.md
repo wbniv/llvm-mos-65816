@@ -32,7 +32,7 @@ Loop strength reduction expresses that read as the current destination pointer p
 
 `canFoldNearIndex` now requires `NoUWrap`, `NoUSWrap` with a nonnegative offset, or known-bits bounds proving that the unsigned sum fits. Otherwise it materializes the 16-bit near address before the access. The rule covers byte/word and absolute/indirect near indexing on 65816. Far indexing retains its bank-carry semantics. The isolated regression places `$5A` and `$C3` at the corresponding addresses in banks $7E and $7F: fusion alone returns `$C3`, and the guard returns `$5A`.
 
-Some loop-generated near pointer additions lack overflow flags even when their original IR had them. Their near accesses now compute addresses explicitly; the far-index tests retain the far fold while accepting the required near addition. Recovering those proofs is an optimization opportunity, not a reason to permit bank carry.
+**Follow-up, September 27:** [near-index proof recovery](2026-09-27-near-index-overflow-proofs.md) now preserves sound unsigned no-wrap facts immediately after Loop Strength Reduction. The demonstrated near loops regain indexed accesses; unproven wrapping addresses still materialize the 16-bit address. The [optimization record](../defects/mos-near-index-overflow-proofs.json) retains its separate baseline and measurements. The validation below remains the dated evidence for the two correctness repairs.
 
 ## Validation
 

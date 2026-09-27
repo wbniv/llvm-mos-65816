@@ -1,0 +1,2 @@
+COMMAND: cc -O2 -I/work/examples/65816 /work/tools/keycmp64-sim.c -o /work/build/near-proof-recovery/corpus-runtime-extra/keycmp64-host
+keycmp64 gate_crc = 0xB8AD

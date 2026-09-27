@@ -1,0 +1,26 @@
+{
+  "session": "01a0e315-89ed-7e70-b7dc-fcc2940366d9",
+  "tool": "OpenAI Codex CLI 0.157.1 (codex-tui)",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "high",
+  "source_pin": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "baseline": {
+    "llc": "a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb",
+    "clang-23": "6e004a8a8c9b095013d1e6e786822e9d930b20691749413a3a2ca312d5bb1fd5",
+    "lld": "30aa087a142c7aea4ba837d2ad35f0354f3faa681485c05e2b50747deb4a513b"
+  },
+  "baseline_vendor_diff_sha256": "9c6cd9206990c7abead87545a84fe4d8c2169e532d251dc21918400436f8c3bd",
+  "initial_candidate": {
+    "llc": "b20b4a930f5bf13731f66f1fe2d00b19ff87b95e30674388837fbbc0a5225e1f",
+    "clang-23": "39d5fb4366b6218251d8a31ff83d22bdbb0e621136a003aeeb9317b28c4c3b8f",
+    "lld": "96b4c997ee7fc862fddadd136ecd82aab00145ebc155e8acb4f94e04618a85e7"
+  },
+  "notes": "Baseline source diff and binaries preserved under build/near-proof-recovery/baseline. Candidate census uses one binary, with proof recovery disabled and enabled.",
+  "final": {
+    "llc": "ab99ecfcc1b1000c14d41d48cdabac90afcc9e78671908faee8acddcf3bd5fd7",
+    "clang-23": "6b773bd1af0fd3c4166fa7e0827d678846122e47a09c9b5e5f690f3fbb585bdc",
+    "lld": "18eea3feae328b7fa2345b1483daefb66c04289126b665a7a159423d6f4c9840"
+  },
+  "final_vendor_diff_sha256": "c06a18e391d521ddf300bd72bfee0cacffcafbe23df9f832addb71e759a8256b",
+  "patch_sha256": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965"
+}

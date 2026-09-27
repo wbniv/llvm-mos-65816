@@ -610,9 +610,10 @@ separate qualified status below.</p>
 <p>Retain the closed <a href="https://github.com/llvm-mos/llvm-mos/pull/609">PR #609</a> and its branch for later revision. The generic TableGen pressure-contract repair, inherited
 farblit legalization failure, and unisolated all-XY16 driver observation remain
 separate follow-ups. Cycle and compile-time measurements are needed before
-making speed or compiler-overhead claims. The upstream validation record also
-retains an unisolated diagnostic-only null-emission failure on both builds;
-normal object emission passes, and this preparation does not attempt its repair.</p>
+making speed or compiler-overhead claims. At validation time, the upstream
+record also captured a diagnostic-only null-emission crash on both builds;
+that separate MOS streamer defect was later isolated and fixed by patch 0068
+(<a href="../investigations/2026-09-27-mos-null-output-streamer.md">investigation</a>).</p>
 <h2 id="11-publication">11. Publication</h2>
 <p>Following the user’s commit/push instruction, compiler commit <code>155e209c4cee</code>
 is pushed to the <a href="https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling">fork branch</a>.
@@ -657,5 +658,5 @@ unmeasured, and no newer-upstream-base rebuild is claimed.</p>
 <p>Validation, CPU audit, documentation, and author review: OpenAI Codex CLI
 0.157.1, model <code>gpt-6-astra</code>, <code>xhigh</code> reasoning effort.</p>
 </main>
-<!-- Source SHA-256: 7a754cb705ffe2587cef08dbe4e3e104545d4b8b7b6da0391c060ea640c4333d -->
+<!-- Source SHA-256: bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19 -->
 </html>

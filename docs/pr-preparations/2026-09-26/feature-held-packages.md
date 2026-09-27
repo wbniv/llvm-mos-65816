@@ -18,6 +18,7 @@ publication hold, not merely waiting for another PR to merge.
 | 0063 near stores shared with increment | Reviewed ABI A:X byte-store sharing for literal +1. Canonicalized decrement uses G_ADD -1 and correctly falls back to native operations. | #321; advertise increment-only optimization. Generalized decrement profitability is not implemented by this patch. |
 | 0065 broader near-store profitability | [September 27 completion](../../plans/2026-09-27-broader-near-store-profitability.md): measured indirect arithmetic/call/byte-source extensions and absolute decrement; loaded pointers stay native. 179 supported MOS tests pass; both emulator cores agree with the runtime oracle. | #321 extraction, exact-destination reconciliation and independent review remain pending; the 0063 review does not certify this new artifact. |
 | Near Y lifetime and bank wrapping in 0002 | [September 27 simulation](../2026-09-27/near-y-pr-simulation.md): unchanged 62-work gallery and all twelve runtime configurations pass; distinct canonical records preserve the two mechanisms. Downstream implementation is committed in e370e031. | #321 native-width compiler/ABI extraction, exact-destination reconciliation and independent review remain pending. |
+| Near-index overflow proofs in 0002 | [September 27 proof recovery](../../investigations/2026-09-27-near-index-overflow-proofs.md): LSR proof loss isolated, matching-input regression passes, 33,159 B saved across 1,197 pairs; bank-wrap runtime checks remain green. | #321 extraction, exact-destination reconciliation and independent review remain pending. |
 
 September 27 near-decoder entry: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e061-3427-74a1-90ad-c0ee84b01b85`.
 
@@ -39,3 +40,5 @@ session `01a0db16-f6a0-7e32-ada6-0c8098813933`. Independent reviews name their
 own verified agent/tool/version/model/effort in the linked records.
 
 September 27 near-store entry: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e0ee-df60-7d80-8629-5ad167a8c407`.
+
+September 27 near-index proof entry: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`.

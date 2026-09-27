@@ -1,0 +1,225 @@
+Pass Arguments:  -targetlibinfo -runtime-library-info -targetpassconfig -machinemoduleinfo -tti -assumption-cache-tracker -libcall-lowering-info -tbaa -scoped-noalias-aa -collector-metadata -profile-summary-info -machine-branch-prob -regalloc-evict -regalloc-priority -domtree -basic-aa -aa -objc-arc-contract -pre-isel-intrinsic-lowering -expand-ir-insts -basiccg -mos-nonreentrant -verify -domtree -basic-aa -loops -loop-simplify -scalar-evolution -canon-freeze -iv-users -loop-reduce -gc-lowering -shadow-stack-gc-lowering -unreachableblockelim -loops -postdomtree -branch-prob -block-freq -consthoist -replace-with-veclib -lazy-branch-prob -lazy-block-freq -opt-remark-emitter -partially-inline-libcalls -post-inline-ee-instrument -scalarize-masked-mem-intrin -expand-reductions -basic-aa -aa -loops -lazy-branch-prob -lazy-block-freq -opt-remark-emitter -postdomtree -branch-prob -block-freq -codegenprepare -lowerinvoke -unreachableblockelim -inline-asm-prepare -safe-stack -stack-protector -verify -cseinfo -domtree -loops -postdomtree -branch-prob -basic-aa -aa -irtranslator -gisel-known-bits -machinedomtree -cseinfo -mos-combiner -mos-shift-rotate-chain -cseinfo -gisel-known-bits -legalizer -mos-internalize -gisel-known-bits -machinedomtree -cseinfo -domtree -basic-aa -aa -mos-combiner -mos-lower-select -regbankselect -localizer -gisel-known-bits -loops -lazy-branch-prob -lazy-block-freq -instruction-select -finalize-isel -lazy-machine-block-freq -early-tailduplication -opt-phis -slotindexes -stack-coloring -localstackalloc -dead-mi-elimination -machinedomtree -machine-loops -machine-block-freq -early-machinelicm -machinedomtree -machine-block-freq -machine-cse -machinepostdomtree -machine-cycles -machine-sink -peephole-opt -dead-mi-elimination -mos-insert-copies -detect-dead-lanes -init-undef -processimpdefs -unreachable-mbb-elimination -livevars -machinedomtree -machine-loops -phi-node-elimination -twoaddressinstruction -slotindexes -liveintervals -register-coalescer -register-coalescer -rename-independent-subregs -machine-block-freq -machine-scheduler -livedebugvars -livestacks -virtregmap -liveregmatrix -edge-bundles -spill-code-placement -lazy-machine-block-freq -machine-opt-remark-emitter -greedy -virtregrewriter -regallocscoringpass -stack-slot-coloring -machine-cp -machinelicm -removeredundantdebugvalues -fixup-statepoint-caller-saved -postra-machine-sink -machine-block-freq -machinedomtree -machinepostdomtree -lazy-machine-block-freq -machine-opt-remark-emitter -shrink-wrap -basiccg -mos-zero-page-alloc -lazy-machine-block-freq -machine-opt-remark-emitter -prologepilog -machine-latecleanup -machinedomtree -machine-loops -machine-block-freq -branch-folder -lazy-machine-block-freq -tailduplication -machine-cp -mos-copy-opt -postrapseudos -mos-scavenging -finalize-isel -postrapseudos -mos-scavenging -mos-late-opt -mos-lower-return-address -basiccg -mos-static-stack-alloc -gc-analysis -machinedomtree -machine-loops -machine-block-freq -machinepostdomtree -block-placement -fentry-insert -xray-instrumentation -patchable-function -mos-insert-rep-sep -branch-relaxation -funclet-layout -remove-loads-into-fake-uses -stackmap-liveness -livedebugvalues -machine-sanmd -lazy-machine-block-freq -machine-opt-remark-emitter -stack-frame-layout
+Target Library Information
+Runtime Library Function Analysis
+Target Pass Configuration
+Machine Module Information
+Target Transform Information
+Assumption Cache Tracker
+Library Function Lowering Analysis
+Type-Based Alias Analysis
+Scoped NoAlias Alias Analysis
+Create Garbage Collector Module Metadata
+Profile summary info
+Machine Branch Probability Analysis
+Default Regalloc Eviction Advisor
+Default Regalloc Priority Advisor
+  ModulePass Manager
+    FunctionPass Manager
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      ObjC ARC contraction
+    Pre-ISel Intrinsic Lowering
+    FunctionPass Manager
+      Expand IR instructions
+    CallGraph Construction
+    Detect non-reentrant functions via detailed call graph analysis
+    FunctionPass Manager
+      Module Verifier
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Natural Loop Information
+      Canonicalize natural loops
+      Scalar Evolution Analysis
+      Loop Pass Manager
+        Canonicalize Freeze Instructions in Loops
+        Induction Variable Users
+        Loop Strength Reduction
+      Lower Garbage Collection Instructions
+      Shadow Stack GC Lowering
+      Remove unreachable blocks from the CFG
+      Natural Loop Information
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Block Frequency Analysis
+      Constant Hoisting
+      Replace intrinsics with calls to vector library
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      Optimization Remark Emitter
+      Partially inline calls to library functions
+      Instrument function entry/exit with calls to e.g. mcount() (post inlining)
+      Scalarize Masked Memory Intrinsics
+      Expand reduction intrinsics
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      Natural Loop Information
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      Optimization Remark Emitter
+      Unnamed pass: implement Pass::getPassName()
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Block Frequency Analysis
+      CodeGen Prepare
+      Lower invoke and unwind, for unwindless code generators
+      Remove unreachable blocks from the CFG
+      Prepare inline asm insts
+      Safe Stack instrumentation pass
+      Insert stack protectors
+      Module Verifier
+      Analysis containing CSE Info
+      Dominator Tree Construction
+      Natural Loop Information
+      Post-Dominator Tree Construction
+      Branch Probability Analysis
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      IRTranslator
+      Analysis for ComputingKnownBits
+      MachineDominator Tree Construction
+      Analysis containing CSE Info
+      MOSCombiner
+      MOS Shift/Rotate Chaining
+      Analysis containing CSE Info
+      Analysis for ComputingKnownBits
+      Legalizer
+    MOS internalize libcalls
+    FunctionPass Manager
+      Analysis for ComputingKnownBits
+      MachineDominator Tree Construction
+      Analysis containing CSE Info
+      Dominator Tree Construction
+      Basic Alias Analysis (stateless AA impl)
+      Function Alias Analysis Results
+      MOSCombiner
+      Lower MOS Select pseudo-instruction
+      RegBankSelect
+      Localizer
+      Analysis for ComputingKnownBits
+      Natural Loop Information
+      Lazy Branch Probability Analysis
+      Lazy Block Frequency Analysis
+      InstructionSelect
+      ResetMachineFunction
+      Finalize ISel and expand pseudo-instructions
+      Lazy Machine Block Frequency Analysis
+      Early Tail Duplication
+      Optimize machine instruction PHIs
+      Slot index numbering
+      Merge disjoint stack slots
+      Local Stack Slot Allocation
+      Remove dead machine instructions
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Machine Block Frequency Analysis
+      Early Machine Loop Invariant Code Motion
+      MachineDominator Tree Construction
+      Machine Block Frequency Analysis
+      Machine Common Subexpression Elimination
+      MachinePostDominator Tree Construction
+      Machine Cycle Info Analysis
+      Machine code sinking
+      Peephole Optimizations
+      Remove dead machine instructions
+      MOS Copy Insertion
+      Detect Dead Lanes
+      Init Undef Pass
+      Process Implicit Definitions
+      Remove unreachable machine basic blocks
+      Live Variable Analysis
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Eliminate PHI nodes for register allocation
+      Two-Address instruction pass
+      Slot index numbering
+      Live Interval Analysis
+      Register Coalescer
+      Register Coalescer
+      Rename Disconnected Subregister Components
+      Machine Block Frequency Analysis
+      Machine Instruction Scheduler
+      Debug Variable Analysis
+      Live Stack Slot Analysis
+      Virtual Register Map
+      Live Register Matrix
+      Bundle Machine CFG Edges
+      Spill Code Placement Analysis
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Greedy Register Allocator
+      Virtual Register Rewriter
+      Register Allocation Pass Scoring
+      Stack Slot Coloring
+      Machine Copy Propagation Pass
+      Machine Loop Invariant Code Motion
+      Remove Redundant DEBUG_VALUE analysis
+      Fixup Statepoint Caller Saved
+      PostRA Machine Sink
+      Machine Block Frequency Analysis
+      MachineDominator Tree Construction
+      MachinePostDominator Tree Construction
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Shrink Wrapping analysis
+    CallGraph Construction
+    Allocate zero page
+      FunctionPass Manager
+        Dominator Tree Construction
+        Natural Loop Information
+        Post-Dominator Tree Construction
+        Branch Probability Analysis
+        Block Frequency Analysis
+    FunctionPass Manager
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Prologue/Epilogue Insertion & Frame Finalization
+      Machine Late Instructions Cleanup Pass
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Machine Block Frequency Analysis
+      Control Flow Optimizer
+      Lazy Machine Block Frequency Analysis
+      Tail Duplication
+      Machine Copy Propagation Pass
+      Optimize copies for MOS
+      Post-RA pseudo instruction expansion pass
+      Scavenge virtual registers emitted by post-RA pseudos
+      Finalize ISel and expand pseudo-instructions
+      Post-RA pseudo instruction expansion pass
+      Scavenge virtual registers emitted by post-RA pseudos
+      MOS Late Optimizations
+      MOS Lower Return Address
+    CallGraph Construction
+    Allocate non-recursive stack to static memory
+    FunctionPass Manager
+      Analyze Machine Code For Garbage Collection
+      MachineDominator Tree Construction
+      Machine Natural Loop Construction
+      Machine Block Frequency Analysis
+      MachinePostDominator Tree Construction
+      Branch Probability Basic Block Placement
+      Insert fentry calls
+      Insert XRay ops
+      Implement the 'patchable-function' attribute
+      MOS Insert REP/SEP
+      Branch relaxation pass
+      Contiguously Lay Out Funclets
+      Remove Loads Into Fake Uses
+      StackMap Liveness Analysis
+      Live DEBUG_VALUE analysis
+      Machine Sanitizer Binary Metadata
+      Lazy Machine Block Frequency Analysis
+      Machine Optimization Remark Emitter
+      Stack Frame Layout Analysis
+      Unnamed pass: implement Pass::getPassName()
+      Free MachineFunction
+Pass Arguments:  -targetlibinfo -domtree -loops -postdomtree -branch-prob -block-freq
+Target Library Information
+  FunctionPass Manager
+    Dominator Tree Construction
+    Natural Loop Information
+    Post-Dominator Tree Construction
+    Branch Probability Analysis
+    Block Frequency Analysis
+exit_code=0

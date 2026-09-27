@@ -1,0 +1,25 @@
+HOST examples/snes/corpus/bf_vm_sim.c 0x9954
+HOST examples/snes/corpus/critters_sim.c 0xAD9F
+HOST examples/snes/corpus/keycmp64_sim.c 0xB8AD
+HOST examples/snes/corpus/lzdec_sim.c 0x0100
+HOST examples/snes/corpus/permscat_sim.c 0x0C2C
+HOST examples/snes/corpus/poolfx_sim.c 0x2B9B
+{'source': 'examples/snes/corpus/bf_vm_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0x9954'}
+{'source': 'examples/snes/corpus/bf_vm_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0x9954'}
+{'source': 'examples/snes/corpus/bf_vm_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0x9954'}
+{'source': 'examples/snes/corpus/critters_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0xAD9F'}
+{'source': 'examples/snes/corpus/critters_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0xAD9F'}
+{'source': 'examples/snes/corpus/critters_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0xAD9F'}
+{'source': 'examples/snes/corpus/keycmp64_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0xB8AD'}
+{'source': 'examples/snes/corpus/keycmp64_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0xB8AD'}
+{'source': 'examples/snes/corpus/keycmp64_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0xB8AD'}
+{'source': 'examples/snes/corpus/lzdec_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0x0100'}
+{'source': 'examples/snes/corpus/lzdec_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0x0100'}
+{'source': 'examples/snes/corpus/lzdec_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0x0100'}
+{'source': 'examples/snes/corpus/permscat_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0x0C2C'}
+{'source': 'examples/snes/corpus/permscat_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0x0C2C'}
+{'source': 'examples/snes/corpus/permscat_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0x0C2C'}
+{'source': 'examples/snes/corpus/poolfx_sim.c', 'mode': 'default', 'exit_code': 0, 'expected': '0x2B9B'}
+{'source': 'examples/snes/corpus/poolfx_sim.c', 'mode': 'a16', 'exit_code': 0, 'expected': '0x2B9B'}
+{'source': 'examples/snes/corpus/poolfx_sim.c', 'mode': 'xy16', 'exit_code': 0, 'expected': '0x2B9B'}
+PASS 18 / 18

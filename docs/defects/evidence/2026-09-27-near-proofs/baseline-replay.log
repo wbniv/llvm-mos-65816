@@ -1,0 +1,65 @@
+build/near-proof-recovery/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll -o -
+build/llvm-mos/bin/FileCheck docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll
+docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll:9:15: error: CHECK-NEXT: expected string not found in input
+; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
+              ^
+<stdin>:49:15: note: scanning from here
+ lda [__rc8],y
+              ^
+<stdin>:59:2: note: possible intended match here
+ sta (__rc6)
+ ^
+
+Input file: <stdin>
+Check file: docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+          .
+          .
+          .
+         44:  stx __rc11 
+         45:  stz __rc3 
+         46:  ldy #0 
+         47: .LBB0_1: ; %loop 
+         48:  ; =>This Inner Loop Header: Depth=1 
+         49:  lda [__rc8],y 
+next:9'0                   X error: no match found
+         50:  sta __rc12 
+next:9'0     ~~~~~~~~~~~~
+         51:  sty __rc2 
+next:9'0     ~~~~~~~~~~~
+         52:  rep #32 
+next:9'0     ~~~~~~~~~
+         53:  lda __rc4 
+next:9'0     ~~~~~~~~~~~
+         54:  clc 
+next:9'0     ~~~~~
+         55:  adc __rc2 
+next:9'0     ~~~~~~~~~~~
+         56:  sta __rc6 
+next:9'0     ~~~~~~~~~~~
+         57:  sep #32 
+next:9'0     ~~~~~~~~~
+         58:  lda __rc12 
+next:9'0     ~~~~~~~~~~~~
+         59:  sta (__rc6) 
+next:9'0     ~~~~~~~~~~~~~
+next:9'1      ?            possible intended match
+         60:  iny 
+next:9'0     ~~~~~
+         61:  cpy #64 
+next:9'0     ~~~~~~~~~
+         62:  bne .LBB0_1 
+next:9'0     ~~~~~~~~~~~~~
+         63: ; %bb.2: ; %exit 
+next:9'0     ~~~~~~~~~~~~~~~~~
+         64:  rts 
+next:9'0     ~~~~~
+          .
+          .
+          .
+>>>>>>
+FAIL: near-index proof recovery

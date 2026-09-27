@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-27",
-  "sourceHash": "d7a19485fce2bec0e9623f88d2239d3de324328648a4b37e55492146eac19b71",
+  "sourceHash": "3214cde844f90e871ab86aba7360ef66e0c4df68a2258a13347ece69c2b43724",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -181,6 +181,24 @@
       "upstreamUrl": null
     },
     {
+      "id": "defect:mos-near-index-overflow-proofs",
+      "kind": "defect",
+      "title": "Loop strength reduction loses near-index unsigned-overflow proofs",
+      "summary": "Recover a proven no-unsigned-wrap flag on scalar near byte GEPs immediately after LSR, before its ScalarEvolution facts are invalidated. This repairs a missed optimization; the independent near bank-wrap correctness guard remains required.",
+      "localStatus": "fixed",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Carry verified near-index proof recovery with the native-width feature series; extract and review against the eventual destination.",
+      "demoUrls": [
+        "https://biohack.net/snes/lzss-gallery/"
+      ],
+      "evidenceUrls": [],
+      "evidenceNote": "Detailed evidence awaits publication.",
+      "upstreamUrl": null
+    },
+    {
       "id": "opt:near-store-broad",
       "kind": "optimization",
       "title": "Broader near-store profitability",
@@ -198,6 +216,22 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0065-mos-near-store-profitability.patch"
       ],
       "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-null-output-streamer-crash",
+      "kind": "defect",
+      "title": "MOS llc crashes during null output when the assembler printer expects a target streamer",
+      "summary": "With -debug-pass=Structure -filetype=null, MOS llc created LLVM's generic MCNullStreamer but MOSAsmPrinter::emitStartOfAsmFile dereferenced its absent target streamer. Registering a MOS null target streamer supplies the expected contract while discarding output. The retained arith.Os.ll crashes with exit 139 on the preserved upstream baseline and completes on the rebuilt candidate; the focused regression and normal object emission pass.",
+      "localStatus": "fixed",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-null-output-streamer-crash.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
       "demoUrls": []
     },
     {
@@ -443,6 +477,7 @@
       "nextStep": "Review the measured selector and its compilation cost. Use completed-output choices to evaluate a cheaper predictor on unseen inputs, and investigate shared frontend work with module-wide allocation preserved. Current default remains always; no upstream default decision or new submission.",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/pull/609",
       "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-carry-profitability-model.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-competing-carry-gate.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-mos-carry-timing.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-26-mos-carry-scheduling.md",
@@ -452,7 +487,7 @@
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-review.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-26/0064-validation.md"
       ],
-      "evidenceNote": "Detailed evidence awaits publication.",
+      "evidenceNote": "",
       "dependsOn": [],
       "demoUrls": []
     },

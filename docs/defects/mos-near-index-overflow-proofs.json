@@ -1,0 +1,222 @@
+{
+  "schema": 1,
+  "id": "mos-near-index-overflow-proofs",
+  "title": "Loop strength reduction loses near-index unsigned-overflow proofs",
+  "status": "fixed",
+  "reproducer_origin": "reduced",
+  "report": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+  "summary": "Recover a proven no-unsigned-wrap flag on scalar near byte GEPs immediately after LSR, before its ScalarEvolution facts are invalidated. This repairs a missed optimization; the independent near bank-wrap correctness guard remains required.",
+  "attribution": [
+    "Implementation and validation: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e315-89ed-7e70-b7dc-fcc2940366d9. Earlier planning attribution is retained verbatim in evidence/interrupted-plan.md.txt; it is not an implementation credit."
+  ],
+  "prior_work": {
+    "disposition": "distinct_from_related",
+    "search_terms": [
+      "near-index",
+      "overflow proof",
+      "canFoldNearIndex",
+      "G_PTR_ADD",
+      "LoopStrengthReduce",
+      "NoUWrap",
+      "NoUSWrap"
+    ],
+    "related_records": [
+      "docs/defects/mos-near-index-bank-wrap.json"
+    ],
+    "related_reports": [
+      "docs/investigations/2026-09-27-near-y-decoder.md"
+    ],
+    "related_changes": [
+      "e370e031",
+      "b445d273",
+      "patches/llvm-mos/0002-321-accum16.patch"
+    ],
+    "source_assessment": "Existing 0002 and live sources contain the necessary bank-wrap guard. LSRInstance::Expand rebuilds a flag-free GEP while cached SCEV retains a nuw recurrence. IRTranslator faithfully transfers the available IR flags.",
+    "binary_assessment": "Actual pre-edit llc retained in build/near-proof-recovery/baseline/bin, with replayed failure and hash. Final llc retained separately. Initial clang and llc had different build times; only llc establishes this matching-input baseline. Census compares disabled/enabled recovery in one compiler.",
+    "decision": "Distinct missed-optimization mechanism: proof loss causes explicit address arithmetic. The related fixed correctness defect was unsoundly permitting bank carry. This record tracks the existing TODO opportunity and does not reopen or duplicate the bank-wrap failure.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/prior-work.json",
+      "sha256": "fc752ec518bd1d3922a24add4207897592156c8b1bb0fca016142259cb716e81"
+    }
+  },
+  "baseline": {
+    "command": "python3 dev/check-near-index-proofs.py build/near-proof-recovery/baseline/bin/llc docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "llc default O2",
+      "lto": false,
+      "expected": "proven loop uses indexed near store; unflagged loop materializes address"
+    },
+    "toolchain_location": "build/near-proof-recovery/baseline/bin; hashes and source snapshots described in docs/defects/evidence/2026-09-27-near-proofs/identity.json",
+    "toolchain_sha256": "a82d0ac480d5a217aedeec05a87e10b079011952c04908c0ff4375d31271deeb",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll",
+      "sha256": "baa407b3747d76eece19d5bbdc5507823949cf4b0bac71feb55c6d94199c3a7a"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/baseline-replay.log",
+      "sha256": "f62f32edeac19dcde37949a69c033e43c46f4b8d6d49b81f2bbce0a5ab3697bf"
+    },
+    "exit_code": 1,
+    "failure_signature": "FAIL: near-index proof recovery"
+  },
+  "resolution": {
+    "change": "MOSRecoverNearNoWrap and immediate post-LSR insertion in MOSTargetMachine.cpp, carried in patches/llvm-mos/0002-321-accum16.patch",
+    "causal_explanation": "A single scalar i8 GEP with a 16-bit index has no scale/truncation/intermediate-sum obligations. Unsigned addition does not overflow iff its result is at least its base. A cached nuw address recurrence starting at the same base establishes that ordering; otherwise ScalarEvolution must prove the ordering directly. The target-only loop pass records nuw before the cached analysis is invalidated.",
+    "trigger_check": "Retained pre/post LSR trace loses inbounds. Recovery trace shows getelementptr nuw. Same input fails indexed-store FileCheck on preserved baseline and passes on candidate. Unflagged wrapping control, stock-6502 scope, and signed bank-$7E runtime matrix remain checked.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll",
+      "sha256": "baa407b3747d76eece19d5bbdc5507823949cf4b0bac71feb55c6d94199c3a7a"
+    },
+    "candidate": {
+      "command": "python3 dev/check-near-index-proofs.py build/near-proof-recovery/final/bin/llc docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-a16",
+          "+mos-xy16"
+        ],
+        "optimization": "llc default O2",
+        "lto": false,
+        "expected": "proven loop uses indexed near store; unflagged loop materializes address"
+      },
+      "toolchain_location": "build/near-proof-recovery/final/bin; hashes and source snapshots described in docs/defects/evidence/2026-09-27-near-proofs/identity.json",
+      "toolchain_sha256": "ab99ecfcc1b1000c14d41d48cdabac90afcc9e78671908faee8acddcf3bd5fd7",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-27-near-proofs/near-index-proofs.ll",
+        "sha256": "baa407b3747d76eece19d5bbdc5507823949cf4b0bac71feb55c6d94199c3a7a"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-27-near-proofs/candidate-replay.log",
+        "sha256": "d584650167fc79ff25f6c3daeac8887f9329b2ee4caa827b4d44c0ce19a97da5"
+      },
+      "exit_code": 0
+    }
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/lsr.log",
+      "sha256": "3b01fa57d13dbc7f2dd743bdc957c6fab10f4ac09ed535b9a5d1f02c948ef526"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/scev-preserved.log",
+      "sha256": "e0837ffab5c96ccb1456f8d54f76a6b07e0d174b05868aed4634605b30e0c640"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/recovery.log",
+      "sha256": "fa33b825b10c657e363bb700835abaa09e262483d05af2d17572288a805fe1df"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/identity.json",
+      "sha256": "6a838bc990c40ccebb644a2e1e21d0419013c0fffb07e9f5f9bffef7452ebe45"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/census.json",
+      "sha256": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/census.log",
+      "sha256": "bd643353b6da5d18147963ff2cde987bbaf1be90dea8c39185b8b6458b79dd86"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/runtime.log",
+      "sha256": "cf1cd4589e41d723db4247225b85371ff30dc58bb0d242b6c4a6c53d17427a7e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/gallery.log",
+      "sha256": "f3a1782115a344b87a7879a685e8f0286c7648ec1858662acb3ba745a5dc5e2a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/lit-final.log",
+      "sha256": "587d8221023aeeb1f31ea07902717900e05a88b5d3f44d70c5359d7d5b0347f3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/focused-final.log",
+      "sha256": "747830195db96cf3139eddaa4170b23358d7808d680e241912d16c34b109227b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/roundtrip.log",
+      "sha256": "9593b44bb6427942640a923e6a83b354acd356ac8a6177d7d26398fad33d8ccb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/final-census.log",
+      "sha256": "19ae020db60bde160b5bcea6ce62097927eac5117bb9599b399bddcc89d82017"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/final-census.json",
+      "sha256": "11aad62dbae009519a5ab44530a49d01492253279ae7c162fc41acfffdb7bbe5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/runtime-final.log",
+      "sha256": "ea7b471ff52d5756ebeb4022680ed9a32740ce8646a1c463c663bef981cfafd6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/corpus-runtime-final.log",
+      "sha256": "df7f10b28311f9f30b81ccd2a90ac1b5250f883c62cbaa0a0dc0a594990128fb"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/corpus-runtime-final.json",
+      "sha256": "a727f376d5fea72a73fa1f1548e81a4d7006db9683e40442c49309f86f717810"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/corpus-runtime-identity.json",
+      "sha256": "3ea1d0009bd59b32ff297c03066465f6360a5eb784d67ea6932f15875fd28615"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/census-failures.json",
+      "sha256": "c167bab278e271516c27b0a8084648da8ba79ad05f8a611a60184a0aa006867e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/corpus-runtime-extra.log",
+      "sha256": "0e2a0ebac70debd6f585b7b318af1bb5845706b7eec1b08a1209aa9adfe38692"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/corpus-runtime-extra.json",
+      "sha256": "25a4c91305900600190a45bd5c49430e35f19acddb7d24403fbc49e80cf45e1c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/run-corpus-extra.py",
+      "sha256": "09d72b6f069c9a3d2e7cb36c272fc5863508033b6136a867c79938495f8b8233"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/lzdec-host.log",
+      "sha256": "1f123fb006d473585b57171071b84ad47293dda0def1637fbc45b46e9239ab3e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/permscat-host.log",
+      "sha256": "c072a9172997c954dacdc1342b22d5dfa40f8db934a12aae8418252e9b5e08a7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/critters-host.log",
+      "sha256": "b4b8c86be7291fa33a4ea8994d5aac44ab1f64b568433953cf6ef5869457fe7b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/bf-vm-host.log",
+      "sha256": "bffe4e31c35aaafb206bc6e35ce4c430c579fa7978a0b655b754f45be0d6abd4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/keycmp64-host.log",
+      "sha256": "d4b60981049e1e76dbd062e7a6de1ba764e91114211b36a86244cc1729c7febc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/poolfx-host.log",
+      "sha256": "aacd897934601f89bf654ae31429475cdce9907e22431403bd9ec0d39582d4ff"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/installed.json",
+      "sha256": "d0ba1e01c959adc6216e0e679e5a7c923e0ed5993cef2eb865b6f2424e18d440"
+    }
+  ],
+  "limitations": [
+    "Recovery is deliberately limited to scalar address-space-zero byte GEPs with one index of exactly 16 bits inside optimized loops. Other lost proofs still require address materialization.",
+    "Census has 1197 paired successful builds out of 1236 configurations; 39 configurations fail with recovery both disabled and enabled. No new failures; nine object/mode configurations grow.",
+    "The initial candidate measured the size census. All 1236 configurations were replayed with the preserved final compiler: all 1197 successful objects have identical code/relocation hashes, and all 39 failing configurations retain their exit status."
+  ],
+  "validation_summary": "Final MOS suites: 183 passed, two unsupported. Final near runtime matrix: 12/12. All 16 corpus programs with changed generated code: 48/48 across default/A16/XY16, using manifest or freshly compiled host oracles. Gallery: 0x5CF0 after 30000 frames on initial candidate. Final corpus replay: 1236/1236 matching outcomes and successful object hashes. Final compiler/linker installed with matching hashes."
+}

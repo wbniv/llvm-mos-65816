@@ -1,0 +1,182 @@
+[
+  {
+    "source": "examples/snes/corpus/byvaledge_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0x4FAB"
+  },
+  {
+    "source": "examples/snes/corpus/byvaledge_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0x4FAB"
+  },
+  {
+    "source": "examples/snes/corpus/byvaledge_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0x4FAB"
+  },
+  {
+    "source": "examples/snes/corpus/csrjmp_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0xADD8"
+  },
+  {
+    "source": "examples/snes/corpus/csrjmp_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0xADD8"
+  },
+  {
+    "source": "examples/snes/corpus/csrjmp_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0xADD8"
+  },
+  {
+    "source": "examples/snes/corpus/dither_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0x80C4"
+  },
+  {
+    "source": "examples/snes/corpus/dither_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0x80C4"
+  },
+  {
+    "source": "examples/snes/corpus/dither_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0x80C4"
+  },
+  {
+    "source": "examples/snes/corpus/doom-fire_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0x3C59"
+  },
+  {
+    "source": "examples/snes/corpus/doom-fire_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0x3C59"
+  },
+  {
+    "source": "examples/snes/corpus/doom-fire_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0x3C59"
+  },
+  {
+    "source": "examples/snes/corpus/invaders_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0x9D57"
+  },
+  {
+    "source": "examples/snes/corpus/invaders_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0x9D57"
+  },
+  {
+    "source": "examples/snes/corpus/invaders_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0x9D57"
+  },
+  {
+    "source": "examples/snes/corpus/jt256_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0xB8CC"
+  },
+  {
+    "source": "examples/snes/corpus/jt256_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0xB8CC"
+  },
+  {
+    "source": "examples/snes/corpus/jt256_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0xB8CC"
+  },
+  {
+    "source": "examples/snes/corpus/perlin_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0xA72D"
+  },
+  {
+    "source": "examples/snes/corpus/perlin_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0xA72D"
+  },
+  {
+    "source": "examples/snes/corpus/perlin_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0xA72D"
+  },
+  {
+    "source": "examples/snes/corpus/strcmprace_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0xF0BA"
+  },
+  {
+    "source": "examples/snes/corpus/strcmprace_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0xF0BA"
+  },
+  {
+    "source": "examples/snes/corpus/strcmprace_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0xF0BA"
+  },
+  {
+    "source": "examples/snes/corpus/truchet_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0xB3E6"
+  },
+  {
+    "source": "examples/snes/corpus/truchet_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0xB3E6"
+  },
+  {
+    "source": "examples/snes/corpus/truchet_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0xB3E6"
+  },
+  {
+    "source": "examples/snes/corpus/vlanest_sim.c",
+    "mode": "default",
+    "exit_code": 0,
+    "expected": "0x153B"
+  },
+  {
+    "source": "examples/snes/corpus/vlanest_sim.c",
+    "mode": "a16",
+    "exit_code": 0,
+    "expected": "0x153B"
+  },
+  {
+    "source": "examples/snes/corpus/vlanest_sim.c",
+    "mode": "xy16",
+    "exit_code": 0,
+    "expected": "0x153B"
+  }
+]

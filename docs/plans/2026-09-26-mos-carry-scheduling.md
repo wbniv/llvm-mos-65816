@@ -442,9 +442,10 @@ separate qualified status below.
 Retain the closed [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) and its branch for later revision. The generic TableGen pressure-contract repair, inherited
 farblit legalization failure, and unisolated all-XY16 driver observation remain
 separate follow-ups. Cycle and compile-time measurements are needed before
-making speed or compiler-overhead claims. The upstream validation record also
-retains an unisolated diagnostic-only null-emission failure on both builds;
-normal object emission passes, and this preparation does not attempt its repair.
+making speed or compiler-overhead claims. At validation time, the upstream
+record also captured a diagnostic-only null-emission crash on both builds;
+that separate MOS streamer defect was later isolated and fixed by patch 0068
+([investigation](../investigations/2026-09-27-mos-null-output-streamer.md)).
 
 ## 11. Publication
 

@@ -1,0 +1,9 @@
+Context reduced to (2/2) to apply fragment at 27
+Context reduced to (1/1) to apply fragment at 91
+Context reduced to (1/1) to apply fragment at 44
+Context reduced to (2/2) to apply fragment at 70
+/home/will/llvm-mos-65816/patches/llvm-mos/0050-mos-float-vector-arithmetic.patch:133: new blank line at EOF.
++
+warning: 1 line adds whitespace errors.
+PASS: entire MOS patch stack applies; all six changed source/test files match live source.
+Tree: /tmp/near-proofs-roundtrip-ni6ff0hb

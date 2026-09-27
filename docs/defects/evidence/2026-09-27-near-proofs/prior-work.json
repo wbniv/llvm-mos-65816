@@ -1,0 +1,25 @@
+{
+  "search_terms": [
+    "near-index",
+    "overflow proof",
+    "canFoldNearIndex",
+    "G_PTR_ADD",
+    "LoopStrengthReduce",
+    "NoUWrap",
+    "NoUSWrap"
+  ],
+  "related_records": [
+    "docs/defects/mos-near-index-bank-wrap.json"
+  ],
+  "related_reports": [
+    "docs/investigations/2026-09-27-near-y-decoder.md"
+  ],
+  "history": [
+    "e370e031: introduces sound near-index guard",
+    "b445d273: starts overflow-proof recovery TODO"
+  ],
+  "interrupted_work": ".scratch/near-proofs contains an uncommitted plan and measurement script; no compiler implementation or measured results. Earlier attribution retained in that plan.",
+  "source_assessment": "Live MOSLegalizerInfo.cpp and 0002 contain canFoldNearIndex; IRTranslator transfers GEP flags. LSRInstance::Expand rebuilds formula operands using unflagged getAddExpr. The retained far_rt_blit trace loses inbounds during LSR. Cached ScalarEvolution retains nuw afterward; a fresh analysis only finds nw.",
+  "binary_assessment": "Baseline copies of the actual build/llvm-mos/bin tools, binary hashes and live source diff retained in build/near-proof-recovery/baseline before edits. Focused trace executed with baseline llc.",
+  "decision": "This is the already tracked missed optimization following the bank-wrap guard, not a new bank-wrap correctness failure. Recover proofs without changing canFoldNearIndex or the closed correctness baseline."
+}

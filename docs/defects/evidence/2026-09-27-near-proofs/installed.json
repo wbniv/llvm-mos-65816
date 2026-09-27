@@ -1,0 +1,8 @@
+{
+  "location": "build/llvm-mos-install/bin",
+  "sha256": {
+    "llc": "ab99ecfcc1b1000c14d41d48cdabac90afcc9e78671908faee8acddcf3bd5fd7",
+    "clang-23": "6b773bd1af0fd3c4166fa7e0827d678846122e47a09c9b5e5f690f3fbb585bdc",
+    "lld": "18eea3feae328b7fa2345b1483daefb66c04289126b665a7a159423d6f4c9840"
+  }
+}

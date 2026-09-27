@@ -1,0 +1,25 @@
+/work/build/near-proof-recovery/runtime/near-y-decode-default-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xC183 complement=0x3E7C
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-y-decode-default-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xE015 complement=0x1FEA
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-y-decode-a16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xBB44 complement=0x44BB
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-y-decode-a16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF651 complement=0x09AE
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-y-decode-xy16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xB542 complement=0x4ABD
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-y-decode-xy16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF26D complement=0x0D92
+SMOKE: PASS off=0x4A6 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-default-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x570E complement=0xA8F1
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-default-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x5931 complement=0xA6CE
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-a16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x5E2C complement=0xA1D3
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-a16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x60EF complement=0x9F10
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-xy16-lto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x5E2C complement=0xA1D3
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+/work/build/near-proof-recovery/runtime/near-index-wrap-xy16-nonlto.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0x60EF complement=0x9F10
+SMOKE: PASS off=0x200 len=2 got=0x5CF0 (ran 180 frames, bsnes-jg)
+RESULT: PASS — near decoder and bank wrapping, three width modes, with and without LTO

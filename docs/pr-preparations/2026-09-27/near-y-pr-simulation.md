@@ -23,6 +23,8 @@ Validation passes all twelve decoder/bank-wrap configurations across default, A1
 
 The [causal investigation](../../investigations/2026-09-27-near-y-decoder.md) records source reconciliation, binary hashes, commands, the gallery stage diagnostic, and the optimization cost of losing an unsigned-wrap proof. Existing passing behavior on another build does not replace these preserved comparisons.
 
+**Optimization follow-up (September 27):** [near-index proof recovery](../../investigations/2026-09-27-near-index-overflow-proofs.md) is implemented locally in `0002`. It preserves sound proofs after LSR and retains the bank-wrap guard. The proposed body and 178-test count above remain the earlier correctness-repair packet; the follow-up report carries its own census and validation. This addition still requires extraction and review with the native-width series. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e315-89ed-7e70-b7dc-fcc2940366d9`.
+
 ## Acceptance before submission
 
 - [x] Reconcile prior patches, live source and tested binaries; preserve both causal baselines.

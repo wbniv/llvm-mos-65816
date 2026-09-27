@@ -1,0 +1,3 @@
+COMMAND: cc -O2 -I/work/examples/65816 /work/tools/bf-vm-sim.c -o /work/build/near-proof-recovery/corpus-runtime-extra/bf-vm-host
+bf output: "Hello World!\n"  (906 ops, 13 bytes)
+bf-vm gate_crc = 0x9954

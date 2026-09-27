@@ -23,12 +23,19 @@ INDEX = 'docs/document-dependencies.md'
 class Tree:
     def __init__(self, root, staged=False):
         self.root, self.staged, self.cache = root, staged, {}
+        self.matches = {}
         args = ['git', 'ls-files', '-z', '--cached']
         if not staged:
             args += ['--others', '--exclude-standard']
         self.paths = set(subprocess.check_output(args, cwd=root).decode().split('\0')) - {''}
         if not staged:
             self.paths = {p for p in self.paths if (root / p).is_file()}
+
+    def match(self, pattern):
+        if pattern not in self.matches:
+            self.matches[pattern] = sorted(
+                p for p in self.paths if PurePosixPath(p).match(pattern))
+        return self.matches[pattern]
 
     def read(self, path):
         if path not in self.cache:
@@ -43,7 +50,7 @@ def fingerprint(tree, sources):
     result = {}
     for spec in sources:
         pattern = spec if isinstance(spec, str) else spec['glob']
-        paths = sorted(p for p in tree.paths if PurePosixPath(p).match(pattern))
+        paths = tree.match(pattern)
         if not paths:
             raise ValueError('Missing dependency: ' + pattern)
         for path in paths:
