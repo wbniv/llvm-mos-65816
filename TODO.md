@@ -2599,9 +2599,10 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 <!-- triaged 2026-09-24: already closed — see Done [title-entropy-gate-wiring]. Not work.
      fp:26cd0e82ac7f98dd -->
 - [verify] **Live upstream dashboard follow-up** — Check keyboard-only navigation, a browser with JavaScript disabled, and a forced GitHub outage against the published page. The 2026-09-26 release checks are recorded in the [dashboard plan](docs/plans/2026-09-26-live-upstream-dashboard.md#release-checks-recorded-2026-09-26).
-- [ ] **(triage)** The generic TableGen fine-grained pressure-set contract. It stays its own T4 item and [defect record](../defects/mos-carry-scheduling-pressure.json). — _from [2026-09-27-0064-competing-carry-gate.md](docs/plans/2026-09-27-0064-competing-carry-gate.md)_  <!-- fp:778b0f57aa8b709f -->
-- [ ] **(triage)** Hot-loop cycle and compile-time measurement of 0064 itself. It is still unmeasured, but it is a separate question from byte growth. — _from [2026-09-27-0064-competing-carry-gate.md](docs/plans/2026-09-27-0064-competing-carry-gate.md)_  <!-- fp:c5212def4f0d977c -->
-- [ ] **(triage)** The combined-stack farblit byte-load legalization failure. — _from [2026-09-27-0064-competing-carry-gate.md](docs/plans/2026-09-27-0064-competing-carry-gate.md)_  <!-- fp:d9e7837c7619956b -->
-- [ ] **(triage)** Re-posting upstream (PR #609 is withdrawn; any revision is user-triggered). — _from [2026-09-27-0064-competing-carry-gate.md](docs/plans/2026-09-27-0064-competing-carry-gate.md)_  <!-- fp:291d28f4e4c35e60 -->
-- [verify] **2026-09-27-0064-competing-carry-gate** — Verification section present but no PASS recorded — run + record the steps. _from [2026-09-27-0064-competing-carry-gate.md](docs/plans/2026-09-27-0064-competing-carry-gate.md)_  <!-- fp:1a4f2407b51b1c0f -->
+<!-- triaged 2026-09-27: all five captured bullets from 2026-09-27-0064-competing-carry-gate.md are
+     already tracked. TableGen pressure-set contract and 0064 cycle/compile-time measurement -> the
+     curated [T4] "Generic fine-grained pressure contract" item; farblit -> the curated [T4]
+     "Combined-stack farblit byte-load legalization" item; PR #609 re-posting -> user-triggered,
+     tracked in docs/upstream-contribution-status.md; unverified steps -> the plan is not started and
+     its [T4] "Gate 0064 to regions with competing carries" item owns them. -->
 <!-- END auto-captured-deferrals -->
