@@ -1,0 +1,85 @@
+{
+  "reviewed_commit": "0eae3e7a0c42b1d20c482c154ec3716a3674ad1c",
+  "coordinator_attribution": {
+    "id": "01a0e67f-298f-7a21-80af-06f867085f84",
+    "cli_version": "0.157.1",
+    "originator": "codex-tui",
+    "source": "vscode",
+    "model": "gpt-6-astra",
+    "effort": "xhigh"
+  },
+  "published_artifacts": {
+    "patches/llvm-mos/0069-mos-far-loop-range.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+    "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+    "docs/defects/evidence/2026-09-28-far-word-policy/source.tar.gz": "0fc3f3b8e2db0bed68cee1b47594f5bbd2b7b0f1a35b4bb9ca989e1de129b919"
+  },
+  "source_archive_comparison": [
+    {
+      "file": "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+      "archived_sha256": "e95d5b9ccc21dc956c99761b5b3f386ef1db2cfba85b9c5820cd7e6c6437d518",
+      "live_sha256": "e95d5b9ccc21dc956c99761b5b3f386ef1db2cfba85b9c5820cd7e6c6437d518",
+      "equal": true
+    },
+    {
+      "file": "llvm/test/CodeGen/MOS/far-loop-range.mir",
+      "archived_sha256": "aad0896456e28c3278022b11c6c99b3b5afd5baff058e60dd25277ceb90eb414",
+      "live_sha256": "aad0896456e28c3278022b11c6c99b3b5afd5baff058e60dd25277ceb90eb414",
+      "equal": true
+    },
+    {
+      "file": "llvm/test/CodeGen/MOS/far-word-policy.mir",
+      "archived_sha256": "7b4c98f043d6bc63e1335c73d72f696d978c9a95eff644b9b7a7e263b477187a",
+      "live_sha256": "7b4c98f043d6bc63e1335c73d72f696d978c9a95eff644b9b7a7e263b477187a",
+      "equal": true
+    }
+  ],
+  "review_method": "Three separate AI review contexts with no author conversation history; code inspection and retained evidence inspection; no new compiler, emulator, or test executions.",
+  "reviewer_metadata": [
+    {
+      "agent_path": "/root/review_interaction",
+      "session_id": "01a0e72f-db92-7062-bd14-764d6c090a2f",
+      "tool": "OpenAI Codex CLI",
+      "tool_version": "0.158.0",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "metadata_source": "/home/will/.codex/sessions/2026/09/28/rollout-2026-09-28T15-44-28-01a0e72f-db92-7062-bd14-764d6c090a2f.jsonl"
+    },
+    {
+      "agent_path": "/root/review_0070",
+      "session_id": "01a0e72f-9fc7-7ec2-845d-f4ffbd66c513",
+      "tool": "OpenAI Codex CLI",
+      "tool_version": "0.158.0",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "metadata_source": "/home/will/.codex/sessions/2026/09/28/rollout-2026-09-28T15-44-13-01a0e72f-9fc7-7ec2-845d-f4ffbd66c513.jsonl"
+    },
+    {
+      "agent_path": "/root/review_0069",
+      "session_id": "01a0e72f-5a2d-7530-b114-4bfe66710323",
+      "tool": "OpenAI Codex CLI",
+      "tool_version": "0.158.0",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "xhigh",
+      "metadata_source": "/home/will/.codex/sessions/2026/09/28/rollout-2026-09-28T15-43-55-01a0e72f-5a2d-7530-b114-4bfe66710323.jsonl"
+    }
+  ],
+  "reviewer_reports": {
+    "0069-addendum.md": "b76035079a488fb4e1c68fff1fd20f425c6f0e0448960bcd890a477a771ca4be",
+    "0069-initial.md": "bfffee5a01216b0232efb8ca307ec5be4f3bed2ab29feac28243ecd59029e7cf",
+    "0070.md": "73efbaae3a5a381ef12992b6cc125478ccb1491c37302f01602dafd2879143dc",
+    "interaction.md": "d217b76515fb66cc5cfdab7276093390f34dfba7bc114ce9590f151c56733096"
+  },
+  "retained_opcode_audit": {
+    "path": "docs/pr-preparations/2026-09-28/far-word-index/independent-review/retained-opcodes.json",
+    "sha256": "f2fddc5189b71c958d962fa727d46177e6373d412af60e30d886f94b1fa8223b",
+    "expected_cases": 78,
+    "matching_cases": 78
+  },
+  "filecheck_source": {
+    "vendor_revision": "8be0546128a55e78c63ca571d466aa72a782cd36",
+    "path": "llvm/lib/FileCheck/FileCheck.cpp",
+    "sha256": "836eed0fb24f66df29a9e1513e985807ea680ec834c7b026151939b493d0dcea",
+    "working_diff_empty": true
+  },
+  "adjudication": "The initial 0069 report was preserved; its delimiter claim and acceptance recommendation are corrected by the same reviewer in a separately retained addendum after receiving the interaction finding."
+}

@@ -125,13 +125,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "28e33183bcdcf786b4740370006a8718a47b2c5438dbad33fef45cc435f3f58a",
+          "docs/upstream-pending-work.md": "8a49e48226454c4bae64768fdfeb810e35f69721eb8f242be97152809ba1b7b6",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
           "docs/upstream-dashboard.json": "b68076045549e48e86f7867d933f423ede9b711ed3732d82ea83e9aca35126fb",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "8c7edff4fb681803f0841efbb19ffb9123c6ae04b986a01a5dded9bc9963bee9"
+          "docs/upstream-dashboard-graph.json": "0a39996bbb6269306c9743ad4bd9ae8c3989978e2e6e48c97aa26e015586579c"
         }
       }
     },
@@ -282,7 +282,8 @@
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/plans/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -328,14 +329,15 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/plans/2026-09-28-farblit-payoff.md": "a29f2fa74aa769dbd2d987983bead2344cc3f9413020462036b6bc69c5723ace",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/plans/2026-09-28-farblit-range-integration.md": "12fa72b45c10459c9d62022fa746684fbbd4a12ad01723fb5795e591e83eed1c",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/plans/2026-09-28-farblit-range-integration.md": "819f534e7a52ea0984b4ec7c55f03f53d11f3f34d753b62fe7af59992bbabafb",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T09:10:19.126234+00:00",
-        "note": "Reviewed the current TODO and updated release record after retiring the live outage-check task at the user's request. Local fallback is recorded; production behavior remains unverified.",
-        "attribution": "OpenAI Codex, agent/tool version unknown, exact model ID unknown, reasoning effort unknown (session metadata unavailable)."
+        "reviewed_at": "2026-09-28T10:43:57.518114+00:00",
+        "note": "Reviewed the combined queue after integrating a0398b09. Preserve the user-requested retirement of the live outage check and its separate local fallback evidence; production outage behavior remains unverified. Both 0069 and 0070 entries now record completed downstream independent AI source review and the resolved opcode assertion finding: 156 wrong substitutions rejected and four focused files passing. Additional coverage, prerequisite extraction and validation/review of the exact upstream stack remain pending. Preserved earlier evidence and contributor attribution.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -364,7 +366,8 @@
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -402,13 +405,14 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:54.312055+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:43.866994+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -437,7 +441,8 @@
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -475,13 +480,14 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:54.315857+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:43.872141+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -617,7 +623,8 @@
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -636,13 +643,14 @@
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:55.438511+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:44.262512+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -708,11 +716,11 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768"
         },
-        "reviewed_at": "2026-09-28T06:21:58.991718+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:46.799986+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -777,11 +785,11 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "01de7d900d2fcd8dfc94effbd8b681dfaf0289e966f33b655b009fcd93caf4db",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
           "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768"
         },
-        "reviewed_at": "2026-09-28T06:21:59.758588+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:46.998148+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -825,11 +833,11 @@
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768"
         },
-        "reviewed_at": "2026-09-28T06:22:00.650373+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:47.194164+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -1681,12 +1689,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b"
         },
-        "reviewed_at": "2026-09-28T06:22:05.476591+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:48.380013+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -1732,11 +1740,11 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768"
         },
-        "reviewed_at": "2026-09-28T06:22:05.476901+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:48.380209+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -1989,12 +1997,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b"
         },
-        "reviewed_at": "2026-09-28T06:22:05.477142+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:48.380369+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2047,12 +2055,12 @@
           "docs/defects/evidence/2026-09-28-farblit-payoff/validate.py": "acd5f7913b1221fc3a5fe52ebdf5e3cb06168c1b3c6b167b07b8e930d5b06c33",
           "docs/defects/evidence/2026-09-28-farblit-payoff/check_bounds_shapes.py": "6ebdd5da386a47bf15923274e27f9c4f01f4cb3936f489b0ded9fa8e3fef8bc7",
           "docs/defects/evidence/2026-09-28-farblit-payoff/mame.sh": "eef6383b29adb315d61f4fd148a1ebeb49ae966470435fb6ee195aee4365b297",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b"
         },
-        "reviewed_at": "2026-09-28T06:22:08.594626+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:49.109457+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2065,12 +2073,12 @@
       "receipt": {
         "sources": {
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b"
         },
-        "reviewed_at": "2026-09-28T06:22:08.594764+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:49.109548+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2086,7 +2094,8 @@
         "dev/regen-patch.sh",
         "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py",
         "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh",
-        "docs/investigations/2026-09-28-far-word-policy.md"
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -2102,34 +2111,37 @@
           "docs/defects/evidence/2026-09-28-farblit-range-integration/prior-work.json": "d6a9014d245793b7bb6f4a2131e5356a48ac56940b958c289a45b3880e209f88",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/receipt.json": "ac174f2f6b45c5be3b98f8087bc529f9906ef131fba45423e9be6be20322f80e",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/results.json": "fe3e31eb7c0704a21a819632f7fd0407489fc899c823ec3ebd33094527037241",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
           "dev/toolchain.sh": "93db87c392f24585ba3594d30f2fc1158ae490c770b5e2a967a7c8bbc6ade19a",
           "dev/regen-patch.sh": "627623dfa5a7eb020f579c9bff9d1c728697e1de2e2a1b9d14eff200fdaaa063",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T06:22:11.179004+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:49.691003+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
       "document": "docs/plans/2026-09-28-farblit-range-integration.md",
       "sources": [
         "docs/investigations/2026-09-28-farblit-range-integration.md",
-        "docs/investigations/2026-09-28-far-word-policy.md"
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T06:22:11.179096+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:49.691097+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2139,7 +2151,8 @@
         "docs/defects/evidence/2026-09-28-far-word-policy/results.json",
         "docs/defects/evidence/2026-09-28-far-word-policy/identity.json",
         "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json",
-        "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json"
+        "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
@@ -2147,27 +2160,30 @@
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
           "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json": "5b07db25e6276a425058c17c4c88499dbbccbca9d4676c06244f18db58f2d9a1",
-          "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json": "0be5acc2dd52f062c05482b61531333d4a491b857b1d37b8751c60d943902439"
+          "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json": "0be5acc2dd52f062c05482b61531333d4a491b857b1d37b8751c60d943902439",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T06:22:13.633596+00:00",
-        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:50.221061+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
       "document": "docs/plans/2026-09-28-far-word-policy.md",
       "sources": [
         "docs/investigations/2026-09-28-far-word-policy.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:55.438572+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:50.221147+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2197,15 +2213,16 @@
         "docs/defects/evidence/2026-09-27-mos-carry-timing/emulator-identity.json",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py",
-        "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py"
+        "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
           "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
-          "patches/llvm-mos/0069-mos-far-loop-range.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
-          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+          "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
@@ -2225,25 +2242,28 @@
           "docs/defects/evidence/2026-09-27-mos-carry-timing/emulator-identity.json": "9d74bf492f4513aaa81b7699fb91d38001547d594d32b8ace9872ff2e780fee2",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py": "af76c7d0d483a6dd1c967bdba316b996a33f748d550754e3aa7a82960df8ce45",
-          "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py": "2ced07c76cfb86b457bd85dbc9f7e698a5dfa2e2ab7903e3c880889a4707d3a8"
+          "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py": "2ced07c76cfb86b457bd85dbc9f7e698a5dfa2e2ab7903e3c880889a4707d3a8",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:47.725464+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:51.738504+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
       "document": "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
       "sources": [
-        "docs/pr-preparations/2026-09-28/far-word-index/review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/review.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "d5f2abfa8448eeec8ca00e4ce2abebf105cae946ef1313dac7907405b0865589"
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "a3968ec99ae2e5a7d62b1d7572d4a55ca706626d149e67e4fc5ebf854ec10e82",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:48.044771+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:51.832684+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -2251,17 +2271,55 @@
       "sources": [
         "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
         "docs/pr-preparations/2026-09-28/far-word-index/review.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/destination.json"
+        "docs/pr-preparations/2026-09-28/far-word-index/destination.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md": "ca32796bcc72f1ec6e75561dcf4026e7d370ed01c1b1204a2590b2e2db9ff999",
-          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "d5f2abfa8448eeec8ca00e4ce2abebf105cae946ef1313dac7907405b0865589",
-          "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc"
+          "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md": "2d7428eab12a9a4d81b63c83ae640ae957ec0f661642d6205a399e4eb4e9a720",
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "a3968ec99ae2e5a7d62b1d7572d4a55ca706626d149e67e4fc5ebf854ec10e82",
+          "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T08:07:48.323707+00:00",
-        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:21:51.924564+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0069-initial.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0069-addendum.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0070.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/interaction.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/basis.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/retained-opcodes.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review/audit-retained-opcodes.py",
+        "patches/llvm-mos/0069-mos-far-loop-range.patch",
+        "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
+        "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-sensitivity.py",
+        "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/results.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0069-initial.md": "bfffee5a01216b0232efb8ca307ec5be4f3bed2ab29feac28243ecd59029e7cf",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0069-addendum.md": "b76035079a488fb4e1c68fff1fd20f425c6f0e0448960bcd890a477a771ca4be",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0070.md": "73efbaae3a5a381ef12992b6cc125478ccb1491c37302f01602dafd2879143dc",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/interaction.md": "d217b76515fb66cc5cfdab7276093390f34dfba7bc114ce9590f151c56733096",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/basis.json": "61ed7052eba000b1991bbaddf9e01b1299c8beccd43291ea0ce86f278d162e03",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/retained-opcodes.json": "f2fddc5189b71c958d962fa727d46177e6373d412af60e30d886f94b1fa8223b",
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review/audit-retained-opcodes.py": "cd5b2e0dd87b85f11db87ce41eee9f1330b26fb0912b4fbb29ba824de679478f",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-sensitivity.py": "7b70ce7d6e0e41e927e269eb7c41be65c74cab6360b46ec794d2dea49ef88943",
+          "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/results.json": "4a430934db24497080fa8126ed9c89a35b23ec86e31d26e2e7c82d8f603a176c",
+          "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz": "36dab8af7b782ef7131c31f22615de7c2b9b3f28bae14948812e22c40a3cc07a"
+        },
+        "reviewed_at": "2026-09-28T09:21:52.886538+00:00",
+        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     }
   ]

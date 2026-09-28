@@ -1,0 +1,718 @@
+{
+  "method": "Static token inventory of retained compiler output; no new compiler, FileCheck or emulator execution.",
+  "source_archive_sha256": "0fc3f3b8e2db0bed68cee1b47594f5bbd2b7b0f1a35b4bb9ca989e1de129b919",
+  "source_member_sha256": "aad0896456e28c3278022b11c6c99b3b5afd5baff058e60dd25277ceb90eb414",
+  "runs_archive_sha256": "c84c4712fd5751225f21582622f3b37fa50c74010585f8047cd143436c5b5fea",
+  "output_member_sha256": {
+    "runs/focused-a16.mir": "1e7edc9844e3907c46fcb1f36b6ffa8d39c3a8b32381f42bfb997fee2e0b3c36",
+    "runs/focused-xy16.mir": "ff391995679a27e361f2389ed15d38c59262c4c537bdb2ef02b6fdacfd6e5ca7",
+    "runs/focused-off.mir": "8b84348af8abe8a022c7a8e3fcfb8f5fa6214bc98f5792e0a5828e9f5be21c60"
+  },
+  "expected_cases": 78,
+  "observed_cases": 78,
+  "matching_cases": 78,
+  "cases": [
+    {
+      "prefix": "A16",
+      "function": "ne_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "eq_exit",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "nonzero_start",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "unsigned_end",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "offset_256",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "wrapped_induction",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "full_cycle",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "equal_start_end",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "step_two",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "eq_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "ne_exit",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "compare_phi",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "borrow_input",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "carry_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "negative_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "overflow_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "zero_copy",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "four_copies",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "five_copies",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "scale_fits",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "scale_overflows_y",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "narrow_scale_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "narrow_add_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "multiple_blocks",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "generic_ne",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "A16",
+      "function": "generic_eq",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "ne_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "eq_exit",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "nonzero_start",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "unsigned_end",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "offset_256",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "wrapped_induction",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "full_cycle",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "equal_start_end",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "step_two",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "eq_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "ne_exit",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "compare_phi",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "borrow_input",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "carry_flag",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "negative_flag",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "overflow_flag",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "zero_copy",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "four_copies",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "five_copies",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "scale_fits",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "scale_overflows_y",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "narrow_scale_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "narrow_add_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "multiple_blocks",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX16",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX16"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "generic_ne",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "XY16",
+      "function": "generic_eq",
+      "expected_token": "G_LOAD_FAR_INDIR_IDX",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR_IDX"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "ne_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "eq_exit",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "nonzero_start",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "unsigned_end",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "offset_256",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "wrapped_induction",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "full_cycle",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "equal_start_end",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "step_two",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "eq_backedge",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "ne_exit",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "compare_phi",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "borrow_input",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "carry_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "negative_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "overflow_flag",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "zero_copy",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "four_copies",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "five_copies",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "scale_fits",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "scale_overflows_y",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "narrow_scale_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "narrow_add_wraps",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "multiple_blocks",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "generic_ne",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    },
+    {
+      "prefix": "OFF",
+      "function": "generic_eq",
+      "expected_token": "G_LOAD_FAR_INDIR",
+      "actual_tokens": [
+        "G_LOAD_FAR_INDIR"
+      ],
+      "exact_match": true
+    }
+  ]
+}

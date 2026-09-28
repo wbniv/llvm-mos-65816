@@ -161,11 +161,11 @@ new file mode 100644
 +# Generic comparisons exercise branch legalization before the memory fold.
 +
 +# A16-LABEL: name: ne_backedge
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: ne_backedge
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: ne_backedge
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: ne_backedge
 +tracksRegLiveness: true
@@ -201,11 +201,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: eq_exit
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: eq_exit
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: eq_exit
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: eq_exit
 +tracksRegLiveness: true
@@ -241,11 +241,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: nonzero_start
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: nonzero_start
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: nonzero_start
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: nonzero_start
 +tracksRegLiveness: true
@@ -281,11 +281,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: unsigned_end
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: unsigned_end
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: unsigned_end
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: unsigned_end
 +tracksRegLiveness: true
@@ -321,11 +321,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: offset_256
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: offset_256
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: offset_256
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: offset_256
 +tracksRegLiveness: true
@@ -361,11 +361,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: wrapped_induction
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: wrapped_induction
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: wrapped_induction
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: wrapped_induction
 +tracksRegLiveness: true
@@ -401,11 +401,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: full_cycle
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: full_cycle
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: full_cycle
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: full_cycle
 +tracksRegLiveness: true
@@ -441,11 +441,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: equal_start_end
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: equal_start_end
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: equal_start_end
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: equal_start_end
 +tracksRegLiveness: true
@@ -481,11 +481,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: step_two
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: step_two
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: step_two
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: step_two
 +tracksRegLiveness: true
@@ -521,11 +521,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: eq_backedge
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: eq_backedge
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: eq_backedge
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: eq_backedge
 +tracksRegLiveness: true
@@ -561,11 +561,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: ne_exit
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: ne_exit
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: ne_exit
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: ne_exit
 +tracksRegLiveness: true
@@ -601,11 +601,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: compare_phi
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: compare_phi
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: compare_phi
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: compare_phi
 +tracksRegLiveness: true
@@ -641,11 +641,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: borrow_input
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: borrow_input
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: borrow_input
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: borrow_input
 +tracksRegLiveness: true
@@ -681,11 +681,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: carry_flag
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: carry_flag
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: carry_flag
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: carry_flag
 +tracksRegLiveness: true
@@ -721,11 +721,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: negative_flag
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: negative_flag
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: negative_flag
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: negative_flag
 +tracksRegLiveness: true
@@ -761,11 +761,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: overflow_flag
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: overflow_flag
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: overflow_flag
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: overflow_flag
 +tracksRegLiveness: true
@@ -801,11 +801,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: zero_copy
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: zero_copy
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: zero_copy
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: zero_copy
 +tracksRegLiveness: true
@@ -842,11 +842,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: four_copies
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: four_copies
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: four_copies
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: four_copies
 +tracksRegLiveness: true
@@ -886,11 +886,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: five_copies
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: five_copies
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: five_copies
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: five_copies
 +tracksRegLiveness: true
@@ -931,11 +931,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: scale_fits
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: scale_fits
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: scale_fits
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: scale_fits
 +tracksRegLiveness: true
@@ -972,11 +972,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: scale_overflows_y
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: scale_overflows_y
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: scale_overflows_y
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: scale_overflows_y
 +tracksRegLiveness: true
@@ -1013,11 +1013,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: narrow_scale_wraps
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: narrow_scale_wraps
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: narrow_scale_wraps
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: narrow_scale_wraps
 +tracksRegLiveness: true
@@ -1054,11 +1054,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: narrow_add_wraps
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: narrow_add_wraps
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: narrow_add_wraps
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: narrow_add_wraps
 +tracksRegLiveness: true
@@ -1095,11 +1095,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: multiple_blocks
-+# A16: = G_LOAD_FAR_INDIR 
++# A16: = G_LOAD_FAR_INDIR{{ }}
 +# XY16-LABEL: name: multiple_blocks
-+# XY16: = G_LOAD_FAR_INDIR_IDX16 
++# XY16: = G_LOAD_FAR_INDIR_IDX16{{ }}
 +# OFF-LABEL: name: multiple_blocks
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: multiple_blocks
 +tracksRegLiveness: true
@@ -1138,11 +1138,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: generic_ne
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: generic_ne
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: generic_ne
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: generic_ne
 +tracksRegLiveness: true
@@ -1178,11 +1178,11 @@ new file mode 100644
 +...
 +
 +# A16-LABEL: name: generic_eq
-+# A16: = G_LOAD_FAR_INDIR_IDX 
++# A16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# XY16-LABEL: name: generic_eq
-+# XY16: = G_LOAD_FAR_INDIR_IDX 
++# XY16: = G_LOAD_FAR_INDIR_IDX{{ }}
 +# OFF-LABEL: name: generic_eq
-+# OFF: = G_LOAD_FAR_INDIR 
++# OFF: = G_LOAD_FAR_INDIR{{ }}
 +---
 +name: generic_eq
 +tracksRegLiveness: true

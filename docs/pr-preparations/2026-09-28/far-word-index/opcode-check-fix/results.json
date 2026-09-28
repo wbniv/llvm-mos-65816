@@ -1,0 +1,189 @@
+{
+  "date": "2026-09-28T09:17:35.717169+00:00",
+  "finding": "REVIEW-INTERACTION-01",
+  "status": "resolved",
+  "scope": "FileCheck opcode assertions only; no compiler implementation change",
+  "attribution": {
+    "tool": "OpenAI Codex CLI",
+    "version": "0.157.1",
+    "session_source": "vscode",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh",
+    "session": "01a0e67f-298f-7a21-80af-06f867085f84"
+  },
+  "repository_base": "0eae3e7a0c42b1d20c482c154ec3716a3674ad1c",
+  "vendor_base": "8be0546128a55e78c63ca571d466aa72a782cd36",
+  "toolchain": {
+    "llc": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "sha256": "cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n  Default target: mos-unknown-unknown\n  Host CPU: tigerlake\n\n  Registered Targets:\n    mos - MOS Technologies 65xx and variants\n"
+    },
+    "FileCheck": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos/bin/FileCheck",
+      "sha256": "08a28afd2e0b867db9713829710d171311e804f12468d19a5c1ed3b0260d429d",
+      "version": "LLVM (http://llvm.org/):\n  LLVM version 23.0.0git\n  Optimized build.\n"
+    }
+  },
+  "sources": {
+    "baseline_patch_0069": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+    "corrected_patch_0069": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+    "unchanged_patch_0070": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+    "unchanged_legalizer": "e95d5b9ccc21dc956c99761b5b3f386ef1db2cfba85b9c5820cd7e6c6437d518",
+    "baseline_checks": "aad0896456e28c3278022b11c6c99b3b5afd5baff058e60dd25277ceb90eb414",
+    "corrected_checks": "71e9b6db4ec03b2a2c754c3b7b47d75de8d06b439426aeb23c877f1004670b98",
+    "runner": "7b70ce7d6e0e41e927e269eb7c41be65c74cab6360b46ec794d2dea49ef88943"
+  },
+  "sensitivity": {
+    "baseline": {
+      "positive_passes": 3,
+      "positive_runs": 3,
+      "expectations": 78,
+      "mutations": 156,
+      "rejected": 52,
+      "accepted_wrong_opcodes": 104,
+      "unexpected_exit_codes": 0,
+      "by_substitution": [
+        {
+          "expected": "G_LOAD_FAR_INDIR",
+          "replacement": "G_LOAD_FAR_INDIR_IDX",
+          "returncode": 0,
+          "count": 43
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR",
+          "replacement": "G_LOAD_FAR_INDIR_IDX16",
+          "returncode": 0,
+          "count": 43
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX",
+          "replacement": "G_LOAD_FAR_INDIR",
+          "returncode": 1,
+          "count": 18
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX",
+          "replacement": "G_LOAD_FAR_INDIR_IDX16",
+          "returncode": 0,
+          "count": 18
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX16",
+          "replacement": "G_LOAD_FAR_INDIR",
+          "returncode": 1,
+          "count": 17
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX16",
+          "replacement": "G_LOAD_FAR_INDIR_IDX",
+          "returncode": 1,
+          "count": 17
+        }
+      ]
+    },
+    "corrected": {
+      "positive_passes": 3,
+      "positive_runs": 3,
+      "expectations": 78,
+      "mutations": 156,
+      "rejected": 156,
+      "accepted_wrong_opcodes": 0,
+      "unexpected_exit_codes": 0,
+      "by_substitution": [
+        {
+          "expected": "G_LOAD_FAR_INDIR",
+          "replacement": "G_LOAD_FAR_INDIR_IDX",
+          "returncode": 1,
+          "count": 43
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR",
+          "replacement": "G_LOAD_FAR_INDIR_IDX16",
+          "returncode": 1,
+          "count": 43
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX",
+          "replacement": "G_LOAD_FAR_INDIR",
+          "returncode": 1,
+          "count": 18
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX",
+          "replacement": "G_LOAD_FAR_INDIR_IDX16",
+          "returncode": 1,
+          "count": 18
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX16",
+          "replacement": "G_LOAD_FAR_INDIR",
+          "returncode": 1,
+          "count": 17
+        },
+        {
+          "expected": "G_LOAD_FAR_INDIR_IDX16",
+          "replacement": "G_LOAD_FAR_INDIR_IDX",
+          "returncode": 1,
+          "count": 17
+        }
+      ]
+    }
+  },
+  "focused_lit": {
+    "returncode": 0,
+    "tests": [
+      {
+        "name": "LLVM :: CodeGen/MOS/far-indir-indexed.ll",
+        "code": "PASS"
+      },
+      {
+        "name": "LLVM :: CodeGen/MOS/far-word-policy.mir",
+        "code": "PASS"
+      },
+      {
+        "name": "LLVM :: CodeGen/MOS/far-loop-range.mir",
+        "code": "PASS"
+      },
+      {
+        "name": "LLVM :: CodeGen/MOS/far-native-word.ll",
+        "code": "PASS"
+      }
+    ],
+    "sandbox_attempt": "The retained initial log-capturing attempt failed while creating a Python worker socket. The identical command passed outside the sandbox."
+  },
+  "patch_check": {
+    "command": [
+      "git",
+      "apply",
+      "--include=llvm/test/CodeGen/MOS/far-loop-range.mir",
+      "/home/will/llvm-mos-65816/.scratch/far-word-publish/patches/llvm-mos/0069-mos-far-loop-range.patch"
+    ],
+    "returncode": 0,
+    "stderr": "",
+    "cpp_diff_unchanged": true,
+    "root_and_isolated_patches_identical": true,
+    "applied_test_matches_live_and_retained": true
+  },
+  "archive_members": {
+    "baseline-0069.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+    "baseline-checks.mir": "aad0896456e28c3278022b11c6c99b3b5afd5baff058e60dd25277ceb90eb414",
+    "baseline-command.json": "4bfa14278f8d4f9150c64704e2b0ae77875d2d03b9da3b75bdebd4535df7e269",
+    "baseline-sensitivity.json": "8d13c39b74ab2ab31fe0c323a23bf7a7cc9966b4132b8f12c2ee3da325d1264a",
+    "compiler-runs.json": "7eebea1b839611bd6ddf4c3007ef9b1527418e09e4c4060912919cc9944ccaab",
+    "corrected-0069.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
+    "corrected-checks.mir": "71e9b6db4ec03b2a2c754c3b7b47d75de8d06b439426aeb23c877f1004670b98",
+    "corrected-command.json": "497926ccc80219a16d6fab09cb3034f47b3ba8d4616314ad3a104c4efe980147",
+    "corrected-sensitivity.json": "e969f543d5e5a3b4ce2453b98d4490906d55284911103b162775280c677e89b6",
+    "focused-lit-command.json": "889341691c329fe1cca7a256df6c020c53cd5faf392e3ad458ce9d27ecadf04b",
+    "focused-lit-sandbox-command.json": "0c7660bab12034cabade6967ff24a7b4c687a014f585b50158f78fa81e73c0ad",
+    "focused-lit-sandbox.log": "78d168c80bea39f35f5cfe8695dffac86b57080fb163faee25eef7974c84cf7b",
+    "focused-lit.json": "e14b3e1e62bc127f48d6e23a0f1142db1c8e4800f9378b3ce3b25289ab7f9913",
+    "focused-lit.log": "7c875a48eec81ec98b7ef79eb7aea0185eb5730bb4ef2c50c7e5f0752facf649",
+    "outputs/a16.mir": "ab9edb0e1ff4817e24918955801ee8e7ce291f4fb301d45dd8f1070ec55ab3d5",
+    "outputs/off.mir": "e975c8f92f7d6bd1bbb9a8dd9a83ac98ab5da9c3ffccfdd64d3dbc6d2777a6bf",
+    "outputs/xy16.mir": "d443e3b0784fa945dba5df8c92f1746cb5a3fed7a9a8f45bf9f8182226bfa91d",
+    "patch-check.json": "c8377f03f81b9329a03769b38920a907abe1140b116479c4a1e0f6577cb63cf7"
+  },
+  "archive_sha256": "36dab8af7b782ef7131c31f22615de7c2b9b3f28bae14948812e22c40a3cc07a"
+}

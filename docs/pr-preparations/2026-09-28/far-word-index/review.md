@@ -1,6 +1,6 @@
 # Native far-word indexing: author review and evidence guide
 
-**September 28, 2026 — local PR preparation.** The implementation and measurements are retained in the [0070 investigation](../../../investigations/2026-09-28-far-word-policy.md). This document audits their use in the [working PR body](pr-body.md), adds a pinned upstream source inspection, and records unresolved questions. It does not certify an upstream extraction or independent review.
+**September 28, 2026 — local PR preparation.** The implementation and measurements are retained in the [0070 investigation](../../../investigations/2026-09-28-far-word-policy.md). This document audits their use in the [working PR body](pr-body.md), adds a pinned upstream source inspection, and records unresolved questions. The [separate independent AI review](independent-review.md) now records three source assessments and the resolved P2 weakness in the 0069 opcode assertions, with matching-input sensitivity evidence. No upstream extraction is certified.
 
 Author preparation: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The original range-proof and payoff investigations retain their own verified credits.
 
@@ -37,7 +37,9 @@ Both Oz modes are unchanged even when forced: A16 stays at 2,085 bytes / 355,972
 5. **Memory operation.** Select the existing M16/Y8 word pseudo with the original memory operand. The 24-bit far effective address can carry into the next bank. A bounded index does not require the base pointer and loaded word to remain within one bank. Controls at `$C1FFFF` and `$C2FFFF` deliberately make one word straddle that boundary.
 6. **Lifetime and cost restrictions.** A possible call between pointer formation and access rejects the fold. Multiple accesses additionally require a function without potential calls. Single-access cases can pass in a function with calls elsewhere. The user-walk and range recursion have depth limits; the whole-function potential-call scan still has a cost that is unmeasured here.
 
-The regression inventory is **12 functions and nine RUN lines** in `far-word-policy.mir`, not 12 independent application benchmarks. The 26-case range regression belongs to prerequisite 0069. The final focused suite contains four passing files; this preparation reuses those recorded runs. Existing native-word tests and the [earlier 0062 review](../../2026-09-26/native-optimization-review.md) supply additional atomic/volatile/ABI context. That earlier review does not independently certify 0070, and the 0070 test is not claimed to add dedicated new volatile-ordering cases.
+The [independent review](independent-review.md) found that 0069's FileCheck patterns accepted longer opcode names by prefix. [The follow-up correction](independent-review.md#correction-and-executed-sensitivity-checks) adds explicit boundaries to all 78 assertions. On the same fresh compiler outputs, the preserved checks accept 104 of 156 wrong-opcode substitutions; the corrected checks reject all 156 and accept all three unmodified outputs. Four focused regression files pass. This closes the assertion finding without changing compiler code or benchmark evidence.
+
+The regression inventory is **12 functions and nine RUN lines** in `far-word-policy.mir`, not 12 independent application benchmarks. The 26-case range regression belongs to prerequisite 0069. The original final focused suite contains four passing files; the assertion-correction follow-up separately reran those same four files successfully. Existing native-word tests and the [earlier 0062 review](../../2026-09-26/native-optimization-review.md) supply additional atomic/volatile/ABI context. That earlier review does not independently certify 0070, and the 0070 test is not claimed to add dedicated new volatile-ordering cases.
 
 Before submission, review the proof against operand roles and control-flow guards rather than accepting the example alone. Check memory flags, mixed-group traversal after legalization mutates uses, call-producing generic instructions, bank carry, and feature-disabled behavior in the extracted series. Compiler overhead and richer loop forms need separate evidence if their claims or implementation scope expand.
 
@@ -113,7 +115,7 @@ For local replay, restore the recorded `.scratch/far-word-policy` layout and ver
 
 Current downstream correctness and performance results remain valid. These questions identify the independent assessment, missing measurements, and design decisions still needed for upstream preparation:
 
-- **Correctness review:** does an independent reviewer agree with 0069's induction/branch proof and 0070's bounds for all pointer uses, including mixed byte/word groups after legalization changes the uses? Review bank carry, memory flags, and call handling against the exact proposed patch stack. The recorded tests pass; independent source review remains pending.
+- **Correctness follow-up:** three separate AI source reviews found no valid-input compiler correctness defect in the published downstream implementation. [REVIEW-INTERACTION-01](independent-review.md#correction-and-executed-sensitivity-checks) is resolved: exact opcode boundaries reject all 156 wrong substitutions, preserve the three passing outputs, and pass the four focused regression files. Additional word-endpoint, operand, guard, and range-boundary cases are recommended. Review the eventual extracted upstream stack separately; its implementation and dependencies may differ.
 
 - **Broader performance:** do other applications with eligible loops benefit from the speed default? Most speed evidence comes from Farblit, O3 covers one fixture, and only two fixtures change code in the 16-fixture census. Additional workloads are needed to support broader profitability claims.
 
@@ -124,3 +126,5 @@ Current downstream correctness and performance results remain valid. These quest
 - **Patch preparation:** does separating and rebasing the required changes preserve their behavior and include every dependency? Build and test the proposed upstream patch stack as described above. Remove incidental formatting changes where practical, and keep measurements for any substantive revision separately identified.
 
 Use these questions to direct further work. Do not broaden the claims by accumulating repeated controls, suppressing a size regression, or promoting the source audit into a claim of destination validation.
+
+Independent-review coordination and summary update: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.

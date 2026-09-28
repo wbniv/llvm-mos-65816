@@ -1,6 +1,6 @@
 # Bounded Farblit range proof: production validation
 
-**Later September 28 speed-policy follow-up:** [0070 is integrated and installed locally](2026-09-28-far-word-policy.md). Native word indexing is enabled for speed at `-O2`/`-O3`; `-Os`/`-Oz` retain their existing output. The A16 size tradeoff is settled by the build policy. Independent upstream review remains separate work.
+**Later September 28 speed-policy follow-up:** [0070 is integrated and installed locally](2026-09-28-far-word-policy.md). Native word indexing is enabled for speed at `-O2`/`-O3`; `-Os`/`-Oz` retain their existing output. The A16 size tradeoff is settled by the build policy. [Independent downstream AI source review](../pr-preparations/2026-09-28/far-word-index/independent-review.md) is complete: no valid-input compiler correctness defect was found. The P2 FileCheck finding is resolved: all 78 assertions have explicit opcode boundaries, all 156 wrong substitutions are rejected, the three real outputs pass, and four focused regression files pass. The preserved assertions accepted 104 of those substitutions; all 78 archived outputs already contained the intended exact opcode. The earlier evidence below is preserved. Review and validation of the extracted upstream stack remain separate work.
 
 Follow-up attribution: OpenAI Codex CLI 0.157.1 (session source: `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
 
@@ -81,3 +81,5 @@ python3 dev/test-farblit-shapes.py
 ```
 
 [Completed integration plan](../plans/2026-09-28-farblit-range-integration.md). Independent review and destination-revision validation remain prerequisites for upstream preparation. Native-word profitability remains a separate TODO.
+
+Independent-review coordination and summary update: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
