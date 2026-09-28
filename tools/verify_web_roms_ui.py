@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Keep ROM and frame progress fixed on screen during interactive verification."""
-import curses
+"""Keep ROM and frame progress on two live lines in the current terminal."""
 import errno
 import os
 import pty
 import re
 import selectors
+import shutil
 import signal
 import subprocess
 import sys
@@ -16,19 +16,26 @@ def clean(line):
     return re.sub(r"\x1b\[[0-9;]*[A-Za-z]", "", line).replace("\r", "")
 
 
-def draw(screen, overall, emulator, messages):
-    height, width = screen.getmaxyx()
-    screen.erase()
-    if width < 1:
-        return
-    visible = max(0, height - 3)
-    rows = [overall, emulator, ""] + (messages[-visible:] if visible else [])
-    for y, line in enumerate(rows[:height]):
-        try:
-            screen.addnstr(y, 0, clean(line), max(0, width - 1))
-        except curses.error:
-            pass
-    screen.refresh()
+class Display:
+    def __init__(self):
+        self.active = False
+        self.last = None
+
+    def update(self, overall, emulator):
+        width = max(0, shutil.get_terminal_size().columns - 1)
+        rows = (clean(overall)[:width], clean(emulator)[:width])
+        if rows == self.last:
+            return
+        if not self.active:
+            os.write(2, b"\n")  # Reserve two lines below the existing terminal output.
+            self.active = True
+        os.write(2, ("\r\x1b[1A\r\x1b[K" + rows[0] + "\n\r\x1b[K" + rows[1]).encode())
+        self.last = rows
+
+    def close(self):
+        if self.active:
+            os.write(2, b"\r\x1b[1A\r\x1b[K\n\r\x1b[K\r\x1b[1A")
+            self.active = False
 
 
 def stop(proc):
@@ -42,12 +49,7 @@ def stop(proc):
         proc.wait()
 
 
-def run(screen, command):
-    try:
-        curses.curs_set(0)
-    except curses.error:
-        pass
-    screen.nodelay(True)
+def run(command, display):
     read_fd, write_fd = pty.openpty()
     tty.setraw(write_fd)
     env = dict(os.environ, VERIFY_WEB_ROMS_UI_CHILD="1", TASK_PROGRESS_FD=str(write_fd))
@@ -107,12 +109,8 @@ def run(screen, command):
                     else:
                         os.close(fd)
             pending = clean(buffers[read_fd].decode(errors="replace"))
-            draw(screen, pending if pending.startswith("VERIFY ") else overall,
-                 pending if pending.startswith("EMU ") else emulator, messages)
-            try:
-                screen.getch()
-            except curses.error:
-                pass
+            display.update(pending if pending.startswith("VERIFY ") else overall,
+                           pending if pending.startswith("EMU ") else emulator)
         return proc.wait(), messages
     finally:
         selector.close()
@@ -133,12 +131,14 @@ def main():
     def interrupted(_signum, _frame):
         raise KeyboardInterrupt
     previous = signal.signal(signal.SIGTERM, interrupted)
+    display = Display()
     try:
         try:
-            status, messages = curses.wrapper(run, command)
+            status, messages = run(command, display)
         except KeyboardInterrupt:
             return 130
     finally:
+        display.close()
         signal.signal(signal.SIGTERM, previous)
     if status:
         for line in messages[-30:]:
