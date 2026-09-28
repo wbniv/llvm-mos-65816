@@ -1,7 +1,15 @@
 # #128 — LZSS gallery transparent 3D, gravity-driven chevrons
 
-**Status:** planned 2026-07-27. Follow-up to the navigation feedback in
+**Status:** retired from active work 2026-09-28; the chevron implementation and navigation checks are
+recorded below and in the [navigation plan](2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
+Follow-up to the navigation feedback in
 [#126](2026-07-26-126-lzss-gallery-nine-public-domain-masters.md).
+
+**Current disposition (2026-09-28):** No chevron defect is currently identified. The later navigation
+verification records keyboard Left/Right, automatic advance, and the full 62-work gallery gate at
+oracle `0x9512`; the published sites also passed their navigation checks. The original 26-work
+`0x3D44` value is dated evidence. The repack display is the live compressor cursor, not the retired
+zipper or scanner beam. Palette ownership is enforced by the audit in [#138](2026-07-27-138-lzss-gallery-palette-range-audit.md).
 
 **Updated 2026-07-27 (review pass):** corrected the gate facts (26 works, generated oracle
 `0x3D44` — the draft's "20-artwork / `0xB5D7`" was stale), fixed the takeoff-impulse sign

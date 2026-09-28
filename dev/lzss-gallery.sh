@@ -9,6 +9,8 @@ CFG="$BUILD/install/bin/mos-snes-gallery.cfg"
 SRC="$ROOT/examples/snes/lzss-gallery.c"
 ROM="$BUILD/lzss-gallery.sfc"
 MAP="$BUILD/lzss-gallery.map"
+echo "==> artwork palette ownership audit"
+python3 "$ROOT/tools/lzss-gallery-palette-audit.py"
 EXPECT=$(python3 -c 'import json
 r=json.load(open("/work/assets/snes/lzss-gallery/derived/report.json"));h=0xffff
 for a in r:

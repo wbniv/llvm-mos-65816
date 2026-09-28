@@ -377,6 +377,16 @@ tasks:
     cmds:
       - dev/run.sh lzdec
 
+  lzss-gallery-palette-audit:
+    desc: "Check every generated gallery raster and palette against the shipped CGRAM ownership map"
+    cmds:
+      - python3 tools/lzss-gallery-palette-audit.py
+
+  lzss-gallery:
+    desc: "Build and verify the LZSS gallery ROM, including its artwork palette ownership audit"
+    cmds:
+      - dev/run.sh lzss-gallery
+
   lzdec-play:
     desc: "PLAY the LZ77 image-decompress reveal demo in a MAME window on this host (builds the ROM first if needed). Shows a compressed image loading in progressively."
     cmds:
