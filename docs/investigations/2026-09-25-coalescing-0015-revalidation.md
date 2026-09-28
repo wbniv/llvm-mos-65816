@@ -136,3 +136,7 @@ The [opcode roundtrip plan](../plans/2026-09-25-65816-all-opcode-roundtrip.md)
 remains written and unimplemented, as requested. Current summaries, earlier
 0015/0028 investigations, and the generated status/flowchart views are updated
 through the document dependency workflow; historical evidence is preserved.
+
+## Browser viewing (2026-09-28)
+
+Use `task md -- docs/investigations/2026-09-25-coalescing-0015-revalidation.md`. The [shared viewing workflow](../howto-document-dependencies.md#view-markdown-in-the-browser) replaces the document-specific HTML renderer. Retained material: [session transcript](../transcripts/2026-09-25-coalescing-0015.md), [baseline diagnostics](../defects/evidence/2026-09-25-coalescing-0015/baseline-closure.log), and [candidate diagnostics](../defects/evidence/2026-09-25-coalescing-0015/candidate-closure.log). Earlier validation and attribution remain dated evidence.

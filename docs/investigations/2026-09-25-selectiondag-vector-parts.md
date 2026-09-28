@@ -106,3 +106,7 @@ The rendered report keeps session and diagnostic transcripts collapsed.
 Earlier evidence and attribution remain intact. The structured inventory now
 contains ten fixed defects and one reentrant contract clarification; unconfirmed
 candidates still need evidence before choosing a fix.
+
+## Browser viewing (2026-09-28)
+
+Use `task md -- docs/investigations/2026-09-25-selectiondag-vector-parts.md`. The [shared viewing workflow](../howto-document-dependencies.md#view-markdown-in-the-browser) replaces the document-specific HTML renderer. Retained material: [session transcript](../transcripts/2026-09-25-selectiondag-vector-parts.md), [baseline diagnostics](../defects/evidence/2026-09-25-aarch64-vector-asm/baseline-runner.log), and [candidate diagnostics](../defects/evidence/2026-09-25-aarch64-vector-asm/candidate-runner.log). Earlier validation and attribution remain dated evidence.

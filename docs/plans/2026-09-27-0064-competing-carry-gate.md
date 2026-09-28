@@ -1,5 +1,7 @@
 # Gate 0064 to regions with competing carries
 
+**Farblit gate update (2026-09-28):** the [per-probe gate](../investigations/2026-09-27-farblit-byte-load.md#completed-gate-update-2026-09-28) passes on preserved and installed compilers, with eight emulator assertions and 15 checker tests per toolchain. The following aggregate-count qualifications are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
+
 **Status (2026-09-27):** implementation and measurements complete; results are presented as an [investigative report for LLVM discussion](../investigations/2026-09-27-competing-carry-gate.md). Default selection remains open. Patch 0067 currently exposes `off`, `always` and experimental `gated`, with `always` as the existing downstream default.
 
 The 3,720-configuration census has 3,592 successful three-policy comparisons and no policy-specific compile failures. Aggregate savings versus `off` are 213,866 B for `always` and 199,309 B for `gated`; growing objects number 39 and six. The gate recovers the 32 original growth cases and the measured timing costs of the 30 SNES cases. A16 and ordinary-6502 subsets show no function growth in this sample. The [profitability follow-up](../investigations/2026-09-27-carry-profitability-model.md) now tests three pressure models and implements complete-object selection, including timing and compilation-cost measurements. The gate contributes 220 B when added to `off`/`always` selection; no default is selected.

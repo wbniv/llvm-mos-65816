@@ -1,8 +1,14 @@
 | Date | Change |
 |------|--------|
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/26dce1dd) | Reconcile Farblit instruction shapes and retain gate qualification |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/1c5e12fc) | fix(mos): repair far extload legalization and measure carry scheduling |
 
 <!--history-meta v1
+26dce1dd	author	Will Norris
+26dce1dd	added	48
+26dce1dd	deleted	1
+26dce1dd	files	1
+26dce1dd	body	Map the fully inlined Farblit probes to their generated access forms on the preserved 0066 toolchain. A controlled rdw byte-split MIR experiment restores indexed-load counts from 2/5 to 3/7, explaining the native-word lowering difference. Identify the A16 cp8 range limitation and the misleading aggregate gate labels. Keep compiler code, fixtures and gate expectations unchanged.\n\nRetain source, MIR, assembly, commands, binary identities and fresh runtime evidence in the existing canonical record. Preserve its failing baseline and established legalization repair. Update current summaries and regenerate dependent views.\n\nValidation: all eight emulator assertions pass; all four ROM hashes match the September 27 captures. The unchanged shell gate still fails its two count checks. Staged document dependencies, defect evidence, comment history and whitespace checks pass.\n\nAI assistance: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63. Earlier contributors' attribution remains in the retained records.
 1c5e12fc	author	Will Norris
 1c5e12fc	added	39
 1c5e12fc	deleted	0

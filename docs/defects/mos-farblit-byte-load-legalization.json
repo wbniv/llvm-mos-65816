@@ -9,9 +9,10 @@
   "attribution": [
     "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0dd01-d72e-76f2-bf27-a796e0f7d994: observation during carry-scheduling validation and baseline capture. Original fixture attribution remains in the increment-2 plan.",
     "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96. Cause isolation, 0066 repair, direct MIR regression, preserved-input comparison and runtime validation.",
-    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e529-62c6-7fc2-a0c6-357800272c63: instruction-shape reconciliation, reconstructed MIR control, and repeated runtime checks; no change to compiler or gate expectations."
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e529-62c6-7fc2-a0c6-357800272c63: instruction-shape reconciliation, reconstructed MIR control, and repeated runtime checks; no change to compiler or gate expectations.",
+    "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63: per-probe gate implementation, source-attribution correction, sensitivity tests, and two-toolchain runtime validation."
   ],
-  "unknowns": "The opcode-count deficit is reconciled in the September 28 investigation: native rdw replaces one/two indexed byte loads, while cp8 A16 remains outside the local range proof. The shell gate still exits 1 at unchanged minima 3/6 (observed 2/5); all eight runtime assertions pass on the preserved 0066 candidate. Replacing the aggregate gate and measuring indexed native-word/copy profitability remain separate work. No exact-upstream applicability or independent review is claimed.",
+  "unknowns": "The per-probe shell gate passes on the preserved 0066 and installed toolchains (eight emulator assertions and 15 checker tests each). Explicit expected forms include native rdw and the A16 cp8 computed-pointer fallback; no new optimization or profitability claim is made. The earlier September 28 shape JSON has incorrect source/probe labels from a file-ID assumption; its raw assembly and opcode counts remain retained, with corrected checked reports in the gate evidence. No exact-upstream applicability or independent review is claimed.",
   "prior_work": {
     "disposition": "distinct_from_related",
     "search_terms": [
@@ -382,6 +383,178 @@
     {
       "path": "docs/defects/evidence/2026-09-28-farblit-shapes/xy16.s.gz",
       "sha256": "774f423abef2004b075557e99e49b63e49c6418b9aa66db333c0021f2cd0d705"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/check-farblit-shapes.py.txt",
+      "sha256": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/farblit.c.txt",
+      "sha256": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/farblit.sh.txt",
+      "sha256": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/farblit_press.c.txt",
+      "sha256": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_a16.dis.gz",
+      "sha256": "da5df2c7d1a541ac3af734fb7f4d9f5ec24ea424d80d3dd7523b80c9f81a48c7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_a16.s.gz",
+      "sha256": "38873d36d221aac8c9ec10c2a2aee026ec7bd320ed873f89154ce85b574abab4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_a16.shapes.json",
+      "sha256": "fb0f233ac8f99717edfb47691f45e4d5861adfb7c8ac6e9d3c5f88071f98a5e4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_a16_debug.dis.gz",
+      "sha256": "f08fe84c355c1d8ab3871c522c956a7ddc972d403cb5677f07defe42116e0334"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_a16.dis.gz",
+      "sha256": "dfcf23b15d59823b6de9244d08bbef05c06dbba8022a74ea116cdadd85464091"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_a16.s.gz",
+      "sha256": "004068152f94964fc37f1de7bb224375e61af8b5b7a5678c9e3ad3c0436ec729"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_a16.shapes.json",
+      "sha256": "e9d0f8007ffee9d954bfafbc70d4588d7bc6a387cb65aa619efeec270b6625bd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_a16_debug.dis.gz",
+      "sha256": "47969dd075674700dacc629aeb63683456ba62f709d6031e3655b49ad4429e8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_xy16.dis.gz",
+      "sha256": "2a166ef98aa913065f9e240df9bb8ccd4a067d21dcafa957ceb4e5a9f7e46cea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_xy16.s.gz",
+      "sha256": "60e5c73ed7ec27ebd0e58a414c32fa0928b42db90b5f86b59d38051dfec2e74f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_xy16.shapes.json",
+      "sha256": "7f87ce296165536b169544920627b645508898b078cd5150c8080515c798e9b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_press_xy16_debug.dis.gz",
+      "sha256": "0191a66ab38f5a0a6b4861b7e04c70eb627aa7024b74f7b42a8b1188202ac430"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_xy16.dis.gz",
+      "sha256": "1b830bba98f525900048740088214d1248f456114672e017c259c78d01121916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_xy16.s.gz",
+      "sha256": "c779728792f0171b82c623eb3ef072b328bdd05e15e4cdd8e2aad317d56af04a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_xy16.shapes.json",
+      "sha256": "55ed838958343dc5401eb72688b09cc844a9fbb94a3d3368d0f90a81fa9d2a41"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/farblit_xy16_debug.dis.gz",
+      "sha256": "d9013e7ac5973c1472f03597471fc8c637902b9854f67c3cca5f6e463dd242ab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/identity.json",
+      "sha256": "424231b8e9f20b7d2cd1a76011e080d35e17e84b37080ea9991a4d73abe04838"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/runtime.log",
+      "sha256": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log",
+      "sha256": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_a16.dis.gz",
+      "sha256": "da5df2c7d1a541ac3af734fb7f4d9f5ec24ea424d80d3dd7523b80c9f81a48c7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_a16.s.gz",
+      "sha256": "38873d36d221aac8c9ec10c2a2aee026ec7bd320ed873f89154ce85b574abab4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_a16.shapes.json",
+      "sha256": "fb0f233ac8f99717edfb47691f45e4d5861adfb7c8ac6e9d3c5f88071f98a5e4"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_a16_debug.dis.gz",
+      "sha256": "f08fe84c355c1d8ab3871c522c956a7ddc972d403cb5677f07defe42116e0334"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_a16.dis.gz",
+      "sha256": "dfcf23b15d59823b6de9244d08bbef05c06dbba8022a74ea116cdadd85464091"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_a16.s.gz",
+      "sha256": "004068152f94964fc37f1de7bb224375e61af8b5b7a5678c9e3ad3c0436ec729"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_a16.shapes.json",
+      "sha256": "e9d0f8007ffee9d954bfafbc70d4588d7bc6a387cb65aa619efeec270b6625bd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_a16_debug.dis.gz",
+      "sha256": "47969dd075674700dacc629aeb63683456ba62f709d6031e3655b49ad4429e8c"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_xy16.dis.gz",
+      "sha256": "2a166ef98aa913065f9e240df9bb8ccd4a067d21dcafa957ceb4e5a9f7e46cea"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_xy16.s.gz",
+      "sha256": "60e5c73ed7ec27ebd0e58a414c32fa0928b42db90b5f86b59d38051dfec2e74f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_xy16.shapes.json",
+      "sha256": "7f87ce296165536b169544920627b645508898b078cd5150c8080515c798e9b0"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_press_xy16_debug.dis.gz",
+      "sha256": "0191a66ab38f5a0a6b4861b7e04c70eb627aa7024b74f7b42a8b1188202ac430"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_xy16.dis.gz",
+      "sha256": "1b830bba98f525900048740088214d1248f456114672e017c259c78d01121916"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_xy16.s.gz",
+      "sha256": "c779728792f0171b82c623eb3ef072b328bdd05e15e4cdd8e2aad317d56af04a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_xy16.shapes.json",
+      "sha256": "55ed838958343dc5401eb72688b09cc844a9fbb94a3d3368d0f90a81fa9d2a41"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/farblit_xy16_debug.dis.gz",
+      "sha256": "d9013e7ac5973c1472f03597471fc8c637902b9854f67c3cca5f6e463dd242ab"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/identity.json",
+      "sha256": "c939c36fefe2d46079294dcdf56d9acd46538ce6e3809337f06d095c8599d691"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log",
+      "sha256": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log",
+      "sha256": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-gate/test-farblit-shapes.py.txt",
+      "sha256": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b"
     }
   ],
   "baseline": {

@@ -1,0 +1,54 @@
+==> 0) generate the far table asm (tbl[i] = (i + (i>>16)) & 0xFFFF, 3 banks $C1..$C3)
+/work/build/farblit_tbl.s: 98304 entries (196608 bytes) -> .far_rodata (banks $C1..$C3)
+==> 1) machine verifier + instruction shapes for every marked farblit access
+  [a16/main] diagnostic totals: b7=2 97=2 a7=5 87=1
+  PASS[a16/rd8]: 1 x lda indirect-y M8 index8
+  PASS[a16/rdg]: 1 x lda long-x M8 index8
+  PASS[a16/rd16]: 1 x lda indirect M8
+  PASS[a16/rdw]: 1 x lda indirect M16
+  PASS[a16/rdw16]: 1 x lda indirect M8
+  PASS[a16/rdw16g]: 1 x lda indirect M8
+  PASS[a16/rdw8]: 1 x lda indirect-y M8 index8
+  PASS[a16/wr8]: 1 x sta indirect-y M8 index8
+  PASS[a16/wr16]: 1 x sta indirect M8
+  PASS[a16/cp8]: 1 x lda indirect M8, 1 x sta indirect-y M8 index8
+  PASS[a16/readback]: 16 x lda long M8
+  [xy16/main] diagnostic totals: b7=5 97=3 a7=1 87=0
+  PASS[xy16/rd8]: 1 x lda indirect-y M8 index8
+  PASS[xy16/rdg]: 1 x lda long-x M8 index8
+  PASS[xy16/rd16]: 1 x lda indirect-y M8 index16
+  PASS[xy16/rdw]: 1 x lda indirect M16
+  PASS[xy16/rdw16]: 1 x lda indirect-y M8 index16
+  PASS[xy16/rdw16g]: 1 x lda long-x M8 index16
+  PASS[xy16/rdw8]: 1 x lda indirect-y M8 index8
+  PASS[xy16/wr8]: 1 x sta indirect-y M8 index8
+  PASS[xy16/wr16]: 1 x sta indirect-y M8 index16
+  PASS[xy16/cp8]: 1 x lda indirect-y M8 index16, 1 x sta indirect-y M8 index8
+  PASS[xy16/readback]: 16 x lda long M8
+==> 2) host oracle
+  host oracle corpus_result=0x1E56EE65
+==> 3) [a16] build the HiROM ROM (far table) + checksum
+==> 4) [a16] MAME: corpus_result == 0x1E56EE65
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 120 ticks)
+==> 5) [a16] bsnes-jg: corpus_result == 0x1E56EE65 (independent confirmation)
+  SMOKE: PASS off=0x21F len=4 got=0x1E56EE65 (ran 240 frames, bsnes-jg)
+==> 3) [xy16] build the HiROM ROM (far table) + checksum
+==> 4) [xy16] MAME: corpus_result == 0x1E56EE65
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 120 ticks)
+==> 5) [xy16] bsnes-jg: corpus_result == 0x1E56EE65 (independent confirmation)
+  SMOKE: PASS off=0x21F len=4 got=0x1E56EE65 (ran 240 frames, bsnes-jg)
+==> 6) [press] 16-bit-Y far load under register pressure: host golden = 0xD695
+  [a16/pressure] diagnostic totals: b7=0 97=0 a7=1 87=1
+  PASS[a16/fill]: 1 x sta indirect M8
+  PASS[a16/sample]: 1 x lda indirect M8
+  [a16] MAME:
+SMOKE: PASS addr=0x7E020A len=2 got=0xD695 (ran 600 ticks)
+  SMOKE: PASS off=0x20A len=2 got=0xD695 (ran 900 frames, bsnes-jg)
+  [xy16/pressure] diagnostic totals: b7=1 97=1 a7=0 87=0
+  PASS[xy16/fill]: 1 x sta indirect-y M8 index16
+  PASS[xy16/sample]: 1 x lda indirect-y M8 index16
+  [xy16] MAME:
+SMOKE: PASS addr=0x7E020A len=2 got=0xD695 (ran 600 ticks)
+  SMOKE: PASS off=0x20A len=2 got=0xD695 (ran 900 frames, bsnes-jg)
+
+RESULT: PASS — Farblit access shapes verified; host == A16 == A16+XY16 on both emulators: 0x1E56EE65, pressure 0xD695

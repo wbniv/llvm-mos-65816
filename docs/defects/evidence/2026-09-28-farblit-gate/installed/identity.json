@@ -1,0 +1,41 @@
+{
+  "toolchain": "/home/will/llvm-mos-65816/build/llvm-mos-install",
+  "tools": {
+    "clang-23": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/clang-23",
+      "sha256": "6b773bd1af0fd3c4166fa7e0827d678846122e47a09c9b5e5f690f3fbb585bdc"
+    },
+    "lld": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/lld",
+      "sha256": "18eea3feae328b7fa2345b1483daefb66c04289126b665a7a159423d6f4c9840"
+    },
+    "llvm-mc": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "sha256": "f79e77e304b98fb31b226704453d48d302d8645479440f7a289cbebeeb6a3792"
+    },
+    "llvm-objdump": {
+      "path": "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "sha256": "8fa52335b6be0fc780f910a5d18610b57b17d0302561373b32708de1b227278f"
+    }
+  },
+  "root_head": "26dce1ddf7370e68f2801eb13b86ce0b6218e2e1",
+  "command": "dev/container.sh -- bash dev/farblit.sh",
+  "exit_code": 0,
+  "runtime_artifacts": {
+    "build/farblit_a16.sfc": "20bbb635d3819131505f311d9fe1fce6bac7c30c8dd2840f9f068d1fa08cd7d1",
+    "build/farblit_a16.map": "a9f94d0faa4b8c2c815f1f413847e67dafb205aa0cb339048c6bd4f53f7917c0",
+    "build/farblit_xy16.sfc": "c9a705fd23beb6d09571f1908bb89df50ccb33c269055edad66360a61fab8277",
+    "build/farblit_xy16.map": "3468fa2af516e13ac766e27a9429652abc9420a5a346029325e279df6cba64f1",
+    "build/farblit_press_a16.sfc": "48e35b378b9c2bb85896b35402ccaf0e1db0dddab9cbf60f730b102ddc4821d5",
+    "build/farblit_press_a16.map": "1d7aa9d4488f2eb43d07fd53a03aa40fbcba142104ea10739203ff8c1446e1da",
+    "build/farblit_press_xy16.sfc": "a4d7db3ab1e5a36922337acffca12aa1aa91d0d47c4f5f9636b9f56b7e579328",
+    "build/farblit_press_xy16.map": "d4a5533e2436d23248c61d2e71525c042259b5cc7cc7e65925e8d6edb458c10e"
+  },
+  "source_hashes": {
+    "examples/65816/farblit.c": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d",
+    "examples/65816/farblit_press.c": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a",
+    "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
+    "dev/check-farblit-shapes.py": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4",
+    "dev/test-farblit-shapes.py": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b"
+  }
+}

@@ -103,3 +103,7 @@ status, the earlier investigation's follow-up, and both generated browser views.
 Other transitive references describe earlier work or generic tracker navigation;
 they do not assert the disposition of this newly captured type failure. Their
 historical claims and attribution are preserved.
+
+## Browser viewing (2026-09-28)
+
+Use `task md -- docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md`. The [shared viewing workflow](../howto-document-dependencies.md#view-markdown-in-the-browser) replaces the document-specific HTML renderer. Retained material: [session transcript](../transcripts/2026-09-25-aarch64-asm-type.md), [baseline diagnostics](../defects/evidence/2026-09-25-aarch64-asm-type/baseline-runner.log), and [candidate diagnostics](../defects/evidence/2026-09-25-aarch64-asm-type/candidate-runner.log). Earlier validation and attribution remain dated evidence.

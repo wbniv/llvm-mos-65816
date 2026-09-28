@@ -74,13 +74,9 @@ are correct. Register known semantic dependencies explicitly.
    python3 dev/docs-deps.py
    ```
 
-   The upstream-pages generator also refreshes the existing
-   `/tmp/llvm-mos-upstream-flowchart.html` and
-   `/tmp/llvm-mos-upstream-status-2026-09-21.html` browser files. Their filenames
-   stay stable, while their content and visible snapshot dates follow the source
-   documents. The overview renderer requires Python's `markdown_it` package.
-   A renderer-only invocation does not update the dependency receipt; use
-   `--refresh` for the complete workflow.
+   This refreshes registered data exports and PR previews. To view Markdown,
+   use the shared command described below. Browser viewing does not create a
+   repository derivative or a new maintenance dependency.
    Registered generators run in dependency order.
 
 5. Stage the changed sources, derivative outputs, manifest, and inventory together.
@@ -96,3 +92,18 @@ The command still reports unresolved generated/maintained dependencies; it does
 not acknowledge them. The initial inventory is broad discovery, not a retrospective
 certification that every existing document is current. Extend explicit declarations
 as documents are reviewed or new derived views are created.
+
+## View Markdown in the browser
+
+Use `task md -- <filename>`, for example:
+
+```sh
+task md -- docs/plans/2026-09-28-farblit-shape-gate.md
+task md -- docs/upstream-pending-work.md
+```
+
+The shared viewer supports tables and Mermaid diagrams. Its HTML files are disposable local previews; edit and link to the Markdown source. Do not add a renderer script, template, tracked HTML copy, or document-dependency entry for an individual Markdown preview. Structured data exports and PR previews that combine patches and review metadata keep their registered generators.
+
+The six document-specific Markdown renderers and their HTML copies were retired on September 28, 2026. Dated evidence and transcripts remain intact; historical links to those views can use their retained Git revision. This replaces the earlier workflow for updating the `/tmp/llvm-mos-upstream-*.html` browser copies.
+
+Viewing workflow: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e529-62c6-7fc2-a0c6-357800272c63`.

@@ -15,7 +15,7 @@ The [preserved-build timing](investigations/2026-09-27-mos-carry-timing.md) reco
 **Separate diagnostic-only validation issue:** MOS had no null target streamer for `-filetype=null`; patch 0068 supplies it, and the retained IR now passes the diagnostic and normal-object checks on the patched downstream build. A [standalone extraction](pr-preparations/2026-09-27/0068-validation.md) is now validated on upstream `26d7c2c1eebf` (21 matching-input null-output repairs, 24 byte-identical ordinary outputs, 133 MOS passes and one unsupported). Independent review and upstream submission remain pending; the historical 0064 extraction remains unchanged. See the [investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 [Farblit legalization is repaired locally by 0066](investigations/2026-09-27-farblit-byte-load.md):
 the original input and direct MIR pass, as do eight emulator assertions. The
-combined-stack opcode-count deficit is reconciled: native `rdw` replaces indexed byte loads. The unchanged gate still fails; per-probe expectations remain follow-up work. Publication
+per-probe gate now passes on both preserved and installed toolchains, including the native `rdw` form, explicit A16 copy fallback and all eight runtime assertions per toolchain. Publication
 of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
 scheduler entry points and carry-class membership are unchanged. Test results
@@ -464,20 +464,15 @@ Green nodes are locally fixed work; red nodes still need a compiler repair.
 A local fix is not a published PR. The remote PR/CI state remains the dated
 snapshot in [the contribution tracker](upstream-contribution-status.md).
 
-[Open the zoomable flowchart](mos-upstream-flowchart.html). Its source is the
-Mermaid block below. Regenerate it after changing this block:
+View the diagram and this tracker in the browser with the shared Markdown viewer:
 
 ```sh
-python3 dev/docs-deps.py --refresh
-python3 dev/docs-deps.py
+task md -- docs/upstream-pending-work.md
 ```
 
-This also refreshes the [status overview](mos-upstream-status-2026-09-21.html).
-The registered generator updates the two original `/tmp/llvm-mos-upstream-*.html`
-browser copies as well as the tracked pages. The repository-wide
-[document dependency inventory](document-dependencies.md) tracks affected
-documents; source/output fingerprints detect stale renderings. Synchronization and renderer: OpenAI Codex CLI
-0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
+View the [contribution status](upstream-contribution-status.md) with `task md -- docs/upstream-contribution-status.md`. Browser previews are local, disposable views of the Markdown sources. The [document dependency inventory](document-dependencies.md) continues to track maintained summaries and data exports.
+
+The September 26 synchronization work was credited to OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort. Viewing update (2026-09-28): OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
 
 ```mermaid
 flowchart TD

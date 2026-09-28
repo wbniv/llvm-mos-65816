@@ -1,0 +1,299 @@
+{
+  "mode": "a16",
+  "fixture": "main",
+  "assembly_matches_plain_object": true,
+  "accesses": {
+    "rd8": [
+      {
+        "operation": "lda",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "source_line": 52,
+        "assembly_line": 82,
+        "function": "main",
+        "instruction": "lda [__rc8],y"
+      }
+    ],
+    "rdg": [
+      {
+        "operation": "lda",
+        "form": "long-x",
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "source_line": 58,
+        "assembly_line": 134,
+        "function": "main",
+        "instruction": "lda mos24(tbl),x"
+      }
+    ],
+    "rd16": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 65,
+        "assembly_line": 246,
+        "function": "main",
+        "instruction": "lda [__rc20]"
+      }
+    ],
+    "rdw": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 16,
+        "index_bits": null,
+        "source_line": 72,
+        "assembly_line": 338,
+        "function": "main",
+        "instruction": "lda [__rc4]"
+      }
+    ],
+    "rdw16": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 80,
+        "assembly_line": 453,
+        "function": "main",
+        "instruction": "lda [__rc28]"
+      }
+    ],
+    "rdw16g": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 87,
+        "assembly_line": 511,
+        "function": "main",
+        "instruction": "lda [__rc4]"
+      }
+    ],
+    "rdw8": [
+      {
+        "operation": "lda",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "source_line": 95,
+        "assembly_line": 587,
+        "function": "main",
+        "instruction": "lda [__rc4],y"
+      }
+    ],
+    "wr8": [
+      {
+        "operation": "sta",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "source_line": 101,
+        "assembly_line": 629,
+        "function": "main",
+        "instruction": "sta [__rc4],y"
+      }
+    ],
+    "wr16": [
+      {
+        "operation": "sta",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 112,
+        "assembly_line": 693,
+        "function": "main",
+        "instruction": "sta [__rc4]"
+      }
+    ],
+    "cp8": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 107,
+        "assembly_line": 795,
+        "function": "main",
+        "instruction": "lda [__rc4]"
+      },
+      {
+        "operation": "sta",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 8,
+        "source_line": 107,
+        "assembly_line": 812,
+        "function": "main",
+        "instruction": "sta [__rc4],y"
+      }
+    ],
+    "readback": [
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 198,
+        "assembly_line": 958,
+        "function": "main",
+        "instruction": "lda 8323040"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 199,
+        "assembly_line": 981,
+        "function": "main",
+        "instruction": "lda 8323071"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 200,
+        "assembly_line": 1003,
+        "function": "main",
+        "instruction": "lda 8323072"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 201,
+        "assembly_line": 1025,
+        "function": "main",
+        "instruction": "lda 8323103"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 202,
+        "assembly_line": 1047,
+        "function": "main",
+        "instruction": "lda 8273920"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 203,
+        "assembly_line": 1069,
+        "function": "main",
+        "instruction": "lda 8274175"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 204,
+        "assembly_line": 1091,
+        "function": "main",
+        "instruction": "lda 8274176"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 205,
+        "assembly_line": 1113,
+        "function": "main",
+        "instruction": "lda 8278580"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 206,
+        "assembly_line": 1135,
+        "function": "main",
+        "instruction": "lda 8306687"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 207,
+        "assembly_line": 1157,
+        "function": "main",
+        "instruction": "lda 8306688"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 208,
+        "assembly_line": 1179,
+        "function": "main",
+        "instruction": "lda 8323073"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 209,
+        "assembly_line": 1201,
+        "function": "main",
+        "instruction": "lda 8339455"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 210,
+        "assembly_line": 1223,
+        "function": "main",
+        "instruction": "lda 8355824"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 211,
+        "assembly_line": 1245,
+        "function": "main",
+        "instruction": "lda 8355847"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 212,
+        "assembly_line": 1267,
+        "function": "main",
+        "instruction": "lda 8355848"
+      },
+      {
+        "operation": "lda",
+        "form": "long",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 213,
+        "assembly_line": 1289,
+        "function": "main",
+        "instruction": "lda 8355871"
+      }
+    ]
+  }
+}

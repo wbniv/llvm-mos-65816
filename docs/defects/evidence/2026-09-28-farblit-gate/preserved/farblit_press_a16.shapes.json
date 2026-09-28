@@ -1,0 +1,31 @@
+{
+  "mode": "a16",
+  "fixture": "pressure",
+  "assembly_matches_plain_object": true,
+  "accesses": {
+    "fill": [
+      {
+        "operation": "sta",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 38,
+        "assembly_line": 149,
+        "function": "fill",
+        "instruction": "sta [__rc12]"
+      }
+    ],
+    "sample": [
+      {
+        "operation": "lda",
+        "form": "indirect",
+        "accumulator_bits": 8,
+        "index_bits": null,
+        "source_line": 50,
+        "assembly_line": 377,
+        "function": "sample",
+        "instruction": "lda [__rc4]"
+      }
+    ]
+  }
+}

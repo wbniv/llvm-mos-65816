@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/3045eb2c) | Update upstream graphs and public compiler contribution records |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/cd13fb33) | Docs: show runtime [dp],Y completion and open near-Y defect |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/ec54b1c0) | Record dashboard publication and remaining checks |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/f2be629f) | Publish compiler evidence and dashboard exports |
 | [2026-09-26](https://github.com/wbniv/llvm-mos-65816/commit/ebd19083) | Document published upstream dashboard and diagram plan |
 
 <!--history-meta v1
+3045eb2c	author	Will Norris
+3045eb2c	added	6
+3045eb2c	deleted	0
+3045eb2c	files	1
+3045eb2c	body	Mark near-Y and bank-wrap repairs fixed locally and map proof recovery to the native-width series. Add the independent null-output repair with its destination-review gate. Regenerate dashboard evidence links and browser views.\n\nRecover the canonical contribution registry from biohack ac04a89, preserve existing optimization/documentation provenance, and add proof recovery and null-output repair evidence. Align the public exporter, CI path filter and paired-site publication path with the website import. Preserve the separate defect-only ROM metadata registry.\n\nReviewed affected current summaries and publication plans; retain historical release snapshots and feature-series submission prerequisites.\n\nAI assistance: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9.
 cd13fb33	author	Will Norris
 cd13fb33	added	10
 cd13fb33	deleted	0

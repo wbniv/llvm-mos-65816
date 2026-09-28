@@ -1,0 +1,20 @@
+test_aggregate_counts_cannot_hide_a_lost_fold (__main__.ShapeTests.test_aggregate_counts_cannot_hide_a_lost_fold) ... ok
+test_all_modes_and_probes (__main__.ShapeTests.test_all_modes_and_probes) ... ok
+test_branch_cannot_skip_the_y16_load (__main__.ShapeTests.test_branch_cannot_skip_the_y16_load) ... ok
+test_byte_load_cannot_satisfy_native_word (__main__.ShapeTests.test_byte_load_cannot_satisfy_native_word) ... ok
+test_disassembly_keeps_relocations (__main__.ShapeTests.test_disassembly_keeps_relocations) ... ok
+test_duplicate_access (__main__.ShapeTests.test_duplicate_access) ... ok
+test_empty_disassembly_is_rejected (__main__.ShapeTests.test_empty_disassembly_is_rejected) ... ok
+test_missing_access (__main__.ShapeTests.test_missing_access) ... ok
+test_missing_debug_file (__main__.ShapeTests.test_missing_debug_file) ... ok
+test_missing_source_location (__main__.ShapeTests.test_missing_source_location) ... ok
+test_nonzero_file_identifiers (__main__.ShapeTests.test_nonzero_file_identifiers) ... ok
+test_pressure_pair_must_be_adjacent (__main__.ShapeTests.test_pressure_pair_must_be_adjacent) ... ok
+test_widths_follow_branches_and_joins (__main__.ShapeTests.test_widths_follow_branches_and_joins) ... ok
+test_wrong_store_addressing (__main__.ShapeTests.test_wrong_store_addressing) ... ok
+test_y16_width_is_required_at_the_access (__main__.ShapeTests.test_y16_width_is_required_at_the_access) ... ok
+
+----------------------------------------------------------------------
+Ran 15 tests in 0.984s
+
+OK

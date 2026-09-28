@@ -1,5 +1,7 @@
 # Live upstream dashboard on wald3n.com
 
+**Viewing update (2026-09-28):** use `task md -- docs/upstream-pending-work.md` and `task md -- docs/upstream-contribution-status.md` for current browser views. The HTML links below retain the dated design references at their historical Git revision.
+
 **Status:** dashboard released as site version `v0.0.432`; the compiler export
 and matching graph were published in compiler commit `f2be629f` and included in
 site version `v0.0.435` on 2026-09-26.
@@ -69,8 +71,8 @@ The release uses these maintained diagrams and status records:
 
 | Existing source | What it contributes | Place on the published site |
 |---|---|---|
-| [Zoomable upstream flowchart](../mos-upstream-flowchart.html), generated from the [Mermaid source](../upstream-pending-work.md#flowchart) | The independent compiler fixes, #320 far ABI, #321 native-width work, SDK #415, validation, and reports needing decisions | A full-width **Dependency map** section after the summary cards, with a dedicated full-screen route for the complete graph |
-| [Generated status overview](../mos-upstream-status-2026-09-21.html) | Detailed queue and submission context behind graph nodes | Context links from node details to the relevant tracker section; retain the dated overview as an engineering archive |
+| [Zoomable upstream flowchart](https://github.com/wbniv/llvm-mos-65816/blob/26dce1ddf7370e68f2801eb13b86ce0b6218e2e1/docs/mos-upstream-flowchart.html), generated from the [Mermaid source](../upstream-pending-work.md#flowchart) | The independent compiler fixes, #320 far ABI, #321 native-width work, SDK #415, validation, and reports needing decisions | A full-width **Dependency map** section after the summary cards, with a dedicated full-screen route for the complete graph |
+| [Generated status overview](https://github.com/wbniv/llvm-mos-65816/blob/26dce1ddf7370e68f2801eb13b86ce0b6218e2e1/docs/mos-upstream-status-2026-09-21.html) | Detailed queue and submission context behind graph nodes | Context links from node details to the relevant tracker section; retain the dated overview as an engineering archive |
 | [Pending-work chart](../upstream-pending-work.md#chart--other-pending-work) | Posting state, next action, and SNES dependency for each item | The existing work-item disclosures and filters, with the graph and list sharing item IDs |
 
 The generated HTML is a dated snapshot and its source includes explicit
@@ -285,7 +287,7 @@ fix path until its evidence or contract is settled.
 - This repository's
   [contribution tracker](../upstream-contribution-status.md),
   [pending-work tracker](../upstream-pending-work.md), structured
-  [defects](../defects/), and [generated flowchart](../mos-upstream-flowchart.html)
+  [defects](../defects/), and [generated flowchart](https://github.com/wbniv/llvm-mos-65816/blob/26dce1ddf7370e68f2801eb13b86ce0b6218e2e1/docs/mos-upstream-flowchart.html)
   contain the editorial statuses and dependency claims. The current HTML page
   renders dated Markdown; regenerating it does not fetch GitHub state.
 

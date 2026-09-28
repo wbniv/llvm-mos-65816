@@ -241,10 +241,12 @@ def render_index(tree, manifest):
     for path in docs:
         target = posixpath.relpath(path, 'docs')
         rows.append(f'| [{path}](<{target}>) | {kinds[path]} | {len(edges.get(path, ()))} | {len(reverse[path])} |')
-    rows += ['', '## Generated browser copies', '']
+    mirrors = []
     for group in manifest['generated']:
         for mirror in group.get('local_copies', []):
-            rows.append(f'- `{mirror}` — refreshed by `{group["id"]}`; not part of the staged Git snapshot.')
+            mirrors.append(f'- `{mirror}` — refreshed by `{group["id"]}`; not part of the staged Git snapshot.')
+    if mirrors:
+        rows += ['', '## Generated browser copies', '', *mirrors]
     return '\n'.join(rows) + '\n'
 
 

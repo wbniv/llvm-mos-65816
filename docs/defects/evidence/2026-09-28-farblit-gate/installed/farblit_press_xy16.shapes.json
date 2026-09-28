@@ -1,0 +1,31 @@
+{
+  "mode": "xy16",
+  "fixture": "pressure",
+  "assembly_matches_plain_object": true,
+  "accesses": {
+    "fill": [
+      {
+        "operation": "sta",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "source_line": 38,
+        "assembly_line": 133,
+        "function": "fill",
+        "instruction": "sta [__rc4],y"
+      }
+    ],
+    "sample": [
+      {
+        "operation": "lda",
+        "form": "indirect-y",
+        "accumulator_bits": 8,
+        "index_bits": 16,
+        "source_line": 50,
+        "assembly_line": 356,
+        "function": "sample",
+        "instruction": "lda [__rc12],y"
+      }
+    ]
+  }
+}

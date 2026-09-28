@@ -2,6 +2,8 @@
 
 **Status (2026-09-27): fixed locally by [0066](../../patches/llvm-mos/0066-mos-far-extload-worklist.patch).** The unchanged historical input fails on its preserved compiler and passes with the repair. [Canonical defect](../defects/mos-farblit-byte-load-legalization.json).
 
+**Gate update (2026-09-28): complete.** The [implemented plan](../plans/2026-09-28-farblit-shape-gate.md) replaces aggregate acceptance counts with checks for each probe. The full shell gate passes on both the preserved 0066 and installed toolchains. See [validation and the evidence-label correction](#completed-gate-update-2026-09-28) below. Earlier failing gate results remain dated evidence.
+
 **Attribution:** OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
 
 ## Cause and prior work
@@ -39,6 +41,8 @@ The unmodified `dev/farblit.sh` still exits 1 because its aggregate opcode-count
 The first runtime attempt used a rebuilt Clang with an unrepaired LTO linker and reproduced the historical failure during linking. Rebuilding lld from the same repaired backend enabled the runtime results above. An LTO validation must identify both executables.
 
 ## Instruction-shape reconciliation (2026-09-28)
+
+The following reconciliation describes the snapshot before the gate update. Its failing-gate status is superseded by the completed update below.
 
 **The opcode deficit is explained; the gate remains failing and its expectations are unchanged.** Native-word lowering in 0062 replaces `rdw`'s byte pair with one accumulator-wide `lda [dp]`. A16 loses one `b7`; XY16 loses two. This is distinct from the repaired legalization crash in the [canonical record](../defects/mos-farblit-byte-load-legalization.json). Neither a new compiler defect nor a performance improvement is established by these counts.
 
@@ -84,3 +88,26 @@ In A16, the byte-pair control materializes the scaled pointer for the low byte a
 The fresh unmodified [shell-gate run](../defects/evidence/2026-09-28-farblit-shapes/runtime.log) exits 1 only on the same two count checks. All eight MAME/bsnes-jg assertions pass: `0x1E56EE65` for farblit and `0xD695` for pressure, in both feature modes. All four ROM hashes match the September 27 identities; map hashes are recorded separately (the two farblit map files differ). This confirms the runtime result on the identified build; it does not validate the reconstructed byte-split control or the current installed compiler.
 
 Before replacing the aggregate expectations, decide which optimization contract the gate should enforce: byte runtime folds, native-word access width, global `long,X`, and the remaining computed-pointer cases each need explicit coverage. If runtime-indexed native-word loads or an A16 `cp8` fold are required, they need separate implementation and profitability evidence. Lowering the minima to 2/5 and retaining “every runtime-base access folded” would incorrectly certify those missing shapes. No compiler, fixture, or gate expectation was changed in this reconciliation.
+
+## Completed gate update (2026-09-28)
+
+`dev/farblit.sh` now checks every marked access with [the shape checker](../../dev/check-farblit-shapes.py). It checks the addressing form, load/store operation, M/X widths at that instruction, and adjacency of each fused runtime Y16 load/access pair. Width analysis follows branches and loops and rejects ambiguous or unreachable accesses. Probe markers are comments on the C memory expressions; runtime inputs, inlining and build flags are unchanged. Missing, duplicate and unlocated accesses fail. The sixteen constant-address readbacks and both pressure probes are included. Whole-object opcode totals are printed only as diagnostics.
+
+The gate assembles the exact checked source-attributed assembly and compares its disassembly and relocations with a plain non-LTO object. Both must match before the shape checks pass. The native-word `rdw` form and the A16 `cp8` fallback are explicit expectations. This updates the test contract; it adds no compiler optimization or compiler-defect closure.
+
+**Evidence correction:** the earlier frozen `2026-09-28-farblit-shapes/analysis.json` has incorrect `probe` and `source_line` fields: its capture script assumed `.loc` file number 0, but the captured assembly used file number 1. Its opcode counts and disassembly comparisons remain valid. The table above is supported by the retained `.file`/`.loc` assembly. The new checker resolves file identifiers to the source path, and the new JSON reports contain validated nonzero source lines and probe names. The inaccurate artifact remains unchanged as dated evidence.
+
+| Check | Preserved 0066 toolchain | Installed toolchain |
+| --- | --- | --- |
+| Full shell-gate exit | 0 | 0 |
+| Machine verifier, plain/annotated instruction and relocation comparison | Pass, both fixtures and modes | Pass, both fixtures and modes |
+| Main access checks | 27 accesses per mode, including readbacks | 27 accesses per mode, including readbacks |
+| Pressure access checks | 2 accesses per mode | 2 accesses per mode |
+| Host/MAME/bsnes-jg assertions | 8 pass | 8 pass |
+| Checker tests, including deliberate bad shapes | 15 pass | 15 pass |
+
+Retained evidence: [preserved identity](../defects/evidence/2026-09-28-farblit-gate/preserved/identity.json), [preserved gate log](../defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log), [installed identity](../defects/evidence/2026-09-28-farblit-gate/installed/identity.json), [installed gate log](../defects/evidence/2026-09-28-farblit-gate/installed/runtime.log), and [checker-test log](../defects/evidence/2026-09-28-farblit-gate/installed/tests.log). Each toolchain directory also retains all four shape reports and the checked assembly/disassemblies. The preserved build's four ROM hashes match the earlier reconciliation. The original compiler-defect baseline and its 0066 resolution are unchanged.
+
+The sensitivity tests remove or duplicate an access, substitute a byte load for the native word, change store addressing and Y width, split or branch into a fused pair, and corrupt debug attribution. One mutation removes `rd8`'s fold while adding unrelated indexed loads until the old aggregate minima pass; the new checker rejects it at `rd8`. Nonzero file identifiers and conflicting widths at a control-flow join are covered.
+
+Implementation, evidence correction and validation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e529-62c6-7fc2-a0c6-357800272c63`.

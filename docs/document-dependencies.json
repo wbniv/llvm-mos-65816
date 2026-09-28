@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "9979cd9f58af085f02b6d1a767c188538e6480ee914665cfcb112e37950eb338",
+          "docs/upstream-dashboard-curation.json": "a92d60d85d3d57c9ae06d3b14ab30f89a11a6b2ef641326ee7d01563779f4f8b",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -85,7 +85,7 @@
           "docs/defects/mos-carry-scheduling-pressure.json": "19945f5f5f15750b7fd8e7da3541966dfa725f38058bbcaae0034c80bb77e24d",
           "docs/defects/mos-coalescing-rc-undef.json": "17a8635cdbcb50795f93e4738e171b8432089e263e4228a87dfd10b7d21b88f0",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
@@ -103,7 +103,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "703711a8301454b221497c046887e292556721263f718b0d21b33f592103ff23"
+          "docs/upstream-dashboard.json": "7b6005f68ebb78b7f5243193f828185e17336dbced4ba4b18b75a5c0bdfb33b4"
         }
       }
     },
@@ -124,138 +124,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "b44793e93cc644870aa4dd3c6ca3df2832d87bf46bea9aff943bae33d382917a",
+          "docs/upstream-pending-work.md": "027f170e5641624fd5c2d0c063bddd8184f88c68e64c79099a99d0f8cced88a6",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "703711a8301454b221497c046887e292556721263f718b0d21b33f592103ff23",
+          "docs/upstream-dashboard.json": "7b6005f68ebb78b7f5243193f828185e17336dbced4ba4b18b75a5c0bdfb33b4",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "83c932959e0ad6a75d0ef6bba3fc10a7f51d1afbda6fa3885efbcf3d3c157bc9"
-        }
-      }
-    },
-    {
-      "id": "upstream-pages",
-      "sources": [
-        "docs/upstream-pending-work.md",
-        "docs/upstream-contribution-status.md",
-        "dev/render-upstream-flowchart.py",
-        "dev/render-upstream-pages.py",
-        "dev/templates/upstream-flowchart.html",
-        "dev/templates/upstream-status.html"
-      ],
-      "outputs": [
-        "docs/mos-upstream-flowchart.html",
-        "docs/mos-upstream-status-2026-09-21.html"
-      ],
-      "local_copies": [
-        "/tmp/llvm-mos-upstream-flowchart.html",
-        "/tmp/llvm-mos-upstream-status-2026-09-21.html"
-      ],
-      "command": [
-        "python3",
-        "dev/render-upstream-pages.py",
-        "--legacy-tmp"
-      ],
-      "receipt": {
-        "sources": {
-          "docs/upstream-pending-work.md": "b44793e93cc644870aa4dd3c6ca3df2832d87bf46bea9aff943bae33d382917a",
-          "docs/upstream-contribution-status.md": "785106937ea29b33e1a1b43cba431a8284a745ce82cd7fa01cb7778ae6232efc",
-          "dev/render-upstream-flowchart.py": "8119fc999b348bda6952ec413dc3ebf1da8b72f4a42e79cadba4e74f30d42e46",
-          "dev/render-upstream-pages.py": "4a8ffa4da73c537c3cd6fbe198669e1f64874a9b2ef20b0d2dd289bcae7f91d3",
-          "dev/templates/upstream-flowchart.html": "384542560f28953ecdc8edc9ec08688472b526f23f145c822c418013bef50888",
-          "dev/templates/upstream-status.html": "4937f37bda3d42114916bc081464c0d75b44815f8199644ea728145303847574"
-        },
-        "outputs": {
-          "docs/mos-upstream-flowchart.html": "fd59f30315facddb0518e6037bb83577089ee495faaa655b17c3ecc98e0d326b",
-          "docs/mos-upstream-status-2026-09-21.html": "4ead73047fa0ec3387cf9232bab0a8370bd91c067a5ccd73e52ce89960345ce7"
-        }
-      }
-    },
-    {
-      "id": "aarch64-asm-type-report",
-      "sources": [
-        "docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md",
-        "docs/transcripts/2026-09-25-aarch64-asm-type.md",
-        "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-runner.log",
-        "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-runner.log",
-        "dev/render-aarch64-asm-type.py"
-      ],
-      "outputs": [
-        "docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.html"
-      ],
-      "command": [
-        "python3",
-        "dev/render-aarch64-asm-type.py"
-      ],
-      "receipt": {
-        "sources": {
-          "docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md": "c0bb071f521e71046423756734ad18e0c5facb11150b61477aaff807d548faa4",
-          "docs/transcripts/2026-09-25-aarch64-asm-type.md": "898bcc227abd3fb3a47d1989b68bbb4a5fdb75c39169921e2e5df407994c4c52",
-          "docs/defects/evidence/2026-09-25-aarch64-asm-type/baseline-runner.log": "558975b19a79ce475995502af016d2089101e8512f014d27b1f9d0ba4d04fb5d",
-          "docs/defects/evidence/2026-09-25-aarch64-asm-type/candidate-runner.log": "73c74d6058fd1d13412160c6df963efedb42a6c3ee758a9176f43566ba809a38",
-          "dev/render-aarch64-asm-type.py": "e3e3ddf71ef3e89c4931728231921826aceee7d1036867345f5d80217063c7a8"
-        },
-        "outputs": {
-          "docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.html": "f6226c4d581aaac9e450ee91dfcb61d4edfcdc8a1280c82a2ed56ef0e1c6fb64"
-        }
-      }
-    },
-    {
-      "id": "vector-parts-report",
-      "sources": [
-        "docs/investigations/2026-09-25-selectiondag-vector-parts.md",
-        "docs/transcripts/2026-09-25-selectiondag-vector-parts.md",
-        "docs/defects/evidence/2026-09-25-aarch64-vector-asm/baseline-runner.log",
-        "docs/defects/evidence/2026-09-25-aarch64-vector-asm/candidate-runner.log",
-        "dev/render-vector-parts.py"
-      ],
-      "outputs": [
-        "docs/investigations/2026-09-25-selectiondag-vector-parts.html"
-      ],
-      "command": [
-        "python3",
-        "dev/render-vector-parts.py"
-      ],
-      "receipt": {
-        "sources": {
-          "docs/investigations/2026-09-25-selectiondag-vector-parts.md": "9b4f29f81f1b79866c5722bde6fc4361979026ea4b6a372c42ce1105a94b516e",
-          "docs/transcripts/2026-09-25-selectiondag-vector-parts.md": "70ca62ec910443dd8765f9cc977d3e0ca44b106ba162bf023744ceb1551b76b9",
-          "docs/defects/evidence/2026-09-25-aarch64-vector-asm/baseline-runner.log": "ee4217cec7528bf4a6641377edbb7a2d43f15b2d1af1285125c2e8a0ad6650cb",
-          "docs/defects/evidence/2026-09-25-aarch64-vector-asm/candidate-runner.log": "b0a6bc2e5d2f815b8631433ea240c2ae0ddfa8eec68d25cd5fa5c4541c3087e8",
-          "dev/render-vector-parts.py": "b04c4b46d9985cce2c396cc3cabb404d8391d8cc55d44bf5ee00c61a96d58982"
-        },
-        "outputs": {
-          "docs/investigations/2026-09-25-selectiondag-vector-parts.html": "2d420a0894abab6f4f2d39647c660a60c28db0b77e4c6634b69dad0b9d4abb13"
-        }
-      }
-    },
-    {
-      "id": "coalescing-0015-report",
-      "sources": [
-        "docs/investigations/2026-09-25-coalescing-0015-revalidation.md",
-        "docs/transcripts/2026-09-25-coalescing-0015.md",
-        "docs/defects/evidence/2026-09-25-coalescing-0015/baseline-closure.log",
-        "docs/defects/evidence/2026-09-25-coalescing-0015/candidate-closure.log",
-        "dev/render-coalescing-0015.py"
-      ],
-      "outputs": [
-        "docs/investigations/2026-09-25-coalescing-0015-revalidation.html"
-      ],
-      "command": [
-        "python3",
-        "dev/render-coalescing-0015.py"
-      ],
-      "receipt": {
-        "sources": {
-          "docs/investigations/2026-09-25-coalescing-0015-revalidation.md": "22ad977042a8c48c75968af5fc8ede612e1f66ac152e1359b927e198573a0ec0",
-          "docs/transcripts/2026-09-25-coalescing-0015.md": "c9b9bf225a19b3a24c6d91b3eb28fb7073607bb0cd8f2f28a3bb3296340bfd30",
-          "docs/defects/evidence/2026-09-25-coalescing-0015/baseline-closure.log": "06f2a8e95153d933e75c28577094ad79b57a4cf99b6df09cc64171475d96f4c4",
-          "docs/defects/evidence/2026-09-25-coalescing-0015/candidate-closure.log": "dea601616330c3795e61dc3dd842b4213170807f2e7af652c47c6348488b0f77",
-          "dev/render-coalescing-0015.py": "44dd9b1e38a67e5c02c64f42e5ad404105f3c958f15eb8d37ec824d94759cd3e"
-        },
-        "outputs": {
-          "docs/investigations/2026-09-25-coalescing-0015-revalidation.html": "dce20a1bf5728e0e2f1b54ed01ef8267b31bbaa93cef32557f867ce7a5b37716"
+          "docs/upstream-dashboard-graph.json": "c54b6d1a5b8ed001fb51842c7c105710787d6c3996d8844269d5cf7868f5bbcf"
         }
       }
     },
@@ -279,29 +154,6 @@
         },
         "outputs": {
           "docs/snes-demo-compiler-bug-map.md": "b2caa257e65f3c3cfc116956379b8678af52773062531d95f404936c2c882c02"
-        }
-      }
-    },
-    {
-      "id": "carry-scheduling-plan-preview",
-      "sources": [
-        "docs/plans/2026-09-26-mos-carry-scheduling.md",
-        "dev/render-carry-plan.py"
-      ],
-      "outputs": [
-        "docs/plans/2026-09-26-mos-carry-scheduling.html"
-      ],
-      "command": [
-        "python3",
-        "dev/render-carry-plan.py"
-      ],
-      "receipt": {
-        "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
-          "dev/render-carry-plan.py": "000636010e5ddaf2cabe5e9a9e5a8c0553ebc36c443df68c5a5eecbc12742215"
-        },
-        "outputs": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.html": "69f6eff1da37fb3a6be49e64ced09ce644f23ba123a8ed9ed7e6864f5f38af15"
         }
       }
     },
@@ -448,19 +300,19 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "b0bba19c927e2d7c10beeed882455f41ace6ac3a24c95a04ef88f933433579dc",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "b7e354f23e3b1bc85fbe439669221e6fbd559e9067a96bb2539ebefe8419023b",
+          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "3a150783fb310b9f7372c9c3d37cc2d0836be369b7cbdc9d1671393b11357454",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:35:09.579654+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:50.458773+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -516,17 +368,17 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:35:09.676164+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:50.563406+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -582,17 +434,17 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:35:09.680331+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:50.567188+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -647,11 +499,11 @@
       "receipt": {
         "sources": {
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
-          "docs/howto-document-dependencies.md": "543649b41577a10e8976e58fd32cfeaa267e1d26bb9737ff01f5461e89132ef1"
+          "docs/howto-document-dependencies.md": "b0f704d2c1d2669e9a38c71574ca09d00604f8c8fcb1cf3b3404a6af06518198"
         },
-        "reviewed_at": "2026-09-27T01:56:16.472897+00:00",
-        "note": "Reviewed the observed-output compatibility rule against the checker and its 27 passing tests: the original baseline stays byte-identical, the green run records its actual 0x5CF0 result, and target/optimization/LTO/oracle settings still must match. AGENTS and CLAUDE retain their causal-proof and immutable-baseline rules. Reviewed the retained 0064 body and MOS validation summary against the withdrawal-only source edits: the original 132-test, 512-vector and 117-pair results remain dated evidence, and the posted body remains byte-identical. Current handoff and plans record closed PR 609 and the separate local near-Y/bank-wrap repair. The diagnostic gallery snapshot is archived byte-for-byte as documentary .c.txt, preserving inherited comments and display code; its stage data and full gallery result are separately retained.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e061-3427-74a1-90ad-c0ee84b01b85"
+        "reviewed_at": "2026-09-28T00:09:50.666140+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -663,13 +515,13 @@
       ],
       "receipt": {
         "sources": {
-          "dev/docs-deps.py": "2e15654a861af55a937a6e5f51f8a9ff124fc817fd0fa39f91b1f759b490d6e2",
-          "dev/test-docs-deps.py": "6f33ceeffb0e5ba24cb17292edee682f1c443eff9222ca2f035ff4fc220e0c9f",
+          "dev/docs-deps.py": "02fa0d322b65be301540da5a93d46b75137593474a85f76db332af13a21815ce",
+          "dev/test-docs-deps.py": "0360363619a44db0326922a40d9eeac49b71fe07fce92f2b44ccc84800ed6dbc",
           ".githooks/pre-commit": "549d721b3888d790580d965562376c518fbc6e7f548a3efc548a74f8adbe57ac"
         },
-        "reviewed_at": "2026-09-27T13:13:29.408617+00:00",
-        "note": "Reviewed the null-streamer closure across current defect records, local and upstream status summaries, the 0064 packet and plans, agent handoff, and dependency workflow. The crash is a separate local MOS null-output issue fixed by 0068; matching-input evidence and the unrebuilt historical upstream extraction are accurately scoped. Updated current summaries and validation entry points. Reviewed the retained 0064 PR body, README, and MOS validation claims and left withdrawn or dated content unchanged. The docs-deps path-match cache preserves PurePosixPath matching semantics. No carry-scheduling performance or publication claims changed.",
-        "attribution": "OpenAI Codex agent via API (version unknown), exact model name/ID and version unknown, reasoning effort unknown from accessible session metadata."
+        "reviewed_at": "2026-09-28T00:14:19.416577+00:00",
+        "note": "Reviewed the shared task md viewing workflow against the inventory generator. The inventory now omits its browser-copy section when no registered local copies exist. The in-memory test tree uses the production path matcher; all eight dependency tests pass. Source fingerprints, staged checks, generated data exports and maintained-summary review requirements remain in force.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -734,20 +586,20 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "d9c21973f0e7a8444dc9d4d4578cf6f3069b93001f31775398a694a97f1daa36",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "b0bba19c927e2d7c10beeed882455f41ace6ac3a24c95a04ef88f933433579dc",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T23:35:10.044847+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:51.026991+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -795,7 +647,7 @@
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
           "docs/defects/mos-carry-scheduling-pressure.json": "19945f5f5f15750b7fd8e7da3541966dfa725f38058bbcaae0034c80bb77e24d",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47",
@@ -808,14 +660,14 @@
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T23:35:12.680018+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:53.482749+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -877,12 +729,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7b9b1491dbbf6b1896b1ea5d445a21e6ce7096cbc459ffbbf72bedc0c01556ed",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "f4855ab6016179d5c6058fc000362b94796c21101b9d5d3063318a6b746659ca",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
           "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a"
         },
-        "reviewed_at": "2026-09-27T23:35:12.876099+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:53.678009+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -894,12 +746,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486"
         },
-        "reviewed_at": "2026-09-27T23:10:56.310881+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T00:09:53.678097+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -923,12 +775,12 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T23:35:13.078779+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:53.860172+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -992,7 +844,7 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
@@ -1021,9 +873,9 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T23:10:59.007393+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T00:09:56.151558+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1097,11 +949,11 @@
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "d538374cf06df88b5de286a7d85a78c95623dae710f30acc87560168f2cce099"
+          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949"
         },
-        "reviewed_at": "2026-09-27T23:11:01.478524+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T00:09:58.491437+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1526,14 +1378,14 @@
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-27T23:11:03.864846+00:00",
-        "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T00:09:58.604727+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
     {
@@ -1739,22 +1591,40 @@
         "patches/llvm-mos/0062-mos-native-far-word.patch",
         "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json",
         "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json",
-        "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log"
+        "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log",
+        "dev/check-farblit-shapes.py",
+        "dev/test-farblit-shapes.py",
+        "examples/65816/farblit_press.c",
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/identity.json"
+        },
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/*.log"
+        }
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "68386197b3bdc92d1db902771f39b861bf55647e705d4fbe101327dddb58062d",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
           "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
-          "dev/farblit.sh": "10944f1328cc99cd6aad3219863709cf74ab40ba5d0eea4f55a987985748685f",
-          "examples/65816/farblit.c": "85e06d857f328458d8cf32667a5c186e99e0d5419607b2aa3e5e9595d0569b79",
+          "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
+          "examples/65816/farblit.c": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json": "9feb44ffe5673d03e02b65eb5e0d905fac79fcb606d99a4c533d251dea8f7b71",
           "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json": "30388a0cf16e5f65f358cccaa52c3cdf74f5964959a43b0615b1f0f06292569f",
-          "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31"
+          "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31",
+          "dev/check-farblit-shapes.py": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4",
+          "dev/test-farblit-shapes.py": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b",
+          "examples/65816/farblit_press.c": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/identity.json": "424231b8e9f20b7d2cd1a76011e080d35e17e84b37080ea9991a4d73abe04838",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/identity.json": "c939c36fefe2d46079294dcdf56d9acd46538ce6e3809337f06d095c8599d691",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc"
         },
-        "reviewed_at": "2026-09-27T23:35:13.723461+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:59.687560+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -1796,13 +1666,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "bccbecdf509d88a99ce27ebc60578db093b1181ed81f961740caed653c13fa19",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "c1994ff9ba25ccf492adf008c296911ef32ad7fa6ae353d4e83be1a805090019",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "be554845eb4cc860d3a1da3941bf00b5248d9d67fd6c3e5ff5917b87cfba213d"
         },
-        "reviewed_at": "2026-09-27T23:35:13.723657+00:00",
-        "note": "Reviewed the September 28 farblit instruction map, unchanged non-LTO disassemblies, reconstructed rdw byte-split control, and eight fresh emulator assertions on the preserved 0066 compiler/linker. Native rdw explains the 3-to-2 and 7-to-5 indexed-load differences; A16 cp8 and XY16 native-word runtime indexing remain outside the emitted fold shapes. Current summaries now distinguish completed reconciliation from the still-failing unchanged shell gate and pending per-probe expectations. Historical increment-2 counts, carry plans/review, 0066 fixed status and baseline evidence remain dated and unchanged. Reviewed dashboard next step and handoff: no new defect closure, compiler installation, independent review or upstream submission is claimed.",
+        "reviewed_at": "2026-09-28T00:09:59.687758+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     },
@@ -2015,6 +1885,40 @@
         "reviewed_at": "2026-09-27T23:11:03.864908+00:00",
         "note": "Reviewed the standalone 0068 extraction against upstream 26d7c2c1eebf: exact patch and binary identities, 21 matching-input null-output crashes repaired, 24 byte-identical normal outputs, and 133 MOS suite passes with one unsupported. Current summaries and draft now distinguish completed validation from pending independent review and submission. Retained the original defect baseline, historical carry packet and posted body, and earlier cohort counts. Corrected the generic finalizer explanation. Public registry still accurately classifies the locally fixed independent defect and links its updated investigation.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-28-farblit-shape-gate.md",
+      "sources": [
+        "dev/farblit.sh",
+        "dev/check-farblit-shapes.py",
+        "dev/test-farblit-shapes.py",
+        "examples/65816/farblit.c",
+        "examples/65816/farblit_press.c",
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/identity.json"
+        },
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/*.log"
+        }
+      ],
+      "receipt": {
+        "sources": {
+          "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
+          "dev/check-farblit-shapes.py": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4",
+          "dev/test-farblit-shapes.py": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b",
+          "examples/65816/farblit.c": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d",
+          "examples/65816/farblit_press.c": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/identity.json": "424231b8e9f20b7d2cd1a76011e080d35e17e84b37080ea9991a4d73abe04838",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/identity.json": "c939c36fefe2d46079294dcdf56d9acd46538ce6e3809337f06d095c8599d691",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
+          "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc"
+        },
+        "reviewed_at": "2026-09-28T00:09:59.687885+00:00",
+        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
       }
     }
   ]

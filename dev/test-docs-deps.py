@@ -15,11 +15,12 @@ deps = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(deps)
 
 
-class MemoryTree:
+class MemoryTree(deps.Tree):
     def __init__(self, files):
         self.files = files
         self.root = Path('/repo')
         self.paths = set(files)
+        self.matches = {}
 
     def read(self, path):
         return self.files[path]

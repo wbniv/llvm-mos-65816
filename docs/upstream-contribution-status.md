@@ -16,7 +16,7 @@ The [preserved-build timing](investigations/2026-09-27-mos-carry-timing.md) reco
 **Separate diagnostic-only validation issue:** MOS had no null target streamer for `-filetype=null`; patch 0068 supplies it, and the retained IR now passes the diagnostic and normal-object checks on the patched downstream build. A [standalone extraction](pr-preparations/2026-09-27/0068-validation.md) is now validated on upstream `26d7c2c1eebf` (21 matching-input null-output repairs, 24 byte-identical ordinary outputs, 133 MOS passes and one unsupported). Independent review and upstream submission remain pending; the historical 0064 extraction remains unchanged. See the [investigation](investigations/2026-09-27-mos-null-output-streamer.md).
 [Farblit legalization is repaired locally by 0066](investigations/2026-09-27-farblit-byte-load.md):
 the original input and direct MIR pass, as do eight emulator assertions. The
-combined-stack opcode-count deficit is reconciled: native `rdw` replaces indexed byte loads. The unchanged gate still fails; per-probe expectations remain follow-up work. Publication
+per-probe gate now passes on both preserved and installed toolchains, including the native `rdw` form, explicit A16 copy fallback and all eight runtime assertions per toolchain. Publication
 of this branch does not submit native-width or SNES platform code.
 The submission recheck found two newer upstream commits at `26d7c2c1eebf`;
 scheduler entry points and carry-class membership are unchanged. Test results
@@ -198,13 +198,9 @@ fallback. Historical opportunity measurements are not fresh compiler savings.
 
 The September 27 [0065 completion record](plans/2026-09-27-broader-near-store-profitability.md) extends near-store profitability beyond 0063 and is committed and pushed to downstream `main` as [4d7136cb](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217). All 486 reduced comparisons and the 412-input corpus have no size increases or new failures; the new runtime fixture agrees with the host on both emulator cores. Loaded destination pointers retain their measured native preference. This local implementation still requires #321 extraction, destination reconciliation and independent review before submission. The September 26 review above remains evidence for the original 0063 artifact.
 
-The [HTML overview](mos-upstream-status-2026-09-21.html) keeps its original filename
-for existing bookmarks. Regenerate it and the [zoomable flowchart](mos-upstream-flowchart.html)
-with `python3 dev/docs-deps.py --refresh`; run `python3 dev/docs-deps.py` to detect
-stale dependencies. The [document inventory](document-dependencies.md) covers the
-rest of the documentation too. This refresh reads the dated GitHub snapshot above; it does not
-perform a new remote-status check. Synchronization and rendering: OpenAI Codex
-CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort.
+View this tracker with `task md -- docs/upstream-contribution-status.md` and the [dependency diagram](upstream-pending-work.md#flowchart) with `task md -- docs/upstream-pending-work.md`. The viewer reads the dated GitHub snapshot in the source; rendering does not perform a remote-status check. The [document inventory](document-dependencies.md) tracks maintained summaries and data exports.
+
+The September 26 synchronization work was credited to OpenAI Codex CLI 0.157.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort. Viewing update (2026-09-28): OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
 
 **Local preparation updated September 23:** independent reviews and audits are recorded
 for 0011 and 0029–0037, including the 0033/0035 revision follow-ups. The [0033 audit](pr-preparations/2026-09-23/0033-review-audit.md)
