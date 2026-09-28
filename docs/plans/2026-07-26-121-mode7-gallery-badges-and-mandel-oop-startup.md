@@ -2272,9 +2272,8 @@ in `~/biohack.net` or `~/indri.studio` was touched.
   `--title-entropy` leg of `dev/verify-web-roms.sh` (over the published manifest set, 3 frames × 8 runs,
   opt-in rather than default because the sweep costs tens of seconds/ROM across 100+ published demos).
   Verified it PASSes on a freshly-rebuilt fixed `mandel-oop.sfc` and correctly FAILs on the still-open
-  `snes-video-reel`/`apollo-reel` post-title defect. See [TODO.md](../../TODO.md) Done.
+  `snes-video-reel`/`apollo-reel` post-title defect. See the [TODO history snapshot](../../TODO-history-2026-09-28.md) Done section.
   (2026‑09‑25: that FAIL was not reproduced on the published `apollo-daylight.sfc` /
   `svx2-fastrom-video.sfc`, which PASS at 60/100/200/400 × 8 — the defect lived only in the battery ROMs;
   see the bullet above.)
-
 

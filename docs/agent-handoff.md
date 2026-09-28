@@ -1,6 +1,36 @@
 # llvm-mos-65816 — agent handoff: build/test mechanics & backend navigation
 
+## Worktree cleanup (2026-09-28)
+
+At the user's request, 11 clean, idle worktree directories were removed to free disk space. **All existing branches and their commits were retained.** A missing directory in the table below is intentional; it does not mean the work was lost or merged. Older worktree paths elsewhere in this document and in dated reports describe the checkout at that time. Use `git worktree list` for the current checkout inventory and `git branch --list` for retained branches.
+
+| Removed checkout | Retained branch | Commit at removal |
+| --- | --- | --- |
+| `/home/will/llvm-mos-65816-138-late-opt` | `throwaway/138-late-opt-crash` | `cef5953c82fe` |
+| `/home/will/llvm-mos-65816-60fps` | `feature/60fps-video` | `d278d56be73b` |
+| `/home/will/llvm-mos-65816-absdiff` | `wt/321-absdiff` | `e5c621bb0659` |
+| `/home/will/llvm-mos-65816-dpy-publish` | `wt/321-dpy-publish` | `cd13fb33e6be` |
+| `/home/will/llvm-mos-65816-exhirom` | `feature/exhirom-canaries` | `28ab9fbed7fb` |
+| `/home/will/llvm-mos-65816-gallery-repro` | `throwaway/gallery-repro-bisect` | `95376890686e` |
+| `/home/will/llvm-mos-65816-mixedwidth` | `wt/321-mixedwidth` | `020ad31d19ba` |
+| `/home/will/llvm-mos-65816-snesgfx-virt-bench` | `throwaway/snesgfx-virt-bench` | `abfd36e15fa2` |
+| `.scratch/carry-clang-docs` | `carry-upstream-clang-validation` | `a9bedfae31b9` |
+| `.scratch/carry-publish` | `carry-scheduling-preparation` | `f7a1e06e54db` |
+| `/tmp/snes-discovery-pr-simulations` | `cleanup-preserved/snes-discovery-pr-simulations` | `ff79e28475fa` |
+
+The last checkout had a detached HEAD; its preservation branch was created before removal. Recreate any listed checkout with `git worktree add <checkout-path> <retained-branch>`. Branch tips can advance after this cleanup; the table records the original commits. Worktrees containing local changes, untracked work, or substantial ignored artifacts were retained, including the patched vendor source in `llvm-mos-65816-base8c`.
+
+Cleanup also cleared disposable ccache entries in `build/.ccache`, `.scratch/carry-scheduling/build/.ccache`, and `/home/will/llvm-mos-65816-base8c/build/.ccache`; npm's `/home/will/.npm/_cacache`; and Rust incremental compilation data under `/home/will/.cache/s100-03-target/debug/incremental` and `/home/will/.cache/s100-13-verify-target/debug/incremental`. Sources, installed compiler binaries, build outputs, logs, and defect baselines were preserved. Future compilation or package installation may refill these caches. Available space on the main filesystem increased from about 4.3 GiB to 17 GiB during this pass.
+
+Dependency review: the project guide, feature-worktree instructions, patch-series guide, and current upstream summaries still apply. Their compiler and publication claims are unaffected by removing these checkouts. Dated plans retain their historical paths, qualified by this cleanup inventory.
+
+Cleanup and documentation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e526-d67a-7c62-aad4-98d6954231cf` (initial inspection used `medium`; deletion and documentation used `high`).
+
+## Current compiler and publication status
+
 **Carry-scheduler investigation:** [LLVM-facing report](investigations/2026-09-27-competing-carry-gate.md). The report compares 213,866 B of aggregate savings under `always` with 199,309 B under `gated`, and 39 versus six growing objects. It presents the 6.81% difference as a trade-off, without selecting an upstream default. A16 and ordinary-6502 subsets have no observed function growth; [Completed-output selection and three pressure-model trials](investigations/2026-09-27-carry-profitability-model.md) are now implemented and measured; broader testing of narrower gating remains an option. The downstream compiler still defaults to `always`. The local 5% threshold is historical planning context, not an LLVM acceptance criterion. Runtime retains the baseline-reproduced XY16 VLA mismatch. The object selector is an investigation prototype; its object-size criterion does not guarantee per-function or final-ROM size. No new scheduler default or upstream submission is selected. The generic pressure contract remains open. Final identities, 181 passing MOS tests and raw measurements remain retained. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
+
+**XY16 `vlastack_sim` follow-up (2026-09-28):** The [canonical correctness record](defects/mos-xy16-stale-x-writer-reload.json) and [causal investigation](investigations/2026-09-28-vlastack-xy16-stale-reload.md) isolate the mismatch to `MOSInsertREPSEP` replaying an X writer after its source pair was overwritten. The original input is confirmed red on the preserved pre-gate compiler; repair and matching-input green evidence remain open. Investigation and documentation: OpenAI Codex API agent 0.157.1, exact model ID unknown (GPT-6 family stated by the session), reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9.
 
 **Farblit gate update (2026-09-28):** the [per-probe gate](investigations/2026-09-27-farblit-byte-load.md#completed-gate-update-2026-09-28) passes on preserved and installed compilers, with eight emulator assertions and 15 checker tests per toolchain. The following aggregate-count qualifications are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
 

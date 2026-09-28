@@ -1,0 +1,1757 @@
+--- |
+  ; ModuleID = 'examples/snes/corpus/vlastack_sim.c'
+  source_filename = "examples/snes/corpus/vlastack_sim.c"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @corpus_result = dso_local global i16 0, align 1
+  @vs_totalruns = internal unnamed_addr global i16 0, align 1
+  @vs_nruns = internal unnamed_addr global [24 x i8] zeroinitializer, align 1
+  @vs_pfxsum = internal unnamed_addr global [24 x i16] zeroinitializer, align 1
+  @vs_img = internal unnamed_addr global [24 x [64 x i8]] zeroinitializer, align 1
+  @vs_rowoff = internal unnamed_addr global [24 x i16] zeroinitializer, align 1
+  @vs_rle = internal unnamed_addr global [792 x i8] zeroinitializer, align 1
+  @static_stack = private global [19 x i8] undef
+  
+  @vs_build_sstk = private alias [17 x i8], ptr @static_stack
+  @vs_decode_sstk = private alias [19 x i8], ptr @static_stack
+  
+  ; Function Attrs: noreturn nounwind optsize
+  define dso_local noundef i16 @main() local_unnamed_addr #0 {
+    tail call fastcc void @vs_build() #6
+    tail call fastcc void @vs_decode() #6
+    %1 = load i16, ptr @vs_totalruns, align 1, !tbaa !2
+    %2 = xor i16 %1, 19755
+    %3 = tail call i16 @llvm.fshl.i16(i16 %2, i16 %2, i16 1)
+    %4 = mul i16 %3, 25173
+    %5 = add i16 %4, 13849
+    br label %6
+  
+  6:                                                ; preds = %26, %0
+    %7 = phi i8 [ 0, %0 ], [ %29, %26 ]
+    %8 = phi ptr [ @vs_img, %0 ], [ %28, %26 ]
+    %9 = phi i8 [ 0, %0 ], [ %27, %26 ]
+    %10 = phi i16 [ %5, %0 ], [ %42, %26 ]
+    %11 = zext nneg i8 %9 to i16
+    %12 = getelementptr i8, ptr @vs_nruns, i16 %11
+    %13 = load i8, ptr %12, align 1, !tbaa !6
+    %14 = zext i8 %13 to i16
+    %15 = xor i16 %10, %14
+    %16 = tail call i16 @llvm.fshl.i16(i16 %15, i16 %15, i16 1)
+    %17 = mul i16 %16, 25173
+    %18 = add i16 %17, 13849
+    %19 = zext nneg i8 %7 to i16
+    %20 = getelementptr i8, ptr @vs_pfxsum, i16 %19
+    %21 = load i16, ptr %20, align 1, !tbaa !2
+    %22 = xor i16 %18, %21
+    %23 = tail call i16 @llvm.fshl.i16(i16 %22, i16 %22, i16 1)
+    %24 = mul i16 %23, 25173
+    %25 = add i16 %24, 13849
+    br label %31
+  
+  26:                                               ; preds = %31
+    %27 = add nuw nsw i8 %9, 1
+    %28 = getelementptr i8, ptr %8, i16 64
+    %29 = add nuw nsw i8 %7, 2
+    %30 = icmp eq i8 %27, 24
+    br i1 %30, label %44, label %6, !llvm.loop !7
+  
+  31:                                               ; preds = %31, %6
+    %32 = phi i16 [ %25, %6 ], [ %42, %31 ]
+    %33 = phi i8 [ 0, %6 ], [ %40, %31 ]
+    %34 = zext nneg i8 %33 to i16
+    %35 = getelementptr i8, ptr %8, i16 %34
+    %36 = load i8, ptr %35, align 1, !tbaa !6
+    %37 = zext i8 %36 to i16
+    %38 = xor i16 %32, %37
+    %39 = tail call i16 @llvm.fshl.i16(i16 %38, i16 %38, i16 1)
+    %40 = add nuw nsw i8 %33, 1
+    %41 = mul i16 %39, 25173
+    %42 = add i16 %41, 13849
+    %43 = icmp eq i8 %40, 64
+    br i1 %43, label %26, label %31, !llvm.loop !9
+  
+  44:                                               ; preds = %26
+    store volatile i16 %42, ptr @corpus_result, align 1, !tbaa !2
+    br label %45
+  
+  45:                                               ; preds = %45, %44
+    tail call void asm sideeffect "wai", ""() #7, !srcloc !10
+    br label %45
+  }
+  
+  ; Function Attrs: nofree noinline norecurse nosync nounwind optsize memory(write, argmem: none, inaccessiblemem: none, target_mem: none)
+  define internal fastcc void @vs_build() unnamed_addr #1 {
+    br label %4
+  
+  1:                                                ; preds = %55
+    %2 = zext nneg i8 %46 to i16
+    %3 = add i16 %10, %2
+    store i16 %3, ptr @vs_totalruns, align 1, !tbaa !2
+    ret void
+  
+  4:                                                ; preds = %0, %55
+    %5 = phi i8 [ 0, %0 ], [ %64, %55 ]
+    %6 = phi i8 [ 0, %0 ], [ %63, %55 ]
+    %7 = phi i16 [ 12059, %0 ], [ %22, %55 ]
+    %8 = phi i16 [ 0, %0 ], [ %58, %55 ]
+    %9 = phi i8 [ 0, %0 ], [ %62, %55 ]
+    %10 = phi i16 [ 0, %0 ], [ %61, %55 ]
+    %11 = zext nneg i8 %6 to i16
+    %12 = getelementptr i8, ptr @vs_rowoff, i16 %11
+    store i16 %8, ptr %12, align 1, !tbaa !2
+    %13 = getelementptr i8, ptr getelementptr inbounds nuw (i8, ptr @vs_rle, i16 1), i16 %8
+    %14 = getelementptr i8, ptr getelementptr inbounds nuw (i8, ptr @vs_rle, i16 2), i16 %8
+    br label %15
+  
+  15:                                               ; preds = %4, %51
+    %16 = phi i8 [ %5, %4 ], [ %54, %51 ]
+    %17 = phi i8 [ 0, %4 ], [ %53, %51 ]
+    %18 = phi i16 [ %7, %4 ], [ %22, %51 ]
+    %19 = phi i16 [ 0, %4 ], [ %35, %51 ]
+    %20 = phi i8 [ 0, %4 ], [ %46, %51 ]
+    %21 = mul i16 %18, 25173
+    %22 = add i16 %21, 13849
+    %23 = icmp eq i8 %20, 15
+    br i1 %23, label %31, label %24
+  
+  24:                                               ; preds = %15
+    %25 = lshr i16 %22, 9
+    %26 = and i16 %25, 7
+    %27 = add nuw nsw i16 %26, 2
+    %28 = add nuw nsw i16 %27, %19
+    %29 = icmp samesign ugt i16 %28, 64
+    %30 = trunc nuw nsw i16 %27 to i8
+    br i1 %29, label %31, label %34
+  
+  31:                                               ; preds = %24, %15
+    %32 = trunc nuw nsw i16 %19 to i8
+    %33 = sub nuw nsw i8 64, %32
+    br label %34
+  
+  34:                                               ; preds = %31, %24
+    %35 = phi i16 [ 64, %31 ], [ %28, %24 ]
+    %36 = phi i8 [ %33, %31 ], [ %30, %24 ]
+    %37 = trunc i16 %22 to i8
+    %38 = lshr i8 %37, 5
+    %39 = and i8 %38, 3
+    %40 = and i8 %16, 12
+    %41 = or disjoint i8 %39, %40
+    %42 = zext nneg i8 %17 to i16
+    %43 = getelementptr i8, ptr %13, i16 %42
+    store i8 %36, ptr %43, align 1, !tbaa !6
+    %44 = zext nneg i8 %17 to i16
+    %45 = getelementptr i8, ptr %14, i16 %44
+    store i8 %41, ptr %45, align 1, !tbaa !6
+    %46 = add nuw nsw i8 %20, 1
+    %47 = freeze i16 %35
+    %48 = icmp samesign ult i16 %47, 64
+    %49 = icmp samesign ult i8 %20, 15
+    br i1 %48, label %51, label %50
+  
+  50:                                               ; preds = %34
+    br label %51
+  
+  51:                                               ; preds = %34, %50
+    %52 = phi i1 [ %49, %34 ], [ false, %50 ]
+    %53 = add nuw nsw i8 %17, 2
+    %54 = add nuw i8 %16, 4
+    br i1 %52, label %15, label %55, !llvm.loop !11
+  
+  55:                                               ; preds = %51
+    %56 = add i16 %8, 1
+    %57 = zext nneg i8 %53 to i16
+    %58 = add i16 %56, %57
+    %59 = getelementptr inbounds nuw i8, ptr @vs_rle, i16 %8
+    store i8 %46, ptr %59, align 1, !tbaa !6
+    %60 = zext nneg i8 %46 to i16
+    %61 = add i16 %10, %60
+    %62 = add nuw nsw i8 %9, 1
+    %63 = add nuw nsw i8 %6, 2
+    %64 = add nuw nsw i8 %5, 4
+    %65 = icmp eq i8 %62, 24
+    br i1 %65, label %1, label %4, !llvm.loop !12
+  }
+  
+  ; Function Attrs: nofree noinline norecurse nosync nounwind optsize
+  define internal fastcc void @vs_decode() unnamed_addr #2 {
+    br label %2
+  
+  1:                                                ; preds = %58
+    ret void
+  
+  2:                                                ; preds = %0, %58
+    %3 = phi i8 [ 0, %0 ], [ %63, %58 ]
+    %4 = phi i8 [ 0, %0 ], [ %62, %58 ]
+    %5 = zext nneg i8 %4 to i16
+    %6 = shl nuw nsw i16 %5, 6
+    %7 = getelementptr i8, ptr @vs_img, i16 %6
+    %8 = zext nneg i8 %3 to i16
+    %9 = getelementptr i8, ptr @vs_rowoff, i16 %8
+    %10 = load i16, ptr %9, align 1, !tbaa !2
+    %11 = getelementptr inbounds nuw i8, ptr @vs_rle, i16 %10
+    %12 = load i8, ptr %11, align 1, !tbaa !6
+    %13 = getelementptr i8, ptr @vs_nruns, i16 %5
+    store i8 %12, ptr %13, align 1, !tbaa !6
+    %14 = zext i8 %12 to i16
+    %15 = tail call ptr @llvm.stacksave.p0()
+    %16 = alloca i16, i16 %14, align 1
+    %17 = icmp eq i8 %12, 0
+    br i1 %17, label %18, label %19
+  
+  18:                                               ; preds = %2
+    tail call void @llvm.memset.p0.i16(ptr noundef nonnull align 1 dereferenceable(64) %7, i8 0, i16 64, i1 false), !tbaa !6
+    br label %58
+  
+  19:                                               ; preds = %2
+    %20 = getelementptr i8, ptr %11, i16 1
+    br label %22
+  
+  21:                                               ; preds = %22
+    br label %36
+  
+  22:                                               ; preds = %19, %22
+    %23 = phi i8 [ %12, %19 ], [ %32, %22 ]
+    %24 = phi ptr [ %16, %19 ], [ %31, %22 ]
+    %25 = phi ptr [ %20, %19 ], [ %30, %22 ]
+    %26 = phi i16 [ 0, %19 ], [ %29, %22 ]
+    %27 = load i8, ptr %25, align 1, !tbaa !6
+    %28 = zext i8 %27 to i16
+    %29 = add i16 %26, %28
+    store i16 %29, ptr %24, align 1, !tbaa !2
+    %30 = getelementptr i8, ptr %25, i16 2
+    %31 = getelementptr i8, ptr %24, i16 2
+    %32 = add i8 %23, -1
+    %33 = icmp eq i8 %32, 0
+    br i1 %33, label %21, label %22, !llvm.loop !13
+  
+  34:                                               ; preds = %49
+    %35 = icmp samesign ult i16 %50, 64
+    br i1 %35, label %54, label %57
+  
+  36:                                               ; preds = %21, %49
+    %37 = phi i8 [ %12, %21 ], [ %52, %49 ]
+    %38 = phi ptr [ %16, %21 ], [ %51, %49 ]
+    %39 = phi ptr [ %11, %21 ], [ %41, %49 ]
+    %40 = phi i16 [ 0, %21 ], [ %50, %49 ]
+    %41 = getelementptr i8, ptr %39, i16 2
+    %42 = load i16, ptr %38, align 1, !tbaa !2
+    %43 = tail call i16 @llvm.umin.i16(i16 %42, i16 64)
+    %44 = icmp samesign ugt i16 %43, %40
+    br i1 %44, label %45, label %49
+  
+  45:                                               ; preds = %36
+    %46 = load i8, ptr %41, align 1, !tbaa !6
+    %47 = getelementptr i8, ptr %7, i16 %40
+    %48 = sub nuw nsw i16 %43, %40
+    tail call void @llvm.memset.p0.i16(ptr align 1 %47, i8 %46, i16 %48, i1 false), !tbaa !6
+    br label %49
+  
+  49:                                               ; preds = %45, %36
+    %50 = phi i16 [ %40, %36 ], [ %43, %45 ]
+    %51 = getelementptr i8, ptr %38, i16 2
+    %52 = add i8 %37, -1
+    %53 = icmp eq i8 %52, 0
+    br i1 %53, label %34, label %36, !llvm.loop !14
+  
+  54:                                               ; preds = %34
+    %55 = getelementptr i8, ptr %7, i16 %50
+    %56 = sub nuw nsw i16 64, %50
+    tail call void @llvm.memset.p0.i16(ptr align 1 %55, i8 0, i16 %56, i1 false), !tbaa !6
+    br label %57
+  
+  57:                                               ; preds = %34, %54
+    br label %65
+  
+  58:                                               ; preds = %65, %18
+    %59 = phi i16 [ -25033, %18 ], [ %72, %65 ]
+    %60 = trunc i16 %8 to i8
+    %61 = getelementptr i8, ptr @vs_pfxsum, i16 %8
+    store i16 %59, ptr %61, align 1, !tbaa !2
+    call void @llvm.stackrestore.p0(ptr %15)
+    %62 = add nuw nsw i8 %4, 1
+    %63 = add nuw nsw i8 %60, 2
+    %64 = icmp eq i8 %62, 24
+    br i1 %64, label %1, label %2, !llvm.loop !15
+  
+  65:                                               ; preds = %57, %65
+    %66 = phi i8 [ %12, %57 ], [ %74, %65 ]
+    %67 = phi ptr [ %16, %57 ], [ %73, %65 ]
+    %68 = phi i16 [ -25033, %57 ], [ %72, %65 ]
+    %69 = load i16, ptr %67, align 1, !tbaa !2
+    %70 = xor i16 %69, %68
+    %71 = mul i16 %70, 25173
+    %72 = add i16 %71, 13849
+    %73 = getelementptr i8, ptr %67, i16 2
+    %74 = add i8 %66, -1
+    %75 = icmp eq i8 %74, 0
+    br i1 %75, label %58, label %65, !llvm.loop !16
+  }
+  
+  ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn
+  declare ptr @llvm.stacksave.p0() #3
+  
+  ; Function Attrs: mustprogress nocallback nofree nosync nounwind willreturn
+  declare void @llvm.stackrestore.p0(ptr) #3
+  
+  ; Function Attrs: nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none)
+  declare i16 @llvm.fshl.i16(i16, i16, i16) #4
+  
+  ; Function Attrs: nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none)
+  declare i16 @llvm.umin.i16(i16, i16) #4
+  
+  ; Function Attrs: nocallback nofree nounwind willreturn memory(argmem: write)
+  declare void @llvm.memset.p0.i16(ptr writeonly captures(none), i8, i16, i1 immarg) #5
+  
+  attributes #0 = { noreturn nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-xy16" }
+  attributes #1 = { nofree noinline norecurse nosync nounwind optsize memory(write, argmem: none, inaccessiblemem: none, target_mem: none) "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-xy16" }
+  attributes #2 = { nofree noinline norecurse nosync nounwind optsize "frame-pointer"="all" "no-trapping-math"="true" "nonreentrant" "stack-protector-buffer-size"="8" "target-cpu"="mosw65816" "target-features"="+mos-xy16" }
+  attributes #3 = { mustprogress nocallback nofree nosync nounwind willreturn }
+  attributes #4 = { nocallback nocreateundeforpoison nofree nosync nounwind speculatable willreturn memory(none) }
+  attributes #5 = { nocallback nofree nounwind willreturn memory(argmem: write) }
+  attributes #6 = { optsize }
+  attributes #7 = { nounwind }
+  
+  !llvm.module.flags = !{!0}
+  !llvm.ident = !{!1}
+  !llvm.errno.tbaa = !{!2}
+  
+  !0 = !{i32 7, !"frame-pointer", i32 2}
+  !1 = !{!"clang version 23.0.0git (https://github.com/llvm-mos/llvm-mos.git 8be0546128a55e78c63ca571d466aa72a782cd36)"}
+  !2 = !{!3, !3, i64 0}
+  !3 = !{!"int", !4, i64 0}
+  !4 = !{!"omnipotent char", !5, i64 0}
+  !5 = !{!"Simple C/C++ TBAA"}
+  !6 = !{!4, !4, i64 0}
+  !7 = distinct !{!7, !8}
+  !8 = !{!"llvm.loop.mustprogress"}
+  !9 = distinct !{!9, !8}
+  !10 = !{i64 871}
+  !11 = distinct !{!11, !8}
+  !12 = distinct !{!12, !8}
+  !13 = distinct !{!13, !8}
+  !14 = distinct !{!14, !8}
+  !15 = distinct !{!15, !8}
+  !16 = distinct !{!16, !8}
+...
+---
+name:            main
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x80000000)
+  
+    JSR @vs_build, mos_csr
+    JSR @vs_decode, mos_csr
+    REP_Immediate 32
+    renamable $a16 = LDAbs16 @vs_totalruns :: (dereferenceable load (s16) from @vs_totalruns, align 1, !tbaa !2)
+    renamable $a16 = EORImm16 killed renamable $a16, 19755
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc5
+    renamable $c = CMPImm renamable $a, 128
+    renamable $rc4, renamable $c = ROL killed renamable $rc4, killed renamable $c
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $y = LDImm 85
+    renamable $x = LDImm 98
+    $rc2 = STImag8 $y
+    $rc20 = STImag8 $y
+    $rc28 = STImag8 $x
+    $rc3 = STImag8 $x
+    $x = TA $a
+    $a = LDImag8 $rc4
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $y = LDImag8 $rc20
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImm target-flags(lo) @vs_img
+    $rc22 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_img
+    $rc23 = STImag8 $x
+    renamable $rc21 = STZImag8
+    $rc24 = STZImag8
+    $rc26 = STZImag8
+  
+  bb.1 (%ir-block.6):
+    successors: %bb.2(0x80000000)
+    liveins: $rc28, $rc24, $y, $rc26, $rs11, $rc21, $rs1
+  
+    $rc27 = STZImag8
+    $x = LDImm target-flags(lo) @vs_nruns
+    $rc4 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_nruns
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    SEP_Immediate 32
+    $x = LDImm 0
+    $rc29 = STImag8 $x
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs13, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $a = LDIndir killed renamable $rs2 :: (load (s8) from %ir.12, !tbaa !6)
+    $rc20 = STImag8 $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = EORImag16 killed renamable $a16, renamable $rs10
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc5
+    renamable $c = CMPImm renamable $a, 128
+    renamable $rc4, renamable $c = ROL killed renamable $rc4, killed renamable $c
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    $rc2 = STImag8 $y
+    $x = LDImag8 $rc28
+    $rc3 = STImag8 killed $x
+    $x = TA $a
+    $a = LDImag8 $rc4
+    $rc27 = STImag8 $y
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc29
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $rc25 = STZImag8
+    $x = LDImm target-flags(lo) @vs_pfxsum
+    $rc4 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_pfxsum
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    SEP_Immediate 32
+    $x = LDImag8 $rc29
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs12, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAIndir16 killed renamable $rs2 :: (load (s16) from %ir.20, align 1, !tbaa !2)
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs2
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc5
+    renamable $c = CMPImm renamable $a, 128
+    renamable $rc4, renamable $c = ROL killed renamable $rc4, killed renamable $c
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    $x = LDImag8 $rc27
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc28
+    $rc3 = STImag8 killed $x
+    $x = TA $a
+    $a = LDImag8 $rc4
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc29
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $rc20 = STZImag8
+  
+  bb.2 (%ir-block.31):
+    successors: %bb.3(0x04000000), %bb.2(0x7c000000)
+    liveins: $rc28, $rc24, $rc27, $rc26, $rs11, $rs10, $rs1
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs11
+    SEP_Immediate 32
+    $x = LDImm 0
+    $rc25 = STImag8 $x
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs10, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $a = LDIndir killed renamable $rs2 :: (load (s8) from %ir.35, !tbaa !6)
+    $rc4 = STImag8 $a
+    $rc5 = STZImag8
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs2
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc5
+    renamable $c = CMPImm renamable $a, 128
+    renamable $rc4, renamable $c = ROL killed renamable $rc4, killed renamable $c
+    renamable $a, dead renamable $c = ROL killed renamable $a, killed renamable $c
+    renamable $rc20 = nuw nsw INC killed renamable $rc20
+    $x = LDImag8 $rc27
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc28
+    $rc3 = STImag8 killed $x
+    $x = TA $a
+    $a = LDImag8 $rc4
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc25
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc20
+    dead $c = CMPImm killed renamable $x, 64, implicit-def dead $c, implicit-def $z
+    BR %bb.2, killed $z, 0
+  
+  bb.3 (%ir-block.26):
+    successors: %bb.4(0x04000000), %bb.1(0x7c000000)
+    liveins: $rs1, $rc21, $rc24, $rc27, $rc26, $rs11
+  
+    renamable $x = LDImm 98
+    $rc28 = STImag8 $x
+    $x = LDImag8 $rc26
+    renamable $x = nuw nsw INC killed renamable $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs11
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 64, killed renamable $c
+    renamable $rs11 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $rc24 = INC killed renamable $rc24
+    renamable $rc24 = INC killed renamable $rc24
+    $rc26 = STImag8 $x
+    $y = LDImag8 $rc27
+    dead $c = CMPImm killed renamable $x, 24, implicit-def dead $c, implicit-def $z
+    BR %bb.1, killed $z, 0
+  
+  bb.4 (%ir-block.44):
+    successors: %bb.5(0x80000000)
+    liveins: $rs1
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    STAbs16 killed renamable $a16, @corpus_result :: (volatile store (s16) into @corpus_result, align 1, !tbaa !2)
+    SEP_Immediate 32
+  
+  bb.5 (%ir-block.45):
+    successors: %bb.5(0x80000000)
+  
+    INLINEASM &wai, sideeffect attdialect, !10
+    BRA %bb.5
+...
+---
+name:            vs_build
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 2, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 4, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 6, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 8, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 9, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 7, name: '', type: spill-slot, offset: 10, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc24', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 8, name: '', type: spill-slot, offset: 11, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc25', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 12, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc27', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 13, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc28', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 14, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc29', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 15, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc30', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 16, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc31', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x80000000)
+    liveins: $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc27, $rc28, $rc29, $rc30, $rc31
+  
+    $x = LDImag8 $rc20
+    frame-setup PH killed $x
+    $x = LDImag8 $rc21
+    frame-setup PH killed $x
+    $x = LDImag8 $rc22
+    frame-setup PH killed $x
+    $x = LDImag8 $rc23
+    frame-setup PH killed $x
+    $x = LDImag8 $rc24
+    frame-setup STAbs killed $x, @vs_build_sstk + 10 :: (store (s8) into %stack.7)
+    $x = LDImag8 $rc25
+    frame-setup STAbs killed $x, @vs_build_sstk + 11 :: (store (s8) into %stack.8)
+    $x = LDImag8 $rc27
+    frame-setup STAbs killed $x, @vs_build_sstk + 12 :: (store (s8) into %stack.9)
+    $x = LDImag8 $rc28
+    frame-setup STAbs killed $x, @vs_build_sstk + 13 :: (store (s8) into %stack.10)
+    $x = LDImag8 $rc29
+    frame-setup STAbs killed $x, @vs_build_sstk + 14 :: (store (s8) into %stack.11)
+    $x = LDImag8 $rc30
+    frame-setup STAbs killed $x, @vs_build_sstk + 15 :: (store (s8) into %stack.12)
+    $x = LDImag8 $rc31
+    frame-setup STAbs killed $x, @vs_build_sstk + 16 :: (store (s8) into %stack.13)
+    renamable $rc29 = STZImag8
+    renamable $x = LDImm 47
+    renamable $y = LDImm 27
+    renamable $a = LDImm 85
+    $rc24 = STImag8 $a
+    renamable $a = LDImm 98
+    $rc25 = STImag8 $a
+    $a = LDImm 0
+    $rc22 = STZImag8
+    $rc4 = STImag8 $y
+    $rc5 = STImag8 $x
+    $rc8 = STZImag8
+    $rc9 = STZImag8
+    $x = TA $a
+    $rc2 = STZImag8
+    $rc3 = STZImag8
+    BRA %bb.1
+  
+  bb.4:
+    successors: %bb.6(0x80000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rc7, $rc2, $rs15, $rc8, $rc6
+  
+    SEP_Immediate 32
+    $x = LDImag8 $rc6
+    $rc20 = STImag8 killed $x
+    $x = LDImag8 $rc7
+    $rc21 = STImag8 killed $x
+    $y = LDImag8 $rc2
+  
+  bb.6 (%ir-block.34):
+    successors: %bb.14(0x40000000), %bb.13(0x40000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rs10, $rs15, $rc8, $y
+  
+    $x = LDImag8 $rc23
+    $rc28 = STImag8 killed $x
+    renamable $x = LDAbs @vs_build_sstk :: (load (s8) from %stack.0)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @vs_build_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    dead $x = LDImm 0
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs14, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = T_A $y
+    STIndir killed renamable $a, killed renamable $rs1 :: (store (s8) into %ir.43, !tbaa !6)
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs15
+    $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs14, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = LDImag8 $rc4
+    renamable $a, dead renamable $c = LSR killed renamable $a
+    renamable $a, dead renamable $c = LSR killed renamable $a
+    renamable $a, dead renamable $c = LSR killed renamable $a
+    renamable $a, dead renamable $c = LSR killed renamable $a
+    renamable $a, dead renamable $c = LSR killed renamable $a
+    renamable $a = ANDImm killed renamable $a, 3
+    $x = TA $a
+    $a = LDImag8 $rc22
+    renamable $a = ANDImm killed renamable $a, 12
+    $rc6 = STImag8 $a
+    $a = T_A $x
+    renamable $a = disjoint ORAImag8 killed renamable $a, killed renamable $rc6
+    STIndir killed renamable $a, killed renamable $rs1 :: (store (s8) into %ir.45, !tbaa !6)
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $c = CMPImm16 killed renamable $a16, 64
+    SEP_Immediate 32
+    $x = LDImm 1
+    BR %bb.13, $c, 1
+  
+  bb.14 (%ir-block.34):
+    successors: %bb.13(0x80000000)
+    liveins: $rc26, $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rs10, $rs15, $rc8
+  
+    $x = LDImm 0
+  
+  bb.13 (%ir-block.34):
+    successors: %bb.8(0x40000000), %bb.7(0x40000000)
+    liveins: $rc26, $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rs10, $rs15, $rc8, $x
+  
+    $rc2 = STImag8 killed $x
+    $x = LDImm 0
+    $y = LDImag8 $rc8
+    renamable $c = CMPImm renamable $y, 15
+    BR %bb.8, killed renamable $c, 1
+  
+  bb.7 (%ir-block.34):
+    successors: %bb.8(0x80000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc2lsb, $rc29, $rs10, $rs15, $y
+  
+    $x = LDImm 1
+  
+  bb.8 (%ir-block.34):
+    successors: %bb.10(0x40000000), %bb.9(0x40000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $xlsb, $rc29, $rs10, $rs15, $y, $rc2lsb
+  
+    dead $a = LDImag8 $rc2, implicit-def $nz
+    BR %bb.10, killed $z, 1
+  
+  bb.9 (%ir-block.50):
+    successors: %bb.10(0x80000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rs10, $rs15, $y
+  
+    $x = LDImm 0
+  
+  bb.10 (%ir-block.51):
+    successors: %bb.2(0x7c000000), %bb.11(0x04000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $xlsb, $rc29, $rs10, $rs15, $y
+  
+    renamable $y = nuw nsw INC killed renamable $y
+    renamable $rc23 = INC killed renamable $rc23
+    renamable $rc23 = INC killed renamable $rc23
+    renamable $c = nuw LDCImm 0
+    $a = LDImag8 $rc22
+    renamable $a, dead renamable $c, dead renamable $v = nuw ADCImm killed renamable $a, 4, killed renamable $c
+    $rc22 = STImag8 $a
+    $rc27 = STImag8 $y
+    dead $a = T_A $x, implicit-def $nz
+    BR %bb.11, killed $z, 1
+  
+  bb.2 (%ir-block.15):
+    successors: %bb.5(0x40000000), %bb.3(0x40000000)
+    liveins: $rs10, $rc27, $rc23, $rc22, $rc24, $rc25, $rc29, $rs15, $rc5, $rc4
+  
+    $x = LDImag8 $rc24
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc25
+    $rc3 = STImag8 killed $x
+    $x = LDImag8 $rc5
+    $a = LDImag8 $rc4
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc27
+    $rc8 = STImag8 $x
+    dead $c = CMPImm killed renamable $x, 15, implicit-def dead $c, implicit-def $z
+    BR %bb.5, killed $z, 1
+  
+  bb.3 (%ir-block.24):
+    successors: %bb.5(0x40000000), %bb.4(0x40000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rc8, $rs15, $rs10
+  
+    $x = LDImag8 $rc5
+    $rc28 = STImag8 killed $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs14
+    renamable $a16 = LSRAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ANDImm16 killed renamable $a16, 7
+    SEP_Immediate 32
+    dead $x = LDImm 0
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs1 = STAImag16 renamable $a16
+    $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs10, killed renamable $c
+    renamable $rs3 = STAImag16 renamable $a16
+    renamable $c = CMPImm16 killed renamable $a16, 65
+    BR %bb.4, killed renamable $c, 0
+  
+  bb.5 (%ir-block.31):
+    successors: %bb.6(0x80000000)
+    liveins: $rc4, $rc5, $rc23, $rc22, $rc24, $rc25, $rc29, $rc8, $rc20, $rs15
+  
+    SEP_Immediate 32
+    renamable $x = LDImm 64
+    renamable $a = T_A $x
+    renamable $c = nuw nsw LDCImm -1
+    renamable $a, dead renamable $c, dead renamable $v = nuw nsw SBCImag8 killed renamable $a, killed renamable $rc20, killed renamable $c
+    $y = TA $a
+    renamable $rc21 = STZImag8
+    $rc20 = STImag8 $x
+    BRA %bb.6
+  
+  bb.11 (%ir-block.55):
+    successors: %bb.12(0x04000000), %bb.1(0x7c000000)
+    liveins: $rc27, $rc25, $rc5, $rc4, $rc29, $rc24, $y, $rc23
+  
+    $x = LDImag8 $rc23
+    $rc28 = STImag8 killed $x
+    renamable $x = LDAbs @vs_build_sstk + 4 :: (load (s8) from %stack.2)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @vs_build_sstk + 5 :: (load (s8) from %stack.2 + 1)
+    $rc3 = STImag8 $x
+    $a = LDImag8 $rc2
+    $rc6 = STImag8 killed $a
+    $rc7 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed $rs1
+    SEP_Immediate 32
+    $x = LDImm 0
+    $rc8 = STImag8 $x
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs14, killed renamable $c
+    renamable $a16 = INCAcc16 killed renamable $a16
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_build_sstk :: (store (s8) into %stack.0)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_build_sstk + 1 :: (store (s8) into %stack.0 + 1)
+    REP_Immediate 16
+    renamable $x16 = LDXImag16 killed renamable $rs3
+    $a = T_A $y
+    STAbsXIdx killed renamable $a, @vs_rle, killed renamable $x16 :: (store (s8) into %ir.59, !tbaa !6)
+    SEP_Immediate 16
+    $rc28 = STImag8 $y
+    renamable $x = LDAbs @vs_build_sstk + 2 :: (load (s8) from %stack.1)
+    $rc2 = STImag8 $x
+    renamable $x = LDAbs @vs_build_sstk + 3 :: (load (s8) from %stack.1 + 1)
+    $rc3 = STImag8 $x
+    $y = LDImag8 $rc2
+    $rc6 = STImag8 killed $y
+    $rc7 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc8
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs14, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $x = LDAbs @vs_build_sstk + 9 :: (load (s8) from %stack.5)
+    renamable $x = nuw nsw INC killed renamable $x
+    renamable $y = LDAbs @vs_build_sstk + 6 :: (load (s8) from %stack.3)
+    $rc8 = STImag8 $y
+    dead renamable $y = LDAbs @vs_build_sstk + 7 :: (load (s8) from %stack.3 + 1)
+    $y = LDImag8 $rc8
+    $rc22 = STImag8 killed $y
+    renamable $rc22 = INC killed renamable $rc22
+    renamable $rc22 = INC killed renamable $rc22
+    renamable $c = nuw LDCImm 0
+    renamable $a = LDAbs @vs_build_sstk + 8 :: (load (s8) from %stack.4)
+    renamable $a, dead renamable $c, dead renamable $v = nuw nsw ADCImm killed renamable $a, 4, killed renamable $c
+    renamable $y = LDAbs @vs_build_sstk :: (load (s8) from %stack.0)
+    $rc8 = STImag8 $y
+    dead renamable $y = LDAbs @vs_build_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    dead renamable $y = LDAbs @vs_build_sstk :: (load (s8) from %stack.0)
+    renamable $y = LDAbs @vs_build_sstk + 1 :: (load (s8) from %stack.0 + 1)
+    $rc9 = STImag8 $y
+    dead $c = CMPImm renamable $x, 24, implicit-def dead $c, implicit-def $z
+    BR %bb.12, killed $z, 1
+  
+  bb.1 (%ir-block.4):
+    successors: %bb.2(0x80000000)
+    liveins: $rc29, $rc5, $rc4, $a, $rc22, $rc24, $rc25, $rs4, $rc3, $rc2, $x
+  
+    STAbs killed renamable $x, @vs_build_sstk + 9 :: (store (s8) into %stack.5)
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_build_sstk + 2 :: (store (s8) into %stack.1)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_build_sstk + 3 :: (store (s8) into %stack.1 + 1)
+    $rc23 = STZImag8
+    $x = LDImm target-flags(lo) @vs_rowoff
+    $rc2 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_rowoff
+    $rc3 = STImag8 $x
+    $y = TA $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc22
+    $rc2 = STImag8 killed $x
+    renamable $rs1 = KILL killed renamable $rs1
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_build_sstk + 6 :: (store (s8) into %stack.3)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_build_sstk + 7 :: (store (s8) into %stack.3 + 1)
+    $x = LDImm 0
+    $rc6 = STImag8 $x
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs11, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs4
+    STAIndir16 killed renamable $a16, killed renamable $rs1 :: (store (s16) into %ir.12, align 1, !tbaa !2)
+    SEP_Immediate 32
+    $x = LDImm target-flags(lo) @vs_rle + 1
+    $rc2 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_rle + 1
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc6
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs4, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_build_sstk :: (store (s8) into %stack.0)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_build_sstk + 1 :: (store (s8) into %stack.0 + 1)
+    $x = LDImm target-flags(lo) @vs_rle + 2
+    $rc2 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_rle + 2
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc8
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc9
+    $rc3 = STImag8 killed $x
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_build_sstk + 4 :: (store (s8) into %stack.2)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_build_sstk + 5 :: (store (s8) into %stack.2 + 1)
+    $x = LDImag8 $rc6
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, killed renamable $rs4, killed renamable $c
+    renamable $rs15 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    STAbs $y, @vs_build_sstk + 8 :: (store (s8) into %stack.4)
+    $rc22 = STImag8 $y
+    $rc20 = STZImag8
+    $rc21 = STZImag8
+    $rc27 = STZImag8
+    BRA %bb.2
+  
+  bb.12 (%ir-block.1):
+    liveins: $rc27, $rs3
+  
+    renamable $rc3 = STZImag8
+    $x = LDImag8 $rc27
+    $rc2 = STImag8 killed $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs3
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, killed renamable $rs1, killed renamable $c
+    STAbs16 killed renamable $a16, @vs_totalruns :: (store (s16) into @vs_totalruns, align 1, !tbaa !2)
+    SEP_Immediate 32
+    $x = frame-destroy LDAbs @vs_build_sstk + 16 :: (load (s8) from %stack.13)
+    $rc31 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 15 :: (load (s8) from %stack.12)
+    $rc30 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 14 :: (load (s8) from %stack.11)
+    $rc29 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 13 :: (load (s8) from %stack.10)
+    $rc28 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 12 :: (load (s8) from %stack.9)
+    $rc27 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 11 :: (load (s8) from %stack.8)
+    $rc25 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_build_sstk + 10 :: (load (s8) from %stack.7)
+    $rc24 = STImag8 $x
+    $x = frame-destroy PL
+    $rc23 = STImag8 $x
+    $x = frame-destroy PL
+    $rc22 = STImag8 $x
+    $x = frame-destroy PL
+    $rc21 = STImag8 $x
+    $x = frame-destroy PL
+    $rc20 = STImag8 $x
+    RTS implicit $rc20, implicit $rc21, implicit $rc22, implicit $rc23, implicit $rc24, implicit $rc25, implicit $rc27, implicit $rc28, implicit $rc29, implicit $rc30, implicit $rc31
+...
+---
+name:            vs_decode
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         true
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: true
+registers:       []
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    true
+  hasCalls:        true
+  framePointerPolicy: all
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 0
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: true
+  localFrameSize:  0
+fixedStack:      []
+stack:
+  - { id: 0, name: '', type: variable-sized, offset: 0, alignment: 1, stack-id: default, 
+      callee-saved-register: '', callee-saved-restored: true, debug-info-variable: '', 
+      debug-info-expression: '', debug-info-location: '' }
+  - { id: 1, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 2, name: '', type: spill-slot, offset: 2, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 3, name: '', type: spill-slot, offset: 4, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 4, name: '', type: spill-slot, offset: 6, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 5, name: '', type: spill-slot, offset: 8, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 6, name: '', type: spill-slot, offset: 9, size: 2, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 9, name: '', type: spill-slot, offset: 11, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc24', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 10, name: '', type: spill-slot, offset: 12, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc25', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 11, name: '', type: spill-slot, offset: 13, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc26', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 12, name: '', type: spill-slot, offset: 14, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc27', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 13, name: '', type: spill-slot, offset: 15, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc28', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 14, name: '', type: spill-slot, offset: 16, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc29', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 15, name: '', type: spill-slot, offset: 17, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc30', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+  - { id: 16, name: '', type: spill-slot, offset: 18, size: 1, alignment: 1, 
+      stack-id: mos-static, callee-saved-register: '$rc31', callee-saved-restored: true, 
+      debug-info-variable: '', debug-info-expression: '', debug-info-location: '' }
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    successors: %bb.1(0x80000000)
+    liveins: $rc20, $rc21, $rc22, $rc23, $rc24, $rc25, $rc26, $rc27, $rc28, $rc29
+  
+    $x = LDImag8 $rc20
+    frame-setup PH killed $x
+    $x = LDImag8 $rc21
+    frame-setup PH killed $x
+    $x = LDImag8 $rc22
+    frame-setup PH killed $x
+    $x = LDImag8 $rc23
+    frame-setup PH killed $x
+    $x = LDImag8 $rc24
+    frame-setup STAbs killed $x, @vs_decode_sstk + 11 :: (store (s8) into %stack.9)
+    $x = LDImag8 $rc25
+    frame-setup STAbs killed $x, @vs_decode_sstk + 12 :: (store (s8) into %stack.10)
+    $x = LDImag8 $rc26
+    frame-setup STAbs killed $x, @vs_decode_sstk + 13 :: (store (s8) into %stack.11)
+    $x = LDImag8 $rc27
+    frame-setup STAbs killed $x, @vs_decode_sstk + 14 :: (store (s8) into %stack.12)
+    $x = LDImag8 $rc28
+    frame-setup STAbs killed $x, @vs_decode_sstk + 15 :: (store (s8) into %stack.13)
+    $x = LDImag8 $rc29
+    frame-setup STAbs killed $x, @vs_decode_sstk + 16 :: (store (s8) into %stack.14)
+    $x = LDImag8 $rc30
+    frame-setup STAbs killed $x, @vs_decode_sstk + 17 :: (store (s8) into %stack.15)
+    $x = LDImag8 $rc31
+    frame-setup STAbs killed $x, @vs_decode_sstk + 18 :: (store (s8) into %stack.16)
+    $x = LDImag8 $rc0
+    $rc30 = STImag8 killed $x
+    $x = LDImag8 $rc1
+    $rc31 = STImag8 killed $x
+    renamable $rc23 = STZImag8
+    $x = LDImm 64
+    $rc2 = STImag8 $x
+    $x = LDImm 0
+    $rc3 = STImag8 $x
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_decode_sstk + 9 :: (store (s8) into %stack.6)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_decode_sstk + 10 :: (store (s8) into %stack.6 + 1)
+    $rc20 = STZImag8
+    $rc24 = STZImag8
+    BRA %bb.1
+  
+  bb.10 (%ir-block.36):
+    successors: %bb.11(0x80000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $rs10, $rs2, $rs14
+  
+    SEP_Immediate 32
+    $x = LDImm 1
+    REP_Immediate 32
+  
+  bb.11 (%ir-block.36):
+    successors: %bb.13(0x40000000), %bb.12(0x40000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $rs10, $rs2, $rs14, $xlsb
+  
+    renamable $c = LDCImm 0
+    renamable $a16 = LDAbs16 @vs_decode_sstk :: (load (s16) from %stack.1, align 1)
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    SEP_Immediate 32
+    dead $y = TX $x, implicit-def $nz
+    BR %bb.13, killed $z, 0
+  
+  bb.12 (%ir-block.36):
+    successors: %bb.13(0x80000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $a16, $rs2, $rs14
+  
+    renamable $x = LDImm 64
+    renamable $rc21 = STZImag8
+    $rc20 = STImag8 $x
+  
+  bb.13 (%ir-block.36):
+    successors: %bb.14(0x40000000), %bb.15(0x40000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $rs10, $rs2, $rs14, $a16
+  
+    REP_Immediate 32
+    renamable $rs5 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs2
+    renamable $c = CMPImag16 killed renamable $a16, renamable $rs10
+    BR %bb.15, killed renamable $c, 1
+  
+  bb.14 (%ir-block.45):
+    successors: %bb.15(0x80000000)
+    liveins: $rc23, $rc29, $rc28, $rs12, $rc22, $rs4, $rs10, $rs2, $rs5
+  
+    SEP_Immediate 32
+    renamable $a = LDIndir renamable $rs5 :: (load (s8) from %ir.41, !tbaa !6)
+    $y = TA $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs4
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs2, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 renamable $rs10
+    renamable $c = LDCImm -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs2, killed renamable $c
+    renamable $rs3 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc7
+    $rc4 = STImag8 killed $x
+    $x = LDImag8 $rc6
+    $a = T_A $y
+    $y = LDImag8 $rc8
+    $rc26 = STImag8 killed $y
+    $y = LDImag8 $rc9
+    $rc27 = STImag8 killed $y
+    $y = LDImag8 $rc28
+    STAbs killed renamable $y, @vs_decode_sstk :: (store (s8) into %stack.1)
+    $y = LDImag8 $rc29
+    STAbs killed renamable $y, @vs_decode_sstk + 1 :: (store (s8) into %stack.1 + 1)
+    $y = LDImag8 $rc10
+    $rc28 = STImag8 killed $y
+    $y = LDImag8 $rc11
+    $rc29 = STImag8 killed $y
+    JSR &__memset, mos_csr, implicit killed $rs1, implicit killed $a, implicit killed $x, implicit killed $rc4
+    $x = LDImag8 $rc28
+    $rc10 = STImag8 killed $x
+    $x = LDImag8 $rc29
+    $rc11 = STImag8 killed $x
+    renamable $x = LDAbs @vs_decode_sstk :: (load (s8) from %stack.1)
+    $rc28 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 1 :: (load (s8) from %stack.1 + 1)
+    $rc29 = STImag8 $x
+    $x = LDImag8 $rc26
+    $rc8 = STImag8 killed $x
+    $x = LDImag8 $rc27
+    $rc9 = STImag8 killed $x
+    $x = LDImag8 $rc20
+    $rc4 = STImag8 killed $x
+    $x = LDImag8 $rc21
+    $rc5 = STImag8 killed $x
+    REP_Immediate 32
+  
+  bb.15 (%ir-block.49):
+    successors: %bb.16(0x04000000), %bb.8(0x7c000000)
+    liveins: $rc23, $rs14, $rs2, $rs4, $rc22, $rs5, $rs12
+  
+    renamable $a16 = LDAImag16 killed renamable $rs12
+    renamable $c = LDCImm 0
+    SEP_Immediate 32
+    $x = LDImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs12 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $rc22 = DEC killed renamable $rc22, implicit-def $nz
+    BR %bb.16, killed $z, 1
+  
+  bb.8 (%ir-block.36):
+    successors: %bb.9(0x40000000), %bb.10(0x40000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $rs14, $rs2, $rs5
+  
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs5
+    STAbs16 killed renamable $a16, @vs_decode_sstk :: (store (s16) into %stack.1, align 1)
+    renamable $a16 = LDAIndir16 renamable $rs12 :: (load (s16) from %ir.38, align 1, !tbaa !2)
+    renamable $rs10 = STAImag16 renamable $a16
+    renamable $c = CMPImm16 killed renamable $a16, 64
+    BR %bb.10, killed renamable $c, 0, implicit-def dead $c
+  
+  bb.9 (%ir-block.36):
+    successors: %bb.11(0x80000000)
+    liveins: $rc23, $rs12, $rc22, $rs4, $rs10, $rs2, $rs14
+  
+    SEP_Immediate 32
+    $x = LDImm 0
+    REP_Immediate 32
+    BRA %bb.11
+  
+  bb.16 (%ir-block.34):
+    successors: %bb.17(0x40000000), %bb.18(0x40000000)
+    liveins: $rc23, $xlsb, $rs14, $rs2, $rs4
+  
+    $rc26 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs2
+    renamable $c = CMPImm16 killed renamable $a16, 64
+    BR %bb.18, killed renamable $c, 1
+  
+  bb.17 (%ir-block.54):
+    successors: %bb.18(0x80000000)
+    liveins: $rc23, $xlsb, $rs14, $rs2, $rs4
+  
+    renamable $a16 = LDAImag16 killed renamable $rs4
+    renamable $c = LDCImm 0
+    SEP_Immediate 32
+    $rc26 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs2, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $x = LDAbs @vs_decode_sstk + 9 :: (load (s8) from %stack.6)
+    $rc6 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 10 :: (load (s8) from %stack.6 + 1)
+    $rc7 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs3
+    renamable $c = LDCImm -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs2, killed renamable $c
+    renamable $rs3 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc7
+    $rc4 = STImag8 killed $x
+    $x = LDImag8 $rc6
+    $a = LDImm 0
+    JSR &__memset, mos_csr, implicit killed $rs1, implicit killed $a, implicit killed $x, implicit killed $rc4
+  
+  bb.18 (%ir-block.57):
+    successors: %bb.19(0x80000000)
+    liveins: $rc23, $rc26lsb, $rs14
+  
+    SEP_Immediate 32
+    renamable $x = LDImm -98
+    renamable $y = LDImm 55
+    $rc2 = STImag8 $y
+    $rc3 = STImag8 $x
+    renamable $x = LDImm 85
+    $rc20 = STImag8 $x
+    renamable $x = LDImm 98
+    $rc21 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 6 :: (load (s8) from %stack.4)
+    $rc24 = STImag8 $x
+    dead renamable $x = LDAbs @vs_decode_sstk + 7 :: (load (s8) from %stack.4 + 1)
+    renamable $x = LDAbs @vs_decode_sstk + 2 :: (load (s8) from %stack.2)
+    $rc4 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 3 :: (load (s8) from %stack.2 + 1)
+    $rc5 = STImag8 $x
+    $x = LDImag8 $rc4
+    STAbs killed renamable $x, @vs_decode_sstk + 2 :: (store (s8) into %stack.2)
+    $x = LDImag8 $rc5
+    STAbs killed renamable $x, @vs_decode_sstk + 3 :: (store (s8) into %stack.2 + 1)
+    renamable $x = LDAbs @vs_decode_sstk + 8 :: (load (s8) from %stack.5)
+    $rc22 = STImag8 $x
+  
+  bb.19 (%ir-block.65):
+    successors: %bb.20(0x04000000), %bb.19(0x7c000000)
+    liveins: $rc23, $rc24, $rs14, $rc22, $rc26lsb, $rc20, $rc21, $rs1
+  
+    REP_Immediate 32
+    renamable $a16 = LDAIndir16 renamable $rs14 :: (load (s16) from %ir.67, align 1, !tbaa !2)
+    renamable $a16 = EORImag16 killed renamable $a16, killed renamable $rs1
+    renamable $rs2 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc20
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc21
+    $rc3 = STImag8 killed $x
+    $x = LDImag8 $rc5
+    $a = LDImag8 $rc4
+    JSR &__mulhi3, mos_csr, implicit killed $a, implicit killed $x, implicit killed $rc2, implicit killed $rc3, implicit-def $a, implicit-def $x
+    $rc2 = STImag8 $a
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc26
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 13849, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs14
+    SEP_Immediate 32
+    $x = LDImag8 $rc26
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs14 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $rc22 = DEC killed renamable $rc22, implicit-def $nz
+    BR %bb.19, killed $z, 0
+  
+  bb.20:
+    successors: %bb.3(0x80000000)
+    liveins: $rc23, $rc24, $rs1
+  
+    renamable $x = LDAbs @vs_decode_sstk + 4 :: (load (s8) from %stack.3)
+    $rc20 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 5 :: (load (s8) from %stack.3 + 1)
+    $rc21 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 2 :: (load (s8) from %stack.2)
+    $rc4 = STImag8 $x
+    renamable $x = LDAbs @vs_decode_sstk + 3 :: (load (s8) from %stack.2 + 1)
+    $rc5 = STImag8 $x
+    $y = LDImag8 $rc4
+    $rc26 = STImag8 killed $y
+    $rc27 = STImag8 $x
+    BRA %bb.3
+  
+  bb.2 (%ir-block.18):
+    successors: %bb.3(0x80000000)
+    liveins: $rc23, $rc24, $rs13, $rs10, $rs4
+  
+    $x = LDImag8 $rc8
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc9
+    $rc3 = STImag8 killed $x
+    $rc4 = STZImag8
+    renamable $x = LDImm 64
+    $a = LDImm 0
+    JSR &__memset, mos_csr, implicit killed $rs1, implicit killed $a, implicit killed $x, implicit killed $rc4
+    renamable $x = LDImm -98
+    renamable $y = LDImm 55
+    $rc2 = STImag8 $y
+    $rc3 = STImag8 $x
+  
+  bb.3 (%ir-block.58):
+    successors: %bb.4(0x04000000), %bb.1(0x7c000000)
+    liveins: $rc23, $rc24, $rs13, $rs1, $rs10
+  
+    $x = LDImm target-flags(lo) @vs_pfxsum
+    $rc4 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_pfxsum
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    renamable $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs10, killed renamable $c
+    renamable $rs2 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    STAIndir16 killed renamable $a16, killed renamable $rs2 :: (store (s16) into %ir.61, align 1, !tbaa !2)
+    SEP_Immediate 32
+    $x = LDImag8 $rc26
+    $rc0 = STImag8 killed $x
+    $x = LDImag8 $rc27
+    $rc1 = STImag8 killed $x
+    $x = LDImag8 $rc24
+    renamable $x = nuw nsw INC killed renamable $x
+    $y = LDImag8 $rc20
+    renamable $y = INC killed renamable $y
+    renamable $y = INC killed renamable $y
+    $rc20 = STImag8 $y
+    $rc24 = STImag8 $x
+    dead $c = CMPImm killed renamable $x, 24, implicit-def dead $c, implicit-def $z
+    BR %bb.4, killed $z, 1
+  
+  bb.1 (%ir-block.2):
+    successors: %bb.2(0x30000000), %bb.5(0x50000000)
+    liveins: $rc23, $rc24, $rc20
+  
+    $rc25 = STZImag8
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs12
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImm target-flags(lo) @vs_img
+    $rc4 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_img
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    SEP_Immediate 32
+    $x = LDImm 0
+    $rc6 = STImag8 $x
+    $c = LDCImm 0
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, killed renamable $rs1, killed renamable $c
+    renamable $rs4 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $rc21 = STZImag8
+    $x = LDImm target-flags(lo) @vs_rowoff
+    $rc2 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_rowoff
+    $rc3 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    $x = LDImag8 $rc6
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs10, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAIndir16 killed renamable $rs1 :: (load (s16) from %ir.9, align 1, !tbaa !2)
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImm target-flags(lo) @vs_rle
+    $rc4 = STImag8 $x
+    $x = LDImm target-flags(hi) @vs_rle
+    $rc5 = STImag8 $x
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    SEP_Immediate 32
+    $x = LDImag8 $rc6
+    $c = CMPImm killed $x, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs1, killed renamable $c
+    STAbs16 killed renamable $a16, @vs_decode_sstk :: (store (s16) into %stack.1, align 1)
+    SEP_Immediate 32
+    REP_Immediate 16
+    renamable $x16 = LDXImag16 renamable $rs1
+    SEP_Immediate 16
+    $y = LDImm target-flags(lo) @vs_nruns
+    $rc2 = STImag8 $y
+    $y = LDImm target-flags(hi) @vs_nruns
+    $rc3 = STImag8 $y
+    REP_Immediate 16
+    renamable $x16 = LDXImag16 renamable $rs1
+    renamable $a = LDAbsXIdx @vs_rle, killed renamable $x16 :: (load (s8) from %ir.11, !tbaa !6)
+    SEP_Immediate 16
+    $x = TA $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    SEP_Immediate 32
+    dead $y = LDImm 0
+    $y = LDImag8 $rc6
+    $c = CMPImm killed $y, 1
+    REP_Immediate 32
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs12, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $a = T_A $x
+    $rc22 = STImag8 $x
+    STIndir killed renamable $a, killed renamable $rs1 :: (store (s8) into %ir.13, !tbaa !6)
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 renamable $rs11
+    renamable $a16 = ASLAcc16 killed renamable $a16, implicit-def dead $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 $rs0
+    renamable $c = LDCImm -1
+    renamable $a16, dead renamable $c, dead renamable $v = SBCImag16 killed renamable $a16, killed renamable $rs1, killed renamable $c
+    renamable $rs14 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $y = LDImag8 $rc0
+    $rc26 = STImag8 killed $y
+    $y = LDImag8 $rc1
+    $rc27 = STImag8 killed $y
+    $y = LDImag8 $rc28
+    $rc0 = STImag8 killed $y
+    $y = LDImag8 $rc29
+    $rc1 = STImag8 killed $y
+    dead $a = T_A $x, implicit-def $nz
+    BR %bb.2, killed $z, 1
+  
+  bb.5 (%ir-block.19):
+    successors: %bb.21(0x40000000), %bb.22(0x40000000)
+    liveins: $rc23, $rs4, $rs14, $rc20, $rs12, $rs13, $x
+  
+    $rc5 = STImag8 $x
+    $x = LDImag8 $rc26
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc27
+    $rc3 = STImag8 killed $x
+    $x = LDImag8 $rc2
+    STAbs killed renamable $x, @vs_decode_sstk + 2 :: (store (s8) into %stack.2)
+    $x = LDImag8 $rc3
+    STAbs killed renamable $x, @vs_decode_sstk + 3 :: (store (s8) into %stack.2 + 1)
+    renamable $rs12 = KILL killed renamable $rs12
+    $x = LDImag8 $rc24
+    STAbs killed renamable $x, @vs_decode_sstk + 6 :: (store (s8) into %stack.4)
+    $x = LDImag8 $rc25
+    STAbs killed renamable $x, @vs_decode_sstk + 7 :: (store (s8) into %stack.4 + 1)
+    $x = LDImag8 $rc20
+    STAbs killed renamable $x, @vs_decode_sstk + 4 :: (store (s8) into %stack.3)
+    $x = LDImm 0
+    STAbs killed renamable $x, @vs_decode_sstk + 5 :: (store (s8) into %stack.3 + 1)
+    REP_Immediate 32
+    renamable $a16 = LDAbs16 @vs_decode_sstk :: (load (s16) from %stack.1, align 1)
+    renamable $rs5 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    $x = LDImag8 $rc10
+    $rc2 = STImag8 killed $x
+    $x = LDImag8 $rc11
+    $rc3 = STImag8 killed $x
+    $rc2 = INC $rc2, implicit-def $z
+    BR %bb.21, $z, 0
+  
+  bb.22 (%ir-block.19):
+    successors: %bb.21(0x80000000)
+    liveins: $rc3, $rc5, $rc23, $rs1, $rs4, $rs5, $rs14
+  
+    $rc3 = INC $rc3
+  
+  bb.21 (%ir-block.19):
+    successors: %bb.6(0x80000000)
+    liveins: $rc23, $rs5, $rs4, $rs14, $rs1, $rc5
+  
+    renamable $rc4 = STZImag8
+    $x = LDImag8 $rc5
+    STAbs renamable $x, @vs_decode_sstk + 8 :: (store (s8) into %stack.5)
+    $y = LDImag8 $rc28
+    $rc6 = STImag8 killed $y
+    $y = LDImag8 $rc29
+    $rc7 = STImag8 killed $y
+    $rc5 = STZImag8
+  
+  bb.6 (%ir-block.22):
+    successors: %bb.7(0x04000000), %bb.6(0x7c000000)
+    liveins: $rc23, $rs5, $rs4, $rs14, $x, $rs3, $rs1, $rs2
+  
+    renamable $a = LDIndir renamable $rs1 :: (load (s8) from %ir.25, !tbaa !6)
+    $rc22 = STImag8 $a
+    REP_Immediate 32
+    renamable $a16 = LDAImag16 killed renamable $rs2
+    $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImag16 killed renamable $a16, renamable $rs11, killed renamable $c
+    renamable $rs2 = STAImag16 renamable $a16
+    STAIndir16 killed renamable $a16, renamable $rs3 :: (store (s16) into %ir.24, align 1, !tbaa !2)
+    renamable $a16 = LDAImag16 killed renamable $rs1
+    $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs1 = STAImag16 killed renamable $a16
+    renamable $a16 = LDAImag16 killed renamable $rs3
+    $c = LDCImm 0
+    renamable $a16, dead renamable $c, dead renamable $v = ADCImm16 killed renamable $a16, 2, killed renamable $c
+    renamable $rs3 = STAImag16 killed renamable $a16
+    SEP_Immediate 32
+    renamable $x = DEC killed renamable $x, implicit-def $nz
+    BR %bb.6, killed $z, 0
+  
+  bb.7 (%ir-block.21):
+    successors: %bb.8(0x80000000)
+    liveins: $rc23, $rs5, $rs4, $rs14
+  
+    renamable $rc4 = STZImag8
+    renamable $x = LDAbs @vs_decode_sstk + 8 :: (load (s8) from %stack.5)
+    $rc22 = STImag8 $x
+    $x = LDImag8 $rc28
+    $rc24 = STImag8 killed $x
+    $x = LDImag8 $rc29
+    $rc25 = STImag8 killed $x
+    $rc5 = STZImag8
+    BRA %bb.8
+  
+  bb.4 (%ir-block.1):
+    $x = LDImag8 $rc30
+    $rc0 = STImag8 killed $x
+    $x = LDImag8 $rc31
+    $rc1 = STImag8 killed $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 18 :: (load (s8) from %stack.16)
+    $rc31 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 17 :: (load (s8) from %stack.15)
+    $rc30 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 16 :: (load (s8) from %stack.14)
+    $rc29 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 15 :: (load (s8) from %stack.13)
+    $rc28 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 14 :: (load (s8) from %stack.12)
+    $rc27 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 13 :: (load (s8) from %stack.11)
+    $rc26 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 12 :: (load (s8) from %stack.10)
+    $rc25 = STImag8 $x
+    $x = frame-destroy LDAbs @vs_decode_sstk + 11 :: (load (s8) from %stack.9)
+    $rc24 = STImag8 $x
+    $x = frame-destroy PL
+    $rc23 = STImag8 $x
+    $x = frame-destroy PL
+    $rc22 = STImag8 $x
+    $x = frame-destroy PL
+    $rc21 = STImag8 $x
+    $x = frame-destroy PL
+    $rc20 = STImag8 $x
+    RTS implicit $rc20, implicit $rc21, implicit $rc22, implicit $rc23, implicit $rc24, implicit $rc25, implicit $rc26, implicit $rc27, implicit $rc28, implicit $rc29, implicit $rc30, implicit $rc31
+...

@@ -1,5 +1,7 @@
 | Date | Change |
 |------|--------|
+| [2026-09-25](https://github.com/wbniv/llvm-mos-65816/commit/66855b98) | fix(snes): pack the video stream into the battery's reel/apollo ROMs |
+| [2026-09-24](https://github.com/wbniv/llvm-mos-65816/commit/e7a446fa) | test(snes): wire dev/title-entropy.sh as an opt-in verify-web-roms.sh leg |
 | [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/3dbabec1) | fix(snesgfx): m7splash_begin owns the PPU control block from power-on |
 | [2026-09-15](https://github.com/wbniv/llvm-mos-65816/commit/24f334f3) | 121 verify: gate 22 on indri closed live (23/23); title-window entropy sensitivity recorded + deferred |
 | [2026-09-14](https://github.com/wbniv/llvm-mos-65816/commit/61767534) | docs(121/123): reconcile the Mode 7 gallery website gates with reality; re-verify both plans |
@@ -8,6 +10,16 @@
 | [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/bdbf5168) | feat: add Mode 7 gallery UX and progressive Mandelbrot |
 
 <!--history-meta v1
+66855b98	author	Will Norris
+66855b98	added	9
+66855b98	deleted	6
+66855b98	files	1
+66855b98	body	The "entropy-sensitive after the title" defect in snes-video-reel and\napollo-reel was never display state: dev/build.sh's battery linked both\ndemos but never packed their SVX2 stream into the ROM (that post-link step\nlived only in dev/snes-video-reel.sh / dev/apollo-reel.sh). The decoder was\nfed zeros (apollo, bank $C1 empty) or open bus (reel, linked as a 32 KiB\nLoROM), read past the staged packet into never-written $7F WRAM, and on a\nrandom power-on its MVN run-fill ran the output pointer off the framebuffer\nacross bank $00 (WRAM mirror, I/O). Traced in a seeded-entropy bsnes-jg\nbuild: execution is identical across seeds up to the key decoder's entry.\nThe published ROMs pass dev/title-entropy.sh at 60/100/200/400.\n\n- dev/build.sh: new `battery-post:` marker (after link, before checksum;\n  $ROM/$MAP exported alongside $ROOT/$BUILD/$INSTALL/$GEN).\n- apollo-reel.c: pack the synthetic stream its battery-prep already bakes.\n- snes-video-reel.c: build the HiROM cartridge its gate builds from the\n  checked-in assets and pack svx2-full-reel.bin — byte-identical to\n  dev/snes-video-reel.sh's ROM.\n- dev/battery-video-selfcheck.sh: regression guard — stream-present\n  (deterministic) + title-entropy legs; FAILs on the old battery ROMs.\n\nNo demo code changes (apollo's code bank is byte-identical); zero cycles.\nPlan: docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md\n\nCo-Authored-By: Claude Opus 5.5 (1M context) <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_017sAprvTwtKFJHKgQmr1qgr
+e7a446fa	author	Will Norris
+e7a446fa	added	5
+e7a446fa	deleted	6
+e7a446fa	files	1
+e7a446fa	body	Adds --title-entropy to dev/verify-web-roms.sh: replays every ROM in the\npublished manifest set through dev/title-entropy.sh at 3 frames x 8 runs\n(the budget decided in docs/plans/2026-07-26-121's follow-ups). Opt-in, not\nfolded into the default fast pre-publish pass, because the sweep costs\ntens of seconds per ROM across 100+ published demos.\n\nVerified: PASSes on a freshly-rebuilt fixed mandel-oop.sfc (same reference\nhashes as the plan's documented fix verification) and correctly FAILs on\nthe still-open snes-video-reel/apollo-reel post-title entropy defect\n(frame 200, matching the plan's recorded signature) -- confirms the\nwiring invokes the underlying tool correctly in both directions.\n\nMoves the TODO item to Done and strikes the plan's now-closed follow-up.\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_017sAprvTwtKFJHKgQmr1qgr
 3dbabec1	author	Will Norris
 3dbabec1	added	318
 3dbabec1	deleted	8

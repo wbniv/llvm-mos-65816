@@ -6,7 +6,7 @@
 **ROADMAP:** step 5 (M2) — correctness defect in the `+mos-a16` patch series, surfaced by the Tier-1
 differential fuzzer.
 **Context:** discovered during the [A/X-return plan](2026-06-17-321-ax-return-convention.md) verification
-(`dev/run.sh fuzz 50 1` came back 49/50). Triage history: [TODO Done `321-seed42-legalizeicmp-swap`](../../TODO.md).
+(`dev/run.sh fuzz 50 1` came back 49/50). Triage history: [TODO Done `321-seed42-legalizeicmp-swap`](../../TODO-history-2026-09-28.md).
 
 ## The defect
 

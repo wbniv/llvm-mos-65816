@@ -67,5 +67,5 @@ XFAIL / PARKED items, then the settled **REJECTED / WON'T-DO / REVERTED** dead-e
 
 Sources: plan **status headers** (grep `WON'T-DO|WON'T-IMPLEMENT|REVERTED|SKIP|DEFER|XFAIL`), the
 `## Watch` and `## Parked` sections of [`TODO.md`](../../TODO.md), the triaged `## Inbox` deferral
-ledger, and the in-plan "Deferred" / "Out of scope" sections. Update this table when a plan lands a new
+ledger preserved in the [September 28 snapshot](../../TODO-history-2026-09-28.md), and the in-plan "Deferred" / "Out of scope" sections. Update this table when a plan lands a new
 WON'T-* / DEFER disposition, or when a deferred trigger fires and the item moves to the plan index.

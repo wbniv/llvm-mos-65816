@@ -3,7 +3,7 @@
 *An at-a-glance index of every plan under [`docs/plans/`](../plans/), one row per plan, **sorted
 oldest → newest** by the commit that first introduced it. Each row: the plan (linked), a one-sentence
 summary, the commit(s) that touched it (oldest → newest), and a category. This is a reading map over the
-M0→M1→M2 arc the [ROADMAP](../ROADMAP.md) and [`TODO.md`](../../TODO.md) track; the plans themselves are
+M0→M1→M2 arc the [ROADMAP](../ROADMAP.md) and the [TODO history snapshot](../../TODO-history-2026-09-28.md) track; [current actions](../../TODO.md) and the plans themselves are
 the contract, this table is just the table of contents.*
 
 **Categories:** `M0 bench` · `M1 toolchain` · `#320 far-pointer` · `Emulator / CI` · `a16 codegen`

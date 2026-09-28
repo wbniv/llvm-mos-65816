@@ -1,0 +1,1566 @@
+
+build/carry-gate/vlastack/baseline/rom.sfc.lto.o:	file format elf32-mos
+
+Disassembly of section .text.main:
+
+00000000 <main>:
+       0:      	jsr	$0 <main>
+			00000001:  R_MOS_ADDR16	.text.vs_build
+       3:      	jsr	$0 <main>
+			00000004:  R_MOS_ADDR16	.text.vs_decode
+       6:      	rep	#$20
+       8:      	lda	$0                      ; 0x0 <main>
+			00000009:  R_MOS_ADDR16	.bss.vs_totalruns
+       b:      	eor	#$4d2b
+       e:      	sta	$0                      ; 0x0 <main>
+			0000000f:  R_MOS_ADDR8	__rc4
+      10:      	sep	#$20
+      12:      	lda	$0                      ; 0x0 <main>
+			00000013:  R_MOS_ADDR8	__rc5
+      14:      	cmp	#$80
+      16:      	rol	$0                      ; 0x0 <main>
+			00000017:  R_MOS_ADDR8	__rc4
+      18:      	rol
+      19:      	ldy	#$55
+      1b:      	ldx	#$62
+      1d:      	sty	$0                      ; 0x0 <main>
+			0000001e:  R_MOS_ADDR8	__rc2
+      1f:      	sty	$0                      ; 0x0 <main>
+			00000020:  R_MOS_ADDR8	__rc20
+      21:      	stx	$0                      ; 0x0 <main>
+			00000022:  R_MOS_ADDR8	__rc28
+      23:      	stx	$0                      ; 0x0 <main>
+			00000024:  R_MOS_ADDR8	__rc3
+      25:      	tax
+      26:      	lda	$0                      ; 0x0 <main>
+			00000027:  R_MOS_ADDR8	__rc4
+      28:      	jsr	$0 <main>
+			00000029:  R_MOS_ADDR16	.text.__mulhi3
+      2b:      	ldy	$0                      ; 0x0 <main>
+			0000002c:  R_MOS_ADDR8	__rc20
+      2d:      	sta	$0                      ; 0x0 <main>
+			0000002e:  R_MOS_ADDR8	__rc2
+      2f:      	stx	$0                      ; 0x0 <main>
+			00000030:  R_MOS_ADDR8	__rc3
+      31:      	rep	#$20
+      33:      	lda	$0                      ; 0x0 <main>
+			00000034:  R_MOS_ADDR8	__rc2
+      35:      	clc
+      36:      	adc	#$3619
+      39:      	sta	$0                      ; 0x0 <main>
+			0000003a:  R_MOS_ADDR8	__rc2
+      3b:      	sep	#$20
+      3d:      	ldx	#$0
+			0000003e:  R_MOS_ADDR16_LO	.bss.vs_img
+      3f:      	stx	$0                      ; 0x0 <main>
+			00000040:  R_MOS_ADDR8	__rc22
+      41:      	ldx	#$0
+			00000042:  R_MOS_ADDR16_HI	.bss.vs_img
+      43:      	stx	$0                      ; 0x0 <main>
+			00000044:  R_MOS_ADDR8	__rc23
+      45:      	stz	$0                      ; 0x0 <main>
+			00000046:  R_MOS_ADDR8	__rc21
+      47:      	stz	$0                      ; 0x0 <main>
+			00000048:  R_MOS_ADDR8	__rc24
+      49:      	stz	$0                      ; 0x0 <main>
+			0000004a:  R_MOS_ADDR8	__rc26
+      4b:      	stz	$0                      ; 0x0 <main>
+			0000004c:  R_MOS_ADDR8	__rc27
+      4d:      	ldx	#$0
+			0000004e:  R_MOS_ADDR16_LO	.bss.vs_nruns
+      4f:      	stx	$0                      ; 0x0 <main>
+			00000050:  R_MOS_ADDR8	__rc4
+      51:      	ldx	#$0
+			00000052:  R_MOS_ADDR16_HI	.bss.vs_nruns
+      53:      	stx	$0                      ; 0x0 <main>
+			00000054:  R_MOS_ADDR8	__rc5
+      55:      	rep	#$20
+      57:      	lda	$0                      ; 0x0 <main>
+			00000058:  R_MOS_ADDR8	__rc4
+      59:      	sep	#$20
+      5b:      	ldx	#$0
+      5d:      	stx	$0                      ; 0x0 <main>
+			0000005e:  R_MOS_ADDR8	__rc29
+      5f:      	clc
+      60:      	rep	#$20
+      62:      	adc	$0                      ; 0x0 <main>
+			00000063:  R_MOS_ADDR8	__rc26
+      64:      	sta	$0                      ; 0x0 <main>
+			00000065:  R_MOS_ADDR8	__rc4
+      66:      	sep	#$20
+      68:      	lda	($0)                    ; 0x0 <main>
+			00000069:  R_MOS_ADDR8	__rc4
+      6a:      	sta	$0                      ; 0x0 <main>
+			0000006b:  R_MOS_ADDR8	__rc20
+      6c:      	rep	#$20
+      6e:      	lda	$0                      ; 0x0 <main>
+			0000006f:  R_MOS_ADDR8	__rc2
+      70:      	eor	$0                      ; 0x0 <main>
+			00000071:  R_MOS_ADDR8	__rc20
+      72:      	sta	$0                      ; 0x0 <main>
+			00000073:  R_MOS_ADDR8	__rc4
+      74:      	sep	#$20
+      76:      	lda	$0                      ; 0x0 <main>
+			00000077:  R_MOS_ADDR8	__rc5
+      78:      	cmp	#$80
+      7a:      	rol	$0                      ; 0x0 <main>
+			0000007b:  R_MOS_ADDR8	__rc4
+      7c:      	rol
+      7d:      	sty	$0                      ; 0x0 <main>
+			0000007e:  R_MOS_ADDR8	__rc2
+      7f:      	ldx	$0                      ; 0x0 <main>
+			00000080:  R_MOS_ADDR8	__rc28
+      81:      	stx	$0                      ; 0x0 <main>
+			00000082:  R_MOS_ADDR8	__rc3
+      83:      	tax
+      84:      	lda	$0                      ; 0x0 <main>
+			00000085:  R_MOS_ADDR8	__rc4
+      86:      	sty	$0                      ; 0x0 <main>
+			00000087:  R_MOS_ADDR8	__rc27
+      88:      	jsr	$0 <main>
+			00000089:  R_MOS_ADDR16	.text.__mulhi3
+      8b:      	sta	$0                      ; 0x0 <main>
+			0000008c:  R_MOS_ADDR8	__rc2
+      8d:      	stx	$0                      ; 0x0 <main>
+			0000008e:  R_MOS_ADDR8	__rc3
+      8f:      	rep	#$20
+      91:      	lda	$0                      ; 0x0 <main>
+			00000092:  R_MOS_ADDR8	__rc2
+      93:      	sep	#$20
+      95:      	ldx	$0                      ; 0x0 <main>
+			00000096:  R_MOS_ADDR8	__rc29
+      97:      	cpx	#$1
+      99:      	rep	#$20
+      9b:      	adc	#$3619
+      9e:      	sta	$0                      ; 0x0 <main>
+			0000009f:  R_MOS_ADDR8	__rc2
+      a0:      	sep	#$20
+      a2:      	stz	$0                      ; 0x0 <main>
+			000000a3:  R_MOS_ADDR8	__rc25
+      a4:      	ldx	#$0
+			000000a5:  R_MOS_ADDR16_LO	.bss.vs_pfxsum
+      a6:      	stx	$0                      ; 0x0 <main>
+			000000a7:  R_MOS_ADDR8	__rc4
+      a8:      	ldx	#$0
+			000000a9:  R_MOS_ADDR16_HI	.bss.vs_pfxsum
+      aa:      	stx	$0                      ; 0x0 <main>
+			000000ab:  R_MOS_ADDR8	__rc5
+      ac:      	rep	#$20
+      ae:      	lda	$0                      ; 0x0 <main>
+			000000af:  R_MOS_ADDR8	__rc4
+      b0:      	sep	#$20
+      b2:      	ldx	$0                      ; 0x0 <main>
+			000000b3:  R_MOS_ADDR8	__rc29
+      b4:      	cpx	#$1
+      b6:      	rep	#$20
+      b8:      	adc	$0                      ; 0x0 <main>
+			000000b9:  R_MOS_ADDR8	__rc24
+      ba:      	sta	$0                      ; 0x0 <main>
+			000000bb:  R_MOS_ADDR8	__rc4
+      bc:      	lda	($0)                    ; 0x0 <main>
+			000000bd:  R_MOS_ADDR8	__rc4
+      be:      	sta	$0                      ; 0x0 <main>
+			000000bf:  R_MOS_ADDR8	__rc4
+      c0:      	lda	$0                      ; 0x0 <main>
+			000000c1:  R_MOS_ADDR8	__rc2
+      c2:      	eor	$0                      ; 0x0 <main>
+			000000c3:  R_MOS_ADDR8	__rc4
+      c4:      	sta	$0                      ; 0x0 <main>
+			000000c5:  R_MOS_ADDR8	__rc4
+      c6:      	sep	#$20
+      c8:      	lda	$0                      ; 0x0 <main>
+			000000c9:  R_MOS_ADDR8	__rc5
+      ca:      	cmp	#$80
+      cc:      	rol	$0                      ; 0x0 <main>
+			000000cd:  R_MOS_ADDR8	__rc4
+      ce:      	rol
+      cf:      	ldx	$0                      ; 0x0 <main>
+			000000d0:  R_MOS_ADDR8	__rc27
+      d1:      	stx	$0                      ; 0x0 <main>
+			000000d2:  R_MOS_ADDR8	__rc2
+      d3:      	ldx	$0                      ; 0x0 <main>
+			000000d4:  R_MOS_ADDR8	__rc28
+      d5:      	stx	$0                      ; 0x0 <main>
+			000000d6:  R_MOS_ADDR8	__rc3
+      d7:      	tax
+      d8:      	lda	$0                      ; 0x0 <main>
+			000000d9:  R_MOS_ADDR8	__rc4
+      da:      	jsr	$0 <main>
+			000000db:  R_MOS_ADDR16	.text.__mulhi3
+      dd:      	sta	$0                      ; 0x0 <main>
+			000000de:  R_MOS_ADDR8	__rc2
+      df:      	stx	$0                      ; 0x0 <main>
+			000000e0:  R_MOS_ADDR8	__rc3
+      e1:      	rep	#$20
+      e3:      	lda	$0                      ; 0x0 <main>
+			000000e4:  R_MOS_ADDR8	__rc2
+      e5:      	sep	#$20
+      e7:      	ldx	$0                      ; 0x0 <main>
+			000000e8:  R_MOS_ADDR8	__rc29
+      e9:      	cpx	#$1
+      eb:      	rep	#$20
+      ed:      	adc	#$3619
+      f0:      	sta	$0                      ; 0x0 <main>
+			000000f1:  R_MOS_ADDR8	__rc2
+      f2:      	sep	#$20
+      f4:      	stz	$0                      ; 0x0 <main>
+			000000f5:  R_MOS_ADDR8	__rc20
+      f6:      	rep	#$20
+      f8:      	lda	$0                      ; 0x0 <main>
+			000000f9:  R_MOS_ADDR8	__rc22
+      fa:      	sep	#$20
+      fc:      	ldx	#$0
+      fe:      	stx	$0                      ; 0x0 <main>
+			000000ff:  R_MOS_ADDR8	__rc25
+     100:      	clc
+     101:      	rep	#$20
+     103:      	adc	$0                      ; 0x0 <main>
+			00000104:  R_MOS_ADDR8	__rc20
+     105:      	sta	$0                      ; 0x0 <main>
+			00000106:  R_MOS_ADDR8	__rc4
+     107:      	sep	#$20
+     109:      	lda	($0)                    ; 0x0 <main>
+			0000010a:  R_MOS_ADDR8	__rc4
+     10b:      	sta	$0                      ; 0x0 <main>
+			0000010c:  R_MOS_ADDR8	__rc4
+     10d:      	stz	$0                      ; 0x0 <main>
+			0000010e:  R_MOS_ADDR8	__rc5
+     10f:      	rep	#$20
+     111:      	lda	$0                      ; 0x0 <main>
+			00000112:  R_MOS_ADDR8	__rc2
+     113:      	eor	$0                      ; 0x0 <main>
+			00000114:  R_MOS_ADDR8	__rc4
+     115:      	sta	$0                      ; 0x0 <main>
+			00000116:  R_MOS_ADDR8	__rc4
+     117:      	sep	#$20
+     119:      	lda	$0                      ; 0x0 <main>
+			0000011a:  R_MOS_ADDR8	__rc5
+     11b:      	cmp	#$80
+     11d:      	rol	$0                      ; 0x0 <main>
+			0000011e:  R_MOS_ADDR8	__rc4
+     11f:      	rol
+     120:      	inc	$0                      ; 0x0 <main>
+			00000121:  R_MOS_ADDR8	__rc20
+     122:      	ldx	$0                      ; 0x0 <main>
+			00000123:  R_MOS_ADDR8	__rc27
+     124:      	stx	$0                      ; 0x0 <main>
+			00000125:  R_MOS_ADDR8	__rc2
+     126:      	ldx	$0                      ; 0x0 <main>
+			00000127:  R_MOS_ADDR8	__rc28
+     128:      	stx	$0                      ; 0x0 <main>
+			00000129:  R_MOS_ADDR8	__rc3
+     12a:      	tax
+     12b:      	lda	$0                      ; 0x0 <main>
+			0000012c:  R_MOS_ADDR8	__rc4
+     12d:      	jsr	$0 <main>
+			0000012e:  R_MOS_ADDR16	.text.__mulhi3
+     130:      	sta	$0                      ; 0x0 <main>
+			00000131:  R_MOS_ADDR8	__rc2
+     132:      	stx	$0                      ; 0x0 <main>
+			00000133:  R_MOS_ADDR8	__rc3
+     134:      	rep	#$20
+     136:      	lda	$0                      ; 0x0 <main>
+			00000137:  R_MOS_ADDR8	__rc2
+     138:      	sep	#$20
+     13a:      	ldx	$0                      ; 0x0 <main>
+			0000013b:  R_MOS_ADDR8	__rc25
+     13c:      	cpx	#$1
+     13e:      	rep	#$20
+     140:      	adc	#$3619
+     143:      	sta	$0                      ; 0x0 <main>
+			00000144:  R_MOS_ADDR8	__rc2
+     145:      	sep	#$20
+     147:      	ldx	$0                      ; 0x0 <main>
+			00000148:  R_MOS_ADDR8	__rc20
+     149:      	cpx	#$40
+     14b:      	beq	$150 <main+0x150>
+     14d:      	jmp	$0 <main>
+			0000014e:  R_MOS_ADDR16	.text.main+0xf6
+     150:      	ldx	#$62
+     152:      	stx	$0                      ; 0x0 <main>
+			00000153:  R_MOS_ADDR8	__rc28
+     154:      	ldx	$0                      ; 0x0 <main>
+			00000155:  R_MOS_ADDR8	__rc26
+     156:      	inx
+     157:      	rep	#$20
+     159:      	lda	$0                      ; 0x0 <main>
+			0000015a:  R_MOS_ADDR8	__rc22
+     15b:      	clc
+     15c:      	adc	#mos16($40)
+     15f:      	sta	$0                      ; 0x0 <main>
+			00000160:  R_MOS_ADDR8	__rc22
+     161:      	sep	#$20
+     163:      	inc	$0                      ; 0x0 <main>
+			00000164:  R_MOS_ADDR8	__rc24
+     165:      	inc	$0                      ; 0x0 <main>
+			00000166:  R_MOS_ADDR8	__rc24
+     167:      	stx	$0                      ; 0x0 <main>
+			00000168:  R_MOS_ADDR8	__rc26
+     169:      	ldy	$0                      ; 0x0 <main>
+			0000016a:  R_MOS_ADDR8	__rc27
+     16b:      	cpx	#$18
+     16d:      	beq	$172 <main+0x172>
+     16f:      	jmp	$0 <main>
+			00000170:  R_MOS_ADDR16	.text.main+0x4b
+     172:      	rep	#$20
+     174:      	lda	$0                      ; 0x0 <main>
+			00000175:  R_MOS_ADDR8	__rc2
+     176:      	sta	$0                      ; 0x0 <main>
+			00000177:  R_MOS_ADDR16	.bss.corpus_result
+     179:      	sep	#$20
+     17b:      	wai
+     17c:      	bra	$17b <main+0x17b>
+
+Disassembly of section .text.vs_build:
+
+00000000 <vs_build>:
+       0:      	stz	$0                      ; 0x0 <vs_build>
+			00000001:  R_MOS_ADDR8	.zp.noinit+0x8
+       2:      	ldx	#$2f
+       4:      	ldy	#$1b
+       6:      	lda	#$55
+       8:      	sta	$0                      ; 0x0 <vs_build>
+			00000009:  R_MOS_ADDR8	.zp.noinit+0x5
+       a:      	lda	#$62
+       c:      	sta	$0                      ; 0x0 <vs_build>
+			0000000d:  R_MOS_ADDR8	.zp.noinit+0x6
+       e:      	lda	#$0
+      10:      	stz	$0                      ; 0x0 <vs_build>
+			00000011:  R_MOS_ADDR8	.zp.noinit+0x3
+      12:      	sty	$0                      ; 0x0 <vs_build>
+			00000013:  R_MOS_ADDR8	__rc4
+      14:      	stx	$0                      ; 0x0 <vs_build>
+			00000015:  R_MOS_ADDR8	__rc5
+      16:      	stz	$0                      ; 0x0 <vs_build>
+			00000017:  R_MOS_ADDR8	__rc6
+      18:      	stz	$0                      ; 0x0 <vs_build>
+			00000019:  R_MOS_ADDR8	__rc7
+      1a:      	tax
+      1b:      	stz	$0                      ; 0x0 <vs_build>
+			0000001c:  R_MOS_ADDR8	__rc2
+      1d:      	stz	$0                      ; 0x0 <vs_build>
+			0000001e:  R_MOS_ADDR8	__rc3
+      1f:      	jmp	$0 <vs_build>
+			00000020:  R_MOS_ADDR16	.text.vs_build+0x17c
+      22:      	sep	#$20
+      24:      	ldx	$0                      ; 0x0 <vs_build>
+			00000025:  R_MOS_ADDR8	__rc6
+      26:      	stx	$0                      ; 0x0 <vs_build>
+			00000027:  R_MOS_ADDR8	.zp.noinit
+      28:      	ldx	$0                      ; 0x0 <vs_build>
+			00000029:  R_MOS_ADDR8	__rc7
+      2a:      	stx	$0                      ; 0x0 <vs_build>
+			0000002b:  R_MOS_ADDR8	.zp.noinit+0x1
+      2c:      	ldy	$0                      ; 0x0 <vs_build>
+			0000002d:  R_MOS_ADDR8	__rc2
+      2e:      	ldx	$0                      ; 0x0 <vs_build>
+			0000002f:  R_MOS_ADDR8	.zp.noinit+0x4
+      30:      	stx	$0                      ; 0x0 <vs_build>
+			00000031:  R_MOS_ADDR8	.zp.noinit+0x7
+      32:      	ldx	$0                      ; 0x0 <vs_build>
+			00000033:  R_MOS_ADDR8	.zp.noinit+0xb
+      34:      	stx	$0                      ; 0x0 <vs_build>
+			00000035:  R_MOS_ADDR8	__rc2
+      36:      	ldx	$0                      ; 0x0 <vs_build>
+			00000037:  R_MOS_ADDR8	.zp.noinit+0xc
+      38:      	stx	$0                      ; 0x0 <vs_build>
+			00000039:  R_MOS_ADDR8	__rc3
+      3a:      	rep	#$20
+      3c:      	lda	$0                      ; 0x0 <vs_build>
+			0000003d:  R_MOS_ADDR8	__rc2
+      3e:      	sep	#$20
+      40:      	ldx	#$0
+      42:      	clc
+      43:      	rep	#$20
+      45:      	adc	$0                      ; 0x0 <vs_build>
+			00000046:  R_MOS_ADDR8	.zp.noinit+0x7
+      47:      	sta	$0                      ; 0x0 <vs_build>
+			00000048:  R_MOS_ADDR8	__rc2
+      49:      	sep	#$20
+      4b:      	tya
+      4c:      	sta	($0)                    ; 0x0 <vs_build>
+			0000004d:  R_MOS_ADDR8	__rc2
+      4e:      	rep	#$20
+      50:      	lda	$0                      ; 0x0 <vs_build>
+			00000051:  R_MOS_ADDR8	.zp.noinit+0x9
+      52:      	clc
+      53:      	adc	$0                      ; 0x0 <vs_build>
+			00000054:  R_MOS_ADDR8	.zp.noinit+0x7
+      55:      	sta	$0                      ; 0x0 <vs_build>
+			00000056:  R_MOS_ADDR8	__rc2
+      57:      	sep	#$20
+      59:      	lda	$0                      ; 0x0 <vs_build>
+			0000005a:  R_MOS_ADDR8	__rc4
+      5b:      	lsr
+      5c:      	lsr
+      5d:      	lsr
+      5e:      	lsr
+      5f:      	lsr
+      60:      	and	#$3
+      62:      	tax
+      63:      	lda	$0                      ; 0x0 <vs_build>
+			00000064:  R_MOS_ADDR8	.zp.noinit+0x3
+      65:      	and	#$c
+      67:      	sta	$0                      ; 0x0 <vs_build>
+			00000068:  R_MOS_ADDR8	__rc6
+      69:      	txa
+      6a:      	ora	$0                      ; 0x0 <vs_build>
+			0000006b:  R_MOS_ADDR8	__rc6
+      6c:      	sta	($0)                    ; 0x0 <vs_build>
+			0000006d:  R_MOS_ADDR8	__rc2
+      6e:      	rep	#$20
+      70:      	lda	$0                      ; 0x0 <vs_build>
+			00000071:  R_MOS_ADDR8	.zp.noinit
+      72:      	cmp	#mos16($40)
+      75:      	sep	#$20
+      77:      	ldx	#$1
+      79:      	bcs	$7d <vs_build+0x7d>
+      7b:      	ldx	#$0
+      7d:      	stx	$0                      ; 0x0 <vs_build>
+			0000007e:  R_MOS_ADDR8	__rc2
+      7f:      	ldx	#$0
+      81:      	ldy	$0                      ; 0x0 <vs_build>
+			00000082:  R_MOS_ADDR8	__rc8
+      83:      	cpy	#$f
+      85:      	bcs	$89 <vs_build+0x89>
+      87:      	ldx	#$1
+      89:      	lda	$0                      ; 0x0 <vs_build>
+			0000008a:  R_MOS_ADDR8	__rc2
+      8b:      	beq	$8f <vs_build+0x8f>
+      8d:      	ldx	#$0
+      8f:      	iny
+      90:      	inc	$0                      ; 0x0 <vs_build>
+			00000091:  R_MOS_ADDR8	.zp.noinit+0x4
+      92:      	inc	$0                      ; 0x0 <vs_build>
+			00000093:  R_MOS_ADDR8	.zp.noinit+0x4
+      94:      	clc
+      95:      	lda	$0                      ; 0x0 <vs_build>
+			00000096:  R_MOS_ADDR8	.zp.noinit+0x3
+      97:      	adc	#$4
+      99:      	sta	$0                      ; 0x0 <vs_build>
+			0000009a:  R_MOS_ADDR8	.zp.noinit+0x3
+      9b:      	sty	$0                      ; 0x0 <vs_build>
+			0000009c:  R_MOS_ADDR8	.zp.noinit+0x2
+      9d:      	txa
+      9e:      	bne	$a3 <vs_build+0xa3>
+      a0:      	jmp	$0 <vs_build>
+			000000a1:  R_MOS_ADDR16	.text.vs_build+0xff
+      a3:      	ldx	$0                      ; 0x0 <vs_build>
+			000000a4:  R_MOS_ADDR8	.zp.noinit+0x5
+      a5:      	stx	$0                      ; 0x0 <vs_build>
+			000000a6:  R_MOS_ADDR8	__rc2
+      a7:      	ldx	$0                      ; 0x0 <vs_build>
+			000000a8:  R_MOS_ADDR8	.zp.noinit+0x6
+      a9:      	stx	$0                      ; 0x0 <vs_build>
+			000000aa:  R_MOS_ADDR8	__rc3
+      ab:      	ldx	$0                      ; 0x0 <vs_build>
+			000000ac:  R_MOS_ADDR8	__rc5
+      ad:      	lda	$0                      ; 0x0 <vs_build>
+			000000ae:  R_MOS_ADDR8	__rc4
+      af:      	jsr	$0 <vs_build>
+			000000b0:  R_MOS_ADDR16	.text.__mulhi3
+      b2:      	sta	$0                      ; 0x0 <vs_build>
+			000000b3:  R_MOS_ADDR8	__rc2
+      b4:      	stx	$0                      ; 0x0 <vs_build>
+			000000b5:  R_MOS_ADDR8	__rc3
+      b6:      	rep	#$20
+      b8:      	lda	$0                      ; 0x0 <vs_build>
+			000000b9:  R_MOS_ADDR8	__rc2
+      ba:      	clc
+      bb:      	adc	#$3619
+      be:      	sta	$0                      ; 0x0 <vs_build>
+			000000bf:  R_MOS_ADDR8	__rc4
+      c0:      	sep	#$20
+      c2:      	ldx	$0                      ; 0x0 <vs_build>
+			000000c3:  R_MOS_ADDR8	.zp.noinit+0x2
+      c4:      	stx	$0                      ; 0x0 <vs_build>
+			000000c5:  R_MOS_ADDR8	__rc8
+      c6:      	cpx	#$f
+      c8:      	beq	$ef <vs_build+0xef>
+      ca:      	ldx	$0                      ; 0x0 <vs_build>
+			000000cb:  R_MOS_ADDR8	__rc5
+      cc:      	stx	$0                      ; 0x0 <vs_build>
+			000000cd:  R_MOS_ADDR8	.zp.noinit+0x7
+      ce:      	rep	#$20
+      d0:      	lda	$0                      ; 0x0 <vs_build>
+			000000d1:  R_MOS_ADDR8	.zp.noinit+0x7
+      d2:      	lsr
+      d3:      	and	#mos16($7)
+      d6:      	sep	#$20
+      d8:      	ldx	#$0
+      da:      	clc
+      db:      	rep	#$20
+      dd:      	adc	#mos16($2)
+      e0:      	sta	$0                      ; 0x0 <vs_build>
+			000000e1:  R_MOS_ADDR8	__rc2
+      e2:      	clc
+      e3:      	adc	$0                      ; 0x0 <vs_build>
+			000000e4:  R_MOS_ADDR8	.zp.noinit
+      e5:      	sta	$0                      ; 0x0 <vs_build>
+			000000e6:  R_MOS_ADDR8	__rc6
+      e7:      	cmp	#mos16($41)
+      ea:      	bcs	$ef <vs_build+0xef>
+      ec:      	jmp	$0 <vs_build>
+			000000ed:  R_MOS_ADDR16	.text.vs_build+0x22
+      ef:      	sep	#$20
+      f1:      	ldx	#$40
+      f3:      	sec
+      f4:      	txa
+      f5:      	sbc	$0                      ; 0x0 <vs_build>
+			000000f6:  R_MOS_ADDR8	.zp.noinit
+      f7:      	tay
+      f8:      	stz	$0                      ; 0x0 <vs_build>
+			000000f9:  R_MOS_ADDR8	.zp.noinit+0x1
+      fa:      	stx	$0                      ; 0x0 <vs_build>
+			000000fb:  R_MOS_ADDR8	.zp.noinit
+      fc:      	jmp	$0 <vs_build>
+			000000fd:  R_MOS_ADDR16	.text.vs_build+0x2e
+      ff:      	ldx	$0                      ; 0x0 <vs_build>
+			00000100:  R_MOS_ADDR8	.zp.noinit+0x4
+     101:      	stx	$0                      ; 0x0 <vs_build>
+			00000102:  R_MOS_ADDR8	.zp.noinit+0x7
+     103:      	ldx	$0                      ; 0x0 <vs_build>
+			00000104:  R_MOS_ADDR8	.zp.noinit+0xf
+     105:      	stx	$0                      ; 0x0 <vs_build>
+			00000106:  R_MOS_ADDR8	__rc2
+     107:      	ldx	$0                      ; 0x0 <vs_build>
+			00000108:  R_MOS_ADDR8	.zp.noinit+0x10
+     109:      	stx	$0                      ; 0x0 <vs_build>
+			0000010a:  R_MOS_ADDR8	__rc3
+     10b:      	lda	$0                      ; 0x0 <vs_build>
+			0000010c:  R_MOS_ADDR8	__rc2
+     10d:      	sta	$0                      ; 0x0 <vs_build>
+			0000010e:  R_MOS_ADDR8	__rc6
+     10f:      	stx	$0                      ; 0x0 <vs_build>
+			00000110:  R_MOS_ADDR8	__rc7
+     111:      	rep	#$20
+     113:      	lda	$0                      ; 0x0 <vs_build>
+			00000114:  R_MOS_ADDR8	__rc2
+     115:      	sep	#$20
+     117:      	ldx	#$0
+     119:      	stx	$0                      ; 0x0 <vs_build>
+			0000011a:  R_MOS_ADDR8	__rc8
+     11b:      	clc
+     11c:      	rep	#$20
+     11e:      	adc	$0                      ; 0x0 <vs_build>
+			0000011f:  R_MOS_ADDR8	.zp.noinit+0x7
+     120:      	inc
+     121:      	sta	$0                      ; 0x0 <vs_build>
+			00000122:  R_MOS_ADDR8	__rc2
+     123:      	sep	#$20
+     125:      	ldx	$0                      ; 0x0 <vs_build>
+			00000126:  R_MOS_ADDR8	__rc2
+     127:      	stx	$0                      ; 0x0 <vs_build>
+			00000128:  R_MOS_ADDR8	.zp.noinit+0xb
+     129:      	ldx	$0                      ; 0x0 <vs_build>
+			0000012a:  R_MOS_ADDR8	__rc3
+     12b:      	stx	$0                      ; 0x0 <vs_build>
+			0000012c:  R_MOS_ADDR8	.zp.noinit+0xc
+     12d:      	rep	#$10
+     12f:      	ldx	$0                      ; 0x0 <vs_build>
+			00000130:  R_MOS_ADDR8	__rc6
+     131:      	tya
+     132:      	sta	$0,x                    ; 0x0 <vs_build>
+			00000133:  R_MOS_ADDR16	.bss.vs_rle
+     135:      	sep	#$10
+     137:      	sty	$0                      ; 0x0 <vs_build>
+			00000138:  R_MOS_ADDR8	.zp.noinit+0x7
+     139:      	ldx	$0                      ; 0x0 <vs_build>
+			0000013a:  R_MOS_ADDR8	.zp.noinit+0xd
+     13b:      	stx	$0                      ; 0x0 <vs_build>
+			0000013c:  R_MOS_ADDR8	__rc2
+     13d:      	ldx	$0                      ; 0x0 <vs_build>
+			0000013e:  R_MOS_ADDR8	.zp.noinit+0xe
+     13f:      	stx	$0                      ; 0x0 <vs_build>
+			00000140:  R_MOS_ADDR8	__rc3
+     141:      	rep	#$20
+     143:      	lda	$0                      ; 0x0 <vs_build>
+			00000144:  R_MOS_ADDR8	__rc2
+     145:      	sep	#$20
+     147:      	ldx	$0                      ; 0x0 <vs_build>
+			00000148:  R_MOS_ADDR8	__rc8
+     149:      	cpx	#$1
+     14b:      	rep	#$20
+     14d:      	adc	$0                      ; 0x0 <vs_build>
+			0000014e:  R_MOS_ADDR8	.zp.noinit+0x7
+     14f:      	sta	$0                      ; 0x0 <vs_build>
+			00000150:  R_MOS_ADDR8	__rc2
+     151:      	sep	#$20
+     153:      	ldx	$0                      ; 0x0 <vs_build>
+			00000154:  R_MOS_ADDR8	.zp.noinit+0x14
+     155:      	inx
+     156:      	ldy	$0                      ; 0x0 <vs_build>
+			00000157:  R_MOS_ADDR8	.zp.noinit+0x11
+     158:      	sty	$0                      ; 0x0 <vs_build>
+			00000159:  R_MOS_ADDR8	__rc6
+     15a:      	ldy	$0                      ; 0x0 <vs_build>
+			0000015b:  R_MOS_ADDR8	.zp.noinit+0x12
+     15c:      	ldy	$0                      ; 0x0 <vs_build>
+			0000015d:  R_MOS_ADDR8	__rc6
+     15e:      	sty	$0                      ; 0x0 <vs_build>
+			0000015f:  R_MOS_ADDR8	.zp.noinit+0x3
+     160:      	inc	$0                      ; 0x0 <vs_build>
+			00000161:  R_MOS_ADDR8	.zp.noinit+0x3
+     162:      	inc	$0                      ; 0x0 <vs_build>
+			00000163:  R_MOS_ADDR8	.zp.noinit+0x3
+     164:      	clc
+     165:      	lda	$0                      ; 0x0 <vs_build>
+			00000166:  R_MOS_ADDR8	.zp.noinit+0x13
+     167:      	adc	#$4
+     169:      	ldy	$0                      ; 0x0 <vs_build>
+			0000016a:  R_MOS_ADDR8	.zp.noinit+0xb
+     16b:      	sty	$0                      ; 0x0 <vs_build>
+			0000016c:  R_MOS_ADDR8	__rc6
+     16d:      	ldy	$0                      ; 0x0 <vs_build>
+			0000016e:  R_MOS_ADDR8	.zp.noinit+0xc
+     16f:      	ldy	$0                      ; 0x0 <vs_build>
+			00000170:  R_MOS_ADDR8	.zp.noinit+0xb
+     171:      	ldy	$0                      ; 0x0 <vs_build>
+			00000172:  R_MOS_ADDR8	.zp.noinit+0xc
+     173:      	sty	$0                      ; 0x0 <vs_build>
+			00000174:  R_MOS_ADDR8	__rc7
+     175:      	cpx	#$18
+     177:      	bne	$17c <vs_build+0x17c>
+     179:      	jmp	$0 <vs_build>
+			0000017a:  R_MOS_ADDR16	.text.vs_build+0x20d
+     17c:      	ldy	$0                      ; 0x0 <vs_build>
+			0000017d:  R_MOS_ADDR8	__rc2
+     17e:      	sty	$0                      ; 0x0 <vs_build>
+			0000017f:  R_MOS_ADDR8	.zp.noinit+0xd
+     180:      	ldy	$0                      ; 0x0 <vs_build>
+			00000181:  R_MOS_ADDR8	__rc3
+     182:      	sty	$0                      ; 0x0 <vs_build>
+			00000183:  R_MOS_ADDR8	.zp.noinit+0xe
+     184:      	stx	$0                      ; 0x0 <vs_build>
+			00000185:  R_MOS_ADDR8	.zp.noinit+0x14
+     186:      	stz	$0                      ; 0x0 <vs_build>
+			00000187:  R_MOS_ADDR8	.zp.noinit+0x4
+     188:      	ldx	#$0
+			00000189:  R_MOS_ADDR16_LO	.bss.vs_rowoff
+     18a:      	stx	$0                      ; 0x0 <vs_build>
+			0000018b:  R_MOS_ADDR8	__rc2
+     18c:      	ldx	#$0
+			0000018d:  R_MOS_ADDR16_HI	.bss.vs_rowoff
+     18e:      	stx	$0                      ; 0x0 <vs_build>
+			0000018f:  R_MOS_ADDR8	__rc3
+     190:      	tay
+     191:      	rep	#$20
+     193:      	lda	$0                      ; 0x0 <vs_build>
+			00000194:  R_MOS_ADDR8	__rc2
+     195:      	sep	#$20
+     197:      	ldx	$0                      ; 0x0 <vs_build>
+			00000198:  R_MOS_ADDR8	.zp.noinit+0x3
+     199:      	stx	$0                      ; 0x0 <vs_build>
+			0000019a:  R_MOS_ADDR8	__rc2
+     19b:      	ldx	$0                      ; 0x0 <vs_build>
+			0000019c:  R_MOS_ADDR8	__rc2
+     19d:      	stx	$0                      ; 0x0 <vs_build>
+			0000019e:  R_MOS_ADDR8	.zp.noinit+0x11
+     19f:      	ldx	$0                      ; 0x0 <vs_build>
+			000001a0:  R_MOS_ADDR8	__rc3
+     1a1:      	stx	$0                      ; 0x0 <vs_build>
+			000001a2:  R_MOS_ADDR8	.zp.noinit+0x12
+     1a3:      	ldx	#$0
+     1a5:      	stx	$0                      ; 0x0 <vs_build>
+			000001a6:  R_MOS_ADDR8	__rc8
+     1a7:      	clc
+     1a8:      	rep	#$20
+     1aa:      	adc	$0                      ; 0x0 <vs_build>
+			000001ab:  R_MOS_ADDR8	.zp.noinit+0x3
+     1ac:      	sta	$0                      ; 0x0 <vs_build>
+			000001ad:  R_MOS_ADDR8	__rc2
+     1ae:      	lda	$0                      ; 0x0 <vs_build>
+			000001af:  R_MOS_ADDR8	__rc6
+     1b0:      	sta	($0)                    ; 0x0 <vs_build>
+			000001b1:  R_MOS_ADDR8	__rc2
+     1b2:      	sep	#$20
+     1b4:      	ldx	#$0
+			000001b5:  R_MOS_ADDR16_LO	.bss.vs_rle+0x1
+     1b6:      	stx	$0                      ; 0x0 <vs_build>
+			000001b7:  R_MOS_ADDR8	__rc2
+     1b8:      	ldx	#$0
+			000001b9:  R_MOS_ADDR16_HI	.bss.vs_rle+0x1
+     1ba:      	stx	$0                      ; 0x0 <vs_build>
+			000001bb:  R_MOS_ADDR8	__rc3
+     1bc:      	rep	#$20
+     1be:      	lda	$0                      ; 0x0 <vs_build>
+			000001bf:  R_MOS_ADDR8	__rc2
+     1c0:      	sep	#$20
+     1c2:      	ldx	$0                      ; 0x0 <vs_build>
+			000001c3:  R_MOS_ADDR8	__rc8
+     1c4:      	cpx	#$1
+     1c6:      	rep	#$20
+     1c8:      	adc	$0                      ; 0x0 <vs_build>
+			000001c9:  R_MOS_ADDR8	__rc6
+     1ca:      	sta	$0                      ; 0x0 <vs_build>
+			000001cb:  R_MOS_ADDR8	__rc2
+     1cc:      	sep	#$20
+     1ce:      	ldx	$0                      ; 0x0 <vs_build>
+			000001cf:  R_MOS_ADDR8	__rc2
+     1d0:      	stx	$0                      ; 0x0 <vs_build>
+			000001d1:  R_MOS_ADDR8	.zp.noinit+0xb
+     1d2:      	ldx	$0                      ; 0x0 <vs_build>
+			000001d3:  R_MOS_ADDR8	__rc3
+     1d4:      	stx	$0                      ; 0x0 <vs_build>
+			000001d5:  R_MOS_ADDR8	.zp.noinit+0xc
+     1d6:      	ldx	#$0
+			000001d7:  R_MOS_ADDR16_LO	.bss.vs_rle+0x2
+     1d8:      	stx	$0                      ; 0x0 <vs_build>
+			000001d9:  R_MOS_ADDR8	__rc2
+     1da:      	ldx	#$0
+			000001db:  R_MOS_ADDR16_HI	.bss.vs_rle+0x2
+     1dc:      	stx	$0                      ; 0x0 <vs_build>
+			000001dd:  R_MOS_ADDR8	__rc3
+     1de:      	rep	#$20
+     1e0:      	lda	$0                      ; 0x0 <vs_build>
+			000001e1:  R_MOS_ADDR8	__rc2
+     1e2:      	sep	#$20
+     1e4:      	ldx	$0                      ; 0x0 <vs_build>
+			000001e5:  R_MOS_ADDR8	__rc6
+     1e6:      	stx	$0                      ; 0x0 <vs_build>
+			000001e7:  R_MOS_ADDR8	__rc2
+     1e8:      	ldx	$0                      ; 0x0 <vs_build>
+			000001e9:  R_MOS_ADDR8	__rc7
+     1ea:      	stx	$0                      ; 0x0 <vs_build>
+			000001eb:  R_MOS_ADDR8	__rc3
+     1ec:      	ldx	$0                      ; 0x0 <vs_build>
+			000001ed:  R_MOS_ADDR8	__rc2
+     1ee:      	stx	$0                      ; 0x0 <vs_build>
+			000001ef:  R_MOS_ADDR8	.zp.noinit+0xf
+     1f0:      	ldx	$0                      ; 0x0 <vs_build>
+			000001f1:  R_MOS_ADDR8	__rc3
+     1f2:      	stx	$0                      ; 0x0 <vs_build>
+			000001f3:  R_MOS_ADDR8	.zp.noinit+0x10
+     1f4:      	ldx	$0                      ; 0x0 <vs_build>
+			000001f5:  R_MOS_ADDR8	__rc8
+     1f6:      	cpx	#$1
+     1f8:      	rep	#$20
+     1fa:      	adc	$0                      ; 0x0 <vs_build>
+			000001fb:  R_MOS_ADDR8	__rc6
+     1fc:      	sta	$0                      ; 0x0 <vs_build>
+			000001fd:  R_MOS_ADDR8	.zp.noinit+0x9
+     1fe:      	sep	#$20
+     200:      	sty	$0                      ; 0x0 <vs_build>
+			00000201:  R_MOS_ADDR8	.zp.noinit+0x13
+     202:      	sty	$0                      ; 0x0 <vs_build>
+			00000203:  R_MOS_ADDR8	.zp.noinit+0x3
+     204:      	stz	$0                      ; 0x0 <vs_build>
+			00000205:  R_MOS_ADDR8	.zp.noinit
+     206:      	stz	$0                      ; 0x0 <vs_build>
+			00000207:  R_MOS_ADDR8	.zp.noinit+0x1
+     208:      	stz	$0                      ; 0x0 <vs_build>
+			00000209:  R_MOS_ADDR8	.zp.noinit+0x2
+     20a:      	jmp	$0 <vs_build>
+			0000020b:  R_MOS_ADDR16	.text.vs_build+0xa3
+     20d:      	rep	#$20
+     20f:      	lda	$0                      ; 0x0 <vs_build>
+			00000210:  R_MOS_ADDR8	__rc2
+     211:      	sta	$0                      ; 0x0 <vs_build>
+			00000212:  R_MOS_ADDR16	.bss.vs_totalruns
+     214:      	sep	#$20
+     216:      	rts
+
+Disassembly of section .text.vs_decode:
+
+00000000 <vs_decode>:
+       0:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000001:  R_MOS_ADDR8	__rc0
+       2:      	stx	$0                      ; 0x0 <vs_decode>
+			00000003:  R_MOS_ADDR8	.zp.noinit+0xa
+       4:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000005:  R_MOS_ADDR8	__rc1
+       6:      	stx	$0                      ; 0x0 <vs_decode>
+			00000007:  R_MOS_ADDR8	.zp.noinit+0xb
+       8:      	stz	$0                      ; 0x0 <vs_decode>
+			00000009:  R_MOS_ADDR8	.zp.noinit+0x3
+       a:      	ldx	#$40
+       c:      	stx	$0                      ; 0x0 <vs_decode>
+			0000000d:  R_MOS_ADDR8	__rc2
+       e:      	ldx	#$0
+      10:      	stx	$0                      ; 0x0 <vs_decode>
+			00000011:  R_MOS_ADDR8	__rc3
+      12:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000013:  R_MOS_ADDR8	__rc2
+      14:      	stx	$0                      ; 0x0 <vs_decode>
+			00000015:  R_MOS_ADDR8	.zp.noinit+0x15
+      16:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000017:  R_MOS_ADDR8	__rc3
+      18:      	stx	$0                      ; 0x0 <vs_decode>
+			00000019:  R_MOS_ADDR8	.zp.noinit+0x16
+      1a:      	stz	$0                      ; 0x0 <vs_decode>
+			0000001b:  R_MOS_ADDR8	.zp.noinit
+      1c:      	stz	$0                      ; 0x0 <vs_decode>
+			0000001d:  R_MOS_ADDR8	.zp.noinit+0x4
+      1e:      	jmp	$0 <vs_decode>
+			0000001f:  R_MOS_ADDR16	.text.vs_decode+0x1de
+      21:      	sep	#$20
+      23:      	ldx	#$1
+      25:      	rep	#$20
+      27:      	clc
+      28:      	lda	$0                      ; 0x0 <vs_decode>
+			00000029:  R_MOS_ADDR8	.zp.noinit+0xc
+      2b:      	adc	#mos16($2)
+      2e:      	sep	#$20
+      30:      	txy
+      31:      	bne	$39 <vs_decode+0x39>
+      33:      	ldx	#$40
+      35:      	stz	$0                      ; 0x0 <vs_decode>
+			00000036:  R_MOS_ADDR8	.zp.noinit+0x1
+      37:      	stx	$0                      ; 0x0 <vs_decode>
+			00000038:  R_MOS_ADDR8	.zp.noinit
+      39:      	rep	#$20
+      3b:      	sta	$0                      ; 0x0 <vs_decode>
+			0000003c:  R_MOS_ADDR8	__rc10
+      3d:      	lda	$0                      ; 0x0 <vs_decode>
+			0000003e:  R_MOS_ADDR8	__rc4
+      3f:      	cmp	$0                      ; 0x0 <vs_decode>
+			00000040:  R_MOS_ADDR8	.zp.noinit
+      41:      	bcc	$46 <vs_decode+0x46>
+      43:      	jmp	$0 <vs_decode>
+			00000044:  R_MOS_ADDR16	.text.vs_decode+0x9f
+      46:      	sep	#$20
+      48:      	lda	($0)                    ; 0x0 <vs_decode>
+			00000049:  R_MOS_ADDR8	__rc10
+      4a:      	tay
+      4b:      	rep	#$20
+      4d:      	lda	$0                      ; 0x0 <vs_decode>
+			0000004e:  R_MOS_ADDR8	__rc8
+      4f:      	clc
+      50:      	adc	$0                      ; 0x0 <vs_decode>
+			00000051:  R_MOS_ADDR8	__rc4
+      52:      	sta	$0                      ; 0x0 <vs_decode>
+			00000053:  R_MOS_ADDR8	__rc2
+      54:      	lda	$0                      ; 0x0 <vs_decode>
+			00000055:  R_MOS_ADDR8	.zp.noinit
+      56:      	sec
+      57:      	sbc	$0                      ; 0x0 <vs_decode>
+			00000058:  R_MOS_ADDR8	__rc4
+      59:      	sta	$0                      ; 0x0 <vs_decode>
+			0000005a:  R_MOS_ADDR8	__rc6
+      5b:      	sep	#$20
+      5d:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000005e:  R_MOS_ADDR8	__rc7
+      5f:      	stx	$0                      ; 0x0 <vs_decode>
+			00000060:  R_MOS_ADDR8	__rc4
+      61:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000062:  R_MOS_ADDR8	__rc6
+      63:      	tya
+      64:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000065:  R_MOS_ADDR8	__rc8
+      66:      	sty	$0                      ; 0x0 <vs_decode>
+			00000067:  R_MOS_ADDR8	.zp.noinit+0x8
+      68:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000069:  R_MOS_ADDR8	__rc9
+      6a:      	sty	$0                      ; 0x0 <vs_decode>
+			0000006b:  R_MOS_ADDR8	.zp.noinit+0x9
+      6c:      	ldy	$0                      ; 0x0 <vs_decode>
+			0000006d:  R_MOS_ADDR8	.zp.noinit+0x6
+      6e:      	sty	$0                      ; 0x0 <vs_decode>
+			0000006f:  R_MOS_ADDR8	.zp.noinit+0xc
+      70:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000071:  R_MOS_ADDR8	.zp.noinit+0x7
+      72:      	sty	$0                      ; 0x0 <vs_decode>
+			00000073:  R_MOS_ADDR8	.zp.noinit+0xd
+      74:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000075:  R_MOS_ADDR8	__rc10
+      76:      	sty	$0                      ; 0x0 <vs_decode>
+			00000077:  R_MOS_ADDR8	.zp.noinit+0x6
+      78:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000079:  R_MOS_ADDR8	__rc11
+      7a:      	sty	$0                      ; 0x0 <vs_decode>
+			0000007b:  R_MOS_ADDR8	.zp.noinit+0x7
+      7c:      	jsr	$0 <vs_decode>
+			0000007d:  R_MOS_ADDR16	__memset
+      7f:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000080:  R_MOS_ADDR8	.zp.noinit+0x6
+      81:      	stx	$0                      ; 0x0 <vs_decode>
+			00000082:  R_MOS_ADDR8	__rc10
+      83:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000084:  R_MOS_ADDR8	.zp.noinit+0x7
+      85:      	stx	$0                      ; 0x0 <vs_decode>
+			00000086:  R_MOS_ADDR8	__rc11
+      87:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000088:  R_MOS_ADDR8	.zp.noinit+0xc
+      89:      	stx	$0                      ; 0x0 <vs_decode>
+			0000008a:  R_MOS_ADDR8	.zp.noinit+0x6
+      8b:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000008c:  R_MOS_ADDR8	.zp.noinit+0xd
+      8d:      	stx	$0                      ; 0x0 <vs_decode>
+			0000008e:  R_MOS_ADDR8	.zp.noinit+0x7
+      8f:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000090:  R_MOS_ADDR8	.zp.noinit+0x8
+      91:      	stx	$0                      ; 0x0 <vs_decode>
+			00000092:  R_MOS_ADDR8	__rc8
+      93:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000094:  R_MOS_ADDR8	.zp.noinit+0x9
+      95:      	stx	$0                      ; 0x0 <vs_decode>
+			00000096:  R_MOS_ADDR8	__rc9
+      97:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000098:  R_MOS_ADDR8	.zp.noinit
+      99:      	stx	$0                      ; 0x0 <vs_decode>
+			0000009a:  R_MOS_ADDR8	__rc4
+      9b:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000009c:  R_MOS_ADDR8	.zp.noinit+0x1
+      9d:      	stx	$0                      ; 0x0 <vs_decode>
+			0000009e:  R_MOS_ADDR8	__rc5
+      9f:      	sep	#$20
+      a1:      	dec	$0                      ; 0x0 <vs_decode>
+			000000a2:  R_MOS_ADDR8	.zp.noinit+0x2
+      a3:      	rep	#$20
+      a5:      	lda	$0                      ; 0x0 <vs_decode>
+			000000a6:  R_MOS_ADDR8	.zp.noinit+0x4
+      a7:      	clc
+      a8:      	sep	#$20
+      aa:      	ldx	#$0
+      ac:      	rep	#$20
+      ae:      	adc	#mos16($2)
+      b1:      	sta	$0                      ; 0x0 <vs_decode>
+			000000b2:  R_MOS_ADDR8	.zp.noinit+0x4
+      b3:      	sep	#$20
+      b5:      	lda	$0                      ; 0x0 <vs_decode>
+			000000b6:  R_MOS_ADDR8	.zp.noinit+0x2
+      b7:      	beq	$d5 <vs_decode+0xd5>
+      b9:      	rep	#$20
+      bb:      	lda	$0                      ; 0x0 <vs_decode>
+			000000bc:  R_MOS_ADDR8	__rc10
+      bd:      	sta	$0                      ; 0x0 <vs_decode>
+			000000be:  R_MOS_ADDR8	.zp.noinit+0xc
+      c0:      	lda	($0)                    ; 0x0 <vs_decode>
+			000000c1:  R_MOS_ADDR8	.zp.noinit+0x4
+      c2:      	sta	$0                      ; 0x0 <vs_decode>
+			000000c3:  R_MOS_ADDR8	.zp.noinit
+      c4:      	cmp	#mos16($40)
+      c7:      	bcs	$cc <vs_decode+0xcc>
+      c9:      	jmp	$0 <vs_decode>
+			000000ca:  R_MOS_ADDR16	.text.vs_decode+0x21
+      cc:      	sep	#$20
+      ce:      	ldx	#$0
+      d0:      	rep	#$20
+      d2:      	jmp	$0 <vs_decode>
+			000000d3:  R_MOS_ADDR16	.text.vs_decode+0x27
+      d5:      	stx	$0                      ; 0x0 <vs_decode>
+			000000d6:  R_MOS_ADDR8	.zp.noinit+0x8
+      d7:      	rep	#$20
+      d9:      	lda	$0                      ; 0x0 <vs_decode>
+			000000da:  R_MOS_ADDR8	__rc4
+      db:      	cmp	#mos16($40)
+      de:      	bcs	$10d <vs_decode+0x10d>
+      e0:      	lda	$0                      ; 0x0 <vs_decode>
+			000000e1:  R_MOS_ADDR8	__rc8
+      e2:      	clc
+      e3:      	sep	#$20
+      e5:      	stx	$0                      ; 0x0 <vs_decode>
+			000000e6:  R_MOS_ADDR8	.zp.noinit+0x8
+      e7:      	rep	#$20
+      e9:      	adc	$0                      ; 0x0 <vs_decode>
+			000000ea:  R_MOS_ADDR8	__rc4
+      eb:      	sta	$0                      ; 0x0 <vs_decode>
+			000000ec:  R_MOS_ADDR8	__rc2
+      ed:      	sep	#$20
+      ef:      	ldx	$0                      ; 0x0 <vs_decode>
+			000000f0:  R_MOS_ADDR8	.zp.noinit+0x15
+      f1:      	stx	$0                      ; 0x0 <vs_decode>
+			000000f2:  R_MOS_ADDR8	__rc6
+      f3:      	ldx	$0                      ; 0x0 <vs_decode>
+			000000f4:  R_MOS_ADDR8	.zp.noinit+0x16
+      f5:      	stx	$0                      ; 0x0 <vs_decode>
+			000000f6:  R_MOS_ADDR8	__rc7
+      f7:      	rep	#$20
+      f9:      	lda	$0                      ; 0x0 <vs_decode>
+			000000fa:  R_MOS_ADDR8	__rc6
+      fb:      	sec
+      fc:      	sbc	$0                      ; 0x0 <vs_decode>
+			000000fd:  R_MOS_ADDR8	__rc4
+      fe:      	sta	$0                      ; 0x0 <vs_decode>
+			000000ff:  R_MOS_ADDR8	__rc6
+     100:      	sep	#$20
+     102:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000103:  R_MOS_ADDR8	__rc7
+     104:      	stx	$0                      ; 0x0 <vs_decode>
+			00000105:  R_MOS_ADDR8	__rc4
+     106:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000107:  R_MOS_ADDR8	__rc6
+     108:      	lda	#$0
+     10a:      	jsr	$0 <vs_decode>
+			0000010b:  R_MOS_ADDR16	__memset
+     10d:      	sep	#$20
+     10f:      	ldx	#$9e
+     111:      	ldy	#$37
+     113:      	sty	$0                      ; 0x0 <vs_decode>
+			00000114:  R_MOS_ADDR8	__rc2
+     115:      	stx	$0                      ; 0x0 <vs_decode>
+			00000116:  R_MOS_ADDR8	__rc3
+     117:      	ldx	#$55
+     119:      	stx	$0                      ; 0x0 <vs_decode>
+			0000011a:  R_MOS_ADDR8	.zp.noinit
+     11b:      	ldx	#$62
+     11d:      	stx	$0                      ; 0x0 <vs_decode>
+			0000011e:  R_MOS_ADDR8	.zp.noinit+0x1
+     11f:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000120:  R_MOS_ADDR8	.zp.noinit+0x12
+     121:      	stx	$0                      ; 0x0 <vs_decode>
+			00000122:  R_MOS_ADDR8	.zp.noinit+0x4
+     123:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000124:  R_MOS_ADDR8	.zp.noinit+0x13
+     125:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000126:  R_MOS_ADDR8	.zp.noinit+0xe
+     127:      	stx	$0                      ; 0x0 <vs_decode>
+			00000128:  R_MOS_ADDR8	__rc4
+     129:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000012a:  R_MOS_ADDR8	.zp.noinit+0xf
+     12b:      	stx	$0                      ; 0x0 <vs_decode>
+			0000012c:  R_MOS_ADDR8	__rc5
+     12d:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000012e:  R_MOS_ADDR8	__rc4
+     12f:      	stx	$0                      ; 0x0 <vs_decode>
+			00000130:  R_MOS_ADDR8	.zp.noinit+0xe
+     131:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000132:  R_MOS_ADDR8	__rc5
+     133:      	stx	$0                      ; 0x0 <vs_decode>
+			00000134:  R_MOS_ADDR8	.zp.noinit+0xf
+     135:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000136:  R_MOS_ADDR8	.zp.noinit+0x14
+     137:      	stx	$0                      ; 0x0 <vs_decode>
+			00000138:  R_MOS_ADDR8	.zp.noinit+0x2
+     139:      	rep	#$20
+     13b:      	lda	($0)                    ; 0x0 <vs_decode>
+			0000013c:  R_MOS_ADDR8	.zp.noinit+0x6
+     13d:      	eor	$0                      ; 0x0 <vs_decode>
+			0000013e:  R_MOS_ADDR8	__rc2
+     13f:      	sta	$0                      ; 0x0 <vs_decode>
+			00000140:  R_MOS_ADDR8	__rc4
+     141:      	sep	#$20
+     143:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000144:  R_MOS_ADDR8	.zp.noinit
+     145:      	stx	$0                      ; 0x0 <vs_decode>
+			00000146:  R_MOS_ADDR8	__rc2
+     147:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000148:  R_MOS_ADDR8	.zp.noinit+0x1
+     149:      	stx	$0                      ; 0x0 <vs_decode>
+			0000014a:  R_MOS_ADDR8	__rc3
+     14b:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000014c:  R_MOS_ADDR8	__rc5
+     14d:      	lda	$0                      ; 0x0 <vs_decode>
+			0000014e:  R_MOS_ADDR8	__rc4
+     14f:      	jsr	$0 <vs_decode>
+			00000150:  R_MOS_ADDR16	.text.__mulhi3
+     152:      	sta	$0                      ; 0x0 <vs_decode>
+			00000153:  R_MOS_ADDR8	__rc2
+     154:      	stx	$0                      ; 0x0 <vs_decode>
+			00000155:  R_MOS_ADDR8	__rc3
+     156:      	rep	#$20
+     158:      	lda	$0                      ; 0x0 <vs_decode>
+			00000159:  R_MOS_ADDR8	__rc2
+     15a:      	sep	#$20
+     15c:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000015d:  R_MOS_ADDR8	.zp.noinit+0x8
+     15e:      	cpx	#$1
+     160:      	rep	#$20
+     162:      	adc	#$3619
+     165:      	sta	$0                      ; 0x0 <vs_decode>
+			00000166:  R_MOS_ADDR8	__rc2
+     167:      	lda	$0                      ; 0x0 <vs_decode>
+			00000168:  R_MOS_ADDR8	.zp.noinit+0x6
+     169:      	sep	#$20
+     16b:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000016c:  R_MOS_ADDR8	.zp.noinit+0x8
+     16d:      	cpx	#$1
+     16f:      	rep	#$20
+     171:      	adc	#mos16($2)
+     174:      	sta	$0                      ; 0x0 <vs_decode>
+			00000175:  R_MOS_ADDR8	.zp.noinit+0x6
+     176:      	sep	#$20
+     178:      	dec	$0                      ; 0x0 <vs_decode>
+			00000179:  R_MOS_ADDR8	.zp.noinit+0x2
+     17a:      	bne	$139 <vs_decode+0x139>
+     17c:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000017d:  R_MOS_ADDR8	.zp.noinit+0x10
+     17e:      	stx	$0                      ; 0x0 <vs_decode>
+			0000017f:  R_MOS_ADDR8	.zp.noinit
+     180:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000181:  R_MOS_ADDR8	.zp.noinit+0x11
+     182:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000183:  R_MOS_ADDR8	.zp.noinit+0xe
+     184:      	stx	$0                      ; 0x0 <vs_decode>
+			00000185:  R_MOS_ADDR8	__rc4
+     186:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000187:  R_MOS_ADDR8	.zp.noinit+0xf
+     188:      	stx	$0                      ; 0x0 <vs_decode>
+			00000189:  R_MOS_ADDR8	__rc5
+     18a:      	ldy	$0                      ; 0x0 <vs_decode>
+			0000018b:  R_MOS_ADDR8	__rc4
+     18c:      	sty	$0                      ; 0x0 <vs_decode>
+			0000018d:  R_MOS_ADDR8	.zp.noinit+0x8
+     18e:      	stx	$0                      ; 0x0 <vs_decode>
+			0000018f:  R_MOS_ADDR8	.zp.noinit+0x9
+     190:      	bra	$1ab <vs_decode+0x1ab>
+     192:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000193:  R_MOS_ADDR8	__rc8
+     194:      	stx	$0                      ; 0x0 <vs_decode>
+			00000195:  R_MOS_ADDR8	__rc2
+     196:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000197:  R_MOS_ADDR8	__rc9
+     198:      	stx	$0                      ; 0x0 <vs_decode>
+			00000199:  R_MOS_ADDR8	__rc3
+     19a:      	stz	$0                      ; 0x0 <vs_decode>
+			0000019b:  R_MOS_ADDR8	__rc4
+     19c:      	ldx	#$40
+     19e:      	lda	#$0
+     1a0:      	jsr	$0 <vs_decode>
+			000001a1:  R_MOS_ADDR16	__memset
+     1a3:      	ldx	#$9e
+     1a5:      	ldy	#$37
+     1a7:      	sty	$0                      ; 0x0 <vs_decode>
+			000001a8:  R_MOS_ADDR8	__rc2
+     1a9:      	stx	$0                      ; 0x0 <vs_decode>
+			000001aa:  R_MOS_ADDR8	__rc3
+     1ab:      	stz	$0                      ; 0x0 <vs_decode>
+			000001ac:  R_MOS_ADDR8	.zp.noinit+0x1
+     1ad:      	ldx	#$0
+			000001ae:  R_MOS_ADDR16_LO	.bss.vs_pfxsum
+     1af:      	stx	$0                      ; 0x0 <vs_decode>
+			000001b0:  R_MOS_ADDR8	__rc4
+     1b1:      	ldx	#$0
+			000001b2:  R_MOS_ADDR16_HI	.bss.vs_pfxsum
+     1b3:      	stx	$0                      ; 0x0 <vs_decode>
+			000001b4:  R_MOS_ADDR8	__rc5
+     1b5:      	rep	#$20
+     1b7:      	lda	$0                      ; 0x0 <vs_decode>
+			000001b8:  R_MOS_ADDR8	__rc4
+     1b9:      	clc
+     1ba:      	adc	$0                      ; 0x0 <vs_decode>
+			000001bb:  R_MOS_ADDR8	.zp.noinit
+     1bc:      	sta	$0                      ; 0x0 <vs_decode>
+			000001bd:  R_MOS_ADDR8	__rc4
+     1be:      	lda	$0                      ; 0x0 <vs_decode>
+			000001bf:  R_MOS_ADDR8	__rc2
+     1c0:      	sta	($0)                    ; 0x0 <vs_decode>
+			000001c1:  R_MOS_ADDR8	__rc4
+     1c2:      	sep	#$20
+     1c4:      	ldx	$0                      ; 0x0 <vs_decode>
+			000001c5:  R_MOS_ADDR8	.zp.noinit+0x8
+     1c6:      	stx	$0                      ; 0x0 <vs_decode>
+			000001c7:  R_MOS_ADDR8	__rc0
+     1c8:      	ldx	$0                      ; 0x0 <vs_decode>
+			000001c9:  R_MOS_ADDR8	.zp.noinit+0x9
+     1ca:      	stx	$0                      ; 0x0 <vs_decode>
+			000001cb:  R_MOS_ADDR8	__rc1
+     1cc:      	ldx	$0                      ; 0x0 <vs_decode>
+			000001cd:  R_MOS_ADDR8	.zp.noinit+0x4
+     1ce:      	inx
+     1cf:      	ldy	$0                      ; 0x0 <vs_decode>
+			000001d0:  R_MOS_ADDR8	.zp.noinit
+     1d1:      	iny
+     1d2:      	iny
+     1d3:      	sty	$0                      ; 0x0 <vs_decode>
+			000001d4:  R_MOS_ADDR8	.zp.noinit
+     1d5:      	stx	$0                      ; 0x0 <vs_decode>
+			000001d6:  R_MOS_ADDR8	.zp.noinit+0x4
+     1d7:      	cpx	#$18
+     1d9:      	bne	$1de <vs_decode+0x1de>
+     1db:      	jmp	$0 <vs_decode>
+			000001dc:  R_MOS_ADDR16	.text.vs_decode+0x320
+     1de:      	stz	$0                      ; 0x0 <vs_decode>
+			000001df:  R_MOS_ADDR8	.zp.noinit+0x5
+     1e0:      	rep	#$20
+     1e2:      	lda	$0                      ; 0x0 <vs_decode>
+			000001e3:  R_MOS_ADDR8	.zp.noinit+0x4
+     1e4:      	asl
+     1e5:      	asl
+     1e6:      	asl
+     1e7:      	asl
+     1e8:      	asl
+     1e9:      	asl
+     1ea:      	sta	$0                      ; 0x0 <vs_decode>
+			000001eb:  R_MOS_ADDR8	__rc2
+     1ec:      	sep	#$20
+     1ee:      	ldx	#$0
+			000001ef:  R_MOS_ADDR16_LO	.bss.vs_img
+     1f0:      	stx	$0                      ; 0x0 <vs_decode>
+			000001f1:  R_MOS_ADDR8	__rc4
+     1f2:      	ldx	#$0
+			000001f3:  R_MOS_ADDR16_HI	.bss.vs_img
+     1f4:      	stx	$0                      ; 0x0 <vs_decode>
+			000001f5:  R_MOS_ADDR8	__rc5
+     1f6:      	rep	#$20
+     1f8:      	lda	$0                      ; 0x0 <vs_decode>
+			000001f9:  R_MOS_ADDR8	__rc4
+     1fa:      	sep	#$20
+     1fc:      	ldx	#$0
+     1fe:      	stx	$0                      ; 0x0 <vs_decode>
+			000001ff:  R_MOS_ADDR8	__rc6
+     200:      	clc
+     201:      	rep	#$20
+     203:      	adc	$0                      ; 0x0 <vs_decode>
+			00000204:  R_MOS_ADDR8	__rc2
+     205:      	sta	$0                      ; 0x0 <vs_decode>
+			00000206:  R_MOS_ADDR8	__rc8
+     207:      	sep	#$20
+     209:      	stz	$0                      ; 0x0 <vs_decode>
+			0000020a:  R_MOS_ADDR8	.zp.noinit+0x1
+     20b:      	ldx	#$0
+			0000020c:  R_MOS_ADDR16_LO	.bss.vs_rowoff
+     20d:      	stx	$0                      ; 0x0 <vs_decode>
+			0000020e:  R_MOS_ADDR8	__rc2
+     20f:      	ldx	#$0
+			00000210:  R_MOS_ADDR16_HI	.bss.vs_rowoff
+     211:      	stx	$0                      ; 0x0 <vs_decode>
+			00000212:  R_MOS_ADDR8	__rc3
+     213:      	rep	#$20
+     215:      	lda	$0                      ; 0x0 <vs_decode>
+			00000216:  R_MOS_ADDR8	__rc2
+     217:      	sep	#$20
+     219:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000021a:  R_MOS_ADDR8	__rc6
+     21b:      	cpx	#$1
+     21d:      	rep	#$20
+     21f:      	adc	$0                      ; 0x0 <vs_decode>
+			00000220:  R_MOS_ADDR8	.zp.noinit
+     221:      	sta	$0                      ; 0x0 <vs_decode>
+			00000222:  R_MOS_ADDR8	__rc2
+     223:      	lda	($0)                    ; 0x0 <vs_decode>
+			00000224:  R_MOS_ADDR8	__rc2
+     225:      	sta	$0                      ; 0x0 <vs_decode>
+			00000226:  R_MOS_ADDR8	__rc2
+     227:      	sep	#$20
+     229:      	ldx	#$0
+			0000022a:  R_MOS_ADDR16_LO	.bss.vs_rle
+     22b:      	stx	$0                      ; 0x0 <vs_decode>
+			0000022c:  R_MOS_ADDR8	__rc4
+     22d:      	ldx	#$0
+			0000022e:  R_MOS_ADDR16_HI	.bss.vs_rle
+     22f:      	stx	$0                      ; 0x0 <vs_decode>
+			00000230:  R_MOS_ADDR8	__rc5
+     231:      	rep	#$20
+     233:      	lda	$0                      ; 0x0 <vs_decode>
+			00000234:  R_MOS_ADDR8	__rc4
+     235:      	sep	#$20
+     237:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000238:  R_MOS_ADDR8	__rc6
+     239:      	cpx	#$1
+     23b:      	rep	#$20
+     23d:      	adc	$0                      ; 0x0 <vs_decode>
+			0000023e:  R_MOS_ADDR8	__rc2
+     23f:      	sta	$0                      ; 0x0 <vs_decode>
+			00000240:  R_MOS_ADDR8	.zp.noinit+0xc
+     242:      	sep	#$20
+     244:      	rep	#$10
+     246:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000247:  R_MOS_ADDR8	__rc2
+     248:      	sep	#$10
+     24a:      	ldy	#$0
+			0000024b:  R_MOS_ADDR16_LO	.bss.vs_nruns
+     24c:      	sty	$0                      ; 0x0 <vs_decode>
+			0000024d:  R_MOS_ADDR8	__rc2
+     24e:      	ldy	#$0
+			0000024f:  R_MOS_ADDR16_HI	.bss.vs_nruns
+     250:      	sty	$0                      ; 0x0 <vs_decode>
+			00000251:  R_MOS_ADDR8	__rc3
+     252:      	rep	#$10
+     254:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000255:  R_MOS_ADDR8	__rc2
+     256:      	lda	$0,x                    ; 0x0 <vs_decode>
+			00000257:  R_MOS_ADDR16	.bss.vs_rle
+     259:      	sep	#$10
+     25b:      	tax
+     25c:      	rep	#$20
+     25e:      	lda	$0                      ; 0x0 <vs_decode>
+			0000025f:  R_MOS_ADDR8	__rc2
+     260:      	sep	#$20
+     262:      	ldy	#$0
+     264:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000265:  R_MOS_ADDR8	__rc6
+     266:      	cpy	#$1
+     268:      	rep	#$20
+     26a:      	adc	$0                      ; 0x0 <vs_decode>
+			0000026b:  R_MOS_ADDR8	.zp.noinit+0x4
+     26c:      	sta	$0                      ; 0x0 <vs_decode>
+			0000026d:  R_MOS_ADDR8	__rc2
+     26e:      	sep	#$20
+     270:      	txa
+     271:      	stx	$0                      ; 0x0 <vs_decode>
+			00000272:  R_MOS_ADDR8	.zp.noinit+0x2
+     273:      	sta	($0)                    ; 0x0 <vs_decode>
+			00000274:  R_MOS_ADDR8	__rc2
+     275:      	rep	#$20
+     277:      	lda	$0                      ; 0x0 <vs_decode>
+			00000278:  R_MOS_ADDR8	.zp.noinit+0x2
+     279:      	asl
+     27a:      	sta	$0                      ; 0x0 <vs_decode>
+			0000027b:  R_MOS_ADDR8	__rc2
+     27c:      	lda	$0                      ; 0x0 <vs_decode>
+			0000027d:  R_MOS_ADDR8	__rc0
+     27e:      	sec
+     27f:      	sbc	$0                      ; 0x0 <vs_decode>
+			00000280:  R_MOS_ADDR8	__rc2
+     281:      	sta	$0                      ; 0x0 <vs_decode>
+			00000282:  R_MOS_ADDR8	.zp.noinit+0x6
+     283:      	sep	#$20
+     285:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000286:  R_MOS_ADDR8	__rc0
+     287:      	sty	$0                      ; 0x0 <vs_decode>
+			00000288:  R_MOS_ADDR8	.zp.noinit+0x8
+     289:      	ldy	$0                      ; 0x0 <vs_decode>
+			0000028a:  R_MOS_ADDR8	__rc1
+     28b:      	sty	$0                      ; 0x0 <vs_decode>
+			0000028c:  R_MOS_ADDR8	.zp.noinit+0x9
+     28d:      	ldy	$0                      ; 0x0 <vs_decode>
+			0000028e:  R_MOS_ADDR8	.zp.noinit+0x6
+     28f:      	sty	$0                      ; 0x0 <vs_decode>
+			00000290:  R_MOS_ADDR8	__rc0
+     291:      	ldy	$0                      ; 0x0 <vs_decode>
+			00000292:  R_MOS_ADDR8	.zp.noinit+0x7
+     293:      	sty	$0                      ; 0x0 <vs_decode>
+			00000294:  R_MOS_ADDR8	__rc1
+     295:      	txa
+     296:      	bne	$29b <vs_decode+0x29b>
+     298:      	jmp	$0 <vs_decode>
+			00000299:  R_MOS_ADDR16	.text.vs_decode+0x192
+     29b:      	stx	$0                      ; 0x0 <vs_decode>
+			0000029c:  R_MOS_ADDR8	__rc5
+     29d:      	ldx	$0                      ; 0x0 <vs_decode>
+			0000029e:  R_MOS_ADDR8	.zp.noinit+0x8
+     29f:      	stx	$0                      ; 0x0 <vs_decode>
+			000002a0:  R_MOS_ADDR8	__rc2
+     2a1:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002a2:  R_MOS_ADDR8	.zp.noinit+0x9
+     2a3:      	stx	$0                      ; 0x0 <vs_decode>
+			000002a4:  R_MOS_ADDR8	__rc3
+     2a5:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002a6:  R_MOS_ADDR8	__rc2
+     2a7:      	stx	$0                      ; 0x0 <vs_decode>
+			000002a8:  R_MOS_ADDR8	.zp.noinit+0xe
+     2a9:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002aa:  R_MOS_ADDR8	__rc3
+     2ab:      	stx	$0                      ; 0x0 <vs_decode>
+			000002ac:  R_MOS_ADDR8	.zp.noinit+0xf
+     2ad:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002ae:  R_MOS_ADDR8	.zp.noinit+0x4
+     2af:      	stx	$0                      ; 0x0 <vs_decode>
+			000002b0:  R_MOS_ADDR8	.zp.noinit+0x12
+     2b1:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002b2:  R_MOS_ADDR8	.zp.noinit+0x5
+     2b3:      	stx	$0                      ; 0x0 <vs_decode>
+			000002b4:  R_MOS_ADDR8	.zp.noinit+0x13
+     2b5:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002b6:  R_MOS_ADDR8	.zp.noinit
+     2b7:      	stx	$0                      ; 0x0 <vs_decode>
+			000002b8:  R_MOS_ADDR8	.zp.noinit+0x10
+     2b9:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002ba:  R_MOS_ADDR8	.zp.noinit+0x1
+     2bb:      	stx	$0                      ; 0x0 <vs_decode>
+			000002bc:  R_MOS_ADDR8	.zp.noinit+0x11
+     2bd:      	rep	#$20
+     2bf:      	lda	$0                      ; 0x0 <vs_decode>
+			000002c0:  R_MOS_ADDR8	.zp.noinit+0xc
+     2c2:      	sta	$0                      ; 0x0 <vs_decode>
+			000002c3:  R_MOS_ADDR8	__rc10
+     2c4:      	sep	#$20
+     2c6:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002c7:  R_MOS_ADDR8	__rc10
+     2c8:      	stx	$0                      ; 0x0 <vs_decode>
+			000002c9:  R_MOS_ADDR8	__rc2
+     2ca:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002cb:  R_MOS_ADDR8	__rc11
+     2cc:      	stx	$0                      ; 0x0 <vs_decode>
+			000002cd:  R_MOS_ADDR8	__rc3
+     2ce:      	inc	$0                      ; 0x0 <vs_decode>
+			000002cf:  R_MOS_ADDR8	__rc2
+     2d0:      	bne	$2d4 <vs_decode+0x2d4>
+     2d2:      	inc	$0                      ; 0x0 <vs_decode>
+			000002d3:  R_MOS_ADDR8	__rc3
+     2d4:      	stz	$0                      ; 0x0 <vs_decode>
+			000002d5:  R_MOS_ADDR8	__rc4
+     2d6:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002d7:  R_MOS_ADDR8	.zp.noinit+0x6
+     2d8:      	stx	$0                      ; 0x0 <vs_decode>
+			000002d9:  R_MOS_ADDR8	__rc6
+     2da:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002db:  R_MOS_ADDR8	.zp.noinit+0x7
+     2dc:      	stx	$0                      ; 0x0 <vs_decode>
+			000002dd:  R_MOS_ADDR8	__rc7
+     2de:      	ldx	$0                      ; 0x0 <vs_decode>
+			000002df:  R_MOS_ADDR8	__rc5
+     2e0:      	stx	$0                      ; 0x0 <vs_decode>
+			000002e1:  R_MOS_ADDR8	.zp.noinit+0x14
+     2e2:      	stz	$0                      ; 0x0 <vs_decode>
+			000002e3:  R_MOS_ADDR8	__rc5
+     2e4:      	lda	($0)                    ; 0x0 <vs_decode>
+			000002e5:  R_MOS_ADDR8	__rc2
+     2e6:      	sta	$0                      ; 0x0 <vs_decode>
+			000002e7:  R_MOS_ADDR8	.zp.noinit+0x2
+     2e8:      	rep	#$20
+     2ea:      	lda	$0                      ; 0x0 <vs_decode>
+			000002eb:  R_MOS_ADDR8	__rc4
+     2ec:      	clc
+     2ed:      	adc	$0                      ; 0x0 <vs_decode>
+			000002ee:  R_MOS_ADDR8	.zp.noinit+0x2
+     2ef:      	sta	$0                      ; 0x0 <vs_decode>
+			000002f0:  R_MOS_ADDR8	__rc4
+     2f1:      	sta	($0)                    ; 0x0 <vs_decode>
+			000002f2:  R_MOS_ADDR8	__rc6
+     2f3:      	sep	#$20
+     2f5:      	dex
+     2f6:      	rep	#$20
+     2f8:      	lda	$0                      ; 0x0 <vs_decode>
+			000002f9:  R_MOS_ADDR8	__rc6
+     2fa:      	clc
+     2fb:      	adc	#mos16($2)
+     2fe:      	sta	$0                      ; 0x0 <vs_decode>
+			000002ff:  R_MOS_ADDR8	__rc6
+     300:      	lda	$0                      ; 0x0 <vs_decode>
+			00000301:  R_MOS_ADDR8	__rc2
+     302:      	clc
+     303:      	adc	#mos16($2)
+     306:      	sta	$0                      ; 0x0 <vs_decode>
+			00000307:  R_MOS_ADDR8	__rc2
+     308:      	sep	#$20
+     30a:      	txa
+     30b:      	bne	$2e4 <vs_decode+0x2e4>
+     30d:      	stz	$0                      ; 0x0 <vs_decode>
+			0000030e:  R_MOS_ADDR8	__rc4
+     30f:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000310:  R_MOS_ADDR8	.zp.noinit+0x6
+     311:      	stx	$0                      ; 0x0 <vs_decode>
+			00000312:  R_MOS_ADDR8	.zp.noinit+0x4
+     313:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000314:  R_MOS_ADDR8	.zp.noinit+0x7
+     315:      	stx	$0                      ; 0x0 <vs_decode>
+			00000316:  R_MOS_ADDR8	.zp.noinit+0x5
+     317:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000318:  R_MOS_ADDR8	.zp.noinit+0x14
+     319:      	stx	$0                      ; 0x0 <vs_decode>
+			0000031a:  R_MOS_ADDR8	.zp.noinit+0x2
+     31b:      	stz	$0                      ; 0x0 <vs_decode>
+			0000031c:  R_MOS_ADDR8	__rc5
+     31d:      	jmp	$0 <vs_decode>
+			0000031e:  R_MOS_ADDR16	.text.vs_decode+0xb9
+     320:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000321:  R_MOS_ADDR8	.zp.noinit+0xa
+     322:      	stx	$0                      ; 0x0 <vs_decode>
+			00000323:  R_MOS_ADDR8	__rc0
+     324:      	ldx	$0                      ; 0x0 <vs_decode>
+			00000325:  R_MOS_ADDR8	.zp.noinit+0xb
+     326:      	stx	$0                      ; 0x0 <vs_decode>
+			00000327:  R_MOS_ADDR8	__rc1
+     328:      	rts
+
+Disassembly of section .text.exit:
+
+00000000 <exit>:
+       0:      	jsr	$0 <exit>
+			00000001:  R_MOS_ADDR16	_fini
+       3:      	bra	$3 <exit+0x3>
+
+Disassembly of section .text.memcpy:
+
+00000000 <memcpy>:
+       0:      	tay
+       1:      	txa
+       2:      	bne	$7 <memcpy+0x7>
+       4:      	tya
+       5:      	beq	$2b <memcpy+0x2b>
+       7:      	lda	$0                      ; 0x0 <memcpy>
+			00000008:  R_MOS_ADDR8	__rc2
+       9:      	sta	$0                      ; 0x0 <memcpy>
+			0000000a:  R_MOS_ADDR8	__rc6
+       b:      	lda	$0                      ; 0x0 <memcpy>
+			0000000c:  R_MOS_ADDR8	__rc3
+       d:      	sta	$0                      ; 0x0 <memcpy>
+			0000000e:  R_MOS_ADDR8	__rc7
+       f:      	lda	($0)                    ; 0x0 <memcpy>
+			00000010:  R_MOS_ADDR8	__rc4
+      11:      	sta	($0)                    ; 0x0 <memcpy>
+			00000012:  R_MOS_ADDR8	__rc6
+      13:      	inc	$0                      ; 0x0 <memcpy>
+			00000014:  R_MOS_ADDR8	__rc6
+      15:      	bne	$19 <memcpy+0x19>
+      17:      	inc	$0                      ; 0x0 <memcpy>
+			00000018:  R_MOS_ADDR8	__rc7
+      19:      	inc	$0                      ; 0x0 <memcpy>
+			0000001a:  R_MOS_ADDR8	__rc4
+      1b:      	bne	$1f <memcpy+0x1f>
+      1d:      	inc	$0                      ; 0x0 <memcpy>
+			0000001e:  R_MOS_ADDR8	__rc5
+      1f:      	dey
+      20:      	cpy	#$ff
+      22:      	bne	$25 <memcpy+0x25>
+      24:      	dex
+      25:      	txa
+      26:      	bne	$f <memcpy+0xf>
+      28:      	tya
+      29:      	bne	$f <memcpy+0xf>
+      2b:      	rts
+
+Disassembly of section .text.__memset:
+
+00000000 <__memset>:
+       0:      	ldy	$0                      ; 0x0 <__memset>
+			00000001:  R_MOS_ADDR8	__rc4
+       2:      	bne	$7 <__memset+0x7>
+       4:      	txy
+       5:      	beq	$1d <__memset+0x1d>
+       7:      	sta	($0)                    ; 0x0 <__memset>
+			00000008:  R_MOS_ADDR8	__rc2
+       9:      	inc	$0                      ; 0x0 <__memset>
+			0000000a:  R_MOS_ADDR8	__rc2
+       b:      	bne	$f <__memset+0xf>
+       d:      	inc	$0                      ; 0x0 <__memset>
+			0000000e:  R_MOS_ADDR8	__rc3
+       f:      	dex
+      10:      	cpx	#$ff
+      12:      	bne	$16 <__memset+0x16>
+      14:      	dec	$0                      ; 0x0 <__memset>
+			00000015:  R_MOS_ADDR8	__rc4
+      16:      	ldy	$0                      ; 0x0 <__memset>
+			00000017:  R_MOS_ADDR8	__rc4
+      18:      	bne	$7 <__memset+0x7>
+      1a:      	txy
+      1b:      	bne	$7 <__memset+0x7>
+      1d:      	rts
+
+Disassembly of section .text.__mulhi3:
+
+00000000 <__mulhi3>:
+       0:      	ldy	$0                      ; 0x0 <__mulhi3>
+			00000001:  R_MOS_ADDR8	__rc3
+       2:      	bne	$8 <__mulhi3+0x8>
+       4:      	ldy	$0                      ; 0x0 <__mulhi3>
+			00000005:  R_MOS_ADDR8	__rc2
+       6:      	beq	$2d <__mulhi3+0x2d>
+       8:      	sta	$0                      ; 0x0 <__mulhi3>
+			00000009:  R_MOS_ADDR8	__rc4
+       a:      	stx	$0                      ; 0x0 <__mulhi3>
+			0000000b:  R_MOS_ADDR8	__rc5
+       c:      	ldy	#$0
+       e:      	tya
+       f:      	lsr	$0                      ; 0x0 <__mulhi3>
+			00000010:  R_MOS_ADDR8	__rc3
+      11:      	ror	$0                      ; 0x0 <__mulhi3>
+			00000012:  R_MOS_ADDR8	__rc2
+      13:      	bcc	$1e <__mulhi3+0x1e>
+      15:      	tax
+      16:      	tya
+      17:      	clc
+      18:      	adc	$0                      ; 0x0 <__mulhi3>
+			00000019:  R_MOS_ADDR8	__rc4
+      1a:      	tay
+      1b:      	txa
+      1c:      	adc	$0                      ; 0x0 <__mulhi3>
+			0000001d:  R_MOS_ADDR8	__rc5
+      1e:      	asl	$0                      ; 0x0 <__mulhi3>
+			0000001f:  R_MOS_ADDR8	__rc4
+      20:      	rol	$0                      ; 0x0 <__mulhi3>
+			00000021:  R_MOS_ADDR8	__rc5
+      22:      	ldx	$0                      ; 0x0 <__mulhi3>
+			00000023:  R_MOS_ADDR8	__rc3
+      24:      	bne	$f <__mulhi3+0xf>
+      26:      	ldx	$0                      ; 0x0 <__mulhi3>
+			00000027:  R_MOS_ADDR8	__rc2
+      28:      	bne	$f <__mulhi3+0xf>
+      2a:      	tax
+      2b:      	tya
+      2c:      	rts
+      2d:      	ldy	#$0
+      2f:      	tya
+      30:      	bra	$2a <__mulhi3+0x2a>

@@ -1,7 +1,7 @@
 # #320 / #321 implementation status — 2026-06-25
 
 Quick-reference for "what's built, what's deferred, and where the ABI comparison landed."
-For the full execution record see [ROADMAP.md](ROADMAP.md) and [TODO.md](../TODO.md).
+For the full execution record see [ROADMAP.md](ROADMAP.md) and the [September 28 TODO history snapshot](../TODO-history-2026-09-28.md). Current actions are in [TODO.md](../TODO.md).
 
 ---
 

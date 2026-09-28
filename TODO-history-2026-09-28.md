@@ -1,0 +1,2627 @@
+# TODO history snapshot — 2026-09-28
+
+This is the exact `TODO.md` content before the September 28 queue cleanup, including already staged additions. It preserves completed-item evidence, old triage comments, links, attribution, and dated claims. Use [TODO.md](TODO.md) for current actions and canonical records for current defect and upstream status. The links below retain their original root-relative targets.
+
+Hook replay during this cleanup captured two already-dispositioned plan statements: fingerprint `5c42576e15fc0763` describes the unchanged native-s16 EQ fold, a scope note rather than work; fingerprint `fad8d5656991c6f9` describes the title-entropy gate, which was already wired and verified in the dated plan. Both fingerprints remain in `docs/plans/.deferrals-seen`, and neither is an active TODO. The archived body below remains byte-identical to the pre-cleanup staged file.
+
+---
+
+# TODO
+
+llvm-mos-65816 = bringing an optimizing open-source C compiler to the WDC 65816 via
+[llvm-mos](https://github.com/llvm-mos/llvm-mos), plus the SNES platform to exercise it.
+See [docs/ROADMAP.md](docs/ROADMAP.md) for the M0 → M1 → M2 plan and
+[docs/INVESTIGATION.md](docs/INVESTIGATION.md) for upstream status and rationale.
+Background: [docs/investigations/llvm-overview.md](docs/investigations/llvm-overview.md)
+(what LLVM is, and where llvm-mos fits). Every plan under `docs/plans/` is catalogued in
+[docs/investigations/plan-index.md](docs/investigations/plan-index.md) — a one-row-per-plan
+table-of-contents (summary · commits · category), sorted oldest → newest.
+
+<!-- todo-lint: disable=stray-done -->
+<!-- ^ Deliberate: ~132 completed entries live inline in their milestone sections
+     rather than in ## Done. Each carries its evidence — the backend bug it caught,
+     disasm notes, verification detail — and most have no linked plan to recover that
+     from, so collapsing them into one-line Done entries would destroy the record.
+     Decided 2026-07-26. Every other check still applies to this file. -->
+
+**Status markers:** `[ ]` open · `[wip]` in progress · `[verify]` implemented, verification
+not yet run+recorded (run the linked plan's verification steps, paste raw output + PASS/FAIL
+back into the plan, then promote to `[x]`) · `[x]` done (moved to Done, one tight line).
+Plan-first: non-trivial work gets a `docs/plans/YYYY-MM-DD-<topic>.md` and a TODO entry.
+
+**Delegation tier:** the bracket also carries a `T0`–`T5` rank, tier last — `[T4]`,
+`[wip T2]`, `[verify T3]`. It says how much *thinking* the item needs, and `/next` uses it
+to dispatch to the cheapest model that can do the work: `T0` lookup (haiku, read-only) ·
+`T1` mechanical edit · `T2` bounded implementation · `T3` multi-file work against a settled
+plan (**the default when unranked**) · `T4` design + implementation · `T5` do it inline, no
+subagent. Done lines drop the tier. On this project most codegen work is T3–T4, and the
+user-triggered upstream posts are T5. Full rubric: `~/CLAUDE.md` — Delegation.
+
+
+## Open
+
+September 26 status reconciliation: the original far-memset wrong-bank report is
+[fixed by existing 0013](docs/defects/mos-far-memset-wrong-bank.json), established
+with identical-input backend comparison and all 4096 physical bytes checked.
+It is a revalidation of `a81874d`, not new compiler work. The
+[prior-work audit](docs/howto-defect-evidence.md#reconcile-prior-work-before-opening-or-fixing-a-defect)
+is required before opening another compiler defect or fix plan.
+
+- [x] ~~**`__attribute__((interrupt))` prologue is unsafe under `+mos-a16`/`+mos-xy16` — found by
+  Round 7 #123 `nmitally`.** Default mode passes the deterministic 120-NMI tally (`0xDA3B`), while
+  a16 produced `0xF4F4` then `0x0000`/`0x0000`, and xy16 `0x0000`. The ISR starts `cld; pha`
+  before establishing M/X, so an interrupt inherits the mainline width and even the first push has
+  variable size; later saves/restores cannot balance reliably. `-verify-machineinstrs` is clean.
+  The ROM gate stays intentionally RED; fix the backend interrupt entry contract, not the demo with
+  an assembly wrapper.**~~ **FIXED in holistic patch `0002`:** `MOSFrameLowering` now adds a full-width A/X/Y outer save
+  envelope, establishes M8/X8 for the C body, restores in M16/X16, then lets RTI restore stacked P.
+  Host/default/a16/xy16 all `0xDA3B`; a16 3× deterministic; playable explanation at
+  [https://biohack.net/snes/nmitally/](https://biohack.net/snes/nmitally/). See
+  [report](docs/investigations/2026-08-03-65816-interrupt-width-prologue.md).
+- [x] **Round 7 demo battery (#119–#141, twenty-two) — COMPLETE 2026-08-04, 22/22 shipped.** Final
+  entry #141 `dpbank` forced the ISR-envelope EXTEND (D/DBR save + normalize; standalone patch
+  `0026` until the `0002` fold). New defect-hunting ROMs; targets chosen by
+  the scoreboard's yield pattern: combiner-formed opcodes (`G_ABDS/U`, s64 ctpop/clz/ctz/abs),
+  first-ever interrupt-CC / inline-asm / mixed-per-function-width mode-state demos, far-pointer third pass,
+  >256 B frames, volatile/atomic discipline, float↔s64 libcalls, s64 limb-seam shifts. First
+  picks (re-ranked 2026-08-03): #123 nmitally, #126 mixedwidth, #125 asmisland, #119 absdiff,
+  #131 farspill. **#122 unmerge32 WITHDRAWN** — its "declared-`unsupported` s32→4×s8 unmerge"
+  premise was already false when the round was written (rule landed `cbc31da`, gated by
+  `dev/run.sh a16unmerge` since 2026-07-19); investigated, not built, nothing committed.
+  Per-demo plans + `/snes-demo` per item.
+  **Addendum 2026-08-04 (#139–#141, from the #123 sibling-gap audit — ask the interrupt-entry
+  contract completely):** #139 `irqgate` (first IRQ-vector C handler + envelope reentrancy when NMI
+  preempts the IRQ handler), #140 `brkcop` (BRK/COP software vectors — the audit already found
+  `platforms/snes/link.ld` wires **COP to `$0000`**, a real platform defect: a native `cop`
+  executes WRAM as code; BRK indistinguishably shares `irq`), #141 `dpbank` (D/DBR interrupt-entry
+  contract: the envelope saves neither — force the extend-or-document decision). **#140 jumps the
+  queue** — it starts from a known defect, not just a question.
+  **#140 `brkcop` DONE 2026-08-04 — clean positive + platform fix landed (`304f3c3`):** all five
+  SNES platforms wired COP to `$0000` (a native `cop` executed WRAM as code); split onto weak
+  `brk`/`cop` C-handler stubs in the shared crt0 + per-platform vector slots. The envelope holds on
+  the software-entry path: both handlers pass the order gate and `nmitally-isr-gate.py`; the vector
+  gate proves no native slot reads `$0000`; host/default/a16/xy16 all `0xA34C`, a16 3×
+  deterministic. BRK signature syntax is posted as
+  [PR #586](https://github.com/llvm-mos/llvm-mos/pull/586); COP remains a separate assembler gap.
+  Retire fork patch `0024-mos-brk-signature-operand` when #586 merges, and retire
+  `0025-llvm-mc-preserve-motorola-default` when
+  [PR #587](https://github.com/llvm-mos/llvm-mos/pull/587) merges.
+  The ROM now uses natural mnemonics and is published on both sites. See
+  [upstream status](docs/upstream-contribution-status.md). Next ranked
+  probe is #139 `irqgate`. [plan](docs/plans/2026-08-04-140-snes-brkcop.md).
+  See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md). (T3: each demo is settled-plan
+  implementation; the round's selection/design was done inline.)
+  **#139 `irqgate` DONE 2026-08-04 (`3b7eb85`) — clean positive:** first C handler on the timer IRQ
+  vector, nested under NMI; nesting asserted in the differential (`nest_hits` 96/96 folded into the
+  hash); host/default/a16/xy16 all `0x24F6`, a16 3× deterministic. Demo-design fault measured out —
+  the C ISR prologue costs ~5 scanlines, so the handler *rendezvouses* with the NMI (bounded spin)
+  instead of tuning `VTIME`; `nmitally-isr-gate.py` C0 false-positive fixed (frame-slot pointer
+  matched as a stack adjust; fix requires same-`__rc` store-back). H-mode per-scanline IRQ REJECTED:
+  at ~262 IRQs/frame the prologue alone exceeds a scanline → livelock (recorded so it isn't
+  re-proposed). [plan](docs/plans/2026-08-04-139-snes-irqgate.md).
+  **#141 `dpbank` DONE 2026-08-04 (`8f9a928`) — EXTEND, decided by measurement; closes the round:**
+  both failure modes captured live on the pre-fix toolchain (a `DBR=$7F` window HANGs — handler
+  stores land in bank $7F; a `D=&decoy` window CORRUPTS — `__rc`/soft-stack traffic runs through
+  the decoy), both reachable from legal code → the 65816 ISR envelope now saves D/DBR and
+  normalizes (`pea 0`/`pld`, `phk`/`plb`), +12 B/+33 cyc per ISR, `interrupt-width-65816.ll`
+  extended. host==default==a16==xy16 `0x4D5F` with 20 D- + 20 B-window landings folded in; siblings
+  re-validated unchanged (`0xDA3B`/`0x24F6`/`0xA34C`). ZP-promotion gotcha recorded: the compiler
+  promotes small globals to zero page, silently making "absolute" accesses D-relative — demos with
+  addressing-mode claims pin globals via `section(".bss.dpbank")`. `llc` is NOT in the distribution
+  install set (explicit `--target llc` after rebuilds). [plan](docs/plans/2026-08-04-141-snes-dpbank.md).
+  **#126 `mixedwidth` DONE 2026-08-03 — clean positive:** per-function target attributes are supported;
+  `mw_native` carries `+mos-a16` and real `rep #$20`/`sep #$20` brackets, while `mw_byte` explicitly
+  carries `-mos-a16,-mos-xy16` and stays transition-free. Host/default/a16/xy16 all `0x83B7` with
+  `-verify-machineinstrs`. Published on both
+  [biohack.net](https://biohack.net/snes/mixedwidth/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/mixedwidth/). No compiler defect;
+  next ranked probe is #125 `asmisland`.
+  [plan](docs/plans/2026-08-03-126-snes-mixedwidth.md).
+  **#125 `asmisland` DONE + PUBLISHED 2026-08-03 — clean positive:** inline asm saves/restores P, explicitly
+  encodes A8/A16 immediates, clobbers A/flags/memory, and leaves native C values live across the
+  island. Raw-byte and post-`plp` M16 gates pass; host/default/a16/xy16 all `0x260B`. No compiler
+  defect. Published on both [biohack.net](https://biohack.net/snes/asmisland/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/asmisland/); next ranked probe is
+  #119 `absdiff`. [plan](docs/plans/2026-08-03-125-snes-asmisland.md).
+  **#119 `absdiff` DONE + PUBLISHED 2026-08-03 — clean positive:** u8, s16, and u32 forms of
+  `a > b ? a - b : b - a` all select and verify; host/default/a16/xy16 agree at `0x3482`.
+  Three synchronized motion-difference bands are computed by the tested kernels. Published on
+  [biohack.net](https://biohack.net/snes/absdiff/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/absdiff/); next ranked probe is
+  #131 `farspill`. [plan](docs/plans/2026-08-03-119-snes-absdiff.md).
+  **#131 `farspill` DONE + PUBLISHED 2026-08-03 — clean positive:** ten non-rematerializable far
+  pointers live across a clobbering multiply force seven four-byte `Imag32` spill slots, expanding
+  to 28 stores and 28 reloads. All `LDImm` destinations remain hardware GPRs; host/a16/xy16 agree
+  at `0x7F3B` on MAME and bsnes-jg. Published on
+  [biohack.net](https://biohack.net/snes/farspill/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/farspill/); next probe is
+  #120 `bitboard64`. [plan](docs/plans/2026-08-03-131-snes-farspill.md).
+  **#120 `bitboard64` DONE + PUBLISHED 2026-08-03 — runnable positive + two historical backend findings:**
+  ctpop/cttz/ctlz i64 form and lower inline; helper-isolated host/default/a16/xy16 agree at `0xC074`
+  on MAME and bsnes-jg. Bring-up reported (1) variable `1ULL << uint8_t` failing legalization
+  at `G_ANYEXT s8->s64`, and (2) all three inline expansions in one pressured caller leaving four
+  undefined `__rc` uses under the non-LTO machine verifier. **2026-09-25 recovery:** the original
+  source edits and diagnostics are recovered; patch 0055 repairs the full shift caller in fork
+  a16/xy16, while a comparison differing only by patch 0028 establishes the inline-bitboard repair.
+  Both C inputs pass supported unpatched-upstream configurations.
+  [Evidence, limits, and attribution](docs/investigations/2026-09-25-historical-baseline-recovery.md). Published on
+  [biohack.net](https://biohack.net/snes/bitboard64/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bitboard64/); #138
+  `shift64seam` retains the associated narrow-count input.
+  [plan](docs/plans/2026-08-03-120-snes-bitboard64.md).
+  **#138 `shift64seam` DONE + PUBLISHED 2026-08-03 — runnable positive + retained historical defect report:**
+  explicitly widened variable counts drive shl/lshr/ashr i64 through every 16- and 32-bit seam;
+  host/default/a16/xy16 agree at `0x2007` on MAME and bsnes-jg. The natural `uint8_t` count failed
+  legalization at `G_ANYEXT s8->s64` during bring-up. **2026-09-25 recovery:** the retained minimal
+  input passes, but the recovered full bitboard caller reproduces the same failure on the captured
+  fork in a16/xy16. Status: **fixed by 0055**, with matching-input evidence and runtime checks;
+  supported upstream configurations pass.
+  [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md). Published on
+  [biohack.net](https://biohack.net/snes/shift64seam/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/shift64seam/); next ranked probe is
+  #121 `llabs64`. [plan](docs/plans/2026-08-03-138-snes-shift64seam.md).
+  **#121 `llabs64` DONE + PUBLISHED 2026-08-03 — clean positive:** `llabs()` and the signed
+  `x < 0 ? -x : x` i64 idiom pass the non-LTO machine verifier across values through every
+  16-bit limb, including `INT64_MIN+1`; host/default/a16/xy16 agree at `0x8490` on MAME and
+  bsnes-jg. Published as the first card in both newest-first catalogs on
+  [biohack.net](https://biohack.net/snes/llabs64/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/llabs64/); next ranked probe is
+  #124 `isrbracket`. [plan](docs/plans/2026-08-03-121-snes-llabs64.md).
+  **#124 `isrbracket` DONE + PUBLISHED 2026-08-03 — clean positive after the #123 fix:** a
+  1,024-NMI run repeatedly interrupts paired native-width arithmetic tunnels; the ISR envelope
+  and mainline bracket are disassembly-gated. Host/default/a16/xy16 agree at `0x1014` on MAME,
+  and all modes pass three repeated bsnes-jg runs. Published first in both catalogs on
+  [biohack.net](https://biohack.net/snes/isrbracket/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/isrbracket/); next ranked probe is
+  #127 `modethread`. [plan](docs/plans/2026-08-03-124-snes-isrbracket.md).
+  **#127 `modethread` DONE + PUBLISHED 2026-08-04 — clean positive:** labels-as-values dispatch
+  crosses alternating A8/A16 handlers; indirect jump and width brackets are disassembly-gated,
+  and host/default/a16/xy16 agree at `0x0489` on MAME and bsnes-jg. Published first on
+  [biohack.net](https://biohack.net/snes/modethread/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/modethread/); next is #128
+  `bankwalk`. [plan](docs/plans/2026-08-04-127-snes-modethread.md).
+  **#128 `bankwalk` DONE + PUBLISHED 2026-08-04 — clean positive:** forward, indexed, and reverse
+  far-pointer walks cross C1:FFFF/C2:0000; host/a16/xy16 agree at `0x4ED7` on MAME and bsnes-jg.
+  Published first on [biohack.net](https://biohack.net/snes/bankwalk/) and
+  [indri.studio](https://indri.studio/apps/llvm-mos-65816/snes/bankwalk/); next is #129
+  `farptrcmp`. [plan](docs/plans/2026-08-04-128-snes-bankwalk.md).
+- [x] ~~**MAME leg for the cartsize canaries — blocked on the SPC700 IPL.**~~ **UNBLOCKED + PASS
+  2026-08-06:** the checksum-gated IPL is retrievable from SSM; all 14 cartsize configurations pass
+  structure, `-verify-machineinstrs`, MAME, bsnes-jg, and six-boot entropy independence. The wider unlocked
+  suite is also green at `corpus-a16` 62/62, c-torture 30/30, and `xcheck-suite` 52/52. The plain
+  `corpus` runner is now green at 63/63 after the follow-up below. [plan](docs/plans/2026-08-06-spc700-ipl-ssm-and-mame-suite-unlock.md).
+- [x] ~~**Default `dev/run.sh corpus` MAME deadline/build freshness.**~~ **FIXED 2026-08-06:** the old
+  deadline was corrected from the initially reported 600 ticks to the actual shared default of **60**.
+  The gate now rebuilds all 63 manifest rows itself, defaults to the already-proven 1000-tick settle with
+  a 20-second MAME backstop, and forwards `SMOKE_SECONDS` through `dev/run.sh`. Negative control at 60
+  ticks: 42/63 (all ROMs present, the same 21 late kernels fail); acceptance: plain corpus 63/63; paired
+  `corpus-a16` 62/62, 0 xfail. [plan](docs/plans/2026-08-06-corpus-mame-settle-and-build-freshness.md).
+
+- [x] ~~**`+mos-xy16` miscompile — iterative in-place `memmove`/`memcpy` rewrite over a 16-bit-indexed buffer** — FIXED in `MOSInsertREPSEP::placeIntraBlock`: `sep #$10` between `ldx` (writes 16-bit X) and `lda abs,X16` (reads 16-bit X) zeroed X's high byte; fix inserts a clone of the last X-writer after the subsequent `rep #$10` to restore the correct value. Repro `examples/65816/xy16-inplace-memmove-repro.c` CAP=1700: `xy16=0x90AA` (was `0x1CC6`). Unblocked #23 L-system 5-way-green. ([investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md))~~
+
+### M0 — Test Bench
+
+_M0 complete — test bench stands (ROADMAP steps 1–2 PASS). See Done._
+
+### M1 — Far Pointers (first real codegen)
+
+- [x] **#320 far-pointer DATA-VALUE type — BUILT BY THE F2 AGENT (verified 2026-06-21); residuals only.**
+  The desirable work the five-space census surfaced (store/load/array/struct a far pointer + `sizeof==4`)
+  was **built by the far-fn-ptr agent**, not just unblocked. Verified by compiling
+  `examples/65816/far-value-evidence/` against their toolchain (`wt/320-far-followups`, clang-23 @
+  2026-06-21 19:36): under `+mos-a16`, `s1`–`s4` (store/load/array/struct), `z1` (`sizeof==4`), and `c1`
+  (far→near) **all OK** (vs all-FAIL on `main`). `getPointerWidthV` gained `case 2: return 32`; `PF` is a
+  storable value type (s32 merge → bytes). **Done, not ours to re-implement.** Caveat: it's in
+  `wt/320-far-followups` (pushed `origin/`), **LANDED on `main` 2026-06-21** (was `wt/320-far-followups`-only): the
+  far-value implementation now ships in `0001` + `0004` + `0005`; the full five-space *upstream PR* stays
+  ABI-blessing-gated (tracked in [upstream-contribution-status](docs/upstream-contribution-status.md)). **Residuals (both close-out, no fork patch — [plan](docs/plans/2026-06-22-320-far-value-residuals.md)):** (a) **"`dp→near` cast" =
+  pre-existing UPSTREAM bug, now root-caused (2026-06-22) as a DP-pointer-ARGUMENT crash** — *any* use of an
+  `addrspace(1)` (8-bit DP) pointer arg fails on plain `mos6502` (the CC passes it in a 16-bit `RS` reg →
+  illegal `(p1)=COPY $rs`, "Copy Instruction illegal with mismatching sizes"; asserts-aborts at
+  `MOSRegisterInfo.cpp:1146`, SIGSEGVs in `MOSLateOptimization` w/o `-verify`). Stock `p1:8:8` (our `0001`
+  only adds `p2:32:8`) ⇒ **upstream issue to draft** (user-triggered post), not a fork fix; (b) far-ptr
+  storage under **default 8-bit** is un-legalized — **CLOSED 2026-06-22: a16-gated by design.** A far ptr is
+  a 32-bit value; its `s32↔bytes` bridge (`G_MERGE/G_UNMERGE {S32,S8}`) is fully `hasAccum16`-gated
+  (MOSLegalizerInfo.cpp:152-169, `unsupported()` else). Under 8-bit, storage fails as a **clean Legalizer
+  `unable to legalize` rejection — no object, no miscompile** (verified all four s1-s4 fixtures, no `-verify`),
+  unlike the (a) crash. Verdict is `0005`-invariant; no 8-bit-only use case (far ⇒ banking ⇒ 65816 ⇒ a16).
+  No fork fix. Evidence: `dev/measure-far-ptr-value-state.sh`.
+  [plan §Re-evaluation](docs/plans/2026-06-21-320-five-address-space-model.md) ·
+  [F2 hand-off](docs/plans/2026-06-21-320-far-calls-followups.md).
+- [x] ~~**#320 five-address-space model — COMPLETE, all 5 spaces measured (2026-06-22).**~~ AS3
+  packed-24 **BUILT + productionized** (`0006`, static-init reloc fixed); AS4 zero-bank **measured
+  and CLOSED as a deliberate null** (bit-identical to a near pointer, dominated by the near +
+  lazy-cast incumbent on every axis) — not a gap, a decided non-goal.
+
+  asiekierka's #320 proposal is 5 spaces (`0`=far-default/`1`=DP/`2`=16-abs/
+  `3`=packed-24/`4`=zero-bank); we ship 3 additive (`0`=near-default/`1`=DP/`2`=32-bit far). **Two hard
+  constraints:** (C1) one MOS datalayout shared with the 6502 ⇒ `0`=far-default is **architecturally
+  foreclosed** (would break every 6502 pointer); "far by default" can only be a clang memory-model flag.
+  (C2) `addrspace(2)`=far is load-bearing tree-wide ⇒ keep additive numbers, defer any rename to upstream.
+  **Phase 0 (`dev/measure-five-space-census.sh`):** ~~0a representability~~ **GO** — 24-bit IS representable
+  (the note's "LLVM needs pow2 pointer sizes" is **WRONG**: `parseSize` has no pow2 rule, `getPointerSize`=3
+  bytes; backend carries `_BitInt(24)`). The real far reason is `MVT` has no `i24` (plumbing, not an IR
+  limit). **0b/Phase 3:** packed-24 would size-optimize *storing a far pointer*, but **storing far pointers
+  doesn't work at all yet** → packed-24 optimizes a non-existent capability ⇒ **DEFER** behind the
+  far-pointer-value-completion item above (NOT a null — the capability is wanted; the byte-packing is the
+  premature part). Zero-bank ≈ a near pointer ⇒ marginal. **Update 2026-06-21 (user said build it):**
+  measured the win = **25% storage** on far-ptr tables (16: 64→48 B) **but a ×3-index cost** (3-byte
+  elements) — opt-in so it never regresses non-users. **Increment A DONE + verified** (the 3-byte TYPE:
+  `AS_FarPacked=3` + datalayout `p3:24:8` + clang width; `sizeof(packed*)==3`, table 48 B, **corpus 7/7**).
+  **Increment B (codegen to store/load/deref packed ptrs) DONE + verified 2026-06-21** on
+  `wt/320-packed24-incB` (off post-F2 `main`) — NOT the predicted s24-narrowing job: (1) `getPointerTy(
+  AS_FarPacked)→i32` to stop `CodeGenPrepare` crashing on the invalid `MVT::i24`; (2) bridge `p3↔3×s8`
+  via `G_MERGE/G_UNMERGE{PFP,S8}` (no `s24`, no `inttoptr` roundtrip — the artifact combiner folds the
+  bridge against the adjacent unmerge/merge). Shipped as stacked **`0006-320-packed24.patch`** (regen
+  `dev/regen-patch-0006.sh`; not folded into 0001 — touches files 0004/0005 share). **Verified:**
+  `dev/run.sh packed24` (new e2e, bank $01) `0xF3` MAME **and** bsnes-jg (bank byte survives 3-byte
+  packing); `-verify-machineinstrs` clean; corpus 7/7; far suite PASS; `fuzz 50` 0-mismatch; storage
+  −16 B/−25% (16-entry table 64→48 B), ×3 index cost. Worktree torn down (`f168003`); work landed on `main`.
+  **Productionization batch — (A) DONE + static-init reloc FIXED (2026-06-22)**
+  ([handoff](docs/plans/2026-06-21-320-packed24-productionization-handoff.md) ·
+  [fix plan](docs/plans/2026-06-22-320-packed24-static-init-reloc-fix.md)): ~~(A) measure the win in realistic
+  context~~ **DONE** (`dev/run.sh measure-packed24`): packed wins **≈N bytes at every N, break-even N≥1** —
+  the indexed-walk access code is equal (far loads only 3 of its 4 entry bytes; ×3-vs-×4 stride is a
+  constant), so the feared ×3-index/byte-2 cost does **not** apply to indexed table access. Task A also
+  surfaced that a **statically-initialized packed table didn't link** (each 3-byte entry emitted one
+  `R_MOS_ADDR8` — no 3-byte data fixup); **FIXED** via an `AsmPrinter::emitNonStandardSizedConstant` hook +
+  MOS override emitting the `ADDR24 SEGMENT_LO/HI/BANK` triple (landed in the updated **`0006`**; new
+  `dev/run.sh packed24_table` `0xA5` MAME+bsnes-jg, corpus 7/7, fuzz 0-mismatch). **Productionization thread
+  CLOSED (2026-06-22)** ([close-out](docs/plans/2026-06-22-320-packed24-residuals-close.md)): ~~(B) byte-2
+  absolute-long cost~~ **= `0007`** — the cost is general, not packed-specific (only the A-register byte 2
+  bloated; STX/STY have no long form), so it was built as the near-abs bank-relaxation `0007` (`8f/af→8d/ad`
+  for ALL near pointers; its plan is literally "the realization of Task B", −2 B on packed byte-2, verified
+  `0001–0007` both emulators); a packed-local fix would duplicate `0007`'s DBR logic ⇒ **don't**. ~~(C)
+  `__far_packed` spelling~~ **closed** — precondition unmet (no AS2 spelling exists to mirror; far/dp/packed
+  are all per-file local `#define`s), so it's the forbidden one-off; revive only via a shared `<mos.h>`
+  covering all spaces (SDK concern). Worktree `wt/320-packed24-incB` torn down (`f168003`, 12 G reclaimed).
+  Separate threads: zero-bank (AS4) **CONFIRMED measured-null** (2026-06-22, model complete); ~~fold `0007`
+  onto `main`'s stack~~ **DONE** (merged 2026-06-22 — stack is now `0001`–`0007`, toolchain rebuilt + verified);
+  post the upstream note (C1 + pow2 + census) — user-triggered.
+  [incB handoff](docs/plans/2026-06-21-320-packed24-incrementB-handoff.md) ·
+  [plan §Build packed-24](docs/plans/2026-06-21-320-five-address-space-model.md).
+- [x] **`[dp],Y` increment 2 published downstream in `a4eb416c` (2026-09-26).** The range-gated runtime index implementation and verification are retained in the [increment-2 plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md). Preserve scaled-offset width checks and narrow-add wrapping.
+- [x] **Far-global `long,X` loads and stores — implemented locally in patch 0061.** Unsigned byte indices use X8; proven 16-bit or scaled byte indices use X16 under `+mos-xy16`. The selector retains a 24-bit global base and uses absolute-long,X. The focused lit checks, `farindex` emulator gate, and machine verifier pass. [Patch](patches/llvm-mos/0061-mos-far-global-long-x.patch) · [measurement](docs/investigations/2026-09-25-longx-global-measurement.md). Runtime far-pointer `[dp],Y` indexing is covered by the separate increment-2 item above.
+- [x] **Native 16-bit far loads and stores — implemented locally in patch 0062.** `M=0` long absolute, long,X, `[dp]`, and `[dp],Y` accesses select native word operations when the value contract permits it; ABI byte-return and byte-argument paths retain their byte operations. The focused lit checks, `farindex`/`farbank` emulator gates, and machine verifier pass. [Patch](patches/llvm-mos/0062-mos-native-far-word.patch) · [measurement](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
+### M2 — Optimizing Payoff
+
+- [x] **Independent Imag8→i1 rejection diagnosis resolved (2026-09-26).** The matcher checks the shared `Any` bank and inserts an `Ac` copy; its source contract disproves Imag8-only rejection. All 72 compiler runs and 48 selection checks pass. No fix or failing baseline is claimed. Keep 0023 and its tests with the feature series; the original far-pointer observation remains qualified. [Evidence and attribution](docs/investigations/2026-09-26-trunc-imag8-i1-contract.md) · [record](docs/defects/mos-trunc-imag8-i1.json).
+- [x] **Narrow-count s64 shift legalization repaired by 0055 (2026-09-25).** Native-width s8/s16/s32-to-s64 `G_ANYEXT` uses the existing zero-extension lowering. The original recovered preprocessed input and reduced masked-byte IR fail on the preserved baseline and pass on the candidate. All 36 recovered-source configurations and nine SNES runtime checks pass, including three LTO runs; installed Clang and LLD are refreshed. Existing patch 0028 repairs the inline-bitboard verifier failure. [Fix evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md) · [shift status](docs/defects/shift64-narrow-count.json) · [bitboard resolution](docs/defects/bitboard-inline-register-pressure.json). The reentrant attribute remains a separate [contract clarification](docs/defects/reentrant-attribute-contract.json).
+- [x] **Near store shared with unit increment — implemented locally in patch 0063.** An ABI A:X value stored to an absolute near address before a local `+1` consumer can remain in byte operations. The September 26 review confirms that ordinary decrement canonicalizes to `G_ADD -1` and retains correct native fallback, not this optimization. The A16 store emulator gate and lit checks pass. [Patch](patches/llvm-mos/0063-mos-near-shared-store.patch) · [review](docs/pr-preparations/2026-09-26/native-optimization-review.md).
+- [x] **Broader near-store profitability — complete in patch 0065 (2026-09-27), committed and pushed to downstream `main` as [4d7136cb](https://github.com/wbniv/llvm-mos-65816/commit/4d7136cb15cf85a676b624a5892e5e8ce7ae0217).** Indirect store-and-unit arithmetic, call results, zero-extended bytes and absolute decrement improve; loaded pointers retain their measured native preference. All 486 reduced comparisons have no size increase. The 412-input corpus has no new failures or size increases; only the new fixture changes (-35 B per native mode). Atomic and call-live contracts remain guarded. [Completion plan and evidence](docs/plans/2026-09-27-broader-near-store-profitability.md).
+- [T4] **Prepare 0065 near-store profitability for upstream review.** Extract the completed optimization with its #321 prerequisites, reconcile the exact destination revision, validate the extracted patch and obtain independent review. Preserve the local completion evidence and loaded-pointer fallback; the earlier 0063 review does not cover 0065. [Remaining upstream work](docs/plans/2026-09-27-broader-near-store-profitability.md#repository-delivery-and-remaining-upstream-work) · [Submission prerequisites](docs/pr-preparations/2026-09-26/feature-held-packages.md).
+- [x] **Computed-carry scheduling prepared as 0064; PR withdrawn.** [Compiler branch](https://github.com/wbniv/llvm-mos/tree/mos-computed-carry-scheduling) pushed at `155e209c4cee`; [PR #609](https://github.com/llvm-mos/llvm-mos/pull/609) was closed at the user's request on September 27; the branch is retained. [PR packet](docs/pr-preparations/2026-09-26/README.md) records author review on `7bd67c0ae4e8`, 132 MOS passes, 512 oracle vectors and 117 neutral C-to-object pairs with rebuilt upstream Clang across three CPUs. The original fixed-IR census repeats 39 distinct 6502 configurations. Targeted kernel 133 → 59 B; downstream 1–41 B costs retained. [Plan](docs/plans/2026-09-26-mos-carry-scheduling.md).
+- [T4] **Generic fine-grained pressure contract and scheduler profitability remain open.** 0064 is a [qualified workaround](docs/defects/mos-carry-scheduling-pressure.json). The [LLVM-facing investigation](docs/investigations/2026-09-27-competing-carry-gate.md) presents the measured saving/regression trade-off without a default decision. The [profitability follow-up](docs/investigations/2026-09-27-carry-profitability-model.md) tests three pressure models and implements complete-object size selection. Adding `gated` to the alternatives gains 220 B; a cheaper predictor, shared frontend work and broader unseen-input testing remain open. The current compiler defaults to `always`; the generic contract and baseline XY16 VLA mismatch remain unresolved.
+- [T4] **`vlastack_sim` miscompiles under `+mos-xy16`.** Returns `0xD3BD` instead of the oracle `0xD77B` on MAME and bsnes-jg; default and A16 return the oracle. It reproduces on the preserved pre-gate compiler and under all three 0064 policies, so it is a real runtime miscompile, not a carry-scheduling effect. Today it is only an unknowns note in the [carry-pressure record](docs/defects/mos-carry-scheduling-pressure.json) and the [gate report](docs/investigations/2026-09-27-competing-carry-gate.md). Open its own canonical defect record with the baseline evidence, then isolate the cause. Reason for T4: unknown root cause in XY16 codegen.
+- [x] **Diagnostic-only null-emission failure — fixed by 0068.** The missing MOS null target streamer caused `MOSAsmPrinter::emitStartOfAsmFile` to dereference a null target-streamer pointer. The retained IR crashes on the preserved baseline and passes on the patched downstream build; focused diagnostic and object-emission checks pass. The [standalone upstream extraction](docs/pr-preparations/2026-09-27/0068-validation.md) is validated on `26d7c2c1eebf`; independent review and posting remain pending. [Investigation](docs/investigations/2026-09-27-mos-null-output-streamer.md) · [canonical record](docs/defects/mos-null-output-streamer-crash.json) · [patch](patches/llvm-mos/0068-mos-null-output-streamer.patch).
+- [x] **Recover lost near-index overflow proofs — implemented locally in `0002`.** A MOS pass recovers sound `nuw` facts immediately after LSR; the bank-wrap guard remains intact. Across 1,197 paired configurations, code shrinks by 33,159 B, with nine growing configurations and no new compile failures. The MOS suites and all twelve near runtime configurations pass; the original gallery returns `0x5CF0`. [Investigation](docs/investigations/2026-09-27-near-index-overflow-proofs.md) · [record](docs/defects/mos-near-index-overflow-proofs.json).
+- [T4] **Prepare near-index overflow-proof recovery for upstream review.** Extract the completed pass from `0002` with its #321 and bank-wrap prerequisites, reconcile the exact destination revision, validate the extracted source/tests and obtain independent review. Preserve the measured size regressions and runtime evidence when describing profitability. [Investigation](docs/investigations/2026-09-27-near-index-overflow-proofs.md) · [Submission prerequisites](docs/pr-preparations/2026-09-26/feature-held-packages.md).
+- [x] **Evaluate the competing-carry gate (0067).** Implementation, save counts, 3,720-configuration census, runtime and compile-time measurements are complete. The [investigative report](docs/investigations/2026-09-27-competing-carry-gate.md) adds subset analysis and implementation options for LLVM discussion. The original local thresholds are retained as historical context; default selection remains open. [Plan](docs/plans/2026-09-27-0064-competing-carry-gate.md).
+- [x] **Combined-stack farblit byte-load legalization — fixed locally by 0066.** Isolated 0061 eager selection plus the in-place far-address rewrite leaving a target pseudo on the generic worklist. Preserved-input red/green, direct MIR, 180 MOS tests and eight emulator assertions pass. The September 28 per-probe gate now passes on preserved and installed toolchains: exact access forms and widths, eight emulator assertions per toolchain, and 15 checker tests per toolchain. [Evidence and completed gate update](docs/investigations/2026-09-27-farblit-byte-load.md).
+- [T4] **Investigate runtime-indexed native-word far loads for Farblit `rdw`.** Not started. The current probe uses a native 16-bit `lda [dp]` after explicit scaled-pointer computation; the runtime-index fold accepts only byte accesses. Reconcile 0062 and the live lowering, then measure a native-word `[dp],Y` candidate, including scaled-index bounds, bank crossing and M/X transitions. Require size/runtime evidence before adopting it. [Reconciled instruction shapes](docs/investigations/2026-09-27-farblit-byte-load.md#instruction-shape-reconciliation-2026-09-28).
+- [T4] **Investigate the A16 Farblit `cp8` range proof.** Not started. The compiler bounds `j + 8` at 263 although this loop visits `j = 0..47`, so the source load computes its pointer explicitly in A16. Investigate a sound loop-range proof or address canonicalization that permits Y8 indexing while preserving integer wrapping and bank crossing. Measure code size and runtime; retain the existing fallback until the candidate is proved correct and worthwhile. [Range limitation and evidence](docs/investigations/2026-09-27-farblit-byte-load.md#controlled-byte-split-experiment).
+
+- [x] ~~**`dev/regen-patch-0004.sh` delta-based redesign**~~ — **DONE 2026-06-25.** The old
+  "baseline = every patch EXCEPT 0004" approach was structurally broken by `0008` (mos-dp-arg-cc, authored
+  on `0004`'s far-CC table → won't `git apply` onto a 0004-less baseline). Rewrote on the `regen-patch-0001.sh`
+  delta method: reconstruct the full `0001..0009` stack, capture new far-CC edits as a delta, re-derive `0004`
+  by applying the committed `0004` + delta onto a minimal `0001+0002+0003` baseline (so `0005..0009`'s shared-file
+  hunks never leak in and `0008` is never applied onto a 0004-less tree). Round-trips clean: `RESULT: PASS —
+  reapplied 0001..0009 == live vendor MOS dir` (regenerated `0004` differs from the committed one only by the
+  git index-hash header, now reflecting the current baseline).
+- [x] ~~**Rebuild main's toolchain to make the consolidation codegen live**~~ — **DONE 2026-06-25.** main's
+  `vendor/llvm-mos` was reconciled to committed `0001..0009`, then `dev/run.sh toolchain` + SDK rebuilt
+  (`snes-hirom`/`snes-zoom` platforms). Gates GREEN on the rebuilt compiler, both emulators: `corpus` 7/7,
+  `a16regpress` `0x01A7` + `corpus-a16` 6/6 (`0009` live), `k_trig32lut` `0x87F0B404` (far-subscript fix live —
+  200 KiB HiROM far LUT, index ≥ 32768), far suite `0xF3`. main is now consistent: patches == vendor == built toolchain.
+- [x] **#321 beefy SNES demo — fixed-point Mandelbrot, differentially verified + rendered on both emulators. DONE 2026-06-25.**
+  First *beefy* `+mos-a16` customer. Branch `wt/321-mandelbrot`.
+  **Track 1 DONE+green** (`dev/run.sh k_mandel`): Q5.10 escape-time kernel (`examples/65816/mandel.h`) compiled
+  by both the SNES target and a host PNG renderer; CRC16 of a 16×10 gate slice → `corpus_result`, asserting
+  host(`0x820B`)==default==`+mos-a16`==`+mos-xy16` on MAME+bsnes-jg, `-verify` clean. Found: `+mos-a16` is
+  +21% *bigger* (Lesson 2 — multiply-bound) and an all-inlined-form `+mos-a16` verifier crash (a16-regalloc
+  pressure family; shipped kernel uses `noinline mandel_cell`). **Track 2 DONE+green** (`dev/run.sh
+  mandel-shot`): renders ON the SNES (`examples/snes/mandel-display.c`, +mos-a16, fat-pixel Mode-1 BG) and
+  captures a **real emulator screenshot from BOTH** cores headless — bsnes-jg framebuffer dump + MAME
+  `video:snapshot` under Xvfb — each asserting on-screen CRC==host (`0x9103`); `+mos-a16`==default
+  pixel-for-pixel. Grew the SNES display HAL (`platforms/snes/snes.h`: VRAM/DMA/BG regs + `snes_ppu_reset_blank`),
+  shared PNG encoder (`tools/png_write.h`), how-to
+  [docs/investigations/snes-emulator-screenshots.md](docs/investigations/snes-emulator-screenshots.md).
+  **Track 3a DONE+green** (`dev/run.sh mandel-far`): Mandelbrot far-stored into HIGH WRAM (`$7E2000`, reachable
+  only by 24-bit addressing) via #320 far stores (`sta [dp]`) + far-load CRC; +mos-a16-only, host==+mos-a16
+  (`0x820B`) on both emulators + disasm gate (`examples/65816/k_mandel_far.c`). **Track 3b DONE+green**
+  (`dev/run.sh mandel-mode7`): a BIG 128×128 per-pixel Mandelbrot far-stored to high WRAM, displayed via **Mode 7**
+  (linear 8bpp, 256 tiles), uploaded by one **32 KiB DMA**, 2× zoom; screenshots MAME + bsnes-jg, on-screen
+  CRC==host (`0x75E8`). Grew the HAL with Mode 7 + DMA regs; rendering **handoff for the next agent**:
+  [docs/handoffs/2026-06-24-snes-graphics-rendering.md](docs/handoffs/2026-06-24-snes-graphics-rendering.md).
+  [plan](docs/plans/2026-06-24-snes-mandelbrot-beefy-demo.md).
+  **Consolidated 2026-06-26** (user request): the separate Track 3b `mandel-mode7` and the M2
+  `mandel-interactive` demos were **removed**, and the Track 2 tester `mandel-display.c` was converted to
+  **far/`+mos-a16`-only** — it now far-stores its 64×56 escape buffer into high WRAM (`$7E2000`) and
+  far-loads it back (CRC `0x204F` unchanged), so the publish gate exercises the `sta [dp]`/`lda [dp]` far
+  path. (`mandel-far`/`k_mandel_far.c` Track 3a kept.)
+  [plan](docs/plans/2026-06-26-collapse-the-snes-mandelbrot-demos-into-one-far-16.md).
+
+- [x] **#321 native s16 — 16-bit comparison follow-ups — DONE 2026-06-21, track CLOSED.** ([plan](docs/plans/2026-06-21-321-native-s16-comparison-followups.md)) Compare surface measured ~complete (`dev/measure-compare-surface.sh`): everything native except the optimal byte-wise register-resident equality. The one open lever — the **ordering-as-value branchless carry-tail** (`zext(sbc-carry)`→`G_UADDE(0,0,carry)` in `legalizeZExt`) — was **BUILT + measured net-negative in realistic context** (correct + leaf-win real `uge_v` 25→19 + default byte-identical 75/75, but the 8-bit `adc` tail's `sep` breaks 16-bit runs: a16cmpaudit **+262 B** rep/sep-churn + `eor` inversions; c-torture 56 progs net≈0 **with** a +5 B regression) → **WON'T-DO** (the select-diamond is the ambient-16-bit optimum; clean gating infeasible — the cost is ambient-mode-dependent, invisible at legalize time). Classic lesson #1 leaf→ambient flip; spike on `wt/321-cmpval` (un-landed). **The mode-matched 16-bit-`rol` follow-up form (separate [banked plan §0a](docs/plans/2026-06-21-321-ordering-value-branchless-banked.md) — a real `ROLAcc16`/`LDAImm16`/`G_CARRY_BOOL16` materialization, `lda #$0000; rol a` at M16) was ALSO BUILT + measured 2026-06-21 → REGRESSES HARDER than v1: a16cmpaudit +654 B (both-widths) / +78 B (s16-direct-gated), whole a16 corpus +340 B with ZERO programs improving → WON'T-DO. Both 8-bit AND 16-bit forms closed: the select-diamond folds inversion free, its M8 tail matches ambient mode, and it keeps the boolean in `X` (not an `Imag16` ZP slot that cascades to spills). Deferred lever = mode-agnostic post-REPSEP pseudo (uncertain/partial upside, delicate REPSEP work — not pursued).** (unsigned ordering, ~~(a) equality `== !=`~~,
+  and ~~(b) signed `slt/sle/sgt/sge`~~ all landed — see Done). Remaining: (c) **equality as a value**
+  (`b = (a == c)`): the `+mos-a16` prologue **regression** is FIXED 2026-06-16 (an s16 load consumed
+  only by `G_UNMERGE` now loads byte-wise instead of a wasteful 16-bit-load→`A16`→spill→re-read —
+  `legalizeLoadStore16`; brings EQ-as-value to parity with default — see Done). The **full native
+  compare** (one `rep; lda; cmp; sep` + materialize Z→0/1, beating default) is **WON'T-IMPLEMENT** (both
+  materializations measured 2026-06-18: Option A reuse-ops **+14 B**, Option B explicit branchless `rol`/`adc`
+  tail **+16…+28 B** — worse, because branchless forgoes the `CmpBr` compare-fusion the diamond exploits, and
+  equality's Z isn't rotatable so the value must be formed first; the select-diamond is near-optimal; see the
+  [full-native materialize plan §Phase 0](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md)
+  + [Option B proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md)); ~~(d) fold a near-abs global RHS into `CMPAbs16`~~ (landed — see Done; also
+  folds the LHS via `lda abs`). **Tier-1 fuzzer finding F3 (the `SelectImm $a16` crash on a 16-bit-
+  accumulator value spilled across a call) is FIXED** for BOTH stacks: static (2026-06-16, direct
+  `STAbs16`/`LDAbs16`; `examples/65816/a16spill.c`) and soft/reentrant (2026-06-16, 16-bit indirect
+  `STAIndir16`/`LDAIndir16` in `expandLDSTStk`; `examples/65816/a16spillr.c`). It was an
+  `Ac16`-spill register-allocator bug — NOT this comparison/legalizer item (the legalizer-gate guess was
+  tried and reverted). See Done.
+  [F3 plan](docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md) ·
+  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md) ·
+  [equality plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md) ·
+  [signed plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md) ·
+  [compare-operand-fold plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md) ·
+  [full-native materialize plan](docs/plans/2026-06-18-321-native-s16-eq-as-value-full-native-materialize.md) ·
+  [Option B rol-tail proof](docs/plans/2026-06-18-prove-option-b-rol-tail-materialization-for-native.md).
+- [x] **#321 soft-stack (reentrant) spill coverage — close the gap the F3 fix exposed.** (P0/P1/P2 all DONE 2026-06-17/18.) The F3 `Ac16`
+  spill fix landed on **both** stacks, but the soft-stack half was found only by a hand-written recursive
+  reproducer — the **fuzzer never reaches it**: `gen_funcs` emits only leaf functions (`expr(pure=True)`
+  excludes the `call` leaf), so the call graph is acyclic → `MOSNonReentrant` marks every function
+  `nonreentrant` → all get static frames. ~~P0: teach `tools/a16_fuzz.py` to emit a **recursive** function
+  (the proven soft-stack trigger) so `expandLDSTStk` spills of `Ac16`/`Imag16`/8-bit get value-level
+  differential coverage (host==default==a16, both emulators).~~ **P0 VERIFIED 2026-06-18** (`RecFuncDef`;
+  `fuzz 50 1` + `fuzz 50 56`: 15/50 PASS each, `+mos-a16` correct all 100 seeds; soft-stack `sta ($0),y`
+  confirmed in seed-2 `f0`; 35/50 `xy16@MAME=0x0000` are pre-existing xy16 hang bugs, not a16 regressions;
+  two new `+mos-xy16` compiler bugs found+fixed: `selectXY16` unclassed-s16 guard + `copyPhysRegImpl`
+  Xc16/Yc16↔Imag16 cases; also found+fixed upstream F4, patch `0003`). ~~P1: document the `expandLDSTStk` spill
+  contract at the `MOSRegisterInfo.cpp:528` assert (every spillable ≥16-bit class needs an explicit case
+  — `xy16` index-16 is the latent next one).~~ **P1 DONE 2026-06-17** (SPILL CONTRACT comment at the
+  `expandLDSTStk` tail assert + the static-path mirror in `MOSInstrInfo::loadStoreRegStackSlot`;
+  comment-only, `0002` round-trips). ~~P2: add a hermetic `.ll` crash-regression for the soft-stack
+  `Ac16` spill.~~ **P2 DONE 2026-06-17** — `examples/65816/a16spillir.ll` (frozen IR of `a16spillr.c`) +
+  `dev/a16spillir.sh`: an `llc` gate (verify-clean + `STStk/LDStk $a16` present), drift-immune companion
+  to `a16spillr.c`; test-only, no vendor change
+  ([P2 plan](docs/plans/2026-06-17-p2-hermetic-ll-crash-regression-for-the-soft-stack.md)).
+  Independent finding: `__attribute__((reentrant))` opts out of the frontend default but
+  does not force the soft stack. The [2026-09-25 recheck](docs/investigations/2026-09-25-older-defect-recheck.md)
+  confirms the behavior; this remains a semantic-contract question, not a proven miscompile. It is not part of #321;
+  its **source-verified issue body is ready to file** at
+  [docs/upstream-reentrant-soft-stack-issue.md](docs/upstream-reentrant-soft-stack-issue.md), with filing
+  user-triggered. [coverage plan](docs/plans/2026-06-16-321-soft-stack-spill-coverage.md).
+- [x] **#321 native s16 — agreed optimization order (after load-fold).** (DONE — every slice shipped or measured-WON'T-DO; (7) HW-stack ABI is upstream-gated.) ~~(2) 16-bit compares/branches~~
+  (slice 1, unsigned ordering — done); ~~(3) inc/dec + 16-bit shifts~~ (constant shifts incl. signed
+  `>>`/ASHR done — see Done; ~~1-byte `inc a`/`dec a`~~ done — see Done [register + global `g±1` via
+  `lda; inc/dec a; sta`]; remaining: ~~variable shifts~~ [**WON'T DO** — task7 spike 2026-06-17: inline counted loop costs more bytes than `__ashlhi3`/`__lsrhi3` libcall at −Os], amount ≥8 [byte-relabel
+  already optimal]; ~~memory-RMW `inc abs`/`dec abs`~~ investigated + rejected — no `inc long` on the
+  65816 and `inc abs` is DBR-relative, unsafe vs the platform's long (DBR-independent) data addressing;
+  see Done); ~~(4) indexed/array access~~ (indirect `(zp)` load/store done; ~~`abs,x`/`(zp),y` 16-bit
+  indexed load/store~~ done — `a16absidx` + `a16indiry` PASS both emus; X-flag dimension NOT needed —
+  llvm-mos is pointer-based; [plan](docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md)); (5) A16-threading (value stays
+  live in the accumulator across ops — biggest win but reintroduces the coalescer-crash risk, so
+  deferred behind a broad corpus — **the corpus now exists: Tier 1 landed 2026-06-16 (differential
+  fuzzer + 6 kernels + 2 combinatorial tests; it already found+fixed 2 backend bugs), so this is
+  de-risked and unblocked**); ~~(6) cross-block REP/SEP mode-tracking~~ (M-flag done — see Done;
+  X-flag is a separate dimension); (7) hardware-stack ABI / 16-bit calling convention (upstream-gated).
+  ROADMAP step 5 frontier.
+  [1d-retry plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+- [x] **#321 A16-threading — keep the running s16 value live in the accumulator across ops** (Phases 0/1/1.5 DONE; Phase 2 retired; Phase 3 CLOSED 2026-06-26 net-negative.) (item (5)
+  above; the ROADMAP-step-5 "biggest win", de-risked now the Tier-1 corpus exists). **Phases 0–1 + 1.5
+  DONE (2026-06-17 — see Done):** the redundant `STAImag16 R; LDAImag16 R` round-trip between dependent
+  native s16 ops is eliminated by a coalescer-safe post-RA peephole (`threadAccum16` in
+  `MOSLateOptimization`) — adjacent in Phase 1, non-adjacent (incl. across volatile stores + multi-reload)
+  in Phase 1.5 — so the value threads through `A16` across the chain (`lda;adc;and;sbc;…;sta`). Measured
+  −31/−36 % on dependent chains, −4..−10 B on real kernels; a corrected 300-program scan shows the true
+  non-adjacent remainder is **1**. **Phase 2 retired:** fold-while-threaded is **already optimal** (interior
+  immediates *and* near-abs globals fold into the threaded chain today — existing selection folds compose
+  with the peephole). **Remaining — (3) the genuine hard core, ~~DEFERRED~~ CLOSED 2026-06-26 (measured
+  net-negative):** RA-level `Ac16` residency. The lever was **pre-RA `Ac16` residency** (thread the single-use
+  producer's `Ac16` vreg into the consumer, collapsing the `INF` single-instruction transits); the
+  `shouldCoalesce` 8-bit↔`Ac16` barrier was its **safety companion, NOT the fix**. The 2026-06-26 trigger-check
+  built and **measured** both behind a hidden flag: the barrier is byte-for-byte **inert** (B0), and pre-RA
+  residency (B1) **fires heavily but gives zero peak-ZP-pressure relief and a +24 B regression** — the
+  realizable gain is capped by the single 65816 accumulator (genuinely-simultaneous live 16-bit values must
+  spill to `Imag16` no matter how transits thread), now **proven, not assumed**. So Phase 3 is **closed, not
+  shelved**; only an *actual* realistic `a16-zp-pressure-overflow` could re-open, and it would need a different
+  remedy (not residency). [spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
+  **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
+  re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
+  **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
+  [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
+  [plan](docs/plans/2026-06-17-321-a16-threading.md) ·
+  [Phase-3 deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
+- [x] **#321 16-bit ALU chain extensions** (DONE — add/bitwise chains shipped; SUB moot; multi-value pressure characterized + DEFER confirmed with data.) (extends Inc 1c, which fused add-chains only). Done:
+  ~~the multi-use add chain~~ (`add_chain16_ld`), ~~immediates *within* add chains~~ (`a+b+c+K` → final
+  `adc #imm`), and ~~AND/OR/XOR chains~~ (`bit_chain16`/`_ld`, no carry-init) — see Done. SUB chains are
+  **moot** (the optimizer reassociates `a-b-c` to `a-(b+c)`, not a homogeneous chain). Remaining —
+  **multi-value register pressure: CHARACTERIZED (measured 2026-06-18); the premise is largely already
+  solved.** There are ~14 16-bit slots (the `Imag16` pool), not one: 2–9 live s16 values already compile to
+  one `rep`/`sep` bracket with the 2nd value folded as a memory operand (`and/adc __rcN`), −58..−65 % vs
+  default, and correct (verify-clean, no crash) even at pool exhaustion. The lone genuine residual — M=16
+  fragmenting into many `rep`/`sep` brackets when a spill is emitted byte-wise-in-8-bit under **>14 live
+  s16** (pool exhaustion) — is **pathological-only**. **Phase 0 scan RAN 2026-06-18
+  (`dev/measure-zp-pressure.sh`): 0 of 13 real functions exhaust the pool (max ~5 of 14 pairs) → DEFER
+  confirmed with data** (the scan also surfaced a separate `+mos-a16 -Os` RA *crash* on `globals.c` — see
+  its own bullet above).
+  **↔ Shared core (native-s16 surface close-out):** a *single* deferred frontier — RA-level 16-bit-value
+  residency under register pressure (A16-threading Phase 3 ≡ ALU-chain >14-live ≡ the `pr15296` ZP-overflow).
+  **Two crashes once lumped into this core left it with orthogonal targeted fixes:** the
+  `globals.c`/`a16regpress.c` `-Os` RA-**crash** (de-pin the i8 loop counter from `{A}` → `G_INC`/`G_DEC`)
+  — **FIXED, patch `0009`** (`ad506ed`, 2026-06-25) — and the `+mos-a16`/`+mos-xy16` **scavenger-N/Z crash**
+  (route a live `$p` through a dead index reg into `RC17`) — **FIXED, patch `0011`** (2026-06-26; + `0012`
+  for a `LDCImm` MC-lowering bug it surfaced); both are now positive gates. The rest stays behind **one**
+  re-open trigger (a 2nd independent *realistic* `regalloc-out-of-registers` / `a16-zp-pressure-overflow`,
+  **or** a real fn crossing ~10/14 `Imag16` pairs) → **one** gated B0→B1→B2 spike.
+  [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md).
+  [multi-value pressure plan](docs/plans/2026-06-18-321-16bit-alu-multivalue-register-pressure.md) ·
+  [1c plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md) ·
+  [add-chain-immediate plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md) ·
+  [bitwise-chains plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
+- [x] **#321 native-width implementation — full xy16 mode + ABI** (DONE — Layers 1–5 + legalizer + CC verified/formalized; HW-stack ABI follow-on is upstream-gated.) (after Increment 1): ~~X/Y permanently 16-bit~~
+  ~~REP/SEP mode-tracking across control flow + churn minimization~~ (M-flag done — see Done; the
+  ~~X-flag is a separate mode dimension still to add to the dataflow~~ **X-flag lattice DONE 2026-06-18**
+  — Layers 1–5 committed to `wt/321-xy16`: feature flag + Xc16/Yc16 regs + pseudos + parallel
+  X-lattice in `MOSInsertREPSEP` + static/soft-stack spills + `selectXY16` skeleton; all compile
+  clean, `xy16spill` PASS); 16-bit arithmetic; ~~native-mode crt0~~ (entry + 16-bit SP + native
+  vectors already present; explicit DBR=0 is the one real gap — dedicated item below); then
+  hardware-stack ABI + calling convention. ROADMAP step 5.
+  **Legalizer integration DONE** (B1 `allUsesAreXY16Compatible` load→`Xc16` constraint + B2 16-bit-index
+  `abs,X16`/`(zp),Y16` widening via `Use16BitIdx`; `selectXY16` C1 direct + C2 indexed handlers all wired).
+  Both B2 sub-paths now gated: `abs,X16` by `xy16ops`, `(zp),Y16` by **`xy16indiry`** (added 2026-06-19 —
+  the path was wired-but-untested; gate PASSES, no bug; [plan](docs/plans/2026-06-19-321-xy16-indiry-gate.md)).
+  **Remaining follow-ons: hardware-stack ABI + calling convention** (gated on the CC decision). (Native-mode
+  crt0 needed no change for in-function xy16; its lone gap — explicit DBR=0 — is the dedicated item below.)
+  [xy16 plan](docs/plans/2026-06-17-321-xy16-index-register-mode.md) · [handoff](docs/plans/2026-06-18-321-xy16-implementation-handoff.md).
+  **Upstream disposition (2026-08-03):** holistic `0002` remains local; there is no #321 PR. A future
+  user-triggered submission is one draft PR for the complete implementation, reorganized as a
+  reviewable commit series. [PR blueprint](docs/321-upstream-native-width-pr.md).
+- [x] **#321 calling-convention — frame decision RESOLVED (phased) 2026-06-18; remaining work deferred/gated.**
+  [CC decision analysis](docs/investigations/65816-calling-convention-decision.md) ·
+  [decision record](docs/plans/2026-06-18-321-cc-frame-phased-decision.md). The "one decision" decomposes
+  into 4 sub-decisions, now all dispositioned: ~~return~~ (A low / X high — **LOCKED 2026-06-17**,
+  `dev/run.sh a16ret`, codegen unchanged; see Done); ~~args~~ (**keep imaginary-register** passing — adopted
+  for the first pass); ~~recursion~~ (the already-hardened soft static stack); and the ~~hard **frame** fork~~
+  (**RESOLVED phased 2026-06-18**: the first pass keeps the soft static stack; the **TCD DP-window** is
+  deferred behind a ZP-pressure measurement; pure stack-relative is ruled out as dominated). Never blocked
+  xy16 + native-mode crt0. **Remaining:** (1) ~~the ZP-pressure measurement~~ **RAN 2026-06-18**
+  (`dev/measure-zp-pressure.sh`, `9fc5cf2`): the ZP is **slack** (real code max ~5 of 14 pairs) → the
+  **DP-window (a) is shelved with evidence**, not built (revisit only if future code nears the ceiling); (2)
+  upstream posture — post the prior-art note + a first-pass CC to #321 (user-triggered; see Upstream section).
+  [A/X-return plan](docs/plans/2026-06-17-321-ax-return-convention.md) ·
+  [prior-art note](docs/320-321-65816-c-abi-prior-art.md).
+- [x] **#321 frame-ABI head-to-head — RESOLVED 2026-06-20: CONFIRMED-shelved (NULL), measured.** Revived the
+  (a)/(b) frame fork the ZP-pressure proxy had shelved on paper, on a `wt/321-frame-abi` feature worktree.
+  **P0** (`c2eaf61`): off-by-default `+mos-dp-frame`/`+mos-sr-frame` features + `frameStrategy()` plumbing,
+  byte-identical-default proven (24/24). **A0** (`a73c564`): the DP↔`__rc` collision (SNES linker pins
+  `__rc*` at ZP `$00–$1F`; 65816 ZP addressing is `D`-relative) is **avoidable** — a DP-window at `D=$1000`
+  read the `__rc16` cell via absolute correctly, `corpus_result==0xBBAA` on MAME+bsnes (`frameabi_a0.c`/`.sh`).
+  But the **A0 census** (`9617b0f`, `dev/frameabi-census.sh`) short-circuited the build: **0/13 realistic
+  corpus+kernel functions can profit** — locals are register-resident in `__rc` and local aggregates go
+  through a pointer in `__rc`, so frame/spill traffic is ~0 and there is **nothing for any frame ABI to
+  optimize**; only contrived volatile/const-shuffle shapes profit (`frameabi_heavy.c`). So A1–A4/B/M were
+  **not built** (would only confirm the measured NULL). A *stronger* result than the proxy shelving — the
+  opportunity itself was measured empty. ~~Durable artifacts merged to `main`~~ (`f114c42`:
+  `frameabi_a0.c`/`.sh`, `frameabi_heavy.c`, `frameabi-census.sh`, `frameabi-byte-identical.sh`). **Remaining:**
+  (1) the `wt/321-frame-abi` branch is **retained until notified** (user, 2026-06-20) — holds the inert,
+  un-landed (a)/(b) `0002` spike; tear down only when told; (2) post the prepared #321 CC design note
+  (user-triggered — see Upstream / Contribution + [note](docs/321-upstream-cc-frame-abi-note.md)).
+  [plan](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
+- [x] ~~**`snesgfx` — OOP-in-C SNES rendering library** — 12 committed headers, 29 demos proven on the differential bar. Formal verification: `mandel-oop.c` (Mode 7 as Drawable, `corpus_result==0x204F`, +mos-a16@bsnes-jg, `-verify` clean). LTO devirtualized single-drawable dispatch to 0 indirect JMPs; OOP overhead +338 B (+10%) vs procedural. `docs/oop-in-c.md` §4–§5 populated with measured numbers. [plan](docs/plans/2026-06-26-snes-rendering-oop-library.md)~~ *(2026‑07‑26 refresh: now 13 headers / 113 demos; the "0 indirect JMPs / LTO devirtualized" claim was a measurement artifact — 1 `__call_indir` call survives; mandel-display has since diverged so +338 B is historical. Corrected in `docs/oop-in-c.md` §4–§5 + new §8 static-vs-virtual benchmark.)*
+- [x] ~~**Space Invaders on `snesgfx`** — full game (5×11 fleet, bombs, UFO, destructible bunkers, score/lives HUD, attract+play), `corpus_result==0x9D57`, five-way GREEN, live at [biohack.net/snes/space-invaders/](https://biohack.net/snes/space-invaders/). [plan](docs/plans/2026-06-26-space-invaders-on-the-snesgfx-oop-library.md)~~
+- [x] ~~**biohack.net cache headers** — `public/_headers` (HTML: `must-revalidate`; `/play/*`: `immutable`). No hard refresh needed after ROM updates. biohack.net v1.0.91. [plan](docs/plans/2026-06-27-cache-control-headers-for-biohack-net-snes-demos.md)~~
+- [T3] **Compiler stress-test demo battery — algorithm+visual SNES demos**
+  ([ideas](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md)). Each on `snesgfx`: a shared
+  host+target logic header → differential CRC (host==default==a16==xy16 on MAME+bsnes-jg, `-verify` clean,
+  bsnes 3× identical) + a two-emulator screenshot, like Mandelbrot/Space-Invaders. Each hits a
+  distinct codegen corner.
+  **Status (2026-07-02): Rounds 1–5 (#1–#92) all shipped + live; Round 6 (harden-the-fixes, #93–#118) DRAFTED, in progress.**
+  **Rounds 6 and 7 (#93–#141) both now COMPLETE.** Dispatched 2026-09-15 to draft and start Round 8
+  (`#142+`) — a fresh untested-corner coverage audit plus a first cluster of new demos.
+  **Round 8 (#142–#160) DRAFTED 2026‑09‑16; Cluster A (#142–#145) BUILT + gated.**
+  [Round 8 section](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md) ·
+  [plan](docs/plans/2026-09-16-round8-unentered-backend-paths.md). The round's angle is new and
+  narrower than Rounds 2–5's: not *"which opcode has no demo?"* (exhausted — every opcode plain C
+  forms now has one) but ***"which branch of an already-exercised rule has never fired?"*** A
+  legalizer handler gated on `Table.MBBs.size() <= 128` has two implementations and 141 demos took
+  one of them; an ABI classifier routing both returns *and* arguments through
+  `getNaturalAlignIndirect` was validated on returns only. Every corner was **measured** — the audit
+  compiled all 100+ corpus slices with `-S` and `-print-before=legalizer` and counted what actually
+  formed — and the corners that turned out **not constructible from plain C** (`G_PTRMASK`,
+  `G_FREEZE`, `G_FFREXP`, `G_FCANONICALIZE`) are recorded as the round's negative result rather than
+  proposed as demos. **Publishing stays out of scope**, as for Cluster G.
+  - **#142 `jt256` — BUILT + gated.** ISA-256, a bytecode machine whose **256-way** opcode dispatch is
+    double `legalizeBrJt`'s limit, so the `JMP (abs,X)` arm is structurally unreachable and the
+    **split low/high byte-table + `G_BRINDIRECT`** arm (its own `MO_HI_JT` relocation) must fire.
+    All five jump tables across #1–#141 (`bf_vm`, `cordic`, `duff`, `perlin`, `turtle-vm`) take the
+    other arm, so this is the first program in the project to compile it. `corpus_result = 0xB8CC`.
+  - **#143 `vlastack` — BUILT + gated.** An RLE scanline decoder whose per-row scratch array is a VLA
+    sized from the compressed stream, in the loop body — the first `G_DYN_STACKALLOC` in the tree.
+    #68 `polyfill`'s VLA const-folds to a fixed alloca, so the existing coverage of this path was
+    **illusory**: `G_STACKSAVE`/`G_STACKRESTORE` only. `corpus_result = 0xD77B`.
+  - **#144 `borrowov` — BUILT + gated.** A reservoir cascade where every transfer is a checked
+    subtract — `__builtin_sub_overflow` at `uint16` (borrow out), `int16` and `int32` (signed,
+    opposite-sign operands: the pairing an *add* can never overflow on). That builtin appears **zero**
+    times across #1–#141; only the add (#44) and mul (#76/#101) forms. `corpus_result = 0x81FB`.
+  - **#145 `bigbyval` — BUILT + gated.** A 144-bit record passed **by value as an argument**, which
+    `classifyArgumentType` sends indirect with **`ByVal=false`** — the callee gets a pointer to
+    caller-owned storage, so by-value semantics rest entirely on a call-site copy. Each stage mutates
+    its own parameter and the driver re-reads its original: a missing copy corrupts the *caller*, with
+    no crash, a correct callee result and a clean verifier. #91 `matcascade` covered only the **return**
+    half of the same helper. `corpus_result = 0xBD6B`.
+  - **Cluster A verdict: four clean positives — no compiler bug found.** Every one of the four
+    un-entered paths lowers correctly: `host == default == +mos-a16 == +mos-xy16` on MAME **and**
+    bsnes-jg, `-verify-machineinstrs` clean in all three modes, and each demo's structure gate
+    confirms the intended shape actually reached the ROM rather than folding into an already-covered
+    one.
+  - **Cluster B (`#146`–`#150`) — BUILT + gated 2026‑09‑16**
+    ([plan](docs/plans/2026-09-16-round8-cluster-b-conversion-comparison-layout.md)). Conversion,
+    comparison and layout paths with no demo. All five ship green on the full bar and
+    **no compiler bug was found** — but **two of the five came back measured-negative**, and the
+    negatives are the more valuable half of the cluster.
+    - **#146 `dblbridge`** — the float↔double promotion pair (`__extendsfdf2` / `__truncdfsf2`,
+      `MOSLegalizerInfo.cpp:375`/`:376`), which **zero** slices across #1–#141 link. The same chaotic
+      map iterated two ways over identical binary32 state — lane A wholly at `float`, lane B promoted
+      to `double` for the step and demoted back each iteration — so the lanes differ only in *where*
+      the rounding happens and the step at which they separate is the measured output. Correctly
+      rounded IEEE only, no libm; the CRC folds raw `uint32_t` bit patterns.
+      `corpus_result = 0xF829`.
+    - **#147 `bsearchviz`** — `bsearch`, a callback ABI the battery has never linked and one
+      structurally unlike `qsort`'s: the comparator drives an interval bisection and the call returns
+      a `void*` **into** the array or `NULL`, which the caller must difference back into an index — a
+      wrong conversion yields a plausible in-range index, never a crash. `corpus_result = 0x7FF5`.
+    - **#148 `strcmprace`** — `memcmp`/`strcmp`/`strncmp`, zero uses tree-wide. The CRC folds the
+      **sign** of every comparison (never the magnitude, which C leaves implementation-defined).
+      **Measured negative:** MOS never inline-expands `memcmp` at any constant size, including the
+      `== 0` form other targets specialise — `enableMemCmpExpansion` is not overridden — so the
+      "second lowering" the ideas doc predicted does not exist. `corpus_result = 0xF0BA`.
+    - **#149 `packrec`** — **measured negative, demo reframed.** `__attribute__((packed))` is a
+      **layout no-op on MOS**: every scalar already has ABI alignment 1, so an unpacked struct has no
+      padding to remove (`sizeof` and every `offsetof` agree between the packed and plain twins; on
+      the x86‑64 host the same pair is 12 vs 10 bytes, so the no-op is target-specific). Joins
+      `G_PTRMASK`/`G_FREEZE` as not-constructible-as-a-distinct-lowering. The demo still ships as the
+      tree's **only regression guard for the padding-free-layout invariant**, which zero demos across
+      #1–#141 assert and on which every binary-format parse built with this toolchain silently
+      depends. `corpus_result = 0x4676`.
+    - **#150 `trapguard`** — `G_TRAP` `.custom()` on the impossible arm of a dense state machine,
+      formed pre-legalizer and emitted as `jsr abort` in all three modes. Honest framing kept: a trap
+      terminates, so it can never be *taken* in a gate run — this is a **presence-and-inertness**
+      probe, weaker than #142–#145, and the gate says so in its own output. Two platform findings
+      fell out: `__builtin_unreachable` alone emits **nothing** (only `__builtin_trap` forms
+      `G_TRAP`), and `abort` → `raise` → stdio means the first `__builtin_trap` in any SNES program
+      **fails to link** on an undefined `__putchar` until the program supplies the hook.
+      `corpus_result = 0x2C2D`.
+    - Publishing stays **out of scope**, as for Cluster A and Round 6 Cluster G.
+  - **Cluster C (`#151`–`#155`) — BUILT + gated 2026‑09‑16, and it FOUND A REAL COMPILER BUG**
+    ([plan](docs/plans/2026-09-16-round8-cluster-c-boundary-and-width-escalations.md)). The
+    boundary and width escalations of paths that already have one shipped demo. All five ship
+    green on the full bar — `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg,
+    `-verify-machineinstrs` clean in all three modes, each with a structure gate proving the
+    intended shape reached the ROM.
+    - **The bug — `ran out of registers during register allocation`, found by #154 on its first
+      compile.** Twelve lines of C — one `uint16_t *`, one call, three stores of which one is
+      byte-width — hard-**error** the register allocator at `-O1` and above. **Not** a
+      `+mos-a16`/`+mos-xy16`/65816 defect and **not** a fork regression: it reproduces on
+      **pristine upstream `llc`** with the **pristine MOS datalayout** at `-mcpu=mos6502`, and
+      is clean at `-O0`. The necessary combination, measured one ingredient at a time, is a call
+      plus mixed-width (i8 *and* i16) traffic through the same pointer plus three or more
+      stores; word-only traffic of the same volume is fine. **Fixed locally September 22
+      by patch 0029:** the two-address pass must not hoist a physical argument definition
+      across virtual operands that require that register. The
+      [PR draft](docs/upstream-twoaddr-physreg-reschedule-pr.md) and
+      [validation](docs/pr-preparations/2026-09-22/0029-validation.md) are prepared.
+      MOS CodeGen/MC: **131 pass / one unsupported**. The separate assertion-enabled
+      build passes **231 focused tests** (X86 169, ARM 29, AArch64 33), with no
+      failures or skips; both bundled MOS tests also pass. The
+      [coverage inventory](docs/pr-preparations/2026-09-22/0029-cross-target-validation.md#backend-coverage-at-the-pinned-revision)
+      records the remaining 22 backends. Final submission review and publication
+      remain; the fix does not depend on #320/#321.
+      [investigation](docs/investigations/2026-09-16-mos-regalloc-out-of-registers-mixed-width-pointer-plus-call.md).
+    - **#151 `vlanest`** — the DEPTH axis of `G_DYN_STACKALLOC`: two VLAs in nested block scopes
+      with independent runtime lengths, the inner length derived from the OUTER allocation's
+      contents, so one save/restore bracket encloses another. An overshooting unwind is silent,
+      so the demo re-reads the outer array after every inner block closes. Measured, and it
+      determined the source shape: a function-scope VLA plus an inner-block VLA gives 2
+      `G_DYN_STACKALLOC` but only **1** save/restore, and so does an explicit outer block entered
+      once — only re-entering both scopes per loop iteration keeps the outer bracket alive (2/2/2).
+      `corpus_result = 0x153B`.
+    - **#152 `jtedge`** — 127, 128 and 129 successors in one ROM, so both `legalizeBrJt` arms and
+      the exact `Table.MBBs.size() <= 128` test are compiled side by side and fed the same
+      in-range opcode stream over three VM copies. **Measured negative for the bug it was built
+      to find: the boundary is exact and inclusive at 128, no off-by-one** (126/127/128 emit
+      `jmp (.LJTI,x)`; 129/130 emit `ldy .LJTI,x` + `lda .LJTI+256,x` + `jmp (__rc)`). It is
+      still the only test in the tree that pins the constant, and it records that the split arm's
+      high table sits at a fixed `+256` whatever the entry count — a full 512-byte table at 129
+      entries. `corpus_result = 0xC199`.
+    - **#153 `jtsparse`** — the THIRD switch-lowering strategy, which no demo across #1–#152
+      forces deliberately: sparse case values never reach `legalizeBrJt` at all and become a
+      binary-search compare tree. The same sixteen handler bodies run through a dense dispatcher
+      (jump table) and a sparse one (compare tree) over independent VM copies, so strategy 3 is
+      differentially checked against strategy 1 in one program, both default arms live.
+      `corpus_result = 0xA131`.
+    - **#154 `byvaledge`** — clang's `getTypeSize(Ty) > 32` by-value classifier compiled from
+      both sides over records differing by one byte, with every stage mutating its own parameter
+      and the caller re-reading its original (the only detector for a missing `ByVal=false`
+      call-site copy). **Measured correction: there is no 33-bit size class on MOS** —
+      `getTypeSize` is in bits and a record is always whole bytes, so a 33-bit-declared bitfield
+      record is `sizeof 5` (40 bits) and goes indirect; the real boundary is `sizeof 4` vs
+      `sizeof 5`. `corpus_result = 0x4FAB`.
+    - **#155 `ovmatrix`** — all six overflow opcodes at all three widths in one noinline kernel,
+      18 cells, every operand from runtime state. **Measured, and it changed the design:** a probe
+      with one CONSTANT operand formed `G_UADDO=2 G_SADDO=2 G_UMULO=2 G_SMULO=2 G_USUBO=1
+      G_SSUBO=0` — folding erases cells and `G_SSUBO`, the family #144 exists for, vanished
+      entirely. Both operands are runtime and the gate asserts every cell fired **both** outcomes;
+      with that, all six opcodes appear 3× each in all three modes. `corpus_result = 0xD4D0`.
+    - Publishing stays **out of scope**, as for Clusters A and B and Round 6 Cluster G.
+    - Remaining: **#156–#160** (`va_arg` width sweep, recursive `sret`, indirect-call arity fan,
+      extending-load sign matrix, address-space cast ladder) — same shape, a future cluster. The
+      regalloc defect above wants its own dispatch, at a higher tier than a demo cluster: a
+      root-cause pass (`-debug-only=regalloc`) first, then a fix, then an upstream issue. It is
+      queued under *Future / blocked* in
+      [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md) — **not**
+      postable yet, and not to be counted as pending.
+  **2026‑09‑15: Cluster G has caught two real bugs.** `#116 backtrack` found that `longjmp`'s page‑1
+  hard-stack reconstruction never executed (the assembler sized a `rep #$20`-mode immediate by value, not
+  by mode, so the CPU read past it into the next opcode at runtime) — FIXED in `platforms/snes/setjmp.S`
+  (one line, the existing `mos16()` immediate-width modifier):
+  [investigation](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md#resolution-2026-09-15).
+  `#118 retryjmp` then found a `+mos-xy16` **miscompile** — an X16/Y16 soft-stack spill is staged
+  through the accumulator (`txa; sta (ptr)` / `lda (ptr); tax` — a 16-bit index register has no
+  `(zp)`-indirect form) and the `LDStk`/`STStk` pseudo never declares that clobber, so register
+  allocation left the live 16-bit value in `A16` across its own index reload — **FIXED 2026‑09‑15**
+  in `MOSRegisterInfo::expandLDSTStk` (patch `0002`):
+  [investigation](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md#resolution-2026-09-15).
+  Round 6 **Cluster G (#116–118)** added 2026-07-02 to harden the new `platforms/snes/setjmp.S` fix (#35 longjmp,
+  runtime/library — not a codegen patch): #116 `backtrack` (deep multi-frame longjmp unwind, the unblocked #35
+  backtracking solver — the flagship), #117 `csrjmp` (all 14 `__rc18..31` CSRs live across the jump), #118
+  `retryjmp` (re-entrant setjmp site, varying depth + deep soft stack). Beyond the `corpus/setjmp_sim.c` guard.
+  **Cluster G result (2026-09-15) — all three BUILT + gated, not yet published. Both defects it found are
+  FIXED.** Publishing is out of scope — no visual demo here is shipped to any site.
+  - **#116 `backtrack` — BUILT + gated, not yet published.** 8-queens, one `setjmp` choice point per recursion
+    level, every dead end `longjmp`ing straight to the deepest still-viable ancestor = a multi-frame unwind from a
+    varying depth. `corpus_result = 0x7336`, `host == default == +mos-a16 == +mos-xy16` on MAME **and** bsnes-jg
+    (MAME actually ran — the SPC700 IPL is present, no SKIP), `-verify-machineinstrs` clean in all three modes.
+    Full set shipped: `expected.tsv` row, `dev/backtrack.{sh,lua}`, the visual ROM `examples/snes/backtrack.c`
+    (trace replay on an 8×8 board with a title card — queens drop in, abandoned rows flash red and snap back),
+    `dev/run.sh` + `Taskfile.yml` wiring. It is the demo that found and now guards the `setjmp.S` page-1 defect.
+  - **#117 `csrjmp` — BUILT + gated, not yet published.** 14 coefficient bytes (the exact width of `jmp_buf`'s
+    `csrs[14]` = `__rc18..__rc31`) held in locals across a `setjmp` while a `noinline` worker occupies and
+    rewrites every callee-saved slot and then `longjmp`s past the epilogue that would restore them; only
+    `longjmp`'s own `csrs[]` restore can recover them. `corpus_result = 0xADD8`, same five-way agreement on both
+    emulators (MAME ran), `-verify` clean in all three modes. Codegen confirms the shape — 12 of the 14 land in
+    `__rc20..__rc31`, the rest on the soft stack. Full set shipped, same as #116. **Verdict: the restore offsets
+    are correct.**
+  - **#118 `retryjmp` — BUILT + gated, not yet published; the defect it found is FIXED.** One `setjmp`
+    site re-entered 24 times, each attempt jumping back from a different depth with six 16-bit locals
+    live across every recursive call. `corpus_result = 0x3388`, `host == default == +mos-a16 ==
+    +mos-xy16` on both emulators, `-verify-machineinstrs` clean in all three modes. Full set shipped,
+    same as #116/#117 — plus a `+mos-xy16 -verify` regression gate at `-O1`/`-Os`/`-Oz`/`-O2` inside
+    `dev/retryjmp.sh`, the exact legs that failed. **The defect:** a 16-bit index register has no
+    `(zp)`-indirect load/store on the 65816, so an X16/Y16 soft-stack spill must be staged through the
+    accumulator — and neither `LDStk` nor `STStk` carries an `A16` operand, so the allocator was never
+    told and left the value bound for `rj_result[]` in `A16` across the spill's own index reload
+    (`0x82D4` vs the host's `0x3388`). The investigation's provisional "frame-index elimination takes a
+    live `Imag16` pair" reading was **wrong** — `$rs1` is genuinely dead there and is the pseudo's own
+    `@earlyclobber` scratch; the verifier's complaint was two clobbers downstream. Fixed by bracketing
+    the staging with new `PHA16`/`PLA16` pseudos when the accumulator is live across the spill;
+    measured blast radius is **2 brackets across all 117 corpus slices, both in `retryjmp_sim.c`**.
+    Also closed the discriminator hole it exposed: `tools/a16_fuzz.py` no longer classifies any
+    *"Using an undefined physical register"* log as the benign `a16-rc-undef-ra-pure-virtual` XFAIL
+    (the operands must all be imaginary registers), **and** a known-issue verify failure no longer
+    short-circuits the 4-way value check — a mismatch is a `FAIL` whatever the verify log said.
+    ([plan](docs/plans/2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md))
+    **Follow-up RESOLVED 2026-09-15 — repro drift diagnosed, XFAIL kept, guard re-armed.** The fix's
+    own agent flagged that the pre-existing `a16-rc-undef-ra-pure-virtual` KNOWN_ISSUES entry's
+    repros had drifted. **Verdict: NOT a fix — do not retire.** Counterfactual settles it: the
+    **pre-`903de3e` `lsystem_sim.c`** still reproduces `main`/`$rc11` on **today's** compiler at
+    ‑O1/‑O2/‑O3/‑Os on both legs, so no compiler change relieved anything — `903de3e` (2026‑08‑01
+    idle-loop `wai` hygiene sweep, 214 files) reshaped `main`'s live ranges out from under the
+    witness. `newton_sim.c -Os` was never drift at all: it has been clean since the cause‑#1 fix
+    `f1af264`, exactly as that commit's own comment states. Cause #2 is live in the shipping battery
+    today (`trimerge_sim.c` `main` `$rs1`, `+mos-xy16` ‑O1/‑Os, plus #33/#69/#71/#123). The real
+    defect was the guard's bookkeeping: `f1af264` retired `a16-newton-step-rc-undef` but left its
+    `KNOWN_ISSUE_REPROS` row, so the guard has been red since 2026‑06‑30 printing an impossible
+    ACTION — invisible because `smoke.yml` last ran 2026‑06‑19. Fixed: new durable repro
+    `examples/65816/rcundef2.c` (compiler test-suite dir, no idle loop to sweep), rows now carry an
+    explicit ‑O level (`rcundef2.c` @ ‑Os + `newton_sim.c` @ ‑O1, both legs), a row naming a retired
+    kid is now itself DRIFT, and the XPASS ACTION now makes you prove *fixed* vs *repro drifted*.
+    `known-issues` 4/4 green. ([plan](docs/plans/2026-09-15-a16-rc-undef-pure-virtual-drift.md))
+  ([#35 defect](docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md) ·
+  [xy16 defect](docs/investigations/2026-09-15-xy16-spill-reload-clobbers-store-value.md) ·
+  [plan](docs/plans/2026-09-15-116-118-setjmp-cluster-g-demos.md))
+  - [T4] **#102 cpu6502** — 6502/65C02 CPU Disassembler + Simulator (a genuinely NEW showcase demo, not a hardening re-stress). Simulates a pure 6502/65C02 (8-bit A/X/Y, 16-bit PC) running the 6502-assembly equivalent of `hello.c` (green color reg + sentinel 0x42, then a loop exercising every ALU gate). On-screen: a scrolling **Waldo 16×16** disassembly listing (highlighted current instruction) + 8 schematic ALU gate symbols (AND/OR/XOR as classic shapes; ADD/SUB/SHL/SHR/CMP blocks) — the gate for the just-executed instruction lights yellow; live register + flag strip. Codegen stressed: **256-entry `switch` → jump table** (`jmp_table=4`), uint16_t PC arithmetic, uint8_t flag bit-ops. **Gate-green, clean positive:** `host==default==+mos-a16==+mos-xy16==0xAC8A` on MAME + bsnes-jg (pixel-identical render), `-verify` clean, `rep/sep=97`. ~~**Publish to biohack.net pending** (`/snes-rom-page`).~~ **ALREADY PUBLISHED — stale note, corrected 2026-07-26.** Live at ✓ [/snes/cpu6502/](https://biohack.net/snes/cpu6502/) (HTTP 200; shipped by biohack.net `aff09db` / tag `v1.0.254`, the full-screen-layout redesign — the page, ROM, preview and a manifest selfcheck `off=0xADD len=2 want=0xAC8A frames=1000` were all already in place). **Re-verified on the rebased toolchain (2026-07-26):** rebuilt ROM is **byte-identical** to both the site-repo copy and the live-served ROM (`sha256 c0df7cfd195ba8bb…`), and re-passes the gate on bsnes-jg (`SMOKE: PASS off=0xADD got=0xAC8A`, 1000 frames) with the render correct (`0019 CMP` highlighted + CMP gate lit). ([plan](docs/plans/2026-07-02-102-snes-cpu6502.md) · [rebase](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md))
+  - [T3] **Compiler-bug videos via the cpu6502 demo.** The cpu6502 simulator is a natural vehicle for showing compiler miscompiles visually — a wrong gate sequence or corrupted register value is immediately on-screen. Produce short MAME/bsnes-jg clips illustrating each known battery-caught bug (wrong output → fixed output). Depends on #102 shipping.
+  - [T3] **#128 lzss-gallery — transparent gravity-chevron navigation + continuous-bracket repack tracker.** Replace the black-badge Prev/Next arrows with transparent beveled 3D chevrons (5 hand-authored poses × dedicated Left/Right tile sets) driven by signed 8.8 ballistic physics in the NMI (takeoff `velocity = -0x00C0`, gravity `+0x0010`, ~24-frame bounce), glow derived from arc state instead of frame parity; replace the box/five-dot compression tracker with capped continuous brackets + one clock-latched traveling packet, rebuilt atomically in the OAM shadow. Also fixes a pre-existing reserved-palette slot bug (CGRAM 132=0 today, so the destination outline/diamond render **black**, not accent — audit in the plan). Gate: 26-work / generated oracle `0x3D44` unchanged. [plan](docs/plans/2026-07-27-128-lzss-gallery-gravity-chevrons.md)
+  - [x] ~~**#105 crcwall** (Round 6, Cluster D) — Bit-Serial CRC Wall: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via three interleaved bit-serial CRC shift registers (CRC-8/16/32) under register pressure — the DEFAULT-8-bit leg is load-bearing (0010 is not accum-gated). **Clean positive, fix holds:** default-8bit compiles clean, `asl/rol/lsr/ror=13`, `host==default==+mos-a16==+mos-xy16==0x8E47`, `-verify` clean.~~ ✓ [/snes/crcwall/](https://biohack.net/snes/crcwall/) ([plan](docs/plans/2026-07-02-105-snes-crcwall.md))
+  - [x] ~~**#106 lfsr2** (Round 6, Cluster D) — Dual-LFSR Scrambler: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) with TWO dissimilar loop-carried shift registers live at once — a maximal-length **Galois** LFSR (shift + tap-XOR gated by the shifted-out bit) + a **Fibonacci** LFSR (XOR-of-taps → top bit) + a 16-bit Galois, stepped simultaneously (extra pressure). DEFAULT-8-bit leg load-bearing (0010 not accum-gated). **Clean positive, fix holds:** both 8-bit LFSRs maximal-length (period 255); default-8bit compiles clean `asl/rol/lsr/ror=15`, `host==default==+mos-a16==+mos-xy16==0x6AA3`, `-verify` clean ×3 (incl. default).~~ ✓ [/snes/lfsr2/](https://biohack.net/snes/lfsr2/) ([plan](docs/plans/2026-07-02-106-snes-lfsr2.md))
+  - [x] ~~**#107 bitweave** (Round 6, Cluster D) — Serial Bit-Reversal Weave: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via a serial **rotate-out/rotate-in carry loop** bit-reversal (`rev=(rev<<1)|(v&1); v>>=1`), loop-carried through the back edge — an 8-bit + a 16-bit reversal interleaved (two rev regs live). NO `__builtin_bitreverse` (the #54 bitshuffle contrast). DEFAULT-8-bit leg load-bearing. **Clean positive, fix holds:** bit-reversal is an INVOLUTION, gate folds `rev(rev(v))^v` self-check witness; default-8bit compiles clean `asl/rol/lsr/ror=20`, `host==default==+mos-a16==+mos-xy16==0x0E03`, `-verify` clean ×3 (incl. default).~~ ✓ [/snes/bitweave/](https://biohack.net/snes/bitweave/) ([plan](docs/plans/2026-07-02-107-snes-bitweave.md))
+  - [x] ~~**#108 uarteye** (Round 6, Cluster D, FINAL) — Bit-Banged UART Eye: re-stresses patch 0010 (coalesce-rotate-Ac, a DEFAULT-8-bit coalescer miscompile) via a software-UART framing loop — a byte framed (start+8data+stop) and shifted OUT of a carry-rotated TX register + INTO a carry-rotated RX register (two loop-carried shift registers). TX→RX round-trip is the identity (verified all 256 bytes) → gate folds `roundtrip(b)^b` self-check witness. DEFAULT-8-bit leg load-bearing. **Clean positive, fix holds:** default-8bit compiles clean `asl/rol/lsr/ror=19`, `host==default==+mos-a16==+mos-xy16==0x3F09`, `-verify` clean ×3 (incl. default). Renders a clean oscilloscope eye. **Completes Cluster D** — 0010 guarded across bit-serial CRCs (#105), dual LFSR (#106), serial bit-reversal (#107), UART framing (#108).~~ ✓ [/snes/uarteye/](https://biohack.net/snes/uarteye/) ([plan](docs/plans/2026-07-02-108-snes-uarteye.md))
+  - [x] ~~**#109 pcooker** (Round 6, Cluster E) — Pressure-Cooker Fixed-Point Evaluator: re-stresses patch 0011 (scavenger-$p) — a giant straight-line int32 fixed-point expression per pixel (a dozen live temps) whose compare's N/Z is consumed in the final select AFTER several __mulsi3/__divsi3 calls, forcing the compare live across the call-clobber. a16/xy16 legs load-bearing (0011 accum-gated). **Clean positive, fix holds:** `__mulsi3=6`, `__divsi3=4`, `rep/sep=38`, `host==default==+mos-a16==+mos-xy16==0xEE6D`, `-verify` clean ×3. Renders a circular level-set implicit surface. (Heavy eval → both legs read frame 1500; corpus set at startup, preview timing only.)~~ ✓ [/snes/pcooker/](https://biohack.net/snes/pcooker/) ([plan](docs/plans/2026-07-02-109-snes-pcooker.md))
+  - [x] ~~**#110 borrowlad** (Round 6, Cluster E) — Borrow-Ladder Odometer: a 128-bit descending odometer (8×16-bit limbs) from chained subtracts-with-borrow, with borrows rippling across limbs. This is an a16/xy16 native-width subtraction demo, not the regression for baseline patch 0012; that fix now has a direct `mos65c02` MIR test. **Clean positive:** `sbc=4`, `sec=1`, `rep/sep=14`, `host==default==+mos-a16==+mos-xy16==0x1BE3`, `-verify` clean ×3. Renders a 128-bit binary counter ticking down.~~ ✓ [/snes/borrowlad/](https://biohack.net/snes/borrowlad/) ([plan](docs/plans/2026-07-02-110-snes-borrowlad.md))
+  - [x] ~~**#97 spaceship** (Round 6, Cluster B) — Width-Sweep Sort Gallery: re-stresses patch 0016 (#46 G_SCMP three-way compare → lowerThreewayCompare) at s16/s32/s64 via qsort callbacks returning (a>b)-(a<b) at int8/16/32/64 keys (s32+s64 are widths qsortviz never reached; qsort keeps the scmp from folding away). **Clean positive, fix holds:** IR probe `llvm.scmp=8` incl. `scmp.i64=2`, `host==default==+mos-a16==+mos-xy16==0xF20F`, `-verify` clean.~~ ✓ [/snes/spaceship/](https://biohack.net/snes/spaceship/) ([plan](docs/plans/2026-07-02-97-snes-spaceship.md))
+  - [x] ~~**#93 ovmove** (Round 6, Cluster A, first-picks intersection) — Overlap-Move Mosaic: re-stresses the #23/patch-0002 +mos-xy16 in-place-memmove REP/SEP index-width fix + #79's both-direction G_MEMMOVE, escalated to a 384-byte (>256) buffer so the SDK memmove indexes with a 16-bit X (four overlapping memmoves/step, ascending+descending). **Clean positive, fix holds:** `memmove-refs=4`, `host==default==+mos-a16==+mos-xy16==0xA990`, `-verify` clean.~~ ✓ [/snes/ovmove/](https://biohack.net/snes/ovmove/) ([plan](docs/plans/2026-07-02-93-snes-ovmove.md))
+  - [x] ~~**#94 rotslab** (Round 6, Cluster A) — In-Place Block Rotate: re-stresses patch 0002 (`MOSInsertREPSEP::placeIntraBlock`, the #23 +mos-xy16 index-width fix) from a DIFFERENT angle than #93 — a hand-written three-reversal rotate (`rev[0,k)·rev[k,n)·rev[0,n)`) of a 384-entry `uint16_t` buffer, NO memmove libcall. The reversal's 16-bit `buf[lo]↔buf[hi]` swaps lower to ZP-indirect access bracketed by `rep #$20`/`sep #$20` width transitions (the placeIntraBlock path). **Clean positive, fix holds:** `rep/sep=48`, xy16 compiles clean, `host==default==+mos-a16==+mos-xy16==0xB93A`, `-verify` clean ×2. Measured aside: runtime `k%=n` folds away (`k≤34<384`) — correct opt, not the corner.~~ ✓ [/snes/rotslab/](https://biohack.net/snes/rotslab/) ([plan](docs/plans/2026-07-02-94-snes-rotslab.md))
+  - [x] ~~**#95 permscat** (Round 6, Cluster A) — Gather-Scatter Permutation: re-stresses patch 0002 (the #23 +mos-xy16 index-width fix) at its HARDEST — a bijective scatter `dst[perm[i]]=src[i]` over a 576-entry (>512) grid with TWO 16-bit indices live at once (loop counter `i` + the DATA-DEPENDENT scatter index `perm[i]`, which can't strength-reduce to a stride). **Clean positive, fix holds:** under +mos-xy16 emits **`sta abs,X` with a 16-bit index** (3×) — the literal #23 addressing shape #94 rotslab did NOT produce (its pointer reversal was ZP-indirect); a16 `rep/sep=41`, xy16 compiles clean, `host==default==+mos-a16==+mos-xy16==0x0C2C`, `-verify` clean ×2. Cluster A now covers 0002 across memmove libcall (#93), indirect (#94), AND indexed-store (#95) forms.~~ ✓ [/snes/permscat/](https://biohack.net/snes/permscat/) ([plan](docs/plans/2026-07-02-95-snes-permscat.md))
+  - [x] ~~**#96 ropeedit** (Round 6, Cluster A, FINAL) — Gap-Buffer Rope Editor: re-stresses patch 0002 (+ #79) AT SCALE as a real editor primitive — a 576-byte gap buffer whose cursor moves memmove text across the gap (both directions, >256B → 16-bit offset), driven by a scripted type/delete/jump edit stream. **Clean positive, fix holds:** `memmove-refs=2`, a16 `rep/sep=54`, xy16 compiles clean, `host==default==+mos-a16==+mos-xy16==0x2361`, `-verify` clean ×2. **Completes Cluster A** — 0002 guarded across memmove-libcall (#93), ZP-indirect (#94), indexed-store abs,X (#95), and editor-at-scale (#96).~~ ✓ [/snes/ropeedit/](https://biohack.net/snes/ropeedit/) ([plan](docs/plans/2026-07-02-96-snes-ropeedit.md))
+  - [x] ~~**#98 ucmprank** (Round 6, Cluster B) — Unsigned Rank Percentile Field: re-stresses the **UNSIGNED half** of patch 0016 (#46) that signed #46/#97 never emitted — qsort with unsigned spaceship comparators `(a>b)-(a<b)` at uint16/uint32/uint64 forces **`G_UCMP` at u16/u32/u64** (→ lowerThreewayCompare). **Clean positive, fix holds:** IR probe `llvm.ucmp=6` incl. `ucmp.i64=2`, signed `scmp=0` (no leak), `host==default==+mos-a16==+mos-xy16==0x4CDD`, `-verify` clean ×2. The unsigned three-way lowering path is correct, now regression-guarded.~~ ✓ [/snes/ucmprank/](https://biohack.net/snes/ucmprank/) ([plan](docs/plans/2026-07-02-98-snes-ucmprank.md))
+  - [x] ~~**#99 trimerge** (Round 6, Cluster B) — Three-Way Merge Diff: re-stresses patch 0016 (#46) with the spaceship result used **AS CONTROL FLOW** (not a qsort return) — a 2-input merge branches on the sign of `(a>b)-(a<b)`: advance-left / emit-both / advance-right, at s32+s64, via **noinline comparators** keeping `G_SCMP` alive as a branch selector. **Clean positive, fix holds:** IR probe `llvm.scmp=4` incl. `scmp.i64=2`, `host==default==+mos-a16==+mos-xy16==0xCCCC`, `-verify` clean ×2. The display colours each cell by the branch that emitted it → the merge decisions braid. lowerThreewayCompare holds driving control flow.~~ ✓ [/snes/trimerge/](https://biohack.net/snes/trimerge/) ([plan](docs/plans/2026-07-02-99-snes-trimerge.md))
+  - [x] ~~**#100 keycmp64** (Round 6, Cluster B, FINAL) — 64-bit Multi-Key Record Sort: re-stresses patch 0016 (#46) at the EXTREME width with a **chained** comparator — libc qsort of records keyed by a primary int64 spaceship, tie-broken by a second int64 spaceship → **`G_SCMP s64` twice per call** (tie-break fires on frequent primary ties: 38 tie pairs). **Clean positive, fix holds:** IR probe `scmp.i64=3` (chained s64), `host==default==+mos-a16==+mos-xy16==0xB8AD`, `-verify` clean ×2. **Completes Cluster B** — 0016 guarded across signed sort (#97), unsigned rank (#98), control-flow branch (#99), chained-s64 tie-break (#100).~~ ✓ [/snes/keycmp64/](https://biohack.net/snes/keycmp64/) ([plan](docs/plans/2026-07-02-100-snes-keycmp64.md))
+  - [x] ~~**#103 oddmask** (Round 6, Cluster C) — Odd-Width Mask Sculptor: re-stresses the **odd-width extend + s64 (un)merge** legalization of patch 0017 (#61 dhmix, which crashed a16/xy16 on `G_ANYEXT s24` + `G_UNMERGE_VALUES s64`). Forms **s20/s24/s28** intermediates (i32-sourced narrow-mask+op → `G_ZEXT sN→s64`, no s16-lane decomposition) threaded through an s64 `__muldi3`. **Clean positive, fix holds:** probe `G_ZEXT s20/s24/s28→s64=3` + `__muldi3=1`, `host==default==+mos-a16==+mos-xy16==0x1FD9`, `-verify` clean ×2. **MEASURED correction:** widths >32 (s40/s48) are unreachable (a `u64 & mask` stays s64 with known-bits — no odd type); odd widths form only i32-sourced ≤32. Extend is `G_ZEXT` not `G_ANYEXT` (exact dhmix opcode no longer reproduces post-0017), same odd-source-width path.~~ ✓ [/snes/oddmask/](https://biohack.net/snes/oddmask/) ([plan](docs/plans/2026-07-02-103-snes-oddmask.md))
+  - [x] ~~**#104 modexp256** (Round 6, Cluster C, FINAL) — 256-bit Modular Exponentiation: re-stresses patch 0017's **s64 (un)merge glue** (#61 dhmix) as a HIGH-VOLUME regression guard — dhmix's 64-bit DH modexp at **256-bit**, built from `uint32[8]` limbs + `uint64` MAC (no s128/s256 node → re-runs the green s64 path hundreds of times). Mod `2^256−189` (pseudo-Mersenne fold); DH identity `A^b==B^a` folded with an `s1^s2` mismatch witness; **cross-checked vs Python** (`g^7 mod m` bit-exact). **Clean positive, fix holds:** `__muldi3`(s64 glue)=2, `rep/sep=54`, `host==default==+mos-a16==+mos-xy16==0x31D4`, `-verify` clean ×2. **Timing:** heavy compute settles frames 500–1500 → both legs read at frame 1500 (`0x0000`@500 = harness timing). **Completes Cluster C** — 0017 guarded across s64 mulh/mulo (#101), odd-width extend (#103), volume (#104).~~ ✓ [/snes/modexp256/](https://biohack.net/snes/modexp256/) ([plan](docs/plans/2026-07-02-104-snes-modexp256.md))
+  - [x] ~~**#101 mulov64** (Round 6, Cluster C, first pick) — 64-bit Multiply-Overflow / Multiply-High: the one untested s64 legalizer path (`G_UMULO`/`G_SMULO` → `G_UMULH`/`G_SMULH` `.lower()`, found by the 2026-07-02 coverage check). **Clean positive, no compiler bug:** disasm confirms the s64 mulh composed from s32 `__mulsi3` pieces + `__muldi3` glue (threads the S32-mul-clamp, no s128 widening); `host==default==+mos-a16==+mos-xy16==0x3A69` on MAME+bsnes-jg, `-verify` clean.~~ ✓ [/snes/mulov64/](https://biohack.net/snes/mulov64/) ([plan](docs/plans/2026-07-02-101-snes-mulov64.md))
+  **Bug scorecard — Round 5 (#73–#92) surfaced ZERO new compiler bugs**: every targeted corner (funnel/rotate
+  shifts, all four saturating ops, G_SMULO, fptosi_sat, signed-bitfield sext, descending memmove, float
+  sign-bit ops, fminf/fmaxf, fptosi/sitofp, Montgomery modmul, variable-count shifts, range coder, signed MAC
+  Sobel/DCT/ADPCM, `__attribute__((cleanup))`, sret struct-return, negamax) lowers correctly, bit-exact across
+  all modes. The only Round-5 scare (**#83 truncstair**) was a **demo-side OOB write** — first misdiagnosed as
+  a `MOSZeroPageAlloc` miscompile, then refuted+fixed; the compiler was correct. (Earlier rounds *did* find real
+  backend bugs — all fixed: the #23 `+mos-xy16` in-place-memmove miscompile, a Round-3 legalizer bug, a Round-4
+  `G_UNMERGE_VALUES` bug, and the scoped setjmp/longjmp break — see the per-round summaries in the ideas doc.)
+  - [x] ~~**#1 Julia set explorer** — `z²+c` Q5.10 **complex multiply** (3 `__mulsi3`/iter) far-stored into high WRAM `$7E2000`, drawn through Mode 7 as `c` orbits `0.7885·e^iθ` (morphs + spins; the grind is the morph, the affine matrix the motion). Gate `julia_gate_crc` `0x3490`; bsnes-jg host==`+mos-a16` + disasm gate (`__mulsi3=3`, `rep/sep=46`). MAME leg SKIP (no SPC700 IPL here; demos-only non-blocker).~~ ✓ [/snes/julia/](https://biohack.net/snes/julia/) ([plan](docs/plans/2026-06-28-1-snes-julia.md))
+  - [x] ~~**#2 Newton's-method fractal** — complex **division** per pixel; shows basins of attraction.~~ ([plan](docs/plans/2026-06-27-2-snes-newton-fractal.md))
+  - [x] ~~**#3 Burning Ship fractal** — `z=(|Re z|+i|Im z|)²+c`; the abs-fold + 3 `__mulsi3`/iter (Q12), escape-time bands, black ship silhouette, palette-cycled; multiply-only. Gate `bs_gate_crc` `0x6F2D`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/burning-ship/](https://biohack.net/snes/burning-ship/) ([plan](docs/plans/2026-06-28-3-snes-burning-ship.md))
+  - [x] ~~**#4 Buddhabrot** — escaping-orbit **density accumulation** into a 128×128 **far** buffer ($7E2000);
+    the battery's **PRNG + far scatter-write** member.~~ ([plan](docs/plans/2026-06-28-4-snes-buddhabrot.md)) — xorshift16
+    samples `c`, `z²+c` escape test, then orbit-replay far RMW (`lda [dp]`/`inc`/`sta [dp]`); 3 `__mulsi3`/iter ×2
+    passes. `+mos-a16`-only (far grid) → **3-way bar**, blossom model. **BUILT + `dev/run.sh buddha-grid` + `buddha`
+    RESULT PASS:** host oracle == bsnes-jg corpus hash `0x7C31`; disasm gate far RMW(`lda/sta [dp]`=2) + rep/sep(31/34)
+    + `__mulsi3`=8; `-verify` clean. Ghostly blue Buddhabrot blooms via Mode 7. MAME leg pending the SPC700 IPL
+    (non-blocking). **PUBLISHED + LIVE** → [biohack.net/snes/buddhabrot/](https://biohack.net/snes/buddhabrot/) (v1.0.119).
+  - [x] ~~**#5 Conway's Game of Life** — bit-packed SWAR neighbour sums (and/eor/ora + asl/lsr, multiply-free); a Gosper glider gun fires gliders into a settling random soup. Gate `life_gate_crc` `0xDDF1`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/life/](https://biohack.net/snes/life/) ([plan](docs/plans/2026-06-28-5-snes-life.md))
+  - [x] ~~**#6 Rule 90/110 1-D Cellular Automaton** — shift+bool CA; Sierpinski/chaos scrolling down. Published [biohack.net/1d-ca/](https://biohack.net/1d-ca/).~~
+  - [x] ~~**#7 Doom-fire** — array sweep + PRNG + palette; shows animated fire from a heat field.~~ ✓ [/snes/doom-fire/](https://biohack.net/snes/doom-fire/) ([plan](docs/plans/2026-06-28-7-snes-doom-fire.md))
+  - [x] ~~**#8 Reaction–diffusion (Gray–Scott)** — heavy fixed-point mul-add PDE; shows Turing patterns.~~
+  - [x] ~~**#9 Lissajous / Harmonograph** — damped sin·env + env·decay (8 `__mulsi3`/sample, sin LUT, multiply-only); four detuned pendulums trace a precessing, inward-spiralling Lissajous curve. Gate `harmo_gate_crc` `0x0EBB`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3.~~ ✓ [/snes/harmonograph/](https://biohack.net/snes/harmonograph/) ([plan](docs/plans/2026-06-28-9-snes-harmonograph.md))
+  - [x] **#10 Fourier epicycles** — sum of rotating vectors traces a shape; many sin/cos + complex add; shows
+    nested circles drawing an outline. ([plan](docs/plans/2026-06-28-10-snes-fourier-epicycles.md)) — the battery's
+    **many-multiply / sin-cos** member (no divide): a sin/cos-LUT sweep with **4 `__mulsi3` per harmonic** + 32-bit
+    accumulate, over 8 baked DFT coefficients of a 5-pointed star (`tools/gen-epicycles-tables.py`). **BUILT +
+    `dev/run.sh epicycles` RESULT PASS:** host oracle == bsnes-jg corpus hash `0x4F6C`; disasm gate `__mulsi3=4` +
+    rep/sep=28, divide=0; default==+mos-a16==+mos-xy16 on bsnes-jg + `-verify` clean (all 3) + UBSan clean. On-screen
+    star draws itself over its generating circle (frame-500 shot = full PT-256 star). **PUBLISHED** [biohack.net/snes/epicycles/](https://biohack.net/snes/epicycles/) (v1.0.113); MAME leg still pending the SPC700 IPL (non-blocking).
+  - [x] **#11 Spirograph (hypotrochoid)** — **DONE + verified (`wt/321-spirograph`).** Four curve families
+    (hypo/epi/rose/Lissajous) bloom into a NEAR 2bpp bitmap canvas (new `snesgfx/bitmap_canvas.h` set-pixel
+    rasterizer + `text_layer.h` HUD), joypad + on-screen `R/W/D/mode/petals` HUD. **No far pointers → full
+    5-way bar:** `dev/run.sh corpus-a16` 9/9 (`spiro_sim` 0x32D4 curve math + `spiro_ctrl_sim` 0x6A26
+    controller/HUD-format math, host==default==a16==xy16 MAME+bsnes); `dev/run.sh spirograph` RESULT PASS
+    (disasm gate __mulsi3+__udiv+rep/sep, bsnes 3× byte-identical, MAME+bsnes screenshots == host 0x32D4).
+    [plan](docs/plans/2026-06-27-11-snes-spirograph-hypotrochoid.md). **PUBLISHED — playable in-browser at
+    https://biohack.net/spirograph/** (biohack.net v1.0.78, `snes-rom-page`; bsnes-jg WASM + Verify-fidelity
+    selfcheck 0x32D4).
+  - [x] ~~**#12 CORDIC rotator** — sin/cos/atan via **shift-add only** (no multiply); shows a rotating hand
+    over a CORDIC-computed vector field + an `atan2` self-check of its angle.~~
+    ([plan](docs/plans/2026-06-28-12-snes-cordic-clock-rotator.md)) — gate CRC `0x4D41`; inverted disasm gate
+    (`mul=div=vshift=0`, `rep/sep=252`, `adc/sbc=143`); `-verify` clean ×3. MAME leg blocked on SPC700 IPL
+    (env-wide non-blocker). ✓ [/snes/cordic/](https://biohack.net/snes/cordic/) (biohack.net v1.0.137).
+  - [x] ~~**#13 N-body orbits** — fixed-point mul + 1/r² **division** + integration; shows orbiting bodies + trails.~~ [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
+  - [x] ~~**#14 Double pendulum** — sin + sensitive fixed-point integration; shows a chaotic path trace.~~
+  - [x] ~~**#15 Raycaster maze** — DDA grid-cast, wall height = screen_h/dist (3 `__udivsi3`/column: 2 deltaDist reciprocals + the 1/dist projection); first-person 3-D corridors, distance-shaded. The battery's **division** member. Gate `rc_gate_crc` `0xB200`; bsnes-jg host==`+mos-a16`, `-verify` clean ×3. (Differential caught a signed-`int32`-overflow UB optimised differently host vs target.)~~ ✓ [/snes/raycaster/](https://biohack.net/snes/raycaster/) ([plan](docs/plans/2026-06-28-15-snes-raycaster.md))
+  - [x] ~~**#17 Sorting race**~~ — quicksort vs heapsort vs mergesort animate three bar arrays; the battery's
+    **recursion / soft-stack / frame-ABI** member. ([plan](docs/plans/2026-06-28-17-snes-sort-race.md)) — recursive
+    `sr_qsort`+`sr_msort` (`noinline`) force the reentrant soft-stack spill path (array pointer live across the
+    self-`jsr`, the `a16spillr.c` machinery in a real workload); iterative `sr_hsort` is the non-recursive contrast.
+    Animation is record/replay (sorts emit an op-log; ROM replays 1 op/algo/frame, repaints touched columns) so REAL
+    recursion stays the stress. **BUILT + `dev/run.sh sort-race` RESULT PASS:** host oracle == bsnes-jg corpus hash
+    `0xB28F` (gate: 8 rounds, each asserts all 3 sorts agree on the identity permutation + folds `cmps^moves`); disasm
+    gate recursion(`sr_qsort`/`sr_msort` refs=695) + `cmp`=44 + `rep/sep`=233, zero 32-bit libcalls; default==+mos-a16==
+    +mos-xy16 `-verify-machineinstrs` clean (all 3). Screenshot shows the race: QUICK(red) `M72 C193 DONE`, HEAP(green)
+    `M183 C226` racing, MERGE(blue) `M160 C118 DONE` — quicksort wins. **MAME leg + runtime 5-way BLOCKED** on the
+    missing gitignored SPC700 IPL (env-wide, non-blocker per 2026-06-28); stays NEAR → full 5-way bar (pending IPL/CI).
+    **PUBLISHED + LIVE** at [biohack.net/snes/sort-race/](https://biohack.net/snes/sort-race/) (biohack.net v1.0.111,
+    Cloudflare Pages deploy OK; bsnes-jg WASM player + Verify-fidelity selfcheck `0xB28F` @ WRAM `0x16ad`).
+  - [x] **#18 Maze generate + solve** — recursion + a priority-queue heap + arrays; shows a maze built then
+    the shortest path lit. ([plan](docs/plans/2026-06-28-18-snes-maze-generate-solve.md)) — the battery's
+    **recursion + data-structure** member (multiply/divide-free). **BUILT + `dev/run.sh maze` RESULT PASS:**
+    host oracle == bsnes-jg corpus hash `0x0749`; disasm gate recursion(`maze_divide` self-call)=3 + rep/sep=227,
+    zero 32-bit libcalls; default==+mos-a16==+mos-xy16 on bsnes-jg + `-verify` clean (all 3). **Carve = recursive
+    division** (centre-biased ~log depth) not a backtracker DFS — the 65816's 256-byte HW stack can't hold a DFS's
+    O(N) recursion depth (measured: ~6 B/level × 199 deep ≫ 256). On-screen A* matches host (`expanded=112 path=37`,
+    seed `0xC0DE`). **PUBLISHED** [biohack.net/snes/maze/](https://biohack.net/snes/maze/) (v1.0.113); MAME leg still pending the SPC700 IPL (non-blocking).
+  - [x] ~~**#16 Wireframe 3-D solid** — 3×3 matrix mul + perspective **divide** + Bresenham; spinning solid.~~ ✓ source **RECREATED** (`4689940`; the original was built on a throwaway worktree + never committed, so the source was lost) strictly to the plan: `wire3d.h` (rotation matrix + perspective `__divsi3` + tetra/cube/octa/icosa tables) + `wireframe.{h,c}` + 2 corpus slices + gate. Gate `0xE737` host==default==a16==xy16 on bsnes-jg, disasm `__mulsi3`+`__divsi3`+rep/sep, `-verify` clean (a16+xy16). Republished [/snes/3d-wireframe/](https://biohack.net/snes/3d-wireframe/) ([plan](docs/plans/2026-06-27-16-snes-wireframe-3d-solid.md))
+  - [x] ~~**#19 π spigot + Monte-Carlo** — multi-precision **carry chains** + div/mod + rng; shows digits + dart scatter.~~
+  - [x] ~~**#20 Bignum factorial/Fibonacci** — multi-precision **carry propagation**; shows the giant number on screen.~~
+  - [x] ~~**#21 Soft-Float Mandelbrot** (Round 2) — escape-time `z²+c` in **IEEE-754 single-precision `float`**: every op a soft-float libcall (`__mulsf3`/`__addsf3`/`__subsf3`/`__divsf3`/`__gtsf2`/`__floatsisf`), the library no Round-1 demo touches. **Bit-exact** host==default==a16==xy16 `0x4169` (FMA forbidden by one-op-per-statement); disasm `__mulsf3=8`/`__add-subsf3=12`/`rep-sep=35`. No compiler bug — soft-float codegen correct across all modes.~~ ✓ [/snes/mandel-float/](https://biohack.net/snes/mandel-float/) ([plan](docs/plans/2026-06-29-21-snes-mandel-float-softfloat.md))
+  - [x] ~~**#22 64-Bit Avalanche** (Round 2) — splitmix64 hash matrix, every op a 64-bit libcall (`__muldi3`/`__lshrdi3`/`__ashldi3`/`__udivdi3`/`__adddi3`) — the integer-width family no Round-1 demo touches. Cell (i,j)=output bit j of `hash64(seed^(1<<i))` (incl. variable `1ULL<<i` shift, whole-limb `>>32`, runtime `__udivdi3`); correct mixer ⇒ ~50% dense rainbow field. **Bit-exact** host==default==a16==xy16 `0x27EA`; disasm `__muldi3=2`/`64-bit-shift`/`__udivdi3=1`/`rep-sep=19`. No bug.~~ ✓ [/snes/avalanche/](https://biohack.net/snes/avalanche/) ([plan](docs/plans/2026-06-29-22-snes-avalanche-64bit.md))
+  - [x] ~~**#23 L-System Plant** (Round 2) — grows an L-system by **string rewriting** (each generation rewrites every symbol IN PLACE with `memmove` (overlapping tail shift) + `memcpy` (write the production) + `strlen` (its length) — the string-libcall corner no other demo runs), then a turtle interprets it into a fractal plant with a `[`/`]` bracket push/pop stack. **Bit-exact** host==default==a16==xy16 `0x79C3`; disasm `memcpy/memmove=2`/`strlen=1`/`rep-sep=87`. Found the `+mos-xy16` in-place-memmove 16-bit-index miscompile (`sep #$10` between `ldx` and `lda abs,X16` zeroed X's high byte); fixed in `MOSInsertREPSEP::placeIntraBlock` (reload-after-sep-corruption, same commit). 5-way green.~~ ✓ [/snes/lsystem/](https://biohack.net/snes/lsystem/) ([plan](docs/plans/2026-06-29-23-snes-lsystem-string-rewriting.md)) — **2026-06-30: progressive-growth + far-pointer upgrade** (v1.0.148): startup interp records segments into a FAR buffer at `$7E2000` (a16 far STORE), loop replays a few/frame (far LOAD) → plant draws itself stroke by stroke; adds high-WRAM store/load coverage (display-only; corpus slice stays 5-way far-free, `0x79C3` unchanged).
+  - [x] ~~**#29b Truchet (packed bitfields)** (Round 2) — a 16x16 "10 PRINT" diagonal maze where every cell is a **16-bit bitfield struct** (orient:1/style:1/hue:3/phase:2/mark:1/energy:4); a wave ripples through it, reading/writing fields -> bitfield **insert/extract** codegen (and/ora/shift, NO libcalls). Declared `uint16_t : n` so layout matches host/target; gate folds EXTRACTED field values. **Bit-exact** host==default==a16==xy16 `0xB3E6`; disasm `and=13`/`ora=8`/`shift=32`/`rep-sep=59`/`libcalls=0`. No bug.~~ ✓ [/snes/truchet/](https://biohack.net/snes/truchet/) ([plan](docs/plans/2026-06-29-29b-snes-truchet-bitfields.md))
+  - [x] ~~**#26 Boids Flock** (Round 2) — Reynolds flocking on a `vec2 {int16_t x,y}` VALUE type; steering kernel takes/returns `struct` by value (`noinline`, O(N²)/frame) → the **aggregate-return ABI** (register-pair vs `sret`) no other demo passes a struct through. Bit-exact `0xA8AB` host==default==a16==xy16; disasm by-value-calls=497 + `__mulsi3` + `__divsi3`. No bug.~~ ✓ [/snes/boids/](https://biohack.net/snes/boids/) ([plan](docs/plans/2026-06-29-26-snes-boids-struct-abi.md))
+  - [x] ~~**#29a Bytecode-VM Turtle** (Round 2) — a stack-machine bytecode interpreter drawing LOGO turtle graphics: the dense `switch(op)` lowers to **`JMP (abs,X)` jump-table dispatch** (JMPIdxIndir) and the ALU ops dispatch through a **function-pointer opcode table** (`jsr __call_indir`) — the indirect/computed control-flow corners no other demo runs. Bit-exact `0x4007` host==default==a16==xy16; disasm jump-table=1 + `__call_indir`=1 + rep/sep. No bug — confirms the xy16 JMPIdxIndir hardening.~~ ✓ [/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) ([plan](docs/plans/2026-06-29-29a-snes-turtle-vm-bytecode.md))
+  - [x] ~~**#24 fn-plot — Recursive-descent float function plotter**~~ (Round 2) — re-parses four baked expressions per pixel via `fn_eval_expr→fn_eval_term→fn_eval_factor` recursion (up to 7 levels; soft-stack ABI stress) + evaluates in `float` (`__mulsf3`/`__subsf3`/`__addsf3`/`__divsf3`/`__fixsfsi`); TitleLayer intro; `canvas_line` connected curves at 2px/frame; cycles automatically. Gate `fn_gate_crc` `0x2EBE` @ WRAM `0x002a`; bsnes-jg host==+mos-a16; disasm `__mulsf3=5`/`__divsf3=1`/`rep-sep=48`; 5-way green. No bug. ✓ [/snes/fn-plot/](https://biohack.net/snes/fn-plot/) ([plan](docs/plans/2026-06-30-24-snes-fn-plot.md))
+  - [x] ~~**#27 Times-table cardioid**~~ (Round 2) — chord from point i to (k·(i+65536)) % N for k=2..30, N=200; modulo-heavy: `__mulsi3=1` + `__umodsi3=1` + `rep/sep=6`; 5-way green `0x523B`; no bug. ✓ [/snes/cardioid/](https://biohack.net/snes/cardioid/) ([plan](docs/plans/2026-06-30-27-snes-cardioid.md))
+  - [x] ~~**#31 Barnes-Hut quadtree galaxy**~~ (Round 2) — recursive bh_insert/bh_force walk a pooled-node quadtree via runtime `child[]` indices (pointer-chasing dynamic tree, distinct from #13 flat-array N-body) + gravity `__mulsi3=5`/`__divsi3=4`; `bh_force` self-recursion (447 refs), `rep/sep=160`; 5-way green `0xEF0B`; no bug. ✓ [/snes/bhut/](https://biohack.net/snes/bhut/) ([plan](docs/plans/2026-06-30-31-snes-bhut.md))
+  - [x] ~~**#32 va_arg variadic formatter**~~ (Round 2) — mini_sprintf(%u/%d/%x) drives Lissajous HUD; 4 calls × 9 `va_arg` total; `jsr=7`, `rep/sep=45`; 5-way green `0xE1F3`; no bug. ✓ [/snes/vaprintf/](https://biohack.net/snes/vaprintf/) ([plan](docs/plans/2026-06-30-32-snes-vaprintf.md))
+  - [x] ~~**#25 FFT spectrum analyser**~~ (Round 2) — 32-pt DIT FFT on synthesised tone; 4×`__mulsi3` per butterfly × 80 butterflies; bit-reversal permutation; `__mulsi3=4`, `rep/sep=63`; 5-way green `0x6D7A`; no bug. ✓ [/snes/fft/](https://biohack.net/snes/fft/) ([plan](docs/plans/2026-06-30-25-snes-fft.md))
+  - [x] ~~**#28 Hilbert space-filling curve**~~ (Round 2) — order-4 d2xy/xy2d bijection; loop var `k` (0..3) drives `rx<<k`, `ry<<k`, `1<<k` → `__ashlsi3=5`+`__lshrsi3`; `rep/sep=23`, `__mulsi3=0`; 5-way green `0x5999`; no bug. ✓ [/snes/hilbert/](https://biohack.net/snes/hilbert/) ([plan](docs/plans/2026-06-30-28-snes-hilbert.md))
+  - [x] ~~**#30 TEA cipher avalanche**~~ (Round 2) — 32-round TEA, 16 key variants 1-bit apart; `__mulsi3=0`, inline shifts (<<4,>>5 ASL+ROL), `rep/sep=22`; 5-way green `0xDF0E`; no bug. ✓ [/snes/tea/](https://biohack.net/snes/tea/) ([plan](docs/plans/2026-06-30-30-snes-tea-cipher.md))
+  - [x] ~~**#33 Double-Precision Mandelbrot**~~ (Round 3, first pick) — escape-time `z²+c` in 64-bit IEEE-754 `double` (top half) beside the 32-bit `float` twin (bottom half) → the **double soft-float library** (`__muldf3=8`/`__adddf3`+`__subdf3=12`/`__gtdf2`/`__floatsidf` + `__truncdfsf2`/`__extendsfdf2`) no other demo touches; bit-exact `host==default==a16==xy16==0x0EDF` on bsnes-jg, `rep/sep=31`. **NEW 3rd witness of the documented `a16-rc-undef-ra-pure-virtual` known issue** (CAUSE #2) — a16/xy16 slice `-verify` "undefined physical register", code **bit-exact correct** (XFAIL, not a miscompile; pre-existing open RA bug, [rc-undef plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md)). ✓ [/snes/mandel-double/](https://biohack.net/snes/mandel-double/) ([plan](docs/plans/2026-06-30-33-snes-mandel-double.md))
+  - [x] ~~**#38 Brainfuck Threaded-Code VM**~~ (Round 3) — the **computed-`goto` / labels-as-values** member: a Brainfuck interpreter dispatching each opcode with `goto *handlers[op]`, which lowers to a genuine 65816 **indexed-indirect jump** (`jmp ($ind,x)` `$7C` — `indirect-jmp=2`), the threaded-dispatch path #29a's `switch` jump-table never opened. Runs Hello World; the tape head scrubs the source, the 64-cell tape heat-grid mutates, the OUT marquee spells HELLO WORLD. Control-flow only (no `__mul`/`__udiv`; `rep/sep=111`). **`host==default==+mos-a16==+mos-xy16==0x9954` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP (no SPC700 IPL here, non-blocking). **No compiler bug** — `indirectbr`/`blockaddress` lower correctly across all three modes (a clean positive, unlike #35's `longjmp`). ✓ [/snes/bf-vm/](https://biohack.net/snes/bf-vm/) ([plan](docs/plans/2026-06-30-38-snes-bf-vm.md))
+  - [x] ~~**#44 HDR Additive Bloom**~~ (Round 3) — the **saturating / overflow-checked add** member: six drifting glows summed per cell with `__builtin_add_overflow`, clamping to 255 so overlaps **blow out to white** (HDR bloom, 8-bit integers, no float). The flag-testing add sequence (carry/overflow tested + branched, `adc`+`bcs`) no earlier demo ran — `adc=14`, carry-branch=11, `rep/sep=71`; no `__mul`/`__udiv`. **`host==default==+mos-a16==+mos-xy16==0xF951` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP (no SPC700 IPL). **No compiler bug** — the overflow builtin lowers correctly across all modes. Gate hidden behind the title (compute-heavy). ✓ [/snes/hdr-bloom/](https://biohack.net/snes/hdr-bloom/) ([plan](docs/plans/2026-06-30-44-snes-hdr-bloom.md))
+  - [x] ~~**#48 IIR Resonant-Filter Scope**~~ (Round 3) — the **recursive feedback dependency chain** member: four 2-pole IIR resonators `y[n]=a1·y[n-1]+a2·y[n-2]+x[n]` plucked into an oscilloscope. The serial chain can't be reordered/vectorized like #25's feed-forward FFT — validated by the differential (host==target on the exact recursion). A runtime vibrato keeps the feedback term a genuine `__mulsi3=2` (`rep/sep=14`). **`host==default==+mos-a16==+mos-xy16==0x49BD` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP (no SPC700 IPL). **No compiler bug.** (Bring-up: forced runtime coeff to keep the mul; slowed vibrato to avoid parametric blow-up; raised `CANVAS_FLUSH_TILES` for the full-redraw scope.) ✓ [/snes/iir-scope/](https://biohack.net/snes/iir-scope/) ([plan](docs/plans/2026-06-30-48-snes-iir-scope.md))
+  - [x] ~~**#36 Polygon Scanline Fill (VLA)**~~ (Round 3) — the **dynamic stack frame** member: a tumbling star morphs its point count (3→8, `nv`=6→16) driving an even-odd scanline fill whose per-scanline x-crossing table is a **C99 runtime-sized VLA** `int16_t xs[nv]` — the soft-stack `alloca`/VLA runtime SP adjustment no fixed-frame demo had exercised. Crossing divide `__divsi3`, vertex `__mulsi3=3`, `rep/sep`. **`host==default==+mos-a16==+mos-xy16==0x8ED9` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP (no SPC700 IPL). **No compiler bug** — the VLA lowers correctly across all modes; "the gap" idea #36 anticipated (a soft-stack target that can't do runtime frames) does not exist. (Bring-up: the fill is 32-bit-divide-heavy → the gate area-fold subsamples scanlines via `PF_GATE_YSTEP`/`GATE_FRAMES=16` so the startup self-check finishes fast; the ROM's visual fill is full-resolution with a fast masked hspan.) ✓ [/snes/polyfill/](https://biohack.net/snes/polyfill/) ([plan](docs/plans/2026-06-30-36-snes-polyfill.md))
+  - [x] ~~**#37 Sparse-Switch Step-Sequencer VM**~~ (Round 3) — the **sparse-switch** member: a register VM with 14 **non-contiguous** opcodes (`0x00..0xF0`) forces `switch(op)` to lower to a **binary-search comparison tree** (not #29a's dense jump table nor #38's computed goto); the 8 registers drive an 8-bar equalizer. Disasm gate: **compares=22, indexed-indirect jmp=0**, `rep/sep=30`; control-flow only (no `__mul`/`__udiv`). **`host==default==+mos-a16==+mos-xy16==0xE8C5` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP (no SPC700 IPL). **No compiler bug** — comparison-tree lowering is byte-exact across all modes. ✓ [/snes/seqvm/](https://biohack.net/snes/seqvm/) ([plan](docs/plans/2026-06-30-37-snes-seqvm.md))
+  - [x] ~~**#39 Constant-Divisor Clock + Odometer**~~ (Round 3) — probe for **magic-reciprocal strength reduction**: a sweeping analog clock + rolling odometer split via compile-time constant divides (`/60 /10 /12`). **MEASURED FINDING (no bug):** llvm-mos does **not** strength-reduce constant division at any width (even `uint16 x/10`→`__udivhi3`) — the reciprocal needs a `MULHU` that is itself a libcall on this soft-multiply target, so the cost model correctly retains `__udivNi3`. So it stresses heavy constant division instead; **`host==default==+mos-a16==+mos-xy16==0xF72E` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP. Governing lesson #1 (measure, don't assume): predicted codegen was wrong, the measurement is the deliverable. ✓ [/snes/divclock/](https://biohack.net/snes/divclock/) ([plan](docs/plans/2026-06-30-39-snes-divclock.md))
+  - [x] ~~**#40 Table-Driven CRC32 Texture**~~ (Round 3) — the **256-entry ROM-LUT indexed byte loop** member: each cell's colour is a bit-standard CRC-32 (poly `0xEDB88320`, `crc32("123456789")==0xCBF43926`) of its `(x,y,time)`, via `crc=TABLE[(crc^byte)&0xFF]^(crc>>8)` where `TABLE` is a `const uint32[256]` in ROM. Flowing hash-marble field. Disasm gate: `CRC32_TAB`-refs=2, `eor`=10, `rep/sep=18`. **`host==default==+mos-a16==+mos-xy16==0xDBBA` on bsnes-jg**, `-verify` clean ×3; MAME leg SKIP. **No compiler bug** — the ROM-LUT indexed byte loop is byte-exact across all modes. ✓ [/snes/crctex/](https://biohack.net/snes/crctex/) ([plan](docs/plans/2026-06-30-40-snes-crctex.md))
+  - [x] ~~**#41 Free-List Pool Allocator**~~ (Round 3) — the **manual free-list pool** member (distinct from #31's append-only bump pool): a particle fountain recycles 48 fixed slots through a singly-linked LIFO free list threaded through the slots — `alloc: i=head; head=slot[head].next`, `free: slot[i].next=head; head=i` — with continuous births (pop) and deaths (push). Disasm gate: `ldy`-indexed slot chase=48, arith-libcalls=0 (pure pointer/index math), `rep/sep=101`. **`host==default==+mos-a16==+mos-xy16==0x2B9B` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the free-list recycling is byte-exact across all modes. ✓ [/snes/poolfx/](https://biohack.net/snes/poolfx/) ([plan](docs/plans/2026-06-30-41-snes-poolfx.md))
+  - [x] ~~**#42 Dissolve Transition (Duff's Device)**~~ (Round 3) — the **irreducible loop-switch control flow** member: an image dissolves into the next in scattered tile bursts, each tile's 16 bytes copied by the classic Duff's device (a `switch` whose case labels land in the middle of a `do/while` body). Disasm gate: `jmp`=19 (irreducible branch mesh), arith-libcalls=0 (`/8`,`%8` fold to shift/mask), `rep/sep=16`. **`host==default==+mos-a16==+mos-xy16==0x5531` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the mos backend lowers the switch/loop tangle byte-exact across all modes (no structurizer to choke). ✓ [/snes/duff/](https://biohack.net/snes/duff/) ([plan](docs/plans/2026-06-30-42-snes-duff.md))
+  - [x] ~~**#43 Signed 64-bit Odometer**~~ (Round 3) — the **signed 64-bit divide+modulo** member (distinct from #22's unsigned `__udivdi3`): a vast signed odometer ticks through zero, each value split into 18 decimal digits by the `v%10`/`v/=10` loop — sign-corrected on negatives. **MEASURED (no bug):** clang merges the adjacent div+mod into the combined *signed* libcall **`__divmoddi4`** (disasm gate: signed-64-divmod=1, unsigned-64=0, `rep/sep=16`). Scrolling value tape. **`host==default==+mos-a16==+mos-xy16==0xD2A2` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — signed 64-bit divmod of both signs is byte-exact across all modes. ✓ [/snes/sodo/](https://biohack.net/snes/sodo/) ([plan](docs/plans/2026-06-30-43-snes-sodo.md))
+  - [x] ~~**#45 Union Type-Pun Metaballs**~~ (Round 3) — the **union type-punning** member: merging metaballs whose `1/dist` falloff is the Quake fast-inverse-sqrt bit hack — `union{float f;uint32_t i;}` reads a float's storage AS an integer, mangles it with `0x5f3759df`, reads it back AS a float. Soft-float, one-op-per-statement (no FMA fusion). Disasm gate: `__mulsf3`=4, magic bytes `#$5f`/`#$37`, `rep/sep=5`. **`host==default==+mos-a16==+mos-xy16==0xAEBE` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the float↔uint32 reinterpret is byte-exact across all modes (visual cross-checked vs host grid at frame 900 — frame-500 dimness was blob clustering, not a miscompile). ✓ [/snes/metaball/](https://biohack.net/snes/metaball/) ([plan](docs/plans/2026-06-30-45-snes-metaball.md))
+  - [x] ~~**#50 Many-Argument Color-Grade Kernel**~~ (Round 3) — the **>register-count argument spilling** member: a per-cell color grade takes **10 int16 params** (3 lifts, 3 gammas, gain, mix, bias + base), overflowing the register-arg budget so the extras spill onto the soft stack (`.noinit..Lstatic_stack`); the coefficients sweep, re-grading a gradient. Disasm gate: `color_grade`-refs=204, soft-stack-spill=40, `rep/sep=18`. **`host==default==+mos-a16==+mos-xy16==0x783F` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the many-arg CC marshals byte-exact across all modes. ✓ [/snes/cgrade/](https://biohack.net/snes/cgrade/) ([plan](docs/plans/2026-06-30-50-snes-cgrade.md))
+  - [x] ~~**#51 Protothread Critter Swarm**~~ (Round 3) — the **resumable-function state preservation** member: a swarm of 24 critters, each a protothread (coroutine) that yields each frame and resumes its box-patrol via a saved continuation index (`lc`) — `switch` case labels inside loops (mid-loop re-entry, à la Duff #42) + local state kept in the struct across re-entry. Disasm gate: `critter_step` on-entry `lc`-dispatch, `jmp`=7 branch mesh, wide-arith-libcalls=0, `rep/sep=50`. **`host==default==+mos-a16==+mos-xy16==0xAD9F` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the resumable protothread resumes byte-exact across all modes. ✓ [/snes/critters/](https://biohack.net/snes/critters/) ([plan](docs/plans/2026-06-30-51-snes-critters.md))
+  - [x] ~~**#73 Funnel-Shift Kaleidoscope**~~ (Round 5, first pick) — G_FSHL/G_FSHR two-source funnel shift `fshl(A,B,k)`/`fshr(B,A,k)` with A≠B; `.lower()` expansion `ora=2`/`rep-sep=58`; gate `0xEED4`; 5-way green. No bug. ✓ [/snes/funnelkal/](https://biohack.net/snes/funnelkal/) ([plan](docs/plans/2026-07-01-73-snes-funnelkal.md))
+  - [x] ~~**#74 Rotate-Register Kaleidoscope**~~ (Round 5) — G_ROTL/G_ROTR `legalizeShiftRotate` ConstantAmt+S8-special+runtime via `__builtin_rotateleft8/right8/rotateleft16`; `ror+rol=18`/`rep-sep=15`; gate `0x300C`; 5-way green. No bug. ✓ [/snes/rotkal/](https://biohack.net/snes/rotkal/) ([plan](docs/plans/2026-07-01-74-snes-rotkal.md))
+  - [x] ~~**#75 Saturating Palette Comet Trails**~~ (Round 5, first pick) — all 4 sat variants `G_UADDSAT/USUBSAT/SADDSAT/SSUBSAT` via `lowerAddSubSatToMinMax`; `cmp=9`/`rep-sep=18`; gate `0xC2AF`; 5-way green. **Demo OOB fix** (comet py=16 → & 15). No compiler bug. ✓ [/snes/satcomet/](https://biohack.net/snes/satcomet/) ([plan](docs/plans/2026-07-01-75-snes-satcomet.md))
+  - [x] ~~**#76 Signed Multiply-Overflow Orbit Sentinel**~~ (Round 5, first pick) — G_SMULO s16+s32 `lowerMulo` (`__muldi3=1`/`__mulsi3=3`/`rep-sep=28`); gate `0xD81B`; 5-way green. No bug. ✓ [/snes/smulorbit/](https://biohack.net/snes/smulorbit/) ([plan](docs/plans/2026-07-01-76-snes-smulorbit.md))
+  - [x] ~~**#77 Saturating-Cast Kaleidoscope**~~ (Round 5) — `fminf`→G_FMINNUM+`fmaxf`→G_FMAXNUM+`(int16_t)`→G_FPTOSI legalizer:502 NaN guard; `__mulsf3=4`/`fminf/fmaxf=2`/`rep-sep=38`; gate `0xC8CF`; 5-way green. No bug. ✓ [/snes/satcast/](https://biohack.net/snes/satcast/) ([plan](docs/plans/2026-07-01-77-snes-satcast.md))
+  - [x] ~~**#78 Signed-Bitfield Terrain Sculptor**~~ (Round 5) — G_SEXT_INREG via `int16_t height:5/slope:4/flow:4` signed-field read-back; `asl=41`/`rep-sep=85`; gate `0x40C5`; 5-way green. Indigo valleys prove sext. No bug. ✓ [/snes/sbitfld/](https://biohack.net/snes/sbitfld/) ([plan](docs/plans/2026-07-01-78-snes-sbitfld.md))
+  - [x] ~~**#79 Descending memmove Scroll Slabs**~~ (Round 5, first pick) — G_MEMMOVE descending (dst>src, :3145-3152) + ascending via `__builtin_memmove`; `memmove-refs=2`/`rep-sep=15`; gate `0x72A7`; 5-way green. No bug. ✓ [/snes/mvscrl/](https://biohack.net/snes/mvscrl/) ([plan](docs/plans/2026-07-01-79-snes-mvscrl.md))
+  - [x] ~~**#80 Fabs Ridgeline**~~ (Round 5, first pick) — G_FABS `legalizeFAbs` inline sign-bit AND via `__builtin_fabsf` tent-map; `__mulsf3=5`/`rep-sep=11`; gate `0x161A`; 5-way green. No bug. ✓ [/snes/fabsridge/](https://biohack.net/snes/fabsridge/) ([plan](docs/plans/2026-07-01-80-snes-fabsridge.md))
+  - [x] ~~**#81 Copysign Compass: Vector-Field Sign Flow**~~ (Round 5) — G_FCOPYSIGN `lowerFCopySign` inline AND/OR + G_IS_FPCLASS `signbitf`; `__floatsisf=2`/`rep-sep=38`; gate `0xB9CB`; 5-way green. No bug. ✓ [/snes/compass/](https://biohack.net/snes/compass/) ([plan](docs/plans/2026-07-01-81-snes-compass.md))
+  - [x] ~~**#82 Fmin/Fmax Speed Cap: NaN-Aware Particle Governor**~~ (Round 5) — G_FMINNUM/G_FMAXNUM `.libcallFor S32` → `fminf`/`fmaxf` (math.cc:18-19); NaN-quieting: `fmaxf(NaN,-8)=-8`; `fminf=2`/`fmaxf=2`/`__mulsf3=2`/`rep-sep=35`; gate `0x0116`; 5-way green. No bug. slug=speedcap (boids taken by #26). ✓ [/snes/speedcap/](https://biohack.net/snes/speedcap/) ([plan](docs/plans/2026-07-01-82-snes-speedcap.md))
+  - [x] ~~**#83 Truncation Staircase: Round-Toward-Zero Quantizer**~~ (Round 5) — G_FPTOSI/G_SITOFP (`__fixsfsi`/`__floatsisf`) as the truncf-via-cast pattern (floorf/ceilf/truncf `.unsupported()`); `__fixsfsi=2`/`__floatsisf=2`; gate `0x02CA`; 5-way green. The differential caught a **demo-side OOB write** (draw_band round-band row-16 overflow of `cv->chr[4096]` corrupting corpus_result on bsnes-jg; MAME's zero-init masked it) — NOT a compiler bug (I first misdiagnosed it as a MOSZeroPageAlloc miscompile; rigorous instrumented refutation re-localized it to demo code). Fixed with a `ty < CANVAS_TILES_H` guard. ✓ ([plan](docs/plans/2026-07-01-83-snes-truncstair.md))
+  - [x] ~~**#84 Montgomery Orbit: Modmul Without Division**~~ (Round 5) — Montgomery REDC (`__mulsi3`/`__mulhi3` + `>>16` + mask + conditional subtract, **zero division libcalls**); distinct from #61 dhmix 64-bit modexp. `__mulsi3=5`/`rep-sep=13`/`division=0`; gate `0xBA9B`; 5-way green. No bug. ✓ [/snes/montorbit/](https://biohack.net/snes/montorbit/) ([plan](docs/plans/2026-07-01-84-snes-montorbit.md))
+  - [x] ~~**#85 Prime Sieve Ulam: Bit-Array as a Set**~~ (Round 5) — variable-count G_SHL/G_LSHR via `arr[i>>3] |= (1u<<(i&7))` bit-array sieve (distinct from #5 life fixed masks, #28 hilbert); `shift-ops=12`/`rep-sep=35`; gate `0x1F2F`; 5-way green. Ulam spiral of primes. No bug. ✓ [/snes/ulam/](https://biohack.net/snes/ulam/) ([plan](docs/plans/2026-07-01-85-snes-ulam.md))
+  - [x] ~~**#86 Range Coder: Multiply-Carry Renormalizer**~~ (Round 5) — binary arithmetic coder; `bound=(range>>PBITS)*prob` (__mulsi3+G_LSHR) + byte-wise renormalize carry loop; distinct from #67 huffman/#49 lzdec; `__mulsi3=1`/`rep-sep=24`; gate `0x6D21`; 5-way green. No bug. ✓ [/snes/rangecode/](https://biohack.net/snes/rangecode/) ([plan](docs/plans/2026-07-01-86-snes-rangecode.md))
+  - [x] ~~**#87 Sobelscope: Signed 3×3 MAC Edge Detector**~~ (Round 5) — signed int16 Sobel MAC + saturating magnitude via `__builtin_elementwise_add_sat/_sub_sat` (G_SADDSAT/G_USUBSAT); distinct from #57 medfilt; `rep-sep=99`/clamp-branches=6; gate `0x2849`; 5-way green (host gcc fallback == target clang intrinsics). No bug. ✓ [/snes/sobel/](https://biohack.net/snes/sobel/) ([plan](docs/plans/2026-07-01-87-snes-sobel.md))
+  - [x] ~~**#88 DCT Bloom: 8×8 Integer Cosine Transform**~~ (Round 5) — 8x8 separable integer DCT; int32 16x16→32 MAC (__mulsi3) + signed ashr descale (G_ASHR) + narrowing cast (G_SEXT_INREG); distinct from #25 fft; `__mulsi3=2`/`rep-sep=74`; gate `0x5364`; 5-way green. No bug. ✓ [/snes/dctbloom/](https://biohack.net/snes/dctbloom/) ([plan](docs/plans/2026-07-01-88-snes-dctbloom.md))
+  - [x] ~~**#89 ADPCM Waverider: Saturating Predictor Feedback Codec**~~ (Round 5) — IMA-ADPCM decoder; G_SADDSAT/G_SSUBSAT (`__builtin_elementwise_add_sat/_sub_sat`) in a serial feedback loop + step-index LUT; distinct from #48 IIR/#67 huffman; `rep-sep=39`/clamp-branches=20; gate `0xCA56`; 5-way green. No bug. ✓ [/snes/adpcm/](https://biohack.net/snes/adpcm/) ([plan](docs/plans/2026-07-01-89-snes-adpcm.md))
+  - [x] ~~**#90 Scope-Guard Ripple Tank: Cleanup-Attr Scope-Exit Destructors**~~ (Round 5) — `__attribute__((cleanup(fn)))` synthesized scope-exit calls (CGDecl.cpp:2254): guarded locals fire at every exit (return/break/nested) in reverse order; `cleanup-calls=31`/`rep-sep=23`; gate `0x05A3`; 5-way green. First cleanup-attr demo. No bug. ✓ [/snes/scopeguard/](https://biohack.net/snes/scopeguard/) ([plan](docs/plans/2026-07-01-90-snes-scopeguard.md))
+  - [x] ~~**#91 Matrix Cascade: sret Hidden-Pointer Struct Return**~~ (Round 5, first pick) — sret hidden-pointer ABI for mat2 (8-byte, over getNaturalAlignIndirect threshold MOS.cpp:88) via chained by-value mat_mul; distinct from #26 boids (32-bit register pair); `__mulsi3=8`/`mat_mul-sret=293`/`rep-sep=57`; gate `0x8064`; 5-way green. No bug. ✓ [/snes/matcascade/](https://biohack.net/snes/matcascade/) ([plan](docs/plans/2026-07-01-91-snes-matcascade.md))
+  - [x] ~~**#92 PlyOracle: Negamax Alpha-Beta Sign-Flip Return ABI**~~ (Round 5) — negamax+alpha-beta TTT: negate-on-return (G_SUB 0,x) + running G_SMAX + alpha-beta cutoff prune CFG; alternating-sign recursion #17/#18 never form; PO_MAXD=3 depth cap for time budget; gate `0x6146`; 5-way green. No bug. ✓ [/snes/plyoracle/](https://biohack.net/snes/plyoracle/) ([plan](docs/plans/2026-07-01-92-snes-plyoracle.md))
+  - [x] ~~**#72 3-D Grid Voxel Life**~~ (Round 4, **final demo of the battery**) — the **multi-dimensional array indexing** member: a life-like cellular automaton (survive 4..7, born 5..6, Moore-26, toroidal wrap) run in a **true 3-D array `uint8 grid[6][6][6]`** accessed as `grid[z][y][x]`, so the COMPILER generates the plane/row stride arithmetic `z*36+y*6+x` (non-power-of-2) — 26 multi-dim reads per cell. Every prior grid demo was 1-D or hand-indexed `y*W+x`. Live voxels tumble as a depth-shaded rotating cube. Gate folds every cell + population over 3 CA steps (`GATE_N=3` — Moore-26 is read-heavy, trimmed from 6 so the startup gate settles by ~frame 500). Disasm gate: `g3_a/g3_b-refs=28`, `shifts=35`, `rep/sep=88` (stride mul=0 — the small strides strength-reduce to shift-adds, cf #39). **`host==default==+mos-a16==+mos-xy16==0xFCDE` on bsnes-jg**, `-verify` clean ×2; MAME BIOS absent here. Clean positive, no compiler bug. **Caught + fixed a DEMO-only display bug** (missing `#define CANVAS_FLUSH_TILES 256` → only the top 64 tiles flushed → cube rendered as ~6 dots); **ruled out a miscompile** by confirming default 8-bit rendered identically to a16/xy16 (WRAM probes showed the read + projection were correct). ✓ [/snes/grid3d/](https://biohack.net/snes/grid3d/) ([plan](docs/plans/2026-06-30-72-snes-grid3d.md))
+  - [x] ~~**#71 Marching-Squares Iso-Contours**~~ (Round 4) — the **marching-squares contour** member: a scalar field (sum of moving parabolic metaball domes) sampled on a grid; each cell's 4 corners thresholded into a **4-bit CASE index**, a **16-entry const edge table `MS_SEG`** maps it to which cell edges the contour crosses, and each crossing placed by **edge-crossing interpolation `t=(iso-va)/(vb-va)`** (signed int32 `__divsi3`). Yellow iso-outline around dim-filled merging/splitting blobs. Distinct from #45 (rendered the *field*, not its contour). Gate folds case indices + crossings over 2 frames (16×16 grid, value grid precomputed so the `__mulsi3`-heavy field settles in-window). Disasm gate: `MS_SEG-refs=4`, `__divsi3=4`, `rep/sep=155`. Correctness green **`host==default==+mos-a16==+mos-xy16==0x86A7` on bsnes-jg** (900 fr; MAME BIOS absent here). **`-verify` XFAIL = documented `a16-rc-undef-ra-pure-virtual`** known issue (divide-heavy, code bit-exact correct — same as #69). Demo field made multiply-free via incremental second-difference stepping, host-cross-checked vs `ms_field` (0 mismatches/200 frames — the demo-fast-path blind-spot). ✓ [/snes/msquares/](https://biohack.net/snes/msquares/) ([plan](docs/plans/2026-06-30-71-snes-msquares.md))
+  - [x] ~~**#70 Floyd-Steinberg Dither**~~ (Round 4) — the **error-diffusion (signed spread)** member: a smooth drifting gradient reduced to 4 grey levels by Floyd-Steinberg — each pixel's **signed** quantisation residual `e=value-level` is spread to its down-right neighbours (7/16 right, 3/16 down-left, 5/16 down, 1/16 down-right) across a two-row error buffer, so following pixels see the accumulated error. Distinct from #7's decay+PRNG fire. All int16 (values + error, signed); residual split `(e*k)>>4` = arithmetic shift (bit-exact host/target), quantiser = 3 compares, levels from a 4-entry LUT → **the FS core needs no division** (the whole point). Gate folds band indices over 3 animated frames, all 4 quantiser branches fire. Disasm gate: `divide-libcalls=0`, `shifts=25`, `rep/sep=69` (incidental index/scene mul=2, cf #39). **`host==default==+mos-a16==+mos-xy16==0x80C4` on bsnes-jg**, `-verify` clean ×2; MAME BIOS absent here. Clean positive, no bug. ✓ [/snes/dither/](https://biohack.net/snes/dither/) ([plan](docs/plans/2026-06-30-70-snes-dither.md))
+  - [x] ~~**#69 Gouraud Triangle Tumbler**~~ (Round 4) — the **barycentric edge-function raster** member: a spinning equilateral triangle FILLED and colour-interpolated per pixel — three signed `int32` cross-product edge functions `E(A,B,P)=(Bx-Ax)(Py-Ay)-(By-Ay)(Px-Ax)` decide inside/outside (all agree with winding), and their values are the barycentric weights that shade the face (`I=(e0·a0+e1·a1+e2·a2)/area`). Distinct from #16's wireframe LINES. Gate rasterises 2 tumble orientations fresh-per-pixel (`__mulsi3` edge fns + `__divsi3` barycentric normalise). Disasm gate: `__mulsi3=11`, `__divsi3=1`, `rep/sep=165`. **`host==default==+mos-a16==+mos-xy16==0xC5E9` on bsnes-jg** (600 frames each; MAME BIOS absent here). **Two compiler findings:** (1) `-verify` crashes under a16/xy16 with the documented **`a16-rc-undef-ra-pure-virtual` known issue** (`Using an undefined physical register`; XFAIL — code bit-exact correct, differential green); (2) a DEMO-only inverted incremental-stepper-sign bug rendered nothing while the gate stayed green (the gate recomputes edges fresh, no steppers) — caught by host cross-check, fixed. ✓ [/snes/gouraud/](https://biohack.net/snes/gouraud/) ([plan](docs/plans/2026-06-30-69-snes-gouraud.md))
+  - [x] ~~**#68 Perlin Gradient-Noise Flow Field**~~ (Round 4) — the **gradient (Perlin) noise** member: a drifting smoke/marble field where each cell's colour is 2-D Perlin noise — a seeded Fisher-Yates permutation table (`PN_PERM`) + the inline Hermite fade polynomial `6t⁵−15t⁴+10t³` (Q0.8 fixed-point, several `__mulsi3`) + 4-way gradient dot + lerp, banded recompute so the field flows with time. Fixed-point → bit-exact host vs target by construction; distinct from value-noise/plasma/CA (none did *gradient* noise). Gate folds noise samples + fade-polynomial values, `GATE_N=120`. Disasm gate: `__mulsi3=15`, `PN_PERM-refs=11`, `rep/sep=60`. **`host==default==+mos-a16==+mos-xy16==0xA72D` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/perlin/](https://biohack.net/snes/perlin/) ([plan](docs/plans/2026-06-30-68-snes-perlin.md))
+  - [x] ~~**#67 Huffman Decode Reveal**~~ (Round 4) — the **bit-stream tree walk** member: a 16×16 image Huffman-encoded then decoded bit by bit — pull one bit MSB-first, descend the pointer-linked Huffman tree (`HF_KID0`/`HF_KID1`), emit `HF_SYM` at a leaf, restart at root — revealed a few pixels/frame (image loading in), then replays. Distinct from #49's byte-oriented LZ back-refs. Gate cross-checks decode==original (fold mixes pixel position + stream bytes so the symmetric image can't cancel to 0). Disasm gate: `bit-shifts=22`, `tree-refs=5`, `rep/sep=49`. **`host==default==+mos-a16==+mos-xy16==0xE8E4` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/huffman/](https://biohack.net/snes/huffman/) ([plan](docs/plans/2026-06-30-67-snes-huffman.md))
+  - [x] ~~**#66 Edit-Distance DP**~~ (Round 4) — the **2-D dynamic-programming table** member: the Levenshtein table `D[i][j]=min(sub,del,ins)` filled by the min-recurrence then backtracked from `D[m][n]` to `D[0][0]` for the optimal alignment; drawn as a cost heat-map with the path lit, cycling 5 word pairs. Doubly-indexed `D[i][j]` (base + i*16 + j → shift) + min-of-3 `cmp` + backtrack — a loop/GEP shape none of the first 65 run. Gate cross-checks symmetry `edit(A,B)==edit(B,A)`; host `edit(KITTEN,SITTING)=3`. Disasm gate: `indexed-load/sta=15`, `cmp=13`, `rep/sep=92`. **`host==default==+mos-a16==+mos-xy16==0xFB59` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/editdist/](https://biohack.net/snes/editdist/) ([plan](docs/plans/2026-06-30-66-snes-editdist.md))
+  - [x] ~~**#65 Convex Hull Rubber-Band**~~ (Round 4) — the **computational-geometry orientation** member: a drifting point cloud wrapped by a rubber-band convex hull, recomputed each frame by gift-wrapping (Jarvis march) purely from the SIGN of the signed 2-D cross product `cross(O,A,B)=(A.x-O.x)(B.y-O.y)-(A.y-O.y)(B.x-O.x)`. Computed in **int32** (cast each int16 diff) to avoid overflow → `__mulsi3`; sign compared via `cmp`. Distinct from #16's wireframe (lines, no orientation predicate). Gate cross-checks the hull is valid (all points left of every edge). Heavy → `GATE_N=12`, snapshot frame 700. Disasm gate: `__mulsi3=8`, `cmp=27`, `rep/sep=110`. **`host==default==+mos-a16==+mos-xy16==0x84E3` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/hull/](https://biohack.net/snes/hull/) ([plan](docs/plans/2026-06-30-65-snes-hull.md))
+  - [x] ~~**#64 Radix / Counting Sort**~~ (Round 4) — the **non-comparison sort** member: 16 bars sorted base-16 one nibble at a time — each pass histograms the digit, prefix-sums the counts into offsets, stable-scatters the elements; **zero data comparisons, 0 mul/div libcalls**. Distinct from #17's comparison sorts (quick/heap/merge). Bars re-bucket raw → low-nibble → sorted (ascending value-band gradient), then reshuffle. Gate cross-checks sorted (inversions=0) + permutation (in/out xor & sum match). Disasm gate: `indexed-load/sta=9`, mul/div-libcalls=0, `rep/sep=34`. **`host==default==+mos-a16==+mos-xy16==0x123E` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/radix/](https://biohack.net/snes/radix/) ([plan](docs/plans/2026-06-30-64-snes-radix.md))
+  - [x] ~~**#63 Fenwick Tree**~~ (Round 4) — the **`i & -i` low-bit isolation** member: a binary-indexed tree maintaining the running integral (prefix sum) of a moving signal; `update` climbs `i += i & -i`, `query` descends `i -= i & -i` — the two's-complement low-bit trick. Width-safe lowbit `(uint16_t)(i & (uint16_t)(0u - i))`. Gate cross-checks the BIT prefix vs a linear reference. Signal bump (green) + integral staircase (amber). Disasm gate: `and=5`, mul/div-libcalls=0, `rep/sep=56`. **`host==default==+mos-a16==+mos-xy16==0x3454` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/fenwick/](https://biohack.net/snes/fenwick/) ([plan](docs/plans/2026-06-30-63-snes-fenwick.md))
+  - [x] ~~**#62 Union-Find Percolation**~~ (Round 4, first pick) — the **disjoint-set (union-find) path compression** member: bond percolation on a 16×16 grid — random adjacent bonds union cells' sets; `find` chases parent pointers to the root then **rewrites the whole path flat**; cells connected to the top light up "wet" until a white spanning cluster reaches the bottom (percolation), then reseeds. Distinct from #18's heap and #31's tree. Gate folds component count + a compressing `find`/bond + percolation verdict + parent checksum. Disasm gate: `parent-refs=43`, `branches=24`, `rep/sep=106`. **`host==default==+mos-a16==+mos-xy16==0x025B` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Clean positive. ✓ [/snes/percol/](https://biohack.net/snes/percol/) ([plan](docs/plans/2026-06-30-62-snes-percol.md))
+  - [x] ~~**#61 Diffie-Hellman Colour-Mixer**~~ (Round 4) — **🐞 CAUGHT + FIXED A REAL BACKEND BUG.** The **64-bit modular exponentiation** member: two parties publish `g^a mod p`/`g^b mod p`, both compute the shared secret `g^(ab) mod p`; hot op = 64-bit modulo (`__umoddi3`) after `__muldi3` in square-and-multiply. Building it **crashed the `+mos-a16`/`+mos-xy16` legalizer** (`unable to legalize G_UNMERGE_VALUES (s64)` splitting an s64 into 16-bit lanes; and `G_ANYEXT (s24)` from a 20-bit mask) — default 8-bit compiled fine. Isolated to an 8-line repro; **fixed** by adding the s64↔s16 (un)merge 2-level glue (`legalizeMergeS64FromWords`/`legalizeUnmergeS64ToWords`, mirroring the s32 handlers) + routing odd-width `G_ANYEXT` through `G_ZEXT`, all `hasAccum16()`-gated. Carried as standalone patch **`0017-321-a16-s64-unmerge-anyext-legalize`** (round-trip vs pristine `c798c3141`), queued upstream. Rebuilt toolchain; **all 62 corpus slices compile a16/xy16 (0 regressions)**, 64-bit demos differential-green. Post-fix **`host==default==+mos-a16==+mos-xy16==0x69AA` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Disasm gate: `__umoddi3=8`, `__muldi3=8`, `rep/sep=28`. ✓ [/snes/dhmix/](https://biohack.net/snes/dhmix/) ([plan](docs/plans/2026-06-30-61-snes-dhmix.md) · [investigation](docs/investigations/2026-06-30-a16-s64-unmerge-anyext-legalize-crash.md))
+  - [x] ~~**#60 Multi-Base Clock**~~ (Round 4, first pick) — the **`div_t`/`lldiv_t` aggregate-return ABI** member: one counter shown in decimal/dozenal/hex/sexagesimal at once, each digit split with libc `div()` returning a `div_t` (quotient+remainder) BY VALUE, + a 64-bit odometer via `lldiv()`. Braids the aggregate-return ABI with the custom `G_SDIVREM` legalizer (@229); distinct from #39's `/`,`%` and #43's raw 64-bit divmod. Real `div`/`lldiv` calls confirmed via relocations. **Width:** `div()` int → counter <32768; `lldiv()` long-long 64-bit-safe; `ldiv` unused (long mismatch). **Notes:** custom multi-row text drawable — must clear the full 32×32 tilemap in `reserve()` (garbage-stripe trap); lldiv-heavy gate → `GATE_N=60`+throttle, snapshot frame 700. Disasm gate: `div-calls=1`, `lldiv-calls=1`, `rep/sep=22`. **`host==default==+mos-a16==+mos-xy16==0x371A` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/multibase/](https://biohack.net/snes/multibase/) ([plan](docs/plans/2026-06-30-60-snes-multibase.md))
+  - [x] ~~**#59 Cosmic Zoom Ruler**~~ (Round 4) — the **64-bit integer ⇄ float conversion** member: a `uint64` scale grows exponentially and is placed on a LOG ruler by converting it to float (`__floatundisf`) — so exponential growth reads as a linear bar sweep — then back to `uint64` (`__fixunssfdi`), plus a signed `__floatdisf`/`__fixsfdi` round-trip. #21/#33 converted only 32-bit ints. Used **float not double** (ROM/speed); `scale<10^18` so `(float)v→(uint64)` can't overflow-UB. **Note:** the zoom bar fills slowly → snapshot frame 1400 (corpus set far earlier). Disasm gate: `__floatundisf=2`, `__fixunssfdi=1`, `__floatdisf=1`, `rep/sep=28`. **`host==default==+mos-a16==+mos-xy16==0x502F` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/cosmzoom/](https://biohack.net/snes/cosmzoom/) ([plan](docs/plans/2026-06-30-59-snes-cosmzoom.md))
+  - [x] ~~**#58 Complex Domain-Colouring**~~ (Round 4) — the **NaN / unordered float compares** member: colours a grid by `f(z)=(z²-1)/(z²+c)`; at a pole `z²+c==0` the reciprocal gives `Inf`/`NaN` and the code branches on `isnan` (`x!=x` → `__unordsf2`) / `isinf` (`__eqsf2`) to paint singularities. #21/#33 used only the ordered `<`. **Differential-safe:** folds the COLOUR INDEX (branch outcome), never raw NaN bits; one-op-per-statement soft-float; a **guaranteed pole** each gate iter. **Soft-float perf:** ~150k cyc/cell → one-reciprocal divide, `GATE_N=4` (corpus set ~frame 250), 8×8 live "developing" render + palette shimmer. Disasm gate: `__unordsf2=2`, `__divsf3=1`, `__mulsf3=12`, `rep/sep=28`. **`host==default==+mos-a16==+mos-xy16==0xF3FD` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/domcol/](https://biohack.net/snes/domcol/) ([plan](docs/plans/2026-06-30-58-snes-domcol.md))
+  - [x] ~~**#57 Median Denoiser**~~ (Round 4, first pick) — the **branchless min/max/abs** member: a salt-and-pepper-noised image cleaned by a 3×3 median filter (a 19-comparator sorting network of `min`/`max` compare-exchanges, `(a<b)?a:b`/`(a<b)?b:a` = `G_UMIN`/`G_UMAX` `.lower()` @272), + abs = `G_ABS` (@281); a sweeping wipe shows denoised vs raw. **MEASURED (no bug):** no cmov on the 65816 → min/max lowers to `cmp`+branch (not a branchless select); zero mul/div libcalls. Gate cross-checks the network median vs an insertion-sort median (**0 mismatches / 200k random tuples**). Disasm gate: `cmp=12`, mul/div-libcalls=0, `rep/sep=19`. **`host==default==+mos-a16==+mos-xy16==0x87FE` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/medfilt/](https://biohack.net/snes/medfilt/) ([plan](docs/plans/2026-06-30-57-snes-medfilt.md))
+  - [x] ~~**#56 Rotozoom**~~ (Round 4, first pick) — the **widening multiply-high** member: an affine texture spin-zoom where each cell samples a procedural texture at a Q16.16 rotated/scaled coord; `q16mul(a,b)=(int64)a*b>>16` keeps the middle 32 of a 64-bit product (the `G_SMULH`/`G_UMULH` `.lower()` @300 = extend/mul/shift/trunc). **MEASURED (no bug):** no narrower mul-high on a soft-multiply target → it widens through `__muldi3` (Q16.16) / `__mulsi3` (Q8.8 coeffs), like #39's degrade-to-primitive. Distinct from #22's full-64 hash (mul-high *extraction* here). **Harness note:** heavy gate (~18 `__muldi3`/iter) → `GATE_N=100`, snapshot frame 700 (0x0000-at-500 was timing, PASSed at 900 — not a miscompile). Disasm gate: `__muldi3=5`, `__mulsi3=4`, `SINCOS=2`, `rep/sep=30`. **`host==default==+mos-a16==+mos-xy16==0x391B` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/rotozoom/](https://biohack.net/snes/rotozoom/) ([plan](docs/plans/2026-06-30-56-snes-rotozoom.md))
+  - [x] ~~**#55 GF(2⁸) Galois Field**~~ (Round 4) — the **finite-field / carryless-multiply** member: a morphing GF(2⁸) plaid (`gf_mul(A,α^x)^gf_mul(B,α^y)`, A/B rotating through α-powers) coloured by the **carryless multiply** (log/antilog tables + XOR, **no `adc` carry chain**) under Reed-Solomon; HUD shows a live RS syndrome (Horner in GF) that flags a corrupted symbol. Gen α=2, primitive poly 0x11D. **Gate cross-checks `gf_mul` vs a slow bit-by-bit carryless multiply over all 65 536 pairs** (0 mismatches host-side). Disasm gate: `GF_EXP=13`, `GF_LOG=5`, `eor=16`, **mul/div-libcalls=0**, `rep/sep=21`. **`host==default==+mos-a16==+mos-xy16==0xC028` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/gf256/](https://biohack.net/snes/gf256/) ([plan](docs/plans/2026-06-30-55-snes-gf256.md))
+  - [x] ~~**#54 Perfect-Shuffle Transition**~~ (Round 4) — the **byte-swap / bit-reverse intrinsics** member: a source image is permuted by the bit-reversal of each cell's index (`__builtin_bitreverse32` → `G_BITREVERSE` inline mask-swap cascade @186; an **involution** → scramble==unscramble), with a `__builtin_bswap32` recolour while held. Distinct from #25/#28's hand-rolled reversal loops. **Notes:** both builtins **inline-lower** (no `__bswapsi2`; masks `#$aa`/`#$cc` for bitrev); `__builtin_bitreverse` is clang-only → gcc host oracle uses a SWAR reference (bit-identical). Disasm gate: `#$aa=6`, `#$cc=8`, `rep/sep=58`. **`host==default==+mos-a16==+mos-xy16==0x2A4A` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/bitshuffle/](https://biohack.net/snes/bitshuffle/) ([plan](docs/plans/2026-06-30-54-snes-bitshuffle.md))
+  - [x] ~~**#53 Bit-Census Field**~~ (**Round 4** #53–#72, first demo) — the **bit-population intrinsic family** member: each cell's colour is a bit-count of a 64-bit value from its (x,y,time), cycling the four `__builtin_*ll` intrinsics (`popcountll`/`clzll`/`ctzll`/`parityll`) → XOR-fractal / magnitude / ruler / checker textures. **MEASURED FINDING (no bug):** they **inline-lower** via `G_CTPOP`/`G_CTLZ`/`G_CTTZ` `.lower()` (`MOSLegalizerInfo.cpp:308`) to SWAR bit-count trees (masks `#$55`/`#$33` in the disasm) — the compiler-rt `__*di2` helpers are never called (like #39's no-strength-reduction). Width-safe via the 64-bit `ll` variants (the `int`/`long` builtins differ host-vs-target → would be a false alarm). Disasm gate: `#$55`=16, `#$33`=32, `rep/sep=166`. **`host==default==+mos-a16==+mos-xy16==0x9516` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. ✓ [/snes/bitcensus/](https://biohack.net/snes/bitcensus/) ([plan](docs/plans/2026-06-30-53-snes-bitcensus.md))
+  - [x] ~~**#52 Cross-Byte-Boundary Bitfield Disassembler**~~ (Round 3, **FINAL Round-3 demo**) — the **unaligned / cross-boundary bitfield extract-insert** member: a 65816 instruction descriptor packs `opcode:8, mode:3, len:2, group:5, cycles:4, flags:7, rmw:1` across a `uint32_t`, with `group` (bits 13-17) crossing bit 16 and `flags` (bits 22-28) crossing bit 24 → multi-byte shift+mask (distinct from #29b truchet's single-`uint16` fields). Colour-coded field-decode map. Disasm gate: `and`-masks=5, multi-byte shifts=23, arith-libcalls=0, `rep/sep=19`. **`host==default==+mos-a16==+mos-xy16==0x31D7` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — cross-byte bitfield codegen is byte-exact across all modes. **This completes the Round-3 (#33–#52) compiler stress-test demo battery.** ✓ [/snes/disbits/](https://biohack.net/snes/disbits/) ([plan](docs/plans/2026-06-30-52-snes-disbits.md))
+  - [x] ~~**#49 LZ77 Image-Decompress Reveal**~~ (Round 3) — the **decode state machine + output back-reference** member: an LZ77/LZSS byte-stream decoder copies back-references from its OWN output buffer (sliding window; overlap RLE-expands runs), decoding a 56-byte stream to a 256-cell diamond image (`tools/lzgen.py` generated + roundtrip-verified), progressively revealed. Disasm gate: `LZ_STREAM`-refs=6, `sta`=27, arith-libcalls=0, `rep/sep=52`. **`host==default==+mos-a16==+mos-xy16==0x0100` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the self-referential back-ref copy is byte-exact across all modes. ✓ [/snes/lzdec/](https://biohack.net/snes/lzdec/) ([plan](docs/plans/2026-06-30-49-snes-lzdec.md))
+  - [x] ~~**#47 Newton-Raphson Reciprocal Floor**~~ (Round 3) — the **iterative fixed-point refinement** member: a perspective checkerboard floor whose `1/z` depth is a MULTIPLY-ONLY Newton reciprocal `x = x*(2 - m*x)` (no hardware divide, no divide libcall; distinct from #39's single divide libcall and #45's float bit-hack). Q15/Q16 uint32, products fit 32 bits. Disasm gate: `__mulsi3`=6, divide-libcalls=0, `rep/sep=19`. **`host==default==+mos-a16==+mos-xy16==0x044A` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. **No compiler bug** — the convergent reciprocal loop is byte-exact across all modes. ✓ [/snes/nrecip/](https://biohack.net/snes/nrecip/) ([plan](docs/plans/2026-06-30-47-snes-nrecip.md))
+  - [x] ~~**#46 qsort Sort Visualizer**~~ (Round 3) — **🐞 CAUGHT + FIXED A REAL BACKEND BUG.** libc `qsort` with a rotating function-pointer comparator (indirect-comparator ABI). The standard comparator idiom `(x>y)-(x<y)` canonicalizes to `G_SCMP`, which `MOSLegalizerInfo` had **no rule for** → backend abort `unable to legalize G_SCMP` in default/a16/xy16 alike, at every width, both -fno-lto and LTO — any spaceship-comparator sort failed to build. **Fix = one line** `getActionDefinitionsBuilder({G_SCMP, G_UCMP}).lower();` (patch `0016-mos-scmp-ucmp-legalize`), routing to LLVM's `lowerThreewayCompare`. Rebuilt toolchain; now **`host==default==+mos-a16==+mos-xy16==0x8EA5` on bsnes-jg**, `-verify` clean ×2; MAME leg SKIP. Queued upstream (standalone-testable, not AS2/accum-gated). ✓ [/snes/qsortviz/](https://biohack.net/snes/qsortviz/) ([plan](docs/plans/2026-06-30-46-snes-qsortviz.md))
+- [x] ~~**#321 Mandelbrot zoom pyramid** — BUILT (Phases 1+2, branch `wt/321-mandel-zoom`) then **SHELVED as a
+  demo** (user call, 2026-06-25): as a *display* it's a flashy slideshow, not a smooth zoom — a full-screen
+  128×128 chr swap (16 KiB) can't fit one vblank so each level boundary force-blanks (flashes), and *between*
+  swaps it's just Mode-7 magnify like the interactive demo; as a `+mos-a16` codegen customer it's redundant
+  (same `view.h` matrix math). Branch kept (unmerged) as the live repro for the bug below. KEEPERS landed on
+  `main`: the MAME key-remap + the compiler-bug finding.~~ **REMOVED from `main` 2026-06-26** (user request) — deleted the demo (`mandel-zoom.c`/`zoom.h`), `tools/mandel-bake-pyramid.c`, `platforms/snes-zoom/`, `dev/mandel-zoom*`, the orphaned `dev/loopfold-repro.sh`/`reduce-loopfold.sh` discovery scripts, and `jgxcheck.cpp`'s `JGX_ZOOM`. The coalesce-rotate fix is unaffected (its self-contained `.mir` lit test in `0010` is the upstream repro). Plan + screenshots kept as history. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md)
+- [x] ~~**MAME key remap for the SNES demos** (`dev/mame-snes-input.cfg`)~~ — binds each SNES button to its
+  matching keyboard letter (R→SNES R, Y→Y, A→A, L→L, S→Select, Enter→Start) so the demo labels just work;
+  MAME's defaults are non-obvious (SNES R = keyboard X, Y = Left-Ctrl, A = Space). `task mandel-mame` drops it
+  in. (Fixes the "Y/A/R don't work" report — it was the key map, not the ROM; verified by injecting the field.)
+- [x] ~~**DEFAULT-8bit 65816 matrix-fold-LOOP miscompile → coalescer fix**~~ — **FIXED 2026-06-26.** A CRC fold over `int16_t m[4]` miscompiled vs the unrolled form (default-8bit; `0xE60E`≠`0xF56C`). cvise→43-line repro, then an instruction-level bsnes-core trace falsified the "wrong-X" lead and pinned it to the **register coalescer** merging two rotate-referenced values into the A-only `Ac` class (strands a loop-carried CRC byte in `Y`; back-edge `ROL` reads stale `A`). Fix in `MOSRegisterInfo::shouldCoalesce` (generic default-8bit → **upstream**), fork patch `0010-coalesce-rotate-ac.patch` + LLVM lit test. Repro fixed, corpus 7/7, torture 30/30, csmith 54/60 (0 mismatch). Upstream PR queued ([`upstream-coalesce-rotate-ac-pr.md`](docs/upstream-coalesce-rotate-ac-pr.md)). [plan](docs/plans/2026-06-25-default8-loopfold-miscompile-reduce-and-fix.md) · [investigation](docs/investigations/2026-06-25-default8-65816-loopfold-miscompile.md).
+
+- [x] ~~**SNES hardware reference docs + subsystem-split `snes.h` + generators**~~ — **LANDED on `main`**
+  2026-06-25 (consolidation). The umbrella `snes.h` re-exports every prior symbol (`VMAIN_INC_LOW_1`,
+  `snes_read_pad1`, `snes_wait_vblank` carried into the split headers); compile-verified.
+  Durable reference set produced *from source*: (1) subsystem-split HAL headers
+  (`platforms/snes/snes_{ppu,dma,cpu,apu,wram,joypad}.h`) under a thin umbrella `snes.h`, annotated with
+  `@reg`/`@bit`; (2) a **complete CPU-visible MMIO register map** generated from those headers
+  (`tools/gen-snes-regmap.py`); (3) a **compact 65816 reference** generated from the in-tree LLVM-MOS
+  backend TableGen (`llvm-tblgen --dump-json`) and **validated against the canonical opcode matrix as a
+  correctness oracle** — which doubles as a **65816 backend-encoding audit**
+  (`tools/gen-65816-ref.py` → `65816-opcode-audit.md`); (4) an authored SNES hardware summary. Adopts
+  `wt/321-mandelbrot`'s exact HAL symbol names (merge stays a union). Unblocks #3's greenfield graphics
+  layer with a real register reference.
+  [plan](docs/plans/2026-06-25-snes-hardware-reference-docs-subsystem-split-snes.md).
+
+### Test Bench / CI
+
+- [T3] **Full 138-demo gate sweep for the build-determinism fix.** Left open by the [2026‑09‑14 plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md) (corpus, corpus-a16 and four demos were gated). First check whether a later full sweep on a toolchain containing the fix already covers it; if so, close this with that run as evidence. No later full sweep exists: after the 2026‑09‑15 fix only `fft`, `mulov64`, `n-body` and `smulorbit` ran their differential gates; the rest got `-verify-machineinstrs` and a ROM byte comparison. Reason for T3 (escalated from T1): no single command runs every demo gate, so the sweep needs a batch driver, a defined demo set and a wall-time budget.
+- [x] **#321 Yarpgen as a second random generator behind `--gen yarpgen`** — **WON'T-DO (superseded 2026-06-26).**
+  The motivation evaporated: it was pitched as "the natural next instrument" *because* it targets the
+  `-O1/-Os` pressure regime that "still hosts the open `a16-zp-pressure-overflow` XFAIL" — but that XFAIL is now
+  **resolved** (stale), and Csmith already drove all three pressure-bug fixes (`0009`/`0011`/pr15296) and runs
+  **0-mismatch** on that regime. Against it: Yarpgen's output isn't UB-free at the target's 16-bit `int` (no
+  `platform.info` equivalent) → real width-surgery cost for marginal added coverage. Re-open only if a real
+  pressure bug ever slips past Csmith. (follow-up to the now-**Done**
+  Csmith fuzzer — see Done `[321-csmith-fuzzer]`). Targets the `-O1/-Os` loop/scalar-opt surface — the same
+  register-pressure regime that produced the `regalloc-out-of-registers` (fixed, `0009`) and
+  `scavenger-p-not-gpr` (fixed, `0011`) crashes; the `a16-zp-pressure-overflow` XFAIL it was meant to chase is
+  now **resolved**. Two
+  costs: redirect its baked-in `printf` to `corpus_result`; the 16-bit-int caveat (no `platform.info`
+  equivalent → would need width surgery to stay UB-free). The `--gen` seam already added for Csmith makes it
+  drop-in. [plan §Follow-ups](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md) ·
+  [harness reference](docs/investigations/csmith-differential-harness.md).
+- [x] **#321 vendor the GCC `c-torture/execute` correctness suite behind the differential gate** — slot the
+  de-facto-standard *execution*-correctness suite (1656 top-level self-checking `abort()`/`exit(0)` programs)
+  into the existing engine (`tools/a16_fuzz.py`), using the **default (non-a16) build as the trusted oracle**: a
+  test is in-scope iff the default build runs it to the PASS sentinel, then any `+mos-a16`/`+mos-xy16`
+  disagreement is a real defect (sidesteps "is this test appropriate for 16-bit `int`" — if default handles it,
+  a16 must too). Fetch-don't-commit (GPLv3 → sha256-pinned gcc-14.2.0, gitignored, reproducible via
+  `dev/fetch-torture.sh`, the WDC816CC/ORCA-refs precedent). **Phases 0+1 + Phase 2 `-O1` pass DONE
+  2026-06-19**: filter → **1253/1656 in-scope**; runner (`tools/torture_run.py` + `dev/run.sh torture`).
+  Full `-O1` pass: **1098 PASS, 136 SKIP, 3 known-XFAIL** (ZP-pressure) **+ 16 confirmed NEW runtime
+  miscompiles** (a16/xy16 wrong-value, all reproduced isolated on both emulators → `xfails.tsv`, gate
+  green-modulo-known). **`-Os` pass DONE 2026-06-20** — full sweep of all 1168 in-scope @ `-Os`: **1114 PASS,
+  0 FAIL, 54 SKIP** after fixing the **2 FAILs it found** (`pr34768-1/-2` — a pre-existing a16
+  load-fold-across-call miscompile, see Done `[321-abs-load-fold-across-call]`); 0 XPASS churn confirms the
+  `CMPIndir16` fold (`9009260`) non-regressing. **Full bsnes-jg 4-way confirmation pass DONE 2026-06-20** —
+  re-ran the entire in-scope set @ `-Os` with the bsnes-jg leg on **every** test (not just per-FAIL):
+  **1174 PASS, 0 FAIL, 54 SKIP** — `host==default@MAME==a16@MAME==a16@bsnes-jg` holds suite-wide, no
+  MAME-vs-bsnes divergence.
+  [sweep plan](docs/plans/2026-06-20-321-broad-c-torture-sweep.md). ~~**Remaining:** Phase 3 sampled CI~~
+  **Phase 3 sampled CI DONE 2026-06-21** — the **`torture`** job in `.github/workflows/smoke.yml`
+  (in-container, `needs: xcheck` for the cached toolchain, 4-way differential, secret-gated skip-not-fail;
+  `mode` input `sampled` [seeded `--sample 150 --sample-seed S` @ `-Os`] / `full` [whole in-scope @ `-Os`
+  **and** `-O1`]). Added a seeded `--sample`/`--sample-seed` to `tools/torture_run.py` (was sequential-slice
+  only). Local sampled verify `dev/run.sh torture --sample 150 --sample-seed 1 --opt -Os` = **143 PASS, 0
+  FAIL, 7 SKIP, 0 XFAIL** (4-way, MAME + bsnes-jg). ~~**Optional tail:** reap orphan MAMEs in the runner~~
+  **Orphan-MAME reaper DONE 2026-06-21** — `_run_emu` in `tools/a16_fuzz.py` spawns every emulator in its
+  own session/process group and `killpg`s the whole group on timeout / exit / SIGTERM (no leaked boots
+  across long local sweeps); behaviour-preserving (same `CompletedProcess`, re-raises `TimeoutExpired`).
+  Verified: forking child reaped group-wide on timeout; normal path unregressed (`torture --sample 8` 8/8).
+  [plan](docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md).
+  **Full vendoring DONE 2026-06-26** — `tools/torture_filter.py` now scans the **whole** suite (top-level +
+  `ieee/` + `builtins/`; SRCDIR-relative manifest keys disambiguate the 5 top-level/subdir name collisions;
+  was top-level-only): **1288/1779 in-scope** (was 1228/1656). `ieee/` (68) → **60 in-scope** = genuinely new
+  floating-point coverage (`-Os` 53 PASS / 4 SKIP / 3 XFAIL · `-O1` 57 PASS / 0 SKIP / 3 XFAIL · **0 FAIL**,
+  4-way MAME + bsnes-jg); `builtins/` (55 main tests) → honest **`builtins-multifile`** bucket (gcc's
+  `builtins.exp` multi-file harness — `main_test()` + `lib/main.c`/`-lib.c` companions — not single-file
+  linkable; the 55 `-lib.c` + 28 `lib/` support files correctly excluded). The sweep **surfaced one new
+  `+mos-xy16` defect** → investigated 2026-06-26: the XFAIL was STALE (de-XFAIL'd to positive gates; see Done).
+  [full-vendoring plan](docs/plans/2026-06-26-finish-the-full-vendoring-of-the-gcc-c-torture-exe.md).
+### Upstream / Contribution
+
+**Work/dependency view:** [pending-work chart and flowchart](docs/upstream-pending-work.md).
+**Document dependencies:** [inventory and refresh workflow](docs/howto-document-dependencies.md).
+SNES is a separate platform track: prioritize reconciling #415, including the runtime
+contract of native mode, while independent fixes continue in parallel.
+
+- [wip T2] **Common SDK longjmp zero return — posted as [SDK PR #450](https://github.com/llvm-mos/llvm-mos-sdk/pull/450):** independent 6502 bug reproduced
+  2026-09-20 against current upstream assembly. Candidate normalization passes 20/20
+  integrated SDK CTest cases against freshly built current libraries/simulator; ready
+  and posted; awaiting maintainer review/CI. No SNES
+  dependency. [Patch and evidence](docs/upstream-pending-work.md#research-notes-and-evidence).
+- [T5] **Register-exhaustion fix 0029:** implementation, validation, final review and
+  an [independent review](docs/pr-preparations/2026-09-22/0029-claude-review.md) are
+  complete; the guard was refined (reserved class members no longer count as
+  available) and the complete X86/ARM/AArch64/MOS suites pass on the revised patch.
+  Upstream main is identical to the pinned base. Remaining: prepare the standalone
+  branch and publish the [PR](docs/upstream-twoaddr-physreg-reschedule-pr.md)
+  (user-triggered). No #320/#321 dependency.
+- [T4] **Reentrant contract:** the report needs a semantics answer before selecting
+  a fix or documentation change. [Readiness](docs/upstream-pending-work.md#what-issue-means-here).
+- [T5] **Physical-copy liveness fix 0030:** implemented, validated, and
+  [independently reviewed](docs/pr-preparations/2026-09-22/0030-claude-review.md)
+  (sixth MIR case added; c-torture corpus: 20 verifier failures repaired, 4,070
+  assemblies identical; MOS CodeGen 84 + MC 46 pass). Upstream `main` is identical
+  to the pinned base. Remaining: prepare the branch and publish the
+  [PR](docs/upstream-copy-phys-reg-liveness-pr.md) (user-triggered).
+- [T5] **Copy-destination reuse 0031 (stacked on 0030):** the second reuse path in
+  `getRegWithVal` was dead code (clobber map updated before the copy was checked);
+  fixed, with a new MIR test and one upstream test's checks regenerated.
+  [Evidence](docs/pr-preparations/2026-09-22/0031-validation.md): no new failures,
+  `.text` −2,530 bytes over 374 changed corpus pairs that assemble (six grow),
+  MOS CodeGen 85 pass / one unsupported, MC 46 pass. The
+  [independent review](docs/pr-preparations/2026-09-22/0031-review-audit.md) found
+  no correctness defect and corrected the submission evidence; local emulator
+  integration records 79/79 passes separately.
+  Remaining: publish the [PR](docs/upstream-copy-phys-reg-reuse-dst-pr.md) after
+  0030 lands (user-triggered).
+- [T5] **Register-named assembly symbols 0032:** reduced, fixed, and installed
+  locally. Standalone MOS CodeGen 84 pass / one unsupported; MC 48 pass.
+  All 61 recorded assembly failures now assemble with direct objects unchanged.
+  Covers 6502/65816 and silent `asl "a"` misassembly.
+  [PR draft](docs/upstream-register-named-symbols-pr.md) ·
+  [Validation](docs/pr-preparations/2026-09-23/0032-validation.md).
+  [Independent review audited](docs/pr-preparations/2026-09-23/0032-review-audit.md):
+  no code defect found; full-corpus assembler failures fall from 821 to zero
+  across 4,091 emitted files (79 backend failures excluded). Applies to the
+  pinned base and local clone revision `c44aaa95aa72`. Remaining: check current
+  upstream when preparing the branch, then publish (user-triggered).
+- [T4] **Undef-lane fix 0028:** validated, with publication held until #320/#321 are
+  ready to open. The existing refactor is selected, independently reviewed, and
+  validated on current LLVM: two focused RUNs and 102 filtered X86 test passes,
+  one existing XFAIL. No implementation-choice or validation gate remains;
+  [the pending-work chart](docs/upstream-pending-work.md) records the hold and evidence.
+
+**Earlier progress snapshot, 2026-09-20, before #604 was posted:** 7 merged PRs (#562, #563, #577, #579, #587, #590,
+#591); 5 open (#578, #584, #586, #588, #589). Published revisions await review;
+#589 still has a change request. Windows CI is blocked by upstream's missing Actions update
+for the Node 20 → Node 24 migration (Will, 2026-09-20). The #588 Ubuntu log confirms
+cancellation during compilation before tests ran; it needs a completed run. See the
+[current PR snapshot](docs/upstream-contribution-status.md#current-pr-progress).
+
+_Live queue + exact post commands: [docs/upstream-contribution-status.md](docs/upstream-contribution-status.md)
+— keep it in sync (drafted → ready-to-post → posted) with the items in this section._
+
+Current preparation: [September 26 posting packet](docs/pr-preparations/2026-09-26/README.md).
+It owns the exact-current artifact/review/validation gates; the
+[feature-held ledger](docs/pr-preparations/2026-09-26/feature-held-packages.md)
+separates real ABI/extraction holds from merge ordering. No posting or push is
+authorized by this pass. The ten [MOS packets](docs/pr-preparations/2026-09-26/mos-validation.md)
+and six [LLVM packets](docs/pr-preparations/2026-09-26/llvm-validation.md)
+(0037, 0041, 0056–0059) are ready to post; 0028 is validated but retains the
+presentation hold above. LLVM suite results are filtered AArch64/X86 checks,
+not full target suites. 0045 has a stock-MOS test and is not fork-only;
+0061's exact artifact needs both #320/#321, while 0063 is increment-only.
+The separate 0060 packet is also ready: a MOS backport of an already-published
+LLVM guard, not a new LLVM repair or parallel-MIR implementation.
+
+Current-status reconciliation: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
+`gpt-6-astra`, `xhigh` reasoning effort; verified reviewer session
+`01a0db96-e0ef-75e2-89ad-2939c4954446`. Earlier implementation and validation
+credits remain in their linked records.
+
+
+- [wip T5] **Upstream submission campaign — post the queue, wave by wave (IN FLIGHT — 🏁 WAVE 1
+  COMPLETE 2026-07-26).** ✅ **All three Wave-1 items live upstream:** `0016` G_SCMP/G_UCMP = issue
+  [#576](https://github.com/llvm-mos/llvm-mos/issues/576) + PR
+  [#577](https://github.com/llvm-mos/llvm-mos/pull/577) (`wbniv:mos-scmp-ucmp-legalize` @
+  `62dd8731dccb`, maintainer review addressed 2026-08-28, fix + lit test, `Fixes #576`); `0010`
+  coalesce-rotate-Ac = PR
+  [#578](https://github.com/llvm-mos/llvm-mos/pull/578) (`wbniv:mos-coalesce-rotate-ac`,
+  red/green-proven, four live-demo links); DWARF step-6 = PR
+  [#579](https://github.com/llvm-mos/llvm-mos/pull/579) (`wbniv:mos-dwarf-65816-test-docs`).
+  Momentum: **7 PRs merged** as of 2026-09-20; #577 and #579 from Wave 1 are merged,
+  while #578 remains open with the MOSCopyOpt loop-liveness fix.
+  Wave-ordered sequencing + per-item mechanics in
+  [docs/plans/2026-07-26-upstream-submission-campaign.md](docs/plans/2026-07-26-upstream-submission-campaign.md):
+  **Report/fix tracks** — reentrant semantics, rc-undef diagnosis and SDK native-setjmp
+  platform integration (see the current dependency chart), **Wave 3** a16-reachable fixes (`0011`/`0015`, both still
+  requiring producer/reachability judgment). Former candidate `0012` was **RETIRED 2026-08-05 — DO
+  NOT POST**: no upstream producer exists and `0027` removed the downstream producer. **Wave 4** design notes (#320 ABI → far-CC →
+  frame-ABI), **Wave 5** the #320/#321 series (presentation layer already built: review guide + primer).
+- [x] ~~**Push the #591 hardening (DONE 2026-08-05).** Incremental commit
+  `b47ed3ee08e2` on `mos-branch-range-diagnostic`: hand-derived byte-exact fixup matrix (8 rows,
+  tool-verified after derivation), boundary-exact range pairs at all four edges, and the
+  `XFAIL`-gated 65CE02 PCRel16 file whose XPASS after the #549 rebase is the designed drop-the-XFAIL
+  signal. Suites exit 0 (MC 43+1 XFAIL, CodeGen 78+1 UNSUPPORTED). Pushed to live
+  [#591](https://github.com/llvm-mos/llvm-mos/pull/591); GitHub head confirmed at `b47ed3ee08e2`, with
+  macOS/Linux/Windows checks triggered. The explanatory comment was subsequently
+  [posted](https://github.com/llvm-mos/llvm-mos/pull/591#issuecomment-5189214169).~~ ✓
+- [x] **65816 BRL follow-up evaluated 2026-09-20 — optimization premise rejected.**
+  #549/#550 have merged, but 65816 conditional branches cannot relax to a long form.
+  For unconditional BRA, BRL replaces a three-byte absolute JMP with another three-byte
+  instruction and costs one extra cycle. No PR proposed; the blanket ROM-size claim is
+  withdrawn. [Assessment](docs/pr-preparations/2026-09-20/brl-assessment.md).
+- [wip T2] **MVN/MVP bank-order fix — posted as [compiler PR #604](https://github.com/llvm-mos/llvm-mos/pull/604).** Prepared commit
+  `ae3108c31890` against upstream `742d554bf080` fixes immediate bytes and symbolic
+  relocation offsets; both corrections and the full regression are now in downstream `0020`.
+  All five targeted checks pass; MOS MC/CodeGen suites pass 130 tests with one
+  unsupported. [Review bundle](docs/pr-preparations/2026-09-20/README.md).
+  Keep this PR focused on the encoding correction and regression results; simulator
+  setup/conventions are a separate discussion, with no merge dependency.
+  [PR mockup](docs/pr-preparations/2026-09-20/mvn-mvp-pr-preview.html).
+  Published head `ae3108c31890` and description verified; awaiting review/CI. [Downstream validation](docs/pr-preparations/2026-09-20/mvn-downstream-validation.md).
+- [T5] **Separate 65816 simulator discussion:** prepared [draft](docs/pr-preparations/2026-09-20/65816-simulator-discussion-body.md)
+  covers prior discussions, runner selection, CI setup and result conventions.
+  Review/post independently of MVN/MVP; no execution harness implemented yet.
+- [T4] **Reconcile with llvm-mos-sdk#415.** Updated [plan](docs/415-snes-target-reconciliation.md)
+  from the live review on 2026-09-20. Next: isolated baseline + file-level inventory,
+  addressing SDK-style startup, interrupt handlers, vector provenance, CPU config
+  and example wiring. Extract basic platform work from fork-only far runtime.
+  Agree the maintainer's proper-65816-support merge prerequisites and CPU/stack ABI;
+  include native setjmp restoration and #450 zero normalization in the same coherent
+  runtime. Simulator infrastructure remains a separate discussion. No reconciled
+  branch, new runtime validation, upstream comment or platform submission yet.
+- [wip T3] **Upstream the F4 `mos-late-opt` TXY/TYX dead-flag fix** — ✅ **PR
+  [#562](https://github.com/llvm-mos/llvm-mos/pull/562) opened 2026-06-22.** Upstream llvm-mos bug
+  (`MOSLateOptimization.cpp`); **breaking commit = `dbce7ad1e9cd2`** ("Support emitting TXY/TYX on
+  W65816/65EL02", #299, 2023-06-17) — added the TYX/TXY rewrite branches without setting `Load`, so they
+  skip the dead/kill-flag cleanup that predates them (`8416d2408044`, 2022). Carried in the fork as patch
+  `0003`. **Awaiting review/merge** → once merged, drop `0003` + bump the vendor pin.
+  [F4 plan](docs/plans/2026-06-16-321-f4-late-opt-txy-dead-flag.md).
+- [T5] **`__builtin_prefetch`: patches 0034 (MOS: drop `G_PREFETCH`) and 0035 (clang: emit the
+  rw/locality operands as `i32` regardless of C expression width; aimed at llvm/llvm-project).** Fixed and
+  validated 2026-09-23: all six `builtin-prefetch-*.c` torture files compile at three levels with the
+  verifier; tests discriminate on both sides. [PR draft 0034](docs/upstream-prefetch-legalize-pr.md) ·
+  [PR draft 0035](docs/upstream-clang-prefetch-int16-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0034-0035-validation.md).
+  [0034 audit](docs/pr-preparations/2026-09-23/0034-review-audit.md): no code defect;
+  130 standalone suite passes, one unsupported; 28 all-CPU legalization checks pass.
+  [0035 audit](docs/pr-preparations/2026-09-23/0035-review-audit.md): casts confirmed,
+  including `1L`/`2L` on x86-64; 32 frontend cases pass, repairing 21 verifier failures.
+  0035 revised 2026-09-23 per the audit: test covers the two-argument, `long` and `long long`
+  forms (pinned Clang now fails on both triples, fixed passes), comments corrected, old `FIXME`
+  removed. Remaining: publish (user-triggered; 0034 to llvm-mos, 0035 to llvm/llvm-project).
+- [T5] **Indirect register outputs in GlobalISel inline asm (patch 0037; the `g` constraint).**
+  `asm("" : "+g"(x))` is lowered by Clang to `"=*imr,0"`; `InlineAsmLowering` picked the register
+  alternative but never stored the def back through the pointer and rejected the call
+  ("unable to translate instruction: call"; 10 c-torture compilations: `pr65053-1/2`, `pr65956`,
+  `pr88904`; also AArch64 with `-global-isel-abort=1`). Fix in generic `InlineAsmLowering`: keep
+  indirect outputs out of the result accounting and `G_STORE` each def through its pointer, as
+  SelectionDAG does. Tests on MOS and AArch64; corpus differential 10 repaired / 0 changed.
+  [PR draft](docs/upstream-gisel-inline-asm-indirect-output-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0037-validation.md). Aimed at llvm/llvm-project.
+  [Independent audit complete](docs/pr-preparations/2026-09-23/0037-review-audit.md):
+  915 standalone suite passes, one unsupported; 12/12 focused corpus cases pass.
+  September 26: the exact generic/AArch64 packet passes four focused RUNs and
+  168 filtered AArch64/X86 tests, three existing XFAILs, on current LLVM.
+  [Current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
+  Ready to post; remaining: publish when requested.
+- [T5] **`__builtin_return_address` / `__builtin_frame_address` on MOS (patch 0038).** Both
+  intrinsics were unlegalized (15 c-torture compilations). Frame address = the incoming soft stack
+  pointer (fixed frame object at offset 0, no frame pointer forced); return address = the word
+  `JSR` pushed plus one, read from the hard stack by an in-place pseudo that the new
+  `MOSLowerReturnAddress` pass expands last with the depth from a forward dataflow over the CFG
+  (`tsx ; lda $0101+d,x`; 65816 `lda 1+d,s`; SPC700 without the `+1`); levels above 0 and
+  interrupt handlers return 0. [Plan](docs/plans/2026-09-23-return-frame-address.md) ·
+  [PR draft](docs/upstream-return-frame-address-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0038-validation.md). Aimed at llvm-mos.
+  September 26: independently reviewed current-main packet passes five focused
+  commands and 134 MOS suite tests; the additional stack-depth MIR and separate
+  SPC700 0003 limitation are recorded in the [posting packet](docs/pr-preparations/2026-09-26/README.md).
+  Remaining: publish (user-triggered).
+- [T5] **Greedy RA segfault in `SplitEditor::enterIntvAfter` on `ashrdi-1.c` (patch 0040).**
+  MOS's reload hook mints an `Imag16` scratch pointer as an extra virtual def, which
+  `getVDefInterval` gives a live interval and the allocator assigns like any other register;
+  `InlineSpiller::coalesceStackAccess` then erased that reload as a redundant slot access,
+  orphaning the scratch register — its assignment stayed in the interference matrix over a
+  `SlotIndex` with no instruction, and the next region split read it back as "last interference"
+  and dereferenced null. Not `+mos-a16`-specific and not 65816-specific: `mos65c02` reproduces
+  once the case is reduced; 0002 is only the pressure that reaches the sequence. Fix = decline to
+  coalesce an access carrying virtual defs other than the spilled register — the coalescing
+  counterpart to 0033's hoisting guard. c-torture differential 1,364 byte-identical, 1 repaired,
+  1 changed (+1 byte), 0 broken. [Plan](docs/plans/2026-09-24-ashrdi1-greedy-ra-segfault.md) ·
+  [PR draft](docs/upstream-inline-spiller-coalesce-scratch-vregs-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-24/0040-validation.md). Aimed at llvm-mos.
+  September 26: independently reviewed pre-greedy MIR reproduces on pristine
+  current MOS without native features; exact candidate passes both RUNs and
+  132 MOS suite tests. Spill hoisting is disabled on both sides to isolate this
+  contract; no 0033 submission prerequisite. [Posting packet](docs/pr-preparations/2026-09-26/README.md).
+  Remaining: publish (user-triggered).
+<!-- triaged 2026-09-24: the "SPC700 -O2 crashes on any immediate load into an imaginary
+     register" item added with 0038 was a re-discovery of patch 0003 (open upstream PR #584,
+     Done 2026-08-01 below). It only reproduced on the isolated 0038 validation stack, which
+     omits 0003; the project toolchain has the fix. Nothing to do. -->
+- [T5] **Upstream Windows CI red on `llvm-mos/main`: `CodeGen/AMDGPU/si-pre-allocate-wwm-regs-preserve-rci.mir`**
+  (an MSVC comma-space CHECK mismatch), proven pre-existing on
+  [main run 34793262107](https://github.com/llvm-mos/llvm-mos/actions/runs/34793262107) (2026‑09‑14),
+  so not caused by [PR #604](https://github.com/llvm-mos/llvm-mos/pull/604) — the reply if a
+  maintainer queries that PR's red check. Worth an upstream issue; posting is user-triggered.
+- [T5] **Multi-register register operands in GlobalISel inline asm (patch 0041).** Generic
+  `InlineAsmLowering` assumed every register operand occupies exactly one register. MOS maps `"r"`
+  to `Imag8` for everything but `i16`, so a `long` needs four: the tied form
+  (`asm("" : "=r"(i) : "0"(x))`) asserted `NumOpRegs == 1`, and the plain input and the output were
+  rejected outright — so relaxing the assertion alone would not have compiled either torture file.
+  The scoped scalar forms now split/merge least significant piece first, as SelectionDAG's
+  `RegsForValue` does; this does not promise clean rejection of every unsupported shape.
+  Reproduces on AArch64
+  (`i128` with `"r"`) at plain `-O0`; two upstream AArch64 tests that encoded the limitation are
+  updated. 6 c-torture compilations repaired (`20030222-1`, `pr52286`), corpus otherwise
+  byte-identical. Aimed at `llvm/llvm-project`.
+  [Plan](docs/plans/2026-09-24-gisel-tied-inline-asm.md) ·
+  [PR draft](docs/upstream-gisel-inline-asm-multi-register-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-24/0041-validation.md).
+  September 26: independent review exposes the older extraction's MOS-only
+  result-widening dependency. The standalone LLVM packet uses explicit
+  multi-register `G_ANYEXT`; ten focused RUNs and 168 filtered AArch64/X86
+  tests pass, with three existing XFAILs. Ready to post when requested.
+  [Posting packet](docs/pr-preparations/2026-09-26/README.md); no 0037 prerequisite.
+- [x] **GlobalISel physical-register inline-asm exhaustion repaired by 0056 (2026-09-25).**
+  An independent AArch64 i128 `{cc}` input reproduces `Ran out of registers to allocate!`
+  on the preserved assertion-enabled baseline. The generic helper validates the entire
+  physical range and emits a clean diagnostic; virtual allocation is independent of class
+  member count. Direct output, input, tied, and indirect-output checks pass at O0/O2 with
+  fallback enabled/disabled, and the 1,067-test AArch64/ARM/X86 GlobalISel run succeeds.
+  MOS's older `=a` witness remains intercepted by 0043. [Evidence and attribution](docs/investigations/2026-09-25-shift-inlineasm-fixes.md)
+  · [structured record](docs/defects/gisel-inline-asm-register-bounds.json).
+  September 26: exact current-LLVM packet independently reviewed and validated;
+  four focused RUNs and 168 filtered AArch64/X86 passes, three existing XFAILs.
+  Ready to post; [current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
+- [x] **SelectionDAG physical-register inline-asm exhaustion repaired by 0057 (2026-09-25).**
+  Seven isolated operand forms fail on the preserved assertion-enabled baseline
+  and receive clean diagnostics at O0/O2 with the fix, including live `callbr`
+  results on both edges. Cross-target inline-asm/callbr and MOS suites pass;
+  rebuilt Clang and LLD are installed. [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-inlineasm.md)
+  · [structured record](docs/defects/selectiondag-inline-asm-register-bounds.json).
+  September 26: exact current-LLVM packet independently reviewed and validated;
+  two focused RUNs and 168 filtered AArch64/X86 passes, three existing XFAILs.
+  Ready to post; [current validation](docs/pr-preparations/2026-09-26/llvm-validation.md).
+- [x] **AArch64 unknown inline-asm operand type abort repaired by 0058 (2026-09-25).**
+  The original `i4096` input aborts on both preserved baselines and receives a
+  clean diagnostic with the `r`/`x` type guards. All 32 diagnostic cases pass;
+  277 cross-target tests pass with four existing expected failures. The full
+  regression uses 0057's `callbr` error recovery. AArch64 candidate retained.
+  September 26: independently reviewed current-LLVM packet passes 19 focused
+  RUNs and 169 filtered AArch64/X86 tests, three existing XFAILs, with 0057
+  applied to both sides. Ready as a dependent submission.
+  [Evidence and attribution](docs/investigations/2026-09-25-aarch64-inlineasm-unknown-type.md)
+  · [structured record](docs/defects/selectiondag-inline-asm-nonstandard-integer.json).
+- [x] **SelectionDAG vector conversion assertions repaired by 0059 (2026-09-25).**
+  The unchanged `<64 x i64>` input fails on preserved 0057/0058 compilers and
+  receives the expected diagnostic with the generic split/join checks. Thirty
+  crashing configurations now diagnose; supported conversions still compile.
+  Cross-target suites: 278 pass; MOS suites: 173 pass. Clang/LLD rebuilt and
+  installed. The original regression requires 0057's virtual-allocation repair;
+  September 26: independent review and exact-current LLVM validation complete;
+  24 focused RUNs and 169 filtered AArch64/X86 passes, three existing XFAILs,
+  with 0057 applied to both sides. Ready as a dependent submission.
+  [Evidence and attribution](docs/investigations/2026-09-25-selectiondag-vector-parts.md)
+  · [record](docs/defects/selectiondag-inline-asm-vector-parts.json).
+- [x] **Revalidate coalescing guard 0015 (2026-09-25).**
+  The recovered C witness is repaired by existing 0028, with matching-input
+  evidence and unchanged allocations; 0015 avoids the trigger. The stock MIR
+  model reproduces; stock C reachability remains unproven. Retain the guard and
+  historical evidence; route this witness through 0028 rather than a separate
+  allocator-fix PR. [Investigation](docs/investigations/2026-09-25-coalescing-0015-revalidation.md)
+  · [record](docs/defects/mos-coalescing-rc-undef.json).
+- [x] **Fix llvm-reduce parallel MIR crash.**
+  Patch `0060` keeps machine functions in parallel MIR workers. The retained
+  eight-instruction input fails on the preserved reducer and reduces with the
+  candidate at `-j 2`; the output remains interesting. The focused MIR test
+  and existing parallel IR test pass. This is retained September 25 evidence.
+  September 26 reconciliation found LLVM's existing guard commit `b1ba3d515a02`
+  predates the local report. The [ready MOS backport](docs/pr-preparations/2026-09-26/0060-pr-body.md)
+  rejects MIR `-j > 1` with a clean diagnostic, retaining serial MIR and parallel
+  IR; it does not silently fall back or claim general parallel-context safety.
+  Exact-current assertion-enabled validation passes all nine RUNs and 180
+  reducer-suite tests, 27 unsupported, with independent receipt review.
+  The rejected LLVM fallback attempt and original candidate remain dated
+  evidence; no duplicate LLVM submission is needed. Nothing posted.
+  [Fix](docs/investigations/2026-09-25-llvm-reduce-parallel-mir-fix.md)
+  · [record](docs/defects/llvm-reduce-parallel-mir-crash.json).
+- [T2] **Plan exhaustive 65816 opcode roundtrip coverage (2026-09-25).**
+  [Plan](docs/plans/2026-09-25-65816-all-opcode-roundtrip.md) written; implementation
+  is deferred at the user's request. Require all 256 opcodes in all four M/X
+  contexts, independent expected bytes, instruction boundaries, and reassembly.
+  Resolve the BRK signature contract and add WDM to the 255-row oracle coverage.
+  This is planned test coverage, not a newly confirmed compiler defect.
+- [x] **Prepare `0043` for posting (September 26).** Exact current-MOS patch,
+  copy-ready draft, twelve reviewed clean diagnostics, positive controls,
+  isolated assertion build and full MOS suites pass. [Packet](docs/pr-preparations/2026-09-26/README.md).
+- [x] **Prepare `0046` for posting (September 26).** Reviewed inferred table
+  bound and compile-time row-count guard; isolated assertion build and existing
+  positive suites pass. No runtime-red claim for this latent invariant repair.
+- [x] **Prepare `0047` for posting (September 26).** Current upstream's MCAsmInfo
+  reference API is accommodated; all eight field widths, object round trips,
+  and isolated MOS suites pass. [Validation](docs/pr-preparations/2026-09-26/mos-validation.md).
+  These are local preparations only; nothing is posted or pushed.
+- [x] **MOS correctness queue repaired (2026-09-25).** Patches `0049`–`0054` backport
+  generic vector scalarization, scalarize float/double arithmetic, repair the byte-index
+  `G_TRUNC`, preserve out-of-bank section-offset relaxation, correct two stale test
+  expectations, and revalidate status-register save ranges during backward scavenging.
+  The section-offset failure was in downstream relaxation suppression; this supersedes
+  the earlier parser-width diagnosis retained in the September 24 investigation.
+  **171 lit passes, 2 unsupported, 0 failures; 36/36 vector configurations compile.**
+  Both original vector tests compile at `-O0` with a16/xy16; the focused status-save
+  regression fails on the preserved baseline and passes compilation and SNES runtime.
+  Installed tools refreshed. Upstream submissions remain separate work.
+  [Evidence and attribution](docs/plans/2026-09-25-mos-correctness-queue.md) ·
+  [float vectors](docs/defects/mos-float-vector-legalization.json) ·
+  [byte index](docs/defects/mos-zp-index-same-width-trunc.json) ·
+  [bank relaxation](docs/defects/mos-bank-relax-section-offset.json) ·
+  [status scavenging](docs/defects/mos-vector-o0-status-scavenge.json).
+- [T5] **Spill hoisting mints unallocatable scratch registers (patch 0033).** Greedy's post-allocation
+  `hoistAllSpills` re-emits spills through `storeRegToStackSlot`; MOS's soft-stack `STStk` mints a scratch
+  `Imag16` vreg that is never assigned: `Remaining virtual register` on assertion builds, a segfault in
+  Machine Copy Propagation on release builds (9 of 12 affected c-torture files at `-O2`). `mos-clang` has
+  hidden it with a blanket `-mllvm -disable-spill-hoist` (which also costs the optimization everywhere and
+  does nothing for `llc`/other frontends). Fix: generic guard in the hoister (refuse a group whose
+  re-emitted spill introduces vregs) plus removal of the driver flag.
+  [PR draft](docs/upstream-spill-hoist-scratch-vregs-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0033-validation.md).
+  [Audit](docs/pr-preparations/2026-09-23/0033-review-audit.md) confirmed the crash fix and found
+  the rollback statistic decremented per instruction; revised 2026-09-23 (per-group `NumHoisted`,
+  added to `NumSpills` only when the group is kept) and revalidated. The audit's provenance
+  finding was a container mount alias, not an unpatched compiler: the follow-up audit
+  verified the original invocation and withdrew that finding. The current test comment
+  obeys AGENTS.md; a fresh revised-0033-only MOS suite passes 130 tests, one unsupported.
+  Remaining: publish (user-triggered).
+- [T5] **Zero-page indexed globals: patch 0036 prepared and installed.** The compact
+  form is intended under the existing whole-object zero-page contract. Classify explicit
+  zero-page sections when selecting indexed opcodes, and inspect the address operand of
+  indexed stores. Direct emission and print/reassembly now agree: 27 C-case mismatches
+  repaired; 18 ordinary-section controls unchanged; standalone suites 132 pass / one
+  unsupported; 36 local width-mode compilations verify and round-trip cleanly.
+  [PR draft](docs/upstream-zero-page-indexed-globals-pr.md) ·
+  [validation](docs/pr-preparations/2026-09-23/0036-validation.md).
+  [Independently reviewed](docs/pr-preparations/2026-09-23/0036-claude-review.md) and
+  [review audited](docs/pr-preparations/2026-09-23/0036-review-audit.md). No code revision
+  requested. Remaining: submission preparation and publication (user-triggered).
+- [T5] **Post the register-scavenger live-`$p` fix PR (`0011`)** (user-triggered). The upstream
+  producer is established: gcc torture `strlen-4.c` at `-O0` on stock `mos6502` fails on pristine
+  upstream and is fixed by 0011 alone, with no other change across the 4,170-comparison corpus
+  ([record](docs/pr-preparations/2026-09-22/0011-stock-6502-reachability.md)); the `+mos-a16`-only
+  MIR test is replaced by one that runs upstream. The
+  `gh pr create` recipe is in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 4) · body
+  [scavenger](docs/upstream-scavenger-live-p-pr.md) ·
+  [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md).
+  **`0012` RETIRED — DO NOT POST (user decision 2026-08-05):** the direct MIR test manufactured
+  `LDCImm 1`; no current upstream producer emits it, and `0027` (`357fe37`) corrected the former
+  downstream a16 producer to canonical `-1`. Its patch and draft remain historical evidence only.
+- [T5] **Post the DWARF step-6 test+docs PR** (user-triggered; ROADMAP step 6). Branch
+  `wbniv:mos-dwarf-65816-test-docs` (`0ae9415`) pushed and ready. Exact `gh pr create` in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 5) · body
+  [docs/321-upstream-dwarf-output-elf-companion.md](docs/321-upstream-dwarf-output-elf-companion.md).
+- [T5] **Post the #321 CC frame-ABI design note** (user-triggered; note, not a PR). Implementation-backed
+  evidence for the calling-convention discussion: the per-frame DP-window/stack-relative ABIs are feasible
+  but NULL on real code (0/13 functions profit — locals are `__rc`-resident), so keep the soft static stack
+  by measurement. Exact `gh issue comment 321` (and/or Discord CC thread) in
+  [upstream-contribution-status](docs/upstream-contribution-status.md) (item 6) · body
+  [docs/321-upstream-cc-frame-abi-note.md](docs/321-upstream-cc-frame-abi-note.md) · record
+  [frame-ABI study §Outcome](docs/plans/2026-06-20-321-frame-abi-build-all-three-and-measure.md).
+- [T4] **#320 far-pointer codegen body — feature-complete, but Future/blocked** (not a postable artifact yet).
+  The fork's whole far-pointer slice (far calls (b); far function pointers (a) incl. the clang `far`/`long_call`
+  attribute, typed `far_fn_t` variable, `sizeof(far*)==4`, the far_indir/`isFarSymbol` crash fix) is now
+  feature-complete + pushed `origin/wt/320-far-followups`, verified both emulators. It forms the bulk of the
+  eventual #320 PR but is **gated on the ABI-blessing design note** (the M1 "#320 post design note upstream"
+  item) — so it's tracked under *Future/blocked* in
+  [upstream-contribution-status](docs/upstream-contribution-status.md), not ready-to-post.
+- [x] ~~**LTO + `+mos-a16` bitmask-loop early-exit bug** — draft upstream issue~~ → **RETRACTED as a
+  MISDIAGNOSIS (2026-06-28); DO NOT POST.** Controlled rebuild proved `cmp #$10` is `_fact_emit`'s
+  `q->n < UPQ_MAX_JOBS` (=16) queue-full exit, not the shift counter `r`: `-DUPQ_MAX_JOBS=20` moves it to
+  `cmp #$14` (tracks the macro). No row-skip miscompile. Issue body + status item 11 banner-retracted.
+  [plan/evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
+- [wip T2] **(LOW-PRIORITY follow-up) The *real* factorial stall** behind the `3ab028e` delay-counter workaround —
+  **now believed logic/timing, NOT a compiler bug.** The real LTO `_fact_emit` shows a *correct* 32-bit
+  zero/nonzero test (`lda;bne ×4; jmp`), the same codegen a `dirty_rows == 0` gate uses — so the stall was
+  most likely the gate reading across the 2-frame, 16-jobs/frame drain, which the delay counter sidesteps.
+  **No compiler issue to file.** Only remaining (optional) certainty step: restore the pre-`3ab028e` gate and
+  run it under LTO (bsnes-jg suffices; MAME needs the absent SNES IPL). The SDK now builds — the earlier
+  `__memset_far` "blocker" was a `MOS_TOOLCHAIN` host-vs-container path footgun (pass
+  `/work/build/llvm-mos-install`, not `$PWD/...`), not a snes-far defect.
+  [evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
+- [T1] **Re-enable CI auto-triggers when repo goes public.** Add `push:` + `pull_request:` to
+  `.github/workflows/smoke.yml` (currently `workflow_dispatch`-only — parked until public). One-liner:
+  uncomment the two trigger lines in the `on:` block.
+
+### Distribution / Packaging
+
+- [T4] **#321 Cross-platform toolchain builds — interim `linux-arm64` + `windows-x86_64` (keep `linux-x86_64`),
+  cross-compiled from the existing Linux x86-64 Docker** (no mac/Win CI runners; scope locked 2026-06-25).
+  Until #321 merges/fixes upstream, upstream CI emits no binary carrying these patches, so arm64-Linux /
+  Windows devs have no prebuilt fork — ship those two. Only the host binaries (clang/lld/llvm-*) differ per
+  platform; the MOS compiler-rt builtins + clang resource headers + SNES SDK are host-agnostic and copied once
+  from the canonical Linux build, so the cross builds disable the runtimes sub-build and reuse
+  `build/llvm-mos/bin` tablegens via `LLVM_NATIVE_TOOL_DIR`. **Inc 0 DONE** — build side (`dd2802a`) +
+  `dev/package-release.sh` generalized to a `PLATFORM` arg (native target artifacts reused, multi-format strip
+  via native objcopy, Windows curated-`.exe`/`.zip` branch, qemu/wine self-test via `dev/cross-selftest.sh`);
+  `linux-x86_64` proven **byte-identical** (orig-vs-refactored staged-tree diff). **Inc 1 DONE+validated** —
+  `linux-arm64` built, packaged, qemu self-test PASS with ROM `sha256 == native`. **Inc 2 DONE (functional
+  deferred)** — `windows-x86_64` built/packaged (curated `clang.exe`+`mos-clang.exe`+`ld.lld`+binutils aliases
+  + 3 mingw DLLs, `.zip`); **wine can't run the mingw-LLVM binary** (faults `0xC0000005` in core codegen at
+  every `-O`), so it ships on the **structural + codegen-identity-by-construction** gate with the functional
+  `-Os` check **deferred to real Windows** (soft-fail `exit 2`, BEFORE-PUBLISH notice). **Inc 3 DONE** —
+  `task cross-build PLATFORM=` + `task package-all`. **REMAINING:** real-Windows functional verification +
+  publish. **Deferred:** `macos-arm64` (osxcross + a user-supplied macOS SDK in `dev/sdks/` — Apple licensing;
+  functional self-test needs a real Mac) — out of interim scope, likely retired by upstream CI. Whole
+  capability retires when `0001–0009` land upstream. [plan](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
+
+### Verification backlog (triaged out of Inbox 2026-08-03)
+
+_The runnable survivors of the 18 auto-captured `[verify]` flags (T0-classified; the other 13 were
+planned/gated/superseded/stale — dispositions recorded as comments in the Inbox). Workflow per
+`[verify]` items: run the linked plan's numbered verification steps, paste raw output + PASS/FAIL
+into the plan, then promote to Done. **Serialize the runs — they share the hot build tree.**_
+
+
+## Watch
+
+- **Upstream #585 (`G_ASHRE` ASR legalization, mlund)** — lands in `0002`'s core files
+  (legalizer/combiner/GISel tds): reconcile on the next vendor rebase; consider re-expressing the
+  fork's a16 s16 `cmp #$8000; ror` ASHR through `G_ASHRE` post-merge. Validation complete and
+  review comment posted (status row 22). [PR](https://github.com/llvm-mos/llvm-mos/pull/585)
+
+_Items here need periodic checking (e.g. an upstream llvm-mos change to track, or a deferred decision to
+revisit) rather than active work._
+
+- **Phase-3 `Ac16`/ZP-residency rework — CLOSED 2026-06-26 (measured net-negative); only an *actual* overflow
+  re-opens, and not via residency.** The two crashes once lumped into this core already got orthogonal fixes
+  (`globals.c`/`a16regpress.c` `-Os` RA-crash → patch `0009`; scavenger-N/Z → `0011`+`0012`; both now positive
+  gates). The 2026-06-26 **trigger-check** then settled the rest: re-open trigger **(b) fired** (new
+  CORDIC/Mandelbrot/Hopalong kernels put 6 real fns at ~10/14 pairs, `cordic16_atan2` at the full 14/14), so we
+  ran the gated spike — and **measured pre-RA `Ac16` residency as net-negative**: it fires heavily but gives
+  **zero** peak-pressure relief and a **+24 B** regression (the pool-fill is genuinely-simultaneous liveness the
+  single accumulator can't thread away). So a `measure-zp-pressure.sh` FIRE is **necessary but not sufficient**
+  — residency is *not* the remedy. **Watch only for** an *actual* realistic `a16-zp-pressure-overflow`
+  (`pr15296`-class — note `pr15296` itself now **passes** on the current stack, a stale XFAIL resolved
+  2026-06-26; this watches for a *new* one) in **real** (not hand-reduced) code; if one appears it needs a **different** remedy (e.g.
+  better `Imag16` spill packing), **not** accumulator residency. Full record:
+  [Phase-3 spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md) ·
+  [a16-regalloc-pressure-failure](docs/investigations/65816-a16-regalloc-pressure-failure.md) ·
+  [deferral formalization](docs/plans/2026-06-20-321-a16-threading-phase-3-formalize-the-deferral-r.md).
+
+
+## Parked
+
+- **Automate the live upstream dashboard** — parked 2026‑09‑27 until next week’s token reset; was ranked T2. Its [plan](docs/plans/2026-09-26-live-upstream-dashboard.md) leaves automated candidate review and cache invalidation from GitHub events as remaining work; the released dashboard does not depend on them. Reason for T2: bounded tooling with a written spec.
+- **Add real lowercase glyphs (extend both fonts to `0x20..0x7F`).** `_title_glyph` currently
+  folds `a-z`→`A-Z` at render time, so titles render as caps; five demo titles are written in mixed
+  case (`NaN / POLES`, `div_t / lldiv_t`, `MEDIAN 3x3`, `i & -i`, `s8/16/32/64`). Extending the range
+  costs +512 B font8, +2048 B font16 in the near-code window (`mandel-double` already needs
+  `TITLE_FONT16_FAR` at 4 KB), and widens the title's VRAM CHR footprint by 5 KB — check no demo's
+  VRAM lands in the newly clobbered window. `` ` ``, `{`, `|`, `}`, `~` come free with the same
+  extension (none is used by any title today; `dev/title-charset.sh` gates them). Deleting the two
+  folding lines is the whole render-side change.
+- **#320 post design note upstream** (user-triggered). Post the drafted note
+  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)) to #320 / the
+  llvm-mos Discord (@asiekierka/@mysterymath) — bring a running implementation, not a question.
+  Note is drafted & ready; posting is the manual step. **Now also carries a "Code model: near vs far"
+  section** (2026-06-22): near=`small`/default, far=`medium/large`/per-symbol → no `-mcmodel` mode; the
+  SNES near-code budget is a link-time contract enforced in the SDK platform (see Done [snes-near-code-budget]).
+- **Coherent a16 16-bit lane-model widening (option A from the G_ADD/G_SUB lanes verdict)** — the
+  1.48% prize (20 corpus slices improve, best −929 B) is real but unreachable by changing `G_ADD`
+  alone: with `G_LOAD`/`G_STORE`/`G_PHI`/shifts/`G_SELECT` still byte-lane, a 16-bit add is a
+  marshalling island and nets **+281 B corpus-wide**. Requires widening the whole lane model
+  together — roadmap-sized. First diagnostic on reopen: the undefined-physreg verifier failures at
+  the s16 carry seam (`pcooker_sim`, `rdiff_sim`).
+  [investigation](docs/investigations/2026-08-04-g-add-sub-s16-lanes.md).
+- **HDMA backdrop gradient for the trimerge page** — visual-polish idea deferred from the
+  [99b trimerge visual fix](docs/plans/2026-07-27-99b-trimerge-visual-fix.md) because snesgfx has
+  no HDMA-gradient support yet; revisit if/when the library grows one (the blossom HUD's HDMA
+  mode-split is the closest existing machinery).
+- **Mesen2 as a third emulator** — abandoned for now: the prebuilt crashes on 26.04
+  (glibc-2.43) and headless `--testrunner` won't run Lua; would need a source build against 26.04.
+  MAME + bsnes-jg already give a two-emulator cross-check, so this is shelved unless a third opinion
+  is needed. [second-emulator plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
+- **Formal #320/#321 psABI document** — deferred as premature: llvm-mos is implementation-first
+  (@mysterymath won't bless an ABI ahead of a high-quality implementation). Promote once a credible
+  implementation exists or the maintainers ask. Overlaps the WDC816CC/ORCA-C prior-art item above.
+  [upstream design-note plan](docs/plans/2026-06-14-320-upstream-design-note.md).
+
+
+## Done
+
+- ✅ 2026-09-27 — [carry-profitability] Measured three pressure models and an object selector. See [report](docs/investigations/2026-09-27-carry-profitability-model.md).
+
+- 2026-09-27 — **XY16 near decoder / split Y index fixed.** Fused byte/word Y accesses prevent high-byte loss; an independently isolated near-address bank-wrap guard preserves DBR. The unchanged 62-work gallery passes `0x5CF0`, and both permanent fixtures pass all twelve width/LTO configurations. [Investigation](docs/investigations/2026-09-27-near-y-decoder.md) · [near-Y record](docs/defects/mos-xy16-near-indirect-y-clobber.json) · [bank-wrap record](docs/defects/mos-near-index-bank-wrap.json).
+
+- ✅ 2026-09-26 — [asmprinter-long-address-pr] Drafted the `0044` upstream PR body +
+  pin-level isolated validation; confirmed by build (not inferred) that `0044` alone
+  still narrows to zero page without `0039`, passes fully once stacked. See
+  [validation](docs/pr-preparations/2026-09-26/0044-validation.md).
+
+- **2026-09-25 — Older-report reproduction and evidence enforcement (OpenAI Codex; original credits retained).** Rechecked narrow-count s64 shifts, reconstructed inline-bitboard pressure, nine existing pressure witnesses, and reentrant semantics. 132 non-LTO/verifier compiles pass; narrow-shift (`0x6A2B`) and inline-bitboard (`0xC074`) runtime probes agree across host/default/a16/xy16 on MAME and a16 on bsnes-jg. The two historical failure reports remain **not reproduced**, pending missing baseline evidence; no new compiler fix is claimed. Added mandatory [evidence/closure rules](docs/howto-defect-evidence.md), three structured status records, and a pre-commit checker with 12 tests. [Full results and limitations](docs/investigations/2026-09-25-older-defect-recheck.md).
+
+- **2026-09-25 — Plain near indirect s16 argument stores fixed (OpenAI Codex; broader A:X finding by Claude).** `*p = v` now uses the ABI bytes directly: **13→8 B** in a16/xy16; store-and-return is **15→12 B**. Preserve native indexed, shared-value, arithmetic, and call-preserved contexts. Also corrected Codex's preceding absolute-store predicate to preserve atomic word stores, with indirect/absolute/shared-value atomic tests. All 153 reduced comparisons have no growth (18 improvements). Census: 407/407 native inputs verify, only the new fixture changes (−8 B per native mode); 372 default pairs are identical, with 35 matching baseline failures. Full MOS lit: 162 pass, 2 unsupported, the same 4 failures. Main compiler matches the validated candidate; both store lit tests, host/MAME/bsnes store fixtures (`0x8509`, `0xDBA7`), and native-copy control (`0x5A3D`) pass. `0002` round-trips. [Focused plan, results, and attribution](docs/plans/2026-09-25-near-indirect-s16-store-residency.md).
+
+- **2026-09-25 — Near absolute s16 argument stores fixed (OpenAI Codex; original finding by Claude).** `g = v` now uses `sta g; stx g+1; rts`: **14→7 B, estimated 27→14 cycles** in a16 and xy16. Gate on a byte-built value with local byte/absolute-store uses; preserve native producers, native consumers, and values crossing calls/inline assembly or blocks. `0002` regenerated and round-trip checked; installed main compiler updated. New lit and host/MAME/bsnes regression pass (`0xDBA7`); full MOS lit has 161 passes, 2 unsupported, and the same 4 existing failures. Census: all 406 native inputs verify, 52 smaller per mode, no larger objects (−410 B a16 / −413 B xy16); 371 successful default pairs are byte-identical, with identical diagnostics for 35 baseline failures. Of these, 51 improvements affect existing inputs; one is the new regression fixture. The subsequent indirect-store fix also corrects the atomic-store omission in this predicate; broader mixed-use costs stay in M2. [Diagnosis, evidence, reproduction, and attribution](docs/plans/2026-09-25-near-s16-store-residency.md).
+
+- ✅ 2026-09-25 — **Independent review of Claude's defect batch.** Extended 0043 to reject
+  too-wide explicit register names reachable from C; narrowed 0047 to directive text output;
+  added 0046's compile-time table-count check and missing lit build helpers. Updated tests,
+  docs, and Claude/Codex attribution. Full MOS suites: 160 pass, 2 unsupported, same 4 failures;
+  331 assembly round trips, 34 undef-lane checks, farbank on both emulators, and both rebuilt
+  video ROMs' stream/entropy checks pass. Scheduler size regressions remain open above.
+  [Review and evidence](docs/pr-preparations/2026-09-25/claude-batch-review.md).
+
+- ✅ 2026-09-25 — [rdiff-title-card-dominates] root cause: `rdiff.c`'s 32×24 grid left only ~110 B of soft-stack
+  headroom (thinnest of any demo), which overran into `gs_u`/the resident `TitleLayer`, randomly reactivating
+  the title for thousands of frames; shrunk grid to 32×20 (corpus gate untouched — separate 8×8 sub-grid),
+  fixed `dev/rdiff.sh`'s false capture-timing comment + frame counts (0% → 96.4% non-black @ frame 6000). See
+  [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
+- ✅ 2026-09-25 — [far-scalar-split-measure] far s16 byte-split: legalizer p2 fallback, no `Ac16` long pseudo; GO (gated), bank seam safe. See [investigation](docs/investigations/2026-09-25-far-scalar-split-measurement.md).
+- ✅ 2026-09-25 — [reel-apollo-entropy] not a display bug: the battery ROMs lacked their packed video stream; added `battery-post:` + `dev/battery-video-selfcheck.sh`. See [plan](docs/plans/2026-09-25-reel-apollo-battery-stream-pack.md).
+- ✅ 2026-09-25 — [longx-global-measure] `long,X` (`bf`/`9f`) far-global Phase 1: **GO** (46→21 B, loops 86–168→20–25 B); non-indexed long ALU NO-GO. See [investigation](docs/investigations/2026-09-25-longx-global-measurement.md).
+- ✅ 2026-09-25 — [farptr-hoist-measure] NO-GO: `loop.c` hoist illegal (16-bit wrap); legal shapes already hoist, win is `[dp],Y` inc 2. See [investigation](docs/investigations/2026-09-25-farptr-hoist-measurement.md).
+- ✅ 2026-09-25 — [dpy-indexed-phase2] `[dp],Y` Phase 2 inc 1: a compile-time-constant far
+  displacement in `[1,3]` now folds to `lda/sta [dp],y` (`b7`/`97`) off the same Imag32 quad instead of a
+  32-bit pointer add — far `uint32_t` read 311→143 B (−54%), far `uint16_t` 107→75 B; new
+  `dev/run.sh farbank` bank-crossing gate + `CodeGen/MOS/far-indir-indexed.ll`. Exposed a separate pre-RA
+  machine-scheduler carry-pressure cliff (see Inbox). See
+  [plan](docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md).
+- ✅ 2026-09-24 — [title-entropy-gate-wiring] Wired `dev/title-entropy.sh` as an opt-in `--title-entropy`
+  leg of `dev/verify-web-roms.sh` over the published manifest set, 3 frames × 8 runs. See
+  [plan §follow-ups](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+- ✅ 2026-09-24 — [newton-basin-capture] Raised `dev/newton.sh`'s bsnes-jg frame count and MAME `SHOT_AT`/`-seconds_to_run` from 500/12s to 6500/114s so both published screenshots show the completed basin fill (98.3% non-black vs 3.1% before); gate hash unchanged (`0x4D8B`, PASS). See [plan §deferred](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
+- ✅ 2026-09-24 — [dpy-indexed-measure] Measured `[dp],Y` (`b7`/`97`): **GO** — 36→19 B / 50→28 cy single access, 68→10 B loop body; 0 genuine `b7`/`97`/`9f` in 487 SNES ROMs. See [investigation](docs/investigations/2026-09-24-dpy-indexed-measurement.md).
+- ✅ 2026-09-24 — [far-lit-coverage] Far/packed-24 codegen had zero lit coverage; added four fork-local
+  tests (`CodeGen/MOS/far-addressing.ll`, `far-call.ll`, `far-legalizer-bridges.ll`, `far-phi.ll`, patch
+  `0048`) pinning `$af`/`$8f`/`$a7`/`$87` selection, `$22`/`$6b`/`$5c` far call/return/tail, the
+  `p2↔s32` and `p3↔3×s8` legalizer bridges and the `G_PHI(p2)` legalisation. `dev/run.sh lit`: 163
+  discovered (was 159), 157 pass, the same 4 known-failing baseline.
+  See [audit §5](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#5-testing-coverage--the-weakest-layer-as-a-category-of-its-own).
+- ✅ 2026-09-24 — [mc-addr-asciz-symbolic-crash] `llvm-mc -show-encoding` no longer crashes on a symbolic
+  `.mos_addr_asciz`: the parser now round-trips the directive as raw text when the streamer can't
+  represent an unresolved symbolic value (patch `0047`, pristine-upstream). The September 25
+  review removed the unnecessary modifier spelling and integer-evaluation edits; all eight
+  directive widths now have object round-trip coverage. See [plan](docs/plans/2026-09-24-mc-addr-asciz-symbolic-crash.md).
+- ✅ 2026-09-24 — [roundtrip-gate] Wired `dev/probe-far-roundtrip.sh` into `dev/run.sh roundtrip` (all 3
+  modes, `--all` 117-fixture default; `--far-only` opts into the fast far/packed24 subset) — confirmed
+  the 0-divergent baseline and the FAIL/exit-code path. See
+  [audit §6.4](docs/investigations/2026-09-24-mos24-far-addressing-completeness-audit.md#64-nothing-tests-this).
+- ✅ 2026-09-24 — [fixupkinds-addrasciz-row] `MOSFixupKinds.cpp`'s `Infos[]` had 14 initialisers for 15
+  fixup kinds; added the missing `AddrAsciz` row (`TargetSize=0`, deliberately — never relax, correct
+  for this variable-width data directive) so the table matches its own "same order as the header"
+  contract (patch `0046`, pristine-upstream). See [plan](docs/plans/2026-09-24-fixupkinds-addrasciz-row.md).
+- ✅ 2026-09-24 — [asmprinter-a16-immediate] 16-bit immediates now print an explicit `mos16(...)` width when
+  the value would fit 8 bits, so a `+mos-a16` `adc #66` cannot reassemble to 2 bytes and desync the M=0
+  instruction stream (patch `0045`, downstream-only — no upstream target). Round-trip 32 → 0 divergent over
+  all 117 `examples/65816` fixtures, in all three modes. See [plan](docs/plans/2026-09-24-asmprinter-a16-immediate.md).
+- ✅ 2026-09-24 — [asmprinter-long-address] 24-bit operands now print an explicit `mos24(...)` width, so far
+  load/store and the `$5C` long jump survive a `-S`-then-reassemble round trip instead of silently collapsing to
+  their DBR-relative / bank-local 16-bit siblings (patch `0044`, printer-side; `0039` was the parser half). No
+  `jml` mnemonic needed — the modifier disambiguates `$5C`. Far fixtures 4 → 0 divergent (default 8-bit).
+  See [plan](docs/plans/2026-09-24-asmprinter-long-address.md).
+- ✅ 2026-09-24 — [mos16-constant-truncation] An explicit width modifier on a constant no longer matches a
+  narrower operand (`lda mos16(240),x` selected `zp,X`; `mos24($123456)` truncated to a byte) — patch `0039`,
+  verification completed on the rebuilt toolchain (lit: the four known failures only; corpus 80/80; corpus-a16
+  79/79, 0 xfail). PR draft queued in [upstream status](docs/upstream-contribution-status.md); posting is
+  user-triggered. See [plan](docs/plans/2026-09-24-mos16-constant-truncation.md).
+- ✅ 2026-09-24 — [inline-asm-physreg-width] MOS inline-asm constraints `a`/`x`/`y`/`R`/`d` now reject an
+  operand wider than their 8-bit register instead of truncating it (patch `0043`, AVR precedent).
+  See [plan](docs/plans/2026-09-24-inline-asm-num-registers.md).
+- ✅ 2026-07-13 — [dp-arg-cc] DP-pointer-arg CC crash fixed upstream (issue #561 closed, PR #563 merged
+  `8be054612`); fork patch 0008 retired. TODO was stale by ~2 months (caught by the 2026-09-24 #320 audit).
+  See [plan](docs/plans/2026-06-22-320-far-value-residuals.md).
+- ✅ 2026-09-24 — [vacuous-verify-sweep] Last 2 of 23 demo gate scripts (`blossom.sh`, `mandel-oop.sh`) got the real
+  `-fno-lto -c` verify leg. The `a16-rc-undef-ra-pure-virtual` blocker is fixed by patch `0028`, so no XFAIL wiring was
+  needed; both gates GREEN (MAME + bsnes-jg). See [plan](docs/plans/2026-08-03-123-snes-nmitally.md).
+- ✅ 2026-09-24 — [scavenger-p-undef-capture] Corrected an over-broad finding (only one of the two
+  named `.mir` files was actually orphaned — `insert-rep-sep-cloned-kills.mir` was already inside
+  `0002`) and captured the real one, `scavenger-p-undef.mir` (a downstream-only `+mos-a16` regression
+  for the 0011 scavenger fix; 0011's actual code fix already lives inside `0002`), into a new
+  standalone patch `0042-mos-scavenger-p-undef-a16-test`, applied by `dev/toolchain.sh` and listed in
+  `dev/regen-patch.sh`'s `STANDALONE_MOSDIR` so a future 0002 regen won't duplicate it. Validated: the
+  patch reproduces the file byte-for-byte against a scratch tree. Not validated: a live end-to-end
+  `dev/regen-patch.sh` round trip against the shared `vendor/`, deliberately skipped — it would also
+  regenerate `0002` from the tree's *other* uncommitted, unrelated `MOSRegisterInfo.*` edits, which
+  aren't this session's to fold in.
+- ✅ 2026-09-24 — [toolchain-bootstrap-variants] `dev/toolchain.sh` bootstraps from the pin again: `-vendor` twins added for `0035`/`0037`/`0041` (+ the missing `0028` line), all 26 patches apply to a fresh `8be0546` checkout, `clang-23` built and assembly-equivalent to the shared build. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
+- ✅ 2026-09-24 — [toolchain-pin-bootstrap] Proved end to end: fetch+checkout hits the pin exactly, but the tracked patch stack does NOT apply cleanly — `0035-clang-prefetch-int16-operands` fails at patch 11/25, no artifact was produced. See [record](docs/pr-preparations/2026-09-24/toolchain-pin-bootstrap.md).
+- ✅ 2026-09-24 — [toolchain-llc] `dev/toolchain.sh` now rebuilds `llc`/`opt`/`llvm-mc`/`llvm-objdump`/`llvm-readobj`/`FileCheck`/`not` (the set the MOS lit RUN lines actually invoke) right after `install-distribution`; new `dev/run.sh lit [PATHS...]` refreshes them then runs `llvm-lit -s`. 153 MOS tests: 147 pass, 2 unsupported, 4 pre-existing fails (unrelated to this fix).
+- ✅ 2026-09-24 — [torture-filter-sanitize] `_first()` now sanitizes before the 200-char cap; regenerated `unsupported.tsv` (14 rows, all `compile-error`, longer/complete diagnostics, no row moved bucket); added `tests/test_torture_filter.py`.
+- ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
+- ✅ 2026-09-24 — [toolchain-pin] `dev/toolchain.sh` fetches a pinned llvm-mos SHA (`8be0546`, the base `0002` is regenerated against) instead of `main`; warns on vendor drift. Commit `67cd5542`.
+- ✅ 2026-09-15 — [gallery-per-image-selfcheck] Verify-fidelity button shipped: gallery ROM republished + manifest flipped to `mode: "live-record"` (biohack.net `5e419b7`). See [plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md).
+- ✅ 2026-09-15 — [mandel-oop-title-entropy] Root cause: power-on-random CGWSEL $2130 clip-to-black; m7splash_begin now resets the PPU block itself. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+- ✅ 2026-09-15 — [lzss-gallery-navigation-and-auto-advance-chevron] 14/15 PASS: step 12 corpus `0x9512` + byte-identical relink, step 15 live 5/5 on both sites. Step 14 is toolchain-drift ROM divergence, accepted per the gallery republish policy, not a nav defect. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
+- ✅ 2026-09-15 — [snes-startup-garbage-title-screens] Newton garbage fixed; titles on all 11 demos (last deferral, factorial, wired gate-neutral); verify 5/5. See [plan](docs/plans/2026-06-28-snes-demo-startup-garbage-and-title-screens.md).
+- ✅ 2026-09-15 — [task-package-gate-hygiene] All 11 battery aborts fixed: 8 demos build via source-declared markers, 3 companion TUs excluded by an enforced contract. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md).
+- ✅ 2026-09-15 — [121-mode7-gallery-badges-and-mandel-oop-startup-verify] 23/23: gate 22 on indri closed live once the player fix deployed (post-title frames hash-identical to biohack); title-window entropy sensitivity found and deferred. See [plan](docs/plans/2026-07-26-121-mode7-gallery-badges-and-mandel-oop-startup.md).
+- ✅ 2026-09-15 — [indri-player-frozen-poster] Real cause was the pinned `@wbniv/bsnes-jg-player` build (`clearTouchNav` scope `ReferenceError` on boot), not template drift; re-resolved in indri `6cb870e`, deployed `v0.1.155`; live step 15 5/5 on `v0.1.156`. See [plan](docs/plans/2026-08-01-lzss-gallery-navigation-and-auto-advance-chevron.md).
+- ✅ 2026-09-15 — [eliminate-build-nondeterminism] Root cause pinned + fixed: `tryAbsoluteIndexedAddressing` rewrote uses without the GISel observer, leaving a stale CSE node whose hit/miss followed heap layout (`sec` flip, ~0.5 %/build). Fix in `0002` + MIR test (`7899355`); 900 builds DISTINCT 1, corpus 63/63 + a16 62/62. See [plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
+- ✅ 2026-09-14 — [svx2-anchors] Anchor (a) restored (real culprit `d6030cf`; `#ifdef VIDEO_REEL_PACKED_FAR` guard + tracked LoROM-fixture recipe `tools/snes-video-reel-extract.py`, `dev/snes-video-lorom-fixture.sh`); gate 7 and anchor (c) retired; cadence gate now measures t0 in-run; `dev/svx2-emulator-validation.sh` split into record/asset/code contracts with honest drift classification. See [plan](docs/plans/2026-09-14-svx2-anchors-decision.md).
+- ✅ 2026-09-14 — [svx2-animated-video-cartridge-verify] Unblocked and run on the restored LoROM fixture: gates 1–6 PASS, gate 7 retired; `pytest` 25/25. Artemis reel `v1.0.360` is behind two player-source commits (`8eca83a`, `ff35036`) → republish is the policy action (not yet staged). See [plan](docs/plans/2026-07-31-svx2-animated-video-cartridge.md).
+- ✅ 2026-09-14 — [fork-patch-followups] `0010`→#578 copy-opt fix (guard dropped, now a standalone patch after `0002`), `0022`→#589 terminator form, `0003`/`0024`/`0021` re-synced to the published/merged forms, RA companion draft retired, six PR mirrors re-synced; stack applies from pristine, lit 8/8 (+red), corpus 63/63, a16 62/62, loopfold `0xF56C`. `0021` retires at the next vendor-pin bump (procedure in plan). See [plan](docs/plans/2026-09-14-fork-patch-followups.md).
+- ✅ 2026-09-14 — [m7-gallery-web-reconcile] All 8 drifted website gates were measurement errors, not site bugs; plans 123 (10/10) and 121 (22/23) re-verified with a reproducible Chrome-DevTools harness (`dev/m7web/`); mandel-oop republished to biohack.net `v1.0.586`. See [plan](docs/plans/2026-09-14-m7-gallery-web-reconcile.md).
+- ✅ 2026-09-14 — [123-mode7-gallery-filter-verify] 10/10 PASS incl. the narrow/reduced-motion step (320 px, `--force-prefers-reduced-motion`). See [plan](docs/plans/2026-07-26-123-mode7-gallery-filter.md).
+- ✅ 2026-09-14 — [jgxcheck-determinism] `jgxcheck` defaults bsnes-jg entropy to None when `JGX_ENTROPY` is unset (`85beec9`); `bootblank.sh --firstframe` pins `JGX_ENTROPY=1` to keep its two-draw test; captures byte-identical 8/8, corpus 63/63 unchanged. See [plan](docs/plans/2026-09-14-jgxcheck-determinism.md).
+- ✅ 2026-09-14 — [cleanroom-published-compiler] Already built 2026-06-25 (`dev/test-release.sh`, `task release-test`, gate in `package-release.sh`); re-run live against apt+tarball: codegen PASS (k_mandel `0x820B` ×4) but the **published package `c49f395` is stale** — its sysroot lacks `snes_cpu.h` so current `examples/snes/` won't compile; two rig defects fixed (header closure, FAIL-path report). New release is a user call. See [plan](docs/plans/2026-09-14-cleanroom-published-compiler.md). Follow-through: new release `20260914-f9711be` cut the same day (apt `0.0.0+git20260914.f9711be`, pre-release `toolchain-20260914-f9711be`, `apt-v0.1.9`).
+- ✅ 2026-09-14 — [blossom-polish] Optional polish closed: (a) 256² supersample proven bit-identical to the 128² render (0/16384 mismatches, not worth 4× WRAM); (c) far-pointer fragility re-tested and confirmed fixed on MAME+bsnes, source comment corrected (ROM byte-identical, gates unchanged). (b) HW multiplier lives in shared `hopalong.h` (6 consumers) — needs its own ranked item if wanted. See [plan](docs/plans/2026-09-14-blossom-polish.md).
+- ✅ 2026-09-14 — [m7-off-boot-forceblank] Closed as a stale duplicate of [m7-splash-forceblank] (2026-08-05): the "re-opened blank" premise was measured false, all 12 splash demos are within budget (`dev/m7blank.sh --gate` PASS today, mandel-oop at the 5-frame target). Gate 11's 0-frame wording routed to the plan-121 reconciliation. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
+- ✅ 2026-09-14 — [display-first-frame-optin] Per-drawable first-frame opt-in shipped (compile-time `SNESGFX_FIRST_FRAME_OPTIN` gate, mandel-oop/life/1d-ca adopt it); non-adopters byte-identical. See [plan](docs/plans/2026-09-14-display-first-frame-optin.md).
+- ✅ 2026-09-14 — [maze-refold] `maze_fold_path` folds while walking `came[]` again (two-pass work-around removed); `-verify` clean ×3, CRC `0x0749` held. See [plan](docs/plans/2026-09-14-maze-refold.md).
+- [x] 2026-07-26 — [build-loop-continue] `dev/build.sh` example loop continue-on-error + end-of-run failure list (`8a73e6a`); item closed 2026-09-14 on finding it already shipped. See [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- [x] 2026-09-14 — [a16-newton-step-rc-undef] Superseded: cause #1 FIXED 2026-06-30 (`f1af264`, shouldCoalesce), cause #2 DECIDED 2026-09-13 (upstream issue, ready to post). See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
+- [x] 2026-09-13 — [rc-undef-cause2] DECIDED: no downstream fix, escalate upstream; issue body gains a pre-RA/SplitKit analysis (suspect: LiveIntervals subrange liveness across an undef partial def), repro re-verified (2 errors), READY TO POST. See [plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md).
+- [x] 2026-08-05 — [display-first-frame] mandel-oop post-title force-blank 11 → 5 (budget 12 → 6); the blanket `display_frame()` fix was MEASURED UNSAFE (119/122 demos palette from the first emit) and rejected. See [plan](docs/plans/2026-08-05-display-first-frame-forceblank.md).
+- [x] 2026-08-05 — [m7blank-coverage] All twelve splash demos measured (`2dc7647`): lzss-gallery cfg fix, video-reel real corpus, seamdemo pure-Python gen, apollo-reel shape-faithful stub; 12-demo gate PASS, original eight byte-identical.
+- [x] 2026-08-05 — [splash-dead-code] "Finish the conversion" premise false — splash.h/splash16 had ZERO consumers (superseded b6ef256/8ac159f); surface deleted, docs de-staled. See [plan](docs/plans/2026-08-05-splash16-forceblank-conversion.md).
+- [x] 2026-08-05 — [dq-baseline-stale-pair] Two pre-c9e0f12 nmitally.c baseline entries dropped with no-match evidence; SNESDQ PASS 254→252 (`9bc0c50`).
+- [x] 2026-08-05 — [m7-splash-forceblank] Mode 7 splash handoff contract: post-title force-blank 720 → 22 frames across 8 demos, floor measured at 1; `dev/m7blank.sh --gate` guards it. See [plan](docs/plans/2026-08-05-mode7-splash-forceblank-floor.md).
+- [x] 2026-08-05 — [0019-posted] Branch-range diagnostics POSTED as [#591](https://github.com/llvm-mos/llvm-mos/pull/591) (companion to open #549, same applyFixup hunk, ours yields on conflict; mint+verify by the 0019 session, post user-triggered). See [body](docs/upstream-branch-range-diagnostic-pr.md).
+- [x] 2026-08-05 — [corpus-slice-repairs] nmitally 240-tick oracle restored (lost by c9e0f12) + nbody_sim resurrected (deleted by 9369ced); corpus-a16 **62/62** first-ever full green (`608b84b`).
+- [x] 2026-08-05 — [motorola-default-verify] Plan verification run + recorded, all steps PASS (PR #587 branch). See [plan](docs/plans/2026-08-04-llvm-mc-motorola-default.md).
+- [x] 2026-08-04 — [cop-mnemonic] COP PR POSTED as [#588](https://github.com/llvm-mos/llvm-mos/pull/588) (mandatory signature, decoder-visible 2-byte decode, W65816-gated; reduction+design per the [draft banner](docs/upstream-cop-brk-signature-pr.md); links pre-flighted, a16/xy16 claim de-forked).
+- [x] 2026-08-04 — [round7-battery] Round 7 complete, 22/22 ROMs; #141 dpbank forced the ISR D/DBR envelope EXTEND (`0026`). See [plan](docs/plans/2026-08-03-round7-defect-hunting-demos.md).
+- [x] 2026-08-04 — [dither-bayer] Confirmed on shipped Apollo corpus: 6.49 pts (78.91→72.42%) at 0.48 dB; rule ≤0.5 dB→Bayer, ≥2 dB→Floyd. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
+- [x] 2026-08-04 — [sbc-carry-normalize] a16 G_SUB carry-in 1→−1 (`357fe37`, patch `0027`); LDCImm 1 gone, `0012` now optional hardening. See [status row 10](docs/upstream-contribution-status.md).
+- [x] 2026-08-04 — [gaddsub-lanes] Verdict (b): s16 add lanes LOSE (+281 B corpus; marshalling dominates) — byte chain deliberate, now documented. See [investigation](docs/investigations/2026-08-04-g-add-sub-s16-lanes.md).
+- [x] 2026-08-04 — [interframe-crossover] P0–P2 done: chooser can't hold 60 fps (φ budget spent by K=120); decided don't-build; dither is the lever. See [plan](docs/plans/2026-08-03-interframe-crossover.md).
+- [x] 2026-08-04 — [cutlabels-verify] All 8 steps PASS (host metadata rejects; ordered 0/1/2/0 latch; cut captures label-correct on the *same* presentation; six transport replays, 0 slips; loop-time reset fires only on the sequential loop; 3,822/3,822 at cadence 1; 9,177-field endurance; labels ROM-resident, absent from site/player). Reproduced on the stable 900-frame HiROM reel — the 1,800-frame 59.94 fps cartridge has no asset recipe in-tree. See [plan](docs/plans/2026-08-01-svx2-cut-aware-dashboard-labels.md).
+- [x] 2026-08-03 — [snes-video-reel] Reel cadence gate GREEN again — the constant was wrong, and had never been right. `expected_presented=776` was 1 too low from the hunk that introduced it (`d6030cf`), so the gate was red for a day, not broken by a later change. My first hypothesis was **wrong and disproved by measurement**: `06ffdf3` (keep video DMA inside VBlank) looked like it recovered a dropped frame, but builds at `06ffdf3^` and `06ffdf3` against an identical stream both give presented=1911 slips=0 — `snes-video-reel.c` is not the variable and there was never a slip. Real cause: with slips=0 the count is pure arithmetic, `1 + floor((4000 - t0)/CADENCE)`, and `t0` cannot depend on cadence. The gate's own cadence-1 constant `0xeee` PASSES, pinning t0=179, at which cadence-2 must be 1911; 1910 would need t0∈{181,182} and would falsify `0xeee`. The two siblings were mutually inconsistent. Fixed 776→777 with the derivation written next to both, so the next bare hex literal can be checked against its sibling by eye. Gate now passes with NO override: composite health, cadence, the new FPS-gauge step, both dashboard cuts, fidelity 47.9%/mae 10.3, transition 78.3%/mae 2.6. See [plan](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md).
+- [x] 2026-08-03 — [snes-fps-gauge] FPS gauge extracted to `examples/snes/video_fps.h` and **gated for the first time**. Sweep first: only 2 of 9 fps-mentioning ROMs draw a gauge, and the reel's was **correct only by accident** — it sampled one VBlank early AND read the presented counter one frame early, two off-by-ones cancelling; Apollo inherited the pair, legitimately moved the call after the deadline wait, and shipped 59.1-then-60.1 to a live page. Contract is now explicit ("sample AFTER the present"), units are frames-per-600-VBlanks so the HUD and the gates' cadence tables cannot disagree, and both gate scripts assert the DISPLAYED number twice — past the first window (catches the 59.1 off-by-one) and at the end (catches the 60.1 scale). Verified before/after on identical builds: reel gauge byte-identical at 5 sample points, Apollo at 6; a cadence-2 build reads 30.0, proving the units are cadence-derived. Apollo gate PASS in full; `-verify` clean on both. **Found a pre-existing red gate on the reel** (see Open) — proven not mine by a pristine-revert control. See [plan](docs/plans/2026-08-03-snes-fps-gauge-sweep-and-shared-component.md).
+- [x] 2026-08-03 — [apollo-video-rom] Apollo cartridge FIXED IN PLACE at true **59.94 fps** — same slug, same page, no second ROM ([/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/); llvm `e275733`, site `73aec47` tag v1.0.363, CI green, live sha `bf62a299…` == gate-built). **Cadence at the 1-VBlank operating point: 600/600 VBlanks, ZERO slips — on slow ROM AND FastROM**, so FastROM is margin, not prerequisite, even on the codec's hardest input (mean packet 3,534 B, worst 3,685). Mapping computed, not assumed: stream 2,141,080 B (only 1.2% under a naive doubling) rules out 2 MiB and lands on **4 MiB Fast HiROM, 33/63 banks — still no ExHiROM**. Kept the 2× speed after measuring both cuts: real-time drops on-screen travel 26% and per-frame motion to 1.62, back toward the 0.93 that made v1 unwatchable. **Crossover item gets its free second point, and the answer is 'barely':** halving the temporal gap recovers only 0.91 ratio points (LZSS ahead 14.31 → 13.40), a real-time control 4.18 — the residual between frames is Floyd–Steinberg dither noise, decorrelated regardless of frame spacing, so the crossover is NOT reachable by frame rate. `snes-video-rgb24-convert.sh` needed no new flag (`--fps` already takes `30000/1001`); usage documents it now. See [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md).
+- [x] 2026-08-02 — [apollo-video-rom] Apollo 11 daylight cartridge LIVE at [/snes/apollo-daylight/](https://biohack.net/snes/apollo-daylight/) (llvm `c1a667f`+`8d4261a`+`70ad999`; site `ad87374`/`0a4f2da`/`c75b0e2`, tags v1.0.357/358/361, CI green, live sha `35fc0807…` == gate-built). **Cadence held: 300/600 VBlanks, ZERO slips on slow ROM AND FastROM** — the hard content costs bytes (SVX2 79.62% of raw vs Artemis 57.04%), not frames. Mapping: ordinary 2 MiB Fast HiROM, 17 of 63 banks — no ExHiROM needed. Keyframe policy K=120 stands (K=15→120 spans only 3,233 B), though the ordering INVERTS vs the first cut: on genuinely moving content a delta packet costs about as much as a keyframe. Emitter extended in place (3 opt-in flags, byte-identical output proven on old input). **Two defects shipped then fixed:** (1) 37 s of black — validation ran force-blanked before the title, and EVERY gate passed because all sampled VBlank 3000+; regression guard added (render at VBlank 180, fail if ≥98% black); (2) boring clip — first interval was a tracking shot with 3–4× less motion than any other corpus (0.93 vs 2.88–3.93 mean|Δ|); recut to the colour ignition/ascent segment, cropped + 2× speed, motion 23.69→50.81 on the running ROM. **Finding worth keeping:** on this content intraframe LZSS beats interframe SVX2 by 14.31 points (up from 2.67) — the codec decision is unaffected (speed-anchored, LZSS ~27× too slow) but that is where delta coding stops paying. See [plan](docs/plans/2026-08-02-apollo-daylight-video-rom.md).
+- [x] 2026-08-02 — [cartcanary-matrix] Deferred ordinary-ROM canary matrix GENERATED + GATED GREEN: 11 new rows (LoROM 512K/1M/3M/4M slow+fast, HiROM 512K/2M/3M fast) all PASS `dev/run.sh cartsize-canary` (host tests, structural inspect, `-verify-machineinstrs`, bsnes-jg oracle + entropy fingerprint); 3 milestone rows re-verified unchanged. Two real generator bugs found+fixed exercising new sizes for the first time: `sites()`'s span-fit check had no bounds check (crashed on <4 MiB images), and `mirror_probes()` used the HiROM mirror pair for LoROM too (wrong for a compound 3+ MiB device — caught by the generator's own internal assertion before any ROM was built). Model extensions: SRAM aperture (`RAM_BOARDS_BML`/`ram_decode`/`ram_windows`/`ram_header_byte`, ported from bsnes-jg's plain `*-RAM` boards, 69→ host tests, collision-checked against ROM decode) and PAL region byte (`REGION_BYTE`/`video_standard_from_region_byte`, ported `videoRegion()` classifier) in `tools/snes_cartmap.py`; `--ram`/`--battery`/`--region` in `tools/snes-checksum.py`. Legacy-vs-expanded-header and 5 new invalid/truncated/ambiguous negative fixtures added. A real regression (unconditional RAM-size/cart-type default-write clobbering a pre-set coprocessor test fixture) caught by its own new regression-guard test before shipping. Host suite 58+27+28 → 69+44+28 tests. `dev/run.sh` gained `JG_FRAMES`/`CANARY_ONLY` docker-env passthrough (pre-existing gap). See [plan](docs/plans/2026-07-30-exhirom-video-boundary-test.md) §Deferred matrix — results.
+- [x] 2026-08-02 — [wai-residual] NO-OP close: the 18 files the `903de3e` sweep skipped as dirty turn out to have **no bare idle loops at all** — comment-aware scan finds 0 empty/comment-only infinite loops; each file's single `for (;;)` is its live frame loop with a real body (`recompute_row`/`field_band`/`display_frame`), i.e. the already-safe class, not removable under C11 forward progress. The sweep skipped them for dirtiness without classifying them; nothing was owed. (Files are clean since `d93499a`.)
+- [x] 2026-08-02 — [138-producer] Vanished `$rl1 = LDImm` producer ROOT-CAUSED + standing gate added (`c95ca7b`). Cause: another worker's `0018-320-imag32-spill` (created 07-27 16:58 — after the crashing 07-26 build, before the clean 07-31 one; its stated failure mode "one byte through a GPR → illegal GPR-to-Imag32 COPY" is exactly the observed malformation, and `unpack_slide` is the far-pointer spiller). Counterfactual rebuild not run — evidence is temporal + shape, strong not airtight. Gate: `dev/lzss-gallery.sh` now asserts every LDImm destination is a GPR (1,043 found, 0 non-GPR); uses `-fno-lto` because the LTO link defers codegen — the first draft passed VACUOUSLY on an empty dump, which the gate now fails loudly on. Needed because 0003's guard skips a returning producer silently instead of crashing.
+- [x] 2026-08-02 — [band-sweep-adopted] Dormant session's BAND 4→1 per-frame refresh sweep adopted across 19 demos (`d93499a`) after verification: 19/19 differential gates PASS (oracles host-derived, unchanged), display-check 6/6 PASS with stable ink. SVX2 reel corridor deliberately left untouched (still mid-edit when that session stopped). Unblocks the wai-idiom residual.
+- [x] 2026-08-02 — [seamdemo] P0–P4 COMPLETE. Three-act ExHiROM boundary cartridge LIVE at [/snes/seamdemo/](https://biohack.net/snes/seamdemo/) (site `445121a`, v1.0.350, CI success, live ROM sha `29dafeb5…` verified, decode-map SVG embedded). Console: act1 `$F0E2` / act2 `$36B6` / act3 `$6D21` → full-cycle `corpus_result $3277`, four-way oracle agreement, `-verify` clean, entropy fingerprint one picture ×6, ~100 s cycle. Coverage 374/374 decode cells, 1,122 edges (755 seam-crossing), one instruction split across the physical device seam. New gallery category **Cartridge & Mapping Tests** carries it plus the three canary pages. Published as-is: cycle length is a runtime dial (no CRC impact); the ~872 KB gzip lever would change `act3_crc`, so it stays open. Deferred: live Mode 7 page-address HUD (needs HDMA mode-split or OBJ; presentation only). See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
+- [x] 2026-08-02 — [lowercmpzeros] Sticky loop-carried `Changed` FIXED (`6249aae`): after a block's first fold every later `CmpZero` went unlowered and the asm printer emitted NOTHING for the survivor — silent dropped flag test, verifier-invisible. Reproduces on PRISTINE upstream → standalone patch `0022` + PR package READY TO POST (row 18). Red/green lit test; suite 83 w/ exactly the 7 known failures; measured in-tree incidence ZERO (17,403 blocks, max 1 CmpZero/block) so the fix is inert here. Corpus differential COMPLETE: 59/61 value rows, **59/59 host==a16@bsnes, 0 mismatches** (the harness's `0/61 passed` is the missing-SPC700-IPL MAME columns, not disagreements). See [plan](docs/plans/2026-08-02-lowercmpzeros-sticky-changed.md).
+- [x] 2026-08-01 — [138-branch-merged] `throwaway/138-late-opt-crash` MERGED to main (`98231c1`): patch `0003-late-opt-nongpr-ldimm-dest` + PR-doc mirror (verified == live #584 body) + toolchain/regen wiring reconciled with the 0021-era `BASELINE_MOSDIR`; status row 15 unified. Upstream PR #584 open, CI green ×3. Foreign toolchain.sh 0018/0019 hunk stash-restored intact.
+- [x] 2026-08-01 — [rom-map-viz] Decode-map SVGs LIVE on all three cartsize pages (site `cfdb7cb`/v1.0.345, CI success, spot-checked; llvm tool commit w/ selftest 380-cell counts asserted vs the model both ways). Seamdemo-page figure lands with P4.
+- [x] 2026-08-01 — [canary-6b-revalidate] Canary gate re-run with rebuilt jgxcheck: 3/3 PASS, 6b NON-vacuous — one picture `11D41DC5:#00FF28` across six entropy boots per config; `rc0` pipefail guard added to the gate script (seamdemo pattern). Live 8 MiB sha matches.
+- [x] 2026-08-01 — [scavenger-php-undef] `PH $p` verifier trip fixed: the `undef`-flag predicate in `saveScavengerRegister` is now the verifier's forward-availability set, not a reaching-def scan (`0002` + upstream `0011`, new `scavenger-p-undef.mir`); seamdemo tolerance removed. See [plan](docs/plans/2026-08-01-exhirom-three-act-synthesis-cart.md).
+- [x] 2026-08-01 — [60fps-video] DONE: ring refill + staged keyframes merged (`5a25872`), post-merge re-baseline recorded (`3273195`) — **slow ROM now clears 60 fps (674/600 hardest slice)**, FastROM is margin not prerequisite (supersedes the pre-optimization claim); keyframe policy Option A K=120 stands (1.12 VBl, structural WRAM floor); negative control re-proven post-merge. Bonus: assembler immediate-sizing gotcha recorded.
+- [x] 2026-08-01 — [apollo-daylight-stressor] Hard-content sweep (NASA Apollo 11 Saturn V daylight
+  launch, real film grain) added to the codec results doc: SVX2/Floyd costs +5.3 ratio points and
+  +19.8 under Bayer vs. the night leg; LZSS beats SVX2 on size here but decision stays SVX2
+  (speed-anchored). See [results](docs/plans/2026-07-30-lzss-gallery-exhirom-video-boundary-test/real-video-codec-benchmark.md).
+- [x] 2026-08-01 — [exhirom-merged] `feature/exhirom-canaries` MERGED to main (`d0d6b39`, ff): cartmap model + ExHiROM platform + 3 canary ROMs + entropy display fix + cartridge SPEED attribute (280/280 tool byte-identity, gate PASS ×3, 108 host tests). AUTOJOY doc sections landed user-directed (`6943ee9`); jgxcheck overlap stash-restored.
+- [x] 2026-08-01 — [cartsize-republish] Three entropy-fixed canary ROMs LIVE ([fc366ba](https://github.com/wbniv/biohack.net/commit/fc366ba79546905086f9a4e95a3df64856cc927e), v1.0.338, CI success, 3/3 live shas match); verdict paints green deterministically in WASM — display defect closed end-to-end, user-confirmed on the live pages.
+- [x] 2026-08-01 — [gallery-republish+retire] Record-carrying reproducible gallery ROM LIVE on biohack.net (`e1e21d6`, v1.0.337, CI success, live sha == 5768…3a95d; manifest unchanged; user-gated app.js untouched); verify-button worktree retired (492M reclaimed, durability check passed).
+- [x] 2026-08-01 — [ppu-reset-blank-bare] Re-checked the premise before fixing (measure, don't
+  assume): only `hello.c` actually drove `INIDISP` bare — `boids.c`/`lsystem.c`/`turtle-vm.c`
+  already call `snes_ppu_reset_blank()` transitively via `display_init()` (in `snesgfx/display.h`
+  since `1d753fef`, which predates all three files), confirmed by 6/6 identical bsnes-jg boots
+  each at their existing gate frame counts — no source change, no defect. `hello.c` fixed
+  (`snes_ppu_reset_blank()` first line of `main`): 5/6 distinct picture hashes pre-fix → 6/6
+  identical post-fix at 700 frames, WRAM sentinel `0x42` unchanged both sides; re-gated `dev/run.sh
+  {build,validate,xcheck,boids,lsystem,turtle-vm}` all PASS, oracles unchanged (`0xA8AB`/`0x8073`/
+  `0x4007`). `hello.c` has no published page on either site (M0 smoke test only) — nothing to
+  republish; the other three demos' currently-deployed ROMs differ from `HEAD` for unrelated drift,
+  out of scope here. See [plan](docs/plans/2026-08-01-cartsize-canary-display-nondeterminism.md).
+- [x] 2026-08-01 — [idle-loop-audit] 338 raw `for(;;)`/`while(1)` hits classified (107 real-body safe, 216 bare fixed across 214 files, 0 unreachable); wai idiom per house pattern, disasm-verified no fall-through (`903de3e`); no shipped ROM found already miscompiled. 18 dirty files deferred to a T1.
+- [x] 2026-07-31 — [gallery-visual-sweep] Full 62-work visual corpus sweep PASS: `corpus_result got=0x96D8 == oracle` after 700 000 frames on bsnes-jg (1 h 25 m jgxcheck leg, ~1 h 31 m whole script), `throwaway/visual-sweep` off `main` HEAD `2343db7`. Already recorded (`b5ea1a6`); this pass verified the record and closed out the TODO marker. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
+- [x] 2026-08-01 — [snes-rom-page-routes] Skill now authors pages via the sites' data-driven routes (`3b212bd`): per-slug `page-template.astro` deleted; per-site registry schemas documented from live HEADs (biohack `src/content/snes/*.json` + count guard, indri `SNES_DEMOS` + non-default playdir gap fixed); dry-run validated both registries.
+- [x] 2026-08-01 — [display-sweep-patched] Full 118-ROM sweep on the patched detector: 117 PASS / 1 FAIL; deltas vs 2026-07-31 baseline = exactly the predicted trio FAIL→PASS, 0 new full-pixel FAILs, 0 reclassifications (3/114 = 2.6% change, `fdb044a`). The 1 FAIL is `svx2-fastrom-video` (corpus_result 0x4f≠0x00) — a post-baseline WIP ROM owned by the in-flight SVX2 plan, reported there.
+- [x] 2026-08-01 — [gallery-repro] Non-reproducible build root-caused (upstream `MOSZeroPageAlloc` DenseMap tie-break), FIXED (patch `0021`, `3500adb`) + VERIFIED (tie 20/20 one set, rom 20/20 one hash `a4e00f3b…`, lit RED→GREEN, suite 7 pre-existing only, `bd6ca35`); upstream package READY-TO-POST (status row 17, user-triggered). Investigation on `throwaway/gallery-repro-bisect`.
+- [x] 2026-07-31 — [snes-rom-page-migrate] Repo skill copy migrated to CLI-delegated engine sync (`5e75e65`): bundled `engine/` + PROVENANCE gate dropped (retired-mechanism note kept), `--touchnav` restored; synthetic e2e green. Follow-up filed: data-driven-routes port.
+- [x] 2026-07-31 — [frozen-detector-apply] Verified FROZEN-detector fix applied to `dev/display-check.py` (`d3000d7`); trio spot-check 3/3 by predicted mechanism; foreign docstring hunk left unstaged. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
+- [x] 2026-07-31 — [pr-critique] All critique items landed on PRs #577/#578/#584 (tests, bodies, TA-hardening) + #579 body; RA issue drafted. See [plan](docs/plans/2026-07-31-upstream-pr-critique-improvements.md).
+- [x] 2026-07-31 — [wt119-registry-row] NO-OP close: the `wt/119-gallery-near-decode-abi` registry row never existed in `docs/agent-handoff.md` (full-history `git log -S` empty; 17 rows, none match) — the wt119-retire deferral recorded a removal that had nothing to remove.
+- [x] 2026-07-31 — [frozen-trio] All 3 FROZEN flags false positives (lzdec phase-aliasing P=142, truchet stride-4 blind grid, turtle-vm designed endpoint); detector fix verified, `20d0b9f`. See [investigation](docs/investigations/2026-07-31-frozen-trio-frozen-flag-discriminator.md).
+- [x] 2026-07-31 — [wt119-retire] Branch verified fully landed, retired via `-s ours` merge `143dbf1`; worktree torn down (495 M reclaimed). Handoff registry row deferred (file was dirty).
+- [x] 2026-07-31 — [rom-republish] 113/114 title-card+F1 republish confirmed already live (2026-07-28); shipped the truncstair F2/F3 + gallery A-clobber deltas to both sites, closed the deferred full `verify-web-roms.sh` sweep. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
+- [x] 2026-07-31 — [scaffold-engine-gate] `scaffold.sh` now refuses PROVENANCE downgrades (site-newer/missing cases, `--force-engine`, `--selftest` 4/4) — fix `9d0d0f3`; live-site dry-run refused correctly, zero writes.
+- [x] 2026-07-31 — [lsystem-blankscan] Detector false positive (clear/regrow apex, frame 1154); quiescence guard adopted `5587462`, 114-ROM sweep green `c29abce`. See [plan](docs/plans/2026-07-30-blankscan-quiescence-gate.md).
+- [x] 2026-07-31 — [137-verify] All 7 steps PASS (step 6 via bench gate post-`2932bcf`, `45d1a6c`; visual sweep tracked separately). See [plan](docs/plans/2026-07-27-137-lzss-gallery-new-repack-visualization.md).
+- [x] 2026-07-31 — [real-video-codec] Real Artemis footage + Bayer axis swept 2×2; SVX2 ships (60.8–69.4 fps on target), ONE codec suffices. See [plan](docs/plans/2026-07-31-real-video-codec-corpus.md).
+- [x] 2026-07-31 — [gallery-repack] Root cause: `decode_bank7e` thunk clobbered A-passed arg (demo bug; compiler exonerated). Fix `2932bcf`, 62/62 bench. See [plan](docs/plans/2026-07-30-gallery-near-decode-abi-clobber.md).
+- [x] 2026-07-30 — [truncstair-f2-f3] F3 repaint-on-change + F2 banded BG3HOFS ring (1 px/frame): `CANVAS_HTILE` tilemap repeat made the recorded 8 KB/bank-$7E blocker moot; gate `0x02CA` unchanged, ring stalls=NONE. See [plan](docs/plans/2026-07-30-truncstair-f2-f3-scroll-ring.md).
+- [x] 2026-07-30 — [60fps-batch-b] `mvscrl` dual V-ring shipped (only qualifying F2 candidate; other 3 closed, Batch C done): gate `0x72A7` host==+mos-a16, both bands 1 px/frame no stalls. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
+- [x] 2026-07-28 — [truncstair-black] Canvas overflow (BAND_ROUND+BAND_H wrote tile row 16) clobbered chr_word/map_word -> VRAM wipe + reset loop; demo renders again. See [investigation](docs/investigations/2026-07-27-60fps-demo-sweep.md).
+
+- [x] 2026-07-27 — [99b-trimerge-visual] Frozen trimerge braid fixed (offset was 4 orders below stride) — waterfall + ties/yellow + palette breathing; gate 0xCCCC; live v1.0.284. See [plan](docs/plans/2026-07-27-99b-trimerge-visual-fix.md).
+- 2026-07-26 — [full-rom-galleries] **113-demo SNES gallery live on both biohack.net + indri.studio (11 with bug-fix callouts); `wbniv/llvm-mos-65816` made public.** [plan](docs/plans/2026-07-26-full-rom-galleries-both-sites.md)
+- 2026-07-26 — [patch-stack-rebase] **llvm-mos fork patch-stack rebased onto upstream tip; from-scratch bootstrap FIXED + steady state reached.** PR #562/#563 (our F4 TYX/TXY dead-flag + DP-arg CC fixes) merged upstream → `0003`/`0008` retired; `0002`'s duplicate AS1 CC hunk hand-resolved to context; `dev/toolchain.sh`'s blind glob replaced by the curated stack, which after the 2026-07-26 regen fold (`0016`/`0017` are MOS-dir-only → absorbed into the comprehensive `0002`) is **`0001 → 0002 → 0006`(non-MOS-dir hunks, path-filtered)** — apply-verified against pristine `8be054612`. Cold rebuild verified (9m32s warm-ccache); 3-way differential green on bsnes-jg (xcheck 16/16, cpu6502 `0xAC8A` with the deployed ROM byte-identical pre-rebase); MAME leg still needs the out-of-band SPC700 IPL. Standalone `0004`–`0017` files = frozen upstream-PR artifacts. [plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md).
+- 2026-07-26 — [regen-scripts-retired] **Per-patch `dev/regen-patch-000N.sh` scripts retired (loud `exit 2` + explanatory header; `-h` intact).** Not repaired: under the two-tier model, per-patch regeneration from the live tree is impossible by construction — the live tree is the sum of all patches, so the additive baselines (pristine + `0001` + narrow-`0002` + …) no longer exist, independent of the deleted `0003`/`0008` steps. Bodies kept as method documentation; refreshing a standalone artifact at posting time = hand-rebase the patch file against the then-current upstream base. [plan §Update](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md) · [upstream status](docs/upstream-contribution-status.md).
+- 2026-07-26 — [zp-alloc-imag32-csr-rename] **Far `[dp]` read-garbage bug FIXED (root-caused to `MOSZeroPageAlloc`) — the real 16×16 Waldo font now ships on `mandel-double` from bank `$01`, `TITLE_FONT16_OFF` deleted.** The far-rodata FONT16 render bug was NOT RA pressure: `mos-snes.cfg`'s `-mlto-zp=224` enables `MOSZeroPageAlloc`, which "silently renames" callee-saved imag registers to zp-static-stack slots (`CSRZPOffsets`, consumed per-operand by `MOSMCInstLower`) — and it predates the fork's `Imag32`: it renamed the far pointer's four bytes (`rc20..23`→`$c4..$c7`) but never the quad `RL5`, so `LDA_IndirectLong` kept reading stale `[$14]` (proven: zero writes to `$14..$17` in the failing binary; single-function `llc` replay correct). **Fix** (in `0002`): a live-use Imag32 quad is one atomic size-4 candidate (4 consecutive slots, as `[dp]` needs) + the offset arm records quad/pairs/bytes so every operand width rewrites. **Verified:** repro now emits `lda [$c4]` + renders "RADIX-2 DIT"/"MANDELBROT" in true shadowed Waldo; `mandel-double` gate `0x0EDF`; near code **byte-identical** pre/post; xcheck 16/16; full build 232 with exactly ONE ROM changed — `mandel-oop`, a likely second silent victim, gate now green `0x204F`; `-verify` clean ×2. `0002` regen round-trips; bootstrap list now `0001→0002→0006`-generic (`0016`/`0017` folded — MOS-dir-only, the documented steady state). [fix plan](docs/plans/2026-07-26-zp-alloc-imag32-csr-rename-fix.md) · [investigation §RESOLUTION](docs/investigations/2026-07-26-far-rodata-read-under-pressure-title-upload.md).
+- 2026-07-26 — [mandel-double-overflow] **`mandel-double` 32 KiB bank overflow fixed — root cause was build-path drift, NOT the LLVM bump.** The demo needs `-DTITLE_FONT16_OFF` (its double soft-float lib is ~20 KB of the 32 KB bank — `__adddf3` 6728 B + `__muldf3` 5431 B + the float twin — leaving no room for title_layer's 4 KB `FONT16` table), but that flag lived **only** in `dev/rebuild-web-roms.sh`'s `EXTRA_CFLAGS`. So the web-rebuild path worked (hence a published ROM) while `dev/build.sh`'s example loop **and** the demo's own gate `dev/mandel-double.sh` both failed to link. Fix: the constraint is now self-declared in `examples/snes/mandel-double.c` (an `#ifndef`-guarded `#define` above the `title_layer.h` include), so *every* build path gets it; the `EXTRA_CFLAGS` table is emptied with a comment on why per-demo flags belong in the source. Also added the missing SPC700-IPL guard to `dev/mandel-double.sh` (it reported a misleading `FAIL` instead of `SKIP` once the gate could finally reach the MAME step — `cpu6502.sh` already had this guard). **Verified:** `dev/run.sh build` **232 programs, 0 link errors** (was aborting at 175); `dev/run.sh mandel-double` **RESULT: PASS** — `host==+mos-a16==0x0EDF` on bsnes-jg with the recorded disasm shape reproduced exactly (`__muldf3=8`, `__add/subdf3=12`, `rep/sep=31`). ROM bytes differ from the deployed copy (expected: soft-float codegen moved with the LLVM bump; the gate hash + disasm counts are unchanged), so a republish would refresh it. Corrects the earlier "newer LLVM pushed it over" framing. [rebase plan](docs/plans/2026-07-25-llvm-mos-fork-patch-stack-upstream-rebase.md) · [#33 plan](docs/plans/2026-06-30-33-snes-mandel-double.md).
+- 2026-07-02 — [setjmp-longjmp-65816-fix] **Fixed `longjmp` on the 65816 (#35 UNBLOCKED).** New **`platforms/snes/setjmp.S`** (65816-aware) shadows the 6502-only common `setjmp.S`: built `-mcpu=mosw65816` and added to `snes-c` ahead of the `common-c` merge, so it precedes common's `setjmp.S.obj` in `libc.a` and the linker resolves `setjmp`/`longjmp` from it (verified: archive indices 1 vs 8; `snes-far`/`snes-hirom` inherit via `PARENT snes`). `longjmp` reconstructs the page-1 16-bit `S = $01xx` (`ora #$0100; tcs`) instead of the broken `tax; txs`, and reads/writes the return address stack-relative (`1,s`/`2,s`) — **no `jmp_buf` ABI change** (the SNES stack is page-1 by crt0 contract). Regression guard `corpus/setjmp_sim.c` added; **`host==default@MAME==+mos-a16@MAME==+mos-xy16@MAME==+mos-a16@bsnes-jg==0x2007`**. [plan](docs/plans/2026-07-02-35-setjmp-longjmp-65816-fix.md); [investigation](docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md) (Fix section); upstream posture in [upstream-contribution-status](docs/upstream-contribution-status.md) §9 (lands with the SNES-platform PR).
+- 2026-07-02 — [title-16x16-waldo-font] **Demo title cards now use a real 16×16 font (recovered *Great Waldo Search* font) instead of the pixel-doubled 8×8.** Shared `snesgfx/title_layer.h` line1 path swapped from `_title_expand_byte` pixel-doubling of `font8.h` to a direct upload of new **`examples/snes/font16.h`** (generated by `tools/gen-font16.py`): the bold Waldo face (A–Z, 0–9 recovered from the retail ROM; symbols `! & + - / = _ . :` + space authored to match) with a **built-in SE drop-shadow** synthesised as face-shifted (+2,+2) — the measured Waldo offset. 2-tone tile: `word = face | shadow<<8` → face = pal-7 colour 1 (animated ink), shadow = colour 2 (fixed dark `0x1084`); same tiles-64..319 / 4 K-word VRAM budget, no layout change. **Gate-neutral** (title fires before `title_end`; not in any corpus CRC). Verified: `dev/run.sh boids` PASS host==+mos-a16==`0xA8AB` on **MAME + bsnes-jg**; title captures show real shadowed glyphs + authored `-` ("STRUCT-BY-VALUE") and digits/`/` ("64-BIT / FLOAT", cosmzoom host==jg `0x502F`). Affects all 84 `title_begin[16]` demos. Font recovery write-up: `~/waldo/docs/investigations/2026-07-01-great-waldo-search-font-recovery.md`. [plan](docs/plans/2026-07-02-title-16x16-waldo-font.md)
+- 2026-06-30 — [setjmp-longjmp-65816-bug] **Demo battery found a real bug: `longjmp` is BROKEN on the 65816 (#35 BLOCKED).** Scoping demo #35 (`setjmp`/`longjmp` backtracking solver) surfaced it: the SDK's common `mos-platform/common/c/setjmp.S` is **6502-only** — `setjmp` reads the return address from a hardcoded page `$0100` (`tsx`; `lda $101,x`/`$102,x`) and saves only the **8-bit** hard SP (`txa`); `longjmp` restores via `tax; txs`. The 65816 in **native mode** (SNES crt0 `XCE`) has a **16-bit** stack pointer not bound to page 1 → `longjmp` restores a corrupted S and `rts`-es to garbage; **`longjmp` never returns** (`setjmp` + normal return is fine). Minimal repro on bsnes-jg: `corpus_result` stuck at the pre-`longjmp` value (`0x1111`, want `0x2007`), **fails in default-8bit AND `+mos-a16`** → pre-existing upstream `llvm-mos-sdk`, not the #321 fork. **User call (2026-06-30): document + skip #35, keep deploying** — fix (65816-aware `setjmp.S`: 16-bit `tsc`/`tcs` + stack-relative return addr) deferred to a dedicated session. [investigation](docs/investigations/2026-06-30-setjmp-longjmp-65816-native-stack-bug.md); queued upstream (issue #9, `llvm-mos-sdk`) in [upstream-contribution-status](docs/upstream-contribution-status.md). #35 stays BLOCKED in the demo backlog.
+- 2026-06-30 — [snes-mandel-double] **#33 Double-Precision Mandelbrot SNES demo — the 64-bit `double` soft-float library (Round 3 first pick).** Escape-time `z²+c` in IEEE-754 **64-bit `double`** (top half) beside the 32-bit `float` twin of #21 (bottom half), Mode-7 far-buffer renderer (`+mos-a16`-only). The 65816 has no FPU, so the double path is the entire double soft-float library — `__muldf3=8`/`__adddf3`+`__subdf3=12`/`__gtdf2`/`__floatsidf` + `__truncdfsf2`/`__extendsfdf2` — disjoint from #22's 64-bit *integer* family, otherwise untested. **Bit-exact `host==default==+mos-a16==+mos-xy16==0x0EDF` on bsnes-jg** (all three compiled modes), `rep/sep=31`; MAME leg env-blocked (no SPC700 IPL, demos-only non-blocker). ROM overflowed one 32 KiB bank by 2289 B (huge double lib: `__adddf3`=6728 B, `__muldf3`=5431 B) → freed by const-folding the coordinate divides (no `__divsf3`; float-divide is #21's corner, not #33's) — the noinline cells keep the real soft-float libcalls. **The precision cliff** (float pixelates while double stays crisp) only emerges at `re_span~1e-6` needing hundreds of iters/pixel → too slow live, so the live demo frames the whole set (double top / float bottom join seamlessly) and the cliff is folded into the gate + shown host-side in the plan (Lesson 1). **Compiler finding:** a NEW (3rd) witness of the documented **`a16-rc-undef-ra-pure-virtual`** known issue (CAUSE #2) — the a16/xy16 corpus slice trips `-verify` "Using an undefined physical register" (same symptom the shipped `mandel-float` slice emits), but the code is **bit-exact correct** (proven by the 4-way bsnes-jg differential incl. the flagged xy16 mode) → XFAIL, not a miscompile; fires at `-Os` with a proven-correct result, strengthening the open RA-interference fix case ([rc-undef plan](docs/plans/2026-06-29-a16-rc-undef-ra-machineverifier-fix.md)). Per the stress-demo protocol the demo is NOT reshaped to dodge it. Published [biohack.net/snes/mandel-double/](https://biohack.net/snes/mandel-double/) (`v1.0.150`). [plan](docs/plans/2026-06-30-33-snes-mandel-double.md)
+
+- 2026-06-29 — [xy16-repsep-reload-fix + snes-lsystem] **`+mos-xy16` in-place-memmove-16bit-index miscompile FIXED + #23 L-System Plant SHIPPED (5-way green).** Root cause: `MOSInsertREPSEP::placeIntraBlock` inserted `sep #$10` (for a `ldy #imm` between `ldx __rcN` and `lda buf,X16`) — the 65816's SEP physically zeroes X's high byte, so the subsequent `lda abs,X16` indexed from `X.lo` only, reading `buf[i & 0xFF]` instead of `buf[i]` for `i ≥ 256`. Fix: track the last XW_X16 X-writer per block; when a 8→16 REP is about to be inserted for an X-reader after a 16→8 corruption, clone the last X-writer and insert it between the REP and the reader. Repro `xy16-inplace-memmove-repro.c` CAP=1700: xy16 `0x90AA` (was `0x1CC6`). All six xy16 gates PASS; `xcheck` PASS; updated `xy16call` step 3 (legalizer-domination fix switched `lda long,X`→`lda abs,X`; both correct). L-System Plant: string-rewriting stress demo (`memcpy`/`memmove`/`strlen` + bracket stack); gate CRC `0x79C3`; host==default==a16==xy16 on bsnes-jg, `-verify` clean, disasm `memcpy/memmove=2`/`strlen=1`/`rep-sep=87`; 5-way green (xy16 was the blocking bug). [investigation](docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md) · [plan](docs/plans/2026-06-29-23-snes-lsystem-string-rewriting.md)
+- 2026-06-29 — [fix-legalizer-indexed-domination] **FORK REGRESSION FIXED + MERGED — `0002` indexed-addressing use-replacement crossed a block boundary (`-verify-machineinstrs` "defs don't dominate all uses").** A fold-while-walk loop (a `uint8_t` array read both as a folded value AND a signed-`int8_t`-table index, with an early-`break` diamond — the maze demo's shape) tripped it. **Root cause:** `0002`'s seed-56 workaround in `MOSLegalizerInfo::tryAbsoluteIndexedAddressing` built `Explicit16 = G_MERGE(trunc(NewOffset),0)` **at the `G_PtrAdd`'s body block** and replaced *all* uses of `NewOffset`, but that value is also used in the loop **header** → body-defined MERGE referenced in a sibling block. **Fix (1 site):** insert the trunc/zext at `NewOffset`'s SSA def (dominates every use). Bisected `0001` clean / `0001+0002` repro; **NOT upstream** (`c798c31` clean) and **NOT a miscompile** (`-verify`-off ROM correct) — but blocked `-verify` builds (forced the maze two-pass split, now a low-pri un-work-around follow-up). Worked on a dedicated branch (`wt/fix-legalizer-indexed-domination` `8c928b8`), shared toolchain rebuilt + merged `fb528d8`. Verified post-rebuild: new `legalindexdom` `-verify` gate clean default/+mos-a16/+mos-xy16; bsnes-jg sweep 6/6 (maze `0x0749`, pi `0x7711`, spirograph `0x32D4`, epicycles `0x4F6C`, n-body `0xCC65`, dbl-pendulum `0xE859`) all host==+mos-a16 (MAME corpus SKIP — no SPC700 IPL). Gate `examples/65816/legalindexdom.c` + `dev/legalindexdom.sh`. Repro/analysis: [spike](docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c).
+- 2026-06-29 — [snes-turtle-vm] **#29a Bytecode-VM Turtle SNES demo — jump-table + function-pointer dispatch.** A stack-machine bytecode interpreter drawing LOGO turtle graphics: the main `switch(op)` over a dense opcode range lowers to **`JMP (abs,X)` jump-table dispatch** (the JMPIdxIndir path the xy16 `requiredXWidth` hardening singled out) and the ALU ops dispatch through a `static const` **function-pointer opcode table** (`jsr __call_indir`) — the indirect/computed control-flow corners no other demo runs. Integer fixed-point (Q8.8 + SINCOS LUT) ⇒ bit-exact; near fnptrs + bank-0 data ⇒ 5-way. corpus gate `0x4007` (180-segment program); `dev/run.sh turtle-vm` RESULT PASS (disasm jump-table=1 + `__call_indir`=1 + `__mulsi3`=2 + rep/sep=155; bsnes-jg host==+mos-a16 `0x4007`); 5-way confirmed host==default==a16==xy16 on bsnes-jg, `-verify` clean — a live cross-mode confirmation of the JMPIdxIndir fix (MAME SKIP — no SPC700 IPL, demos-only non-blocker). Draws a woven multi-colour spiral rosette = the visual proof; **no bug**. Published [biohack.net/snes/turtle-vm/](https://biohack.net/snes/turtle-vm/) (`v1.0.130`). [plan](docs/plans/2026-06-29-29a-snes-turtle-vm-bytecode.md)
+- 2026-06-29 — [snes-boids] **#26 Boids Flock SNES demo — struct-by-value / aggregate-return ABI.** Reynolds flocking on a `vec2 {int16_t x,y}` VALUE type whose steering kernel (`v2_add`/`v2_sub`/`v2_scale` + `separation`/`alignment`/`cohesion`) takes/returns the struct by value, `noinline` so the O(N²)/frame calls survive `-Os` — the small-struct register-pair-vs-`sret` return path no other demo exercises. Integer fixed-point (Q12.4) ⇒ bit-exact; far-pointer-free ⇒ 5-way. corpus gate `0xA8AB` (8-bird flock, 12 steps); `dev/run.sh boids` RESULT PASS (disasm by-value-calls=497 + `__mulsi3`=6 + `__divsi3`=4 + rep/sep=103; bsnes-jg host==+mos-a16 `0xA8AB`); 5-way confirmed host==default==a16==xy16 on bsnes-jg, `-verify` clean (MAME SKIP — no SPC700 IPL, demos-only non-blocker). Flock coloured by heading octant (aligned birds share a hue → coherent streams) = the visual proof; **no bug** — aggregate-return ABI correct in all modes. Published [biohack.net/snes/boids/](https://biohack.net/snes/boids/) (`v1.0.128`). [plan](docs/plans/2026-06-29-26-snes-boids-struct-abi.md)
+- 2026-06-29 — [snes-title-hdma-pixel-center] **Title intro: slow the fly-in + pixel-centre each line via HDMA.** Two user reports on the shared `snesgfx/title_layer.h`: (1) the vertical fly-in was too fast to see — swapped the exponential `>>3` ease for a constant slow velocity (`TITLE_FLY_STEP=3`, ~12-13 rows over ~70 frames ≈ 1.15 s), spin cap 48→96; (2) tile-grid centring leaves odd-length lines 4 px off — added per-line PIXEL centring by streaming `BG2HOFS` per scanline via new reusable `snesgfx/hdma_hscroll.h` (2-band write-twice HDMA, channel 3, table in low-WRAM bss). Static table (split in the blank gap row, scanline 108, to dodge the 1-line HDMA value-settle shear); separates the two lines for the whole fly-in so no per-frame rebuild. Verified on `life` (mixed parity CONWAY LIFE 11-odd / GLIDER GUN 10-even): gate `0xDDF1` unchanged (gate-neutral), diff vs `-DTITLE_PIXEL_CENTER_OFF` shows CONWAY LIFE shifted **exactly +4 px**, GLIDER GUN **zero** diff (independent per-line, no artifact), `-verify-machineinstrs` clean. [plan](docs/plans/2026-06-29-snes-title-hdma-pixel-center-slow-flyin.md)
+- 2026-06-28 — [snes-doom-fire] **#7 Doom-fire / heat-field SNES demo.** Classic PSX-Doom fire: a 32×28 heat grid rises + flickers from a max-heat source row through a 16-colour CGRAM ramp on BG1 4bpp. Deliberately **multiply-/divide-free** — the stress is a flat-index 8-bit array sweep + a 16-bit xorshift16 PRNG per cell. corpus gate 0x3C59 (16×16 grid, 30 steps); `dev/run.sh doom-fire` RESULT PASS (disasm eor=6 asl/lsr=8 rep/sep=21, zero __mulsi3/__udivmodsi4; bsnes-jg host==+mos-a16 0x3C59). MAME leg pending the SPC700 IPL (env-wide non-blocker; demos-only policy). Published [biohack.net/snes/doom-fire/](https://biohack.net/snes/doom-fire/). [plan](docs/plans/2026-06-28-7-snes-doom-fire.md)
+- 2026-06-27 — [snes-newton] **#2 Newton's-method fractal SNES demo.** z³−1 basins of attraction; corpus gate 0x4D8B (8×8 grid, 20-iter cap); 5-way PASS (__divsi3=2 __mulsi3=17 rep/sep=67); XFAIL newton_sim (a16-newton-step-rc-undef verifier false-positive, code correct). Published [biohack.net/snes/newton/](https://biohack.net/snes/newton/). [plan](docs/plans/2026-06-27-2-snes-newton-fractal.md)
+- 2026-06-27 — [snes-factorial] **#20 Bignum factorial SNES demo.** Base-10000 bignum carry-mul; corpus gate 0x772F (50!, FACT_GATE_N=50), 5-way PASS (__mulsi3=1 __udivmodsi4=1 rep/sep=14), published [biohack.net/snes/factorial/](https://biohack.net/snes/factorial/). [plan](docs/plans/2026-06-27-20-snes-bignum-factorial-factorial.md)
+- 2026-06-27 — [snes-rdiff] **#8 Gray-Scott reaction-diffusion SNES demo.** Activator-inhibitor PDE; 3×__mulsi3/cell; corpus gate 0x8484 (GS_GATE_STEPS=8, 8×8 grid; noinline gs_step prevents LTO merge bug), 5-way PASS (mul=3 rep/sep=111), published [biohack.net/snes/rdiff/](https://biohack.net/snes/rdiff/). [plan](docs/plans/2026-06-27-8-snes-rdiff-gray-scott.md)
+- 2026-06-27 — [snes-n-body] **#13 N-body orbits SNES demo.** Sun+Earth+Jupiter Symplectic Euler; corpus gate 0xCC65 (32 steps), 5-way PASS (__udivsi3=2 __mulsi3=6 rep/sep=82), published [biohack.net/snes/n-body/](https://biohack.net/snes/n-body/). [plan](docs/plans/2026-06-27-13-snes-n-body-orbits.md)
+- 2026-06-27 — [snes-1d-ca] **#6 Rule 90/110 1-D CA SNES demo.** Bitpacked 256-cell CA; sliding-window inner loop (constant-1 shifts only); corpus gate 0xAB2C (32 R90 + 32 R110 gens), 5-way PASS (shifts=7 bools=11 bad_mul=0), published [biohack.net/1d-ca/](https://biohack.net/1d-ca/). [plan](docs/plans/2026-06-27-6-snes-rule90-110-1d-ca.md)
+- 2026-06-27 — [snes-double-pendulum] **#14 Double Pendulum chaos SNES demo.** Two pendulums, 1 LUT-tick offset → diverging path traces; corpus gate 0xE859 (256 steps), 5-way PASS (__mulsi3=6 __divsi3=2 rep/sep=77), published [biohack.net/double-pendulum/](https://biohack.net/double-pendulum/). [plan](../../biohack.net/docs/plans/2026-06-27-14-snes-double-pendulum.md)
+- 2026-06-27 — [snes-pi-spigot] **#19 π Spigot + Monte-Carlo SNES demo.** Rabinowitz-Wagon carry chain + MC darts, corpus gate 0x771D (PI_GATE_DIGITS=1, PI_GATE_THROWS=256), corpus-a16 10/10 PASS, published [biohack.net/spigot/](https://biohack.net/spigot/) v1.0.82. [plan](docs/plans/2026-06-27-19-snes-pi-spigot-montecarlo.md)
+- 2026-06-26 — [321-far-ptr-phi-legalize] **#321 far-pointer induction-variable loop → unsupported `G_PHI (p2)` backend abort — FIXED, fork patch `0014`.** A far (addrspace 2) pointer carried across a loop back-edge (`for(;n;p++) *p=…`, a far-ptr IV) forms a `G_PHI` of a far (p2) pointer; the MOS legalizer made `G_PHI` legal only for `{s1,s8,p0,p1}`, NOT the 32-bit `p2`, so the backend ABORTED (`unable to legalize instruction: %N:_(p2) = G_PHI ...`) on valid C — a pre-existing latent gap noted as follow-up by [[320-far-memops]]. **Fix (`MOSLegalizerInfo::legalizePhi`, `.customFor({PF})` on the `G_PHI` rule + a `legalizeCustom` dispatch arm):** custom-legalize a far-pointer phi to an **s32 phi** — `G_PTRTOINT` each incoming value at the end of its predecessor block, retype the phi to s32, then `G_INTTOPTR` back to p2 after the block's phis — the same ptrtoint/inttoptr bridge `legalizePtrAdd`/far load+store use; the s32 phi then hands off to the standard `narrowScalar`-of-`G_PHI(s32)`→bytes path. Stable (the GISel artifact combiner has no phi handler; ptrtoint/inttoptr aren't artifacts), purely additive (other phi types untouched → zero regression). `PFP`/p3 is memory-only (never a register/phi value) so it can't reach the handler. **Test-shape subtlety:** at `-Os`/`-O2` indvars strength-reduces a plain `p++` IV into an integer index (no phi), so the gate `examples/65816/far_loop.c` advances by a **runtime (volatile) stride** to keep the far-ptr phi alive to the legalizer at every `-O`. Gated `dev/run.sh far_loop` (far-ptr IV write+read-back of high WRAM `$7E`, sum == `0xC9`, MAME `-Os`/`-O2` + bsnes-jg via `xcheck`); compile gate IS the crash regression-guard (pre-fix aborts). No regression (corpus 7/7, corpus-a16 6/6, far 15 ROMs on bsnes-jg, far_memops `0x74`). Patch `0014` + `dev/regen-patch-0014.sh` (per-patch delta vs `0001..0013`, round-trips; 0 foreign hunks — NB the legacy `dev/regen-patch.sh` would wrongly fold `0004..0013` into `0002`). Commit `__PENDING__`. [plan](docs/plans/2026-06-26-fix-the-far-pointer-g-phi-p2-backend-gap.md) · [upstream status](docs/upstream-contribution-status.md).
+- 2026-06-26 — [320-far-memops] **#320/#321 far (addrspace 2) memset/memcpy/memmove silent WRONG-BANK miscompile — FIXED.** A far memop the backend can't inline-expand (variable size, or constant > `legalizeMemOp`'s `SizeLimit`) fell through to the generic `createMemLibcall`, which calls the **near** runtime (`__memset`/`memcpy`, 16-bit `char*`) while passing the 32-bit far pointer → the **bank byte was silently dropped** (wrong-bank store/load, no diagnostic). Root cause was **not just the loop-idiom recognizer** (the originally-proposed "smallest fix"): clang `EmitAggregateCopy` (any far struct copy, no size threshold), null/const init, `__builtin_mem*`, and MemCpyOpt all converge on the same path — so the fix lives at the **`legalizeMemOp` chokepoint**: two static helpers (`anyFarPointerOperand` + `createFarMemLibcall`, fork patch `0013`) route far memops to a far-aware runtime (`__memset_far`/`__memcpy_far`/`__memmove_far`, `platforms/snes/mem-far.c`), widening near pointers to far bank `$00` and coercing the length to `size_t`. Near path untouched; **no generic-LLVM change**; upstream-worthy once #320's AS2 lands. The runtime is **index-style** (`ptr[i]`, invariant far base) because a far-pointer loop IV forms an unsupported `G_PHI (p2)` — a pre-existing backend gap noted for follow-up. Gated `dev/run.sh far_memops` (variable far memset + far aggregate memcpy into high WRAM `$7E`, read back == `0x74`, **MAME `-Os`/`-O2` + bsnes-jg**); no regression (corpus 7/7, corpus-a16 6/6, far suite 14/14, torture 40/40). Commit `a81874d`. [plan](docs/plans/2026-06-26-fix-the-far-addrspace-2-memset-memcpy-memmove-sile.md) · [upstream status](docs/upstream-contribution-status.md).
+- 2026-06-26 — [321-xy16-cmove-stale-xfail] **#321 `+mos-xy16` fp compare-as-select ("cmove") miscompile — XFAIL was STALE; de-XFAIL'd to positive gates.** The `ieee/` full-vendoring sweep's lone new defect (`ieee/fp-cmp-8.c` + `fp-cmp-8l.c` + `pr38016.c`, the gcc "cmove patterns" body) does **not** reproduce on a clean build of the committed patch stack (`0001..0012`): all 3 **XPASS at both `-Os` and `-O1`**, `host==default==+mos-a16==+mos-xy16==0x600D` on MAME+bsnes-jg. The xy16 codegen for this body uses **no 16-bit index register at all** (no `rep/sep #$10`, no `LDXAbs16`), so the hypothesized "16-bit index parked in X16 across the select diamond" class can't manifest; `+mos-xy16` is genuinely live (3 distinct objects). The committed patch stack is **byte-identical at the finding commit `5f3b316` and HEAD** (and `0006/0007` predate the finding), so the 12:02 sweep measured a stale/dirty shared `build/`, not the tracked patches — the same stale-XFAIL pattern as [[321-pr15296-zp-overflow]]. Removed the 3 rows + stale comment from `xfails.tsv` (now positive gates, a recurrence hard-FAILS). **No `vendor/`/`0002` change.** Worktree `wt/321-xy16cmove`. [resolution](docs/plans/2026-06-26-321-xy16-cmove-stale-xfail-resolution.md) · [superseded fix-hypothesis plan](docs/plans/2026-06-26-full-xy16-backend-fix-close-the-last-mos-xy16-defe.md).
+- 2026-06-26 — [321-mandel-display-far] **Collapsed the SNES Mandelbrot demos into one far/16-bit tester (#321).** Deleted `mandel-mode7.c` + `mandel-interactive.c` and their interactive-only deps (`view.h`, generated `mandel_image.h`, `tools/mandel-bake.c`, `dev/mandel-{mode7,interactive}.sh`); converted the canonical tester `examples/snes/mandel-display.c` to **far / `+mos-a16`-only** — it far-stores its 64×56 escape buffer into high WRAM (`$7E2000`) and far-loads it back for the VRAM reveal + CRC, keeping the 64×56 N=15 grid so the host-oracle CRC is unchanged (`0x204F`). So the publish gate now exercises the 24-bit far path (`sta [dp]`/`lda [dp]`). **Differential PASS** (`dev/run.sh mandel-shot`, 5800 frames): host == bsnes-jg == MAME == `0x204F`; disasm gate confirms 1× `sta [dp]` (87) + 2× `lda [dp]` (A7); `corpus_result` @ WRAM `$0200`. Pruned dead `mode7.h` vbuf/DMA helpers; excised `jgxcheck.cpp`'s `JGX_VIEW` path (it `#include`d the removed `view.h`); dropped the `mandel_image.h` bake from `dev/build.sh`; release gate forces `mandel-display` a16-only (`k_mandel` keeps both). **Deployed to the website**: the in-browser playable demo (`indri.studio/apps/llvm-mos-65816/play/`) + bsnes-jg-wasm bundle now ship the far ROM (selfcheck `off 0x200`/`frames 5800`); live ROM sha256 == the gate build. Commits `0034e3c` (here), `bsnes-jg-wasm 85de645`, `indri.studio e8751f5`. Clean-room `task release-test` not re-run (recommended before next publish). [plan](docs/plans/2026-06-26-collapse-the-snes-mandelbrot-demos-into-one-far-16.md).
+- 2026-06-26 — [todo-stale-box-sweep] **Backlog audit — flipped 8 stale `[ ]` umbrella boxes to `[x]` and closed Yarpgen as WON'T-DO; Open now reflects reality.** Following the far-data + pr15296 stale-XFAIL finds, swept the whole Open list: the genuinely-remaining items are upstream-posting (user-triggered) or measured-WON'T-DO — there are **no further hidden-done features**. Marked done (work already recorded in Done + the investigations): `#320 far-pointer data-value type` (built, residuals closed), `#321 soft-stack reentrant spill coverage` (P0/P1/P2 done; P3 = upstream issue), `native s16 optimization order` (all slices shipped/WON'T-DO), `A16-threading` (Phases 0/1/1.5 done, 2 retired, 3 CLOSED net-negative), `16-bit ALU chain extensions` (shipped + DEFER-with-data), `xy16 mode + ABI` (verified/formalized), `CC frame decision` (RESOLVED phased), `frame-ABI head-to-head` (CONFIRMED-shelved NULL). **Closed `Yarpgen` as WON'T-DO (superseded):** its motivating `a16-zp-pressure-overflow` XFAIL is resolved + Csmith already covers the `-O1/-Os` pressure regime 0-mismatch; its 16-bit-`int` UB-soundness cost isn't worth marginal coverage. **The lone substantive open engineering item is now `#3 SNES Blossom on-screen interactive port`** (greenfield graphics); the rest is upstream/distribution/gated.
+- 2026-06-26 — [320-far-indir-tail] **#320 Phase B DONE — far-indirect calls now LINK + RUN, a far-caller call miscompile FIXED, and the far-indirect thunk tail folds.** Completes the "thunk tails" arc ([[320-thunk-tail-calls]] did far→near). **(1) Landed the missing runtime stub** `platforms/snes/call-indir-far.s` (`__call_indir_far`: `jml (__mos_far_target)` + the 4-byte `__mos_far_target` `.noinit` slot) + wired into `platforms/snes/CMakeLists.txt` (gc-sectioned, `-mcpu=mosw65816`; snes-far inherits it via PARENT). A far-indirect *call* now links (was `ld.lld: undefined symbol: __call_indir_far`); resurrected e2e `examples/65816/far_fnptr.c` + `dev/far_fnptr.sh` (`far_leaf(0x5A)==0xFF`, MAME+bsnes-jg). **(2) Fixed a pre-existing far-indirect-from-far-caller miscompile:** a far function calling `__call_indir_far` was mis-routed through `__call_near_from_far` (`IsFarNearThunk` captured the bank-0 `__call_indir_far` global, overriding `IsFarIndirThunk`) → stack corruption (the indir thunk `jml`s away, never returns to the near thunk's `pea` site). Fix: exclude `__call_indir_far` from `IsFarNearThunk` so it JSLs directly. **(3) Added the `IndirFarThunk` fold arm** to `MOSLateOptimization::tailJMP` — now live post-fix: `JSL __call_indir_far; RTL → TailJML` (the indir thunk pushes nothing → far target's RTL pops the original caller's return). New gate `examples/65816/far_indir_tail.c` + `dev/far_indir_tail.sh` (`far_outer` far-indirect tail folds to `$5C`, `0xFF` both emulators). Compiler edits (MOSCallLowering.cpp + MOSLateOptimization.cpp) regenerated into `0001`; round-trips `0001..0012`. xcheck all 14 far ROMs PASS on bsnes-jg (incl. far_fnptr/far_indir_tail 0xFF, far_near_call 0xE0 unaffected); corpus 7/7; csmith 50 0-mismatch. Closes the far-fn-ptr-(a) "done+landed" overclaim. Worktree `wt/320-far-indir-stub`. [plan](docs/plans/2026-06-26-320-thunk-tail-calls.md).
+- 2026-06-26 — [321-pr15296-zp-overflow] **#321 `pr15296` link-time ZP overflow (`a16-zp-pressure-overflow`) — XFAIL was STALE; now a positive gate.** The gated narrow-fix spike's diagnosis found the bug no longer reproduces: on the current stack (`c798c31`+`0001..0012`) `dev/run.sh torture --tests pr15296.c` at **both `-Os` and `-O1`** folds `default==+mos-a16==+mos-xy16==0x600D` on MAME+bsnes-jg, with `.zp.noinit` **18 B** (not the recorded 1043 B). The documented "`Imag16`-saturation past 256 B" mechanism was **wrong** — the allocator hard-caps ZP at `-zp-avail=224` (`MOSZeroPageAlloc.cpp:263/267/829/841`), so the 1043 B was a pre-fix register-pressure artifact relieved by the post-`0009` advances (`0010`–`0012`; likely `0011`'s scavenger live-`$p` rework, whose pre-fix `$p` mishandling inflated spill/ZP traffic — exact patch not bisected, would need a counterfactual rebuild). Dropped `KNOWN_ISSUES["a16-zp-pressure-overflow"]` (`tools/a16_fuzz.py`) so a recurrence hard-FAILS; pr15296 is now a positive in-scope c-torture gate. **No `+mos-a16` register-pressure XFAILs remain.** No compiler change (already fixed). [plan](docs/plans/2026-06-26-pr15296-mos-a16-link-time-zp-overflow-gated-narrow.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
+- 2026-06-26 — [321-a16-phase3-trigger-check] **#321 A16-threading Phase 3 trigger-check → CLOSE Phase 3 as measured net-negative.** Trigger **(b) FIRED** — new heavy-16-bit math kernels (CORDIC `k_trig16`/`k_trig32`, Mandelbrot, Hopalong) pushed 6 real fns to ~10/14 pairs (`cordic16_atan2` at the full **14/14**), up from ~5/14 on 2026-06-18; trigger **(a)** clean (full sweep + csmith 200, 0 mismatch/crash). Ran the gated spike: **B0** (`shouldCoalesce` `{Anyi1,Anyi8,GPR}→Ac16` barrier) proven **byte-for-byte inert** across all 190 example/corpus compiles (isolated in-build — a false `far_near_call.c` diff was hot-tree vendor drift). **B1** (flag-gated pre-RA `Ac16`-residency pass `MOSPreRAAccum16`, mirrors post-RA `threadAccum16` on SSA vregs) **fires heavily** (`k_trig16` −103 round-trips) and is `-verify` clean on all 190, but gives **zero peak-ZP-pressure relief** (`cordic16_atan2` 14/14→14/14) and is a **net +24 B regression** (`k_trig16` +26 B). **B2** (residency defaulted on so the differential exercises it): correct (corpus 7/7, a16/k_ suite 66/66, csmith 200 0-mismatch, 196/196 `-verify`-clean) but **+530 B across the whole example+corpus set** (41 worse / 6 better) → fails net-neutral-or-better. A **post-RA-extension probe** (salvage the 6 winners pressure-neutrally?) came back **not real** — `threadAccum16` already removes 100% of *resident* round-trips; the rest are genuine reloads across the single accumulator's reuse (intrinsically RA-level). The pool-fill is genuinely-simultaneous liveness the single accumulator can't thread away, confirming the deferral's cap by measurement. Nothing landed (default build byte-identical). Added the explicit Phase-3 FIRE line to `dev/measure-zp-pressure.sh`; the spike implementation is described in the investigation doc (raw `.diff` not retained — Phase 3 closed). See [spike+verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md) · [plan](docs/plans/2026-06-26-321-a16-threading-phase-3-trigger-check-pass-re-op.md).
+- 2026-06-26 — [320-thunk-tail-calls] **#320 far→near thunk tail now folds (−1 B); far-indirect BLOCKED on an unlanded prereq; stale far-tail status row fixed.** Opened from a self-contradicting `implementation-status.md` (`:53-54` recorded the `4adda8b` far→far landing, `:72` still said "JSL is never tail-converted"). **Phase A (DONE):** broaden `MOSLateOptimization::tailJMP`'s far arm to also fold `JSL __call_near_from_far; RTL → TailJML` — the far→near mixed-banking thunk is `ChangeToES`'d to an EXTERNAL symbol, so match it by exact name (`isSymbol() && name == "__call_near_from_far"`, mirroring `MOSCallLowering`); stack-safe (the thunk's `pea…rts` is a net-0 near frame above the 3-byte far return, its `rtl` pops the original caller's). Flipped `dev/far_near_call.sh`'s negative gate → positive (long `jmp __call_near_from_far` + `R_MOS_ADDR24`, no jsl/rtl); `0xE0` MAME+bsnes-jg, far_tail still `0xCB`, corpus 7/7, csmith 50 0-mismatch, `+mos-a16` verify clean. In `0001` (round-trips `0001..0012`; diff vs main's `0001` = only the far-arm broadening). Also fixed `regen-patch-0001.sh`'s **stale `STACK`** (stopped at `0009`; appended `0010`–`0012` so the round-trip verify matches live). **Phase B (BLOCKED, not deferred):** far-indirect `JSL __call_indir_far; RTL` would fold the same way, but a far-indirect *call* doesn't link on `main` — its runtime stub (`call-indir-far.s` + `__mos_far_target`) was never landed into tracked `platforms/snes/`/the SDK (only WIP `7ee5f6f`/`1ea7507`); proven via `ld.lld: undefined symbol: __call_indir_far`. Recommend landing the stub + a far-indirect-call e2e first (also corrects the far-fn-ptr-(a) "done+landed" overclaim). Worktree `wt/320-far-tail-thunks`. [plan](docs/plans/2026-06-26-320-thunk-tail-calls.md).
+- 2026-06-26 — [321-trig-phase3-derived-hyperbolic] **#321 trig compiler-test Phase 3 — derived (tan/asin/acos) + hyperbolic (sinh/cosh/tanh) Q2.14 CORDIC. DONE + VERIFIED — the trig set is now COMPLETE.** Completes the surface across both widths: Phase 1 (Q16.16 libfixmath, s32-libcall payload) · Phase 2 (Q2.14 CORDIC direct, zero-libcall native-s16) · **Phase 3 (Q2.14 derived + hyperbolic)**. Two new coverage points: (a) a **16-bit-context s32-libcall payload** — `tan=sin/cos` needs a Q2.14 divide and `asin/acos=atan2(·,√(1−x²))` a Q2.14 sqrt, so `__mulsi3`/`__divsi3` fire (the 16-bit analogue of Phase 1), `-verify` clean, no 64-bit leak, 346 rep / 372 sep; (b) **CORDIC hyperbolic mode** for `sinh/cosh/tanh` (the repeated i=4,13 `atanh(2^-i)` schedule) — a path neither Phase 1/2 reach. Extends `tools/gen-cordic-tables.py` (hyperbolic `atanh` table + `HGAIN=19784`, `--check`-able) + `examples/65816/cordic16.h` (libcall-free `q214_sqrt`/`q214_div`, derived + hyperbolic functions; hyperbolic seeds `x0=ONE` not `1/An_h` so the fast-growing `cosh` stays in int16, post-scaled by `HGAIN`; `tanh=y/x` cancels the gain). New `examples/65816/k_trig16x.c` + `dev/k_trig16x.sh` + `tools/trig-accuracy3.c`. **`dev/run.sh k_trig16x`**: `corpus_result==0x759567C4` host==default(8-bit)==`+mos-a16` on **MAME + bsnes-jg**; cross-width PASS with the **32-bit hyperbolic derived from the now-compiled `fix16_exp`** (vendored-but-uncompiled until Phase 3) — `fix16_exp` is accurate (hyperbolic cross ~5e-4) while CORDIC again *beats* libfixmath on `asin/acos` (err16 4e-4 vs err32 1.0e-2). Bit-exact host==target holds because int32 intermediates have identical value semantics both legs. No compiler change (SDK/example-level). [plan](docs/plans/2026-06-26-trig-phase3-derived-hyperbolic.md).
+- 2026-06-26 — [321-trig-phase2-cordic] **#321 trig compiler-test Phase 2 — 16-bit Q2.14 CORDIC as the native-s16 / zero-libcall differential. DONE + VERIFIED.** The deliberate complement to Phase 1 (Q16.16 libfixmath, which *asserts* the s32 libcalls `__mulsi3`/`__divsi3` fire): CORDIC is shift-and-add only, so under `+mos-a16` it compiles to almost-entirely `rep`/`sep`-bracketed native 16-bit ALU code with **zero arithmetic libcalls** — the driver asserts the *absence* of every `__*hi3`/`__*si3`/`__*di3` mul/div/shift helper (114 rep / 132 sep, `-verify` clean). A **fresh re-implementation** (`grep -ri cordic` confirmed nothing pre-existed): `examples/65816/cordic16.h` (rotation-mode `sincos`, vectoring-mode `atan/atan2`, fully UNROLLED so every `>>i` is a constant shift), seeded from `tools/gen-cordic-tables.py` → `examples/65816/cordic16_tables.h` (`atan(2^-i)` table + gain `K=9949` derived from first principles, `--check`-able). **Three format-driven design moves** (Q2.14 range is [−2,2), so π doesn't fit): angles kept in-format (`sin/cos`∈[−π/2,π/2], `atan2` right-half-plane only); no int16 overflow anywhere (rotation seeds `x0=1/An` so magnitude ≤ ONE; vectoring pre-halves inputs, scale-invariant) → **host (32-bit int) == target (16-bit int) bit-exact**; pure-additive volatile-stepped input sweep so the *whole* kernel is libcall-free. `dev/run.sh k_trig16`: `corpus_result==0x9446C734` host==default(8-bit)==`+mos-a16` on **MAME + bsnes-jg**; cross-width harness `tools/trig-accuracy.c` PASS (16-bit vs 32-bit bounded by libfixmath's coarse side, as predicted — and CORDIC `atan` err 3.6e-4 actually *beats* libfixmath's 1.0e-2). No compiler change (SDK/example-level). Phase 3 (derived `tan/asin/acos`, hyperbolic) stays deferred. [plan](docs/plans/2026-06-26-trig-phase2-q214-cordic.md).
+- 2026-06-26 — [320-far-data-3bank] **#320 "Far data > 2 banks" — formalized into a dedicated passing gate (`dev/run.sh farindex`).** The capability was already implemented (the clang far-subscript fix in `0001` — promote a far/AS2 array index to the 32-bit per-address-space width so `index*elemsize` carries into the 24-bit **bank byte**) and emulator-verified as a *side-effect* of `dev/run.sh k_trig32lut` (the ~200 KiB libfixmath sin LUT across banks $C1..$C4), but `implementation-status.md` still read "⬜ Deferred… multi-bank data placement not yet exercised" and the minimal repro `examples/65816/farindex.c` was a stale "DOCUMENTED-OPEN repro, not yet a passing gate" with no driver. **Now a dedicated, fast gate:** a `const FAR uint16_t tbl[]` spanning banks **$C1/$C2/$C3** (98304 × uint16 = 192 KiB in `.far_rodata`, `platforms/snes-hirom`, supplied by new `tools/gen-farindex-lut-asm.py`) is read at three runtime (volatile) indices — 100/50000/90000 — that land in three distinct banks via `lda [dp]` (A7, R_MOS_ADDR24), folded to `corpus_result==0x0001D8A1`. Value contract `tbl[i]=(i+(i>>16))&0xFFFF` makes each read's value depend on its bank ordinal, so every probe independently regress-detects (a plain `i&0xFFFF` would let the $C3 probe alias its own bug). a16-only (a far ptr is a 32-bit value); **host == +mos-a16 on MAME + bsnes-jg.** Rewrote `farindex.c` into the differential micro-test (fresh passing-gate header), new `dev/farindex.sh` (modeled on `dev/k_trig32lut.sh`, tiny settle budget), wired `dev/run.sh`. No compiler change, no platform/linker change (`snes-hirom` already ships; the `FULL(rom_far)` image is 512 KiB). Single-object absolute-long cross-bank read stays gated by `far-bank1`. [plan](docs/plans/2026-06-26-formalize-far-data-2-banks-into-a-dedicated-passin.md).
+- 2026-06-26 — [321-scavenger-live-p] **#321 `+mos-a16`/`+mos-xy16` register-scavenger crash (`$p is not a GPR`) — FIXED, pristine-upstream fork patch `0011` (+ `0012` for the bug it surfaced).** The 8/500-seed scavenger crash (`a16scavnz.c`; family 169/173/196/268/271/272/306/420) was *previously* deferred as an upstream issue-with-no-fix. **Root cause** (asserts-confirmed): `MOSRegisterInfo::saveScavengerRegister` assumed N/Z dead at every scavenge point AND that a live `$p` is only preserved across a *balanced* hard-stack range; both break under 16-bit-accumulator flag live ranges, where a 16-bit compare keeps N (or Z) live across a frame-index materialization whose carry the scavenger places in `$c` (a sub-register of `$p`) — forcing the whole `$p` preserved across an *unbalanced* range → illegal `STImag8 $p` + undefined-`$p` `PH $p`. **Fix (`0011`):** for the unbalanced case, route `$p` **hard-stack-neutrally** through a dead 8-bit index register into the reserved `RC17` slot (`PHP;PL<idx>;ST<idx> RC17` / `LD<idx> RC17;PH<idx>;PLP`) — each half net-0 on the stack, so independent of the imbalance; width-safe because `MOSInsertREPSEP` (runs after scavenging) forces index ops to `XW_X8` even under `+mos-xy16`. Plus: flag the no-reaching-def `PHP` `undef` (verifier), drop the stale `assertNZDeadAt` (its premise is the false invariant; flag preservation is holistic via the scavenger's interleaved P-saves). **Second bug found while validating** (compilation reached MC lowering once the scavenger no longer crashed): `MOSMCInstLower` lowered `LDCImm` only for `0`/`-1`, but a *set* i1 carry can arrive as `1` (a 16-bit `SBC` carry-in) → `llvm_unreachable` on asserts (silent UB under NDEBUG); a plain `+mos-a16` 16-bit subtract reproduces it. **Fix (`0012`):** lower any nonzero i1 as `SEC`. Both pristine-upstream (drop on merge); `0011`/`0012` round-trip (`0001..0012` == live tree). DEFAULT 8-bit unaffected; corpus 7/7; `a16scavnz.c` promoted to a **positive gate** (`dev/run.sh a16scavnz` → `0x22A6`, host==default==`+mos-a16`==`+mos-xy16`, MAME+bsnes-jg, **asserts-clean**); `KNOWN_ISSUES["scavenger-p-not-gpr"]` + its repro row dropped; differential fuzzer 0 mismatch/0 crash. [plan](docs/plans/2026-06-26-321-scavenger-nz-live-p-save-fix.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-scavenger-nz-liveness.md) · [scavenger PR](docs/upstream-scavenger-live-p-pr.md) · [LDCImm PR](docs/upstream-ldcimm-set-lowering-pr.md).
+- 2026-06-25 — [321-a16-pressure-fix] **#321 `+mos-a16 -O1/-Os` regalloc out-of-registers crash on real code (`globals.c`) — FIXED, fork patch `0009`.** The `globals.c`/`a16regpress.c` *"ran out of registers during register allocation"* deadlock under `+mos-a16 -O1/-Os` (DEFAULT 8-bit + `+mos-a16 -O0` always compiled clean) is fixed. **Root cause** (fresh asserts pinpoint, `-debug-only=regalloc`): the final blocker was **not** `Ac16`-residency but a single **A-pinned i8 loop counter** — the strength-reduced array byte index (stepped `i += 2`) selects to `add Ac,imm → ADCImm` (class `Ac`={A}; `adc` is hardware-A-only), held live across the 16-bit indexed-load `Ac16`=A:B transit → collides on physical A; last-chance recolor fails (singleton `{A}`) and the 1-instr INF transit can't spill. **Fix (`0009`, `ad506ed`):** under `hasAccum16()`, `MOSInstructionSelector::selectAddSub` lowers a small-constant i8 add/sub (`|amt| ≤ 2`) to a relocatable `G_INC`/`G_DEC` chain (Anyi8 = A/X/Y/zp) instead of the A-pinned `ADCImm`, so the byte index coalesces into the X array index (`inx; inx; cpx`) and frees A16 — **one spillable/relocatable change, no RA rework**. Refutes the 2026-06-18 *"no targeted fix, only the general Phase-3 `Ac16`-residency rework"* conclusion **for this crash** (coalescing still ruled out — it's an orthogonal de-pin). DEFAULT 8-bit byte-identical (gated); **−123 B over 122 c-torture programs (0 worse)**; both `a16regpress.c` and the original `globals.c` compile + run clean (release + asserts). `KNOWN_ISSUES["regalloc-out-of-registers"]` dropped + repro row removed; `examples/65816/a16regpress.c` promoted to a **positive gate** (`dev/run.sh a16regpress` → `0x01A7`, both emulators). `regen-patch-0009.sh` round-trips (`0001..0009` == live `MOSInstructionSelector.cpp`). **NOT fixed by `0009`** (still XFAIL — the genuinely-deferred s16-pressure core): the scavenger-N/Z crash (`a16scavnz.c`, `scavenger-p-not-gpr`) + the `pr15296.c` link-time ZP overflow (`a16-zp-pressure-overflow`), both byte-identical pre/post. [plan](docs/plans/2026-06-24-321-a16-pressure-fix-implementation.md) · [handoff](docs/plans/2026-06-23-321-a16-pressure-scavenger-fix-handoff.md) · [investigation §RESOLUTION](docs/investigations/65816-a16-regalloc-pressure-failure.md).
+- 2026-06-25 — [321-mandel-zoom-pyramid] **Mandelbrot ZOOM PYRAMID — true increasing detail on zoom-in (#321 M2), Phases 1 + 2.** The interactive demo only *magnifies* its baked bitmap; this adds genuinely-deeper detail. The host bakes a STACK of Mandelbrot levels, each 2× finer zoom centered on the real-axis mini-Mandelbrot (`c=-1.7548776662`, finalized by rendering several centres to PNG — Lesson 1); on the SNES, Mode 7 hardware-zooms the current level and the ROM **DMAs the next finer level** as zoom crosses each 2× threshold — so the dive runs into NEW structure (whole set → down the antenna → a complete tiny copy of the set) with **zero on-console fractal math**. 64×64 × 6 levels = 32× deep fits one 32 KiB LoROM bank (no linker change); builds **both default-8bit and `+mos-a16`** (near ROM DMA, no far pointer). New `tools/mandel-bake-pyramid.c` (host `double` renderer → gitignored `examples/snes/pyramid_image.h`: per-level tiled chr, one shared normalized palette, `MANDEL_PYR[]`/`MANDEL_PYR_HASH[]`, per-level PNGs), `examples/snes/{zoom.h (pure host-replayable level-swap state machine — `[S0/2,2·S0]` hysteresis, R/L dive, Y/A rotate), mandel-zoom.c}`, `dev/mandel-zoom.sh`; `mode7.h` gains parametric `m7_tilemap_identity`; `jgxcheck.cpp` gains `JGX_ZOOM`. **Differential PASS** (`dev/run.sh mandel-zoom`): per-level image hash all 6 levels host==default==`+mos-a16` (SMOKE 0x9191 + HASH) on MAME + bsnes-jg; scripted-zoom view-math host==target both builds (ZOOM, swaps=3); `-verify` clean; 32 KiB fit. Regressions green (`mandel-interactive` 0xF99C, `mandel-mode7` 0x75E8). **The gate caught a real DEFAULT-8bit matrix-fold-loop MISCOMPILE** (loop `m[i]` folds 0x456E vs correct 0xB115; unrolled form correct; context-sensitive, independent of #321 — see the new follow-up item). **Phase 2 DONE+green (`6fb3d1b`): multi-bank LoROM, 128×128 × 8 levels = 256× deep, 256 KiB / 8 banks** — new `platforms/snes-zoom` platform (one bank-aligned level per bank), bake `PYR_MULTIBANK` mode (per-level `.rodata_levelK` + `MANDEL_PYR_BANK[]`), the swap DMAs from `(bank : addr16)` (no far pointer → still builds default+`+mos-a16`), `snes-checksum.py` 256 KiB, a `jgxcheck` VRAM-readback gate + host ROM-file per-bank hash. `dev/run.sh mandel-zoom` (PYR_MODE=hd default | sd) PASS both modes/builds. **Found the vblank limit** (a 16 KiB swap DMA overruns vblank → truncated mid-transfer; fixed by force-blanking the large swap — the VRAM gate caught it). Live: `task mandel-zoom-play`. [plan](docs/plans/2026-06-25-321-mandelbrot-zoom-pyramid.md).
+- 2026-06-25 — [321-interactive-mandelbrot] **Interactive SNES Mandelbrot — a real-time Mode 7 joypad fly-around (#321 M2), INSTANT boot, host==default==+mos-a16.** The static `mandel-mode7` was too slow (~4 min on-console compute); this bakes the 128×128 image host-side TILED into Mode 7 character order (`tools/mandel-bake.c` → gitignored `examples/snes/mandel_image.h`) and DMAs it straight ROM→VRAM at boot — no compute, no de-linearize loop (measured the reused `build_vbuf` at ~5–6 s of black boot and redesigned around it). Removing the far staging buffer means the demo builds **both default-8bit and `+mos-a16`**. New `examples/snes/{mandel-interactive.c, mode7.h (shared Mode 7 upload + DMA + matrix setters, refactored out of mandel-mode7.c), view.h (pure pan/zoom/rotate state + the 8.8 Mode 7 matrix 16×16→32 multiplies)}`, joypad HAL in `platforms/snes/snes.h` (`snes_read_pad1`/`snes_wait_vblank` + `JOY_*` + `VMAIN_INC_LOW_1`). **Differential PASS:** displayed-image hash **`0xF99C`** host==default==`+mos-a16` on MAME (Xvfb snapshot) + bsnes-jg; a **scripted-input view-math gate** (`dev/jgxcheck.cpp -DJGX_VIEW` replays `view.h` over the ROM's ground-truth pad log) host==target for BOTH builds; `-verify-machineinstrs` clean; 32 KiB fit. The gate caught a real 8/16 promotion bug (`h>>15` on the 16-bit-int target → negative-int arithmetic shift). Bonus fixes: a pre-existing dep-tracking bug (`dev/sync-platform.sh` — editing `platforms/snes/snes.h` now reaches the build) and `dev/build.sh` (bake the header + build `mos-a16-only`-marked far examples with +mos-a16; `dev/run.sh build` was broken on main since the beefy merge). Regressions green: `mandel-mode7` 0x75E8, `k_mandel` 0x820B, corpus 7/7. Controls: D-pad pan / L-R zoom / Y-A rotate / Select palette / Start reset (`task mandel-play`). [plan](docs/plans/2026-06-25-321-interactive-mandelbrot-mode7.md).
+- 2026-06-25 — [321-csmith-fuzzer] **#321 Csmith differential fuzzer DONE (Phases 0–5) + consolidated into a single-file reference.** Off-the-shelf [Csmith](https://github.com/csmith-project/csmith) replaced the hand-rolled generator as the `dev/run.sh fuzz` default (builtin kept via `--gen builtin`): per-seed gen (`tools/csmith_run.py`) → host-side fit pre-filter → the 4-way **default-as-oracle** differential (`host`≡`default@MAME` == `+mos-a16` == `+mos-xy16` == `+mos-a16@bsnes-jg`), sound because `platform.info` (int=2) + kept `safe_math` make output UB-free at the target's 16-bit `int`. SNES adapter `examples/65816/csmith/{csmith_snes.h,platform.info}` folds Csmith's 32-bit CRC into `corpus_result`; `vendor/csmith` built on demand (`dev/fetch-csmith.sh`). **Caught + drove fixes:** the a16 `G_UNMERGE`/`G_MERGE` s32 legalizer gaps (seeds 11, 113) + the `+mos-xy16` high-byte clobber (seeds 247+445) — all FIXED on `main`. **Phase 5 (`e865dff`):** sampled/full `fuzz-csmith` CI job (host-side, `needs: xcheck`, secret-gated, nightly `schedule:` ready-but-commented). Merged `dd5616b` (2026-06-19); consolidated 2026-06-25 — mechanism + state + open residue (nightly schedule, far/AS2/AS3 out-of-scope-by-design, regression-seed extraction, Yarpgen) + the WDC816CC/Plum Hall motivation — into [investigation](docs/investigations/csmith-differential-harness.md). [plan](docs/plans/2026-06-19-321-csmith-differential-fuzzer.md).
+- 2026-06-24 — [blossom-snes-kernel] **Blossom (Hopalong attractor) ported to SNES — Phase 1 headless Q8.8 math kernel, 4-way verified.** The math heart of Blossom 4.0 (`~/Downloads/blossom.html`) the 1989 way: fixed-point + a 512 B sqrt LUT (`BLOSSOM.TBL`-style), no FPU. New `examples/65816/k_hopalong.c` (Q8.8 `short` orbit, `volatile` params so the 1024-iter loop can't fold, `tools/gen-sqrt-lut.py`-generated `SQRT_LUT`, rotate-xor fold → `corpus_result`; `#ifdef HOST` oracle), `dev/k_hopalong.sh` (`dev/run.sh k_hopalong`). `sign(x)*sqrt` written as a conditional negate (not `__mulhi3`) → a16 +46 B shrank to **+14 B**. **Differential PASS:** host == default == `+mos-a16` == **`0x1BBC`** on MAME + bsnes-jg; `-verify-machineinstrs` clean; native 16-bit active (12 rep/13 sep). a16 is **+14 B** vs default — the expected 8/16-interleave regression class (`b*x` `__mulsi3` + sign/clamp branches through 16-bit math), a measurement not a defect. On-screen interactive renderer = #3 (Open/M2). [plan](docs/plans/2026-06-24-blossom-snes.md).
+- 2026-06-24 — [reviewer-presentation] **Reviewer-facing presentation of the `0001`–`0008` stack — review guide + LLVM primer + upstream-PR Appendix D, plus 2 ROM-neutral platform refinements.** New `docs/65816-patch-series-review-guide.md` (per-patch need/patch/proof, dependency+sequencing+timeline diagrams, Appendices A–D, GitHub-linked to all 8 patches + 17 artifacts) + `docs/llvm-primer-for-65816-review.md` (front-end→IR→backend→MC, GlobalISel/TableGen/MC/RA + glossary) for the upstream submission. Appendix D + `dev/upstream-status.sh` = the bug-fix-PR accounting (`0003`→PR #562, `0008`→#561/PR #563; scavenger deferred). Platform: `clang.cfg` now defaults `-mcpu=mosw65816`; crt0 `.init.50` rewritten from hand-encoded `.byte` to 65816 mnemonics (`-fno-lto` so module-level asm gets `W65816`) — both **ROM-byte-identical** (corpus 7/7, smoke 0x42). Renderer fix in python-tui-lib `0134f1c` (footnote links). [plan](docs/plans/2026-06-24-reviewer-patch-series-presentation.md).
+- 2026-06-23 — [321-s32-verification] **#321 32-bit `long`/`int32_t` support VERIFIED — micro-test + builtin-fuzzer s32 track (no compiler change).** Two complementary differential verifications of the existing s32 codegen (2×s16 + 4×s8↔s32 (un)merge + `__mulsi3`/`__udivsi3`/`__umodsi3` libcalls). **(1)** `examples/65816/a16s32.c` + `dev/run.sh a16s32`: folds every s32 hazard into a 32-bit `corpus_result`; full 4-way `host==default==+mos-a16==0x50F2B870` on **MAME + bsnes-jg** (4-byte read; `long` has a default leg, so stronger than the far tests). WANT is the host-oracle of the identical `uint32_t` arithmetic (`-DHOST_ORACLE`) + a runtime drift-guard. **(2)** `tools/a16_fuzz.py` gains a `--s32` track: a seeded op-list over 4 `uint32_t` regs interpreted by BOTH a C emitter and the exact Python oracle (lockstep), gated so `--s32` off is byte-identical (30/30). `dev/run.sh fuzz --gen builtin --s32` → **40/40, 0 mismatch** (deterministic 4-way now exercises `long`; csmith already did non-deterministically). Both deliverables 2-agent-workflow reviewed → **ship** (emit/eval lockstep checked over 200k randomized op-lists, 0 drift; UBSan-clean; one impl-defined-consistency comment added). Worktree `wt/321-s32-verify` retained. [plan](docs/plans/2026-06-23-321-32bit-long-verification.md).
+- 2026-06-22 — [320-far-tail-calls] **#320 far tail calls DONE — far→far tail folds 5 B→4 B, verified both emulators.** New `TailJML` pseudo (→ `JMP_AbsoluteLong` `$5C`, `R_MOS_ADDR24`) + a far arm in `MOSLateOptimization::tailJMP`: `JSL <direct far global>; RTL → TailJML`, gated `isGlobal && .far_` so near→far (`JSL;RTS`) + the bank-0 thunks (external/non-`.far_` symbols) auto-exclude — conservative (a misclass only misses a win). a16-independent → regenerated into the worktree's `0001` (round-trips `0001..0007`; `MOSLateOptimization.cpp` added to `FAR_FILES`); **landed on `main` (`4adda8b`) + toolchain rebuilt/verified 2026-06-23.** New `dev/run.sh far_tail` (`far_outer` single fold + execution-discriminating two-block `far_pick` → `0xCB`) MAME+bsnes-jg; negative gate in `far_near_call.sh` (thunk tail NOT converted); `+mos-a16` verify clean; corpus 7/7, far suite 12 ROMs, csmith 50 0-mismatch. Design + impl each 3-agent-workflow reviewed (all ship; one test-strengthening + one comment fix applied). Worktree `wt/320-far-tailcall` retained till upstream. [plan](docs/plans/2026-06-22-320-far-tail-calls.md).
+- 2026-06-22 — [0007-fold-toolchain-rebuild] **Patch stack is now `0001`–`0007` on `main`; toolchain rebuilt clean from the stack + verified.** The near-abs bank-relaxation **`0007`** (Task B's realization) **and** the `regen-patch-0001.sh` 7-patch-stack / complete-`FAR_FILES` tooling refresh landed on `main` (`ff02726` / `d5c5946`, integrated via the 2026-06-22 merge). A **clean `dev/run.sh toolchain` rebuild from the patch stack** (vendor reset → apply `0001`–`0007` → 8m31s incremental build) brought this checkout's install — a stale 2026-06-20 snapshot — back in sync with committed `main`. **Verified:** `far_near_call == 0xE0` (the far→near thunk routing; its earlier failure was the **stale install**, not a regression — main's source always had it), `corpus` 7/7, `far_call == 0xF3`, `a16 == 0x0042` on both emulators.
+- 2026-06-22 — [snes-near-code-budget] **SNES near-code budget is now an enforced link-time contract (+ the near/far "code model" framing).** Answers *"add a mode that limits codegen to 64k/32k?"* → **no** — near (`JSR`/`RTS`, `CodeModel::Small`, 2-byte fn ptr) is already the default, far is per-symbol opt-in, so a `-mcmodel` mode buys no codegen win. **Fix (linker-script only, no `vendor/`):** `platforms/snes/link.ld` + `snes-far/link.ld` carve the fixed header+vectors into a `romhdr` MEMORY region so `rom`'s LENGTH (`$8000–$FFAF` = 0x7FB0 = 32688 B) **is** the budget → an over-budget link now fails with the clear `region 'rom' overflowed by N bytes` (was an obscure `.snes_header` overlap). **Verified:** ROM **byte-identical** for in-budget programs (7 snes corpus + 5 snes-far ROMs, 0 diffs); `corpus` 7/7; far suite PASS (`far-bank1`/`far-run`/`far_call`/`far_store`/`far_arith` == 0xF3, byte-identical); overflow probe → `overflowed by 206 bytes`. (`far_near_call` failed at verification time **only** due to a stale 2026-06-20 install — proven by stash+rebuild, not this change; a later clean toolchain rebuild restored it to `== 0xE0`.) Docs: "Code model: near vs far" section in the #320 upstream note + a pointer in upstream-contribution-status. [plan](docs/plans/2026-06-22-snes-near-code-budget-and-code-model.md).
+- 2026-06-22 — [321-native-s16-surface-consolidation] **#321 native-s16 surface CONSOLIDATED + measured-COMPLETE — the #321 analogue of the zero-bank close (nothing built).** Durable roll-up `dev/measure-native-s16-surface.sh` drives the three existing harnesses + adds the missing ROADMAP step-5 acceptance table. **Phase 0 (RAN 2026-06-22):** all three states reproduce — compares native except the optimal byte-wise register-resident EQ-as-value; A16-threading `roundtrips=0` (post-`threadAccum16` optimum); ZP `0/13` pool-exhaust (max ~5/14). Step-5 **a16-vs-default is honestly MIXED** — the sustained-16-bit class wins (`chain −63%`, `multivalue −65%`, `k_isort −39%`, **aggregate −22%/−220 B**, corpus **7/7**) while 8/16-interleave stress kernels regress by-design (`k_prng +60%`, `k_crc16 +27%`; verified pure `rep`/`sep`+`Imag16` cost, no libcall asymmetry) → confirms **why a16 is opt-in/per-op-gated**. **The one fact it contributes:** A16-threading Phase 3 ≡ ALU-chain >14-live ≡ `globals.c` `-Os` RA-crash are the **same** deferred core (RA-level 16-bit residency under register pressure) — one frontier, one trigger, one B0→B1→B2 recipe, now cross-referenced from all three still-open items. New ≥8-shift bracket-fragmentation candidate routed to a future gated spike (didn't meet the GO bar). GO contingency did **not** fire; doc cascade landed (`a584a78`: ROADMAP §5 + upstream-status fold). [plan](docs/plans/2026-06-22-321-native-s16-surface-consolidation-and-close.md) · [close-out](docs/plans/2026-06-22-321-native-s16-surface-consolidation-knock-out-the.md).
+- 2026-06-22 — [m1-incremental-rebuild] **M1 incremental-rebuild time MEASURED (plan step 4 PASS): editing one backend `.cpp` → ~11 s relink, not a full rebuild.** Real string-literal edit to `MOSInsertREPSEP.cpp` (preprocessor-surviving → true ccache miss) → `dev/run.sh toolchain` = 12 ninja steps (recompile TU + re-`ar` MOS lib + relink lld/clang-23/clang-scan-deps), 11 s wall / 10 s in-container, vs 30–90 min cold. Measured on a verified-quiet host in an isolated real-copy worktree (per howto §compiler-changing); evidence in the plan. [m1 plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
+- 2026-06-22 — [320-zerobank-as4] **#320 zero-bank (AS4) measure-and-closed: CONFIRMED measured-null — the five-address-space model is now COMPLETE (all 5 spaces measured).** De-lumped the circular 0b census (the old `dev/measure-five-space-census.sh` line "zero-bank likewise has 0 users" was a lumped assertion, never an AS4-specific probe) into a direct, reproducible measurement — `dev/measure-zerobank-census.sh` + `examples/65816/zerobank_probe.c`, host-only: **0 realistic sites** carry bank-0 data as a far-typed pointer (corpus/kernels `Nfar=0`; far suite stores 0 far ptrs, all transient), and at any site zero-bank — bit-identical to a near pointer (`p4:16:8`==`p0:16:8`) — **ties the "near + lazy `near→far` cast" incumbent on every axis**: storage 2 B==2 B, global access `ad`==near's `ad`, runtime deref `(dp)` (no far indexed-long mode; AS4 cheap access is globals-only). Its one possible access win (forcing `ad` over `af`) is exactly the in-flight `0007` near-abs relaxation's win for ALL near pointers — not a new far-typed space. Premise-checked (workflow: 4 readers + 3 adversarial skeptics, 0 wins); feasible (~30 LoC, reuses near path + 0006 cast template, no `MVT` workaround) so **null by worth, not infeasibility** — dominated like frame-ABI's DP/SR frames by the soft static stack. **Nothing built.** Five-space §Phase 2, the upstream note + status, and the circular census line all updated. [plan](docs/plans/2026-06-22-320-zerobank-as4-measure-and-close.md).
+- 2026-06-21 — [320-far-pointer-integration] **#320 far-pointer line LANDED on `main`: far fn pointers (a) folded into `0001`, the far-pointer calling convention (Imag32) as `0004`, the lone a16-context-entangled legalizer hunk as `0005`.** Round-trip patch surgery (`dev/land-far-integration.sh`): extracted the (a) recipes as `diff(R, FF)` against a same-base reference (`R` = pristine+`0001`+`0002`+`0003`+`0004`; `FF` = `wt/320-far-followups`), folded the a16-free far-fn-ptr work (backend Layers 1–3 + Gap A/B + the `__call_indir_far` mechanism + clang F2 `far`/`long_call` attr + typed `far_fn_t` var + `sizeof(far*)==4` + the `isFarSymbol` far_indir fix) into `0001` (a16-free — 0 `mos-a16`/`Ac16`/`hasAccum16` in the new hunks), landed the canonical far-cc `0004` (Imag32 won the 4-variant measure, 70 B/50441), and split the lone a16-context-entangled (a) hunk (`MOSLegalizerInfo` PF-as-value, which edits `0002`'s `if(hasAccum16)` block) into new **`0005`**. **Round-trip-proven:** `0001`+`0002`+`0003`+`0004`+`0005` reproduces the verified FF tree EXACTLY over `clang/`+`MOS/`, except two documented non-(a) files — `MOSInsertREPSEP.cpp` (FF working tree stale vs main's *current* `0002` X-width catch-all) and `clang/cmake/caches/MOS.cmake` (build-config drift, in no patch). `0002`/`0003` SHAs unchanged; `0004` = canonical `2efa05f2`. Harness landed too (`dev/farcc_*.sh`, `measure-far-cc.sh`, `probe-cycles.lua`, `regen-patch-0004.sh` baseline extended for `0005`, new `regen-patch-0005.sh`) + the far-cc measurement note (upstream-status #7). [land plan](docs/plans/2026-06-21-320-far-pointer-integration-land-0004-and-a-recipes.md).
+- 2026-06-21 — [321-xy16-cc-boundary] **#321 xy16 calling-convention — boundary VERIFIED + formalized; both optimization levers measured + shelved (the last open M2 CC item; codegen-inert).** The xy16 (16-bit X/Y index) call/return boundary was already mechanically implemented (X/Y forced 8-bit at every `isCall`/`isReturn` via `MOSInsertREPSEP` `requiredXWidth`→`XW_X8`, `XIn[Entry]=XW_X8`; X16/Y16 caller-saved in `MOS_CSR_RegMask`) but **UNTESTED across a call** — every prior xy16 test indexes *within* a function; `xy16spillr` carries `Ac16`. New deterministic guard `examples/65816/xy16call.c` + `dev/xy16call.sh` (`dev/run.sh xy16call`): a genuine 16-bit index (`0x0102`, load-bearing high byte → the value test is itself the LTO-narrowing detector) held live across a clobbering `noinline` call, then used as an array index → 4-way `host==default==+mos-a16==+mos-xy16==0x7E5A` on **MAME + bsnes-jg**, PASS. **Measured finding (refined the plan's hypothesis):** the boundary is correct *by construction* — the RA allocates the cross-call-live index to a **callee-saved ZP imaginary pair** (`$rs10`, in the `JSR` preserve regmask), reloading it into X16 via `LDXImag16` only at the point of use; **physical X16 is NEVER live across a call**, so the narrowing `sep` before the `jsr` can't touch the ZP-resident value and there is no X16 spill (A2 fix = no-op). Contract formalized in the CC decision doc §"Index registers across calls — adopted" + the prior-art note. **Both xy16-specific levers measured + shelved:** (B1) i32-return-in-`A16:X16` census `dev/xy16ret32-census.sh` → REALISTIC `N_i32callsite=0` (same 0/realistic signature as the frame-ABI NULL), only 30 i32-returning call sites across all 1228 in-scope c-torture programs — realizing it needs an ABI-wide typed hole in the REP/SEP "8-bit at boundary" invariant for traffic realistic code doesn't produce; (B2) `PHX`/`PLX` hardware-stack index-spill — premise removed by the measurement (no physical-X16 spill across calls), bounded near-zero by the existing ZP-pressure slack (~5/14 pairs), and against the soft/static-stack-only grain. Codegen-inert: test + docs + census + an `a16_fuzz.py` comment only — no `vendor/`, no `0002` regen (corpus/fuzz/c-torture not re-run — guaranteed-pass + shared-box courtesy). [plan](docs/plans/2026-06-18-321-m2-xy16-calling-convention-verify-formalize-me.md).
+- 2026-06-21 — [worktree-teardown-enforcement] **Worktree-teardown enforcement — keep durable artifacts, reclaim dupes (hook + wrapper).** Enforces the user policy (memory `worktree-teardown-keep-durable-artifacts`): on teardown reclaim the 95%+ `vendor/`+`build/` dupes but never lose the scripts/verdicts that reconstruct a conclusion; retain worktrees until upstream merge. Git has no `worktree remove` hook → the only intercept is a Claude Code **PreToolUse(Bash)** guard (`.claude/hooks/guard-worktree-teardown.sh`, wired in `.claude/settings.json`) that DENYs raw `git worktree remove` / `git branch -[dD] wt/…` and redirects to **`dev/worktree-teardown.sh`** — the blessed teardown that hard-aborts if any tracked work isn't on `main` (compares vs `main`, not the worktree's stale HEAD), then removes + reports reclaimed GB. Command-position-anchored matcher (mentions/`grep`/`list`/`add`/the wrapper pass through); the wrapper's internal removes are subprocess-exempt. `.gitignore` un-ignores `.claude/settings.json`+`hooks/` so the wiring is reproducible. Verified **15/15** (`dev/test-worktree-teardown.sh`): wt/321-track-a PASS (reclaim 12 GB); wt/320-far-cc ABORT on 2 unmerged commits. Schema confirmed via claude-code-guide. Committed `f2b61a2`. Follow-up: sha256 `hook-runner` integrity (deferred). [plan](docs/plans/2026-06-21-worktree-teardown-enforcement-hook.md).
+- 2026-06-21 — [321-known-issues-xpass-guard] **#321: known-issues XPASS guard — surface "drop the entry" the moment a deferred bug is fixed.** The deferred RA/scavenger defects are XFAIL'd via `KNOWN_ISSUES` with *"REMOVE when fixed"* comments, but nothing **surfaced the trigger**: an upstream/RA fix would just make the repro silently verify clean, leaving a stale entry that masks a future regression of the same signature. New guard: `KNOWN_ISSUE_REPROS` table + `tools/a16_fuzz.py known-issues` subcommand asserts each repro (`a16regpress.c`→regalloc-out-of-registers, `a16scavnz.c`→scavenger-p-not-gpr) STILL crashes `-verify-machineinstrs` under **both** `+mos-a16` and `+mos-xy16` with its expected kid; **XPASS** (verifies clean) or **DRIFT** (different/no signature, or missing) → hard FAIL printing the exact follow-up (drop the `KNOWN_ISSUES` entry + promote to a positive gate). Pure host verify (no SDK/emulator/secret). Wired: `dev/known-issues.sh` + `dev/run.sh known-issues` + an **unconditional CI step** in `smoke.yml`'s `xcheck` job (after the toolchain build), so any push/PR carrying the fix turns CI red with the instruction. Verified: guard PASS 4/4 legs (host + container/CI path); a simulated fix (row → clean TU) trips a loud FAIL exit 1 with the drop+promote ACTION. (`a16-zp-pressure-overflow` out of scope — its repro is a gitignored c-torture *link* error, not a verify crash.) [plan](docs/plans/2026-06-21-321-known-issues-xpass-guard.md).
+- 2026-06-21 — [321-xy16-verify-both-legs] **#321 xy16: both-legs verify hardening — a known `+mos-a16` issue can no longer mask a NEW `+mos-xy16` crash.** Follow-up to [321-xy16-verify-classify-known]: that fix still let the **a16** verify leg early-return `XFAIL` on a known issue *before* the **xy16** leg ran, so a genuinely-new xy16-only crash (e.g. an X-lattice regression) on a known-a16 program was silently hidden behind the a16 XFAIL. Hardening: in `evaluate()` run **both** legs (unless a16 is itself a NEW crash → fast-path early-out), then decide by priority — a **NEW (unclassified) crash on either leg hard-FAILs**, and only if neither leg has a new crash does a known issue on either leg yield `XFAIL`. Closes the masking gap for the population (16-bit-pressure programs) most likely to expose an X-lattice regression. Perf cost = one extra xy16 verify only for known-a16-issue programs (the 8 scavenger seeds, `globals`, the two repros) — negligible; clean-a16 already ran xy16, new-a16-crash still early-outs. Python-only tool change — no `vendor/`, no `0002` regen. Verified: a 7-row decision-table unit test (mocked `verify_machineinstrs`) ALL PASS incl. the critical **a16=known + xy16=new → CRASH**; `check` a16regpress/a16scavnz still XFAIL; `corpus-a16` 5/6 PASS + `globals` XFAIL (no flip, now both legs); builtin fuzz seed 306 → XFAIL `scavenger-p-not-gpr`. [plan](docs/plans/2026-06-21-321-xy16-verify-both-legs-hardening.md).
+- 2026-06-21 — [321-xy16-verify-classify-known] **#321 xy16: classify known-issue crashes under `+mos-xy16` too — symmetric XFAIL in `evaluate()`.** `tools/a16_fuzz.py` `evaluate()` runs the MIR-verify crash gate under both `+mos-a16` and `+mos-xy16` (xy16 implies a16), but only the **a16** leg ran `classify_known()` → `XFAIL`; the **xy16** leg unconditionally returned `CRASH`, so a known, deferred defect tripping the xy16 verify mis-reported as a hard `FAIL` instead of a tracked `XFAIL`. Fix = mirror the a16 leg — `classify_known(vlog_xy)` → `XFAIL` ahead of the `CRASH` fallthrough (an *unmatched* xy16 crash still hard-FAILs, preserving the leg's X-lattice regression-guard role). The two known repros `a16regpress.c` (`regalloc-out-of-registers`) + `a16scavnz.c` (`scavenger-p-not-gpr`) fail MIR-verify under **both** modes with identical signatures (measured host-side), but both crash the **a16** leg first → via `check` they already XFAIL'd at the short-circuit; this is **latent-gap closure** (bites when a16 verifies clean but xy16 doesn't, or a sweep reaches the xy16 leg directly). Python-only tool change — no `vendor/`, no `0002` regen. Verified: host MIR-verify signatures match `KNOWN_ISSUES` under both modes; `check` still `PASS (known issue)` for both; direct unit exercise proves the xy16 leg now returns `XFAIL` (was `CRASH`); `dev/run.sh xy16ops` PASS + `corpus-a16` 5/6 PASS, `globals` XFAIL (no row flip); diff confined to the `if not ok_xy:` branch. [plan](docs/plans/2026-06-21-321-xy16-verify-leg-classify-known.md).
+- 2026-06-21 — [321-xy16-track-a] **#321 xy16 Track A: `requiredXWidth` 8-bit-indexed-family hardening — the last `requiredXWidth` index-width omission, closed structurally.** Third + broadest member of the `requiredXWidth` omission family (after `55ec505` value-ops + `4d8a2bd` transfers/push): the broad 8-bit indexed/indirect family (`LDAAbsIdx`/`LDAZpIdx`/`ST{Abs,Zp}Idx`/`LDIndirIdx`/`STIndirIdx`, the 18 ALU-indexed `{ADC,SBC,AND,ORA,EOR,CMP}{Abs,Zp,Indir}Idx`, the 4 RMW `{ASL,LSR,ROL,ROR}Idx`, **and** the 4 a16-value/8-bit-index `*Idx16` forms `LD/ST{Abs,Indir}Idx16`) fell through `MOSInsertREPSEP::requiredXWidth` to `XW_None` (X-passthrough) instead of `XW_X8` — so a stray X=16 ambient at one would deref a 16-bit index with a garbage high byte (the addressing-index sibling of the pr49419 value-compare bug). Fix = a **memory-gated structural catch-all** `(mayLoad()||mayStore()) && readsRegister(X/Y) → XW_X8` after the `XLow` check + value-op switch, **plus** an index-reading-branch clause `isBranch() && readsRegister(X/Y) → XW_X8` that closes the `JMP (abs,X)` jump-table dispatch (`JMPIdxIndir`, the one family member the memory rule can't reach — a non-`mayLoad` branch). `TRI` threaded into `requiredXWidth` + all 3 call sites. The `mayLoad/mayStore` gate is the refinement over a bare `readsRegister`: it excludes the M-governed `T_A` (TXA/TYA), which reads X/Y as a *value* (mayLoad=mayStore=0) — a stray `sep #$10` before it would zero a live 16-bit X high byte (a real regression, not a size nit). **Correctness-safe + `HasIndex16`-gated**: verified 32/32 that every 16-bit-index (`Xc16`/`Yc16`) op carries `XLow=1` → returns `XW_X16` *before* the catch-all, so it can only ever insert a `sep`, never widen a live 16-bit value. **Hardening, not a live bug**: the gap is X8-pinned everywhere in real code, so the change is byte-identical on the corpus. Verified (clang-23 rebuilt): default+a16 disasm **byte-identical 75/75** (gating proof) + xy16 **byte-identical 75/75** + csmith 247/445 ROM-identical (inertness); corpus 7/7; xy16 suite (basic/ops/indiry/spill/spillr) + `k_isort` PASS both emulators; fuzz csmith 200×2 (seeds 101–500) **0 mismatch/0 crash** (one seed-488 MAME timeout was QUIET-box contention, re-verified PASS in isolation); **torture 60 PASS, 0 FAIL, 0 XFAIL** (the de-XFAIL'd pr49419/doloop-1/20041011-1/va-arg-22 rows stay XPASS); `-verify-machineinstrs` clean; `0002` round-trips with 0 foreign content (the `.td` `@@`-shifts are cosmetic — main's committed `0002` had drifted behind far-cc's `0001` growth; #321 content byte-identical). **No standalone RED test** (X8-pinned + LTO narrows small indices — a purpose-built candidate compiled byte-identical and LTO-narrowed to X8; shipped as code-inspection hardening like `55ec505`); regression guard = the structural-safety proof + the byte-identical proof + the c-torture suite. Closes the last known `requiredXWidth` index-width omission, full stop. [plan](docs/plans/2026-06-21-321-xy16-track-a-requiredxwidth-indexed-family-hardening.md).
+- 2026-06-20 — [321-xy16-seed247-445] **#321 xy16 seeds 247/445 `+mos-xy16` miscompile — FIXED (approach B).** cvise-reduced to an 8-line UB-free repro; root cause: a non-index 16-bit value classed `Xc16`, loaded into X16 and left live across an 8-bit-index op whose index-narrowing `sep #$10` zeroes the X/Y high byte. Fix: `selectXY16`'s `G_LOAD16_ABS` emits the direct `LDXAbs16`/`LDYAbs16` only when the value is genuinely used as an index, else reclasses to `Imag16` and lowers through the accumulator (≈22 lines, `HasIndex16`-gated → a16/default byte-identical). Verified 4-way both emulators (incl. MAME) + csmith 101–500 (0 mismatch/400) + c-torture 60/60; `-verify-machineinstrs` clean; smaller code (`main` 61→54 B). Patch `0002`=`2d8ab51`; refuted A′ (pre-RA clobber) + #2 (scheduler) documented. See [reduction plan](docs/plans/2026-06-20-321-xy16-seed445-cvise-reduction.md) · [investigation](docs/investigations/65816-xy16-index16-highbyte-clobber.md).
+- 2026-06-20 — [320-inc4-far-calls] **#320 Inc 4 Phase 1 — far CALLS (JSL/RTL) + Phase 0 far-pointer STORE (`sta [dp]`), two-emulator verified.** The cross-function half of #320 begins: a direct call to a function the linker placed in another 64 KB bank now emits **JSL** ($22, pushes a 3-byte PBR:PC) and the callee returns via **RTL** ($6B, pops 3). New `JSL`/`RTL` pseudos mirror `JSR`/`MOSReturn<RTS>`; `MOSCallLowering::lowerCall`/`lowerReturn` swap JSR→JSL / RTS→RTL when the callee/function is in a `.far_*` section, **`STI.hasW65816()`-gated** so default 6502 codegen is byte-identical. `.far_text`→`rom_1` (bank $01) added to `snes-far/link.ld`. `__far` = section attribute (no clang change); caller (JSL) and callee (RTL) are driven by the same attribute so they always agree. **MVP scope:** the far function is a LEAF — a far fn that `JSR`'d a near fn would keep PBR=$01 and run the wrong bank's bytes (mixed-banking + far function pointers + far tail calls are follow-ups; tail-call opt auto-skips since it keys on `MOS::JSR`). Gate `examples/65816/far_call.c` + `dev/far_call.sh`: `jsl` at the call + `rtl` in the far leaf, `far_leaf @ 0x18000` (bank $01), value 0xF3 crosses the boundary on MAME + bsnes-jg (far calls are a16-independent — 8-bit args). **Phase 0** closed the Inc 3 `sta [dp]` store loose end: `examples/65816/far_store.c` + `dev/far_store.sh` (disasm `87`, store-then-read-back 0xF3, both emulators). No regression: corpus 7/7 (near JSR/RTS intact), a16call/a16ret PASS, Csmith 27/30 (0 mismatch/crash), all 5 prior far ROMs PASS. In `0001` (a16-independent); new **`dev/regen-patch-0001.sh`** (sequential worktrees — 3-at-once overflowed /tmp) regenerates the far patch by isolating the far delta from 0002's interleaved a16 hunks, round-trip verified (0001 a16-free, 0002 still stacks). Gotcha recorded: a `.far_text` linker change needs `dev/run.sh build` (SDK rebuild), not just `toolchain` — else far code silently orphans into bank $00. [plan](docs/plans/2026-06-20-320-inc4-far-calls-and-far-pointer-cc.md).
+- 2026-06-20 — [320-inc3c-far-arith] **#320 Inc 3c — runtime far-pointer arithmetic (`fp++` / `G_PTR_ADD` on AS2), two-emulator verified — Inc 3 COMPLETE.** The last deferred Inc 3 item. `fp++` on an `address_space(2)` far pointer now lowers and executes: `G_PTR_ADD {PF,S32}` skips the `G_INC` fast-path (32-bit base) → generic `ptrtoint`/`add`/`inttoptr`; the s32 ±1 add (`legalizeAddSub`) splits the value with `buildUnmerge(S8, s32)` = a **4×s8 ← s32 `G_UNMERGE_VALUES`** that was `unsupported()` — the one gap blocking 3c. Fix = the symmetric mirror of the existing `legalizeMergeS32FromBytes`: **`legalizeUnmergeS32ToBytes`** (`customFor({{S8,S32}})` under `hasAccum16`, in `0002`) rewrites it 2-level — unmerge s32→2×s16 (legal `{S16,S32}`), then each s16→2×s8 (legal `{S8,S16}`), reusing the 4 original byte defs; builds only unmerges so no merge↔unmerge artifact-combine loop. Default 8-bit codegen untouched (a16-gated). **Bonus:** also closes a latent a16 bug — a `uint32_t` shift-by-≥8 (`legalizeShiftRotate`) emitted the same unsupported unmerge; no test hit it yet. Gate `examples/65816/far_arith.c` + `dev/far_arith.sh` + `xcheck` row (bank $00, `fp++` then `lda [dp]`, `arr[1]=0xA9 ^ 0x5A = 0xF3`). Verified (clang-23 rebuilt): far_arith disasm `2a: a7 00 lda [$0]` + MAME `0xF3` + bsnes-jg `0xF3`; far_indir/far_cast/far-run/far-bank1 no regression; a16incdec/a16add/a16sub PASS both emulators; Csmith 27/30 (0 mismatch, 0 crash, 0 error); `0002` regen round-trips (only the `legalizeUnmergeS32ToBytes` hunk — 0 foreign, `0001` untouched). 3a/3b shipped in `0001`; this unmerge in `0002`. **#320 Inc 3 (3a+3b+3c) now complete**; far-pointer CC + far calls remain Inc 4 (upstream-gated). [task plan](docs/plans/2026-06-20-do-3c-finish-320-increment-3-runtime-far-pointer-a.md) · [inc3 plan](docs/plans/2026-06-20-320-far-pointer-runtime.md).
+- 2026-06-20 — [320-inc3-far-runtime] **#320 Inc 3 — runtime far-pointer dereference (`lda [dp]`) + near→far cast, two-emulator verified.** A far pointer computed at RUNTIME (opaque via volatile, can't fold to absolute-long) now dereferences via 65816 indirect-long `lda [dp]` (opcode A7), and an AS0→AS2 `addrspacecast` zero-extends a near pointer to far (bank $00). Added the backend's **first first-class 32-bit ZP register** — `Imag32`, a quad over two `RS` words = 4 contiguous `__rc` bytes the `[dp]` mode reads (subreg indices `sublo16`/`subhi16`, `RL#K` entities, `getReservedRegs` quad-overlap reservation so a far ptr never lands on the stack ptr `RS0`/scavenger `RS8`, `getRegClassForType(32)`, a `selectMergeValues` 2×s16→Imag32 compose with two class-pin sites vs class-less bridge COPYs, `copyPhysReg`, `__rc`-symbol lowering) + 4 legalizer type-rules (`G_INTTOPTR`/`G_PTRTOINT`/`G_PTR_ADD`/`G_ADDRSPACE_CAST` for `PF`) + `tryFarIndirectAddressing`. Needs `+mos-a16` (a runtime far ptr is a 32-bit *value*; far machinery itself is a16-independent). The handoff's `LDA_IndirectLong` MC defs already existed (CC1_All multiclass) → `MOSInstrInfo.td` untouched. Gates `dev/run.sh far_indir`/`far_cast` (A7 + corpus_result=0xF3) + `xcheck` — MAME+bsnes-jg PASS; corpus 7/7, a16unmerge/a16spill/a16ptr + far-run/far-bank1 no regression; in `0001` (regen-patch.sh round-trips, 0002 re-stacked). **3c (far arithmetic) landed 2026-06-20** (the s32→4×s8 unmerge mirror — see [320-inc3c-far-arith] above); far-pointer CC deferred to Inc 4. [plan](docs/plans/2026-06-20-320-far-pointer-runtime.md).
+- 2026-06-20 — [321-loadfold-unify] **#321 unify the a16 load-fold gate — measured, then SPLIT: AA-precision landed, volatile-drop closed net-negative.** Spun out of the load-fold-call-hazard audit §Deferred. **Phase 1** (instrument-and-count probes on a throwaway worktree, 2615 compile-only runs) confirmed both recoveries exist (Probe A 7 sites, Probe B 43). **Phase 2** built both halves + byte-diff'd, which **split the unification**: **(a) AA-precision LANDED** — `noStoreBetween`→**`noClobberBetween`** + a `mayAlias(AA,*Def)` check (an *ordered* store still hard-bails, so a volatile load never reorders across a volatile store); `AA` threaded through `foldable{Abs,Indir}Load16` + 10 call sites (the `GIMatchTableExecutor` base member). **−26 B** over the a16 corpus, **0 regressions**, verify-machineinstrs clean (0 new fails), all **5 Probe-A c-torture recovery sites + a 120-test sweep PASS** host==default==+mos-a16==+mos-xy16 on both MAME & bsnes-jg, `0002` round-trips (no foreign hunks). **(b) volatile-drop CLOSED (net-negative, not pursued)** — dropping `shouldFoldMemAccess`'s volatile bail is *correct* but measured **net +17 B / 19 regressions** (folding a single-use volatile load consumed as bytes loses to imag8: `a16abscmp` +43, `a16cmp` +37); a residency/schedule-gated version is high-effort for modest, entangled wins → **recorded, not a backlog item.** The literal single-helper merge was rejected by measurement (inherits `shouldFoldMemAccess`'s ordered-ref scan → regresses `a16abscmp`'s `volatile g1==g2` fold across the intervening operand load). Keepers: `dev/measure-loadfold-recovery.sh` (Phase 1 gate), `dev/measure-loadfold-bytes.sh` (Phase 2 byte-diff). [plan](docs/plans/2026-06-20-321-unify-loadfold-gate-aa-volatile.md) · [audit](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md).
+- 2026-06-20 — [321-a16-s32-merge-s8x4] **#321 fix: a16 `G_MERGE_VALUES` 4×s8→s32 legalizer gap (Csmith seed 113).** The Csmith Phase-4 sweep (seeds 101–300) found a `+mos-a16` LTO codegen crash: `LLVM ERROR: unable to legalize %_(s32) = G_MERGE_VALUES s8,s8,s8,s8 (in function: main)`. Extends the prior s32 work ([321-a16-unmerge-s32], which handled s32↔**s16**): under a16 s32 is 2×s16, so 2×s16→s32 merge is legal, but a **direct 4×s8→s32** merge (an i8→i32 sext the artifact combiner couldn't fold) hit `unsupported()`. `selectMergeValues` only takes a 2-source merge, so the fix is in the **legalizer**: a custom action (`legalizeMergeS32FromBytes`, gated `customFor({{S32,S8}})` under `hasAccum16()`) rewrites it into the legal 2-level form `merge(merge(a,b)→s16, merge(c,d)→s16)→s32`, which the artifact combiner folds — no selector change. Default codegen untouched. Repro is the deterministic Csmith seed (the merge is an LTO-only artifact; minimal C / per-TU IR don't reproduce, and a whole-module frozen `.ll` over-triggers by compiling runtime fns like `__adddf3` with +mos-a16 — so no hermetic `.ll`, gate is the differential). Verified (clang-23 rebuilt): `dev/run.sh fuzz --gen csmith 1 113` → `0x21B1` all-agree 0-crash (was crash); `a16unmerge` (s32↔s16 gate) still PASS; a16cmpaudit 0x5EE0; `0002` round-trips (`legalizeMergeS32FromBytes` only). [plan](docs/plans/2026-06-20-321-a16-s32-merge-s8x4-legalizer.md).
+- 2026-06-20 — [321-abs-load-fold-across-call] **#321 fix: a16 load-fold must not move a load across a memory-clobbering call (the broad `-Os` c-torture sweep's only 2 FAILs).** The full `-Os` torture sweep (all 1168 in-scope, the first-ever `-Os` pass — prior full pass was `-O1`) found **2 FAILs: `pr34768-1`/`pr34768-2`** (default PASS, a16@MAME=a16@bsnes=`0xDEAD`). Root cause = a **pre-existing a16 backend miscompile** (NOT the middle-end — post-LTO IR is byte-identical to default and correct; NOT `9009260`): `foldableAbsLoad16`/`foldableIndirLoad16` fold a single-use same-BB 16-bit load into the consuming ALU/compare op as a memory operand (`adc abs`/`cmp abs`/`cmp (zp)`), but checked only single-use + same-BB — **never whether an instruction between the load and the user clobbers that memory**. With a call in between (`int tmp=g; clobber(); use(tmp,g)`), folding moves the read **past** the clobber → reads the mutated value. `pr34768` (`int tmp=x; (c?foo:bar)(); return tmp+x;`, `foo` does `x=-x`): at `-Os`, LTO const-props `c=1` → straight-line `foo()` call → a16 emitted `jsr foo; lda x; adc x` (= `x+x`, wrong) instead of saving `tmp` before the call; `-O1` passed only because it didn't const-collapse the ternary. Fix = new `noStoreBetween(Def,User)` scanning the strictly-between instrs; bail on any `mayStore()`/`isCall()`/`hasUnmodeledSideEffects()` → stage through `Imag16` as before (conservative per lesson #2 — a miss only forgoes a win). Applied to **both** helpers (`foldableIndirLoad16` from `9009260` shared the latent flaw). Buggy abs fold introduced in `ef4671d`. Default codegen unaffected (no 16-bit fold). Regression guard: `examples/65816/a16loadcall.c` + `dev/a16loadcall.sh` (abs + `(zp)` + compare operands across a clobbering call, host-verified 0x0100). Verified (clang-23 rebuilt): pr34768-1/-2 `-Os` PASS both emulators; a16loadcall 0x0100 4-way; **folds preserved** (a16cmpidx ≥5 `cmp (zp)`/a16abscmp/a16loadfold/a16mixfold/a16cmpaudit/a16cmp all PASS — no win lost); **full `-Os` re-sweep 1114 PASS / 0 FAIL** (was 2); fuzz 45/50 0-mismatch/0-crash; verify-machineinstrs clean; `0002` round-trips (noStoreBetween only, no foreign hunks). `86c2602`. **Audit follow-up 2026-06-20 (no code change):** swept every a16 load-fold site for the same across-call hazard — the two helpers fixed here were the **only** vulnerable ones; all others guard via `shouldFoldMemAccess` (8-bit `m_FoldedLd*`, `loadStoreValueIntoA16`) or explicit `isCall`/`mayStore` (`threadAccum16` + late peepholes). Did **not** consolidate onto `shouldFoldMemAccess` — it bails on all volatile loads, which would regress the #321 single-use *volatile*-operand folds the corpus relies on (a16abscmp/a16loadfold/a16mixfold); `noStoreBetween` is volatile-tolerant + across-clobber-safe, complementary by design. Bug class closed. [fix plan](docs/plans/2026-06-20-321-abs-load-fold-across-call-miscompile.md) · [audit plan](docs/plans/2026-06-20-321-audit-a16-loadfold-call-hazard.md).
+- 2026-06-20 — [321-native-16bit-indexed-compares] **#321 native s16 — 16-bit RHS-indexed compare fold (`cmp (zp)`, CMPIndir16) + whole-compare-surface differential-audit.** Extend (#2) then harden (#1). Phase-0 measurement corrected the scope: `u16 arr[i]` does **not** become `lda abs,x` (the `*2` element scaling routes it through a computed pointer → `lda (zp)` plain-indirect, `G_LOAD16_INDIR`), so the gap is a RHS-indexed *indirect* compare and the fold instr is **`CMPIndir16` (`cmp (zp)`, $D2)**, not `CMPAbsIdx16` — cleaner: no index reg → no X-flag-lattice coupling, no frame-index concern. Before: `limit < arr[i]` staged `arr[i]` through an `Imag16` temp (`lda (zp); sta __rc; lda limit; cmp __rc` — the store survives, `lda limit` clobbers A16 between so threading can't remove it). Fix = new `CMPIndir16` MC instr (`MOSCMP16` + `PseudoInstExpansion<(CMP_Indirect addr8:$addr)>`, `Ac16:$l, Imag16:$addr`) + `foldableIndirLoad16` helper (single-use + same-BB `G_LOAD16_INDIR`) + a new `selectSbc16` RHS arm folding it to `cmp (zp)` instead of `CMPImag16`. Gated (lesson #2): single-use + same-BB → 1-to-1 volatile-safe; multi-use/cross-block/non-indirect → falls to today's `CMPImag16` (a miss only forgoes a win). LHS-indexed (`arr[i] < limit`) was already optimal (threads back into A16); `lim > arr[i]` swaps arr[i] to the LHS (`lda (zp); cmp`). EQ-indexed + `cmp abs,x`/`(zp),y` indexed forms + xy16-16-bit-index **deferred** (gate on a frequency scan). Regression guard: `examples/65816/a16cmpidx.c` (5 `cmp (zp)` folds, 0x1111 both emulators) + the Phase-3 audit harness `a16cmpaudit.c` (8 predicates × {value,branch} × 6 RHS shapes + LHS-indexed, host oracle 0x5EE0, host==default==a16 both emulators). Verified: a16cmpidx 0x1111 + a16cmpaudit 0x5EE0 (both 4-way agree), a16 compare suite 6/6, fuzz 50 0-mismatch/0-crash, torture 60/60, verify-machineinstrs clean; `0002` regen round-trips (only the CMPIndir16 hunk, no foreign symbols). [plan](docs/plans/2026-06-19-321-native-s16-16-bit-indexed-comparisons-rhs-cmp.md).
+- 2026-06-20 — [321-xy16-xflag-lattice] **#321 xy16: fix the `requiredXWidth` index-width gap — ONE fix cleared all 5 remaining defects.** `MOSInsertREPSEP::requiredXWidth` enumerated the index-register *address/load/store/transfer* ops needing X=8 but omitted the index-register **value** ops: the compares `CMPImm`/`CMPImag8`/`CMPAbs` reading X/Y (→ `cpx`/`cpy`) and register `INC`/`DEC` (→ `inx`/`iny`/`dex`/`dey`). They fell through to `XW_None` (X-agnostic), so each ran in whatever X width was AMBIENT — and after a 16-bit-indexed load (`rep #$30`) the ambient is X=16, so `cpy #imm` read a 2-byte immediate and compared the loop counter's UNINITIALIZED high byte (the counter was created/incremented at X=8) → wrong bound → hang (`corpus_result` 0x0000) or wrong value. Root-caused via `pr49419` (MIR after `mos-insert-rep-sep`: `CMPImm $y,2` had a `sep #$20`-only restore before it, X still 16). Fix: classify those ops `XW_X8` when the X/Y operand is the compared/modified value (compares = operand 1, op0 is the `Cc` carry def; inc/dec = operand 0). Cleared the whole cluster: **pr49419, doloop-1, 20041011-1, va-arg-22** (all 4 xy16 `xfails.tsv` rows) **+ `k_isort`'s xy16 leg** — the shared-X-flag-cause hypothesis confirmed (as the frame-index fix cleared 13). xy16-only by construction (`requiredXWidth` is `HasIndex16`-gated; the pass early-returns unless `hasAccum16()` — default + `+mos-a16` untouched). Verified: torture XPASS ×4, `k_isort` 0xF47A all-agree (default==a16==xy16==host), fuzz 45/50 0-mismatch/0-crash + verify-machineinstrs clean, corpus 7/7; `0002` regen round-trips, diff exclusively this hunk. Regression guard: 4 de-XFAIL'd torture rows + `k_isort` (always-on xy16 leg). No standalone micro-test — the B2 16-bit-index gate still fires per-function (`xy16ops` PASSES) but **under LTO** (the differential harness links via `--config`) a provably-small global/pointer index narrows back to X8, so only `pr49419`'s double-indirect computed chase keeps a 16-bit index through LTO; a minimal global-array test would compile to all-X8 in the linked ROM and not exercise the X=16 ambient. [plan](docs/plans/2026-06-19-321-xy16-xflag-lattice-fix.md).
+- 2026-06-19 — [321-jg-only-suite] **#321 bsnes-jg-only confirmation runner (`dev/run.sh xcheck-suite`).** MAME-skipping `JG_ONLY` pass over value-differential micro-tests; 45/45 PASS ~49 s incl. all 4 xy16 value tests; no BIOS/quiet-box needed. [plan](docs/plans/2026-06-19-second-emulator-jg-only-confirmation.md).
+- 2026-06-19 — [321-corpus-a16-gate] **#321 `corpus-a16` differential gate (standing capability).** `dev/run.sh corpus-a16`; builds +a16/+xy16 vs default on both emus; VERIFIED 2026-06-19 arith/control/arrays/structs/funcs PASS, `globals` XFAIL. [plan](docs/plans/2026-06-19-321-corpus-a16-differential-mode.md).
+- 2026-06-19 — [321-corpus-a16-ci] **#321 `corpus-a16` in CI — VERIFIED green (run `27823207476`).** Secret-gated step in `smoke.yml` `xcheck` job; +a16/+xy16 on MAME+bsnes-jg, `globals` XFAIL; first real CI run. [plan](docs/plans/2026-06-19-321-corpus-a16-ci.md).
+- 2026-06-19 — [321-bsnes-jg-xcheck-ci] **#321 bsnes-jg `xcheck` in CI — VERIFIED green (run `27823207476`, ~1h46m cold; cached after).** `smoke.yml` `xcheck` job: from-source toolchain+SDK, `dev/run.sh xcheck` on bsnes-jg; first real CI validation. [plan](docs/plans/2026-06-15-wire-bsnes-jg-xcheck-into-ci.md).
+- 2026-06-19 — [321-cmpbrabsimm16-frameindex] **fix the `CmpBrAbsImm16` frame-index elimination scramble — ONE line cleared 13 c-torture miscompiles.** `MOSRegisterInfo::eliminateFrameIndex` chose a frame object's displacement by a positional guess ("the operand after the frame index is its displacement immediate"); for the a16 fused pseudo `CmpBrAbsImm16` (`addr16:$l, i16imm:$r`) the post-address operand is the COMPARE immediate, so a16-LTO static/zero-page-stack accesses resolved to `base+compareImm` not `base+frameOffset` → wrong values → 0xDEAD. Fix: key the displacement source off the opcode (`LDStk`/`STStk`/`Addr{Lo,Hi}stk` → trailing imm operand; everything else incl. all `CmpBrAbs*` → the FI operand's own `getOffset()`). Default codegen unchanged by construction (no 8-bit instr has the FI-then-immediate layout). Root-caused via `20071210-1` (filed as a REPSEP/computed-goto suspect — it wasn't); the class sweep cleared 13 of 18 `xfails.tsv` rows (incl. `pr34768-1/-2` + `20010518-2`, both mis-hypothesized). Regression guard: 13 de-XFAIL'd torture rows + `examples/65816/a16frameidx` (0x4321 both emulators). Verified: corpus 7/7, fuzz 45/50 0-mismatch, a16 suite all-PASS (the `k_isort` xy16 fail is pre-existing, proven unrelated). `f2d65c2`; `0002` round-trips, no foreign hunks. [plan](docs/plans/2026-06-19-321-cmpbrabsimm16-frameindex-elimination-scramble.md).
+- 2026-06-19 — [321-torture-dg-require] **honor `dg-require-effective-target` in the c-torture Phase-0 filter — closes the oracle gap that admitted `pr7284-1`.** `tools/torture_filter.py` now denies the unsatisfiable integer-width requirements (`int32plus`/`int128`) before building, so UB-reliant tests (e.g. `pr7284-1`'s `n<<24` on 16-bit `int`) are bucketed `dg-require-unsupported` instead of passing default by UB-luck and "failing" a16 as false positives. In-scope 1253→1228 (58 dg-require-unsupported); `pr7284-1` removed from `xfails.tsv`. Harness-only (no `0002` change). [plan](docs/plans/2026-06-19-321-torture-honor-dg-require-effective-target.md).
+- 2026-06-19 — [dwarf-round-trip] **DWARF round-trip (ROADMAP step 6) + drmon VS Code GUI: COMPLETE.** `-g` builds emit `<rom>.elf` companion; drmon loads it via libdwarf; source breakpoints fire in VS Code + MAME headlessly (8/8). `dev/run.sh dwarf` 7/7. Upstream PR halves drafted (lit test + `.elf` doc note). Left: user-triggered upstream posting (item 5 in upstream-contribution-status.md). [plan](docs/plans/2026-06-18-dwarf-round-trip-roadmap-step-6-drmon-tie-in.md).
+- 2026-06-19 — [321-a16-unmerge-s32] **#321 `+mos-a16` s32 (`long`/`int32_t`) support — fixed the `G_UNMERGE_VALUES s32` backend abort.** Csmith-found (`wt/321-csmith` seed 11 + 9 more, XFAILed as `a16-unmerge-s32`): `+mos-a16` aborted on valid C using `int32_t`/`long` in s16-interacting shapes (e.g. `trunc i32→i16`), while DEFAULT compiled clean. Root cause: under `+mos-a16` s16 is a legal type so narrowing stops at s16 and diverts s32 into 2×s16 pieces, but the s32↔s16 legalizer glue didn't exist (no minimal fix — the cascade unmerge→trunc→anyext is the s32-under-a16 feature). Fix = **4 additive `hasAccum16()`-gated legalizer rules** (`G_ANYEXT`/`G_TRUNC`/`G_MERGE`/`G_UNMERGE` for s32↔s16); the artifact combiner folds the (un)merge so **no selector change**; `G_ZEXT` left at maxScalar S8 (raising to S16 broke s8→s16 zext). Verified: sweep **92/100 PASS, 0 mismatch, 0 xfail** (was 83/10/7); corpus-a16 5/6+xfail; hermetic `dev/run.sh a16unmerge` (frozen seed-11 `.ll`, **red-green validated** with fresh `mos-clang` — `llc` is stale, not in the `toolchain` rebuild path); `0002` regen round-trips. Remaining bookkeeping: remove the `a16-unmerge-s32` XFAIL on `wt/321-csmith`. [plan](docs/plans/2026-06-19-321-a16-unmerge-s32-legalizer.md).
+- 2026-06-19 — [pre-public-polish] **Repo: Apache-2.0 LICENSE + NOTICE, README → M2, gitignore transcripts.** All four steps PASS (181af86). [plan](docs/plans/2026-06-14-pre-public-polish-license-readme-m2-gitignore.md).
+- 2026-06-19 — [xy16-hang-verification] **#321 xy16: verified the runtime hangs are FIXED — no live hang remains.** The soft-stack P0 note's "35/50 `xy16@MAME=0x0000` hangs" were cleared by `8961afb` (byte-level `ldx/ldy/stx/sty` `XHigh` fix) + `4d8a2bd` (X-governed transfer/push-pull annotation). Fresh confirmation: `fuzz 50 1` and `fuzz 50 56` (the exact recorded-hang batches) = **50/50** each; `fuzz 500` = **492/500, 0 mismatch, 0 hangs**. Sole residual = 8 `$p`-spill **compile** xfails (169/173/196/268/271/272/306/420) — the separate `scavenger-p-not-gpr` item, not a hang. Corrected the stale "active area" triage note. (No code change — measurement only.)
+- 2026-06-19 — [xy16-skeleton-comment-fix] **#321 xy16: corrected the stale `// skeleton`/`returns false for everything` comments on `selectXY16`** — the function is fully implemented (C1 direct + C2 `abs,X16`/`(zp),Y16` indexed); comment-only `0002` regen, round-trip PASS, no codegen change. [plan](docs/plans/2026-06-19-fix-the-stale-skeleton-comments-in-selectxy16-rege.md).
+- 2026-06-18 — [repsep-x-annotation-for-x-governed-transfers-push] **#321 xy16: seed-31 FIXED — REPSEP X-annotation for X-governed transfers/push-pull unblocked the critical-edge fix. fuzz 500 → 492/500, 0 mismatch.** Two commits. **Commit A** (`4d8a2bd`): `requiredXWidth` now returns `XW_X8` for `TA` (TAX/TAY), `TX` (TXY/TYX) and `PH`/`PL` with `$x`/`$y` (PHX/PLX/PHY/PLY) — index transfers/push-pull whose width is X-flag-governed; the 8-bit-intent pseudos were `XW_None`, so when the dataflow holds X=16 across a loop back-edge an 8-bit `TAY`/`TYX` ran 16-bit and dragged B-accumulator garbage into `Y.high`/`X.high` (the M side never had this — `requiredWidth` defaults to `MW_M8`). `T_A` (TXA/TYA) left X-agnostic (M-governed). Monotone-conservative (only adds `sep #$10`). **Bonus: fixed seed-157** (a second transfer-in-held-X16 mismatch). **Commit B** (re-applied the reverted `B.begin()` critical-edge placement, now safe): replaces the whole-function `placeLegacy` bail with a single absolute-mode entry switch at the target block's start (retains `placeLegacy` only for the X-passthrough-conflict corner). Verified: seed-31/157/160 all pass; `fuzz 500` 491→492/500 with seed-31 the only FAIL→PASS delta (bisect: seed-160 PASS on both bail and B.begin paths, no new regression); corpus 7/7, xy16 suite green, verify-clean on 31/160, `0002` round-trips (foreign-hunks=5). Residual 8 fuzz crashes are the separate pre-existing `$p`-spill bug (own open item). [impl plan](docs/plans/2026-06-18-repsep-x-annotation-for-x-governed-transfers-push.md) · [critical-edge analysis](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
+- 2026-06-18 — [321-repsep-critical-edge-x16-liveness] **#321 seed-31 critical-edge fix: implemented + verified-correct, then REVERTED (regresses seed-160) — investigation logged.** Root-caused seed-31 (the hang fix's lone fuzz-50 residual): `MOSInsertREPSEP` bails to `placeLegacy` on a true critical edge (`bb.1→bb.3`), which forces X=8 at every block terminator and truncates `$x16` live across `bb.0→bb.1` (`sep #$30` zeroes X.high → wrong `cpx` branch). Replaced the bail with a single `B.begin()` entry-switch (provably correct in isolation). **Fixed seed-31, fuzz 50/50, suite green** — BUT `fuzz 200` exposed a **regression at seed-160**: removing the bail makes critical-edge functions use the dataflow's loop-mode-*holding*, which surfaces a **pre-existing latent bug** — X-agnostic transfer instructions (`TAY`/`TYX`, whose width is governed by the X flag) drag B-accumulator garbage into `Y.high`/`X.high` when X16 is held across the back-edge. Per "never regress", **reverted** (vendor + `0002` byte-identical to the hang-fix commit). seed-31 is now **blocked on the transfer-instruction fix** (open). Also surfaced pre-existing 51–200 residuals: seed-157 (xy16 mismatch), seed-169/173/196 (`+mos-a16` `$p`-spill verify crash, pre-REPSEP). Lesson: a green fuzz-50 is not enough for a core-pass change — the wider sweep + bail-bisect caught it. [plan](docs/plans/2026-06-18-321-repsep-critical-edge-x16-liveness.md).
+- 2026-06-18 — [321-xy16-hang-fix-xhigh] **#321 xy16 hang fix: byte-level `ldx/ldy/stx/sty` ran in X16 → 2-byte read/write corrupted adjacent ZP/struct bytes → soft-stack overflow → `xy16@MAME=0x0000`.** `XHigh=1` on 14 real X/Y instr defs (`MOSInstrFormats.td` CC0_Regular + `MOSInstrInfo.td`) **plus** `requiredXWidth()` register-residency for the generic load/store pseudos that only become `LDX_ZeroPage`/etc. at MC-lowering, after REPSEP (`LDAbs`/`LDImag8`/`LDImm`/`STAbs`/`STImag8`/`LDXIdx`/`LDYIdx` with `$x`/`$y` → `XW_X8`). Fuzz **16/50 → 49/50, all 34 hangs cleared**; corpus 7/7, xy16 suite green; `0002` round-trips. Lone residual = seed-31, a separate critical-edge X16-liveness bug (own open item). [plan](docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md).
+- 2026-06-18 — [321-native-mode-crt0-xy16] **#321 native-mode crt0 DBR=0 contract.** `phk; plb` in `.init.50` makes DBR=0 an explicit contract; standing `crt0native` gate; fuzz 50/50 green. [plan](docs/plans/2026-06-18-321-native-mode-crt0-xy16.md).
+- 2026-06-18 — [321-abs-x-indiry-indexed-load-store] **#321 Increment 1e: native 16-bit `abs,x` and `(zp),y` indexed load/store.** `tryIndexedAddressing16` detects `G_PTR_ADD(global, G_ZEXTLOAD(s16))` → `G_LOAD16_ABS_IDX` → `lda abs,x` (M=0); and `G_PTR_ADD(zp_ptr, G_ZEXTLOAD(s16))` → `G_LOAD16_INDIR_IDX` → `lda (zp),y` (M=0). 4 new GISel pseudos + 4 logical MC pseudos + selector helpers. G_ZEXTLOAD (not G_ZEXT) because IRTranslator fuses load+zext; safe to `buildTrunc(S8)` because G_ZEXTLOAD legalises to `G_MERGE_VALUES(lo, G_CONSTANT(0))` — RA cannot elide the explicit constant (cf. seed-56 crash where known-bits-zero path caused undefined-pair spill). `a16absidx` (BF, 0x9ABC) + `a16indiry` (B1, 0x5678) PASS on MAME + bsnes-jg; fuzz 100/100 (seeds 1–100), 0 mismatch; `0002` round-trips. [plan](docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md).
+- 2026-06-18 — [321-mem-access-follow-ups] **#321 s16 memory-access follow-ups: all closed** — indirect/abs/copy-fold done; (a) indir-dst WON'T-DO: corpus check 2026-06-18 0/6 progs 0 B pattern absent; (b) moot; (c) WON'T-DO. [plan](docs/plans/2026-06-18-321-indir-dst-copy-fold.md).
+- 2026-06-18 — [321-seed42-legalizeicmp-swap] **fix #321 fuzzer-found default-build miscompile: an EQ-canonicalization operand-swap in `0002`'s `legalizeICmp` leaked into the non-a16 8-bit path.** seed-42 (`dev/run.sh fuzz 1 42`, surfaced during a16ret verification) computed `corpus_result=0xB226` vs correct `0xEC0D` in BOTH default 8-bit AND `+mos-a16` builds (host=python-16bit + unpatched-upstream@MAME both 0xEC0D). Root-caused by ~20 isolated ccache-reuse build bisections: register topology (A16/B/Ac16) **innocent** (upstream+topology=0xEC0D), as were td/feature-infra, selector, InstrInfo, LateOpt, RegisterInfo, the unconditional InsertREPSEP pass (it early-exits `!hasAccum16`), and the legalizer constructor rules — narrowed to `MOSLegalizerInfo::legalizeICmp`. The FIRST of two EQ-canonicalization swaps was guarded only by `ComputedVsGlobal` (which does NOT require `hasAccum16` and has no `Pred==EQ` check), so in the default build a non-EQ compare (`<`/`>`) with a computed-s16-vs-foldable-abs-global operand pair hit `std::swap(LHS,RHS)` → **reversed the comparison** → wrong value. (The SECOND swap was correctly gated on `NativeS16Eq`; the first was missing it — exactly governing-lesson-#2: gate so a misclassification only misses a win, never regresses.) **Fix (1 line):** gate the first swap on `NativeS16Eq` (= `hasAccum16 && Pred==EQ && S16`), so it fires only in the intended native-a16-EQ path where EQ's Z-symmetry makes the swap safe. Verified: seed-42 default+a16 → `0xEC0D`; a16 suite **50/50**, corpus **7/7**, **fuzz 50/50** (0 mismatch); `a16eqvalmg` still native (`cmp` long fold ×2) + `0x0111`, verify-clean. `0002` regenerated — only `MOSLegalizerInfo.cpp` changed, no foreign hunks, round-trips. [fix plan](docs/plans/2026-06-18-321-seed42-legalizeicmp-swap-fix.md) ·
+  [found during a16ret](docs/plans/2026-06-17-321-ax-return-convention.md).
+- 2026-06-17 — [321-ax-return-convention] **lock the A (low) / X (high) return convention as a tested ABI invariant (test+docs only, no codegen change).** The free, uncontroversial CC piece: `i8 → A`, `i16 → A(low):X(high)` is already emergent from `CC_MOS` byte-splitting (no `RetCC_MOS`) AND the documented prior art (WDC816CC p.21 / ORCA `A_X`). New `examples/65816/a16ret.c` + `dev/a16ret.sh` (wired into `dev/run.sh`): value differential `corpus_result==0x2387` host==default==+mos-a16 (MAME+bsnes-jg) + a byte-pinned disasm gate — i16 return is `ldx <high>; lda <low>; rts` (X reads `__rc`+1 vs A, proving high→X/low→A), i8 return delivers A alone. The value test catches miscompiles; the disasm gate catches convention drift (a value test alone can't — a consistent A↔X swap round-trips). Decision recorded in CC-analysis §"Return values — adopted" + the prior-art note. Verified: a16 suite 50/50, corpus 7/7, no `vendor/`/`0002` change. [plan](docs/plans/2026-06-17-321-ax-return-convention.md).
+- 2026-06-17 — [321-unify-1b-1c-peephole] **retire 1b/1c GISel combiner peephole — native path now handles all shapes** (~1400 lines deleted; corpus 7/7, 5 in-scope a16 tests PASS, full suite 43/43 confirmed by concurrent task7 run, -verify-machineinstrs clean). [plan](docs/plans/2026-06-17-321-unify-1b-1c-peephole-into-native.md).
+- 2026-06-17 — [321-task7-eq-residuals] **EQ-as-value task7: `computed==global` → `CmpBrImagAbs16` (`lda zp; cmp long`); items 2–7 confirmed-deferred.** New pseudo + legalizer `ComputedVsGlobal` gate + `foldableAbsLoad16(RHS16)` selector fold + canonicalization swap (`isFoldableAbsS16Load(LHS) && isImag16Resident(RHS)`) + `GlobalVsImm` guard; `a16eqvalmg` 0x0111 host==default==+mos-a16 (MAME+bsnes-jg, both orderings, 2×`cf` in-block + 2×`c5` cross-block fallback). Disasm gate: `cf` (CMP Long 24-bit, SNES global addressing), not `cd` (was a wrong gate). Spike measurements: item 2 (`x==0` as value) +5 B (native rep/sep worse than byte-OR); item 5 (indir-dst) already −13 B via 16-bit mode (selector reorder ~4 B more, corpus gain unverified → deferred); items 3/4/6/7 confirmed by prior spikes. `0002` round-trips (7×`CmpBrImagAbs16`, no TXY/TYX). [plan](docs/plans/2026-06-17-321-task7-eq-residuals-indir-dst-xflag-varshift.md).
+- 2026-06-17 — [321-a16-threading] **A16-threading Phase 1.5: relax the redundant-reload peephole beyond strict adjacency (non-adjacent + multi-reload, threads across volatile stores).** Generalized `threadAccum16` so the `STAImag16`→`LDAImag16` pair need not be adjacent: intervening instructions are allowed if none rewrites `$a16` (`modifiesRegister(MOS::A16)` catches 8-bit sub-`A` writes + `xba`; calls/inline-asm bail) or overwrites the home. A volatile *store* between is fine (it only READS `$a16` — the store stays put, only the non-volatile reload of the `Imag16` temp drops; a volatile *load* writes `$a16` and is caught). Handles the multi-reload case (a kept store reloaded more than once — its pending entry survives until the store is actually erased) and clears stale `$a16` kills across the gap. **Measurement honesty:** the opportunity was first mis-sized at "~40/300 programs"; a mode-aware scan cut the byte-assembly false positives (`sta lo; stx hi; rep #32; lda` assembles a value, not a reload), then counting *all* `lda` (not just `lda __rcN`) as A16-clobbers cut the indirect/abs-load false positives — the **true** non-adjacent opportunity was ~14, of which Phase 1.5 captures all but **1**/300. Non-breaking: suite + kernels **47/47**, corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` clean over 47 examples + 150 fuzz programs (exercising volatile-store threading), `0002` round-trips (`threadAccum16` + `isInlineAsm`, no `TXY`/`TYX`). **Phase 2 retired** (fold-while-threaded already optimal); Phase 3 (RA-level `Ac16` residency) stays deferred. [plan](docs/plans/2026-06-17-321-a16-threading.md).
+- 2026-06-17 — [321-a16-threading] **A16-threading Phases 0–1: eliminate the redundant Imag16 round-trip between dependent native-s16 ops (coalescer-free; −31/−36 % on dependent chains).** The ROADMAP-step-5 "biggest win", de-risked by the Tier-1 corpus. Each native s16 op is self-contained (`LDAImag16 → OP → STAImag16`, value home = `Imag16` between ops — the 1d-retry coalescer-safe invariant), so a dependent chain stores each intermediate and **immediately reloads it** (`sta __rcN; lda __rcN`). **Phase 0 (measure):** 20 such round-trips across the test set (12 synthetic, 8 in real kernels). **Phase 1 (the fix):** a new post-RA peephole `threadAccum16` in `MOSLateOptimization.cpp` — when `$rsN = STAImag16 $a16` is immediately followed by `$a16 = LDAImag16 $rsN`, erase the redundant reload (`$a16` already holds the value) and DCE the dead store, so the value threads through `$a16` across the chain (`lda;adc;and;sbc;…;sta`). **Post-RA on purpose:** RA has already chosen `$a16` both sides, so collapsing the pair cannot reintroduce the 1d coalescer crash (an 8-bit value coalescing into `A16`); `LDAImag16`/`STAImag16` model no NZ def, so erasing them is flag-safe; strict adjacency keeps it conservative. **Measured:** all 20 round-trips → 0; chain3 39→27 B (−31%), chain5 55→35 (−36%), k_crc16/k_prng/k_bits/k_isort −4/−8/−8/−10 B. New `examples/65816/a16thread.c` + `dev/a16thread.sh` (0 round-trips, 1 rep/sep bracket, corpus_result 0x2544 host==default==+mos-a16 on MAME + bsnes-jg) + reusable `dev/measure-a16-threading.sh`. Non-breaking: a16 suite + kernels **47/47**, corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` 47/47 clean (incl. `a16localx`, the coalescer-crash guard), `0002` round-trips (carries `threadAccum16`, no `TXY`/`TYX` — F4 stays in `0003`). Phases 2 (selection-time fusion) + 3 (RA-level `Ac16` residency) remain — see Open. [plan](docs/plans/2026-06-17-321-a16-threading.md).
+- 2026-06-17 — [321-native-s16-eq-v2-computed-imag16-lhs] **native s16 equality-as-value v2: COMPUTED / Imag16-resident operands go native (`(a+b) == (c+d)`, −3 B; multi-use chained −13 B).** The last gated EQ-as-value win from the spike. A **gate-only** change (no new pseudo — rides the existing `buildNZSelect → MOSLowerSelect → G_BRCOND_IMM → CmpBrImag16/CmpBrImm16` path): `legalizeICmp` now fires native EQ when both operands are already **Imag16-resident** (a computed native-s16 value or an indirect load) or one is a constant. `isComputedS16` matches the generic ALU/shift ops (G_ADD/SUB/AND/OR/XOR/SHL/LSHR/ASHR) **and** the load-rooted MOS combiner pseudos (G_ADD16_ABSLD/G_SUB16_ABSLD/G_ADDCHAIN16_ABSLD/G_BITCHAIN16_ABSLD — a multi-use `(a+b)` of globals becomes G_ADD16_ABSLD, not generic G_ADD); `ComputedEq` fires only when neither operand is a register-arg (which would spill — the +8 B regression the spike measured) or a global (v3's domain). **Measured:** computed==computed −3 B, computed==const −2 B, the multi-use chained test 146→133 B (−13 B), and `computed == param` **byte-identical** (gate declines → no regression). New `examples/65816/a16eqvalc.c` + `dev/a16eqvalc.sh` (native 16-bit cmp, cmp #imm for the const, no cpx/cpy; corpus_result 0x1101 host==default==+mos-a16 on MAME + bsnes-jg). Non-breaking: a16 suite + corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` clean, `0002` round-trips. Completes the four gated EQ-as-value wins (v1/v3/imm/v2). [plan](docs/plans/2026-06-17-321-native-s16-eq-v2-computed-imag16-lhs.md).
+- 2026-06-17 — [321-native-s16-eq-imm-constant-through-merge] **native s16 `g == 0x1234` folds to `lda abs; cmp #imm` — recover the byte-split constant (+ lights up the dormant `CmpBrImm16`).** The v3 follow-up: a 16-bit constant EQ operand is byte-split into `G_MERGE_VALUES(i8 lo, i8 hi)` during legalization (a `G_CONSTANT i16` is illegal), so the EQ matcher `CmpNZImm16_match` — which recovered the RHS only via `getIConstantVRegValWithLookThrough` — missed it and fell to `CmpBrImag16` (constant materialized). Added a shared `getI16Const(R, const MRI&)` that recovers a constant directly OR through `G_MERGE_VALUES` of two byte constants (two non-constant byte loads → nullopt, so `g == h` isn't mistaken for an immediate), used it in `CmpNZImm16_match`, and DRY'd `getImm16Operand` (the ordering/ALU path already had this exact logic) to call it. Re-instated the `CmpBrAbsImm16` pseudo + the `selectBrCondImm` `m_CmpNZImm16` fold (foldable-abs LHS → `lda abs`, const RHS → `cmp #imm`; else the now-reachable `CmpBrImm16`) + `expandCmpBr16`/dispatch/`getBranchDestBlock`, and the `GlobalVsImm` gate disjunct (+ canonicalization swap) in `legalizeICmp` so value-use `g == imm` goes native. **Bonus:** v1's `*p == 0x1234` and the branch `if (g == 0x1234)` now select `CmpBrImm16` → `cmp #imm` (was materialized `LDImm16`+`cmp zp`). `examples/65816/a16eqvalg.c` extended with `r3 = (g0 == 0x1234)` (3 `CmpBrAbsAbs16` + 1 `CmpBrAbsImm16`; gate asserts `cmp #imm16`, no `cmp zp`, no `cpx/cpy`; corpus_result 0x1101 host==default==+mos-a16 on MAME + bsnes-jg). Non-breaking (the `getImm16Operand` refactor is byte-identical — `a16imm`/`a16localimm`/`a16chainimm` green): a16 suite + corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` clean, `0002` round-trips. [plan](docs/plans/2026-06-17-321-native-s16-eq-imm-constant-through-merge.md).
+- 2026-06-17 — [321-native-s16-eq-as-value-v3-abs-fold-globals] **native s16 equality-as-value v3: both-global `g1 == g2` folds to native `lda abs; cmp abs` (−48 B / −24% on a chained test).** Building on v1, an s16 `g1 == g2` consumed as a VALUE (and the branch `if (g1 == g2)`) now reads BOTH globals in place — `rep; lda abs g1; cmp abs g2; sep; beq/bne` + 0/1 — instead of round-tripping each through an `Imag16` pair (the blanket-native form the v1 spike measured as +4 B in isolation) or narrowing to the 8-bit cpx/cmp chain. New pseudo `CmpBrAbsAbs16` (mirrors `selectSbc16`'s `a16abscmp` fold on the EQ branch-pseudo path): gate `BothGlobal` (`isFoldableAbsS16Load` ×2, single-use) in `legalizeICmp`, the fold in `selectBrCondImm`'s `m_CmpNZImag16` block (erases the two folded `G_LOAD16_ABS`; the dead `COPY`+`G_SBC` are cleaned by `isTriviallyDead`), `expandCmpBr16` → `LDAbs16; CMPAbs16; BR`, and `analyzeBranch` now scans ALL memrefs for volatility (`CmpBrAbsAbs16` carries two). **Measured −48 B** (`a16eqvalg` `.text.main` 0x9a vs the gate-disabled 8-bit baseline 0xca) — confirming the spike's +4/+12 "regressions" were isolated-leaf artifacts (in 16-bit-ambient code even the non-folded native form beats 8-bit). Single + independent both-global compares fold fully; deep expression-chaining hoists some operands cross-block (volatile → can't fold safely) but those stay native (still a win). **`g1 == 0x1234` deferred** — the 16-bit constant is byte-split (`G_MERGE_VALUES`) before selection, blocking `CmpBrAbsImm16` and the dormant `CmpBrImm16` alike (needs a `CmpNZ16` constant-through-merge fix; see Open). New `examples/65816/a16eqvalg.c` + `dev/a16eqvalg.sh` (native disasm gate + 0x0101 host==default==+mos-a16 on MAME + bsnes-jg). Stale gates in `a16eq` (branch) + `a16eqval` (value) updated — v3 improved their global compares from `cmp zp` to `cmp abs/long` (the `a16eqval` byte-wise stopgap is now superseded). Verified: a16 suite 36/36, corpus 7/7, **fuzz 50/50** (0 mismatch/crash/error), `-verify-machineinstrs` clean, `0002` round-trips. [plan](docs/plans/2026-06-17-321-native-s16-eq-as-value-v3-abs-fold-globals.md).
+- 2026-06-17 — [321-native-s16-eq-gated-impl] **native s16 equality-as-value v1: an indirect-load operand goes native (−4 B).** `b = (*p == c)` consumed as a VALUE narrowed to the 8-bit cpx/cmp two-byte chain even under +mos-a16. A spike proved the *blanket* native form regresses register/global operands (the native compare routes the LHS through `Imag16` + `rep`/`sep` that the tight 8-bit `cpx;cmp` avoids), so it is **gated** (`isIndirectS16Load` in `MOSLegalizerInfo::legalizeICmp`) to fire only when an EQ operand is a non-absolute (indirect) s16 load — there the value already lands in `Imag16`, so the native 16-bit compare reads it directly (`rep; lda (zp); cmp; sep; beq/bne` + 0/1 materialize) instead of unmerging it back to bytes; `eq_deref` 38→34 B. **No new pseudo** — the value materializes via the existing `buildNZSelect → MOSLowerSelect → G_BRCOND_IMM → CmpBrImag16` path (the original `CmpSelImag16` sketch proved unnecessary). Subsumes the closed indirect-s16-load byte-wise follow-up (a native EQ keeps the operand 16-bit → no `G_UNMERGE`, no spill-vs-byte-spill dilemma). Verified: register/global/computed shapes byte-identical (no regression), `-verify-machineinstrs` clean, ambient indirect-EQ native; `examples/65816/a16eqvalp.c` host==default==+mos-a16 0x0101 on MAME + bsnes-jg; suite 44/44, corpus 7/7, **fuzz 50/50** (F4-fixed build, 0 mismatch), `0002` round-trips (no F4 leakage). v2 (computed-LHS) + v3 (abs-fold globals) remain — see Open. [plan](docs/plans/2026-06-16-321-native-s16-eq-gated-impl.md).
+- 2026-06-16 — [321-indirect-s16-load-bytewise] **indirect s16 load consumed only as bytes: investigated → WON'T-IMPLEMENT.** The byte-wise-load fix (`7c0fe56`) gates only the *absolute* s16 load; the open question was whether to extend the `AllUsesUnmerge` guard to the **indirect** load (`G_LOAD16_INDIR`, `legalizeLoadStore16`). Measured native-vs-byte-wise via a scratch `!AllUsesUnmerge` gate: in isolated **leaf** functions byte-wise won −6 B (no `rep`/`sep`/spill island), BUT `+mos-a16` runs predominantly in **16-bit (M=0)** mode, and re-measuring in 16-bit-ambient code showed the win is **schedule-dependent** — byte-wise wins only when the load is *adjacent* to its byte-compare (`loop_deref` −6 B) and is a **+2 B regression** when 16-bit math is scheduled between load and compare (`mixed_deref`, the common shape), because it then carries two byte-spills across that region vs the native form's one word-spill. The blanket gate can't distinguish them, so it fails the "not meaningfully worse elsewhere" bar. The real fix is **native s16 EQ-as-value** (removes the `G_UNMERGE` entirely) — folded into the Open M2 native-EQ item. Tree left native (scratch reverted, codegen byte-identical to baseline). [plan](docs/plans/2026-06-16-321-indirect-s16-load-bytewise.md).
+- 2026-06-16 — [321-s16-load-unmerge-bytewise] **s16 equality-as-value prologue regression FIXED: an s16 load consumed only by `G_UNMERGE` now loads byte-wise.** Investigating M2 item (c) (`b = (a == c)`) surfaced a `+mos-a16` *regression*: the s16 operand loads were emitted as native 16-bit `G_LOAD16_ABS` (`lda abs → A16; sta imag16`) and then the 8-bit-narrowed compare `G_UNMERGE`d them straight back into bytes — a wasteful round-trip the default build never does. Fix (`MOSLegalizerInfo::legalizeLoadStore16`): when every use of an s16 load is `G_UNMERGE`, skip the native 16-bit load and fall to the byte-wise `narrowScalar` (matches default). `b = (a == c)` now loads operands byte-wise (no `rep`-bracketed prologue before the compare) — back to parity with default. Regression `examples/65816/a16eqval.c` + `dev/a16eqval.sh` (`corpus_result == 0x0101` host==default==a16 on both emulators + a no-prologue disasm gate). Non-breaking: suite 42/42 (now 43 w/ a16eqval), corpus 7/7, fuzz 50/50; `0002` round-trips. The FULL native equality-as-value (a fused compare-select) remains deferred — see Open M2. [plan](docs/plans/2026-06-16-321-s16-load-unmerge-bytewise.md).
+- 2026-06-16 — [321-softstack-ac16-spill] **F3 follow-up FIXED: the soft-stack (reentrant) `Ac16` spill.** The static-stack F3 fix left the soft-stack spill path with the same `Imag16`-only gap — a reentrant `+mos-a16` function holding a 16-bit value in the accumulator across a call crashed (`Scavenger spill for register not yet implemented` / `SelectImm $a16`) because `MOSRegisterInfo::expandLDSTStk` fell `Ac16` through to a byte path that `COPY`ed `A16` to an 8-bit GPR (the high byte `B` isn't byte-addressable without `XBA`). Fix: spill `Ac16` with one 16-bit **indirect** `STAIndir16`/`LDAIndir16` through a slot pointer formed in the spill's reserved `Imag16:$scratch` (reusing the existing far-offset `AddrLostk`/`AddrHistk` machinery — no new post-RA allocation) — the indirect analog of the static `STAbs16`/`LDAbs16` fix. Proved the crash on the pre-fix build first (recursion forces the soft stack: `MOSNonReentrant` only marks non-recursive functions `nonreentrant`). Regression `examples/65816/a16spillr.c` + `dev/a16spillr.sh`: `corpus_result == 0x3457` host==default==+mos-a16 on MAME + bsnes-jg; the MLow=1 op is rep/sep-bracketed. Non-breaking: suite 42/42, corpus 7/7 (incl. recursive `funcs`), fuzz 50/50; `0002` round-trips. [plan](docs/plans/2-one-tracked-follow-up-glimmering-ladybug.md).
+- 2026-06-16 — [321-fix-cmp-value-selectimm] **F3 FIXED (the `SelectImm $a16` crash → `fuzz 50 1` 50/50, 0 xfail): spill the 16-bit accumulator `Ac16` via a direct 16-bit `LDAbs16`/`STAbs16`, not a COPY through an 8-bit GPR.** Root-caused to **register allocation**, not the legalizer: `MOSInstrInfo::loadStoreRegStackSlot` only special-cased `Imag16`, so an `Ac16` value spilled across a call fell through to a single-byte path that emitted `GPR = COPY A16` → `copyPhysRegImpl` (`:743`, `Anyi1` branch) → invalid `SelectImm $a16`. Added an `Ac16` case using `LDAbs16`/`STAbs16` to the frame index, restoring the native-s16 invariant ("A16 entered/left only via 16-bit load/store"). The first-guess legalizer-gate fix (the s16 ordering native gate lacking the equality gate's all-uses-are-`G_BRCOND_IMM` guard) was implemented and **disproven** first (clean SSA, but all 8 seeds still crashed post-RA; reverted). Verified: repro + 8 seeds compile clean; `fuzz 50 1` → 50/50 (seed 1 `0x525C`, seed 7 `0x9447`, all four oracles agree); a16+kernels suite 40/40, corpus 7/7; `0002` round-trips. New regression `examples/65816/a16spill.c` + `dev/a16spill.sh` (compile-time gate; the fuzzer de-XFAIL covers values). Follow-up: soft-stack `Ac16` spill (`expandLDSTStk`) has the same gap (pre-existing, corpus-unreachable). [plan](docs/plans/2026-06-16-321-fix-cmp-value-selectimm.md).
+- 2026-06-16 — [321-tier1-broaden-corpus] **Tier 1: broaden the test corpus — the safety net that de-risks A16-threading (Tier 2) + peephole unification (Tier 3).** A **differential** corpus: each program's `corpus_result` must agree across host-computed == default(trusted 8-bit) == `+mos-a16` on **both** MAME and bsnes-jg, plus `-verify-machineinstrs`. (1) Seeded **fuzzer** `tools/a16_fuzz.py` + `dev/run.sh fuzz [N] [seed]` — random UB-free C over mixed 16/8-bit vars and the full operator set, with a Python evaluator validated 500/500 against host gcc, delta-reduced triage, XFAIL-classified known issues; `fuzz 50 1` → 42/50 PASS + 8 xfail, **0 mismatch/crash/error**. (2) Six **kernels** (`k_crc16` 0x29B1, `k_fxmul`, `k_prng`, `k_bits`, `k_satadd`, `k_isort`). (3) Two **combinatorial** tests (`a16mix1/2`). It immediately found **3** real defects (next two entries + the deferred SelectImm crash). Non-breaking: a16 suite + kernels + combinatorial = **40/40** on a quiet box, corpus 7/7. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
+- 2026-06-16 — [321-fix-asl-lsr-carry-clobber] **backend fix (found by Tier-1 `k_crc16`): 16-bit `asl`/`lsr` must model the carry clobber.** A CRC16 differential FAIL (`+mos-a16` 0x036D ≠ correct 0x29B1, both emulators agreeing → deterministic miscompile) minimized to `if (crc & 0x8000) crc=(crc<<1)^P; else crc=crc<<1;`: the hoisted common `crc<<1` (`ASLAcc16`) was scheduled **between** the `cmp` and its `bcs`, clobbering the branch carry (carry := bit 15). `ASLAcc16`/`LSRAcc16` declared no carry def, so the scheduler placed them in a live-carry interval. Fix: `let Defs = [C]` on both (`MOSInstrLogical.td`); `RORAcc16` already modeled carry, `INC/DECAcc16` correctly don't clobber C. Regression `k_crc16` → 0x29B1 both emus; native shifts unaffected; `0002` round-trips. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
+- 2026-06-16 — [321-fix-ashr-ge8-hang] **backend fix (found by Tier-1 fuzzer): signed `>>` by ≥ 8 hung the compiler.** 5 fuzz seeds timed out the `+mos-a16` compile; minimized to a 2-line `(short)g >> 8` that never terminates (`>> 7` is fine — the native ASHR path covers 1–7; unsigned `>>` is fine; default build compiles in 0.04 s). The `Amt >= 8` byte-decomposition path computed the ASHR sign-fill with an s16 `ICMP_SLT(Src,0)`; under `+mos-a16` that re-enters the native signed-compare legalization as a compare-result-as-VALUE and loops. Fix: 8-bit `AShr(highByte, 7)` sign broadcast — no s16 compare (`MOSLegalizerInfo.cpp`). Regression `a16ashift8` → 0x001F both emus (amounts 8 & 13, neg + pos); `0002` round-trips. Harness hardened too: `_run` retries an environmental timeout, a *persistent* one is surfaced as a triaged CRASH. [plan](docs/plans/2026-06-15-321-tier1-broaden-corpus.md).
+- 2026-06-15 — [321-native-s16-bitwise-chains] **ALU-chain ext: 16-bit AND/OR/XOR chains.** A homogeneous ≥3-term bitwise chain of near-abs globals now threads the running value through A16 (`lda a; and b; and c; sta`) with **no carry-init**, the bitwise analogue of the add chain. `collectAddChain` generalized to `collectAluChain` (parameterized by the chain operator + per-op constant fold); new `bit_chain16`/`bit_chain16_ld` combiners + `G_BITCHAIN16_ABS{,LD}` pseudos (opcode-parameterized) + `selectBitChain16`. ADD path left untouched (only the shared walk generalized). SUB chains moot (reassociated to `a-(b+c)`). `a16bitchain` reads 0x6261 (AND/OR/XOR, store + multi-use). 31 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-bitwise-chains.md).
+- 2026-06-15 — [321-native-s16-add-chain-immediate] **ALU-chain ext: immediate term in an add chain (`a+b+c+K`).** A constant in a ≥3-term add chain had broken the chain match (every leaf had to be a load), dropping the whole chain to the round-tripping per-add path. `collectAddChain` now folds constant leaves into one running immediate (rematerializable, never erased), and both chain forms end in `adc #imm` (`lda a; clc; adc b; clc; adc c; clc; adc #K; sta`). Threshold is `loads + (const?1:0) >= 3`, keeping the 2-operand cases (`a+b`, `a+K`) on the `alu16_abs`/`absld` immediate path. `a16chainimm` reads 0x2569 (store + multi-use forms). 30 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-add-chain-immediate.md).
+- 2026-06-15 — [320-321-c-abi-prior-art] **standalone 65816 C calling-convention prior-art note (WDC816CC / ORCA-C).** Documented prior art for the #320/#321 calling-convention decision, read **firsthand** from primary sources: WDC816CC manual pp.21–26 + ORCA/C `Gen.pas` (`GenEnt` emits `tsc/phd/tcd`; `A_X` return class). Both shipped-in-production compilers converge on a **hybrid** frame — args on the hardware stack, then `PHD`/`TCD` remap the Direct Page onto the frame for fast 8-bit-offset locals (hard **256-byte frame cap**, "partly done for speed"), return in **A** (low)/**X** (high); the `near`/`far` keyword model maps onto #320's addrspaces. Surfacing upstream rides the user-triggered #320 posting. Sources vendored (gitignored — redistribution-restricted) at `docs/refs/65816-c-abi/` + `dev/fetch-refs.sh` (sha256-verified). [note](docs/320-321-65816-c-abi-prior-art.md) · [plan](docs/plans/2026-06-15-wdc816cc-orca-c-65816-c-abi-prior-art-note-primary.md).
+- 2026-06-15 — [321-native-s16-add-chain-multiuse] **load-fold (c): multi-use add chain (`t = a+b+c+d`, reused).** A ≥3-term add chain of near-abs globals whose result is reused — which `add_chain16` (store-rooted) couldn't reach — now threads the running sum through A16 via a new `add_chain16_ld` combiner → `G_ADDCHAIN16_ABSLD` → `lda a; clc; adc b; clc; adc c; clc; adc d; sta t`, dropping the N−2 intermediate `sta tmp; lda tmp` Imag16 round-trips. Mirrors how `alu16_absld` extended `alu16_abs`; reuses `collectAddChain` over the root's operands (multi-use root, single-use interior). `a16chainld` reads 0x1234 (sum stays in A16: 1 `sta zp`, not 3). **Completes all load-fold follow-ups (a/b/c).** 29 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-add-chain-multiuse.md).
+- 2026-06-15 — [321-native-s16-inc-dec-abs] **`inc a`/`dec a` for global `g ± 1` (+ `inc abs` rejected).** `selectAlu16Abs` now emits `lda <g>; inc/dec a; sta <g>` for a global ±1 instead of `clc; lda; adc #$0001; sta` (3 instrs vs 4), keeping the compiler's 24-bit long addressing. A single `inc abs`/`dec abs` memory-RMW was prototyped and **reverted**: the 65816 has no `inc long`, `inc abs` is DBR-relative, and this platform's native-16 path uses DBR-independent long loads/stores (the 8-bit `abs` path *is* DBR-relative — see the 2026-06-18 native-crt0 DBR=0 work) — the RMW only works via the low-8KB WRAM mirror (DBR=0 + bank-0 LoRAM), a latent miscompile for any high global. `a16incabs` reads 0x3502 (3 inc + 1 dec, no adc #1, no ee/ce). 28 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-inc-dec-memory-rmw.md).
+- 2026-06-15 — [321-native-s16-inc-dec] **1-byte `inc a` / `dec a` (register ±1).** A 16-bit register/local `x ± 1` had dropped to an 8-bit byte inc/dec-with-carry chain (sep/ldx/inc-zp/bne/inc-zp/rep) thrashing M-mode in a 16-bit region. `legalizeAddSub` now keeps s16 ±1 un-narrowed under +mos-a16 and `selectAlu16Native` emits one `inc a`/`dec a` (new `INCAcc16`/`DECAcc16` MLow=1 pseudos; ADD+1/SUB-1→inc, ADD-1/SUB+1→dec). `a16incdec` reads 0x2668 (2 inc + 2 dec, no byte chain); `a16loopred` guards that a counted `while(i){x++;i--}` still strength-reduces to a native 16-bit add (0x1239). Bonus: the now-native trailing `+1` removes a forced mode switch in a16ashift (drops a sep) and a16ptr (merges 2 rep brackets); both gates updated. Variable/≥8 shifts intentionally left (libcall / byte-relabel already optimal); memory-RMW `inc abs` is the follow-up. 27 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-s16-inc-dec-accumulator.md).
+- 2026-06-15 — [321-native-s16-single-use-non-store-fold] **load-fold (b): single-use-non-store results.** A both-global ALU op whose single-use result does not feed a near-abs store (the case `alu16_absld` skips via its `>1 use` guard, `alu16_abs` as a non-store) folds both operands directly in `selectAlu16Native` — covered implicitly by the mixed-operand fold (keyed on operands, not result use-count). No new codegen; `a16sunfold` (0x3480 both emus, 0 globals materialized) is the regression guard. 25 a16* tests + corpus 7/7 green; patch `0002` unchanged + round-trips. [plan](docs/plans/2026-06-15-321-native-s16-single-use-non-store-fold.md).
+- 2026-06-15 — [321-native-s16-mixed-operand-fold] **mixed-operand load-fold (`t = a16v OP local`).** `selectAlu16Native` reads a single-use near-abs global operand directly instead of materializing it into an Imag16 pair — two fold sites: operand A → LHS `lda abs` (`LDAbs16`), operand B → absolute ALU form (`adc|sbc|and|ora|eor abs`). Uniform across ADD/SUB/AND/OR/XOR; correct for both SUB directions (minuend is always the loaded A) with no commutativity swap. Volatile-safe 1-to-1 fold (reuses `foldableAbsLoad16`). `a16mixfold` reads 0x2DC0 both emus (6 mixed ops, global read in place); 24 a16* tests + corpus 7/7 green; `0002` round-trips. (a16localx's adc-zp gate updated to also count adc-abs.) [plan](docs/plans/2026-06-15-321-native-s16-mixed-operand-load-fold.md).
+- 2026-06-15 — [321-native-s16-compare-abs-fold] **fold near-abs global operands into the 16-bit compare (`a < gv`).** `selectSbc16` reads a single-use near-abs `G_LOAD16_ABS` operand directly — LHS via `lda abs` (`LDAbs16`), RHS via `cmp abs` (`CMPAbs16`) — so a global-vs-global compare is `rep; lda abs; cmp abs; sep; bcc/bcs` (no Imag16 round-trip, no `cmp zp`). Volatile-safe 1-to-1 fold; signed/XOR'd operands stay on the Imag16 path. `a16abscmp` reads 0x4303 both emus; 23 a16* tests + corpus 7/7 green; `0002` round-trips. [plan](docs/plans/2026-06-15-321-native-16bit-compare-abs-operand-fold.md).
+- 2026-06-15 — [321-native-s16-copy16-fold] **fuse the 16-bit indirect copy (`g = *p`).** Extends the
+  abs→abs copy fusion to indirect/mixed copies at selection: a single-use 16-bit `G_LOAD16_ABS`/
+  `G_LOAD16_INDIR` feeding a 16-bit store folds the load directly into the accumulator (new helper
+  `loadStoreValueIntoA16` in the store paths of `selectMem16Abs`/`selectMem16Indir`), gated by
+  `shouldFoldMemAccess` (same block, non-volatile load, no aliasing/ordered op between) — so `g = *p`
+  is `lda (p); sta g` instead of `lda (p); sta tmp; lda tmp; sta g`. `a16copy` (abs←indir) folds with
+  no Imag16 round-trip and reads 0x3456; `-verify-machineinstrs` clean; both MAME + bsnes-jg.
+  Non-breaking: corpus 7/7, all 22 a16* tests green, patch `0002` round-trips. The indir-dst direction
+  folds only when the dst-pointer load doesn't intervene as an ordered memref (volatile-pointer copies
+  conservatively stay a round-trip — correct).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
+
+- 2026-06-15 — [321-native-s16-copy16abs] **fuse the 16-bit global-to-global copy (`g = gg`).** The
+  absolute load/store landed `g = gg` as `lda gg; sta tmp; lda tmp; sta g` — the value round-tripped
+  through an Imag16 temp because the load and store were selected independently. A new pre-legalizer
+  combiner `copy16abs` (`matchCopy16Abs`/`applyCopy16Abs`) folds `G_STORE(single-use near-abs
+  G_LOAD(absSrc), absDst)` into `G_COPY16_ABS`, which `selectCopy16Abs` lowers to `lda src; sta dst`
+  (LDAbs16+STAbs16, both MLow=1, no temp) in one rep/sep. Disjoint from alu16_abs/add_chain16 (those
+  need a G_ALU value). `g = gg` is now 2 ops; `a16abs` still reads 0x5A3D; `-verify-machineinstrs`
+  clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 21 a16* tests green, patch `0002`
+  round-trips. Follow-up: extend to indirect/mixed copies (`*q = *p`, `g = *p`).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
+
+- 2026-06-15 — [321-native-16bit-absolute-load-store] **native 16-bit absolute load/store (`g = gg`).**
+  A 16-bit global-to-global copy / global store of a computed value did a 4-op 8-bit X/Y byte shuffle
+  with no rep/sep; now `legalizeLoadStore16` routes a global-addressed s16 access (via
+  `matchAbsoluteAddressing`) to `G_LOAD16_ABS`/`G_STORE16_ABS`, selected (`selectMem16Abs`) to
+  `lda abs`/`sta abs` via the existing `LDAbs16`/`STAbs16` `MLow=1` forms. `a16abs` reads 0x5A3D, no
+  byte shuffle; register-valued `corpus_result = …` stores across the suite go native and merge into
+  the preceding bracket (fewer rep/sep). **Constant-valued stores are gated out** (kept on the
+  STZ-fusion/byte path — `g16 = 0` stays `rep; stz; sep`). The merge changed the rep/sep shape of 11
+  existing tests; all were emulator-verified still correct before the stale exact-count gates were
+  relaxed. `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 21 a16*
+  tests green, patch `0002` round-trips. Follow-up: fuse the load→store copy (drop the Imag16 temp
+  round-trip).
+  [plan](docs/plans/2026-06-15-321-native-16bit-absolute-load-store.md).
+
+- 2026-06-15 — [321-native-16bit-indirect-load-store] **native 16-bit indirect load/store (`*p`,
+  `a[i]`, `a[i]=v`).** Scope correction: indexed/array access does NOT need the X-flag dimension —
+  llvm-mos lowers arrays via computed pointers whose arithmetic is already native 16-bit; only the
+  16-bit VALUE was loaded/stored as two 8-bit indirect ops (`lda (zp); lda (zp),y`). Now an s16
+  `G_LOAD`/`G_STORE` through a non-absolute 16-bit pointer routes (new `legalizeLoadStore16`, gated on
+  `!matchAbsoluteAddressing`) to `G_LOAD16_INDIR`/`G_STORE16_INDIR`, selected (`selectMem16Indir`) to
+  `lda (zp)`/`sta (zp)` via new `LDAIndir16`/`STAIndir16` `MLow=1` forms in one rep/sep; the whole
+  pointer (incl. `a[i]`'s G_PTR_ADD) materializes into the Imag16 pair so plain-indirect is always
+  correct. Absolute/indexed s16 access falls back to byte-pair narrowing (follow-ups). `a16ptr`
+  round-trips 0xABCE via `*p`, no `(zp),y`; `-verify-machineinstrs` clean (it caught a misplaced load
+  memref on `STAImag16` — moved to the real `LDAIndir16`); both MAME + bsnes-jg. Non-breaking: corpus
+  7/7 (default pointer/array codegen untouched), all 20 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-indirect-load-store.md).
+
+- 2026-06-15 — [321-native-16bit-signed-compares] **native 16-bit signed ordering compares
+  (`< <= > >=` on `short`).** Signed order equals unsigned order after flipping the sign bit, so
+  `legalizeICmp` rewrites an s16 `SLT` (the canonical signed primitive — the other three reduce to it)
+  to `ULT` on `(a^0x8000, b^0x8000)`: the XORs are the already-native 16-bit EOR and the compare
+  re-legalizes through the already-native unsigned UGE carry path (`rep; eor #$8000; …; cmp; sep;
+  bcc/bcs`). No new flag handling (no V/N^V), no selector/pseudo changes — a one-block hook. `a16scmp`
+  reads 0x0111 with negative operands (an unsigned misread would get every ordering wrong);
+  `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 19 a16* tests
+  green, patch `0002` round-trips. Compare→stored-bool is the remaining compare follow-up.
+  [plan](docs/plans/2026-06-15-321-native-16bit-signed-compares.md).
+
+- 2026-06-15 — [321-native-16bit-equality-compares] **native 16-bit equality compares (`== !=`).**
+  An s16 `a == b`/`a != b` narrowed to a two-block 8-bit `cmp/cpx` chain; now each `==`/`!=` feeding a
+  branch is one fused 16-bit compare-branch `rep; lda; cmp; sep; beq/bne`. Unlike the carry (ordering)
+  path, Z can't be a plain i1 (selectSbc asserts N/Z must fuse into a terminator), so: the legalizer
+  keeps s16 `ICMP_EQ` un-narrowed only when every use is `G_BRCOND_IMM`; new `CmpBrImag16`/`CmpBrImm16`
+  pseudos (Defs `[C,A16,NZ]`) carry it; type-discriminated `CmpNZ16` matchers + new `selectBrCondImm`
+  cases (handled before the 8-bit ones, with an s8 guard added to the 8-bit matcher); and `expandCmpBr16`
+  lowers post-RA to `LDAImag16; CMPImag16/CMPImm16` (both `MLow=1`, so REP/SEP brackets the `lda;cmp`)
+  + `BR` reading Z (sep preserves Z). `a16eq` reads 0x0011 (operands differ in both bytes), no 8-bit
+  cpx/cpy; `-verify-machineinstrs` clean; both MAME + bsnes-jg. Non-breaking: corpus 7/7, all 18 a16*
+  tests green, patch `0002` round-trips. Equality→stored-bool and signed compares are follow-ups.
+  [plan](docs/plans/2026-06-15-321-native-16bit-equality-compares.md).
+
+- 2026-06-15 — [321-native-16bit-signed-shift-ashr] **native 16-bit signed (arithmetic) right shift
+  (`>>` on `short`).** Completes the constant-shift family. The 65816 has no native ASR, so
+  `selectShift16Native` emits `cmp #$8000; ror a` per bit (the compare sets carry = the sign bit, the
+  rotate replicates it into bit 15) via a new carry-threaded `RORAcc16` `MLow=1` form; the legalizer
+  gate adds `G_ASHR` to the [1,7] native passthrough. `a16ashift` sign-extends 0xF000 >> 3 = 0xFE00
+  (reads 0xFE01) under one rep/sep, no 8-bit lsr/ror byte chain, no libcall; both MAME + bsnes-jg.
+  Non-breaking: corpus 7/7, all 17 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-signed-shift-ashr.md).
+
+- 2026-06-15 — [321-native-16bit-constant-shifts] **native 16-bit constant shifts (`<<`, unsigned
+  `>>`).** `x << k` / unsigned `x >> k` (k a compile-time constant) had narrowed to the 8-bit
+  `asl/rol` (or `lsr/ror`) byte-pair chain even under `+mos-a16`. The legalizer now leaves a small s16
+  `G_SHL`/`G_LSHR` (amount 1–7) un-narrowed (`legalizeShiftRotate`, after the `Amt==0` base case) and
+  `selectShift16Native` emits one `lda; (asl|lsr)×k; sta` run on the `Imag16` value via new
+  `ASLAcc16`/`LSRAcc16` `MLow=1` pseudos (expand onto `ASL_Accumulator`/`LSR_Accumulator`; no carry
+  operand — each shift self-fills 0). The value enters A16 only via LDAImag16 and leaves via STAImag16
+  (no Ac16↔8-bit COPY). `a16shift` reads 0x1278 with 4× `asl` + 2× `lsr` under one rep/sep (the mode
+  tracker folds a following add into the same bracket), no `rol/ror` pairs, no `__ashlhi3` libcall;
+  both MAME + bsnes-jg. Follow-ups: signed `>>` (ASHR needs ror+sign), variable shifts, amount ≥8 /
+  `xba`, 1-byte `inc a`/`dec a`, memory-RMW `inc abs`, shift-into-store fusion. Non-breaking: corpus
+  7/7, all 16 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-native-16bit-constant-shifts.md).
+
+- 2026-06-15 — [321-cross-block-repsep] **cross-block REP/SEP mode-tracking.** `MOSInsertREPSEP` was
+  per-block and 8-bit-anchored, so a loop with a 16-bit body re-ran `rep … sep` every iteration. It now
+  runs a forward dataflow over the M-width lattice (`{None, M8, M16, Conflict}`) and places switches
+  only at genuine transitions — inside a block (seeded with the block's `In` width, no forced 8-bit at
+  exit) and on CFG edges `P→B` where `Out[P]≠In[B]`. `requiredWidth()` keeps entry/calls/returns 8-bit
+  (the ABI boundary) and branches/carry-init agnostic; v1 bails the whole function to legacy per-block
+  anchoring on any switch that would hit a true critical edge. Must-win lands: a 16-bit loop body holds
+  16-bit mode across iterations — `rep` hoisted to the preheader, `sep` sunk to the exit, none in the
+  body (`a16loop` 0x2340); a call inside a 16-bit region runs 8-bit (`a16call` 0x4456). Both on MAME +
+  bsnes-jg. New `dev/regen-patch.sh` captures the isolated-worktree patch-regen method. Non-breaking:
+  corpus 7/7, all 13 a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-15-321-cross-block-repsep-mode-tracking.md).
+
+- 2026-06-14 — [321-native-16bit-compares] **native 16-bit unsigned-ordering compares (slice 1).**
+  `if (a16v < b16v)` (and `<= > >=`) compiled to a verbose multi-block 8-bit `cpx/cpy` chain; now it's
+  one 16-bit compare: `rep #$20; lda; cmp; sep #$20; bcc/bcs`. The legalizer keeps s16 **UGE**
+  un-narrowed under `hasAccum16` (all four orderings canonicalize to UGE = the C flag, no terminator-
+  fusion) by emitting a width-flexible 16-bit `G_SBC`; `selectSbc16` lowers it to `lda lhs; cmp rhs`
+  (new `CMPImag16`/`CMPAbs16`/`CMPImm16`, `MLow=1` → one rep/sep bracket) producing C, which the branch
+  reads. A constant RHS folds to `cmp #imm16` (`CMP_Immediate16` exists via the `CC1_All` multiclass).
+  `a16cmp.c` (four orderings + a high-byte-differs case: low byte bigger, high byte smaller) shows 5
+  16-bit `cmp`, **zero** 8-bit `cpx/cpy`, and `corpus_result==0x1103` on both MAME and bsnes-jg.
+  Non-breaking: corpus 7/7, all 13 a16* tests green, patch `0002` round-trips. Equality (`== !=`, Z →
+  CmpBr fusion), signed (N^V), and compare→select are follow-ups.
+  [plan](docs/plans/2026-06-14-321-native-16bit-compares.md).
+
+- 2026-06-14 — [321-native-s16-load-fold] **fold near-abs global operands into the 16-bit ALU.** For a
+  multi-use `t = a16v OP b16v` (the store-fused peephole can't reach a multi-use result), the new
+  combiner rule `alu16_absld` reads both globals directly via the 16-bit absolute forms instead of
+  copying each byte-wise into an `Imag16` pair (~8 instrs dropped): `clc; rep; lda b16v; adc a16v; sta
+  __rc2; sep`. New register-result pseudos `G_{ADD,SUB,AND,OR,XOR}16_ABSLD` (skipped by the legalizer
+  opcode-range, no rule) + `selectAlu16AbsLd` (clone of `selectAlu16Abs` ending in `STAImag16`); reuses
+  `nearAbsLoad`/`nearAbsGlobalDef`. The `>1-use` guard means single-store globals still fuse via
+  `alu16_abs` (a16add/sub/bit stay green). `a16loadfold.c` reads 0x2345 (lda/adc abs, no `adc zp`) on
+  both MAME and bsnes-jg; with `volatile` operands a16local/sub/bit fold too (gates widened, results
+  unchanged), pure-native `adc zp` stays covered by a16localx. Non-breaking: corpus 7/7, all 12 a16*
+  tests green, patch `0002` round-trips. Mixed load+register + single-use-non-store cases are follow-ups.
+  [plan](docs/plans/2026-06-14-321-native-s16-fold-global-operand-loads-into-the.md).
+
+- 2026-06-14 — [321-native-s16-imm-fold] **fold a constant operand into the immediate ALU form
+  (`adc #imm`).** `selectAlu16Native` folds a compile-time-constant operand into `ADCImm16`/`ANDImm16`/
+  `ORAImm16`/`EORImm16` instead of materializing it into an `Imag16` pair — `t = a16v + 0x0345` →
+  `clc; rep; lda a16v; adc #$0345; sta; sep`, dropping the ~4-instr `ldx #lo;stx;ldx #hi;stx`. A
+  `getImm16Operand` helper handles both shapes (direct constant, and a `G_MERGE` of two byte constants
+  → `lo|hi<<8`); commutative ops fold either operand (swap); SUB never folds (no `SBCImm16`; `x-C`
+  canonicalized to `x+(-C)` upstream); the dead constant is auto-erased by `isTriviallyDead`.
+  `a16localimm.c` asserts `adc #` (opcode 69, not 65), no materialization, 0x1545 on both emulators.
+  Non-breaking: corpus 7/7, all a16* tests green, patch `0002` round-trips.
+  [plan](docs/plans/2026-06-14-321-native-s16-immediate-operand-optimization-adc.md).
+
+- 2026-06-14 — [321-increment-1d-retry] **GISel-native s16 — the A16-aliasing coalescer crash SOLVED;
+  native 16-bit add/sub/and/or/xor all ship** (steps 1-5). Re-diagnosed from the code: the crash was NOT the `A16=A`
+  aliasing (the peephole makes `Ac16` vregs and is fine; aliasing is needed for transient-`A16`
+  soundness) — it was the reverted prototype keeping the value resident *in* `Ac16` and shuffling it
+  to/from `Imag16` with `copyPhysReg` (COPY-like), so an 8-bit `LDImm` coalesced into that COPY →
+  `$a16 = LDImm`. Fix mirrors the peephole: s16 **value lives in `Imag16`**; native add selects to a
+  self-contained `lda zp; clc; adc zp; sta zp` on the transient `A16` (new `LDAImag16`/`ADCImag16`/
+  `STAImag16`, with `STAImag16` DEF-ing its `Imag16` like `STImag8`) — accumulator entered/left **only
+  via load/store, never a COPY to/from 8-bit**. A multi-use **local** add (`a16local.c`, peephole-
+  impossible) runs `0x1122`; the exact complex case that crashed the prototype (`a16localx.c`: 5 native
+  adds, reused locals, heavy `Imag16` pressure) **compiles clean** (`-verify-machineinstrs`) and runs
+  `0x33A0` — both on **both** MAME and bsnes-jg. Step 5 generalized `selectAdd16Native` → `selectAlu16Native`
+  for native s16 **sub** (`sec/sbc`, `a16localsub` 0x1222) and **bitwise** (`and/ora/eor`, `a16localbit`
+  0x000F), widening the legalizer gate to s16 `G_SUB` + `G_AND/OR/XOR` under `+mos-a16`. Immediate operands
+  work (constant materialized into `Imag16`; `adc #imm` deferred as a size opt). Non-breaking: corpus 7/7,
+  all 10 a16* tests green, SDK builds, patch `0002` round-trips. `dev/run.sh a16local|a16localx|a16localsub|a16localbit`.
+  [plan](docs/plans/2026-06-14-321-increment-1d-retry-imag16-native-s16.md).
+
+- 2026-06-14 — [321-increment-1c-chained-16bit-alu] **chained 16-bit ADD — a value stays live in A16
+  across ops** (first general-path slice): `g = a + b + c` fuses (pre-legalizer combiner, recursive
+  `collectAddChain` over the G_ADD tree → variadic `G_ADDCHAIN16_ABS` → `selectAddChain16`) to one
+  bracket `rep #$20; lda b; clc; adc a; clc; adc c; sta g; sep #$20`, threading the running sum
+  through A16 (the intermediate `a+b` survives in the accumulator for `+c`). Reads
+  `corpus_result == 0x1230` on **both** MAME and bsnes-jg. Disjoint from 1b's `alu16_abs` (fires only
+  on ≥3-term load chains). Non-breaking: 1b (add/sub/bitwise/imm) + 1a + corpus 7/7 green, SDK builds.
+  `dev/run.sh a16chain`; patch `0002-321-accum16.patch`. First codegen where a 16-bit value survives
+  across operations in the register — the start of the general path.
+  [plan](docs/plans/2026-06-14-321-increment-1c-chained-16bit-alu.md).
+
+- 2026-06-14 — [321-increment-1b-dual-width-accumulator] **a running 16-bit ALU (add/sub/and/or/xor)
+  through the dual-width A16 accumulator** — modeled the 65816's 16-bit accumulator `A16 = B:A` (class
+  `Ac16`, aliasing `A`; named A16 not WDC's "C" to avoid the carry-flag footgun), then a pre-legalizer
+  combiner fuses `g = a OP b` (near abs globals) → a `G_{ADD,SUB,AND,OR,XOR}16_ABS` op → `selectAlu16Abs`
+  emitting one REP/SEP-bracketed 16-bit sequence: `clc;lda;adc;sta` (0x2345), `sec;lda;sbc;sta` (0x0123),
+  and `lda;and|ora|eor;sta` (AND→0x0F00; three bitwise ops merge into ONE bracket). All read back correct
+  on **both** MAME and bsnes-jg; add is 31 B vs 48 B for the 8-bit carry chain. Also **immediate
+  operands** — `g = a OP #imm16` selects `adc/and/ora/eor #imm` (`a+0x0345`→0x1545; subtract-by-const
+  folds to add of the negated const), and the REP/SEP pass now treats the carry-init as M-width-agnostic
+  so consecutive ops share one bracket. Non-breaking: corpus 7/7, Inc 1a + far xcheck green, SDK builds.
+  Findings: a legalizer rule for a MOS-specific *generic* opcode corrupts the legalizer tables (skip by
+  opcode-range instead); the carry-init must not split the REP/SEP run. `dev/run.sh a16add|a16sub|a16bit|a16imm`;
+  patch `0002-321-accum16.patch`. The genuine hard core of #321. Next (general path): chained ops /
+  values staying live in A16. [plan](docs/plans/2026-06-14-321-increment-1b-dual-width-accumulator.md).
+
+- 2026-06-14 — [321-native-mode-crt0] **SNES platform now boots 65816 native mode** — crt0 `.init.50`
+  does `clc; xce` + a 16-bit `ldx #$01ff; txs` (page-1 stack) + `sep #$30` (8-bit A/X default), so
+  *every* program runs native; the four 65816-only opcodes are emitted as `.byte` (SDK assembles crt0
+  as 6502). a16 drops its test-local `clc; xce` and still reads `0x0042` on both emulators — driven
+  solely by the crt0. Non-breaking: corpus 7/7, far-run/far-bank1/xcheck all green in native 8-bit.
+  Platform-only change (no backend/patch). Enables all future 16-bit codegen to run unmodified.
+  [plan](docs/plans/2026-06-14-321-native-mode-crt0.md).
+- 2026-06-14 — [321-increment-1a-16bit-accumulator] **first real 16-bit-accumulator codegen** — a
+  16-bit store-of-zero fuses (under opt-in `+mos-a16`) to `rep #$20; stz; sep #$20` via the new
+  `MOSInsertREPSEP` pass (reuses the MC `MLow/MHigh` width TSFlags), and — run in 65816 native mode —
+  fully zeroes the 16-bit value: `corpus_result == 0x0042` on **both** MAME and bsnes-jg. Non-breaking
+  (corpus 7/7, far/xcheck unaffected; feature not implied by W65816). Tracked patch
+  `0002-321-accum16.patch`; `dev/run.sh a16`. Finding: 16-bit registers need native mode (XCE) — the
+  deferred prerequisite. ROADMAP step 5 (first slice). [plan](docs/plans/2026-06-14-321-increment-1-16bit-accumulator.md).
+- 2026-06-14 — [second-emulator-xcheck] **second-emulator fidelity cross-check** — `dev/run.sh xcheck`
+  boots the far ROMs in **bsnes-jg** (cycle-accurate, independent of MAME) headless and reads WRAM via
+  `Bsnes::getMemoryRaw(MainRAM)` (a small `dev/jgxcheck.cpp` harness, no SDL/X/save-state): far-run
+  (bank $00) + far-bank1 (bank $01) both `got=0xF3`, agreeing with MAME — the bank-$01 far read isn't a
+  MAME quirk. Mesen2 abandoned (prebuilt crashes on 26.04 glibc-2.43; headless `--testrunner` won't run
+  Lua). Completes ROADMAP step 3's "both emulators".
+  [plan](docs/plans/2026-06-14-second-emulator-cross-check-bsnes-jg.md).
+- 2026-06-14 — [320-upstream-design-note] drafted the upstream #320 design note
+  ([docs/320-upstream-far-pointer-note.md](docs/320-upstream-far-pointer-note.md)): leads with the
+  verified running slice (Inc 1/2/2b, by commit), the addrspace-numbering divergence (slice `2`=far
+  additive vs proposal `0`=far-default) + a reconciliation path, the open ABI decisions, and the
+  WDC816CC/ORCA-C calling-convention prior art. Code-first artifact to anchor the #320 discussion;
+  posting upstream is user-triggered. [plan](docs/plans/2026-06-14-320-upstream-design-note.md).
+- 2026-06-14 — [320-increment-2b-multi-bank-far-read] far read now **crosses a real ROM bank
+  boundary**: a 64 KiB LoROM (`snes-far` child platform, banks $00+$01) places a far global in bank
+  $01 ($018000), far-read via `lda $018000` (`af 00 80 01`); the cross-bank result round-trips in MAME
+  (`SMOKE: PASS got=0xF3`). No codegen/native-mode change (section attr + linker rule; `snes-checksum.py`
+  now owns the ROM-size byte). New `dev/run.sh far-bank1` + `examples/65816/far-bank1.c`; 5/5 PASS,
+  default snes platform untouched (corpus 7/7, far-run PASS). Completes ROADMAP step 3.
+  [plan](docs/plans/2026-06-14-320-increment-2b-multi-bank-rom-far-read.md).
+- 2026-06-14 — [320-increment-2-far-emulator-run] far-pointer codegen now **executes in MAME**: a
+  `-mcpu=mosw65816` program far-LOADs a ROM constant and far-STOREs the result to WRAM; the byte
+  reads back `0xF3` (`SMOKE: PASS`) on the existing single-bank emulation-mode crt0. Finding:
+  absolute-long ignores the DBR → no native mode needed (XCE/DBR/16-bit regs re-scoped to M2/#321);
+  multi-bank far-read split to Increment 2b. New `dev/run.sh far-run` + `examples/65816/far-run.c`;
+  5/5 verification steps PASS, corpus still 7/7. ROADMAP step 3 (execution half).
+  [plan](docs/plans/2026-06-14-320-increment-2-far-pointer-emulator-end-to-end-mi.md).
+- 2026-06-14 — [320-increment-1-far-codegen] far (addrspace 2) load/store now lowers to 65816
+  absolute-long (`LDA/STA $xxxxxx`, AF/8F, 4-byte incl. bank), gated on `W65816`; near stays 16-bit,
+  far global → `R_MOS_ADDR24`. GISel `G_LOAD/STORE_FAR_ABS` → `LDAbsLong/STAbsLong` MC wrappers.
+  `dev/run.sh far` 5/5 PASS + corpus 7/7 on the patched from-source toolchain. ROADMAP step 4.
+  Tracked patch `0001-320-far-addrspace.patch`. [plan](docs/plans/2026-06-14-320-far-pointer-codegen.md).
+- 2026-06-14 — [m1-phase0-toolchain] llvm-mos built FROM SOURCE in the dev container
+  (`dev/run.sh toolchain`), lean (clang+lld, dropped clang-tools-extra → 39.2→26.1 min cold). Bench
+  toolchain selectable via `MOS_TOOLCHAIN`; `build.sh` wipes the SDK tree on toolchain change. Corpus
+  7/7 on the self-built compiler (byte-equiv to prebuilt). M1 codegen prerequisite.
+  [plan](docs/plans/2026-06-14-m1-from-source-toolchain.md).
+- 2026-06-14 — [regression-corpus] 6 self-contained C programs (`examples/snes/corpus/`) exercising
+  ALU / control flow / arrays+.rodata / structs+pointers / calls+recursion / crt0 init; host-checked
+  vs `expected.tsv`. `dev/run.sh corpus` 7/7 PASS, negative control + clean-room `repro` green.
+  ROADMAP step 2. [plan](docs/plans/2026-06-14-m0-regression-corpus-5-self-contained-c-programs.md).
+- 2026-06-14 — [emulator-smoke-loop] `dev/run.sh smoke` boots hello.sfc headless in MAME's `snes`
+  driver, asserts `sentinel==0x42` in WRAM. Negative control + clean-room `dev/run.sh repro` +
+  manual GitHub CI (run 27475012894) all green. Closes ROADMAP step 1 (run-half).
+  [plan](docs/plans/2026-06-14-emulator-smoke-loop.md).
+- 2026-06-13 — [snes-sdk-platform] SNES SDK platform (crt0, header, link.ld, snes.h, clang.cfg)
+  builds a valid 32 KiB LoROM `.sfc` from C via the 6502 backend; structural verification PASS
+  (reset→crt0 byte-exact, `main()` placed, checksum 0xFFFF). ROADMAP step 1, structural half.
+
+
+## Inbox — auto-captured plan deferrals
+
+_Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage each into M1/M2/etc. and delete it here — it will not come back._
+
+<!-- triaged 2026-09-25: both items filed by the [dpy-indexed-phase2] dispatch were genuine open
+     work with no owner — PROMOTED as [T4]: increment 2 (range-gated runtime index) at the end of
+     M1, the pre-RA scheduler carry-pressure cliff at the top of M2. -->
+
+<!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
+<!-- triaged 2026-09-24: all five captured deferrals from
+     2026-09-24-asmprinter-a16-immediate.md are non-work — §8 is an "also changed /
+     recorded so it is not rediscovered" section, not a deferral list.
+     • "probe gained --all" -> shipped in this same commit; the follow-on decision
+       (what a gate run may cost) is already the curated [T2] "Promote
+       dev/probe-far-roundtrip.sh to a committed round-trip gate" item, which now
+       records the clean three-mode baseline.
+     • "No upstream follow-up" -> a statement that nothing is queued: 0045 is
+       downstream-only (+mos-a16 does not exist upstream), so there is deliberately
+       no docs/upstream-contribution-status.md entry and no PR-draft item. The
+       absence is the disposition.
+     • "narrower width modifier on an Immediate16 operand" -> measured absent across
+       all 117 fixtures in both a16 modes, and would be a LOWERING bug rather than a
+       printer gap if it ever appeared. Recorded in the plan so it is not
+       rediscovered; nothing to build.
+     • "X-side has no codegen test" -> codegen never selects LDX/CPX_Immediate16
+       today (every index immediate is the two-byte form, measured); the printer
+       already covers the X forms. Becomes testable only if a later change folds a
+       constant into an index immediate — no item until then.
+     • "the disassembler's own wrapper is now redundant" -> a deliberate
+       leave-in-place (plan §2), not a cleanup owed. Deleting stock llvm-mos code to
+       save nothing is churn.
+     Nothing open here. -->
+<!-- triaged 2026-09-15: all three captured deferrals from
+     2026-09-15-fix-xy16-spill-reload-clobbers-store-value.md are non-work.
+     • "Publishing #118 (or #116/#117) to biohack.net" -> the curated M2 Cluster G block
+       already states all three are "BUILT + gated, not yet published" and that publishing
+       is user-triggered and out of scope for the battery. Nothing separately open.
+     • "The suboptimal spill itself" (retryjmp_gate_crc spills X16 and reloads it one
+       instruction later) -> a register-allocation QUALITY observation, not a correctness
+       item; deliberately left alone by the fix and not worth its own backlog entry.
+     • "Upstreaming" -> LDStk/STStk staging through A16 is fork-only (+mos-xy16), so there
+       is no stock-llvm-mos defect to report and nothing to queue in
+       docs/upstream-contribution-status.md.
+     Nothing open here. -->
+<!-- triaged 2026-06-16: both Tier-1 "out of scope" bullets are non-work — the
+     fault-injection mode is explicitly "not needed" (the seed corpus is the volume),
+     and "Backend fixes: minimize → root-cause → fix" is the PROCESS that was followed
+     and COMPLETED this increment (2 bugs fixed, 1 deferred/XFAIL). Nothing open. -->
+<!-- triaged 2026-06-16: all six captured deferrals already live in curated M2 items.
+     • "Full native s16 EQ-as-value" + "Indirect s16 load consumed only as bytes"
+       (s16-load-unmerge-bytewise.md) -> the M2 bullet "#321 native s16 equality-as-value
+       — the full native compare (deferred from item (c))".
+     • the [verify] flag for s16-load-unmerge-bytewise -> verification now recorded in the
+       plan (all PASS, commit 7c0fe56).
+     • the three soft-stack-spill-coverage notes (xy16 index-16 spill impl, the upstream
+       `reentrant`-attribute issue, interrupt/optnone alternative triggers) -> covered by
+       the M2 bullet "#321 soft-stack (reentrant) spill coverage" + its plan's Out-of-scope.
+     Nothing open here. -->
+<!-- triaged 2026-06-16: indirect-s16-load-bytewise is a PLANNED, investigation-gated item
+     (Status: planned) — its "Verification (if implemented)" section is intentionally unrun
+     (nothing built yet). Tracked by the M2 "equality-as-value" bullet. Not a missed step. -->
+<!-- triaged 2026-06-17: both F4-plan deferrals dispositioned.
+     • P1/P2/P3 (expandLDSTStk contract note, .ll durability, reentrant upstream note) -> the F4
+       plan's Out-of-scope explicitly defers these to the parent soft-stack plan; covered by the M2
+       Open bullet "#321 soft-stack (reentrant) spill coverage" (which lists exactly P1/P2/P3).
+     • "Upstreaming the PR is user-triggered" -> PROMOTED to a curated Upstream/Contribution bullet
+       ("Upstream the F4 mos-late-opt TXY/TYX dead-flag fix"). Nothing open here. -->
+<!-- triaged 2026-06-17: native-s16-EQ v1 landed (commit 37674ff). All four are already curated:
+     • v2 (computed-LHS), v3 (abs-fold globals), and the post-A16-threading re-measure -> the M2
+       Open bullet "#321 native s16 equality-as-value — v2/v3 (remaining gated wins)".
+     • the cmpsel "[verify]" is a false positive: that plan is design+spike, and its Verification
+       contract was fulfilled by the gated-impl plan's recorded PASS (eq_deref native, suite 44/44,
+       corpus 7/7, fuzz 50/50, a16eqvalp both emulators). Nothing open here. -->
+<!-- triaged 2026-06-17: the ten v3/gated-impl EQ-as-value deferrals all dispositioned.
+     LANDED since capture (done, not deferred):
+       • v2 computed/Imag16 LHS (a+b)==c        -> fd6b281 (plan v2-computed-imag16-lhs).
+       • v3 abs-fold both-global g1==g2          -> efce68f (plan v3-abs-fold-globals).
+       • g1==0x1234 global-vs-immediate (x3 fps) -> f8a32ae (plan eq-imm-constant-through-merge);
+         the byte-split-constant blocker is fixed (getI16Const through G_MERGE_VALUES).
+     COVERED by the curated M2 bullet "#321 native s16 equality-as-value — micro-cases"
+     (its (a)/(b)/(c) + the A16-threading re-measure) — all intentionally 8-bit today (no regression):
+       • mixed global-vs-register / global-vs-computed-local (g1==a, g1==(b+c)) -> (a).
+       • register/param operands (eq_ret, eq_store)                             -> (c).
+       • g1==0 (RHSIsZero, G_CMPZ path)                                         -> (b).
+       • chained value-EQ with cross-block-hoisted loads (stays native = a win, not a regression).
+       • re-measure after A16-threading                                        -> the bullet's tail.
+     Nothing open here. -->
+<!-- triaged 2026-06-17: both P2-plan deferrals already covered.
+     • "upstream lit test under llvm/test/CodeGen/MOS/" -> belongs with the #321 UPSTREAMING work
+       (Upstream/Contribution section); the constraint (regen-patch mirrors only the lib dir, so a
+       vendor test file is lost) is documented in the P2 plan + the soft-stack plan's P2 section.
+     • "xy16 index-16 spill case" -> gated on the xy16 increment; covered by the curated M2 soft-stack
+       bullet (P1's expandLDSTStk SPILL CONTRACT tripwire) + the M2 X-flag/xy16 re-evaluate item.
+     Nothing open here. -->
+<!-- triaged 2026-06-17: both A/X-return-plan deferrals already covered (intentional follow-ups, not lost work).
+     • "A16-aware return optimization (drop the Imag16 round-trip) + xy16 32-bit-return evolution" -> the A/X
+       plan's Non-goals/Out-of-scope explicitly defers these; the optimization is A16-threading-adjacent
+       (curated M2 "#321 A16-threading" item) and the 16-bit-register return is gated on the curated M2 xy16 item.
+     • "argument-passing + frame-storage sub-decisions" -> the curated M2 "#321 calling-convention decision"
+       bullet + docs/investigations/65816-calling-convention-decision.md (the hard frame fork, gated on a
+       product steer + post-xy16 measurement). Nothing open here. -->
+<!-- triaged 2026-06-17: both SNES-415 plan deferrals already covered (this plan was routed in from
+     ~/.claude/plans by a housekeeping pass; its Out-of-scope/follow-ups travel with the now-tracked plan).
+     • "Upstreaming: cut the llvm-mos-sdk PR from platforms/snes-8bit/" -> the curated Open bullet
+       "Reconcile with llvm-mos-sdk#415 (the existing open SNES target PR)" + the Upstream queue entry in
+       docs/upstream-contribution-status.md (#415 reconciliation, user-triggered posting). Already tracked.
+     • "Port the DMA/VRAM helpers to 16-bit codegen" -> a Phase-2 (16-bit native target) deferral documented
+       in the plan's own Out-of-scope, gated behind the same #415 reconciliation + the broader #321 effort.
+     Nothing open here. -->
+<!-- triaged 2026-06-17, status reconciled 2026-08-03: pre-implementation verification was tracked by
+     the #321 native-width xy16 item, now completed locally in holistic 0002. → fp:b24d6be9c36ef6e5 -->
+<!-- triaged 2026-06-18: both are "Out of scope" NON-GOALS from the seed-42 fix plan (clarifying the A/X
+     return convention and the +mos-a16 EQ fold are UNCHANGED) — not deferred work. The fix is complete +
+     verified (a16 50/50, corpus 7/7, fuzz 50/50). fp:27bd502017f767b4 fp:5d3100a79ceeab83 -->
+<!-- triaged 2026-06-18: both plans are WON'T-DO — corpus trigger check 0/6 progs 0 B; the
+     verification sections were for the implementation (never executed). No work pending.
+     fp:91dc9eb4b93c09c3 fp:ac13f5e988de2e42 -->
+<!-- triaged 2026-06-18: both crt0-xy16 plan deferrals already covered.
+     • "Hardware-stack ABI / 16-bit calling convention" -> already the curated M2 Open item
+       "#321 calling-convention decision (open, blocks the hardware-stack ABI)"; gated on the
+       same calling-convention / frame sub-decision. No new work here.
+     • "Native interrupt service" -> not active work; bare `rti` stubs are width-safe for bring-up.
+       The M16/X16-entry `php`/force-width note is recorded in the plan for the future worker who
+       lands real vblank/IRQ handlers. Nothing open today. fp:ba56664f75e7c2fa fp:dd5e492a20c5fd16 -->
+<!-- triaged 2026-06-18: prove-option-b Verification section now has all 5 steps recorded with raw output +
+     PASS (the experiment ran: Option B measured +16..+28 B, WON'T-IMPLEMENT confirmed). The flag fired
+     because the steps were written as a contract before the run; they are now filled. Nothing open. fp:e9e161484c038906 -->
+<!-- triaged 2026-06-18: both xy16-hang-fix deferrals PROMOTED to the curated M2 Open bullet
+     "#321 xy16 — remaining REPSEP X-annotation gaps (watch pending fuzz evidence)" — PHX/PLX/PHY/PLY
+     in X16 mode + TAX/TXA/… transfers in mixed modes. They are speculative (no corpus/fuzz evidence
+     yet), so tracked as watch items, not active work. Detail stays in the plan's Deferred section.
+     fp:089392f5e8b0053d fp:9a09f71d5902e937 -->
+<!-- triaged 2026-06-18: all three repsep-x-annotation "Out of scope" bullets dispositioned.
+     • seed-157 — NO LONGER a residual: FIXED by Commit A (transfer X-annotation); it was a second
+       transfer-in-held-X16 bug. Recorded as fixed in the curated "$p-spill compiler crash" item.
+     • seed-169/173/196 — covered by the curated "+mos-a16 $p-spill compiler crash" item (now lists all
+       8 seeds: 169/173/196/268/271/272/306/420).
+     • TSX/TXS — non-work: no compiler-pseudo path (crt0 stack init is hand-written asm); would only
+       matter for a future native-hardware-stack frame. Nothing open.
+     fp:e3eda71d77592d8c fp:d64f4a3bcd9e3615 fp:5357e60ef6ea3fea -->
+<!-- triaged 2026-06-19: all four are FALSE POSITIVES from the DWARF step-6 plan's Step 5 "DONE" section —
+     none is deferred work. The first two are the *rationale* for a justified deviation (regen-patch only
+     mirrors lib/, and full llvm-lit is unbuildable here), and the last two are the *delivered* artifacts
+     (dev/run.sh dwarf gate 7/7 + the verified staged lit test) — Step 5 is complete (commit cc940f1).
+     Nothing open. fp:02d8811ec8003aa5 fp:b4a301783ca3b9e3 fp:110cfbbe5aab25e6 fp:fe7817097ea1d37e -->
+<!-- triaged 2026-06-19: all three corpus-a16-plan "Out of scope" bullets dispositioned.
+     • "Fixing globals.c" -> already the curated M2 Open bullet "#321 +mos-a16 -O1/-Os register-allocation
+       FAILURE on real code (corpus globals.c)" (root-caused; DECISION = keep XFAIL, reevaluate at M2 wrap-up).
+     • "Wiring corpus-a16 into CI" -> PROMOTED to a curated Test Bench/CI bullet ("Wire corpus-a16 into CI",
+       right below the corpus-a16 gate item).
+     • "New corpus programs" -> non-work scope marker: this plan deliberately added none; broadening the
+       corpus (Tier-2) is open-ended future work, not a tracked deliverable here. Nothing open.
+     fp:3807f2b481a45e90 fp:13cb10ca9b2122a5 fp:f1527e7e0ec4fec4 -->
+<!-- triaged 2026-06-19: both corpus-a16-CI plan "Out of scope" bullets are non-work.
+     • "Adding push:/pull_request: triggers" -> intentional posture, not pending work: the whole
+       snes-smoke workflow stays workflow_dispatch-only until the repo goes public / collaborators push
+       (documented in smoke.yml's header + the curated "Wire bsnes-jg xcheck into CI" item). Re-add triggers
+       then, for ALL jobs at once — not a corpus-a16-specific task.
+     • "A separate corpus-a16 job (rejected above)" -> a rejected design alternative, not work. The chosen
+       design extends the xcheck job (no toolchain-build duplication). Nothing open.
+     fp:5f8372d2444e1e6b fp:6a08cf207dd87a4b -->
+<!-- triaged 2026-06-19: all three xy16-indiry-gate "Out of scope" bullets dispositioned (none is work for this task).
+     • "open xy16 fuzz failures / emulator hangs" -> CORRECTED 2026-06-19: the xy16 runtime hangs are FIXED
+       (8961afb XHigh + 4d8a2bd X-governed transfers); fresh fuzz 50 1 / 50 56 = 50/50 and fuzz 500 = 492/500,
+       0 mismatch / 0 hangs. The only residual is the $p-spill COMPILE crash (8 xfails) — the curated
+       "#321 $p-spill register-scavenger crash" item (TODO above), NOT a hang. (See Done.)
+     • "hardware-stack ABI + calling convention" -> dispositioned by the completed native-width item and
+       the curated "#321 calling-convention" decision. Already covered.
+     • "standalone (zp),Y16 STORE gate" -> deliberate scope marker: the load path is the higher-value read; the
+       symmetric store pseudo (STIndirYIdx16) is exercised by the fuzzer's xy16 track. Nothing open.
+     fp:1fcc2870d2445ea7 fp:9b195ad521b9ffae fp:8e99366f38c84605 -->
+<!-- triaged 2026-06-19: both from the comment-fix plan, both resolved.
+     • "Any functional change. Comments only." -> the Out-of-scope marker itself (no work — the change is
+       literally comments only).
+     • the [verify] flag -> RESOLVED: the plan's "Result — VERIFIED 2026-06-19" section now records the regen
+       round-trip PASS + the comment-only 0002 diff (committed c2882b3). Nothing open.
+     fp:93d7dc31ec1433be fp:be0273e614032501 -->
+<!-- triaged 2026-06-19: all four are explicit "## Out of scope" NON-GOALS from the c-torture plan, not
+     deferred work — they scope the plan, nothing to track.
+     • Csmith/Yarpgen random generation -> a separate (generator) axis; we already have tools/a16_fuzz.py.
+     • c-testsuite stdout model -> recorded as the fallback if the GPL fetch is rejected; not built otherwise.
+     • Conformance claims -> deliberately disclaimed (this is differential bug-finding, not ISO certification).
+     • Floating-point / full-libc tests -> outside the freestanding subset; the Phase-0 filter excludes them.
+     fp:3d23564aa9d16214 fp:9502a10868aa863f fp:9ef5b0820dd8d148 fp:a2b25e70c9c08d3b -->
+<!-- triaged 2026-06-19: all four verification steps were run immediately before commit 181af86 (grep counts and grep output recorded in the plan, all PASS). The [verify] flag is a false positive — the plan was fulfilled in the same session. Nothing open. fp:72e135cd9174e480 -->
+<!-- triaged 2026-06-19: promoted into curated entries — the Csmith fuzzer (+ its Yarpgen follow-up) under
+     Test Bench / CI, and the `G_UNMERGE_VALUES s32` finding (now FIXED, see Done) under M2 — Optimizing
+     Payoff. These three were the plan's own Follow-ups bullets (Yarpgen; Yarpgen-vs-known-bugs; "add the
+     Csmith TODO entry"); now covered. fp:192eb34724f01c54 fp:0350991c23596f7a fp:d29683e80d7e9f15 -->
+<!-- triaged 2026-06-20: all three are the indexed-compares plan's own Deferred section, dispositioned there + in the Done entry [321-native-16bit-indexed-compares].
+     • "Indexed LHS explicit fold" -> NON-WORK: Phase 0 measured the LHS case (`arr[i] < limit`) already optimal (the staged value threads back into A16 via threadAccum16); the "only if Phase 0 shows threading misses it" gate did not trigger.
+     • "EQ RHS-indexed fusion" + "+mos-xy16 16-bit-index compares" -> real but measurement-gated extensions, intentionally not built in v1 (low frequency / separate instruction); fully recorded in the plan's Deferred section, to be revived only if a frequency scan justifies them. Nothing open. fp:2a340a3f28882754 fp:2596e84dcec84614 fp:c65f6994b1384180 -->
+<!-- triaged 2026-06-20: both are explicit "## Out of scope / non-goals" NON-GOALS from the Phase-3
+     deferral-formalization plan, not deferred work.
+     • "No compiler change" -> the whole point of the plan: the deferral IS the deliverable (the curated
+       Watch re-open trigger + the M2 A16-threading bullet's gated B0->B1->B2 spike recipe). Nothing to build.
+     • "The other two XFALs keep their own TODO bullets" -> already true: `scavenger-p-not-gpr` and
+       `a16-zp-pressure-overflow` each have their own curated M2 bullets. Nothing open.
+     fp:fd9f6337217bdfdf fp:d23acc84e2e4c0bd -->
+<!-- triaged 2026-06-20: all three are explicit "## Out of scope / non-goals" NON-GOALS from the frame-ABI
+     head-to-head plan, not deferred work — they scope the study.
+     • "Not changing argument passing / A/X return" -> those CC sub-decisions are LOCKED/adopted; this study
+       is the frame/locals sub-decision only.
+     • "Not auto-merging (a)/(b)" -> the pre-registered go/no-go IS the plan's decision rule; nothing to track.
+     • "Not posting upstream from this plan" -> upstream posting is the curated user-triggered CC item; the
+       evidence paragraph is prepared by phase D. Nothing open.
+     fp:29fde811ff5d23b8 fp:45ce4d0c0263904b fp:ad37a4514712de70 -->
+<!-- triaged 2026-06-20: all three are RESOLVED-status bullets from the audit doc's
+     "## Deferred → RESOLVED" section (the hook matched the word "Deferred" in the heading) —
+     NOT open work. They record the loadfold-unify outcome (AA-precision landed; volatile-drop
+     closed net-negative; the literal single-helper merge rejected by measurement), now captured
+     by the Done item [321-loadfold-unify]. Nothing to track.
+     fp:5f85cd31e68981cc fp:f85cd73b8f51bdd5 fp:98f82e24c01c1ac9 -->
+<!-- triaged 2026-06-20: verification run + recorded in the plan's "## Verification — DONE" section (all 5 steps ✓; commits 9a255fd/6779286). fp:7b6f4179413cb08f -->
+<!-- triaged 2026-06-20: both #320 Inc 3 deferrals dispositioned.
+     • "Far-pointer calling convention" -> already the curated M1 Open bullet "#320 far-pointer calling
+       convention — pass/return a 32-bit p2 across function boundaries" (added this increment; grouped with
+       far calls / Inc 4, upstream-gated). Duplicate.
+     • "G_STORE runtime far (sta [dp])" -> NOT open work: the store path IS implemented this increment
+       (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store), exercised by the legalizer/selector
+       alongside the load. Only a dedicated far_store.c micro-test is unwritten — trivial polish, not a
+       tracked deliverable. Nothing open.
+     fp:2f1aaa13df1acdfe fp:edb3f3d7062da359 -->
+<!-- triaged 2026-06-20: re-capture of the two #320 Inc 3 "out of scope" deferrals from the migrated
+     task plan (do-3c-finish-...); both already dispositioned in the 2026-06-20 note above (only the
+     fingerprints differ — new plan file, restated wording).
+     • "Far-pointer calling convention" -> the curated M1 Open bullet "#320 far-pointer calling
+       convention" (grouped with far calls / Inc 4, upstream-gated). Duplicate.
+     • "sta [dp] store micro-test" -> NOT open work: the store path IS implemented
+       (G_STORE_FAR_INDIR -> STIndirLong, the symmetric [dp] store); only a dedicated far_store.c
+       micro-test is unwritten — trivial polish, not a tracked deliverable. Nothing open.
+     fp:bffa7ff820f61a6a fp:41566cc6a199377c -->
+<!-- triaged 2026-06-20: all four are "## Out of scope / non-goals" NON-GOALS from the far-pointer-CC
+     Phase 2 plan (the hook matched the "Not ..." bullets) — scope boundaries, not open work.
+     • "not changing near-ptr/scalar passing or the A/X return (LOCKED)" + "not auto-merging variants"
+       -> methodology guardrails of the study itself; nothing to track.
+     • "far function pointers / indirect far calls" -> already the curated M1 bullet "#320 far calls —
+       follow-ups (a)". Duplicate.
+     • "not posting upstream" -> the curated user-triggered "#320 post design note upstream" bullet.
+       Duplicate. Nothing open.
+     fp:b7a659d550bb10a3 fp:9b54c26fd2f46d90 fp:5612fe3202e783db fp:a5a5bc42d30cd1b6 -->
+<!-- triaged 2026-06-25: all three are far-cc STUDY scope-boundary non-goals ("Not X"), not open work —
+     and the far-cc work has LANDED (0004 Imag32 winner on main; far function pointers via the curated M1
+     "#320 far calls follow-ups (a)"; only the winner merged, the losers stayed inert spikes — exactly as
+     these guardrails state). Echoes the earlier far-cc-variants triage just above. Nothing to track.
+     fp:608f27e69a9ee6af fp:d15da622c632fbdd fp:209db6851015623a -->
+<!-- triaged 2026-06-25: VERIFIED + recorded. Ran the far-cc-variants verification on main — all 4 variant
+     round-trips PASS (dev/run.sh farcc_{imag32,split,axy,stack} == 0xF3, both emulators, -verify clean),
+     far-suite non-regression PASS, and 0001/0009 round-trip byte-identical. Results written into the plan's
+     new "## Verification results — re-run on main 2026-06-25" section. The residual tooling (regen-0004
+     structural redesign + main toolchain rebuild) is split out as its own curated M2 item below — it is NOT
+     part of this study's codegen verification. fp:e3b7f46b9e51afa0 -->
+<!-- triaged 2026-06-21: native-s16-comparison-followups §5 verification is intentionally Phase-0-gated (it runs only IF the Phase 0 §3 byte-diff measures a win; the §4a step-1 audit IS recorded). Covered by the curated M2 "comparison follow-ups" SCOPED item above. Not a missed step. fp:c91b9765672261df -->
+<!-- triaged 2026-06-21: banked plan §5 verification is MOOT — candidate A was BUILT + measured net-negative (a16cmpaudit +654/+78 B, a16 corpus +340 B zero wins) and CLOSED WON'T-DO (§0a); nothing lands in 0002, so there is no codegen to verify. Covered by the curated M2 "comparison follow-ups" item above (now records both the 8-bit v1 AND 16-bit candidate-A close-outs). Not a missed step. fp:5f242fd76b40e2f7 -->
+<!-- triaged 2026-06-21: all four far-calls-followups "Out of scope" bullets are non-work — covered
+     by curated items or explicit non-goals of the now-tracked plan:
+     • (c) far tail calls -> already named as "(c) far tail calls = separate" inside the curated M1
+       "#320 far calls — follow-ups" bullet (conservative-safe today: tail peephole keys on JSR).
+     • far-pointer DATA CC (p2 passing/returning) -> the curated M1 "#320 Inc 4 Phase 2 — far-pointer
+       calling convention" bullet + wt/320-far-cc.
+     • SPC700 indirect-far -> explicit NON-GOAL (65816-only; the __rc17 thunk path is untouched).
+     • Auto-promoting near callees to far -> explicit NON-GOAL ((b) keeps near callees byte-identical;
+       uniform-far is a measured control/fallback, not a shipped default).
+     fp:a5f1db95f5a9627a fp:5221ad4b75df9534 fp:78cda9a654aa2b5f fp:fde87b8fe11d4df6 -->
+<!-- triaged 2026-06-21: RESOLVED — the land plan now has a §Verification (2026-06-21) section with PASS recorded (round-trip empty over clang/+MOS/ except the 2 documented drift/stale files; a16-free + 0002/0003-sha-unchanged + sequence-apply all PASS). Landing is done; nothing left to run. fp:a51d6afac2a18fef -->
+<!-- triaged 2026-06-21: the packed24-incrementB-handoff §3 "Verification gate" is INSTRUCTIONS for the future agent who builds Increment B (the bar THEY must clear), not a verification to run now — Increment B is deferred until F2 lands on main. Nothing to verify here; covered by the curated M1 five-space item + its handoff link. fp:3d3c94fe546a028c -->
+<!-- triaged 2026-06-21: the packed24-productionization-handoff §2 "Verification gate" is INSTRUCTIONS for the future agent who picks up the next batch (the bar THEY must clear), not a verification to run now — it's a forward-looking resume prompt, not a completed plan. Tracked by the curated M1 five-space item's "next batch" link. Nothing to verify here. fp:93f3ef0f25357389 -->
+<!-- triaged 2026-06-22: all four are explicit "Out of scope" NON-GOALS from the SNES near-code-budget
+     plan (2026-06-22-snes-near-code-budget-and-code-model.md), not deferred work — each is a decision
+     already stated in the curated M1 bullet "SNES near-code budget link-time assertion + #320 near/far
+     code-model framing note": no -mcmodel mode (near IS the default, zero codegen win), no -mno-far
+     guardrail (far is per-symbol opt-in; user skipped), rom_1 left as-is (already a named overflow-checked
+     region), linker-script + docs only (no vendor edit). Nothing open.
+     fp:a349fdb9e6fb6627 fp:13a459b641dd2a38 fp:27a0f051def92af7 fp:9c15ab41c1ea4e0c -->
+<!-- triaged 2026-06-22: both close-out "Follow-up" bullets are already curated, not new work.
+     • "Integrate 0007 onto main's patch stack" -> already a named separate thread in the M2 five-space
+       item ("fold 0007 onto main's stack") and tracked in upstream-contribution-status.md (0007 built on
+       wt/320-near-abs-bank-relax, not yet landed). Its own thread, not a packed-24 residual.
+     • "Post the #320 upstream design note" -> the standing user-triggered item in the Upstream/Contribution
+       section + upstream-contribution-status.md (artifact docs/320-upstream-far-pointer-note.md).
+     Both fingerprints ledgered; deleted permanently. Nothing open here.
+     fp:8a5ca7613ee06e0a fp:883b7d12864cf920 -->
+<!-- triaged 2026-06-22: all five are the knock-out close-out plan's explicit "Out of scope" NON-GOALS,
+     not open work — a measure-and-close that builds nothing.
+     • "Building anything / A16-threading Phase 3 / multi-value spill-fusion" + "Re-opening either WON'T-DO"
+       -> the recorded keep-the-XFAIL / WON'T-DO decisions; the shared deferred core is tracked by the three
+       open items (globals.c RA / A16-threading Phase 3 / ALU >14-live), now unified with one trigger.
+     • "≥8-shift bracket-fragmentation candidate" -> routed to a FUTURE measurement-gated spike (didn't meet
+       the GO bar); a new docs/plans/ entry only if pursued. Not open now.
+     • "CC/ABI track, xy16, the two RA/scavenger bugs" -> named boundary; owned by their own curated items.
+     • "upstream paragraph posting" -> user-triggered, already drafted in-plan + folded into upstream-status.
+     Fingerprints ledgered; deleted permanently. Nothing open here.
+     fp:ceeea11785514bd6 fp:15f2dd1d2684d2f2 fp:c49fd89e43e4867a fp:5c1003efe2386b53 fp:a2954d6096e3b85c -->
+<!-- triaged 2026-06-22: all three 2026-06-22-65816-near-abs-bank-relax.md follow-ups handled — the two
+     "Belt-and-suspenders … full 0001-0007 gate" bullets are DONE (§5: combined-stack gate all green on
+     both emulators 2026-06-22); "Upstreamable (generic llvm-mos 65816 size fix)" is a future
+     user-triggered candidate recorded in the plan's §Status Follow-ups (not yet a drafted artifact, so
+     not queued in upstream-contribution-status.md). Nothing open to track here.
+     fp:92f89fa0e9b5b7fe fp:61d02e85f1ef111f fp:e9d664a8ba74dadc -->
+<!-- triaged 2026-06-23: all three are scope-markers / a forward-note / a contingency from the routed
+     far-cc AXY variant-(c) hygiene plan (2026-06-21-320-far-cc-axy-variant-c-hygiene-capture.md), not open
+     work for this housekeeping pass — variant (d)/M-harness/winner-promotion are explicitly out of scope
+     (covered by the curated M1 far-pointer-CC item + 2026-06-21-320-far-cc-variants-bcd-and-measure.md),
+     the D-step fold-note is a forward reminder for that effort, and the 'debug variant (c)' branch is a
+     conditional contingency, not active work. Owned by the far-cc effort; nothing new opened here.
+     fp:3dc7cd082923d714 fp:be1ae59165aaf65d fp:f4fd52ba2dcb7fba -->
+<!-- triaged 2026-06-23: scavenger-nz-fix-spike verification IS recorded — step 1 FAIL → NO-GO outcome
+     documented in the plan (the conservative canSaveScavengerRegister(P) gate dead-ends the scavenger on a
+     flag-class pseudo with no spill impl). Not a pending [verify]; spike concluded, issue stays issue-only.
+     fp:ff8c440178114461 -->
+<!-- triaged 2026-06-24: all three are scope notes from the reviewer-presentation plan, not open work.
+     • "codegen unchanged" = a scope statement (this task = docs + two ROM-byte-neutral platform
+       refinements); nothing to build.
+     • "GitHub links resolve once main is pushed" = RESOLVED — main merged + pushed at the close of the task.
+     • "posting upstream artifacts is user-triggered" = a standing fact, already curated in the
+       Upstream/Contribution section + upstream-contribution-status.md. Nothing open here.
+     fp:05152983f417d956 fp:2b58be7d4ba4a17d fp:383468bec170eac8 -->
+<!-- triaged 2026-06-24: all three are the deferred Phase-2/3 sub-points of the Blossom SNES port,
+     already curated as the single "#3 SNES Blossom on-screen interactive port" item under Open/M2
+     (graphics layer = Mode-7 framebuffer + $7E shadow buffer + DMA + CGRAM regs; interactivity =
+     joypad controls; optional perf = $4202 hw multiplier). Not separate open work — covered there.
+     fp:9a83cc394836d1de fp:8b629fbc2e270274 fp:fb7011942a1132aa -->
+<!-- triaged 2026-06-25: this IS done — the matching Test Bench / CI entry was promoted to Done as
+     [321-csmith-fuzzer] in the same commit (2cfd375) that captured this deferral; the struck-through plan
+     bullet is the now-completed action, not open work. fp:bd0898d1d5c10cfa -->
+<!-- triaged 2026-06-25: PLANNED pre-implementation plan (Status: PLANNED) — its Verification section is
+     intentionally unrun because nothing is built yet; the steps require the increments to exist first. Tracked
+     by the curated open item "#321 Cross-platform toolchain builds" under Distribution / Packaging, where the
+     PASS evidence will be recorded as Inc 0–4 land. Not a missed step. fp:6676955ce1f1f4cf -->
+<!-- triaged 2026-06-25: trig Phase 2 (16-bit CORDIC) + Phase 3 (derived/hyperbolic) are curated FUTURE
+     phases of the trig differential plan, not deferrals — the plan itself tracks them. Phase 1 (Q16.16
+     libfixmath) landed + verified this session (k_trig32 0x068A6933, k_trig32lut HiROM 0x87F0B404, both
+     emulators). fp:b69409f652ecf145 fp:6129cc5f0e5198c0 -->
+<!-- triaged 2026-06-26: [verify] DONE — all 5 verification steps of
+     [2026-06-26-shared-plan-index-tooling.md](docs/plans/2026-06-26-shared-plan-index-tooling.md) RAN + PASS,
+     raw output recorded in the plan's Verification section (checker in-sync 148 rows + drift stub; pre-commit
+     regen/audit still fire; post-commit dispatcher silent-on-sync; seed+check in a fresh repo; llvm-specific
+     copies removed + corpus 7/7). Plan MECHANISM-DONE+VERIFIED; cross-project rollout stays user-gated. fp:118418f2ad7a1a78 -->
+<!-- triaged 2026-06-26: all three trigger-check-pass deferrals are Out-of-scope/non-goal
+     scope clarifications, not lost work — all covered by curated items.
+     • "No compiler change unless a trigger fires" / "Not re-deriving the spike" -> the new curated
+       M2 bullet "#321 A16-threading Phase 3 — trigger-check pass" + the Watch re-open trigger + the
+       already-recorded B0→B1→B2 spike (formalization plan + A16-threading bullet).
+     • "The other two XFAILs (scavenger-p-not-gpr, a16-zp-pressure-overflow/pr15296.c)" -> each keeps
+       its own bullet; pr15296.c is hand-reduced and explicitly NOT a trigger by itself.
+     Nothing open here. fp:3ad2a744312d14fb fp:e42894459a597bc4 fp:65a3ffeffa32c30e -->
+<!-- triaged 2026-06-26: NOT a deferral — this is the struck-through DONE marker for trig Phase 2,
+     now a curated Done entry [321-trig-phase2-cordic] (k_trig16 0x9446C734 host==default==+mos-a16,
+     both emulators; zero arithmetic libcalls; cross-width PASS). The hook keyed on the
+     "Phase 2 — 16-bit CORDIC" text under the master plan's Deferred header. fp:946b42a13cc7db77 -->
+<!-- triaged 2026-06-26: NOT a deferral — this is the struck-through DONE marker for trig Phase 3,
+     now a curated Done entry [321-trig-phase3-derived-hyperbolic] (k_trig16x 0x759567C4
+     host==default==+mos-a16, both emulators; cross-width PASS). The hook keyed on the
+     "Phase 3 — derived + hyperbolic" text under the master plan's (renamed) Completed-phases header. fp:ad6e1b319a9a239b -->
+<!-- triaged 2026-06-26: all three full-vendoring "Out of scope" captures are deliberate non-goals /
+     non-deferrals, nothing open.
+     • "builtins multi-file harness" (run the 55 builtins main tests by replicating gcc's builtins.exp
+       multi-file link) -> an explicit, documented non-goal in the plan's Out-of-scope; the 55 are already
+       accounted-for as the `builtins-multifile` unsupported bucket. Low value (most lower to libc we don't
+       provide); reopen only if someone wants real builtin coverage — the plan records exactly what it takes.
+     • "Opt-level-aware xfails / runner retry-on-flake" -> carried verbatim from the ORIGINAL c-torture
+       plan's out-of-scope (already-known non-work), not introduced by this increment.
+     • "No CI change …" -> NOT a deferral; it's the statement that the torture CI job reads the committed
+       manifest so it needs no edit (the hook keyed on the "No CI change" prose). Verified true this commit.
+     fp:7b6e5bccb4c5ca3f fp:356612fa02492cc3 fp:cfb4ea31c0a22df9 -->
+<!-- triaged 2026-06-29: VERIFIED + recorded — ran the cache-control curl steps against live
+     biohack.net (page = `public, max-age=0, must-revalidate`; `/play/*` = `public, max-age=31536000,
+     immutable`), PASS pasted into the plan's "Verified 2026-06-29" section; fresh-ROM pickup proven by
+     the real v1.0.121 republish. Already covered by the curated [x] "biohack.net cache headers" above.
+     fp:040872b597cf6793 -->
+<!-- triaged 2026-07-01: title-screen-counter-slide verified — hilbert/rdiff/avalanche/sort-race/fft gates all PASS, -verify clean; visual animation behavior gate-neutral. fp:b133881a09190800 -->
+<!-- triaged 2026-07-01: gallery categories plan — verified in-session: task build clean (79 pages), 10 cat-shelf sections confirmed in HTML, 74 cards confirmed, hilbert chip confirmed with href /snes/#cat-motion. fp:933d48bc3dd6368a -->
+<!-- triaged 2026-07-26: both rebase-plan "Out of scope" captures dispositioned; nothing open here.
+     • "Regenerating 0004-0015's individual patches against the new pristine base" -> the plan's own
+       Out-of-scope, and its actionable half is ALREADY a curated Open item under Test Bench / CI
+       ("Fix dev/regen-patch-000N.sh scripts that hardcode now-deleted 0003/0008 applies"). The other
+       half (their "clean git apply --check vs pristine" claims are stale now the base moved past
+       8be054612) only matters when those patches are actually posted upstream — recorded in the plan,
+       and it rides with the posting, which is user-triggered.
+     • "Posting any new/updated upstream PRs" -> explicitly NOT work: 0003/0008 are already posted AND
+       merged (PR #562/#563); this rebase is fork-side bookkeeping that produces no new postable
+       artifact. Posting remains user-triggered per standing policy.
+     fp:adb7cd38a491445a fp:dcffbc00e6a08c58 -->
+<!-- triaged 2026-07-26: not a deferral — it is a deliberate NON-goal plus a hard constraint. Far ROM is
+     opt-in per demo (TITLE_FONT16_FAR + the snes-far-platform marker) precisely so a demo that already
+     fits keeps its single 32 KB bank and does NOT double to 64 KB; the plan states it as a requirement
+     and verifies it empirically rather than assuming. Only mandel-double would ever opt in, and it
+     currently does NOT (the far-font path is blocked on the codegen bug below). Nothing open.
+     fp:e5c3e9ac6e56c865 -->
+<!-- triaged 2026-07-26: false positive — the campaign plan has no verification section to run; the
+     hook keyed on its "Immediate next actions" checklist, which is DELIBERATELY unrun: the whole plan
+     is gated on user review ("AWAITING USER REVIEW" in the curated Upstream item) and every outward
+     action is individually user-triggered. The checklist (draft 0016 bodies, re-verify the DWARF
+     branch) becomes work only after that review. Covered by the curated campaign item.
+     fp:12194fba501ac4d3 -->
+<!-- triaged 2026-08-03 (T0-classified, all 18 [verify] flags dispositioned — see the
+     verification-backlog block above ## Watch for the 5 kept):
+     • mode7-title-screen-sweep — Status: planned, never implemented; verification intentionally
+       unrun (same class as the indirect-s16-load precedent). Not a missed step.
+     • 119-carousel — implemented/published 07-26 but its corpus + 32/31-color design are
+       explicitly superseded (125/136/139 palette contract, 26→62-work expansions); the published
+       gallery states since carry their own gates. Verification of the 07-26 state is moot.
+     • 125-full-mode7-color — status records IMPLEMENTED, VERIFIED, AND PUBLISHED; design since
+       superseded by the settled 221-colour palette contract (4b690b3). Moot.
+     • 127-repack-explainer — implemented/published, then superseded by the 26-work expansion
+       (372bc89) and later repack-visualization work (#137, verified separately). Moot.
+     121-badges and 123-filter are KEPT as runnable [verify T3] (implemented, still-live mode7
+     gallery features, no supersession found). -->
+<!-- triaged 2026-07-30: same library work as the Parked "truncstair F2 HOFS scroll-ring / 32-column canvas" entry, which carries the measured constraints (bank-0 .bss overflow, _canvas_emit bank-0x00 DMA) and both motivating demos (#99b trimerge, truncstair). fp:f9122100c1e60a3f -->
+<!-- triaged 2026-08-03: HDMA backdrop gradient (99b trimerge visual polish idea, blocked on
+     snesgfx library support) -> moved to ## Parked as an idea; not scheduled work. -->
+<!-- triaged 2026-07-27: #128 is planned-not-yet-implemented; its verification runs with the implementation, tracked by the curated [T3] "#128 lzss-gallery" battery sub-item. fp:8b0a76b3e990a0e0 -->
+<!-- triaged 2026-08-03:
+     • 131-cartridge-treemap + 132-chevron-hitboxes — Status: Ready to implement; nothing built,
+       verification runs when implementation happens. Not missed steps.
+     • 134-thai-paintings — Status: explicitly queued behind tranche #133 ("do not implement
+       until…"). Gated, not missed.
+     • 139-hblank-palette-reuse — Status: RETIRED 2026-07-28 (premise fails on hardware); the
+       retirement + its PASS evidence are recorded in the plan. Nothing to run.
+     • 136-contiguous-artwork-palette — Status: PLANNED; unimplemented. Not a missed step. -->
+<!-- triaged 2026-07-28: verification is deliberately unrun — the plan's own assertion is BLOCKED by the work-0 repack divergence (ROM 15254 vs embedded lz_len 15305). Covered by the curated [verify T2] "#137" item, which records step 6 as FAIL and links this plan. fp:c1b8375f773427e9 -->
+<!-- triaged 2026-08-03: exhirom-video-boundary-test — STALE FLAG: flagged 07-30 when unrun, but
+     verification has since been run and recorded (24×PASS in the plan as of dd40ce3 2026-08-02;
+     the single "FAIL" string match is the boilerplate "with a PASS/FAIL note" instruction, not a
+     failure). Nothing open. -->
+<!-- triaged 2026-07-31: all three abi-clobber deferrals dispositioned.
+     • "Not merged to main" + "62-work visual corpus gate not re-run" -> folded into the curated
+       [wip T4] repack-differential bullet, which now records the verdict and tasks the merge,
+       the 40k differential + bench gate, and lists the ~2.5 h visual gate as the deferral.
+     • "Unrelated compiler crash" -> PROMOTED to the curated [T4] "#138 — MOS Late Optimizations
+       crash on @unpack_slide" bullet, pointing at the existing #138 plan. fp:4e675c3ad0ba3ad5
+       fp:d674d7d5be702bb7 fp:dd1e1ad204ea7356 -->
+<!-- triaged 2026-08-03: real-video-codec-corpus — STALE FLAG: plan is Status: COMPLETE
+     2026-07-31 with PASS evidence recorded since. Nothing open. -->
+<!-- triaged 2026-08-03: the five svx2 "Upstream compiler follow-up" bullets (MVN/MVP MC fix:
+     reduce to MC test, WDC-doc syntax confirmation, run suites, minimal commit/PR, reproducer
+     framing) are ONE workstream — consolidated into a single curated T2 bullet under
+     Upstream / Contribution ("MVN/MVP block-move bank-order MC fix (0020)") + status-doc row 17.
+     Nothing dropped; the five steps are the new bullet's checklist. -->
+<!-- triaged 2026-08-03: svx2-animated-video-cartridge — implemented + live; verification
+     genuinely unrecorded -> KEPT as runnable [verify T3] in the verification-backlog block
+     above ## Watch. -->
+<!-- triaged 2026-08-01: seamdemo plan is PLANNED-status; verification runs per phase and is covered by the curated [T4] seamdemo item (blocked on the exhirom-canaries merge). fp:c3a1de9e87d9d4ca -->
+<!-- triaged 2026-08-03: lzss-gallery-navigation-chevron — implemented + live (chevron input
+     re-fixed 3b8a559 2026-08-02); verification genuinely unrecorded -> KEPT as runnable
+     [verify T3] in the verification-backlog block above ## Watch. -->
+<!-- triaged 2026-08-01: both are scope statements of the curated 60 fps video item, not new work — (c) is analysis-only by that item's own wording, and reel-side integration is held pending another worker's in-flight snes-video-reel.c edits. fp:3a823bd1aa076872 fp:838c40fb50c90609 -->
+<!-- triaged 2026-08-01: three canary-6b addendum bullets are recorded RESULTS (gate PASS evidence), not deferred work — covered by the canary-6b-revalidate Done entry. fp:8bd02423f82e515c fp:296dbe20a6aa20e4 fp:89b5e6bf073a6ac8 -->
+<!-- triaged 2026-08-02: verification recorded in the plan; item closed in Done. -->
+<!-- triaged 2026-08-03:
+     • svx2-video-technical-page — Status: Ready to implement; unbuilt, verification runs when
+       implementation happens. Not a missed step.
+     • svx2-cut-aware-dashboard-labels — implemented + wired into the shipping 59.94 fps build;
+       verification genuinely unrecorded -> KEPT as runnable [verify T3] in the
+       verification-backlog block above ## Watch. -->
+<!-- triaged 2026-08-02: all five are the plan's "Required size classes" list, not deferred work
+     — the audit hook flagged them as unverified bullets. The [cartcanary-matrix] Done entry now
+     covers every class: exact power of two (lorom512k/1m/4m, hirom512k/2m), sum of two descending
+     powers of two (lorom3m, hirom3m = 2+1 MiB), maximum ordinary-map size (4 MiB, lorom4m/hirom4),
+     minimum/maximum extended-map size (exhirom6/8, milestone rows), and invalid/truncated/
+     ambiguously-padded rejection (5 new TestNegativeFixtures cases). fp:a7d670bfc9b8f6d4
+     fp:633d71862b454a38 fp:984f9ef55eda44a3 fp:aa51f3c1c9cffc38 fp:662c5e80d93b1529 -->
+<!-- triaged 2026-08-03: the 60fps-ring-refill scope-(c) bullet self-describes as analysis-only
+     and superseded 2026-08-03 (59.94 fps master already on disk) — non-work, dropped. -->
+<!-- triaged 2026-08-03: interframe-crossover — Status: PLANNED, actively in progress (its
+     curated [T4] Open bullet tracks the work); verification intentionally unrun. Not a missed
+     step. -->
+<!-- triaged 2026-08-03: not a deferral — the plan is PLANNED, not executed. Its Verification section is the spec for work that has not run yet, and the curated Open item above tracks doing it. fp:e7f32215206709ed -->
+<!-- triaged 2026-08-04: not a deferral — the audit heuristic mis-captured two lines out of the
+     MachineVerifier error transcript in the nmitally plan's "Follow-up: vacuous
+     -verify-machineinstrs sweep" section (a fenced ``` code block quoting the compiler's own
+     "- function: main" / "- instruction: ..." diagnostic format, not a plan bullet). The actual
+     finding — blossom.sh/mandel-oop.sh trip the known a16-rc-undef-ra-pure-virtual false-positive
+     and need T3/T4 XFAIL-wiring — is already tracked in the curated [wip T2] vacuous-verify-sweep
+     Open item's Progress note above. Nothing open here. fp:b0fbb26e5bab0a02 fp:26fe362b8541987b -->
+<!-- triaged 2026-08-04: all three #140 brkcop deferrals routed —
+     • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
+     • ABORT $FFE8/$FFF8 = $0000 -> documented non-work (pin not connected on SNES; decision in the plan);
+     • assembler cop / brk #imm -> queued in docs/upstream-contribution-status.md "Future / blocked". -->
+<!-- triaged 2026-09-24: all four #139 irqgate captures are non-work or already curated —
+     • publishing -> the standard user-gated /snes-rom-page flow (never tracked as open work);
+     • MAME leg SKIP without the SPC700 IPL -> by design (the IPL is a write-only CI secret; present
+       on this box since 2026-08-06), not a deferral;
+     • H-mode per-scanline IRQ -> already REJECTED and recorded in the curated #139 block above
+       ("livelock … recorded so it isn't re-proposed");
+     • retire 0024 when PR #586 merges -> already carried verbatim in the curated #140 brkcop block
+       (PR #586 still OPEN as of today — it stays a watch there, not an open item here).
+     fp:4b71ee8c13a90d5b fp:bc642b4b5ab8d2bf fp:8974b954bfca2a54 fp:83367950e9cfe689 -->
+<!-- triaged 2026-08-04: two COP/BRK-plan Out-of-scope bullets.
+     • BRK/COP disassembly-length change -> rides the curated [T5] "COP-only upstream complement"
+       bullet (Upstream / Contribution) as a named follow-up; not a separate item.
+     • wdm's mandatory operand -> recorded non-finding (already matches ca65, untouched);
+       non-work. -->
+<!-- triaged 2026-08-04 (dpbank #141 batch + doc-consolidation batch, 7 bullets):
+     • dpbank publishing (fp:f6c1864ba5ae0447) — standing user-gated flow, non-work here.
+     • dpbank MAME leg (fp:f83c9b7c63ac345f) — covered by the curated [T2] "MAME leg …
+       blocked on the SPC700 IPL" bullet + Parked; SKIP-by-design.
+     • status-doc pointer for the envelope extension (fp:a39e5add49045fa2) — DONE this pass:
+       0026 recorded in the Future/blocked narrative (rides the #321 body; folds into 0002).
+     • COP/BRK/IRQ re-exercise under D/DBR windows (fp:02591359511db2d6) — already done by the
+       #141 agent itself: nmitally/irqgate/brkcop re-validated on the new envelope, hashes
+       unchanged (0xDA3B/0x24F6/0xA34C), recorded in the #141 inline record.
+     • reentrant in-fork fix (fp:401d886c178e096d) — long-standing documented deferral; the
+       curated bullet tracks the ready-to-file upstream issue, in-fork fix explicitly rejected.
+     • the two [verify] captures (fp:19d580e4f8f9d469, fp:ad9f5336b3eb87c3) — PROMOTED to the
+       verification backlog above ## Watch as [verify T2] / [verify T1]. -->
+<!-- triaged 2026-08-05: all three mode7-splash-forceblank deferrals are covered by curated M2
+     items added in the same commit.
+     - fp:0bf704293cb24048 (build_step residual) -> the [T3] `snesgfx` Display first-frame item.
+     - fp:0bcb5b4ecf571ae0 (splash.h / splash16)  -> the [T2] finish-the-conversion item.
+     - fp:52f8d7d6f905eaea (four unmeasurable demos) -> the [T2] m7blank coverage item. -->
+<!-- resolved 2026-08-05: fp:0bcb5b4ecf571ae0's item is CLOSED and no longer exists above — the
+     premise was false (splash.h/splash16 had zero consumers, superseded by b6ef256/8ac159f) and
+     the dead surface was deleted rather than converted, so nothing regenerates it. The note above
+     is left as written; this line just keeps its pointer from dangling.
+     See docs/plans/2026-08-05-splash16-forceblank-conversion.md. -->
+<!-- triaged 2026-08-05: fp:3d96a1cd97548340 — the verification section now records all six
+     steps with raw output and a 6/6 PASS line (same commit). The capture fired because the
+     first commit landed the plan before the results were written back. -->
+<!-- triaged 2026-09-15: the capture fired on the struck-through Deferred bullet in the same
+     commit that CLOSED it — all 11 battery aborts are fixed (8 demos build, 3 companion TUs
+     excluded by an enforced contract) and the evidence lives in that plan's "Follow-up — task
+     package gate hygiene fixed (2026-09-15)" section. Already recorded in Done. Nothing open. -->
+<!-- triaged 2026-09-24: all four are genuine open work with no curated owner — PROMOTED to
+     "### Test Bench / CI" as ranked items (rdiff title-card T2, newton capture timing T1,
+     reel/apollo post-title entropy T2, title-entropy.sh gate wiring T2).
+     fp:086d8820767bc6fc fp:d0b4dbafe655b800 fp:2fa4f51ae43816fd fp:588a35b403879067 -->
+<!-- triaged 2026-09-15: both selfcheck-plan follow-ups are non-work for THIS repo.
+     • "gallery ROM not in the npm demo bundle" is not a deferral — it is a recorded decision with
+       its rationale (a +50% npm tarball for a demo asset) and a one-line `DEMO_ROMS` flip if the
+       user wants it. It belongs to ~/bsnes-jg-wasm's packaging, not to any llvm-mos-65816 item.
+     • "retarget rows remain unexercised" is already a curated item in ~/bsnes-jg-wasm/TODO.md
+       ("Re-verify the retarget-once stop case"), and it is player-runtime behaviour — this repo
+       owns the ROM and the gate, neither of which can drive live pad input mid-check.
+     Both are covered by the curated M2 bullet "Per-image Verify fidelity button". Nothing open. -->
+<!-- triaged 2026-09-15: all five Cluster-G captures are the SAME blocker, already stated in full
+     in the curated M2 battery item ("Cluster G result (2026-09-15)") and in the plan's own
+     BLOCKED banner. #117 csrjmp / #118 retryjmp, dev/backtrack.sh + the expected.tsv row +
+     Taskfile entries, the examples/snes/backtrack.c visual half, and "corpus/setjmp_sim.c is not
+     a sufficient guard for this class" all wait on one open defect:
+     docs/investigations/2026-09-15-longjmp-page1-reconstruct-never-executes.md (longjmp leaves S
+     in page 0; bug #35 still live). They are the fix's natural guards, so they belong to whoever
+     lands it, not to a separate backlog row. The [verify] capture is correct-but-moot: the plan's
+     verification section records the BLOCKED evidence rather than a PASS, deliberately — the gate
+     is not weakened to manufacture one. Nothing separately open. -->
+<!-- triaged 2026-09-15: all three already tracked elsewhere, nothing open here.
+     • npm registry `publish` — a deliberate skip (git-dependency release was sufficient for both
+       consumer sites; registry only matters for outside consumers, none exist yet).
+     • gallery republish + `mode: "live-record"` manifest flip — already the curated M2 sub-item
+       "(5)" inside the "Compiler stress-test demo battery" entry above, gated on its own ROM
+       republish sequencing.
+     • `bsnes-jg-wasm` retarget rows — already tracked in that repo's own TODO.md per the
+       [selfcheck plan](docs/plans/2026-07-28-gallery-per-image-selfcheck.md) Follow-up section. -->
+<!-- triaged 2026-09-15: all four are already carried by the curated "Cluster G result (2026-09-15)"
+     paragraph inside the M2 "Compiler stress-test demo battery" item above, nothing separately open.
+     - the +mos-xy16 spill-address/live-Imag16 miscompile -> named there as the OPEN defect #118 found,
+       with its own investigation doc, and ESCALATED (backend work, higher tier).
+     - #118's withheld half (expected.tsv row 0x3388, dev/retryjmp.{sh,lua}, the visual ROM) -> stated
+       there as deliberately un-gated until that fix lands.
+     - the a16_fuzz.py KNOWN_ISSUES message-text discriminator -> stated there as a flagged consequence
+       of the same defect; it is fixed alongside it, not separately.
+     - "corpus/setjmp_sim.c is not a sufficient guard on its own" -> #116 backtrack now covers the
+       return-out-of-a-setjmp-frame case and is in expected.tsv, so the gap is closed. -->
+<!-- triaged 2026-09-24: three of the four 0044 captures are covered or non-work.
+     • "The 16-bit-immediate sibling" -> the curated M2 item "[T4] AsmPrinter does not mark
+       16-bit immediates under +mos-a16" already owns it; the 0044 plan §3 just records the
+       shape it should reuse. Nothing separately open.
+     • "Promoting the probe to a gate" -> the curated M2 item "[T2] Promote
+       dev/probe-far-roundtrip.sh to a committed round-trip gate" already owns it; 0044 only
+       changes the baseline it should record (0 divergent default-8bit, 2 fixtures a16).
+     • "jml for $5C" -> a deliberate NON-GOAL recorded in the 0044 plan §2 (mos24() already
+       disambiguates the encoding), not work. Do not re-open.
+     The remaining bullet (the 0044 upstream PR draft) is genuine open work with no curated
+     owner and is left here for ranking — it mirrors the 0043 PR-draft item. -->
+<!-- triaged 2026-09-24: the 0044 upstream PR draft is genuine open work — PROMOTED to the
+     Upstream / Contribution section as a [T2] item beside its 0043 twin. fp:aae009e400ac4fcc -->
+<!-- triaged 2026-09-24: the fixupkinds-addrasciz-row verify stub is resolved — all three
+     verification steps now carry raw output + PASS in the plan file, and the item is already
+     in ## Done ([fixupkinds-addrasciz-row]). Not work. fp:255b0081c55a9e47 -->
+<!-- triaged 2026-09-24: already tracked by the curated Open item "snes-video-reel and
+     apollo-reel are entropy-sensitive AFTER the title" (Test Bench / CI, wip T2). Not new
+     work. fp:bd244e96fd5c633a -->
+<!-- triaged 2026-09-24: already closed — see Done [title-entropy-gate-wiring]. Not work.
+     fp:26cd0e82ac7f98dd -->
+- [verify] **Live upstream dashboard follow-up** — Check keyboard-only navigation, a browser with JavaScript disabled, and a forced GitHub outage against the published page. The 2026-09-26 release checks are recorded in the [dashboard plan](docs/plans/2026-09-26-live-upstream-dashboard.md#release-checks-recorded-2026-09-26).
+<!-- triaged 2026-09-27: all five captured bullets from 2026-09-27-0064-competing-carry-gate.md are
+     already tracked. TableGen pressure-set contract and 0064 cycle/compile-time measurement -> the
+     curated [T4] "Generic fine-grained pressure contract" item; farblit -> the curated [T4]
+     "Combined-stack farblit byte-load legalization" item; PR #609 re-posting -> user-triggered,
+     tracked in docs/upstream-contribution-status.md; unverified steps -> the plan is not started and
+     its [T4] "Gate 0064 to regions with competing carries" item owns them. -->
+<!-- END auto-captured-deferrals -->

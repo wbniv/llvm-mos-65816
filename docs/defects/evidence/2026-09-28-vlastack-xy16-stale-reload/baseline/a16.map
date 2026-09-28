@@ -1,0 +1,274 @@
+     VMA      LMA     Size Align Out     In      Symbol
+       0        0        0     1 __rc0 = 0x00
+       0        0        0     1 __rc1 = __rc0 + 1
+       0        0        0     1 PROVIDE(__rc2 = __rc1 + 1)
+       0        0        0     1 __rc3 = __rc2 + 1
+       0        0        0     1 PROVIDE(__rc4 = __rc3 + 1)
+       0        0        0     1 __rc5 = __rc4 + 1
+       0        0        0     1 PROVIDE(__rc6 = __rc5 + 1)
+       0        0        0     1 __rc7 = __rc6 + 1
+       0        0        0     1 PROVIDE(__rc8 = __rc7 + 1)
+       0        0        0     1 __rc9 = __rc8 + 1
+       0        0        0     1 PROVIDE(__rc10 = __rc9 + 1)
+       0        0        0     1 __rc11 = __rc10 + 1
+       0        0        0     1 PROVIDE(__rc12 = __rc11 + 1)
+       0        0        0     1 __rc13 = __rc12 + 1
+       0        0        0     1 PROVIDE(__rc14 = __rc13 + 1)
+       0        0        0     1 __rc15 = __rc14 + 1
+       0        0        0     1 PROVIDE(__rc16 = __rc15 + 1)
+       0        0        0     1 __rc17 = __rc16 + 1
+       0        0        0     1 PROVIDE(__rc18 = __rc17 + 1)
+       0        0        0     1 __rc19 = __rc18 + 1
+       0        0        0     1 PROVIDE(__rc20 = __rc19 + 1)
+       0        0        0     1 __rc21 = __rc20 + 1
+       0        0        0     1 PROVIDE(__rc22 = __rc21 + 1)
+       0        0        0     1 __rc23 = __rc22 + 1
+       0        0        0     1 PROVIDE(__rc24 = __rc23 + 1)
+       0        0        0     1 __rc25 = __rc24 + 1
+       0        0        0     1 PROVIDE(__rc26 = __rc25 + 1)
+       0        0        0     1 __rc27 = __rc26 + 1
+       0        0        0     1 PROVIDE(__rc28 = __rc27 + 1)
+       0        0        0     1 __rc29 = __rc28 + 1
+       0        0        0     1 PROVIDE(__rc30 = __rc29 + 1)
+       0        0        0     1 __rc31 = __rc30 + 1
+       0        0        0     1 
+       0        0        0     1 __stack = 0x2000
+    8000     8000      726     1 .text
+    8000     8000        0     1         _init = .
+    8000     8000        0     1         _start = .
+    8000     8000       18     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.init.50)
+    8006     8006        0     1                 $xl.0
+    800e     800e        0     1                 $mh.1
+    8013     8013        0     1                 $mh.2
+    8018     8018        8     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(init-stack.S.obj):(.init.100)
+    8018     8018        0     1                 __do_init_stack
+    8020     8020        3     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(zero-bss.c.obj):(.init.200)
+    8020     8020        0     1                 __do_zero_bss
+    8023     8023        3     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.call_main)
+    8026     8026        3     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(exit-custom.S.obj):(.after_main)
+    8026     8026        0     1                 __after_main
+    8029     8029        0     1         _fini = .
+    8029     8029        1     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.fini_rts)
+    802a     802a        4     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.text)
+    802a     802a        0     1                 irq
+    802b     802b        0     1                 nmi
+    802c     802c        0     1                 brk
+    802d     802d        0     1                 cop
+    802e     802e       13     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(zero-bss.c.obj):(.text.__zero_bss)
+    802e     802e       13     1                 __zero_bss
+    8041     8041      17e     1         build/vlastack-triage/a16.sfc.lto.o:(.text.main)
+    8041     8041      17e     1                 main
+    804c     804c        0     1                 $ml.0
+    8055     8055        0     1                 $mh.1
+    805a     805a        0     1                 $xh.2
+    806c     806c        0     1                 $xh.3
+    8070     8070        0     1                 $xh.4
+    8077     8077        0     1                 $ml.5
+    807e     807e        0     1                 $xh.6
+    808e     808e        0     1                 $xh.7
+    809c     809c        0     1                 $xh.8
+    80b9     80b9        0     1                 $mh.9
+    80be     80be        0     1                 $xh.10
+    80c7     80c7        0     1                 $xh.11
+    80ce     80ce        0     1                 $xh.12
+    80d6     80d6        0     1                 $xh.13
+    80dc     80dc        0     1                 $ml.14
+    80e5     80e5        0     1                 $xh.15
+    80f3     80f3        0     1                 $xh.16
+    810b     810b        0     1                 $mh.17
+    8110     8110        0     1                 $xh.18
+    8120     8120        0     1                 $xh.19
+    8128     8128        0     1                 $xh.20
+    812e     812e        0     1                 $ml.21
+    813d     813d        0     1                 $xh.22
+    815c     815c        0     1                 $mh.23
+    8163     8163        0     1                 $xh.24
+    8173     8173        0     1                 $xh.25
+    817b     817b        0     1                 $xh.26
+    8181     8181        0     1                 $ml.27
+    8188     8188        0     1                 $xh.28
+    8191     8191        0     1                 $xh.29
+    819d     819d        0     1                 $ml.30
+    81a8     81a8        0     1                 $xh.31
+    81bf     81bf      22a     1         build/vlastack-triage/a16.sfc.lto.o:(.text.vs_build)
+    81bf     81bf      22a     1                 vs_build
+    81c1     81c1        0     1                 $xh.32
+    81c5     81c5        0     1                 $mh.33
+    81c9     81c9        0     1                 $mh.34
+    81cd     81cd        0     1                 $mh.35
+    81d1     81d1        0     1                 $xh.36
+    81e3     81e3        0     1                 $xh.37
+    81ff     81ff        0     1                 $xh.38
+    821f     821f        0     1                 $mh.39
+    8224     8224        0     1                 $mh.40
+    8231     8231        0     1                 $ml.41
+    8236     8236        0     1                 $xh.42
+    823a     823a        0     1                 $xh.43
+    8246     8246        0     1                 $xh.44
+    824c     824c        0     1                 $xh.45
+    8256     8256        0     1                 $mh.46
+    825a     825a        0     1                 $xh.47
+    8262     8262        0     1                 $xh.48
+    8273     8273        0     1                 $xh.49
+    827a     827a        0     1                 $ml.50
+    8281     8281        0     1                 $xh.51
+    8289     8289        0     1                 $xh.52
+    8292     8292        0     1                 $ml.53
+    8297     8297        0     1                 $xh.54
+    829c     829c        0     1                 $ml.55
+    82a6     82a6        0     1                 $ml.56
+    82b0     82b0        0     1                 $xh.57
+    82b9     82b9        0     1                 $xh.58
+    82be     82be        0     1                 $xh.59
+    82ce     82ce        0     1                 $xh.60
+    82d6     82d6        0     1                 $xh.61
+    82e4     82e4        0     1                 $xh.62
+    82fa     82fa        0     1                 $xh.63
+    8309     8309        0     1                 $xh.64
+    8319     8319        0     1                 $xh.65
+    8325     8325        0     1                 $xh.66
+    8328     8328        0     1                 $xh.67
+    8339     8339        0     1                 $mh.68
+    833b     833b        0     1                 $xh.69
+    834e     834e        0     1                 $xh.70
+    835a     835a        0     1                 $xh.71
+    8369     8369        0     1                 $xh.72
+    8386     8386        0     1                 $xh.73
+    8394     8394        0     1                 $xh.74
+    83a0     83a0        0     1                 $xh.75
+    83b6     83b6        0     1                 $xh.76
+    83d2     83d2        0     1                 $xh.77
+    83e9     83e9      2e8     1         build/vlastack-triage/a16.sfc.lto.o:(.text.vs_decode)
+    83e9     83e9      2e8     1                 vs_decode
+    83e9     83e9        0     1                 $xh.78
+    83f3     83f3        0     1                 $xh.79
+    840c     840c        0     1                 $xh.80
+    8414     8414        0     1                 $ml.81
+    841c     841c        0     1                 $xh.82
+    8420     8420        0     1                 $xh.83
+    8446     8446        0     1                 $xh.84
+    844d     844d        0     1                 $xh.85
+    8460     8460        0     1                 $xh.86
+    8483     8483        0     1                 $xh.87
+    8487     8487        0     1                 $ml.88
+    849d     849d        0     1                 $ml.89
+    84a7     84a7        0     1                 $xh.90
+    84ae     84ae        0     1                 $xh.91
+    84b4     84b4        0     1                 $ml.92
+    84be     84be        0     1                 $xh.93
+    84c8     84c8        0     1                 $xh.94
+    84db     84db        0     1                 $xh.95
+    84e1     84e1        0     1                 $mh.96
+    84e8     84e8        0     1                 $xh.97
+    8510     8510        0     1                 $xh.98
+    8521     8521        0     1                 $xh.99
+    8529     8529        0     1                 $xh.100
+    852f     852f        0     1                 $ml.101
+    8538     8538        0     1                 $xh.102
+    853e     853e        0     1                 $ml.103
+    8549     8549        0     1                 $xh.104
+    8551     8551        0     1                 $xh.105
+    855b     855b        0     1                 $xh.106
+    855d     855d        0     1                 $mh.107
+    8562     8562        0     1                 $xh.108
+    856c     856c        0     1                 $xh.109
+    8583     8583        0     1                 $xh.110
+    8594     8594        0     1                 $xh.111
+    8598     8598        0     1                 $xh.112
+    85b3     85b3        0     1                 $xh.113
+    85c1     85c1        0     1                 $xh.114
+    85d0     85d0        0     1                 $xh.115
+    85de     85de        0     1                 $xh.116
+    85ee     85ee        0     1                 $xh.117
+    85fc     85fc        0     1                 $xh.118
+    860c     860c        0     1                 $xh.119
+    861a     861a        0     1                 $xh.120
+    863e     863e        0     1                 $xh.121
+    865f     865f        0     1                 $xh.122
+    867f     867f        0     1                 $xh.123
+    86a3     86a3        0     1                 $ml.124
+    86ab     86ab        0     1                 $ml.125
+    86b7     86b7        0     1                 $xh.126
+    86c8     86c8        0     1                 $xh.127
+    86d1     86d1        5     1         build/vlastack-triage/a16.sfc.lto.o:(.text.exit)
+    86d1     86d1        5     1                 exit
+    86d6     86d6       1e     1         build/vlastack-triage/a16.sfc.lto.o:(.text.__memset)
+    86d6     86d6        0     1                 $xh.129
+    86d6     86d6       1e     1                 __memset
+    86e6     86e6        0     1                 $xh.130
+    86ec     86ec        0     1                 $xh.131
+    86f4     86f4       32     1         build/vlastack-triage/a16.sfc.lto.o:(.text.__mulhi3)
+    86f4     86f4       32     1                 __mulhi3
+    86f4     86f4        0     1                 $xh.132
+    86f8     86f8        0     1                 $xh.133
+    86fe     86fe        0     1                 $xh.134
+    8716     8716        0     1                 $xh.135
+    871a     871a        0     1                 $xh.136
+    8721     8721        0     1                 $xh.137
+    8726     8726        0     1         __init_array_start = .
+    8726     8726        0     1         __init_array_end = .
+    8726     8726        0     1         __fini_array_start = .
+    8726     8726        0     1         __fini_array_end = .
+     200      200        0     1 .data
+     200      200        0     1         __data_start = .
+     200      200        0     1         __data_end = .
+     200      200        0     1 __data_load_start = LOADADDR(.data)
+     200      200        0     1 __data_size = SIZEOF(.data)
+      20       20        0     1 .zp.data
+      20       20        0     1         __zp_data_start = .
+      20       20        0     1 __zp_data_load_start = LOADADDR(.zp.data)
+      20       20        0     1 __zp_data_size = SIZEOF(.zp.data)
+      20       20        0     1 .zp.bss
+      20       20        0     1         __zp_bss_start = .
+      20       20        0     1 __zp_bss_size = SIZEOF(.zp.bss)
+      20       20       19     1 .zp
+      20       20       19     1         build/vlastack-triage/a16.sfc.lto.o:(.zp.noinit)
+     200      200      994     1 .bss
+     200      200        0     1         __bss_start = .
+     200      200        2     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.corpus_result)
+     200      200        2     1                 corpus_result
+     202      202        2     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_totalruns)
+     202      202        2     1                 vs_totalruns
+     204      204       18     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_nruns)
+     204      204       18     1                 vs_nruns
+     21c      21c       30     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_pfxsum)
+     21c      21c       30     1                 vs_pfxsum
+     24c      24c      600     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_img)
+     24c      24c      600     1                 vs_img
+     84c      84c       30     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_rowoff)
+     84c      84c       30     1                 vs_rowoff
+     87c      87c      318     1         build/vlastack-triage/a16.sfc.lto.o:(.bss.vs_rle)
+     87c      87c      318     1                 vs_rle
+     b94      b94        0     1         __bss_end = .
+     b94      b94        0     1 __bss_size = SIZEOF(.bss)
+     b94      b94        0     1 .noinit
+     b94      b94        0     1         __heap_start = ALIGN(., 2)
+    ffb0     ffb0       30     1 .snes_header
+    ffb0     ffb0       30     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.snes_header)
+    ffb0     ffb0        0     1                 __snes_header
+    ffe0     ffe0       10     1 .snes_vectors_native
+    ffe0     ffe0        2     1         SHORT(0x0000)
+    ffe2     ffe2        2     1         SHORT(0x0000)
+    ffe4     ffe4        2     1         SHORT(cop)
+    ffe6     ffe6        2     1         SHORT(brk)
+    ffe8     ffe8        2     1         SHORT(0x0000)
+    ffea     ffea        2     1         SHORT(nmi)
+    ffec     ffec        2     1         SHORT(0x0000)
+    ffee     ffee        2     1         SHORT(irq)
+    fff0     fff0       10     1 .snes_vectors_emu
+    fff0     fff0        2     1         SHORT(0x0000)
+    fff2     fff2        2     1         SHORT(0x0000)
+    fff4     fff4        2     1         SHORT(cop)
+    fff6     fff6        2     1         SHORT(0x0000)
+    fff8     fff8        2     1         SHORT(0x0000)
+    fffa     fffa        2     1         SHORT(nmi)
+    fffc     fffc        2     1         SHORT(_start)
+    fffe     fffe        2     1         SHORT(irq)
+       0        0       d4     1 .comment
+       0        0       d4     1         <internal>:(.comment)
+       0        0      dd0     4 .symtab
+       0        0      dd0     4         <internal>:(.symtab)
+       0        0       86     1 .shstrtab
+       0        0       86     1         <internal>:(.shstrtab)
+       0        0      6df     1 .strtab
+       0        0      6df     1         <internal>:(.strtab)
