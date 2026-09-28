@@ -3,6 +3,7 @@
 import argparse
 from contextlib import contextmanager
 import os
+import selectors
 import signal
 import subprocess
 import sys
@@ -21,6 +22,11 @@ class Progress:
             os.fstat(self.fd)
         except OSError:
             self.fd = 2
+        self.terminal = os.isatty(self.fd)
+
+    def clear(self):
+        if self.terminal:
+            os.write(self.fd, b"\r\033[K")
 
     def update(self, completed, detail=""):
         self.completed = completed
@@ -29,7 +35,11 @@ class Progress:
         elapsed = int(time.monotonic() - self.started)
         line = (f"{self.label} [{'#' * filled}{'-' * (20-filled)}] "
                 f"{percent:3d}% {completed}/{self.total} complete | "
-                f"{max(0, self.total-completed)} remaining | {elapsed}s | {detail}\n")
+                f"{max(0, self.total-completed)} remaining | {elapsed}s | {detail}")
+        if self.terminal:
+            line = "\r\033[K" + line + ("\n" if completed >= self.total else "")
+        else:
+            line = "progress snapshot: " + line + "\n"
         os.write(self.fd, line.encode(errors="replace"))
 
     @contextmanager
@@ -49,15 +59,28 @@ class Progress:
     def run(self, command, detail=""):
         self.update(self.completed, detail + " | starting")
         fds = (self.fd,) if self.fd > 2 else ()
-        child = subprocess.Popen(command, pass_fds=fds, start_new_session=True)
+        child = subprocess.Popen(command, pass_fds=fds, start_new_session=True,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         try:
-            while True:
-                try:
-                    result = child.wait(timeout=30)
-                    break
-                except subprocess.TimeoutExpired:
-                    self.update(self.completed, detail + " | running")
+            with selectors.DefaultSelector() as pending:
+                pending.register(child.stdout, selectors.EVENT_READ, 1)
+                pending.register(child.stderr, selectors.EVENT_READ, 2)
+                refreshed = time.monotonic()
+                while pending.get_map():
+                    for key, _ in pending.select(timeout=1):
+                        data = os.read(key.fileobj.fileno(), 65536)
+                        if data:
+                            self.clear()
+                            os.write(key.data, data)
+                        else:
+                            pending.unregister(key.fileobj)
+                            key.fileobj.close()
+                    if time.monotonic() - refreshed >= 30:
+                        self.update(self.completed, detail + " | running")
+                        refreshed = time.monotonic()
+            result = child.wait()
         except BaseException:
+            self.clear()
             os.killpg(child.pid, signal.SIGTERM)
             try:
                 child.wait(timeout=5)
@@ -65,7 +88,12 @@ class Progress:
                 os.killpg(child.pid, signal.SIGKILL)
                 child.wait()
             raise
+        finally:
+            child.stdout.close()
+            child.stderr.close()
         self.update(self.completed + 1, detail + (" | finished" if result == 0 else f" | exit {result}"))
+        if self.completed < self.total:
+            self.clear()
         return result if result >= 0 else 128 - result
 
 
@@ -91,7 +119,8 @@ def main():
     try:
         return progress.run(command, args.detail)
     except KeyboardInterrupt:
-        progress.update(progress.completed, args.detail + " | interrupted")
+        progress.clear()
+        os.write(progress.fd, f"{args.label}: interrupted\n".encode())
         return 130
 
 

@@ -147,6 +147,7 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   progress "$((pass+fail+missing))" "verifying $id ($frames frames)"
   rom="$ROM_DIR/$id.sfc"
   if [ ! -f "$rom" ]; then
+    task_clear
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
   fi
   if [ "$mode" = "live-record" ]; then
@@ -155,6 +156,7 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
     # would have to land inside the ~530-frame ready window of a ~9100-frame cycle.
     out=$(JGX_BLANKSCAN=1 JGX_BLANKSCAN_ROWS="$blankscan_rows" JGX_POLL=1 JGX_WRAM_DUMP="$base" JGX_WRAM_DUMP_LEN=5 \
             "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+    task_clear
     detail=$(JGXOUT="$out" record_check "$id" 2>&1) || {
       printf '  %-16s FAIL  live-record: %s\n' "$id" "$detail"
       fail=$((fail+1)); failed="$failed $id"; continue
@@ -162,6 +164,7 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   else
     out=$(JGX_BLANKSCAN=1 JGX_BLANKSCAN_ROWS="$blankscan_rows" \
             "$JGX" "$rom" "$DB" "$off" "$len" "$want" "$frames" 2>&1 || true)
+    task_clear
     detail=""
   fi
   # `|| true`: a grep that matches nothing exits 1, and under `set -e` that kills the run mid-way
@@ -212,6 +215,7 @@ if [ "$TITLE_ENTROPY" -eq 1 ]; then
     progress "$((te_pass+te_fail+te_missing))" "title entropy: $id"
     rom="$ROM_DIR/$id.sfc"
     if [ ! -f "$rom" ]; then
+        task_clear
         printf '  %-16s MISSING %s\n' "$id" "$rom"; te_missing=$((te_missing+1)); continue
     fi
     out=$(JGX="$JGX" JGX_DB="$DB" "$TE" "$rom" --runs "$TE_RUNS" --frames "$TE_FRAMES" 2>&1) || {

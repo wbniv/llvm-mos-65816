@@ -60,6 +60,7 @@ for F in ${FRAMES//,/ }; do
   JGX_ENTROPY=0 "$JGX" "$ROM" "$DB" 897 2 204F "$F" "$TMP/ref.png" >/dev/null 2>&1 || true
   render_done=$((render_done+1))
   [ -s "$TMP/ref.png" ] || {
+    task_clear
     echo "  frame $F: FAIL — entropy-0 render produced no PNG"
     fail=1; render_skipped=$((render_skipped+RUNS)); render_done=$((render_done+RUNS)); continue
   }
@@ -74,6 +75,7 @@ for F in ${FRAMES//,/ }; do
     [ "$got" = "$REF" ] || bad=$((bad + 1))
     render_done=$((render_done+1))
   done
+  task_clear
   if [ "$bad" -eq 0 ]; then
     printf '  frame %4s: PASS  %d/%d entropy-1 runs == entropy-0 %s\n' "$F" "$RUNS" "$RUNS" "$REF"
   else

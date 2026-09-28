@@ -211,6 +211,7 @@ def main():
         progress.update(completed, name + " | " + " ".join(f"{k} {v}" for k, v in tally.items()))
         test = SRCDIR / name
         if not test.exists():
+            progress.clear()
             errors += 1
             print("  %-22s ERROR  not found" % name); continue
         with progress.watch(name):
@@ -225,6 +226,7 @@ def main():
                 status, detail = "XPASS", "listed in xfails.tsv but now PASSes — remove the row"
         tally[status] = tally.get(status, 0) + 1
         mark = {"PASS": "  ", "SKIP": "··", "XFAIL": "xf", "XPASS": "XP", "FAIL": "!!"}.get(status, "??")
+        progress.clear()
         print("  %s %-22s %-5s %s" % (mark, name, status, detail))
         if status == "FAIL":
             fails.append((name, detail))

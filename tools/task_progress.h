@@ -30,7 +30,7 @@ public:
     update(0, "starting", true);
   }
   ~TaskProgress() { if (stream) fclose(stream); }
-  void update(int done, const char *state = "running", bool force = false) {
+  void update(int done, const char *state = "running", bool force = false, bool finished = false) {
     if (!stream) return;
     auto now = Clock::now();
     auto interval = std::chrono::duration_cast<std::chrono::seconds>(now - previous).count();
@@ -44,7 +44,7 @@ public:
     fprintf(stream, "%sEMU %s [%s] %d%% %d/%d frames | %llds | %s%s",
             terminal ? "\r\033[K" : "", label.c_str(), bar.c_str(), percent,
             done, total, static_cast<long long>(elapsed), state,
-            terminal && !force ? "" : "\n");
+            terminal && !finished ? "" : "\n");
     fflush(stream);
   }
 };

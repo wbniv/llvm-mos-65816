@@ -13,6 +13,11 @@ fi
 task_progress() {
   python3 "$TASK_PROGRESS_PY" --total "$1" --done "$2" --label "$3" --detail "${4:-}"
 }
+task_clear() {
+  if [ -t "$TASK_PROGRESS_FD" ]; then
+    printf '\r\033[K' >&"$TASK_PROGRESS_FD"
+  fi
+}
 task_run() {
   local total="$1" completed="$2" label="$3" detail="$4"
   shift 4

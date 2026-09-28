@@ -59,6 +59,7 @@ while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
     echo "FATAL: corpus checksum failed: $cfile"
     exit 1
   fi
+  task_clear
   printf '  %-18s built\n' "$name"
   built=$((built+1))
 done < "$MANIFEST"
@@ -78,9 +79,11 @@ while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
   map="$BUILD/$name.map"
 
   if line="$(run_assert "$rom" "$map" "$symbol" "$expected")"; then
+    task_clear
     printf '  %-10s PASS  %s=%s  %s\n' "$name" "$symbol" "$expected" "$desc"
     pass=$((pass + 1))
   else
+    task_clear
     printf '  %-10s FAIL  %s\n' "$name" "$line"
     fail=$((fail + 1))
   fi
