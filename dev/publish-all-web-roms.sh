@@ -202,10 +202,21 @@ cp "$candidate/biohack-manifest.json" "$BIO_MANIFEST"
 cp "$candidate/indri-manifest.json" "$INDRI_MANIFEST"
 
 phase 5 'build both sites'
-echo "==> building biohack.net"
-task_run 2 0 BUILD 'site 1/2: biohack.net' pnpm --dir "$BIOHACK" build
-echo "==> building indri.studio"
-task_run 2 1 BUILD 'site 2/2: indri.studio' pnpm --dir "$INDRI" build
+build_site() {
+  local index="$1" name="$2" site="$3" log="$4"
+  echo "==> building $name (log: $log)"
+  if task_run 2 "$index" BUILD "site $((index+1))/2: $name" \
+      pnpm --dir "$site" build >"$log" 2>&1; then
+    echo "BUILD $name || PASS"
+  else
+    local status=$?
+    echo "BUILD $name || FAIL (exit $status; log: $log)" >&2
+    tail -80 "$log" >&2
+    return "$status"
+  fi
+}
+build_site 0 biohack.net "$BIOHACK" "$ROOT/build/publish-biohack-build.log"
+build_site 1 indri.studio "$INDRI" "$ROOT/build/publish-indri-build.log"
 
 # Stage only the release payload, then prepare both commits before either deployment is triggered.
 phase 6 'prepare release commits'

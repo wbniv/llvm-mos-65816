@@ -56,6 +56,10 @@ USAGE
   exit 0;; esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+# Interactive verification keeps both progress counters in fixed terminal rows.
+if [ -t 1 ] && [ -t 2 ] && [ "${TERM:-dumb}" != dumb ] && [ "${VERIFY_WEB_ROMS_UI_CHILD:-0}" != 1 ] && [ "${VERIFY_WEB_ROMS_UI:-1}" != 0 ]; then
+  exec python3 "$ROOT/tools/verify_web_roms_ui.py" "$0" "$@"
+fi
 source "$ROOT/dev/task-progress.sh"
 SITE="$HOME/biohack.net"
 MANIFEST=""
@@ -173,10 +177,6 @@ progress() {
 progress_done() {
   local done=$((pass+fail+missing))
   progress "$done" "PASS $pass | FAIL $fail | MISSING $missing"
-  # The next emulator owns the terminal's live line; keep this completed count above it.
-  if [ -t "$TASK_PROGRESS_FD" ] && [ "$done" -lt "$total" ]; then
-    printf '\n' >&"$TASK_PROGRESS_FD"
-  fi
 }
 
 pass=0; fail=0; missing=0; failed=""
