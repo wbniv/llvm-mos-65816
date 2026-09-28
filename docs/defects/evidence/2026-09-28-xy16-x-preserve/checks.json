@@ -1,0 +1,96 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline-insert-rep-sep-cloned-kills.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-insert-rep-sep-cloned-kills.log",
+    "check_exit_code": 1
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline-insert-rep-sep-stack.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-insert-rep-sep-stack.log",
+    "check_exit_code": 1
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/original-normalized.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/baseline-original.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-original-normalized.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/candidate-insert-rep-sep-cloned-kills.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-insert-rep-sep-cloned-kills.log",
+    "check_exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/candidate-insert-rep-sep-stack.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-insert-rep-sep-stack.log",
+    "check_exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=mos-insert-rep-sep",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/original-normalized.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/xy16-x-preserve/candidate-original.mir"
+    ],
+    "exit_code": 0,
+    "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-original-normalized.log"
+  }
+]

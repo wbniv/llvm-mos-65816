@@ -1,0 +1,40 @@
+[
+  {
+    "mode": "a16",
+    "command": [
+      ".scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-word-experiment",
+      "-filetype=obj",
+      ".scratch/farblit-payoff/a16.pre",
+      "-o",
+      ".scratch/farblit-payoff/runs/word-only-a16.o"
+    ],
+    "byte_identical_to_baseline": true,
+    "sha256": "2058e78c7e4eee7c26bec11bfac51411136443b2f3c6d4878d9792afb2d2a5b5"
+  },
+  {
+    "mode": "xy16",
+    "command": [
+      ".scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-word-experiment",
+      "-filetype=obj",
+      ".scratch/farblit-payoff/xy16.pre",
+      "-o",
+      ".scratch/farblit-payoff/runs/word-only-xy16.o"
+    ],
+    "byte_identical_to_baseline": true,
+    "sha256": "967820e8102a18b541a1915511026ca152ecf89007063185f3cc7243f255a7c3"
+  }
+]

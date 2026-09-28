@@ -1,0 +1,66 @@
+[
+  {
+    "fixture": "bounds",
+    "variant": "baseline",
+    "mode": "a16",
+    "expected": 3374804766,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/bounds-baseline-a16.sfc"
+  },
+  {
+    "fixture": "bounds",
+    "variant": "both",
+    "mode": "a16",
+    "expected": 3374804766,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/bounds-both-a16.sfc"
+  },
+  {
+    "fixture": "bounds",
+    "variant": "baseline",
+    "mode": "xy16",
+    "expected": 3374804766,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/bounds-baseline-xy16.sfc"
+  },
+  {
+    "fixture": "bounds",
+    "variant": "both",
+    "mode": "xy16",
+    "expected": 3374804766,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/bounds-both-xy16.sfc"
+  },
+  {
+    "fixture": "pressure",
+    "variant": "baseline",
+    "mode": "a16",
+    "expected": 54933,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/pressure-baseline-a16.sfc"
+  },
+  {
+    "fixture": "pressure",
+    "variant": "both",
+    "mode": "a16",
+    "expected": 54933,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/pressure-both-a16.sfc"
+  },
+  {
+    "fixture": "pressure",
+    "variant": "baseline",
+    "mode": "xy16",
+    "expected": 54933,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/pressure-baseline-xy16.sfc"
+  },
+  {
+    "fixture": "pressure",
+    "variant": "both",
+    "mode": "xy16",
+    "expected": 54933,
+    "pass": true,
+    "rom": ".scratch/farblit-payoff/runs/pressure-both-xy16.sfc"
+  }
+]

@@ -1,0 +1,92 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-gline-tables-only",
+      "-mllvm",
+      "-stop-before=legalizer",
+      "-S",
+      "examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-gline-tables-only",
+      "-emit-llvm",
+      "-S",
+      "examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.ir"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-gline-tables-only",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-mllvm",
+      "-stop-before=legalizer",
+      "-S",
+      "examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--target=mos",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-gline-tables-only",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-emit-llvm",
+      "-S",
+      "examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.ir"
+    ],
+    "exit_code": 0,
+    "diagnostics": ""
+  }
+]

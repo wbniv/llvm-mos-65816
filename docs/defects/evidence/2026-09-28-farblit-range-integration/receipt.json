@@ -1,0 +1,71 @@
+{
+  "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab",
+  "focused_mir": {
+    "cases": 26,
+    "runs": 3,
+    "pass": true,
+    "contract": "A16, XY16, disabled A16; tracked final regression also passes through lit"
+  },
+  "object_sweep": {
+    "fixtures": 16,
+    "modes": 2,
+    "optimization_levels": [
+      "Os",
+      "Oz",
+      "O2"
+    ],
+    "builds": 192,
+    "machine_verifier_pass": true,
+    "identical_pairs": 88
+  },
+  "runtime": {
+    "lto_rom_configurations": 36,
+    "mame_pass": 36,
+    "bsnes_pass": 36,
+    "bsnes_executions": 72,
+    "repeated_profiles_identical": true,
+    "oracles": {
+      "farblit": "0x1E56EE65",
+      "farblit_press": "0xD695",
+      "bounds": "0xC9276F1E"
+    },
+    "rom_file_sizes": {
+      "farblit": 524288,
+      "bounds": 524288,
+      "farblit_press": 32768
+    }
+  },
+  "original_gate": {
+    "candidate": "PASS, eight emulator assertions and exact per-probe shapes",
+    "installed": "PASS, eight emulator assertions and exact per-probe shapes",
+    "shape_mutation_tests": 16
+  },
+  "byte_identity": {
+    "installed_to_candidate": {
+      "objects": 96,
+      "lto_roms": 18
+    },
+    "disabled_to_baseline": {
+      "objects": 96,
+      "lto_roms": 18
+    }
+  },
+  "mos_codegen_suite": {
+    "passed": 127,
+    "unsupported": 2,
+    "known_opt_startup_failures": 5,
+    "new_tracked_mir_file_separately_passes": true
+  },
+  "patch_stack": {
+    "roundtrip": "PASS, full MOS directory and focused tests",
+    "0002_hunks_unchanged": true
+  },
+  "limitations": [
+    "No independent reviewer or exact-upstream validation; downstream integration only.",
+    "Fourteen of sixteen size fixtures are unchanged; this is limited evidence of general profitability.",
+    "O2 XY16 Farblit grows 24 bytes while running 2.72% faster; Os has no growing object in this sample.",
+    "Master clocks for pressure/bounds are exclusive of called functions and used only as deterministic controls, not complete-work runtime claims.",
+    "HiROM images stay padded to 524288 bytes and pressure LoROM images to 32768; linked code sizes measure savings.",
+    "Native-word indexing remains experimental and uninstalled."
+  ]
+}

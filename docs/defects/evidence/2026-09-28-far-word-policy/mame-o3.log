@@ -1,0 +1,4 @@
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 600 ticks)
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 600 ticks)
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 600 ticks)
+SMOKE: PASS addr=0x7E021F len=4 got=0x1E56EE65 (ran 600 ticks)

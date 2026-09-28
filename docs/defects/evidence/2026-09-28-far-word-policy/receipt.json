@@ -1,0 +1,32 @@
+{
+  "status": "integrated_and_installed_locally",
+  "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84",
+  "policy": "O2/O3 without size or optnone attributes; explicit off/all controls",
+  "object_configurations_per_variant": 96,
+  "variants": [
+    "baseline",
+    "all",
+    "speed",
+    "off",
+    "default"
+  ],
+  "primary_mame_bsnes_pairs": 54,
+  "additional_o3_mame_bsnes_pairs": 4,
+  "installed_identical_objects": 96,
+  "installed_identical_roms": 18,
+  "shape_cases": 144,
+  "mir_cases": 12,
+  "final_lit_passed": 4,
+  "initial_assertion_only_observer_test": "unsupported in Release build",
+  "document_dependencies": "PASS (worktree)",
+  "defect_evidence": "PASS (23 records, worktree)",
+  "patch_reconstruction": "PASS; original 0002 restored byte-for-byte after comparing per-file patch payloads",
+  "installed_llc": {
+    "path": "build/llvm-mos-install/bin/llc",
+    "sha256": "cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7",
+    "same_as_tested_policy_llc": true,
+    "previous_binary_preserved_at": ".scratch/far-word-policy/llc-installed-before"
+  },
+  "independent_review": "pending",
+  "upstream_submission": "not performed"
+}

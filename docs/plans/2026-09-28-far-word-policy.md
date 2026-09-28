@@ -1,0 +1,19 @@
+# Native far-word speed/size policy
+
+**Status: completed and installed locally, September 28, 2026.** [Measurements, implementation, and validation](../investigations/2026-09-28-far-word-policy.md).
+
+Attribution: OpenAI Codex CLI 0.157.1 (session source: `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
+
+## Completed scope
+
+1. Reconcile the existing defect, native-word experiment, installed 0069 proof, patch stack, source, and compiler identities. Rebase the word experiment using an isolated build.
+2. Trace the A16 `-Os` growth: the word loop saves 27 bytes, while surrounding allocation and spill changes add 89. Mode-switch counts are unchanged.
+3. Implement a speed policy that respects function size/no-opt attributes, retains boundary/call/escape restrictions, and limits mixed word/byte groups to Y8.
+4. Compare A16/XY16 at `-Os`, `-Oz`, and `-O2`; retain bank-crossing, wrapping, pressure, instruction-shape, and dual-emulator checks. Add a focused `-O3` comparison because the default also applies there.
+5. Integrate patch 0070, preserve 0002, install, verify exact output controls, and refresh the evidence and dependent summaries.
+
+At `-O2`, complete Farblit `main` is 7.12%/7.74% faster and 13/38 bytes smaller in A16/XY16. `-O3` A16 accepts 46 bytes for 7.29% faster execution. `-Os`/`-Oz` retain baseline output. The size cost therefore does not veto use in a build that requests speed.
+
+## Separate upstream work
+
+The [working PR packet](../pr-preparations/2026-09-28/far-word-index/README.md) now maps choices to evidence, includes proof and dependency diagrams, and records a source inspection of upstream `26d7c2c1eebf`. The inspected upstream path lacks the required native/far machinery. Independent review and building/testing the exact compiler patch stack proposed for upstream remain in [TODO](../../TODO.md). The [validation steps](../pr-preparations/2026-09-28/far-word-index/review.md#what-testing-the-proposed-upstream-patch-stack-means) explain how to separate the required changes, apply them to a pinned upstream base, and repeat the relevant comparisons; the existing downstream results remain valid. This is local preparation; no upstream build or publication is claimed.

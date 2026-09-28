@@ -1,0 +1,618 @@
+[
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word128",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 96
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word129",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 198
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 300
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word256",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 402
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 504
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word_step2",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 606
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "copy248",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 8,
+        "x": 8,
+        "line": 717
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "copy249",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 8,
+        "x": 8,
+        "line": 799
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "copy_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 8,
+        "x": 8,
+        "line": 881
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "copy_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 939
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "baseline",
+    "function": "word_pressure",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 1105
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word128",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 16,
+        "x": 8,
+        "line": 73
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word129",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 172
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 274
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word256",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 376
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 478
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word_step2",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 580
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "copy248",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 667
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "copy249",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 8,
+        "x": 8,
+        "line": 750
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "copy_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 8,
+        "x": 8,
+        "line": 832
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "copy_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 890
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "a16",
+    "variant": "both",
+    "function": "word_pressure",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 16,
+        "x": 8,
+        "line": 1055
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word128",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 96
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word129",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 198
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 300
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word256",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 402
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 504
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word_step2",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 606
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "copy248",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 16,
+        "line": 702
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "copy249",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 16,
+        "line": 771
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "copy_wrap",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 16,
+        "line": 840
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "copy_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 900
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "baseline",
+    "function": "word_pressure",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 1066
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word128",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 16,
+        "x": 8,
+        "line": 73
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word129",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 172
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word_wrap",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 274
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word256",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 376
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 478
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word_step2",
+    "accesses": [
+      {
+        "form": "indirect",
+        "m": 16,
+        "x": 8,
+        "line": 580
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "copy248",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 667
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "copy249",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 16,
+        "line": 735
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "copy_wrap",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 16,
+        "line": 804
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "copy_wrapped_index",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 8,
+        "x": 8,
+        "line": 864
+      }
+    ],
+    "pass": true
+  },
+  {
+    "mode": "xy16",
+    "variant": "both",
+    "function": "word_pressure",
+    "accesses": [
+      {
+        "form": "indirect-y",
+        "m": 16,
+        "x": 8,
+        "line": 1029
+      }
+    ],
+    "pass": true
+  }
+]

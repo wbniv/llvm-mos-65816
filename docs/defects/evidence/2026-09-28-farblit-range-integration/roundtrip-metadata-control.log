@@ -1,0 +1,1 @@
+PASS: every 0002 file section has identical hunks; regeneration only reorders sections and changes index hash abbreviation. Retained original patch bytes after successful full source/test reconstruction.

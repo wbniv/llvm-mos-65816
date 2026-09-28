@@ -1,11 +1,17 @@
 | Date | Change |
 |------|--------|
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/7a249b08) | Check each Farblit instruction shape and use task md for previews |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/86dbb3ee) | mos: investigate carry profitability and prototype size selection |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/b65bb853) | docs: present carry scheduling as an LLVM investigation |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/c3c1967c) | mos: add and measure experimental competing-carry gate |
 | [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/1bd2a347) | docs(plan): gate 0064 to regions with competing carries |
 
 <!--history-meta v1
+7a249b08	author	Will Norris
+7a249b08	added	2
+7a249b08	deleted	0
+7a249b08	files	1
+7a249b08	body	Replace aggregate opcode acceptance with source-attributed addressing and M/X\nwidth checks for each main and pressure probe. Compare the checked assembly\nwith plain-object instructions and relocations. Preserve exact toolchain\nidentities, passing runtime logs, and the correction to earlier source labels.\n\nRemove six document-specific renderers, two templates, and six generated HTML\nfiles. Use the shared task md viewer, update references and dependency receipts,\nand omit an empty browser-copy inventory section.\n\nValidation: full Farblit gate passes on preserved and installed toolchains,\nwith eight emulator assertions and 15 checker tests each. All eight document\ndependency tests pass; six Markdown views render with task md. Staged document,\ndefect-evidence and comment checks pass.\n\nImplementation and validation: OpenAI Codex CLI 0.157.1 (codex-tui), model\ngpt-6-astra, high reasoning effort; verified session\n01a0e529-62c6-7fc2-a0c6-357800272c63.
 86dbb3ee	author	Will Norris
 86dbb3ee	added	1
 86dbb3ee	deleted	1

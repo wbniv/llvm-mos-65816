@@ -82,6 +82,9 @@ STANDALONE_MOSDIR=(
   "$PATCHES/0065-mos-near-store-profitability.patch"
   "$PATCHES/0066-mos-far-extload-worklist.patch"
   "$PATCHES/0067-mos-competing-carry-gate.patch"
+  "$PATCHES/0068-mos-null-output-streamer.patch"
+  "$PATCHES/0069-mos-far-loop-range.patch"
+  "$PATCHES/0070-mos-far-word-index-policy.patch"
 )
 TESTRELS=(
   "llvm/test/CodeGen/MOS/carry-pressure-schedule.mir"
@@ -93,6 +96,7 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/a16-byte-store.ll"
   "llvm/test/CodeGen/MOS/scavenger-p-undef.mir"   # +mos-a16 regression for the 0011 scavenger fix; downstream-only
   "llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir"
+  "llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir"
   "llvm/test/CodeGen/MOS/interrupt-width-65816.ll"
   "llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir"
   "llvm/test/MC/MOS/all-65816-opcodes.s"
@@ -109,6 +113,8 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/far-global-long-x.ll"
   "llvm/test/CodeGen/MOS/far-absolute-extload.mir"
   "llvm/test/CodeGen/MOS/far-native-word.ll"
+  "llvm/test/CodeGen/MOS/far-loop-range.mir"
+  "llvm/test/CodeGen/MOS/far-word-policy.mir"
 )
 
 [ -d "$VENDOR/.git" ] || { echo "FATAL: no vendor/llvm-mos checkout (run dev/run.sh toolchain)"; exit 1; }

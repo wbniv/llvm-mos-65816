@@ -1,0 +1,11 @@
+{
+  "command": [
+    "git",
+    "apply",
+    "--unsafe-paths",
+    "/home/will/llvm-mos-65816/.scratch/far-word-policy/candidate.patch"
+  ],
+  "status": 0,
+  "source_identical": true,
+  "test_identical": true
+}

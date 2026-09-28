@@ -1,5 +1,9 @@
 # Gate 0064 to regions with competing carries
 
+**XY16 Vlastack update (2026-09-28):** the [separate stale-X defect](../defects/mos-xy16-stale-x-writer-reload.json) is fixed locally in `0002`. The unchanged original XY16 input returns `0xD77B` on both emulators; the preserved baseline still returns `0xD3BD`. VLA-mismatch statements below describe the earlier build. Carry-policy measurements, the generic pressure-contract qualification and upstream review requirements remain as recorded. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e5e8-7760-7383-a39a-629f539d24fa`.
+
+**Later September 28 range-proof integration:** [0069 is installed locally](../investigations/2026-09-28-farblit-range-integration.md); `cp8` now uses Y8 in both modes. The current gate passes eight emulator assertions and 16 sensitivity tests. The following gate counts describe earlier builds; the standalone 0064 packet and publication status are unchanged. Attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e61c-c24c-7053-aa56-a4a4e43f12ab`.
+
 **Farblit gate update (2026-09-28):** the [per-probe gate](../investigations/2026-09-27-farblit-byte-load.md#completed-gate-update-2026-09-28) passes on preserved and installed compilers, with eight emulator assertions and 15 checker tests per toolchain. The following aggregate-count qualifications are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
 
 **Status (2026-09-27):** implementation and measurements complete; results are presented as an [investigative report for LLVM discussion](../investigations/2026-09-27-competing-carry-gate.md). Default selection remains open. Patch 0067 currently exposes `off`, `always` and experimental `gated`, with `always` as the existing downstream default.

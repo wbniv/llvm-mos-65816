@@ -1,0 +1,1586 @@
+[
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "a16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "a16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "a16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "xy16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "xy16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "farblit",
+      "xy16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "off",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "a16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "a16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "a16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "xy16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "xy16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "farblit",
+      "xy16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "speed",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "a16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "a16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "a16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "a16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "xy16",
+      "Os",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Os",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "xy16",
+      "Oz",
+      "main"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word128"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "Oz",
+      "word_pressure"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "farblit",
+      "xy16",
+      "O2",
+      "main"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word128"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word129"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrap"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word256"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_wrapped_index"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_step2"
+    ],
+    "expected_fold": false,
+    "pass_shape": true
+  },
+  {
+    "policy": "all",
+    "key": [
+      "bounds",
+      "xy16",
+      "O2",
+      "word_pressure"
+    ],
+    "expected_fold": true,
+    "pass_shape": true
+  }
+]

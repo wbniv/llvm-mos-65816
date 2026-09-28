@@ -1,0 +1,234 @@
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir:13:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:35:21: note: scanning from here
+name: stack_pop_byte
+                    ^
+<stdin>:100:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir:34:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:103:22: note: scanning from here
+name: stack_push_byte
+                     ^
+<stdin>:168:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir:56:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:171:21: note: scanning from here
+name: stack_pop_word
+                    ^
+<stdin>:242:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir:80:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:245:22: note: scanning from here
+name: stack_push_word
+                     ^
+<stdin>:317:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir:107:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:320:20: note: scanning from here
+name: stack_live_nz
+                   ^
+<stdin>:396:2: note: possible intended match here
+ RTS implicit $a
+ ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+             .
+             .
+             .
+            30:  } 
+            31:   
+            32:  attributes #0 = { "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" } 
+            33: ... 
+            34: --- 
+            35: name: stack_pop_byte 
+check:13'0                          X error: no match found
+            36: alignment: 1 
+check:13'0      ~~~~~~~~~~~~~
+            37: exposesReturnsTwice: false 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            38: legalized: false 
+check:13'0      ~~~~~~~~~~~~~~~~~
+            39: regBankSelected: false 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~~~
+            40: selected: false 
+check:13'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+            95:  STAbs killed $y, 4864 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~~~
+            96:  REP_Immediate 16 
+check:13'0      ~~~~~~~~~~~~~~~~~~
+            97:  $x16 = LDXImm16 511 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~
+            98:  $a = LDAbsXIdx 4096, killed $x16 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            99:  SEP_Immediate 16 
+check:13'0      ~~~~~~~~~~~~~~~~~~
+           100:  RTS implicit $a 
+check:13'0      ~~~~~~~~~~~~~~~~~
+check:13'1       ?                possible intended match
+           101: ... 
+check:13'0      ~~~~
+           102: --- 
+check:13'0      ~~~~
+           103: name: stack_push_byte 
+check:13'0      ~~~~~~~~~~~~~~~~~~~~~
+check:34'0                           X error: no match found
+           104: alignment: 1 
+check:34'0      ~~~~~~~~~~~~~
+           105: exposesReturnsTwice: false 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           106: legalized: false 
+check:34'0      ~~~~~~~~~~~~~~~~~
+           107: regBankSelected: false 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           108: selected: false 
+check:34'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           163:  $x16 = LDXImm16 511 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~~
+           164:  $a = LDAbsXIdx 4096, killed $x16 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           165:  SEP_Immediate 16 
+check:34'0      ~~~~~~~~~~~~~~~~~~
+           166:  $y = PL 
+check:34'0      ~~~~~~~~~
+           167:  STAbs killed $y, 4865 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           168:  RTS implicit $a 
+check:34'0      ~~~~~~~~~~~~~~~~~
+check:34'1       ?                possible intended match
+           169: ... 
+check:34'0      ~~~~
+           170: --- 
+check:34'0      ~~~~
+           171: name: stack_pop_word 
+check:34'0      ~~~~~~~~~~~~~~~~~~~~
+check:56'0                          X error: no match found
+           172: alignment: 1 
+check:56'0      ~~~~~~~~~~~~~
+           173: exposesReturnsTwice: false 
+check:56'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           174: legalized: false 
+check:56'0      ~~~~~~~~~~~~~~~~~
+           175: regBankSelected: false 
+check:56'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           176: selected: false 
+check:56'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           237:  $x16 = LDXImm16 511 
+check:56'0      ~~~~~~~~~~~~~~~~~~~~~
+           238:  STAbsXIdx16 killed $a16, 4096, killed $x16 
+check:56'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           239:  SEP_Immediate 32 
+check:56'0      ~~~~~~~~~~~~~~~~~~
+           240:  $a = LDImm 123 
+check:56'0      ~~~~~~~~~~~~~~~~
+           241:  SEP_Immediate 16 
+check:56'0      ~~~~~~~~~~~~~~~~~~
+           242:  RTS implicit $a 
+check:56'0      ~~~~~~~~~~~~~~~~~
+check:56'1       ?                possible intended match
+           243: ... 
+check:56'0      ~~~~
+           244: --- 
+check:56'0      ~~~~
+           245: name: stack_push_word 
+check:56'0      ~~~~~~~~~~~~~~~~~~~~~
+check:80'0                           X error: no match found
+           246: alignment: 1 
+check:80'0      ~~~~~~~~~~~~~
+           247: exposesReturnsTwice: false 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           248: legalized: false 
+check:80'0      ~~~~~~~~~~~~~~~~~
+           249: regBankSelected: false 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           250: selected: false 
+check:80'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           312:  $a16 = PLA16 
+check:80'0      ~~~~~~~~~~~~~~
+           313:  STAbs16 killed $a16, 4867 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           314:  SEP_Immediate 32 
+check:80'0      ~~~~~~~~~~~~~~~~~~
+           315:  $a = LDImm 123 
+check:80'0      ~~~~~~~~~~~~~~~~
+           316:  SEP_Immediate 16 
+check:80'0      ~~~~~~~~~~~~~~~~~~
+           317:  RTS implicit $a 
+check:80'0      ~~~~~~~~~~~~~~~~~
+check:80'1       ?                possible intended match
+           318: ... 
+check:80'0      ~~~~
+           319: --- 
+check:80'0      ~~~~
+           320: name: stack_live_nz 
+check:80'0      ~~~~~~~~~~~~~~~~~~~
+check:107'0                        X error: no match found
+           321: alignment: 1 
+check:107'0     ~~~~~~~~~~~~~
+           322: exposesReturnsTwice: false 
+check:107'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           323: legalized: false 
+check:107'0     ~~~~~~~~~~~~~~~~~
+           324: regBankSelected: false 
+check:107'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           325: selected: false 
+check:107'0     ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           391:  BRA %bb.2 
+check:107'0     ~~~~~~~~~~~
+           392:   
+check:107'0     ~~
+           393:  bb.1: 
+check:107'0     ~~~~~~~
+           394:  SEP_Immediate 48 
+check:107'0     ~~~~~~~~~~~~~~~~~~
+           395:  $a = LDImm 123 
+check:107'0     ~~~~~~~~~~~~~~~~
+           396:  RTS implicit $a 
+check:107'0     ~~~~~~~~~~~~~~~~~
+check:107'1      ?                possible intended match
+           397:   
+check:107'0     ~~
+           398:  bb.2: 
+check:107'0     ~~~~~~~
+           399:  SEP_Immediate 48 
+check:107'0     ~~~~~~~~~~~~~~~~~~
+           400:  $a = LDImm 0 
+check:107'0     ~~~~~~~~~~~~~~
+           401:  RTS implicit $a 
+check:107'0     ~~~~~~~~~~~~~~~~~
+           402: ... 
+check:107'0     ~~~~
+>>>>>>

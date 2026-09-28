@@ -93,6 +93,13 @@ class ShapeTests(unittest.TestCase):
         source, text = self.changed_access('rd16', lambda line: '\tsep #16\n' + line, mode='xy16')
         self.rejects(source, text, 'rd16: expected', mode='xy16')
 
+    def test_copy_load_uses_byte_index(self):
+        for mode in ['a16', 'xy16']:
+            with self.subTest(mode=mode):
+                source, text = self.changed_access('cp8', lambda line: '\t rep #16\n' + line,
+                                                   mode=mode)
+                self.rejects(source, text, 'cp8: expected', mode=mode)
+
     def test_pressure_pair_must_be_adjacent(self):
         source, text = self.changed_access('sample', lambda line: '\tldx __rc4\n' + line,
                                            mode='xy16', fixture='pressure')
@@ -111,7 +118,7 @@ class ShapeTests(unittest.TestCase):
         source, text, rows = self.cases['main', 'a16']
         lines = text.splitlines()
         lost = rows['rd8'][0]['assembly_line'] - 1
-        substitute = rows['cp8'][0]['assembly_line'] - 1
+        substitute = rows['rd16'][0]['assembly_line'] - 1
         lines[lost] = lines[lost].replace(',y', '')
         extra = lines[substitute] + ',y'
         lines[substitute] = extra + '\n' + extra

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-28",
-  "sourceHash": "0fd8fa3ec687f3da6f4f684aaab006a9e8879d04c904d84e2c23c3d9b23d6e40",
+  "sourceHash": "56db5c9e34e6f6c3e05dc013dc1a5dee78f8d7868cf20712c3776a70994fddcb",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -299,13 +299,13 @@
       "id": "defect:mos-xy16-stale-x-writer-reload",
       "kind": "defect",
       "title": "XY16 width restoration reloads an overwritten X-writer source",
-      "summary": "The pre-gate XY16 compiler returns 0xD3BD for vlastack_sim instead of the host/A16 oracle 0xD77B. MOSInsertREPSEP clones an LDX from $rs1 after an index-width narrowing, although intervening stores have replaced $rs1 ($rc2:$rc3) with the vs_nruns destination pointer. The indexed stream read uses that pointer as its offset and every row count becomes 8. No repair or green candidate is claimed.",
-      "localStatus": "qualified",
+      "summary": "MOSInsertREPSEP now saves the actual 16-bit X value before narrowing and restores it before a full-width reader, without replaying a mutable or arithmetic writer. The unchanged original XY16 -Os LTO input returns 0xD77B on MAME and bsnes-jg at 1200 frames; the preserved baseline returns 0xD3BD on both. Focused MIR, live-flags/hard-stack runtime cases, and the earlier XY16 in-place-memmove gate pass.",
+      "localStatus": "fixed",
       "publicationStatus": "unposted",
       "dependsOn": [
         "platform:321"
       ],
-      "nextStep": "Preserve the 16-bit X value across index narrowing, then validate the original vlastack input red/green and a MIR regression for overwritten writer sources.",
+      "nextStep": "Local X-preservation repair and original-input red/green on both emulators are complete. Prepare and review the change with #321; retain the separate full-suite opt registration failures.",
       "demoUrls": [
         "https://biohack.net/snes/vlastack/"
       ],

@@ -1,0 +1,692 @@
+[
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true,
+    "rom_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "opt": "Os",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "opt": "Oz",
+    "reference": "baseline",
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "opt": "O2",
+    "reference": "all",
+    "object_identical": true
+  }
+]

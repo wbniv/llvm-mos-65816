@@ -1,0 +1,2 @@
+vlastack rows=24 width=64 total_runs=284 runs_min=9 runs_max=15
+vlastack gate_crc = 0xD77B

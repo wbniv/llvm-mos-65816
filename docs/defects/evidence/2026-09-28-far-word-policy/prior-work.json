@@ -1,0 +1,34 @@
+{
+  "disposition": "optimization_policy; no new correctness defect or defect status change",
+  "related_record": "docs/defects/mos-farblit-byte-load-legalization.json",
+  "search_terms": [
+    "rdw",
+    "native-word",
+    "tryFarRuntimeIndexFold",
+    "G_LOAD16_FAR_INDIR_IDX",
+    "legalizeLoadStore16",
+    "0069"
+  ],
+  "sources": [
+    "docs/investigations/2026-09-28-farblit-payoff.md",
+    "docs/investigations/2026-09-28-farblit-range-integration.md",
+    "docs/plans/2026-09-28-farblit-payoff.md",
+    "docs/defects/evidence/2026-09-28-farblit-payoff/prior-work.json",
+    "docs/defects/evidence/2026-09-28-farblit-range-integration/prior-work.json",
+    "TODO.md",
+    "docs/upstream-pending-work.md"
+  ],
+  "patches": [
+    "0002",
+    "0061",
+    "0062",
+    "0066",
+    "0069"
+  ],
+  "source_assessment": "0062 supplies the M16/Y8 word pseudo; 0069 installs the bounded loop proof but retains byte-only entry and all-users guards. The captured live legalizer is byte-identical to the 0069 integration source. 0070 changes the word admission policy and enforces a Y8 bound for mixed word/byte groups. The existing legalization defect and its immutable evidence remain unchanged.",
+  "binary_assessment": "The preserved 0069 candidate supplies baseline Clang/llc/lld. The experimental build copies the live build and bind-mounts the candidate legalizer. Disabled output matches 96 baseline objects and 18 ROMs. The final default build and installed compiler reproduce the explicit speed-policy outputs exactly.",
+  "history": "dfdf05ff66ea2f19c31052306841926b88f67889 Color progress bars and show ROM verification pace\n11c3cb6fe5447b808a57edd2b32149dc80ce7f6a Keep ROM progress in the current terminal\nca0df851f628fc8ff982e82274f563923ee3e61b Keep ROM verification progress fixed and quiet site builds",
+  "vendor_history": "8be0546128a55e78c63ca571d466aa72a782cd36 [MOS] Pass addrspace(1) (8-bit direct-page) pointer arguments in an 8-bit register (#563)",
+  "decision": "Adopt speed-only local policy for O2/O3 with no size/optnone attribute; retain Os/Oz behavior. Independent upstream review and exact-destination validation remain separate work.",
+  "attribution": "OpenAI Codex CLI 0.157.1 (session source: vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+}

@@ -1,5 +1,7 @@
 # `[dp],Y` Phase 2 — increment 2: fold a **range-proven runtime index** into `b7`/`97`
 
+**Later September 28 optimization follow-up:** [0069 is integrated and installed](../investigations/2026-09-28-farblit-range-integration.md); `cp8` uses Y8 in both modes. The current gate passes eight emulator assertions and 16 sensitivity tests. The earlier 15-test results below remain dated evidence. Attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e61c-c24c-7053-aa56-a4a4e43f12ab`.
+
 **Farblit gate update (2026-09-28):** the [per-probe gate](../investigations/2026-09-27-farblit-byte-load.md#completed-gate-update-2026-09-28) passes on preserved and installed compilers, with eight emulator assertions and 15 checker tests per toolchain. The following aggregate-count qualifications are dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
 
 **Farblit resolution (2026-09-27):** [0066 repairs the extending-byte legalization failure](../investigations/2026-09-27-farblit-byte-load.md). The preserved input and direct MIR have matching-input red/green evidence; farblit and its pressure variant pass eight emulator checks. The combined-stack opcode-count gate remains qualified. Earlier status and validation text below is dated evidence. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.

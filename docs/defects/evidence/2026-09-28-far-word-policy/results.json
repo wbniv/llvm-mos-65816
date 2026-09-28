@@ -1,0 +1,5166 @@
+{
+  "rows": [
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1949,
+      "object_sha256": "e3f0109f8cea0b8e26eb2de950556e0b50fc5bb5edcc5bf97a7947534cf47d37",
+      "lto_main_bytes": 1949,
+      "lto_code_bytes": 2070,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.map",
+      "expected": 509013605,
+      "clocks": 308814,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 2085,
+      "object_sha256": "b8cc4185f72105c515ad570319b8ee533d18cf6a7b1dedfc6d8e2b81a60f4618",
+      "lto_main_bytes": 2085,
+      "lto_code_bytes": 2206,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.map",
+      "expected": 509013605,
+      "clocks": 355972,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3279,
+      "object_sha256": "6b8d67aad0aee51ae4c11241e88d825197bf4e50596df1f948be8dee0c3331fb",
+      "lto_main_bytes": 3279,
+      "lto_code_bytes": 3400,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.map",
+      "expected": 509013605,
+      "clocks": 311266,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1921,
+      "object_sha256": "a5b12cfffa38b90c4dd67d1e3f2952cb8b7de9f0292232391d30c46c5b074b11",
+      "lto_main_bytes": 1921,
+      "lto_code_bytes": 2042,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.map",
+      "expected": 509013605,
+      "clocks": 284774,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1942,
+      "object_sha256": "3837f650793fad06ac96ffc78580bebdfd10e1cf290426b14b8002ee2d3d66bf",
+      "lto_main_bytes": 1942,
+      "lto_code_bytes": 2063,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.map",
+      "expected": 509013605,
+      "clocks": 311650,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3235,
+      "object_sha256": "051c95c00112c170393f48608f4da28aeab7c9b4e2edd53cfb8180e0d2e5bf92",
+      "lto_main_bytes": 3235,
+      "lto_code_bytes": 3356,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.map",
+      "expected": 509013605,
+      "clocks": 292108,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1056,
+      "object_sha256": "8b1038174d8a2597aff442438b1f737eae5f3718c3d75a7a7ef8c68ef2053dd7",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1084,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.map",
+      "expected": 54933,
+      "clocks": 1256,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1059,
+      "object_sha256": "ba5674f9848d36743b1516955c76fe92033965023c49508ee579604429750288",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1087,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1061,
+      "object_sha256": "32480d98c2c9a47a94c677b3b715c5c2ab295b3755c0384473e1f931f3f13df8",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1089,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 991,
+      "object_sha256": "2d4058ea8756ef7112739a9dfbbed06c042a893c239bffbb23a3bba65955b233",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1023,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 994,
+      "object_sha256": "6016f651a3749405f86e27ec0af9cd42f77d5bc8daf77a9d76ef48a7ce93462a",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1026,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 996,
+      "object_sha256": "2a280948bedff04fd109df8d6c0ca4813e2ae780461898ef909a90bba498e855",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1028,
+      "rom": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3416,
+      "object_sha256": "c3e988707bcf0ffefdc9b556f953742c49c6569b280efc82abb04b2326042c29",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3424,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786428,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3268,
+      "object_sha256": "60688b353dd63bd165ec2b8fe60dd92feebf2550fab21e350066c8871e8cceaf",
+      "lto_main_bytes": 1083,
+      "lto_code_bytes": 3190,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 463830,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4515,
+      "object_sha256": "2ab18d2bea4d698dd9b5e639e879786e3454dc15b6a2512e15f4362346cf86db",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4523,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786468,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3364,
+      "object_sha256": "d0bb8d66358a573caa39adfd2ded885f27e34a82cd915b37452cb5a2b82be439",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3372,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3175,
+      "object_sha256": "8a794eb5f487e6ca0c41414de4253fcca87209086b1444618a98a666c03d78ed",
+      "lto_main_bytes": 1068,
+      "lto_code_bytes": 3097,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 313462,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4489,
+      "object_sha256": "74bdb83d26ab9ff66fb473d525ea0eef38ff1da952c20ff66afa5d52519c17a5",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4497,
+      "rom": ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786508,
+      "pass": true
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 243,
+      "object_sha256": "ccb7b1471f56a402744fe0b010144757222b615e947d970113d8f9a9eed1fb36"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 202,
+      "object_sha256": "4a5d12f9b75818d3d079c803c49ef0b9f795c4fdb1d8cfe770c4f1cc22c416ef"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 257,
+      "object_sha256": "05d3764506ffcec25430ff0023bc0fc7687fb1c8d8b97bf7fefc5152be1f195d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 226,
+      "object_sha256": "6d60cc699e49014df52cad466a1ffa358e3ae929c961166c342981f4bd02ed3d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 168,
+      "object_sha256": "12a083a67a21853221c636a6280e37e4c09d663c125bb6c6b848be3c13eb44d4"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 240,
+      "object_sha256": "27dc327f3c7dc9c2f094b192ba87502d698d34b43e1e39b2fbf30ccfbe7303d6"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 776,
+      "object_sha256": "d0a47d5dabf98fe6c7436586324970f4a90c36fb893f9ac9d81b6d0fa3c063b7"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 767,
+      "object_sha256": "97992c790d579a65dc9e6309e001ab9d94ac8364852e14b4adf56dacfef5e69a"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 757,
+      "object_sha256": "d4023bc96b0a0b3894d3ca8e991f592232123689d47959424f9a704b19148b5f"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 748,
+      "object_sha256": "1e6f06b8861e94f273ac6b13a92d3353c28c3fcf82d80db4647c9c2923073fe7"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1644,
+      "object_sha256": "0bd528b3df537d982399ecee1ffdb18dd7a63186cb9dcc5a646db19e8965448e"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1572,
+      "object_sha256": "eedb497a0a79f234e8d78205bbfddeb65a72ad3b807aab91746d5f98c27d12fe"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1652,
+      "object_sha256": "bdc0c9a8551d335c5af5689d59797b33bec5a173047b8a577644ed10eed1b236"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1582,
+      "object_sha256": "0b0dbe669f7d16df8dedb79a09a8d53b740a21dfbd68b743a6e7ba51e2b56384"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1510,
+      "object_sha256": "593f27a99cc9fe6f8ee2cc33ab988b6eb9f3a98a1fd82d46f1ada6e0161ceb6c"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1590,
+      "object_sha256": "73fed0031ec044f74ecceea6be5ada742f1b17fb5f8b7b4d49185f4e7d96f80a"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 958,
+      "object_sha256": "6b87ed86d7bb233bc93cb4edbf2c416d17a2097124a55e18c64c5dbb97a81741"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 961,
+      "object_sha256": "63700eb253e61fa2eea0fbe71c6ab2eb69f15ba774a656ad581434eedbaed151"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 969,
+      "object_sha256": "51b15b48c75a42daeaacdc0cd2ba59000cd1a86b68cd2ee5b1ced7ed898385db"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 901,
+      "object_sha256": "759c1c21702088937c5aa781d96f2b8abe0f6721e373aa1a2dd69f18aa83a1a3"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 904,
+      "object_sha256": "c98ac5ad38162caca0653e885711844171f134511d119dbc37bcbfc3ab12fdf6"
+    },
+    {
+      "variant": "baseline",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 915,
+      "object_sha256": "b00d397934847589c4a66fc2cca38aa76236f3a8a13f1e1ea2e376474a4f58ec"
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 2011,
+      "object_sha256": "58c4cc171988fbcb7b33f1f3edc95b197c1c054bb51e6c2e6c6c1885de60911c",
+      "lto_main_bytes": 2011,
+      "lto_code_bytes": 2132,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-a16-Os.map",
+      "expected": 509013605,
+      "clocks": 289658,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 2085,
+      "object_sha256": "b8cc4185f72105c515ad570319b8ee533d18cf6a7b1dedfc6d8e2b81a60f4618",
+      "lto_main_bytes": 2085,
+      "lto_code_bytes": 2206,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-a16-Oz.map",
+      "expected": 509013605,
+      "clocks": 355972,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3266,
+      "object_sha256": "21115a48bbaa22d0cedb522c0efc823333cdfa23fe65e8a604f92fb7dfa5439b",
+      "lto_main_bytes": 3266,
+      "lto_code_bytes": 3387,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-a16-O2.map",
+      "expected": 509013605,
+      "clocks": 289102,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1893,
+      "object_sha256": "ec37a08fc377dee36fa3e369349ca5a572ea49ca05bc1de966f1ea09d1791750",
+      "lto_main_bytes": 1893,
+      "lto_code_bytes": 2014,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-xy16-Os.map",
+      "expected": 509013605,
+      "clocks": 262336,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1942,
+      "object_sha256": "3837f650793fad06ac96ffc78580bebdfd10e1cf290426b14b8002ee2d3d66bf",
+      "lto_main_bytes": 1942,
+      "lto_code_bytes": 2063,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-xy16-Oz.map",
+      "expected": 509013605,
+      "clocks": 311650,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3197,
+      "object_sha256": "47fa5141ede6a6e697d05d2951eaddde35c7725b9c4334b21993ec2d7800e4ed",
+      "lto_main_bytes": 3197,
+      "lto_code_bytes": 3318,
+      "rom": ".scratch/far-word-policy/runs/all-farblit-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit-xy16-O2.map",
+      "expected": 509013605,
+      "clocks": 269494,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1056,
+      "object_sha256": "8b1038174d8a2597aff442438b1f737eae5f3718c3d75a7a7ef8c68ef2053dd7",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1084,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-a16-Os.map",
+      "expected": 54933,
+      "clocks": 1256,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1059,
+      "object_sha256": "ba5674f9848d36743b1516955c76fe92033965023c49508ee579604429750288",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1087,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-a16-Oz.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1061,
+      "object_sha256": "32480d98c2c9a47a94c677b3b715c5c2ab295b3755c0384473e1f931f3f13df8",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1089,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-a16-O2.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 991,
+      "object_sha256": "2d4058ea8756ef7112739a9dfbbed06c042a893c239bffbb23a3bba65955b233",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1023,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-xy16-Os.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 994,
+      "object_sha256": "6016f651a3749405f86e27ec0af9cd42f77d5bc8daf77a9d76ef48a7ce93462a",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1026,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-xy16-Oz.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 996,
+      "object_sha256": "2a280948bedff04fd109df8d6c0ca4813e2ae780461898ef909a90bba498e855",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1028,
+      "rom": ".scratch/far-word-policy/runs/all-farblit_press-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-farblit_press-xy16-O2.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3378,
+      "object_sha256": "3c995fefc8509fd7437aff5c935e5d7038f8490dd8b78d66425f01f4b7cd2516",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3387,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-a16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786428,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3268,
+      "object_sha256": "60688b353dd63bd165ec2b8fe60dd92feebf2550fab21e350066c8871e8cceaf",
+      "lto_main_bytes": 1083,
+      "lto_code_bytes": 3190,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-a16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 463830,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4477,
+      "object_sha256": "7f6d3d09a84120cf329c1ee38292f4c6e310905696db7b356a1804454ad85d72",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4486,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-a16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3326,
+      "object_sha256": "c872b864029dcae46cad48915e41521e07099bf26f7362f3ac82bbbb1c8de212",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3335,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-xy16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786468,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3175,
+      "object_sha256": "8a794eb5f487e6ca0c41414de4253fcca87209086b1444618a98a666c03d78ed",
+      "lto_main_bytes": 1068,
+      "lto_code_bytes": 3097,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-xy16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 313462,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4451,
+      "object_sha256": "8d68458b48035b49e86d83f1636b17fb34cfc7f5a2ed13c17b1424bbbc33c52f",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4460,
+      "rom": ".scratch/far-word-policy/runs/all-bounds-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/all-bounds-xy16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786388,
+      "pass": true
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "all",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 243,
+      "object_sha256": "ccb7b1471f56a402744fe0b010144757222b615e947d970113d8f9a9eed1fb36"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 202,
+      "object_sha256": "4a5d12f9b75818d3d079c803c49ef0b9f795c4fdb1d8cfe770c4f1cc22c416ef"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 257,
+      "object_sha256": "05d3764506ffcec25430ff0023bc0fc7687fb1c8d8b97bf7fefc5152be1f195d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 226,
+      "object_sha256": "6d60cc699e49014df52cad466a1ffa358e3ae929c961166c342981f4bd02ed3d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 168,
+      "object_sha256": "12a083a67a21853221c636a6280e37e4c09d663c125bb6c6b848be3c13eb44d4"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 240,
+      "object_sha256": "27dc327f3c7dc9c2f094b192ba87502d698d34b43e1e39b2fbf30ccfbe7303d6"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 776,
+      "object_sha256": "d0a47d5dabf98fe6c7436586324970f4a90c36fb893f9ac9d81b6d0fa3c063b7"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 767,
+      "object_sha256": "97992c790d579a65dc9e6309e001ab9d94ac8364852e14b4adf56dacfef5e69a"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 757,
+      "object_sha256": "d4023bc96b0a0b3894d3ca8e991f592232123689d47959424f9a704b19148b5f"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 748,
+      "object_sha256": "1e6f06b8861e94f273ac6b13a92d3353c28c3fcf82d80db4647c9c2923073fe7"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1644,
+      "object_sha256": "0bd528b3df537d982399ecee1ffdb18dd7a63186cb9dcc5a646db19e8965448e"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1572,
+      "object_sha256": "eedb497a0a79f234e8d78205bbfddeb65a72ad3b807aab91746d5f98c27d12fe"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1652,
+      "object_sha256": "bdc0c9a8551d335c5af5689d59797b33bec5a173047b8a577644ed10eed1b236"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1582,
+      "object_sha256": "0b0dbe669f7d16df8dedb79a09a8d53b740a21dfbd68b743a6e7ba51e2b56384"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1510,
+      "object_sha256": "593f27a99cc9fe6f8ee2cc33ab988b6eb9f3a98a1fd82d46f1ada6e0161ceb6c"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1590,
+      "object_sha256": "73fed0031ec044f74ecceea6be5ada742f1b17fb5f8b7b4d49185f4e7d96f80a"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 958,
+      "object_sha256": "6b87ed86d7bb233bc93cb4edbf2c416d17a2097124a55e18c64c5dbb97a81741"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 961,
+      "object_sha256": "63700eb253e61fa2eea0fbe71c6ab2eb69f15ba774a656ad581434eedbaed151"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 969,
+      "object_sha256": "51b15b48c75a42daeaacdc0cd2ba59000cd1a86b68cd2ee5b1ced7ed898385db"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 901,
+      "object_sha256": "759c1c21702088937c5aa781d96f2b8abe0f6721e373aa1a2dd69f18aa83a1a3"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 904,
+      "object_sha256": "c98ac5ad38162caca0653e885711844171f134511d119dbc37bcbfc3ab12fdf6"
+    },
+    {
+      "variant": "all",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 915,
+      "object_sha256": "b00d397934847589c4a66fc2cca38aa76236f3a8a13f1e1ea2e376474a4f58ec"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1949,
+      "object_sha256": "e3f0109f8cea0b8e26eb2de950556e0b50fc5bb5edcc5bf97a7947534cf47d37",
+      "lto_main_bytes": 1949,
+      "lto_code_bytes": 2070,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-a16-Os.map",
+      "expected": 509013605,
+      "clocks": 308814,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 2085,
+      "object_sha256": "b8cc4185f72105c515ad570319b8ee533d18cf6a7b1dedfc6d8e2b81a60f4618",
+      "lto_main_bytes": 2085,
+      "lto_code_bytes": 2206,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-a16-Oz.map",
+      "expected": 509013605,
+      "clocks": 355972,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3266,
+      "object_sha256": "21115a48bbaa22d0cedb522c0efc823333cdfa23fe65e8a604f92fb7dfa5439b",
+      "lto_main_bytes": 3266,
+      "lto_code_bytes": 3387,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-a16-O2.map",
+      "expected": 509013605,
+      "clocks": 289102,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1921,
+      "object_sha256": "a5b12cfffa38b90c4dd67d1e3f2952cb8b7de9f0292232391d30c46c5b074b11",
+      "lto_main_bytes": 1921,
+      "lto_code_bytes": 2042,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-xy16-Os.map",
+      "expected": 509013605,
+      "clocks": 284774,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1942,
+      "object_sha256": "3837f650793fad06ac96ffc78580bebdfd10e1cf290426b14b8002ee2d3d66bf",
+      "lto_main_bytes": 1942,
+      "lto_code_bytes": 2063,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-xy16-Oz.map",
+      "expected": 509013605,
+      "clocks": 311650,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3197,
+      "object_sha256": "47fa5141ede6a6e697d05d2951eaddde35c7725b9c4334b21993ec2d7800e4ed",
+      "lto_main_bytes": 3197,
+      "lto_code_bytes": 3318,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit-xy16-O2.map",
+      "expected": 509013605,
+      "clocks": 269494,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1056,
+      "object_sha256": "8b1038174d8a2597aff442438b1f737eae5f3718c3d75a7a7ef8c68ef2053dd7",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1084,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-a16-Os.map",
+      "expected": 54933,
+      "clocks": 1256,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1059,
+      "object_sha256": "ba5674f9848d36743b1516955c76fe92033965023c49508ee579604429750288",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1087,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-a16-Oz.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1061,
+      "object_sha256": "32480d98c2c9a47a94c677b3b715c5c2ab295b3755c0384473e1f931f3f13df8",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1089,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-a16-O2.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 991,
+      "object_sha256": "2d4058ea8756ef7112739a9dfbbed06c042a893c239bffbb23a3bba65955b233",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1023,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-Os.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 994,
+      "object_sha256": "6016f651a3749405f86e27ec0af9cd42f77d5bc8daf77a9d76ef48a7ce93462a",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1026,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-Oz.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 996,
+      "object_sha256": "2a280948bedff04fd109df8d6c0ca4813e2ae780461898ef909a90bba498e855",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1028,
+      "rom": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-farblit_press-xy16-O2.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3416,
+      "object_sha256": "c3e988707bcf0ffefdc9b556f953742c49c6569b280efc82abb04b2326042c29",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3424,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-a16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786428,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3268,
+      "object_sha256": "60688b353dd63bd165ec2b8fe60dd92feebf2550fab21e350066c8871e8cceaf",
+      "lto_main_bytes": 1083,
+      "lto_code_bytes": 3190,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-a16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 463830,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4477,
+      "object_sha256": "7f6d3d09a84120cf329c1ee38292f4c6e310905696db7b356a1804454ad85d72",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4486,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-a16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3364,
+      "object_sha256": "d0bb8d66358a573caa39adfd2ded885f27e34a82cd915b37452cb5a2b82be439",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3372,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-xy16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3175,
+      "object_sha256": "8a794eb5f487e6ca0c41414de4253fcca87209086b1444618a98a666c03d78ed",
+      "lto_main_bytes": 1068,
+      "lto_code_bytes": 3097,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-xy16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 313462,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4451,
+      "object_sha256": "8d68458b48035b49e86d83f1636b17fb34cfc7f5a2ed13c17b1424bbbc33c52f",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4460,
+      "rom": ".scratch/far-word-policy/runs/speed-bounds-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/speed-bounds-xy16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786388,
+      "pass": true
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "speed",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 243,
+      "object_sha256": "ccb7b1471f56a402744fe0b010144757222b615e947d970113d8f9a9eed1fb36"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 202,
+      "object_sha256": "4a5d12f9b75818d3d079c803c49ef0b9f795c4fdb1d8cfe770c4f1cc22c416ef"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 257,
+      "object_sha256": "05d3764506ffcec25430ff0023bc0fc7687fb1c8d8b97bf7fefc5152be1f195d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 226,
+      "object_sha256": "6d60cc699e49014df52cad466a1ffa358e3ae929c961166c342981f4bd02ed3d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 168,
+      "object_sha256": "12a083a67a21853221c636a6280e37e4c09d663c125bb6c6b848be3c13eb44d4"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 240,
+      "object_sha256": "27dc327f3c7dc9c2f094b192ba87502d698d34b43e1e39b2fbf30ccfbe7303d6"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 776,
+      "object_sha256": "d0a47d5dabf98fe6c7436586324970f4a90c36fb893f9ac9d81b6d0fa3c063b7"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 767,
+      "object_sha256": "97992c790d579a65dc9e6309e001ab9d94ac8364852e14b4adf56dacfef5e69a"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 757,
+      "object_sha256": "d4023bc96b0a0b3894d3ca8e991f592232123689d47959424f9a704b19148b5f"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 748,
+      "object_sha256": "1e6f06b8861e94f273ac6b13a92d3353c28c3fcf82d80db4647c9c2923073fe7"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1644,
+      "object_sha256": "0bd528b3df537d982399ecee1ffdb18dd7a63186cb9dcc5a646db19e8965448e"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1572,
+      "object_sha256": "eedb497a0a79f234e8d78205bbfddeb65a72ad3b807aab91746d5f98c27d12fe"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1652,
+      "object_sha256": "bdc0c9a8551d335c5af5689d59797b33bec5a173047b8a577644ed10eed1b236"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1582,
+      "object_sha256": "0b0dbe669f7d16df8dedb79a09a8d53b740a21dfbd68b743a6e7ba51e2b56384"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1510,
+      "object_sha256": "593f27a99cc9fe6f8ee2cc33ab988b6eb9f3a98a1fd82d46f1ada6e0161ceb6c"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1590,
+      "object_sha256": "73fed0031ec044f74ecceea6be5ada742f1b17fb5f8b7b4d49185f4e7d96f80a"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 958,
+      "object_sha256": "6b87ed86d7bb233bc93cb4edbf2c416d17a2097124a55e18c64c5dbb97a81741"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 961,
+      "object_sha256": "63700eb253e61fa2eea0fbe71c6ab2eb69f15ba774a656ad581434eedbaed151"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 969,
+      "object_sha256": "51b15b48c75a42daeaacdc0cd2ba59000cd1a86b68cd2ee5b1ced7ed898385db"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 901,
+      "object_sha256": "759c1c21702088937c5aa781d96f2b8abe0f6721e373aa1a2dd69f18aa83a1a3"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 904,
+      "object_sha256": "c98ac5ad38162caca0653e885711844171f134511d119dbc37bcbfc3ab12fdf6"
+    },
+    {
+      "variant": "speed",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 915,
+      "object_sha256": "b00d397934847589c4a66fc2cca38aa76236f3a8a13f1e1ea2e376474a4f58ec"
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1949,
+      "object_sha256": "e3f0109f8cea0b8e26eb2de950556e0b50fc5bb5edcc5bf97a7947534cf47d37",
+      "lto_main_bytes": 1949,
+      "lto_code_bytes": 2070,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-a16-Os.map",
+      "expected": 509013605,
+      "clocks": 308814,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 2085,
+      "object_sha256": "b8cc4185f72105c515ad570319b8ee533d18cf6a7b1dedfc6d8e2b81a60f4618",
+      "lto_main_bytes": 2085,
+      "lto_code_bytes": 2206,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-a16-Oz.map",
+      "expected": 509013605,
+      "clocks": 355972,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3279,
+      "object_sha256": "6b8d67aad0aee51ae4c11241e88d825197bf4e50596df1f948be8dee0c3331fb",
+      "lto_main_bytes": 3279,
+      "lto_code_bytes": 3400,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-a16-O2.map",
+      "expected": 509013605,
+      "clocks": 311266,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1921,
+      "object_sha256": "a5b12cfffa38b90c4dd67d1e3f2952cb8b7de9f0292232391d30c46c5b074b11",
+      "lto_main_bytes": 1921,
+      "lto_code_bytes": 2042,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-xy16-Os.map",
+      "expected": 509013605,
+      "clocks": 284774,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1942,
+      "object_sha256": "3837f650793fad06ac96ffc78580bebdfd10e1cf290426b14b8002ee2d3d66bf",
+      "lto_main_bytes": 1942,
+      "lto_code_bytes": 2063,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-xy16-Oz.map",
+      "expected": 509013605,
+      "clocks": 311650,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3235,
+      "object_sha256": "051c95c00112c170393f48608f4da28aeab7c9b4e2edd53cfb8180e0d2e5bf92",
+      "lto_main_bytes": 3235,
+      "lto_code_bytes": 3356,
+      "rom": ".scratch/far-word-policy/runs/off-farblit-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit-xy16-O2.map",
+      "expected": 509013605,
+      "clocks": 292108,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1056,
+      "object_sha256": "8b1038174d8a2597aff442438b1f737eae5f3718c3d75a7a7ef8c68ef2053dd7",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1084,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-a16-Os.map",
+      "expected": 54933,
+      "clocks": 1256,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1059,
+      "object_sha256": "ba5674f9848d36743b1516955c76fe92033965023c49508ee579604429750288",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1087,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-a16-Oz.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1061,
+      "object_sha256": "32480d98c2c9a47a94c677b3b715c5c2ab295b3755c0384473e1f931f3f13df8",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1089,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-a16-O2.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 991,
+      "object_sha256": "2d4058ea8756ef7112739a9dfbbed06c042a893c239bffbb23a3bba65955b233",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1023,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-xy16-Os.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 994,
+      "object_sha256": "6016f651a3749405f86e27ec0af9cd42f77d5bc8daf77a9d76ef48a7ce93462a",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1026,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-xy16-Oz.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 996,
+      "object_sha256": "2a280948bedff04fd109df8d6c0ca4813e2ae780461898ef909a90bba498e855",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1028,
+      "rom": ".scratch/far-word-policy/runs/off-farblit_press-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-farblit_press-xy16-O2.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3416,
+      "object_sha256": "c3e988707bcf0ffefdc9b556f953742c49c6569b280efc82abb04b2326042c29",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3424,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-a16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786428,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3268,
+      "object_sha256": "60688b353dd63bd165ec2b8fe60dd92feebf2550fab21e350066c8871e8cceaf",
+      "lto_main_bytes": 1083,
+      "lto_code_bytes": 3190,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-a16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 463830,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4515,
+      "object_sha256": "2ab18d2bea4d698dd9b5e639e879786e3454dc15b6a2512e15f4362346cf86db",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4523,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-a16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786468,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3364,
+      "object_sha256": "d0bb8d66358a573caa39adfd2ded885f27e34a82cd915b37452cb5a2b82be439",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3372,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-xy16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3175,
+      "object_sha256": "8a794eb5f487e6ca0c41414de4253fcca87209086b1444618a98a666c03d78ed",
+      "lto_main_bytes": 1068,
+      "lto_code_bytes": 3097,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-xy16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 313462,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4489,
+      "object_sha256": "74bdb83d26ab9ff66fb473d525ea0eef38ff1da952c20ff66afa5d52519c17a5",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4497,
+      "rom": ".scratch/far-word-policy/runs/off-bounds-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/off-bounds-xy16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786508,
+      "pass": true
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "off",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 243,
+      "object_sha256": "ccb7b1471f56a402744fe0b010144757222b615e947d970113d8f9a9eed1fb36"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 202,
+      "object_sha256": "4a5d12f9b75818d3d079c803c49ef0b9f795c4fdb1d8cfe770c4f1cc22c416ef"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 257,
+      "object_sha256": "05d3764506ffcec25430ff0023bc0fc7687fb1c8d8b97bf7fefc5152be1f195d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 226,
+      "object_sha256": "6d60cc699e49014df52cad466a1ffa358e3ae929c961166c342981f4bd02ed3d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 168,
+      "object_sha256": "12a083a67a21853221c636a6280e37e4c09d663c125bb6c6b848be3c13eb44d4"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 240,
+      "object_sha256": "27dc327f3c7dc9c2f094b192ba87502d698d34b43e1e39b2fbf30ccfbe7303d6"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 776,
+      "object_sha256": "d0a47d5dabf98fe6c7436586324970f4a90c36fb893f9ac9d81b6d0fa3c063b7"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 767,
+      "object_sha256": "97992c790d579a65dc9e6309e001ab9d94ac8364852e14b4adf56dacfef5e69a"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 757,
+      "object_sha256": "d4023bc96b0a0b3894d3ca8e991f592232123689d47959424f9a704b19148b5f"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 748,
+      "object_sha256": "1e6f06b8861e94f273ac6b13a92d3353c28c3fcf82d80db4647c9c2923073fe7"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1644,
+      "object_sha256": "0bd528b3df537d982399ecee1ffdb18dd7a63186cb9dcc5a646db19e8965448e"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1572,
+      "object_sha256": "eedb497a0a79f234e8d78205bbfddeb65a72ad3b807aab91746d5f98c27d12fe"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1652,
+      "object_sha256": "bdc0c9a8551d335c5af5689d59797b33bec5a173047b8a577644ed10eed1b236"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1582,
+      "object_sha256": "0b0dbe669f7d16df8dedb79a09a8d53b740a21dfbd68b743a6e7ba51e2b56384"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1510,
+      "object_sha256": "593f27a99cc9fe6f8ee2cc33ab988b6eb9f3a98a1fd82d46f1ada6e0161ceb6c"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1590,
+      "object_sha256": "73fed0031ec044f74ecceea6be5ada742f1b17fb5f8b7b4d49185f4e7d96f80a"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 958,
+      "object_sha256": "6b87ed86d7bb233bc93cb4edbf2c416d17a2097124a55e18c64c5dbb97a81741"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 961,
+      "object_sha256": "63700eb253e61fa2eea0fbe71c6ab2eb69f15ba774a656ad581434eedbaed151"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 969,
+      "object_sha256": "51b15b48c75a42daeaacdc0cd2ba59000cd1a86b68cd2ee5b1ced7ed898385db"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 901,
+      "object_sha256": "759c1c21702088937c5aa781d96f2b8abe0f6721e373aa1a2dd69f18aa83a1a3"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 904,
+      "object_sha256": "c98ac5ad38162caca0653e885711844171f134511d119dbc37bcbfc3ab12fdf6"
+    },
+    {
+      "variant": "off",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 915,
+      "object_sha256": "b00d397934847589c4a66fc2cca38aa76236f3a8a13f1e1ea2e376474a4f58ec"
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1949,
+      "object_sha256": "e3f0109f8cea0b8e26eb2de950556e0b50fc5bb5edcc5bf97a7947534cf47d37",
+      "lto_main_bytes": 1949,
+      "lto_code_bytes": 2070,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-a16-Os.map",
+      "expected": 509013605,
+      "clocks": 308814,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 2085,
+      "object_sha256": "b8cc4185f72105c515ad570319b8ee533d18cf6a7b1dedfc6d8e2b81a60f4618",
+      "lto_main_bytes": 2085,
+      "lto_code_bytes": 2206,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-a16-Oz.map",
+      "expected": 509013605,
+      "clocks": 355972,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3266,
+      "object_sha256": "21115a48bbaa22d0cedb522c0efc823333cdfa23fe65e8a604f92fb7dfa5439b",
+      "lto_main_bytes": 3266,
+      "lto_code_bytes": 3387,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-a16-O2.map",
+      "expected": 509013605,
+      "clocks": 289102,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1921,
+      "object_sha256": "a5b12cfffa38b90c4dd67d1e3f2952cb8b7de9f0292232391d30c46c5b074b11",
+      "lto_main_bytes": 1921,
+      "lto_code_bytes": 2042,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-xy16-Os.map",
+      "expected": 509013605,
+      "clocks": 284774,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1942,
+      "object_sha256": "3837f650793fad06ac96ffc78580bebdfd10e1cf290426b14b8002ee2d3d66bf",
+      "lto_main_bytes": 1942,
+      "lto_code_bytes": 2063,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-xy16-Oz.map",
+      "expected": 509013605,
+      "clocks": 311650,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 3197,
+      "object_sha256": "47fa5141ede6a6e697d05d2951eaddde35c7725b9c4334b21993ec2d7800e4ed",
+      "lto_main_bytes": 3197,
+      "lto_code_bytes": 3318,
+      "rom": ".scratch/far-word-policy/runs/default-farblit-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit-xy16-O2.map",
+      "expected": 509013605,
+      "clocks": 269494,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1056,
+      "object_sha256": "8b1038174d8a2597aff442438b1f737eae5f3718c3d75a7a7ef8c68ef2053dd7",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1084,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-a16-Os.map",
+      "expected": 54933,
+      "clocks": 1256,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1059,
+      "object_sha256": "ba5674f9848d36743b1516955c76fe92033965023c49508ee579604429750288",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1087,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-a16-Oz.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1061,
+      "object_sha256": "32480d98c2c9a47a94c677b3b715c5c2ab295b3755c0384473e1f931f3f13df8",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1089,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-a16-O2.map",
+      "expected": 54933,
+      "clocks": 1216,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 991,
+      "object_sha256": "2d4058ea8756ef7112739a9dfbbed06c042a893c239bffbb23a3bba65955b233",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1023,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-xy16-Os.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 994,
+      "object_sha256": "6016f651a3749405f86e27ec0af9cd42f77d5bc8daf77a9d76ef48a7ce93462a",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1026,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-xy16-Oz.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farblit_press",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 996,
+      "object_sha256": "2a280948bedff04fd109df8d6c0ca4813e2ae780461898ef909a90bba498e855",
+      "lto_main_bytes": 99,
+      "lto_code_bytes": 1028,
+      "rom": ".scratch/far-word-policy/runs/default-farblit_press-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-farblit_press-xy16-O2.map",
+      "expected": 54933,
+      "clocks": 1176,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3416,
+      "object_sha256": "c3e988707bcf0ffefdc9b556f953742c49c6569b280efc82abb04b2326042c29",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3424,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-a16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-a16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786428,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3268,
+      "object_sha256": "60688b353dd63bd165ec2b8fe60dd92feebf2550fab21e350066c8871e8cceaf",
+      "lto_main_bytes": 1083,
+      "lto_code_bytes": 3190,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-a16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-a16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 463830,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4477,
+      "object_sha256": "7f6d3d09a84120cf329c1ee38292f4c6e310905696db7b356a1804454ad85d72",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4486,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-a16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-a16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 3364,
+      "object_sha256": "d0bb8d66358a573caa39adfd2ded885f27e34a82cd915b37452cb5a2b82be439",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 3372,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-xy16-Os.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-xy16-Os.map",
+      "expected": 3374804766,
+      "clocks": 2786348,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 3175,
+      "object_sha256": "8a794eb5f487e6ca0c41414de4253fcca87209086b1444618a98a666c03d78ed",
+      "lto_main_bytes": 1068,
+      "lto_code_bytes": 3097,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-xy16-Oz.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-xy16-Oz.map",
+      "expected": 3374804766,
+      "clocks": 313462,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "bounds",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 4451,
+      "object_sha256": "8d68458b48035b49e86d83f1636b17fb34cfc7f5a2ed13c17b1424bbbc33c52f",
+      "lto_main_bytes": 1452,
+      "lto_code_bytes": 4460,
+      "rom": ".scratch/far-word-policy/runs/default-bounds-xy16-O2.sfc",
+      "map": ".scratch/far-word-policy/runs/default-bounds-xy16-O2.map",
+      "expected": 3374804766,
+      "clocks": 2786388,
+      "pass": true
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farindex",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 287,
+      "object_sha256": "5b8fe8069b1d6495fef4324f96d431bee94e943f6ce3058cefb1925bba5afc64"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 175,
+      "object_sha256": "d77f7ccd7a77dc96997387aae079be30695d3475f4e3000bcbeb3aba064d95b1"
+    },
+    {
+      "variant": "default",
+      "fixture": "farbank",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 212,
+      "object_sha256": "c6433605af12fe8d3d88a891aed47db18c292b73d7263d7e03d04e1278c898ac"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 193,
+      "object_sha256": "17d040d40d06679fb8284452b0264ee29b00e14df75ad76f54a0a7bad14dec11"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_loop",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 214,
+      "object_sha256": "d7c43e3460a1aff217ae4282df65d140ec7d3e2a97e8b043a6a54c2b2a93ed19"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_indir",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 48,
+      "object_sha256": "b0a35a38516351c49ba63b002961b264904aa37d430fe1b97b7e84855434603d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_store",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 50,
+      "object_sha256": "47e3fa82857b1e03988aa1882726a865c71cc4415baf4f852c625c97b7d04788"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 99,
+      "object_sha256": "4e166ca5d5e71a6597d196f5df2a93036a2906438e65bdee11e9edce860edca5"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memset",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 78,
+      "object_sha256": "78366f1609dd1632cbf6e354e13bcf70ea3b947d40e3a1e1caabda4277cdb962"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 243,
+      "object_sha256": "ccb7b1471f56a402744fe0b010144757222b615e947d970113d8f9a9eed1fb36"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 202,
+      "object_sha256": "4a5d12f9b75818d3d079c803c49ef0b9f795c4fdb1d8cfe770c4f1cc22c416ef"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 257,
+      "object_sha256": "05d3764506ffcec25430ff0023bc0fc7687fb1c8d8b97bf7fefc5152be1f195d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 226,
+      "object_sha256": "6d60cc699e49014df52cad466a1ffa358e3ae929c961166c342981f4bd02ed3d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 168,
+      "object_sha256": "12a083a67a21853221c636a6280e37e4c09d663c125bb6c6b848be3c13eb44d4"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_memops",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 240,
+      "object_sha256": "27dc327f3c7dc9c2f094b192ba87502d698d34b43e1e39b2fbf30ccfbe7303d6"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_cast",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 40,
+      "object_sha256": "a0277e2a2b2eaadbf6dffef722f7fb9eab82263db51534ed80ec8537cd7c0514"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "far_arith",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 42,
+      "object_sha256": "69869c3a8af601d579a7e99d8514ef33c5325ac626103cb7243db38fb45be11d"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "near-index-wrap",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 84,
+      "object_sha256": "fa026f9feadf79815ec268cdbd99d91904ed70b51d23ef396adf311c7fae36c5"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 776,
+      "object_sha256": "d0a47d5dabf98fe6c7436586324970f4a90c36fb893f9ac9d81b6d0fa3c063b7"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 767,
+      "object_sha256": "97992c790d579a65dc9e6309e001ab9d94ac8364852e14b4adf56dacfef5e69a"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 757,
+      "object_sha256": "d4023bc96b0a0b3894d3ca8e991f592232123689d47959424f9a704b19148b5f"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 748,
+      "object_sha256": "1e6f06b8861e94f273ac6b13a92d3353c28c3fcf82d80db4647c9c2923073fe7"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_mandel_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1322,
+      "object_sha256": "cefd9ea317c05ad24b7b6ae6188c35dafca21da11a44dc463db574e82861096b"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1644,
+      "object_sha256": "0bd528b3df537d982399ecee1ffdb18dd7a63186cb9dcc5a646db19e8965448e"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1572,
+      "object_sha256": "eedb497a0a79f234e8d78205bbfddeb65a72ad3b807aab91746d5f98c27d12fe"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1652,
+      "object_sha256": "bdc0c9a8551d335c5af5689d59797b33bec5a173047b8a577644ed10eed1b236"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 1582,
+      "object_sha256": "0b0dbe669f7d16df8dedb79a09a8d53b740a21dfbd68b743a6e7ba51e2b56384"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 1510,
+      "object_sha256": "593f27a99cc9fe6f8ee2cc33ab988b6eb9f3a98a1fd82d46f1ada6e0161ceb6c"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_buddha_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 1590,
+      "object_sha256": "73fed0031ec044f74ecceea6be5ada742f1b17fb5f8b7b4d49185f4e7d96f80a"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 958,
+      "object_sha256": "6b87ed86d7bb233bc93cb4edbf2c416d17a2097124a55e18c64c5dbb97a81741"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 961,
+      "object_sha256": "63700eb253e61fa2eea0fbe71c6ab2eb69f15ba774a656ad581434eedbaed151"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "a16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 969,
+      "object_sha256": "51b15b48c75a42daeaacdc0cd2ba59000cd1a86b68cd2ee5b1ced7ed898385db"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Os",
+      "compile_status": 0,
+      "function_bytes": 901,
+      "object_sha256": "759c1c21702088937c5aa781d96f2b8abe0f6721e373aa1a2dd69f18aa83a1a3"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "Oz",
+      "compile_status": 0,
+      "function_bytes": 904,
+      "object_sha256": "c98ac5ad38162caca0653e885711844171f134511d119dbc37bcbfc3ab12fdf6"
+    },
+    {
+      "variant": "default",
+      "fixture": "k_blossom_far",
+      "mode": "xy16",
+      "opt": "O2",
+      "compile_status": 0,
+      "function_bytes": 915,
+      "object_sha256": "b00d397934847589c4a66fc2cca38aa76236f3a8a13f1e1ea2e376474a4f58ec"
+    }
+  ],
+  "aggregate": [
+    {
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "Os",
+      "function_bytes": 11118
+    },
+    {
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "Oz",
+      "function_bytes": 10932
+    },
+    {
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "O2",
+      "function_bytes": 14131
+    },
+    {
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "Os",
+      "function_bytes": 10797
+    },
+    {
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "Oz",
+      "function_bytes": 10438
+    },
+    {
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "O2",
+      "function_bytes": 13842
+    },
+    {
+      "variant": "all",
+      "mode": "a16",
+      "opt": "Os",
+      "function_bytes": 11142
+    },
+    {
+      "variant": "all",
+      "mode": "a16",
+      "opt": "Oz",
+      "function_bytes": 10932
+    },
+    {
+      "variant": "all",
+      "mode": "a16",
+      "opt": "O2",
+      "function_bytes": 14080
+    },
+    {
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "Os",
+      "function_bytes": 10731
+    },
+    {
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "Oz",
+      "function_bytes": 10438
+    },
+    {
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "O2",
+      "function_bytes": 13766
+    },
+    {
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "Os",
+      "function_bytes": 11118
+    },
+    {
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "Oz",
+      "function_bytes": 10932
+    },
+    {
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "O2",
+      "function_bytes": 14080
+    },
+    {
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "Os",
+      "function_bytes": 10797
+    },
+    {
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "Oz",
+      "function_bytes": 10438
+    },
+    {
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "O2",
+      "function_bytes": 13766
+    },
+    {
+      "variant": "off",
+      "mode": "a16",
+      "opt": "Os",
+      "function_bytes": 11118
+    },
+    {
+      "variant": "off",
+      "mode": "a16",
+      "opt": "Oz",
+      "function_bytes": 10932
+    },
+    {
+      "variant": "off",
+      "mode": "a16",
+      "opt": "O2",
+      "function_bytes": 14131
+    },
+    {
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "Os",
+      "function_bytes": 10797
+    },
+    {
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "Oz",
+      "function_bytes": 10438
+    },
+    {
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "O2",
+      "function_bytes": 13842
+    },
+    {
+      "variant": "default",
+      "mode": "a16",
+      "opt": "Os",
+      "function_bytes": 11118
+    },
+    {
+      "variant": "default",
+      "mode": "a16",
+      "opt": "Oz",
+      "function_bytes": 10932
+    },
+    {
+      "variant": "default",
+      "mode": "a16",
+      "opt": "O2",
+      "function_bytes": 14080
+    },
+    {
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "Os",
+      "function_bytes": 10797
+    },
+    {
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "Oz",
+      "function_bytes": 10438
+    },
+    {
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "O2",
+      "function_bytes": 13766
+    }
+  ],
+  "o3": [
+    {
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "O3",
+      "lto_main_bytes": 14662,
+      "clocks": 376006
+    },
+    {
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "O3",
+      "lto_main_bytes": 14016,
+      "clocks": 361030
+    },
+    {
+      "variant": "default",
+      "mode": "a16",
+      "opt": "O3",
+      "lto_main_bytes": 14708,
+      "clocks": 348590
+    },
+    {
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "O3",
+      "lto_main_bytes": 13920,
+      "clocks": 337664
+    }
+  ]
+}

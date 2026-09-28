@@ -1,0 +1,203 @@
+{
+  "expected": 509013605,
+  "rows": [
+    {
+      "variant": "baseline",
+      "mode": "a16",
+      "main_bytes": 2050,
+      "rom_bytes": 524288,
+      "rom_sha256": "b3bd349f53faaf414229b174b730e8224a791265b158f03646152113c618c05a",
+      "regions": {
+        "rdw": {
+          "bytes": 103,
+          "start": 33229,
+          "stop": 33332,
+          "master_clocks": 88046,
+          "instructions": 3455,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 92,
+          "start": 33950,
+          "stop": 34042,
+          "master_clocks": 58918,
+          "instructions": 2447,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 2050,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 356600,
+          "instructions": 13955,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "variant": "range",
+      "mode": "a16",
+      "main_bytes": 1949,
+      "rom_bytes": 524288,
+      "rom_sha256": "40e388ea958c4843432dfbdc9e9cfe21d7820651ab6a134b8888f32f252bb08e",
+      "regions": {
+        "rdw": {
+          "bytes": 103,
+          "start": 33228,
+          "stop": 33331,
+          "master_clocks": 88046,
+          "instructions": 3455,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 16,
+          "start": 33925,
+          "stop": 33941,
+          "master_clocks": 11546,
+          "instructions": 528,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 1949,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 308814,
+          "instructions": 12022,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "variant": "both",
+      "mode": "a16",
+      "main_bytes": 2011,
+      "rom_bytes": 524288,
+      "rom_sha256": "d08ffd1ad7f62851146d5cd9f717ccb2bc7eb81554e166502a56a519ea1486e1",
+      "regions": {
+        "rdw": {
+          "bytes": 76,
+          "start": 33239,
+          "stop": 33315,
+          "master_clocks": 65646,
+          "instructions": 2431,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 16,
+          "start": 33976,
+          "stop": 33992,
+          "master_clocks": 11546,
+          "instructions": 528,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 2011,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 289658,
+          "instructions": 11129,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "variant": "baseline",
+      "mode": "xy16",
+      "main_bytes": 1939,
+      "rom_bytes": 524288,
+      "rom_sha256": "2c324c6b11d742284f592a368a36f1a43a7f85b9d9ac54aa8de0cb2b91a2969d",
+      "regions": {
+        "rdw": {
+          "bytes": 103,
+          "start": 33213,
+          "stop": 33316,
+          "master_clocks": 88086,
+          "instructions": 3455,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 31,
+          "start": 33875,
+          "stop": 33906,
+          "master_clocks": 20850,
+          "instructions": 816,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 1939,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 294174,
+          "instructions": 11197,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "variant": "range",
+      "mode": "xy16",
+      "main_bytes": 1921,
+      "rom_bytes": 524288,
+      "rom_sha256": "53d102f7330656ee57cbae3ef53042b7a21606d5414a043fc20a647c4d9a98b9",
+      "regions": {
+        "rdw": {
+          "bytes": 103,
+          "start": 33214,
+          "stop": 33317,
+          "master_clocks": 88086,
+          "instructions": 3455,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 16,
+          "start": 33872,
+          "stop": 33888,
+          "master_clocks": 11546,
+          "instructions": 528,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 1921,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 284774,
+          "instructions": 10898,
+          "repeat_identical": true
+        }
+      }
+    },
+    {
+      "variant": "both",
+      "mode": "xy16",
+      "main_bytes": 1893,
+      "rom_bytes": 524288,
+      "rom_sha256": "90588c1fd319d091e9a4e40c22954650cfb6f5b151a5c90a913b3d4c3822e7e8",
+      "regions": {
+        "rdw": {
+          "bytes": 76,
+          "start": 33213,
+          "stop": 33289,
+          "master_clocks": 65686,
+          "instructions": 2431,
+          "repeat_identical": true
+        },
+        "cp8": {
+          "bytes": 16,
+          "start": 33844,
+          "stop": 33860,
+          "master_clocks": 11586,
+          "instructions": 528,
+          "repeat_identical": true
+        },
+        "main": {
+          "bytes": 1893,
+          "start": 32813,
+          "stop": 4294967295,
+          "master_clocks": 262336,
+          "instructions": 9874,
+          "repeat_identical": true
+        }
+      }
+    }
+  ]
+}

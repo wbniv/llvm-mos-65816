@@ -1,0 +1,63 @@
+[
+  {
+    "command": [
+      ".scratch/farblit-range-integration/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "-o",
+      ".scratch/farblit-range-integration/runs/focused-a16.mir"
+    ],
+    "check": [
+      "build/llvm-mos/bin/FileCheck",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "--check-prefix=A16",
+      "--input-file=.scratch/farblit-range-integration/runs/focused-a16.mir"
+    ],
+    "status": 0
+  },
+  {
+    "command": [
+      ".scratch/farblit-range-integration/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "-o",
+      ".scratch/farblit-range-integration/runs/focused-xy16.mir"
+    ],
+    "check": [
+      "build/llvm-mos/bin/FileCheck",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "--check-prefix=XY16",
+      "--input-file=.scratch/farblit-range-integration/runs/focused-xy16.mir"
+    ],
+    "status": 0
+  },
+  {
+    "command": [
+      ".scratch/farblit-range-integration/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-loop-range=false",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "-o",
+      ".scratch/farblit-range-integration/runs/focused-off.mir"
+    ],
+    "check": [
+      "build/llvm-mos/bin/FileCheck",
+      ".scratch/farblit-range-integration/source/far-loop-range.mir",
+      "--check-prefix=OFF",
+      "--input-file=.scratch/farblit-range-integration/runs/focused-off.mir"
+    ],
+    "status": 0
+  }
+]

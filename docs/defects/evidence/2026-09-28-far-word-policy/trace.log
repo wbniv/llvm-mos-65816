@@ -1,0 +1,9 @@
+trace_bb0_1 72 73 {'ldy': 1} {'iny': 1}
+trace_bb0_3 98 109 {'lda': 2, 'sta': 2, 'ldy': 1, 'iny': 1} {}
+trace_bb0_8 59 58 {'lda': 2, 'sta': 3} {'ldx': 1, 'ldy': 1, 'sty': 1, 'stx': 1, 'tay': 1}
+trace_bb0_9 103 76 {'stx': 1, 'ldy': 6, 'sty': 5} {'sta': 9, 'txa': 1, 'lda': 7, 'rol': 3, 'stz': 2, 'tya': 1, 'clc': 1, 'adc': 4}
+trace_bb0_13 88 92 {'sty': 1, 'ldy': 1} {}
+trace_bb0_17 39 48 {'sta': 2, 'ldx': 2, 'txa': 2, 'phy': 1, 'dey': 1, 'ply': 1} {'stz': 1, 'sty': 1}
+trace_bb0_19 84 84 {'dey': 2, 'tya': 1, 'tay': 1} {'lda': 1, 'sta': 1}
+trace_bb0_20 67 121 {'ldx': 2, 'ldy': 2, 'lda': 8, 'sta': 8, 'phy': 2, 'iny': 6, 'ply': 2, 'stx': 2} {}
+trace_bb0_21 834 845 {'lda': 2, 'sta': 2, 'iny': 1, 'ldy': 1} {}

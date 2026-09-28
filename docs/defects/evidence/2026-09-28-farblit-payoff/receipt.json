@@ -1,0 +1,18 @@
+{
+  "expected": {
+    "farblit": "0x1E56EE65",
+    "bounds": "0xC9276F1E",
+    "pressure": "0xD695"
+  },
+  "original_rom_configurations": 6,
+  "bounds_rom_configurations": 4,
+  "pressure_rom_configurations": 4,
+  "mame_assertions": 14,
+  "bsnes_timing_executions": 36,
+  "bsnes_additional_runtime_executions": 8,
+  "all_pass": true,
+  "all_timing_repeats_identical": true,
+  "instruction_and_relocation_identity_after_label_insertion": true,
+  "shape_assertions": "original 27 accesses per mode/variant; supplemental 11 load functions per mode/variant; pressure 2 accesses per mode/variant",
+  "measurement_correction": "Initial cp8 intervals ended at the next named basic block; some included post-loop hashing. initial-mixed-interval.tar.gz retains those rejected intervals. Final intervals end immediately after the loop backedge (fallthrough or equality-exit target). Final results.json and runs.tar.gz supersede those loop timing/size fields."
+}

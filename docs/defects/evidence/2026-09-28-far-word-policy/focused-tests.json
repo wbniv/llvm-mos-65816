@@ -1,0 +1,98 @@
+[
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-mos-far-word-index=off",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  },
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-mos-far-word-index=speed",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  },
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-mos-far-word-index=all",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  },
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-mos-far-word-index=off",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  },
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-mos-far-word-index=speed",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  },
+  {
+    "command": [
+      ".scratch/far-word-policy/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-mos-far-word-index=all",
+      "-run-pass=legalizer",
+      "-verify-machineinstrs",
+      ".scratch/far-word-policy/source/far-word-policy.mir",
+      "-o",
+      "-"
+    ],
+    "compiler": 0,
+    "check": 0
+  }
+]

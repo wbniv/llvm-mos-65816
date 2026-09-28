@@ -1,0 +1,5193 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.44591020699590445,
+    "log": "baseline-farblit-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.02350850001676008,
+    "log": "baseline-farblit-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-DHOST",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/farblit-host"
+    ],
+    "status": 0,
+    "seconds": 0.30443954799557105,
+    "log": "farblit-host-build.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/farblit-host"
+    ],
+    "status": 0,
+    "seconds": 0.0023368129623122513,
+    "log": "farblit-host.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.4767708010040224,
+    "log": "baseline-farblit-a16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.3001548709580675,
+    "log": "baseline-farblit-a16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.010446486994624138,
+    "log": "baseline-farblit-a16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x885d",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.6765421180170961,
+    "log": "baseline-farblit-a16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x885d",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.6135527290171012,
+    "log": "baseline-farblit-a16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.27974259498296306,
+    "log": "baseline-farblit-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.008058127015829086,
+    "log": "baseline-farblit-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.0333759599598125,
+    "log": "baseline-farblit-a16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.16509733098791912,
+    "log": "baseline-farblit-a16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.009806407033465803,
+    "log": "baseline-farblit-a16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8880",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.5929131099837832,
+    "log": "baseline-farblit-a16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8880",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.5137041719863191,
+    "log": "baseline-farblit-a16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.20828595699276775,
+    "log": "baseline-farblit-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.005402459006290883,
+    "log": "baseline-farblit-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.0290076590026729,
+    "log": "baseline-farblit-a16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.17530268098926172,
+    "log": "baseline-farblit-a16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.01105416496284306,
+    "log": "baseline-farblit-a16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8d82",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.48689937498420477,
+    "log": "baseline-farblit-a16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8d82",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.4536432789755054,
+    "log": "baseline-farblit-a16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.2174878449877724,
+    "log": "baseline-farblit-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.006331532960757613,
+    "log": "baseline-farblit-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.317041993024759,
+    "log": "baseline-farblit-xy16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.2102300690021366,
+    "log": "baseline-farblit-xy16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.009555180964525789,
+    "log": "baseline-farblit-xy16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x87ee",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.5898497180314735,
+    "log": "baseline-farblit-xy16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x87ee",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.5084544880082831,
+    "log": "baseline-farblit-xy16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.2124877119786106,
+    "log": "baseline-farblit-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006995136965997517,
+    "log": "baseline-farblit-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.310589529981371,
+    "log": "baseline-farblit-xy16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.1785435870406218,
+    "log": "baseline-farblit-xy16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.006038246967364103,
+    "log": "baseline-farblit-xy16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x87f1",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.47162019700044766,
+    "log": "baseline-farblit-xy16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x87f1",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.4996209390228614,
+    "log": "baseline-farblit-xy16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.2316591300186701,
+    "log": "baseline-farblit-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.010878403962124139,
+    "log": "baseline-farblit-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.019841297995299,
+    "log": "baseline-farblit-xy16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.2331833849893883,
+    "log": "baseline-farblit-xy16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.010608326003421098,
+    "log": "baseline-farblit-xy16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8ce6",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.710588869987987,
+    "log": "baseline-farblit-xy16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x8ce6",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.6417795660090633,
+    "log": "baseline-farblit-xy16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.14732813503360376,
+    "log": "baseline-farblit_press-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.006069210008718073,
+    "log": "baseline-farblit_press-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-DHOST",
+      "-O2",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/farblit_press-host"
+    ],
+    "status": 1,
+    "seconds": 0.052939681976567954,
+    "log": "farblit_press-host-build.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.38829105097102,
+    "log": "baseline-farblit_press-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.024779147992376238,
+    "log": "baseline-farblit_press-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-DHOST",
+      "-O2",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/farblit_press-host"
+    ],
+    "status": 0,
+    "seconds": 0.385564133990556,
+    "log": "farblit_press-host-build.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/farblit_press-host"
+    ],
+    "status": 0,
+    "seconds": 0.004124862956814468,
+    "log": "farblit_press-host.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.9779592049890198,
+    "log": "baseline-farblit_press-a16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.6466354520525783,
+    "log": "baseline-farblit_press-a16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.025744060985744,
+    "log": "baseline-farblit_press-a16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.652529016020708,
+    "log": "baseline-farblit_press-a16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 2.937178907042835,
+    "log": "baseline-farblit_press-a16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.24883639300242066,
+    "log": "baseline-farblit_press-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.00770723499590531,
+    "log": "baseline-farblit_press-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.4459309339872561,
+    "log": "baseline-farblit_press-a16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.20241392799653113,
+    "log": "baseline-farblit_press-a16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.00809196598129347,
+    "log": "baseline-farblit_press-a16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 4.288194305030629,
+    "log": "baseline-farblit_press-a16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 4.770404826034792,
+    "log": "baseline-farblit_press-a16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.6103558089816943,
+    "log": "baseline-farblit_press-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.028147232020273805,
+    "log": "baseline-farblit_press-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.5803664529812522,
+    "log": "baseline-farblit_press-a16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.29926086496561766,
+    "log": "baseline-farblit_press-a16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.005257617973256856,
+    "log": "baseline-farblit_press-a16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.9288086849846877,
+    "log": "baseline-farblit_press-a16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.5646747539867647,
+    "log": "baseline-farblit_press-a16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.3532457630499266,
+    "log": "baseline-farblit_press-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.03112273698206991,
+    "log": "baseline-farblit_press-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.582474367984105,
+    "log": "baseline-farblit_press-xy16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.2382832959992811,
+    "log": "baseline-farblit_press-xy16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.008081610954832286,
+    "log": "baseline-farblit_press-xy16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.280711190018337,
+    "log": "baseline-farblit_press-xy16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 2.933289712003898,
+    "log": "baseline-farblit_press-xy16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.4524428420118056,
+    "log": "baseline-farblit_press-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.026928006031084806,
+    "log": "baseline-farblit_press-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 2.0783036579960026,
+    "log": "baseline-farblit_press-xy16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.6164234390016645,
+    "log": "baseline-farblit_press-xy16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.01768195501063019,
+    "log": "baseline-farblit_press-xy16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.9464238380314782,
+    "log": "baseline-farblit_press-xy16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 5.0393872749991715,
+    "log": "baseline-farblit_press-xy16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.9907423380063847,
+    "log": "baseline-farblit_press-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.03667464101454243,
+    "log": "baseline-farblit_press-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farblit_press.c",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.602295437012799,
+    "log": "baseline-farblit_press-xy16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.5204678539885208,
+    "log": "baseline-farblit_press-xy16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.011564103013370186,
+    "log": "baseline-farblit_press-xy16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.255731087003369,
+    "log": "baseline-farblit_press-xy16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farblit_press-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x805b",
+      "0x80be",
+      "0xffffffff",
+      "0x20a",
+      "2",
+      "0xd695",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 3.4132275040028617,
+    "log": "baseline-farblit_press-xy16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 1.4031820449745283,
+    "log": "baseline-bounds-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.1558300760225393,
+    "log": "baseline-bounds-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "cc",
+      "-DHOST",
+      "-O2",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/bounds-host"
+    ],
+    "status": 0,
+    "seconds": 1.8002429470070638,
+    "log": "bounds-host-build.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/bounds-host"
+    ],
+    "status": 0,
+    "seconds": 0.007430944009684026,
+    "log": "bounds-host.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 2.5288526049698703,
+    "log": "baseline-bounds-a16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.38430057000368834,
+    "log": "baseline-bounds-a16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.013258763996418566,
+    "log": "baseline-bounds-a16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x87c1",
+      "0x8d6d",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.2503057739813812,
+    "log": "baseline-bounds-a16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x87c1",
+      "0x8d6d",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.4260786909726448,
+    "log": "baseline-bounds-a16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 1.2613455620012246,
+    "log": "baseline-bounds-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.039833178045228124,
+    "log": "baseline-bounds-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.858351306989789,
+    "log": "baseline-bounds-a16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.3796071669785306,
+    "log": "baseline-bounds-a16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.012467160006053746,
+    "log": "baseline-bounds-a16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x87be",
+      "0x8bf9",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.1554362929891795,
+    "log": "baseline-bounds-a16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x87be",
+      "0x8bf9",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.9509109100326896,
+    "log": "baseline-bounds-a16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.41171132103772834,
+    "log": "baseline-bounds-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.012300751986913383,
+    "log": "baseline-bounds-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 1.397250742011238,
+    "log": "baseline-bounds-a16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.2089435940142721,
+    "log": "baseline-bounds-a16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.005619507981464267,
+    "log": "baseline-bounds-a16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8c0c",
+      "0x91b8",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.2269554079975933,
+    "log": "baseline-bounds-a16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-a16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8c0c",
+      "0x91b8",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.1668120460235514,
+    "log": "baseline-bounds-a16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.5912461849511601,
+    "log": "baseline-bounds-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.022378958004992455,
+    "log": "baseline-bounds-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 2.761143901036121,
+    "log": "baseline-bounds-xy16-Os-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.3528216130216606,
+    "log": "baseline-bounds-xy16-Os-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.018157140002585948,
+    "log": "baseline-bounds-xy16-Os-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8773",
+      "0x8d1f",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.415007458999753,
+    "log": "baseline-bounds-xy16-Os-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Os.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8773",
+      "0x8d1f",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.4564600070007145,
+    "log": "baseline-bounds-xy16-Os-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.9660633520106785,
+    "log": "baseline-bounds-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.011158665001858026,
+    "log": "baseline-bounds-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 2.115904144011438,
+    "log": "baseline-bounds-xy16-Oz-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.36564702400937676,
+    "log": "baseline-bounds-xy16-Oz-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.011443819967098534,
+    "log": "baseline-bounds-xy16-Oz-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8770",
+      "0x8b9c",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.2689213939593174,
+    "log": "baseline-bounds-xy16-Oz-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-Oz.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8770",
+      "0x8b9c",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.2123713759938255,
+    "log": "baseline-bounds-xy16-Oz-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.8268656700383872,
+    "log": "baseline-bounds-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.00987318204715848,
+    "log": "baseline-bounds-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-Wl,--mllvm=-verify-machineinstrs",
+      "-Wl,--save-temps",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/bounds.c",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 2.5175661229877733,
+    "log": "baseline-bounds-xy16-O2-lto.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.sfc"
+    ],
+    "status": 0,
+    "seconds": 0.19655342097394168,
+    "log": "baseline-bounds-xy16-O2-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.sfc.elf"
+    ],
+    "status": 0,
+    "seconds": 0.009112540981732309,
+    "log": "baseline-bounds-xy16-O2-lto-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8bd8",
+      "0x9184",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 0.8738081980263814,
+    "log": "baseline-bounds-xy16-O2-bsnes.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-bounds-xy16-O2.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8bd8",
+      "0x9184",
+      "0xffffffff",
+      "0x200",
+      "4",
+      "0xc9276f1e",
+      "1500",
+      "1"
+    ],
+    "status": 0,
+    "seconds": 1.1279710530070588,
+    "log": "baseline-bounds-xy16-O2-bsnes-repeat.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.1330553310108371,
+    "log": "baseline-farindex-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.0075595309608615935,
+    "log": "baseline-farindex-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.052913106977939606,
+    "log": "baseline-farindex-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.00807169999461621,
+    "log": "baseline-farindex-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.07106393703725189,
+    "log": "baseline-farindex-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.008796546026133,
+    "log": "baseline-farindex-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.06331614399095997,
+    "log": "baseline-farindex-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.0041416489984840155,
+    "log": "baseline-farindex-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05954710900550708,
+    "log": "baseline-farindex-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.012837903981562704,
+    "log": "baseline-farindex-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farindex.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.06360256200423464,
+    "log": "baseline-farindex-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farindex-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.007465625007171184,
+    "log": "baseline-farindex-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.06385335797676817,
+    "log": "baseline-farbank-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.009378698945511132,
+    "log": "baseline-farbank-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0581696440349333,
+    "log": "baseline-farbank-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.007784789020661265,
+    "log": "baseline-farbank-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.07333262596512213,
+    "log": "baseline-farbank-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.007245912973303348,
+    "log": "baseline-farbank-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.07071978400927037,
+    "log": "baseline-farbank-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.008015685016289353,
+    "log": "baseline-farbank-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.07423040200956166,
+    "log": "baseline-farbank-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006207372003700584,
+    "log": "baseline-farbank-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/farbank.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.07578920002561063,
+    "log": "baseline-farbank-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-farbank-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.00632735900580883,
+    "log": "baseline-farbank-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.08644948399160057,
+    "log": "baseline-far_loop-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.007532726973295212,
+    "log": "baseline-far_loop-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.061063528002705425,
+    "log": "baseline-far_loop-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.00966560299275443,
+    "log": "baseline-far_loop-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.07589440798619762,
+    "log": "baseline-far_loop-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.011271202005445957,
+    "log": "baseline-far_loop-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.07381069305120036,
+    "log": "baseline-far_loop-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.00848476798273623,
+    "log": "baseline-far_loop-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.07828733598580584,
+    "log": "baseline-far_loop-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0070705359685234725,
+    "log": "baseline-far_loop-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_loop.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.06777409603819251,
+    "log": "baseline-far_loop-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_loop-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.008234212000388652,
+    "log": "baseline-far_loop-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.07375730999046937,
+    "log": "baseline-far_indir-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.007610080006998032,
+    "log": "baseline-far_indir-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.042587126954458654,
+    "log": "baseline-far_indir-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006267028977163136,
+    "log": "baseline-far_indir-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.0455978829995729,
+    "log": "baseline-far_indir-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.006007841031532735,
+    "log": "baseline-far_indir-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.03945635101990774,
+    "log": "baseline-far_indir-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.006771127053070813,
+    "log": "baseline-far_indir-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0403418309870176,
+    "log": "baseline-far_indir-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006419474026188254,
+    "log": "baseline-far_indir-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_indir.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.0398694800096564,
+    "log": "baseline-far_indir-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_indir-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.005129994009621441,
+    "log": "baseline-far_indir-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.045287535001989454,
+    "log": "baseline-far_store-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.00660366500960663,
+    "log": "baseline-far_store-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.044167248997837305,
+    "log": "baseline-far_store-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.009739577013533562,
+    "log": "baseline-far_store-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.04329161101486534,
+    "log": "baseline-far_store-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.004177288967184722,
+    "log": "baseline-far_store-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.038255224004387856,
+    "log": "baseline-far_store-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.007608357991557568,
+    "log": "baseline-far_store-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.035364881972782314,
+    "log": "baseline-far_store-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.004982265003491193,
+    "log": "baseline-far_store-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_store.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.04222136799944565,
+    "log": "baseline-far_store-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_store-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.00581366999540478,
+    "log": "baseline-far_store-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.048060565954074264,
+    "log": "baseline-far_memset-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.005997382977511734,
+    "log": "baseline-far_memset-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05564727302407846,
+    "log": "baseline-far_memset-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0054849020089022815,
+    "log": "baseline-far_memset-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.04549463896546513,
+    "log": "baseline-far_memset-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.004197842034045607,
+    "log": "baseline-far_memset-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.04593204101547599,
+    "log": "baseline-far_memset-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.005914387991651893,
+    "log": "baseline-far_memset-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.043059602030552924,
+    "log": "baseline-far_memset-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006247098965104669,
+    "log": "baseline-far_memset-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memset.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.04311430698726326,
+    "log": "baseline-far_memset-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memset-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.005006139981560409,
+    "log": "baseline-far_memset-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.07300340797519311,
+    "log": "baseline-far_memops-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.00957993499469012,
+    "log": "baseline-far_memops-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.049212936020921916,
+    "log": "baseline-far_memops-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.005226971989031881,
+    "log": "baseline-far_memops-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.08224618900567293,
+    "log": "baseline-far_memops-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.007493918004911393,
+    "log": "baseline-far_memops-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.0616446909843944,
+    "log": "baseline-far_memops-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.005194736004341394,
+    "log": "baseline-far_memops-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05806113901780918,
+    "log": "baseline-far_memops-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.007708639022894204,
+    "log": "baseline-far_memops-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_memops.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.0591590580297634,
+    "log": "baseline-far_memops-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_memops-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.006561690999660641,
+    "log": "baseline-far_memops-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.04075252200709656,
+    "log": "baseline-far_cast-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.006358471990097314,
+    "log": "baseline-far_cast-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.04854111198801547,
+    "log": "baseline-far_cast-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.006558226014021784,
+    "log": "baseline-far_cast-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.039580013952217996,
+    "log": "baseline-far_cast-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.00476643000729382,
+    "log": "baseline-far_cast-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.038374088995624334,
+    "log": "baseline-far_cast-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.004870772012509406,
+    "log": "baseline-far_cast-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.037430046999361366,
+    "log": "baseline-far_cast-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.005971759965177625,
+    "log": "baseline-far_cast-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_cast.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.04151748900767416,
+    "log": "baseline-far_cast-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_cast-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.007253147952724248,
+    "log": "baseline-far_cast-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.043822480016388,
+    "log": "baseline-far_arith-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.009323477977886796,
+    "log": "baseline-far_arith-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.04606938501819968,
+    "log": "baseline-far_arith-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.007848896959330887,
+    "log": "baseline-far_arith-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.05060143198352307,
+    "log": "baseline-far_arith-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.03073815000243485,
+    "log": "baseline-far_arith-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.13919166999403387,
+    "log": "baseline-far_arith-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.010700378043111414,
+    "log": "baseline-far_arith-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05567583197262138,
+    "log": "baseline-far_arith-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.009254047006834298,
+    "log": "baseline-far_arith-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/far_arith.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.05218620499363169,
+    "log": "baseline-far_arith-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-far_arith-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.012481107958592474,
+    "log": "baseline-far_arith-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.07725886203115806,
+    "log": "baseline-near-index-wrap-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.005627350008580834,
+    "log": "baseline-near-index-wrap-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05267990997526795,
+    "log": "baseline-near-index-wrap-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.007726464013103396,
+    "log": "baseline-near-index-wrap-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.06587269098963588,
+    "log": "baseline-near-index-wrap-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.006179163989145309,
+    "log": "baseline-near-index-wrap-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.04850490199169144,
+    "log": "baseline-near-index-wrap-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.005943972966633737,
+    "log": "baseline-near-index-wrap-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.05253971798811108,
+    "log": "baseline-near-index-wrap-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0080685910070315,
+    "log": "baseline-near-index-wrap-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/near-index-wrap.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.05166771198855713,
+    "log": "baseline-near-index-wrap-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-near-index-wrap-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.005764306988567114,
+    "log": "baseline-near-index-wrap-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.11277855903608724,
+    "log": "baseline-k_mandel_far-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.009704235009849072,
+    "log": "baseline-k_mandel_far-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.11788874701596797,
+    "log": "baseline-k_mandel_far-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.007432466023601592,
+    "log": "baseline-k_mandel_far-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.23079289897577837,
+    "log": "baseline-k_mandel_far-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.017130477994214743,
+    "log": "baseline-k_mandel_far-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.15477192896651104,
+    "log": "baseline-k_mandel_far-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.012138381018303335,
+    "log": "baseline-k_mandel_far-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.14706848101923242,
+    "log": "baseline-k_mandel_far-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.0075994140352122486,
+    "log": "baseline-k_mandel_far-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_mandel_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.21768839500145987,
+    "log": "baseline-k_mandel_far-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_mandel_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.010694550001062453,
+    "log": "baseline-k_mandel_far-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.2969549859990366,
+    "log": "baseline-k_buddha_far-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.017319058999419212,
+    "log": "baseline-k_buddha_far-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.16222100000595674,
+    "log": "baseline-k_buddha_far-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.008411353046540171,
+    "log": "baseline-k_buddha_far-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.21638942300342023,
+    "log": "baseline-k_buddha_far-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.007005040999501944,
+    "log": "baseline-k_buddha_far-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.20320938201621175,
+    "log": "baseline-k_buddha_far-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.009937116003129631,
+    "log": "baseline-k_buddha_far-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.17576932604424655,
+    "log": "baseline-k_buddha_far-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.008699185971636325,
+    "log": "baseline-k_buddha_far-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_buddha_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.18304521101526916,
+    "log": "baseline-k_buddha_far-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_buddha_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.009741843969095498,
+    "log": "baseline-k_buddha_far-xy16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.13560015603434294,
+    "log": "baseline-k_blossom_far-a16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.006760319054592401,
+    "log": "baseline-k_blossom_far-a16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.11422645300626755,
+    "log": "baseline-k_blossom_far-a16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.013676293019670993,
+    "log": "baseline-k_blossom_far-a16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.13125786097953096,
+    "log": "baseline-k_blossom_far-a16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-a16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.010963253036607057,
+    "log": "baseline-k_blossom_far-a16-O2-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Os",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.14832778798881918,
+    "log": "baseline-k_blossom_far-xy16-Os-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-Os.o"
+    ],
+    "status": 0,
+    "seconds": 0.007827595982234925,
+    "log": "baseline-k_blossom_far-xy16-Os-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-Oz",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.165619462961331,
+    "log": "baseline-k_blossom_far-xy16-Oz-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-Oz.o"
+    ],
+    "status": 0,
+    "seconds": 0.014817632967606187,
+    "log": "baseline-k_blossom_far-xy16-Oz-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-a16",
+      "-Xclang",
+      "-target-feature",
+      "-Xclang",
+      "+mos-xy16",
+      "-O2",
+      "-mllvm",
+      "-verify-machineinstrs",
+      "-fno-lto",
+      "-I",
+      "/home/will/llvm-mos-65816/examples/65816",
+      "-c",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/source/k_blossom_far.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.1415217820322141,
+    "log": "baseline-k_blossom_far-xy16-O2-compile.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/baseline/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-range-integration/runs/baseline-k_blossom_far-xy16-O2.o"
+    ],
+    "status": 0,
+    "seconds": 0.008470877015497535,
+    "log": "baseline-k_blossom_far-xy16-O2-symbols.log"
+  }
+]

@@ -7,8 +7,8 @@
 // rdg: global long,X with X8. rdw16g uses X16 under +mos-xy16 and a computed
 // pointer under A16. The wrapped 16-bit sum must stay within the source bank.
 // wr8: byte [dp],Y with Y8. wr16 uses Y16 under +mos-xy16 and a computed
-// pointer under A16. cp8 stores with Y8; its source's j+8 displacement uses Y16
-// under +mos-xy16 and a computed pointer under A16.
+// pointer under A16. At -Os, cp8 loads and stores with Y8: its bounded loop
+// proves j is 0..47, so the source displacement j+8 fits an 8-bit index.
 //
 // Runtime bases are volatile, and accesses cross bank boundaries. The host oracle
 // models wrapping at MOS integer widths. Stores are read back through constant

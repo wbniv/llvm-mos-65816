@@ -1,0 +1,878 @@
+[
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 2050,
+    "candidate_bytes": 1949,
+    "object_identical": false,
+    "baseline_main_bytes": 2050,
+    "candidate_main_bytes": 1949,
+    "baseline_lto_code_bytes": 2171,
+    "candidate_lto_code_bytes": 2070,
+    "baseline_main_master_clocks": 356600,
+    "candidate_main_master_clocks": 308814
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 2085,
+    "candidate_bytes": 2085,
+    "object_identical": true,
+    "baseline_main_bytes": 2085,
+    "candidate_main_bytes": 2085,
+    "baseline_lto_code_bytes": 2206,
+    "candidate_lto_code_bytes": 2206,
+    "baseline_main_master_clocks": 355972,
+    "candidate_main_master_clocks": 355972
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 3367,
+    "candidate_bytes": 3279,
+    "object_identical": false,
+    "baseline_main_bytes": 3367,
+    "candidate_main_bytes": 3279,
+    "baseline_lto_code_bytes": 3488,
+    "candidate_lto_code_bytes": 3400,
+    "baseline_main_master_clocks": 344426,
+    "candidate_main_master_clocks": 311266
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 1939,
+    "candidate_bytes": 1921,
+    "object_identical": false,
+    "baseline_main_bytes": 1939,
+    "candidate_main_bytes": 1921,
+    "baseline_lto_code_bytes": 2060,
+    "candidate_lto_code_bytes": 2042,
+    "baseline_main_master_clocks": 294174,
+    "candidate_main_master_clocks": 284774
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 1942,
+    "candidate_bytes": 1942,
+    "object_identical": true,
+    "baseline_main_bytes": 1942,
+    "candidate_main_bytes": 1942,
+    "baseline_lto_code_bytes": 2063,
+    "candidate_lto_code_bytes": 2063,
+    "baseline_main_master_clocks": 311650,
+    "candidate_main_master_clocks": 311650
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 3211,
+    "candidate_bytes": 3235,
+    "object_identical": false,
+    "baseline_main_bytes": 3211,
+    "candidate_main_bytes": 3235,
+    "baseline_lto_code_bytes": 3332,
+    "candidate_lto_code_bytes": 3356,
+    "baseline_main_master_clocks": 300276,
+    "candidate_main_master_clocks": 292108
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 1056,
+    "candidate_bytes": 1056,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1084,
+    "candidate_lto_code_bytes": 1084,
+    "baseline_main_master_clocks": 1256,
+    "candidate_main_master_clocks": 1256
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 1059,
+    "candidate_bytes": 1059,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1087,
+    "candidate_lto_code_bytes": 1087,
+    "baseline_main_master_clocks": 1216,
+    "candidate_main_master_clocks": 1216
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 1061,
+    "candidate_bytes": 1061,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1089,
+    "candidate_lto_code_bytes": 1089,
+    "baseline_main_master_clocks": 1216,
+    "candidate_main_master_clocks": 1216
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 991,
+    "candidate_bytes": 991,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1023,
+    "candidate_lto_code_bytes": 1023,
+    "baseline_main_master_clocks": 1176,
+    "candidate_main_master_clocks": 1176
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 994,
+    "candidate_bytes": 994,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1026,
+    "candidate_lto_code_bytes": 1026,
+    "baseline_main_master_clocks": 1176,
+    "candidate_main_master_clocks": 1176
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 996,
+    "candidate_bytes": 996,
+    "object_identical": true,
+    "baseline_main_bytes": 99,
+    "candidate_main_bytes": 99,
+    "baseline_lto_code_bytes": 1028,
+    "candidate_lto_code_bytes": 1028,
+    "baseline_main_master_clocks": 1176,
+    "candidate_main_master_clocks": 1176
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 3459,
+    "candidate_bytes": 3416,
+    "object_identical": false,
+    "baseline_main_bytes": 1452,
+    "candidate_main_bytes": 1452,
+    "baseline_lto_code_bytes": 3467,
+    "candidate_lto_code_bytes": 3424,
+    "baseline_main_master_clocks": 2786428,
+    "candidate_main_master_clocks": 2786428
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 3268,
+    "candidate_bytes": 3268,
+    "object_identical": true,
+    "baseline_main_bytes": 1083,
+    "candidate_main_bytes": 1083,
+    "baseline_lto_code_bytes": 3190,
+    "candidate_lto_code_bytes": 3190,
+    "baseline_main_master_clocks": 463830,
+    "candidate_main_master_clocks": 463830
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 4558,
+    "candidate_bytes": 4515,
+    "object_identical": false,
+    "baseline_main_bytes": 1452,
+    "candidate_main_bytes": 1452,
+    "baseline_lto_code_bytes": 4566,
+    "candidate_lto_code_bytes": 4523,
+    "baseline_main_master_clocks": 2786468,
+    "candidate_main_master_clocks": 2786468
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 3381,
+    "candidate_bytes": 3364,
+    "object_identical": false,
+    "baseline_main_bytes": 1452,
+    "candidate_main_bytes": 1452,
+    "baseline_lto_code_bytes": 3389,
+    "candidate_lto_code_bytes": 3372,
+    "baseline_main_master_clocks": 2786308,
+    "candidate_main_master_clocks": 2786348
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 3175,
+    "candidate_bytes": 3175,
+    "object_identical": true,
+    "baseline_main_bytes": 1068,
+    "candidate_main_bytes": 1068,
+    "baseline_lto_code_bytes": 3097,
+    "candidate_lto_code_bytes": 3097,
+    "baseline_main_master_clocks": 313462,
+    "candidate_main_master_clocks": 313462
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 4506,
+    "candidate_bytes": 4489,
+    "object_identical": false,
+    "baseline_main_bytes": 1452,
+    "candidate_main_bytes": 1452,
+    "baseline_lto_code_bytes": 4514,
+    "candidate_lto_code_bytes": 4497,
+    "baseline_main_master_clocks": 2786508,
+    "candidate_main_master_clocks": 2786508
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farindex",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 287,
+    "candidate_bytes": 287,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 212,
+    "candidate_bytes": 212,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 175,
+    "candidate_bytes": 175,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 212,
+    "candidate_bytes": 212,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 212,
+    "candidate_bytes": 212,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 175,
+    "candidate_bytes": 175,
+    "object_identical": true
+  },
+  {
+    "fixture": "farbank",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 212,
+    "candidate_bytes": 212,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 214,
+    "candidate_bytes": 214,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 193,
+    "candidate_bytes": 193,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 214,
+    "candidate_bytes": 214,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 214,
+    "candidate_bytes": 214,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 193,
+    "candidate_bytes": 193,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_loop",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 214,
+    "candidate_bytes": 214,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_indir",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 48,
+    "candidate_bytes": 48,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_store",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 50,
+    "candidate_bytes": 50,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 99,
+    "candidate_bytes": 99,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 99,
+    "candidate_bytes": 99,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 99,
+    "candidate_bytes": 99,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 78,
+    "candidate_bytes": 78,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 78,
+    "candidate_bytes": 78,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memset",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 78,
+    "candidate_bytes": 78,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 243,
+    "candidate_bytes": 243,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 202,
+    "candidate_bytes": 202,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 257,
+    "candidate_bytes": 257,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 226,
+    "candidate_bytes": 226,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 168,
+    "candidate_bytes": 168,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_memops",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 240,
+    "candidate_bytes": 240,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_cast",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 40,
+    "candidate_bytes": 40,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "far_arith",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 42,
+    "candidate_bytes": 42,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "near-index-wrap",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 84,
+    "candidate_bytes": 84,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 776,
+    "candidate_bytes": 776,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 767,
+    "candidate_bytes": 767,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 1322,
+    "candidate_bytes": 1322,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 757,
+    "candidate_bytes": 757,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 748,
+    "candidate_bytes": 748,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_mandel_far",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 1322,
+    "candidate_bytes": 1322,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 1644,
+    "candidate_bytes": 1644,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 1572,
+    "candidate_bytes": 1572,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 1652,
+    "candidate_bytes": 1652,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 1582,
+    "candidate_bytes": 1582,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 1510,
+    "candidate_bytes": 1510,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_buddha_far",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 1590,
+    "candidate_bytes": 1590,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "optimization": "Os",
+    "baseline_bytes": 958,
+    "candidate_bytes": 958,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "optimization": "Oz",
+    "baseline_bytes": 961,
+    "candidate_bytes": 961,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "a16",
+    "optimization": "O2",
+    "baseline_bytes": 969,
+    "candidate_bytes": 969,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "optimization": "Os",
+    "baseline_bytes": 901,
+    "candidate_bytes": 901,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "optimization": "Oz",
+    "baseline_bytes": 904,
+    "candidate_bytes": 904,
+    "object_identical": true
+  },
+  {
+    "fixture": "k_blossom_far",
+    "mode": "xy16",
+    "optimization": "O2",
+    "baseline_bytes": 915,
+    "candidate_bytes": 915,
+    "object_identical": true
+  }
+]

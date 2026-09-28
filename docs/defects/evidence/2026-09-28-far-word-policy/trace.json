@@ -1,0 +1,740 @@
+[
+  {
+    "variant": "off",
+    "blocks": [
+      {
+        "name": "main",
+        "start": 0,
+        "bytes": 69,
+        "ops": {
+          "clc": 2,
+          "lda": 6,
+          "adc": 6,
+          "sta": 6,
+          "stz": 4,
+          "ldx": 4,
+          "stx": 4,
+          "ldy": 1,
+          "tyx": 1
+        }
+      },
+      {
+        "name": "trace_bb0_1",
+        "start": 69,
+        "bytes": 72,
+        "ops": {
+          "lda": 7,
+          "sta": 8,
+          "txa": 1,
+          "cpx": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "iny": 4,
+          "ldx": 2,
+          "cpy": 1,
+          "bne": 1,
+          "ldy": 1,
+          "stz": 4,
+          "txy": 1
+        }
+      },
+      {
+        "name": "trace_bb0_3",
+        "start": 141,
+        "bytes": 98,
+        "ops": {
+          "lda": 8,
+          "sta": 7,
+          "tya": 1,
+          "cpy": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "inx": 1,
+          "ldy": 1,
+          "cpx": 1,
+          "bne": 1,
+          "ldx": 4,
+          "stx": 4,
+          "clc": 1,
+          "adc": 4,
+          "tay": 1,
+          "stz": 5
+        }
+      },
+      {
+        "name": "trace_bb0_5",
+        "start": 239,
+        "bytes": 23,
+        "ops": {
+          "ldx": 2,
+          "stx": 2,
+          "tax": 1,
+          "rep": 1,
+          "lda": 1,
+          "clc": 1,
+          "sep": 1,
+          "phy": 1,
+          "ldy": 2,
+          "bcs": 1
+        }
+      },
+      {
+        "name": "trace_bb0_7",
+        "start": 262,
+        "bytes": 94,
+        "ops": {
+          "sty": 1,
+          "ply": 2,
+          "rep": 2,
+          "adc": 5,
+          "sta": 10,
+          "lda": 8,
+          "sep": 2,
+          "tya": 1,
+          "phy": 1,
+          "ldy": 1,
+          "cpy": 1,
+          "txa": 1,
+          "cpx": 2,
+          "rol": 4,
+          "stz": 1,
+          "eor": 2,
+          "ldx": 1,
+          "inx": 2,
+          "stx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_8",
+        "start": 356,
+        "bytes": 59,
+        "ops": {
+          "lda": 6,
+          "ldx": 2,
+          "asl": 1,
+          "sta": 5,
+          "ldy": 1,
+          "sty": 1,
+          "stx": 1,
+          "rol": 3,
+          "clc": 1,
+          "adc": 4,
+          "tay": 1,
+          "stz": 3,
+          "txa": 1
+        }
+      },
+      {
+        "name": "trace_bb0_9",
+        "start": 415,
+        "bytes": 103,
+        "ops": {
+          "sta": 14,
+          "txa": 1,
+          "asl": 1,
+          "lda": 12,
+          "rol": 7,
+          "stz": 2,
+          "tya": 1,
+          "clc": 1,
+          "adc": 4,
+          "rep": 2,
+          "sep": 2,
+          "cmp": 1,
+          "eor": 2,
+          "inx": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_10",
+        "start": 518,
+        "bytes": 87,
+        "ops": {
+          "lda": 9,
+          "ldy": 1,
+          "sta": 7,
+          "iny": 3,
+          "ldx": 7,
+          "stx": 6,
+          "clc": 1,
+          "adc": 4,
+          "tay": 1,
+          "stz": 4
+        }
+      },
+      {
+        "name": "trace_bb0_11",
+        "start": 605,
+        "bytes": 75,
+        "ops": {
+          "sta": 10,
+          "tya": 1,
+          "clc": 1,
+          "adc": 4,
+          "lda": 9,
+          "cmp": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "inc": 1,
+          "sep": 1,
+          "dex": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_12",
+        "start": 680,
+        "bytes": 26,
+        "ops": {
+          "lda": 1,
+          "ldx": 2,
+          "stx": 1,
+          "stz": 5,
+          "ldy": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_13",
+        "start": 706,
+        "bytes": 88,
+        "ops": {
+          "sta": 11,
+          "clc": 1,
+          "adc": 4,
+          "lda": 9,
+          "sty": 2,
+          "cmp": 1,
+          "rol": 4,
+          "rep": 2,
+          "eor": 2,
+          "sep": 2,
+          "dex": 1,
+          "inc": 1,
+          "phy": 1,
+          "ldy": 1,
+          "ply": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_14",
+        "start": 794,
+        "bytes": 60,
+        "ops": {
+          "ldx": 5,
+          "stx": 4,
+          "lda": 5,
+          "clc": 1,
+          "adc": 4,
+          "sta": 4,
+          "ldy": 1,
+          "stz": 4
+        }
+      },
+      {
+        "name": "trace_bb0_15",
+        "start": 854,
+        "bytes": 68,
+        "ops": {
+          "sta": 6,
+          "lda": 7,
+          "cmp": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "dex": 1,
+          "iny": 1,
+          "cpx": 1,
+          "bne": 1,
+          "ldx": 2,
+          "stx": 2,
+          "ldy": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_17",
+        "start": 922,
+        "bytes": 39,
+        "ops": {
+          "sta": 3,
+          "iny": 1,
+          "clc": 1,
+          "adc": 1,
+          "cpy": 1,
+          "bne": 1,
+          "ldx": 2,
+          "txa": 2,
+          "ldy": 3,
+          "stz": 3,
+          "dey": 1,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_19",
+        "start": 961,
+        "bytes": 84,
+        "ops": {
+          "ldx": 4,
+          "stx": 3,
+          "rep": 2,
+          "lda": 7,
+          "sep": 2,
+          "clc": 3,
+          "adc": 6,
+          "sta": 8,
+          "phy": 1,
+          "ldy": 1,
+          "dey": 1,
+          "ply": 1,
+          "tya": 1,
+          "eor": 1,
+          "inx": 2,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_20",
+        "start": 1045,
+        "bytes": 67,
+        "ops": {
+          "ldx": 1,
+          "ldy": 2,
+          "lda": 10,
+          "sta": 10,
+          "clc": 1,
+          "adc": 4,
+          "stx": 1,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_21",
+        "start": 1112,
+        "bytes": 834,
+        "ops": {
+          "tya": 1,
+          "clc": 1,
+          "adc": 1,
+          "tyx": 1,
+          "tay": 1,
+          "lda": 91,
+          "txy": 1,
+          "sta": 91,
+          "iny": 5,
+          "cpy": 1,
+          "bne": 1,
+          "ldy": 5,
+          "cmp": 22,
+          "pha": 1,
+          "pla": 1,
+          "rol": 88,
+          "rep": 23,
+          "eor": 44,
+          "sep": 23,
+          "stz": 1,
+          "ldx": 2,
+          "stx": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_23",
+        "start": 1946,
+        "bytes": 3,
+        "ops": {
+          "wai": 1,
+          "bra": 1
+        }
+      }
+    ]
+  },
+  {
+    "variant": "all",
+    "blocks": [
+      {
+        "name": "main",
+        "start": 0,
+        "bytes": 69,
+        "ops": {
+          "clc": 2,
+          "lda": 6,
+          "adc": 6,
+          "sta": 6,
+          "stz": 4,
+          "ldx": 4,
+          "stx": 4,
+          "ldy": 1,
+          "tyx": 1
+        }
+      },
+      {
+        "name": "trace_bb0_1",
+        "start": 69,
+        "bytes": 73,
+        "ops": {
+          "lda": 7,
+          "sta": 8,
+          "txa": 1,
+          "cpx": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "iny": 3,
+          "ldx": 2,
+          "cpy": 1,
+          "bne": 1,
+          "ldy": 2,
+          "stz": 4,
+          "txy": 1
+        }
+      },
+      {
+        "name": "trace_bb0_3",
+        "start": 142,
+        "bytes": 109,
+        "ops": {
+          "lda": 10,
+          "sta": 9,
+          "tya": 1,
+          "cpy": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "inx": 1,
+          "ldy": 2,
+          "cpx": 1,
+          "bne": 1,
+          "iny": 1,
+          "ldx": 4,
+          "stx": 4,
+          "clc": 1,
+          "adc": 4,
+          "tay": 1,
+          "stz": 5
+        }
+      },
+      {
+        "name": "trace_bb0_5",
+        "start": 251,
+        "bytes": 23,
+        "ops": {
+          "ldx": 2,
+          "stx": 2,
+          "tax": 1,
+          "rep": 1,
+          "lda": 1,
+          "clc": 1,
+          "sep": 1,
+          "phy": 1,
+          "ldy": 2,
+          "bcs": 1
+        }
+      },
+      {
+        "name": "trace_bb0_7",
+        "start": 274,
+        "bytes": 94,
+        "ops": {
+          "sty": 1,
+          "ply": 2,
+          "rep": 2,
+          "adc": 5,
+          "sta": 10,
+          "lda": 8,
+          "sep": 2,
+          "tya": 1,
+          "phy": 1,
+          "ldy": 1,
+          "cpy": 1,
+          "txa": 1,
+          "cpx": 2,
+          "rol": 4,
+          "stz": 1,
+          "eor": 2,
+          "ldx": 1,
+          "inx": 2,
+          "stx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_8",
+        "start": 368,
+        "bytes": 58,
+        "ops": {
+          "lda": 8,
+          "asl": 1,
+          "sta": 8,
+          "rol": 3,
+          "clc": 1,
+          "adc": 4,
+          "ldx": 1,
+          "stz": 3,
+          "txa": 1
+        }
+      },
+      {
+        "name": "trace_bb0_9",
+        "start": 426,
+        "bytes": 76,
+        "ops": {
+          "stx": 1,
+          "asl": 1,
+          "ldy": 6,
+          "sta": 5,
+          "rep": 2,
+          "lda": 5,
+          "sep": 2,
+          "cmp": 1,
+          "rol": 4,
+          "sty": 5,
+          "eor": 2,
+          "inx": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_10",
+        "start": 502,
+        "bytes": 87,
+        "ops": {
+          "lda": 9,
+          "ldy": 1,
+          "sta": 7,
+          "iny": 3,
+          "ldx": 7,
+          "stx": 6,
+          "clc": 1,
+          "adc": 4,
+          "tay": 1,
+          "stz": 4
+        }
+      },
+      {
+        "name": "trace_bb0_11",
+        "start": 589,
+        "bytes": 75,
+        "ops": {
+          "sta": 10,
+          "tya": 1,
+          "clc": 1,
+          "adc": 4,
+          "lda": 9,
+          "cmp": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "inc": 1,
+          "sep": 1,
+          "dex": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_12",
+        "start": 664,
+        "bytes": 26,
+        "ops": {
+          "lda": 1,
+          "ldx": 2,
+          "stx": 1,
+          "stz": 5,
+          "ldy": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_13",
+        "start": 690,
+        "bytes": 92,
+        "ops": {
+          "sta": 11,
+          "clc": 1,
+          "adc": 4,
+          "lda": 9,
+          "sty": 3,
+          "cmp": 1,
+          "rol": 4,
+          "phy": 1,
+          "ldy": 2,
+          "rep": 2,
+          "eor": 2,
+          "sep": 2,
+          "dex": 1,
+          "inc": 1,
+          "ply": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_14",
+        "start": 782,
+        "bytes": 60,
+        "ops": {
+          "ldx": 5,
+          "stx": 4,
+          "lda": 5,
+          "clc": 1,
+          "adc": 4,
+          "sta": 4,
+          "ldy": 1,
+          "stz": 4
+        }
+      },
+      {
+        "name": "trace_bb0_15",
+        "start": 842,
+        "bytes": 68,
+        "ops": {
+          "sta": 6,
+          "lda": 7,
+          "cmp": 1,
+          "rol": 4,
+          "rep": 1,
+          "eor": 2,
+          "sep": 1,
+          "dex": 1,
+          "iny": 1,
+          "cpx": 1,
+          "bne": 1,
+          "ldx": 2,
+          "stx": 2,
+          "ldy": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_17",
+        "start": 910,
+        "bytes": 48,
+        "ops": {
+          "sta": 5,
+          "iny": 1,
+          "clc": 1,
+          "adc": 1,
+          "cpy": 1,
+          "bne": 1,
+          "ldx": 4,
+          "txa": 4,
+          "ldy": 3,
+          "stz": 2,
+          "phy": 1,
+          "dey": 2,
+          "ply": 1
+        }
+      },
+      {
+        "name": "trace_bb0_19",
+        "start": 958,
+        "bytes": 84,
+        "ops": {
+          "ldx": 4,
+          "stx": 3,
+          "rep": 2,
+          "lda": 6,
+          "sep": 2,
+          "clc": 3,
+          "adc": 6,
+          "sta": 7,
+          "phy": 1,
+          "ldy": 1,
+          "dey": 3,
+          "ply": 1,
+          "tya": 2,
+          "eor": 1,
+          "inx": 2,
+          "tay": 1,
+          "cpx": 1,
+          "beq": 1,
+          "jmp": 1
+        }
+      },
+      {
+        "name": "trace_bb0_20",
+        "start": 1042,
+        "bytes": 121,
+        "ops": {
+          "ldx": 3,
+          "ldy": 4,
+          "lda": 18,
+          "sta": 18,
+          "clc": 1,
+          "adc": 4,
+          "phy": 2,
+          "iny": 6,
+          "ply": 2,
+          "stx": 3,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_21",
+        "start": 1163,
+        "bytes": 845,
+        "ops": {
+          "tya": 1,
+          "clc": 1,
+          "adc": 1,
+          "tyx": 1,
+          "tay": 1,
+          "lda": 93,
+          "txy": 1,
+          "sta": 93,
+          "iny": 6,
+          "cpy": 1,
+          "bne": 1,
+          "ldy": 6,
+          "cmp": 22,
+          "pha": 1,
+          "pla": 1,
+          "rol": 88,
+          "rep": 23,
+          "eor": 44,
+          "sep": 23,
+          "stz": 1,
+          "ldx": 2,
+          "stx": 2,
+          "sty": 1
+        }
+      },
+      {
+        "name": "trace_bb0_23",
+        "start": 2008,
+        "bytes": 3,
+        "ops": {
+          "wai": 1,
+          "bra": 1
+        }
+      }
+    ]
+  }
+]

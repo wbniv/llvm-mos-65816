@@ -1,0 +1,74 @@
+[
+  {
+    "configuration": "baseline-a16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "baseline-a16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "range-a16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "range-a16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "both-a16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "both-a16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "baseline-xy16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "baseline-xy16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "range-xy16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "range-xy16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "both-xy16",
+    "probe": "rdw",
+    "entry_executions": 64,
+    "profile_sum_matches_interval": true
+  },
+  {
+    "configuration": "both-xy16",
+    "probe": "cp8",
+    "entry_executions": 48,
+    "profile_sum_matches_interval": true
+  }
+]

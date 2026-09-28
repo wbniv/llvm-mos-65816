@@ -1,0 +1,112 @@
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -3228,6 +3228,21 @@
+   }
+   return Max;
+ }
++enum class FarWordIndexPolicy { Off, Speed, All };
++static cl::opt<FarWordIndexPolicy> FarWordIndex(
++    "mos-far-word-index", cl::Hidden, cl::init(FarWordIndexPolicy::Off),
++    cl::desc("Fold bounded native far word loads into Y8 indexing"),
++    cl::values(clEnumValN(FarWordIndexPolicy::Off, "off", "Retain explicit pointers"),
++               clEnumValN(FarWordIndexPolicy::Speed, "speed", "Enable in functions optimized for speed"),
++               clEnumValN(FarWordIndexPolicy::All, "all", "Enable regardless of size attributes")));
++
++static bool isPlainFarWordLoad(const MachineInstr &MI,
++                               const MachineRegisterInfo &MRI) {
++  const auto *Load = dyn_cast<GLoad>(&MI);
++  return Load && MRI.getType(Load->getReg(0)) == LLT::scalar(16) &&
++         Load->getMemSize() == LocationSize::precise(2);
++}
++
+ // The pointer add disappears only when every use is a non-atomic access, or
+ // a constant non-negative displacement leading exclusively to such accesses.
+ // MaxEnd includes each access's final byte. Escapes and selected fallbacks keep
+@@ -3237,7 +3252,7 @@
+                                           Register Ptr, uint64_t Disp,
+                                           uint64_t &MaxEnd,
+                                           unsigned &NumAccesses,
+-                                          bool FnMayCall, unsigned Depth) {
++                                          bool FnMayCall, bool AllowWord, bool &HasWord, unsigned Depth) {
+   // Bound the walk and the displacement; neither limit can admit a fold that a
+   // deeper/larger walk would reject — hitting one just declines.
+   if (Depth > 4 || Disp > 0xFFFF)
+@@ -3245,8 +3260,10 @@
+   for (const MachineInstr &U : MRI.use_nodbg_instructions(Ptr)) {
+     if (const auto *LS = dyn_cast<GLoadStore>(&U)) {
+       if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() || LS->isAtomic() ||
+-          MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8))
++          (MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8) &&
++           !(AllowWord && isPlainFarWordLoad(U, MRI))))
+         return false;
++      HasWord |= isPlainFarWordLoad(U, MRI);
+       if (const auto *St = dyn_cast<GStore>(LS))
+         if (St->getValueReg() == Ptr) // the pointer is the stored VALUE: escapes
+           return false;
+@@ -3268,7 +3285,7 @@
+         return false;
+       if (!allUsesAreFoldableFarAccesses(MRI, VDef, PA->getReg(0),
+                                          Disp + C->Value.getZExtValue(), MaxEnd,
+-                                         NumAccesses, FnMayCall, Depth + 1))
++                                         NumAccesses, FnMayCall, AllowWord, HasWord, Depth + 1))
+         return false;
+       continue;
+     }
+@@ -3292,9 +3309,13 @@
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+ 
+-  // The indexed pseudos below carry one byte. A native word access must retain
+-  // its own lowering, and wider siblings must not keep a partially folded add.
+-  if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
++  const Function &F = Builder.getMF().getFunction();
++  const bool AllowWord = STI.hasAccum16() &&
++      (FarWordIndex == FarWordIndexPolicy::All ||
++       (FarWordIndex == FarWordIndexPolicy::Speed && !F.hasOptSize() &&
++        !F.hasOptNone()));
++  const bool Word = AllowWord && isPlainFarWordLoad(MI, MRI);
++  if (!Word && MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
+     return false;
+ 
+   // (a)
+@@ -3313,7 +3334,7 @@
+     return false;
+ 
+   // (b) range proof on the offset itself, before the (costlier) user walk.
+-  const uint64_t Limit = STI.hasIndex16() ? 0xFFFF : 0xFF;
++  uint64_t Limit = !Word && STI.hasIndex16() ? 0xFFFF : 0xFF;
+   const uint64_t MaxOff =
+       FarLoopRange ? getFarOffsetMax(Off, MRI, *VT, *MI.getParent())
+                    : VT->getKnownBits(Off).getMaxValue().getLimitedValue();
+@@ -3328,12 +3349,17 @@
+       FnMayCall |= mayBecomeCall(I, MRI);
+   uint64_t MaxEnd = 0;
+   unsigned NumAccesses = 0;
++  bool HasWord = false;
+   if (!allUsesAreFoldableFarAccesses(MRI, *V, Addr, 0, MaxEnd, NumAccesses,
+-                                     FnMayCall, 0))
++                                     FnMayCall, AllowWord, HasWord, 0))
+     return false;
+   // (f)
+   if (NumAccesses > 1 && FnMayCall)
+     return false;
++  // Native word pseudos consume Y8. Every sibling must fit that same limit,
++  // including a byte access visited before the word access.
++  if (HasWord)
++    Limit = 0xFF;
+   if (MaxOff + MaxEnd > Limit)
+     return false;
+   // This access is one of V's users, so its displacement is inside the walk.
+@@ -3347,9 +3373,9 @@
+               .getReg(0);
+ 
+   const bool IsLoad = isa<GLoad>(MI);
+-  unsigned Opcode =
+-      Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16 : MOS::G_STORE_FAR_INDIR_IDX16)
+-           : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX : MOS::G_STORE_FAR_INDIR_IDX);
++  unsigned Opcode = Word ? MOS::G_LOAD16_FAR_INDIR_IDX
++      : Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16 : MOS::G_STORE_FAR_INDIR_IDX16)
++             : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX : MOS::G_STORE_FAR_INDIR_IDX);
+   Builder.buildInstr(Opcode)
+       .add(MI.getOperand(0))  // dst (load) / value (store)
+       .addUse(V->getBaseReg()) // far pointer -> Imag32 ZP quad

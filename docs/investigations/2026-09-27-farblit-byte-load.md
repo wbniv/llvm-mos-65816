@@ -1,8 +1,12 @@
 # Farblit byte-load legalization: cause and repair
 
+**Speed-policy follow-up, September 28:** [0070 is installed locally](2026-09-28-far-word-policy.md). The gate described here builds with `-Os` and retains its native-word fallback; speed-oriented `-O2`/`-O3` builds now fold bounded word loads. Earlier measurements below identify their captured builds. Update attribution: OpenAI Codex CLI 0.157.1 (session source: `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
+
 **Status (2026-09-27): fixed locally by [0066](../../patches/llvm-mos/0066-mos-far-extload-worklist.patch).** The unchanged historical input fails on its preserved compiler and passes with the repair. [Canonical defect](../defects/mos-farblit-byte-load-legalization.json).
 
 **Gate update (2026-09-28): complete.** The [implemented plan](../plans/2026-09-28-farblit-shape-gate.md) replaces aggregate acceptance counts with checks for each probe. The full shell gate passes on both the preserved 0066 and installed toolchains. See [validation and the evidence-label correction](#completed-gate-update-2026-09-28) below. Earlier failing gate results remain dated evidence.
+
+**Optimization follow-up (later September 28):** [0069 integrates the bounded range proof](2026-09-28-farblit-range-integration.md). The installed compiler now uses Y8 for the `cp8` load in both modes; native-word `rdw` keeps its fallback. The installed gate passes eight emulator assertions and 16 sensitivity tests. Earlier gate counts and copy-fallback contracts below describe their captured builds. Follow-up attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e61c-c24c-7053-aa56-a4a4e43f12ab`.
 
 **Attribution:** OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e126-2178-79f3-adba-51b951fb1f96`.
 

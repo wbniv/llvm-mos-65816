@@ -1,0 +1,344 @@
+{
+  "checked_at": "2026-09-28T07:49:22.764160+00:00",
+  "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84",
+  "scope": "Read-only source and retained-evidence audit; no new compiler/emulator tests",
+  "evidence_manifest": {
+    "path": "docs/defects/evidence/2026-09-28-far-word-policy/manifest.json",
+    "sha256": "5320d2bb0d855e0d2b6b91e3e6928152cb70912af796f7bb86c38ac4425fd380",
+    "verified_files": 87,
+    "all_match": true
+  },
+  "patch": {
+    "path": "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
+    "sha256": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+    "matches_retained_candidate": true
+  },
+  "farblit_table": [
+    {
+      "mode": "a16",
+      "opt": "Os",
+      "baseline_bytes": 1949,
+      "enabled_bytes": 2011,
+      "baseline_clocks": 308814,
+      "enabled_clocks": 289658,
+      "clock_reduction_percent": 6.2
+    },
+    {
+      "mode": "xy16",
+      "opt": "Os",
+      "baseline_bytes": 1921,
+      "enabled_bytes": 1893,
+      "baseline_clocks": 284774,
+      "enabled_clocks": 262336,
+      "clock_reduction_percent": 7.88
+    },
+    {
+      "mode": "a16",
+      "opt": "Oz",
+      "baseline_bytes": 2085,
+      "enabled_bytes": 2085,
+      "baseline_clocks": 355972,
+      "enabled_clocks": 355972,
+      "clock_reduction_percent": 0.0
+    },
+    {
+      "mode": "xy16",
+      "opt": "Oz",
+      "baseline_bytes": 1942,
+      "enabled_bytes": 1942,
+      "baseline_clocks": 311650,
+      "enabled_clocks": 311650,
+      "clock_reduction_percent": 0.0
+    },
+    {
+      "mode": "a16",
+      "opt": "O2",
+      "baseline_bytes": 3279,
+      "enabled_bytes": 3266,
+      "baseline_clocks": 311266,
+      "enabled_clocks": 289102,
+      "clock_reduction_percent": 7.12
+    },
+    {
+      "mode": "xy16",
+      "opt": "O2",
+      "baseline_bytes": 3235,
+      "enabled_bytes": 3197,
+      "baseline_clocks": 292108,
+      "enabled_clocks": 269494,
+      "clock_reduction_percent": 7.74
+    },
+    {
+      "mode": "a16",
+      "opt": "O3",
+      "baseline_bytes": 14662,
+      "enabled_bytes": 14708,
+      "baseline_clocks": 376006,
+      "enabled_clocks": 348590,
+      "clock_reduction_percent": 7.29
+    },
+    {
+      "mode": "xy16",
+      "opt": "O3",
+      "baseline_bytes": 14016,
+      "enabled_bytes": 13920,
+      "baseline_clocks": 361030,
+      "enabled_clocks": 337664,
+      "clock_reduction_percent": 6.47
+    }
+  ],
+  "farblit_profile_interval_checks": [
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "a16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "a16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "a16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "all-sweep.json.gz",
+      "variant": "all",
+      "mode": "xy16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-o3-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "O3",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-o3-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "O3",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "a16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "baseline-sweep.json.gz",
+      "variant": "baseline",
+      "mode": "xy16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-o3-sweep.json.gz",
+      "variant": "default",
+      "mode": "a16",
+      "opt": "O3",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-o3-sweep.json.gz",
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "O3",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "a16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "a16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "a16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "default-sweep.json.gz",
+      "variant": "default",
+      "mode": "xy16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "a16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "a16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "a16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "off-sweep.json.gz",
+      "variant": "off",
+      "mode": "xy16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "a16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "Os",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "Oz",
+      "exclusive_equals_interval": true
+    },
+    {
+      "source": "speed-sweep.json.gz",
+      "variant": "speed",
+      "mode": "xy16",
+      "opt": "O2",
+      "exclusive_equals_interval": true
+    }
+  ],
+  "code_checks": {
+    "hasOptSize_includes_minsize": "llvm/include/llvm/IR/Function.h:714-715 in captured downstream source",
+    "whole_group_y8": "HasWord lowers Limit to 0xFF before checking MaxOff + MaxEnd",
+    "all_policy": "Bypasses codegen level and function-attribute policy; still requires native features and fold guards"
+  },
+  "upstream_audit": "destination.json",
+  "independent_review": "pending",
+  "upstream_build": "not performed",
+  "emulator_provenance_qualification": {
+    "bsnes_revision_field": "Enclosing project revision, not a bsnes repository revision; git -C vendor/bsnes-jg rev-parse --show-toplevel resolves to project root",
+    "probe_sha256": "e294aed948506ab5b131afa983b6c82d838707949f84e1f6720e9cfea3e114ba",
+    "matches_calibration_record": "docs/defects/evidence/2026-09-27-mos-carry-timing/emulator-identity.json",
+    "historical_identity": "unchanged"
+  }
+}

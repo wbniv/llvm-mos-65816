@@ -1,0 +1,89 @@
+{
+  "schema": 1,
+  "checked_at": "2026-09-28 07:43:01 UTC",
+  "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84",
+  "destination": {
+    "branch": "main",
+    "commit_url": "https://github.com/llvm-mos/llvm-mos/commit/26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+    "committed_at": "2026-09-26T20:23:03Z",
+    "repository": "llvm-mos/llvm-mos",
+    "sha": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6"
+  },
+  "feature_issues": [
+    {
+      "body": "Part of https://github.com/llvm-mos/llvm-mos/issues/32 . This issue is a (simpler) specialization of the problem space presented in https://github.com/llvm-mos/llvm-mos/issues/319 , but still requires a lot of consideration with regards on how to implement it.\r\n\r\nNote that this issue alone, without implementing 16-bit register modes, allows for the development of 65816 targets; the only remaining distinction for 65816 \"native mode\" is adjusting llvm-mos-sdk's crt0 to initialize the stack pointer to $01FF rather than $FF on such targets.",
+      "html_url": "https://github.com/llvm-mos/llvm-mos/issues/320",
+      "number": 320,
+      "state": "open",
+      "title": "[65816] 24-bit address space support",
+      "updated_at": "2024-03-14T16:26:52Z"
+    },
+    {
+      "body": "Part of https://github.com/llvm-mos/llvm-mos/issues/32 .\r\n\r\nThe main challenge here is being clever about emitting REP/SEP instructions to switch, and deciding which register widths to support and how - while the 8-bit registers A and B are effectively subsets of their 16-bit counterpart, they are not as cheap to access as on most LLVM-supported architectures; in addition, the 8-bit registers X and Y cannot be treated as subsets of their 16-bit counterparts, as their high portions are reset when the 16-bit index register mode is disabled.\r\n\r\nNote that a target which provides the 65816's 16-bit register modes, but not the 24-bit address space, is already present in llvm-mos-sdk as \"rpc8e\" (RedPower 2's RPC8/e \"fantasy\" computer), and may as such prove useful for testing.",
+      "html_url": "https://github.com/llvm-mos/llvm-mos/issues/321",
+      "number": 321,
+      "state": "open",
+      "title": "[65816] 16-bit register mode support",
+      "updated_at": "2026-06-29T14:14:07Z"
+    }
+  ],
+  "inspection": "Read-only source, test inventory, two legalizer test files, and ten most recent commits affecting MOSLegalizerInfo.cpp at the pinned destination. No destination compiler build or independent review.",
+  "finding": "The destination legalizer admits 8- and 16-bit pointers and narrows ordinary scalar loads to 8 bits. Its addressing-mode selector has no 32-bit pointer branch. The inspected source lacks tryFarRuntimeIndexFold, getFarOffsetMax, and the Accum16/Index16 feature queries. Existing 65816 instruction support does not supply this native far-word pipeline.",
+  "preparation": "0070 is a downstream delta on the native/far feature stack including 0062, the runtime far-index fold, and 0069. Extract and validate with the compiler/ABI series for issues #320/#321.",
+  "publication": "Local draft only. Evidence links require published immutable commit URLs before posting.",
+  "scope_note": "This is an optimization preparation record, not a new compiler defect or a change to existing defect status.",
+  "artifacts": {
+    "upstream-MOSInstrGISel.td": {
+      "sha256": "9dd8984d4901b1f8557da934d394f7c6ed14fdfa94d59804e92a48c565d34692",
+      "bytes": 7765
+    },
+    "upstream-MOSInstrInfo.td": {
+      "sha256": "8160fd03a841130482f2f0e3128cf47b704c6ae8d03b88cdd6a89b4740df6291",
+      "bytes": 34490
+    },
+    "upstream-MOSLegalizerInfo.cpp": {
+      "sha256": "af98159c08a79e88eaacfddc16ce0ccd1826d263b119cc9c4f6dd70198633929",
+      "bytes": 94034
+    },
+    "upstream-MOSLegalizerInfo.h": {
+      "sha256": "6758cbe969f2f38dd7fd78ced134eb7744812c45733c86c049e19c924bdb7b4e",
+      "bytes": 7780
+    },
+    "upstream-MOSSubtarget.h": {
+      "sha256": "955187bb13e21755216f18fa414be6fc46d6cb8347804906a38649a7b438f6c7",
+      "bytes": 5407
+    },
+    "upstream-legalizer-history.json": {
+      "sha256": "048b25a345922b210319ab2a9c26f2d2e01e6533a05d298a3a3e42e6eb0f24c7",
+      "bytes": 29285
+    },
+    "upstream-legalizer-ir.mir": {
+      "sha256": "071c15dcc3c600cbbe636102d0637c23df2c8f5febf88338f00f61f2ef0e8ede",
+      "bytes": 6125
+    },
+    "upstream-legalizer.mir": {
+      "sha256": "56d5ea6205e612432758e22a96e9c38ca5056c020691b57fa1c6092ffddb51a8",
+      "bytes": 170179
+    },
+    "upstream-test-inventory.json": {
+      "sha256": "83ca4323471cb82b855067fb7519a21bce234d4384ca31def745b1b9cfd64b29",
+      "bytes": 12527
+    }
+  },
+  "source_archive": {
+    "path": "destination-source.tar.gz",
+    "sha256": "5357af95e0c31a4247f93336f407f7bb7bc4aa59462fb78dcfebbf09bd630e49"
+  },
+  "published_demo_checks": [
+    {
+      "url": "https://biohack.net/snes/bankwalk/",
+      "response_sha256": "8cb9f8b29f210b923d76dec896f43127589a5ac7072b0f623e665a636930cf92",
+      "method": "curl -fsSL; read published description; no ROM rebuild"
+    },
+    {
+      "url": "https://biohack.net/snes/dpbank/",
+      "response_sha256": "b633a9a64b52b62300e4701a5f650566c9b98b246f46546d409db5c1683a9c23",
+      "method": "curl -fsSL; read published description; no ROM rebuild"
+    }
+  ]
+}

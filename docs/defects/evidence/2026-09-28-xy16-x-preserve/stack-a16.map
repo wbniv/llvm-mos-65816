@@ -1,0 +1,169 @@
+     VMA      LMA     Size Align Out     In      Symbol
+       0        0        0     1 __rc0 = 0x00
+       0        0        0     1 __rc1 = __rc0 + 1
+       0        0        0     1 PROVIDE(__rc2 = __rc1 + 1)
+       0        0        0     1 __rc3 = __rc2 + 1
+       0        0        0     1 PROVIDE(__rc4 = __rc3 + 1)
+       0        0        0     1 __rc5 = __rc4 + 1
+       0        0        0     1 PROVIDE(__rc6 = __rc5 + 1)
+       0        0        0     1 __rc7 = __rc6 + 1
+       0        0        0     1 PROVIDE(__rc8 = __rc7 + 1)
+       0        0        0     1 __rc9 = __rc8 + 1
+       0        0        0     1 PROVIDE(__rc10 = __rc9 + 1)
+       0        0        0     1 __rc11 = __rc10 + 1
+       0        0        0     1 PROVIDE(__rc12 = __rc11 + 1)
+       0        0        0     1 __rc13 = __rc12 + 1
+       0        0        0     1 PROVIDE(__rc14 = __rc13 + 1)
+       0        0        0     1 __rc15 = __rc14 + 1
+       0        0        0     1 PROVIDE(__rc16 = __rc15 + 1)
+       0        0        0     1 __rc17 = __rc16 + 1
+       0        0        0     1 PROVIDE(__rc18 = __rc17 + 1)
+       0        0        0     1 __rc19 = __rc18 + 1
+       0        0        0     1 PROVIDE(__rc20 = __rc19 + 1)
+       0        0        0     1 __rc21 = __rc20 + 1
+       0        0        0     1 PROVIDE(__rc22 = __rc21 + 1)
+       0        0        0     1 __rc23 = __rc22 + 1
+       0        0        0     1 PROVIDE(__rc24 = __rc23 + 1)
+       0        0        0     1 __rc25 = __rc24 + 1
+       0        0        0     1 PROVIDE(__rc26 = __rc25 + 1)
+       0        0        0     1 __rc27 = __rc26 + 1
+       0        0        0     1 PROVIDE(__rc28 = __rc27 + 1)
+       0        0        0     1 __rc29 = __rc28 + 1
+       0        0        0     1 PROVIDE(__rc30 = __rc29 + 1)
+       0        0        0     1 __rc31 = __rc30 + 1
+       0        0        0     1 
+       0        0        0     1 __stack = 0x2000
+    8000     8000      245     1 .text
+    8000     8000        0     1         _init = .
+    8000     8000        0     1         _start = .
+    8000     8000       18     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.init.50)
+    8006     8006        0     1                 $xl.0
+    800e     800e        0     1                 $mh.1
+    8013     8013        0     1                 $mh.2
+    8018     8018        8     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(init-stack.S.obj):(.init.100)
+    8018     8018        0     1                 __do_init_stack
+    8020     8020        3     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(zero-zp-bss.c.obj):(.init.200)
+    8020     8020        0     1                 __do_zero_zp_bss
+    8023     8023        3     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.call_main)
+    8026     8026        3     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(exit-custom.S.obj):(.after_main)
+    8026     8026        0     1                 __after_main
+    8029     8029        0     1         _fini = .
+    8029     8029        1     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.fini_rts)
+    802a     802a      103     1         /work/build/xy16-x-preserve/runtime/stack.o:(.text)
+    802a     802a        0     1                 $xh.0
+    802a     802a       29     1                 stack_pop_byte
+    802f     802f        0     1                 $xl.1
+    8047     8047        0     1                 $xh.2
+    8053     8053       29     1                 stack_push_byte
+    8055     8055        0     1                 $xl.3
+    805b     805b        0     1                 $xh.4
+    8078     8078        0     1                 $xh.5
+    807c     807c       30     1                 stack_pop_word
+    807e     807e        0     1                 $xl.6
+    8087     8087        0     1                 $xl.7
+    809a     809a        0     1                 $xh.8
+    80a7     80a7        0     1                 $mh.9
+    80ac     80ac       42     1                 stack_push_word
+    80ae     80ae        0     1                 $xl.10
+    80b4     80b4        0     1                 $xh.11
+    80b8     80b8        0     1                 $xl.12
+    80e9     80e9        0     1                 $mh.13
+    80ee     80ee       3f     1                 stack_live_nz
+    80f0     80f0        0     1                 $xl.14
+    80f6     80f6        0     1                 $xh.15
+    80fa     80fa        0     1                 $xl.16
+    8102     8102        0     1                 $xh.17
+    8125     8125        0     1                 $mh.18
+    812a     812a        0     1                 $mh.19
+    812d     812d        4     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.text)
+    812d     812d        0     1                 irq
+    812e     812e        0     1                 nmi
+    812f     812f        0     1                 brk
+    8130     8130        0     1                 cop
+    8131     8131       13     1         /work/build/install/bin/../mos-platform/snes/lib/libcrt0.a(zero-zp-bss.c.obj):(.text.__zero_zp_bss)
+    8131     8131       13     1                 __zero_zp_bss
+    8144     8144       de     1         /work/build/xy16-x-preserve/runtime/stack-a16.sfc.lto.o:(.text.main)
+    8144     8144       de     1                 main
+    8146     8146        0     1                 $xh.0
+    8150     8150        0     1                 $ml.1
+    815a     815a        0     1                 $mh.2
+    815e     815e        0     1                 $xh.3
+    8165     8165        0     1                 $xh.4
+    8170     8170        0     1                 $ml.5
+    8177     8177        0     1                 $xh.6
+    817f     817f        0     1                 $xh.7
+    818c     818c        0     1                 $mh.8
+    8190     8190        0     1                 $xh.9
+    819b     819b        0     1                 $ml.10
+    81a5     81a5        0     1                 $mh.11
+    81a9     81a9        0     1                 $xh.12
+    81b4     81b4        0     1                 $ml.13
+    81be     81be        0     1                 $mh.14
+    81c2     81c2        0     1                 $xh.15
+    81c9     81c9        0     1                 $xh.16
+    81d4     81d4        0     1                 $ml.17
+    81de     81de        0     1                 $mh.18
+    81e5     81e5        0     1                 $xh.19
+    81ef     81ef        0     1                 $xh.20
+    81f9     81f9        0     1                 $xh.21
+    820e     820e        0     1                 $xh.22
+    8222     8222        5     1         /work/build/xy16-x-preserve/runtime/stack-a16.sfc.lto.o:(.text.exit)
+    8222     8222        5     1                 exit
+    8227     8227       1e     1         /work/build/xy16-x-preserve/runtime/stack-a16.sfc.lto.o:(.text.__memset)
+    8227     8227        0     1                 $xh.24
+    8227     8227       1e     1                 __memset
+    8237     8237        0     1                 $xh.25
+    823d     823d        0     1                 $xh.26
+    8245     8245        0     1         __init_array_start = .
+    8245     8245        0     1         __init_array_end = .
+    8245     8245        0     1         __fini_array_start = .
+    8245     8245        0     1         __fini_array_end = .
+     200      200        0     1 .data
+     200      200        0     1         __data_start = .
+     200      200        0     1         __data_end = .
+     200      200        0     1 __data_load_start = LOADADDR(.data)
+     200      200        0     1 __data_size = SIZEOF(.data)
+      20       20        0     1 .zp.data
+      20       20        0     1         __zp_data_start = .
+      20       20        0     1 __zp_data_load_start = LOADADDR(.zp.data)
+      20       20        0     1 __zp_data_size = SIZEOF(.zp.data)
+      20       20        2     1 .zp.bss
+      20       20        0     1         __zp_bss_start = .
+      20       20        2     1         /work/build/xy16-x-preserve/runtime/stack-a16.sfc.lto.o:(.zp.bss)
+      20       20        2     1                 corpus_result
+      22       22        0     1 __zp_bss_size = SIZEOF(.zp.bss)
+     200      200        0     1 .bss
+     200      200        0     1         __bss_start = .
+     200      200        0     1         __bss_end = .
+     200      200        0     1 __bss_size = SIZEOF(.bss)
+     200      200        0     1 .noinit
+     200      200        0     1         __heap_start = ALIGN(., 2)
+    ffb0     ffb0       30     1 .snes_header
+    ffb0     ffb0       30     1         /work/build/install/bin/../mos-platform/snes/lib/crt0.o:(.snes_header)
+    ffb0     ffb0        0     1                 __snes_header
+    ffe0     ffe0       10     1 .snes_vectors_native
+    ffe0     ffe0        2     1         SHORT(0x0000)
+    ffe2     ffe2        2     1         SHORT(0x0000)
+    ffe4     ffe4        2     1         SHORT(cop)
+    ffe6     ffe6        2     1         SHORT(brk)
+    ffe8     ffe8        2     1         SHORT(0x0000)
+    ffea     ffea        2     1         SHORT(nmi)
+    ffec     ffec        2     1         SHORT(0x0000)
+    ffee     ffee        2     1         SHORT(irq)
+    fff0     fff0       10     1 .snes_vectors_emu
+    fff0     fff0        2     1         SHORT(0x0000)
+    fff2     fff2        2     1         SHORT(0x0000)
+    fff4     fff4        2     1         SHORT(cop)
+    fff6     fff6        2     1         SHORT(0x0000)
+    fff8     fff8        2     1         SHORT(0x0000)
+    fffa     fffa        2     1         SHORT(nmi)
+    fffc     fffc        2     1         SHORT(_start)
+    fffe     fffe        2     1         SHORT(irq)
+       0        0       d4     1 .comment
+       0        0       d4     1         <internal>:(.comment)
+       0        0      7f0     4 .symtab
+       0        0      7f0     4         <internal>:(.symtab)
+       0        0       82     1 .shstrtab
+       0        0       82     1         <internal>:(.shstrtab)
+       0        0      44d     1 .strtab
+       0        0      44d     1         <internal>:(.strtab)

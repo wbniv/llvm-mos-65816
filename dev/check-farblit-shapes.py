@@ -44,7 +44,7 @@ def expectations(mode, fixture):
         'rdw16g': [load('long-x', index=16) if wide else load('indirect')],
         'rdw8': [load('indirect-y', index=8)],
         'wr8': [store('indirect-y', 8)],
-        'cp8': [indexed_load, store('indirect-y', 8)],
+        'cp8': [load('indirect-y', index=8), store('indirect-y', 8)],
         'wr16': [indexed_store],
         'readback': [load('long')] * 16,
     }

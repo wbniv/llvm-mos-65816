@@ -1,0 +1,1431 @@
+[
+  {
+    "command": [
+      "cc",
+      "-DHOST",
+      "-O2",
+      "/home/will/llvm-mos-65816/examples/65816/farblit.c",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/host"
+    ],
+    "exit_code": 0,
+    "log": "host-build.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/host"
+    ],
+    "exit_code": 0,
+    "log": "host.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.s"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81cd",
+      "0x8234",
+      "0x8234",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81cd",
+      "0x8234",
+      "0x8234",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x849e",
+      "0x84fa",
+      "0x84fa",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x849e",
+      "0x84fa",
+      "0x84fa",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x882f",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x882f",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-a16-main-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.s"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81cc",
+      "0x8233",
+      "0x8233",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81cc",
+      "0x8233",
+      "0x8233",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8485",
+      "0x8495",
+      "0x8495",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8485",
+      "0x8495",
+      "0x8495",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87ca",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87ca",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-a16-main-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.s"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/a16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.o"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81d7",
+      "0x8223",
+      "0x8223",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81d7",
+      "0x8223",
+      "0x8223",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x84b8",
+      "0x84c8",
+      "0x84c8",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x84b8",
+      "0x84c8",
+      "0x84c8",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8808",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-a16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8808",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-a16-main-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.s"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-baseline",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81bd",
+      "0x8224",
+      "0x8224",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81bd",
+      "0x8224",
+      "0x8224",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8453",
+      "0x8472",
+      "0x8472",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8453",
+      "0x8472",
+      "0x8472",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87c0",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/baseline-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87c0",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "baseline-xy16-main-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.s"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81be",
+      "0x8225",
+      "0x8225",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81be",
+      "0x8225",
+      "0x8225",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8450",
+      "0x8460",
+      "0x8460",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8450",
+      "0x8460",
+      "0x8460",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87ae",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/range-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x87ae",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "range-xy16-main-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-filetype=asm",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.s"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-asm.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-obj.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/bin/llc-candidate",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-x=mir",
+      "-start-before=legalizer",
+      "-verify-machineinstrs",
+      "-mos-far-range-experiment",
+      "-mos-far-word-experiment",
+      "-stop-after=legalizer",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/xy16.pre",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.after.mir"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-after.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-mc",
+      "-triple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-filetype=obj",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.labels.s",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-labels.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.o"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-plain-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-dr",
+      "--mcpu=mosw65816",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.labels.o"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-labels-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/install/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-Os",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.labels.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-Wl,-Map=/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.map",
+      "-o",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-link.log"
+  },
+  {
+    "command": [
+      "python3",
+      "/home/will/llvm-mos-65816/tools/snes-checksum.py",
+      "--hirom",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-checksum.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-t",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-symbols.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/llvm-mos-install/bin/llvm-objdump",
+      "-d",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc.elf"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-linked-dis.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81bd",
+      "0x8209",
+      "0x8209",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-rdw-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x81bd",
+      "0x8209",
+      "0x8209",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-rdw-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8434",
+      "0x8444",
+      "0x8444",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-cp8-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x8434",
+      "0x8444",
+      "0x8444",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-cp8-timing-1.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8792",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-main-timing-0.log"
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/carry-timing/jgxcycles-verified",
+      "/home/will/llvm-mos-65816/.scratch/farblit-payoff/runs/both-xy16.sfc",
+      "/home/will/llvm-mos-65816/vendor/bsnes-jg/Database",
+      "0x802d",
+      "0x8792",
+      "0xffffffff",
+      "0x21f",
+      "4",
+      "0x1e56ee65",
+      "240",
+      "1"
+    ],
+    "exit_code": 0,
+    "log": "both-xy16-main-timing-1.log"
+  }
+]

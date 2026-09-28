@@ -77,15 +77,15 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "e65a194d94bb5e4174b23788ebac5905a4911bcfe25cf729039dd446e28dbda6",
+          "docs/upstream-dashboard-curation.json": "041e5aa49ac00f30188e61d55967a3d6b813a372e6a23800852cf2c77077c53a",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
-          "docs/defects/mos-carry-scheduling-pressure.json": "bd692e0f7fd9f8e7e56bd7d04ab401bd32c614a7c44ce16552af5d5dfe2402df",
+          "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/mos-coalescing-rc-undef.json": "17a8635cdbcb50795f93e4738e171b8432089e263e4228a87dfd10b7d21b88f0",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
@@ -94,7 +94,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
           "docs/defects/mos-vector-o0-status-scavenge.json": "28374b964d9c7f14226abe4c1014d6e922696eef7559b958ce98b609d9aaf2df",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
-          "docs/defects/mos-xy16-stale-x-writer-reload.json": "7fb329e01ce7a9b1d2c3d10764dac98f8d08e444637f3f802ec014138b5e17f9",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "5e5d75c0c4494e7d0f10b7bbd0053751e025e041259f27786ede5984e3c1a123",
           "docs/defects/mos-zp-index-same-width-trunc.json": "cdbe44541ce1abc9cdfe7d3e0cb666cb1d7cb8865d29b378aa146c55941f7640",
           "docs/defects/reentrant-attribute-contract.json": "15e8272f46879514803da4effd45251fec86befccfc553341f16cbcbad1827ad",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "b58ad1cc26c6cee550e6b4f2b3677a7b7e3d9d004ad5d9c94cf77fcc6a09d2cd",
@@ -104,7 +104,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "2bf2c024dd962f951a998638b69e36b4065ba634215f863e94b411444f759405"
+          "docs/upstream-dashboard.json": "b68076045549e48e86f7867d933f423ede9b711ed3732d82ea83e9aca35126fb"
         }
       }
     },
@@ -125,13 +125,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "df3c54312955587e25f281dc287798bbed2ae31722e3ee51133e21aa64aedb85",
+          "docs/upstream-pending-work.md": "28e33183bcdcf786b4740370006a8718a47b2c5438dbad33fef45cc435f3f58a",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "2bf2c024dd962f951a998638b69e36b4065ba634215f863e94b411444f759405",
+          "docs/upstream-dashboard.json": "b68076045549e48e86f7867d933f423ede9b711ed3732d82ea83e9aca35126fb",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "ac9f1f2338e212f10909a8d394243ccca8f242a6eb5bbe2f14f8bbb222ac3c39"
+          "docs/upstream-dashboard-graph.json": "8c7edff4fb681803f0841efbb19ffb9123c6ae04b986a01a5dded9bc9963bee9"
         }
       }
     },
@@ -266,6 +266,9 @@
         "docs/howto-defect-evidence.md",
         "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md",
         "docs/pr-preparations/2026-09-26/README.md",
+        "docs/plans/2026-09-26-live-upstream-dashboard.md",
+        "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md",
+        "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md",
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-farblit-byte-load.md",
@@ -273,7 +276,13 @@
         "docs/plans/2026-09-27-0064-competing-carry-gate.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
         "docs/investigations/2026-09-27-carry-profitability-model.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/investigations/2026-09-28-farblit-payoff.md",
+        "docs/plans/2026-09-28-farblit-payoff.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/plans/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
       ],
       "receipt": {
         "sources": {
@@ -294,7 +303,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-stale-x-writer-reload.json": "41350893ee094bd4592023e3ab3ad6f3d740a303085e7e3810662012a306c537",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -304,20 +313,29 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "b0bba19c927e2d7c10beeed882455f41ace6ac3a24c95a04ef88f933433579dc",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-live-upstream-dashboard.md": "89ce9574135abebecef8b15a8df096963778f1b2059092e0f0f351fd0e7af927",
+          "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
+          "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "3a150783fb310b9f7372c9c3d37cc2d0836be369b7cbdc9d1671393b11357454",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c1aabd8329cde2cbbd9bed51afe3938f87a773e66ebc68a62ee6473dd7cd27eb",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
+          "docs/plans/2026-09-28-farblit-payoff.md": "a29f2fa74aa769dbd2d987983bead2344cc3f9413020462036b6bc69c5723ace",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/plans/2026-09-28-farblit-range-integration.md": "12fa72b45c10459c9d62022fa746684fbbd4a12ad01723fb5795e591e83eed1c",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
         },
-        "reviewed_at": "2026-09-28T05:53:16.736326+00:00",
-        "note": "Reviewed the LZSS plan-index disposition changes: #128 is retired, #138 is implemented and gated in the gallery build, and the live queue contains neither as open work.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-luna, medium reasoning effort"
+        "reviewed_at": "2026-09-28T08:25:03.124885+00:00",
+        "note": "Reviewed the merged compiler queue against the published dashboard plan, the existing XY16 repair record, and the 0069/0070 investigations and PR packet. Dashboard automation remains parked; completed gallery and Round 8 work stays retired; package verification remains parked. Native-word integration is complete downstream, while independent review and building/testing the proposed upstream prerequisite stack remain pending. Expressed the runtime reductions as fewer master clocks and retained size tradeoffs and unchanged size-mode defaults. Existing dated evidence and contributor attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -343,7 +361,10 @@
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
         "docs/investigations/2026-09-27-carry-profitability-model.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
       ],
       "receipt": {
         "sources": {
@@ -363,7 +384,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-stale-x-writer-reload.json": "41350893ee094bd4592023e3ab3ad6f3d740a303085e7e3810662012a306c537",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -373,18 +394,21 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
         },
-        "reviewed_at": "2026-09-28T01:49:53.336633+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T08:07:54.312055+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -410,7 +434,10 @@
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
         "docs/investigations/2026-09-27-carry-profitability-model.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
       ],
       "receipt": {
         "sources": {
@@ -430,7 +457,7 @@
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
           "docs/defects/mos-vector-o0-status-scavenge.json": "536bf65a34e2abf876bbd3c420ec080a991c1c7e40b0c09ce07054d54d050597",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "7d1039816603df3dc0c28c26e7b5b874dce64bc771db6fcddea01ec68b6fb65a",
-          "docs/defects/mos-xy16-stale-x-writer-reload.json": "41350893ee094bd4592023e3ab3ad6f3d740a303085e7e3810662012a306c537",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "e6b7375ebd803455cbca7a2b699f00d05b69b37827d5b81d88e9993ec9eb138d",
           "docs/defects/mos-zp-index-same-width-trunc.json": "6f9a0f67b5e880df06f027a98ced0a9d0553420531064ce9b129ebc279e64587",
           "docs/defects/reentrant-attribute-contract.json": "b6b52765930d13c63b9f2e5c40cdb9c9e2171551b21af5f79c21938cae37dbb4",
           "docs/defects/selectiondag-inline-asm-nonstandard-integer.json": "360957bd5d6cc962f51221f6fcac6b69bcac05d25cdf2f1158bae79f458e2501",
@@ -440,18 +467,21 @@
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
         },
-        "reviewed_at": "2026-09-28T01:49:53.340421+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T08:07:54.315857+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -584,7 +614,10 @@
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-competing-carry-gate.md",
         "docs/investigations/2026-09-27-carry-profitability-model.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
       ],
       "receipt": {
         "sources": {
@@ -592,21 +625,24 @@
           "docs/defects/mos-far-memset-wrong-bank.json": "0b112c4993c36996af64d7db142f59f4456c2e041827033616100c5dd0fb5d14",
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "b0bba19c927e2d7c10beeed882455f41ace6ac3a24c95a04ef88f933433579dc",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
         },
-        "reviewed_at": "2026-09-28T01:49:54.431970+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T08:07:55.438511+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -639,12 +675,13 @@
         "docs/pr-preparations/2026-09-26/0064-validation.md",
         "docs/investigations/2026-09-27-near-y-decoder.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
-        "docs/investigations/2026-09-27-competing-carry-gate.md"
+        "docs/investigations/2026-09-27-competing-carry-gate.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md"
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "6a1b21a1367b41aad9f2612d805db3767cd8b6e6c852083c588a4f74ac8a361a",
-          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
+          "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
+          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -652,8 +689,8 @@
           "dev/measure-near-store.py": "b777bd54764f79c66aefd19fac62c4e9e51ae6cd594ab692f94278f69ae4f8ff",
           "patches/llvm-mos/0064-mos-computed-carry-scheduling.patch": "caba454c79ea8eaf8214a68bdf8a3d5df9dbba8b9b192c2d66084174e8a451d9",
           "dev/measure-carry-scheduling.py": "92544eb196fdf7c98d304c0ef2dcf6a7d6b6560b257192c31f267451b81eedfb",
-          "docs/defects/mos-carry-scheduling-pressure.json": "bd692e0f7fd9f8e7e56bd7d04ab401bd32c614a7c44ce16552af5d5dfe2402df",
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
+          "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/census-summary.json": "478c4353eaa1090671e09bea9e80acb8866dcc5b95d64394e87d376b491ded7a",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/growth-review.json": "6e771de918739b326595779117774463f10a4fbd16abcb1d4ba47c964d7fb145",
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/candidate-identity.json": "14c083760c230b3706a657f8432b90175ab433f5d8a581f74ec6e2f29f2c5f47",
@@ -666,15 +703,16 @@
           "docs/defects/evidence/2026-09-26-mos-carry-scheduling/carry-final-roundtrip-xy16-retry.log": "652e96905d7428c4eccebaddaf1d65bfbe32fce4201d9a2de14f8e0b4ce54197",
           "docs/pr-preparations/2026-09-26/0064-llvm-mos.patch": "3ee6c4f1c8b0a64c1415b657fde7f82ef6e2499fd2d435f2241fba59a6134983",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "a102443fb0c44f34da11d861f90ce9677173a7b8dc91bb7b576a64d3aeef2ee0",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
         },
-        "reviewed_at": "2026-09-28T01:50:01.458125+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T06:21:58.991718+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -694,13 +732,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-carry-scheduling-pressure.json": "de3fa36e1f2e739fb65d48cbddb8ab0dfb19529d64c629d6fa3bd0cafd5bd3d7",
+          "docs/defects/mos-carry-scheduling-pressure.json": "04239357ca3ab59373b3a9a73dba012e5e0b14ec846b4c89f8429dcb9fd905f7",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549"
         },
-        "reviewed_at": "2026-09-28T01:50:01.458971+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T03:25:01.825156+00:00",
+        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -731,17 +769,19 @@
             "summary",
             "resolution.change"
           ]
-        }
+        },
+        "docs/investigations/2026-09-28-farblit-range-integration.md"
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "f4855ab6016179d5c6058fc000362b94796c21101b9d5d3063318a6b746659ca",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "01de7d900d2fcd8dfc94effbd8b681dfaf0289e966f33b655b009fcd93caf4db",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
-          "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a"
+          "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
         },
-        "reviewed_at": "2026-09-28T00:09:53.678009+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T06:21:59.758588+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -752,12 +792,12 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "a102443fb0c44f34da11d861f90ce9677173a7b8dc91bb7b576a64d3aeef2ee0",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486"
         },
-        "reviewed_at": "2026-09-28T00:09:53.678097+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T05:25:39.929995+00:00",
+        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
       }
     },
     {
@@ -771,7 +811,8 @@
         "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json",
         "docs/investigations/2026-09-27-farblit-byte-load.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
-        "docs/investigations/2026-09-27-competing-carry-gate.md"
+        "docs/investigations/2026-09-27-competing-carry-gate.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md"
       ],
       "receipt": {
         "sources": {
@@ -781,13 +822,14 @@
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/pr-preparations/2026-09-26/0064-destination-recheck.json": "b89053bd766d6a2ea03f0294deb3ce568411aea29a76a0135b0a55c16949835a",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
         },
-        "reviewed_at": "2026-09-28T01:50:01.973635+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T06:22:00.650373+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -806,12 +848,12 @@
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream/receipt.json": "b7dff2ff7cab32d86c104b6eaaf998b76ee6df6984eb606fa18b8531170abc1f",
           "docs/pr-preparations/2026-09-26/validation/runs/carry-0064-upstream-clang/receipt.json": "a2a4bc6bf492a3ed4c0a46f84054d1726165e44aae110f0eb0fe0c44a0f54b03",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-28T01:50:02.234623+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T03:36:17.012178+00:00",
+        "note": "Reviewed the changed 0002 sections: only MOSInsertREPSEP and its two MIR regressions differ; all near-index/Y/bank-wrap implementation sections remain byte-identical. Preserved the near-Y and proof-recovery measurements as evidence for their identified September 27 builds. The 0064 review/validation and ready-packet plan still describe their exact upstream extractions and independent-review/publication limits; the new X preservation repair is downstream #321 work and does not close the separate all-XY16 driver observation or carry pressure contract. The increment-1 follow-up now qualifies Vlastack history and links the original-input dual-emulator repair.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -850,7 +892,7 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/0064-pr-body.md": "c619ede2cf7532545c7e15953161ecaff6830d6e7b6eb304f56a9e458364a863",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949",
+          "docs/pr-preparations/2026-09-26/0064-review.md": "a102443fb0c44f34da11d861f90ce9677173a7b8dc91bb7b576a64d3aeef2ee0",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
@@ -879,9 +921,9 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-28T00:09:56.151558+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T05:25:46.152879+00:00",
+        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
       }
     },
     {
@@ -955,11 +997,11 @@
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-mos-reducer/0060/receipt.json": "cbceaf24d6bdf5a1608c31c9a101c78588640479ad7a5a27ca5684172e9b1950",
           "docs/pr-preparations/2026-09-26/0060-llvm-mos.patch": "a62ebcdbdd7059d85c638e20c9bff8efaed808e9df5c35c4d2d6c93b3be04601",
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
-          "docs/pr-preparations/2026-09-26/0064-review.md": "0870c29c1fab79d5450b70974dc6f5bfe360cd9f4045271ef7308cd6b5fde949"
+          "docs/pr-preparations/2026-09-26/0064-review.md": "a102443fb0c44f34da11d861f90ce9677173a7b8dc91bb7b576a64d3aeef2ee0"
         },
-        "reviewed_at": "2026-09-28T00:09:58.491437+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T05:25:52.465810+00:00",
+        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
       }
     },
     {
@@ -1384,14 +1426,14 @@
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
           "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
         },
-        "reviewed_at": "2026-09-28T00:09:58.604727+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T05:25:52.758858+00:00",
+        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
       }
     },
     {
@@ -1439,13 +1481,13 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
+          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-27T14:25:10.061850+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T03:36:19.429206+00:00",
+        "note": "Reviewed the changed 0002 sections: only MOSInsertREPSEP and its two MIR regressions differ; all near-index/Y/bank-wrap implementation sections remain byte-identical. Preserved the near-Y and proof-recovery measurements as evidence for their identified September 27 builds. The 0064 review/validation and ready-packet plan still describe their exact upstream extractions and independent-review/publication limits; the new X preservation repair is downstream #321 work and does not close the separate all-XY16 driver observation or carry pressure contract. The increment-1 follow-up now qualifies Vlastack history and links the original-input dual-emulator repair.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -1568,22 +1610,31 @@
         "docs/investigations/2026-09-27-carry-profitability-model.md",
         "docs/defects/mos-near-index-overflow-proofs.json",
         "docs/defects/mos-null-output-streamer-crash.json",
-        "docs/pr-preparations/2026-09-27/0068-validation.md"
+        "docs/pr-preparations/2026-09-27/0068-validation.md",
+        {
+          "glob": "docs/defects/mos-xy16-stale-x-writer-reload.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change"
+          ]
+        }
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
-          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776"
         },
-        "reviewed_at": "2026-09-28T01:50:03.132901+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T03:25:07.363701+00:00",
+        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -1606,32 +1657,36 @@
         },
         {
           "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/*.log"
-        }
+        },
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md"
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-farblit-byte-load-legalization.json": "7e5c3b8b3118bbc391da472a919e633843cc5ce202fb7bd14a3d3a16b1bda809",
+          "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "patches/llvm-mos/0066-mos-far-extload-worklist.patch": "2c725a85fa3d485b875c2975cfa02a98461947d831bc6030528ef1aa1287b597",
           "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
-          "examples/65816/farblit.c": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d",
+          "examples/65816/farblit.c": "1516171c532d55976a21ae6c4acedd070b8ee129d79d8016de10c8321cabf0a3",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "docs/defects/evidence/2026-09-28-farblit-shapes/analysis.json": "9feb44ffe5673d03e02b65eb5e0d905fac79fcb606d99a4c533d251dea8f7b71",
           "docs/defects/evidence/2026-09-28-farblit-shapes/identity.json": "30388a0cf16e5f65f358cccaa52c3cdf74f5964959a43b0615b1f0f06292569f",
           "docs/defects/evidence/2026-09-28-farblit-shapes/runtime.log": "77e4fbe65cca6a9b168fcb98693b0a7e42d52735104b48a9b46ff5028245fc31",
-          "dev/check-farblit-shapes.py": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4",
-          "dev/test-farblit-shapes.py": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b",
+          "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
+          "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
           "examples/65816/farblit_press.c": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/identity.json": "424231b8e9f20b7d2cd1a76011e080d35e17e84b37080ea9991a4d73abe04838",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/identity.json": "c939c36fefe2d46079294dcdf56d9acd46538ce6e3809337f06d095c8599d691",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
-          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc"
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
         },
-        "reviewed_at": "2026-09-28T00:09:59.687560+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T06:22:05.476591+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -1648,18 +1703,18 @@
       ],
       "receipt": {
         "sources": {
-          "docs/defects/mos-carry-scheduling-pressure.json": "bd692e0f7fd9f8e7e56bd7d04ab401bd32c614a7c44ce16552af5d5dfe2402df",
+          "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/receipt.json": "e5f3753b19812a30882c341ab0b179ec122a3f48ade98e49a3dd504bccd95f19",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/results.json": "d4716cbbbdb98edda548b1d7b0a5f3a7e17c28bfecbbc89091cd7b5b4a315280",
           "docs/defects/evidence/2026-09-27-mos-carry-timing/interpreter-results.json": "8a37cc4d8c4d64c56f43e6465732ba538717bbeee38ec5eab0c7e5db9ea6dbdd",
           "dev/build-cycle-probe.py": "525a574c36c9edf022205a6ad0cfafa371406bb9c996a30f47e171be25292f98",
           "dev/jgxcycles.cpp": "67e5ed9b4eb4a6f9d65fdf90b2f0670b8f3e233965dcb560ed63e2160bcadb0d",
           "dev/measure-carry-cycles.py": "13a50d5677ae9d4b3f476ee4aac4d3c2551d2b60f9911aa79a6ac23079a8a2fd",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e"
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549"
         },
-        "reviewed_at": "2026-09-28T01:50:04.795594+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T03:24:52.500369+00:00",
+        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -1668,18 +1723,20 @@
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/investigations/2026-09-27-farblit-byte-load.md",
-        "docs/investigations/2026-09-27-competing-carry-gate.md"
+        "docs/investigations/2026-09-27-competing-carry-gate.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md"
       ],
       "receipt": {
         "sources": {
-          "docs/plans/2026-09-26-mos-carry-scheduling.md": "26ae3f6bea78d2e2f7ed05b66a74503e7c627b1af9649e4cb0b58c4834fa576d",
+          "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
-          "docs/investigations/2026-09-27-farblit-byte-load.md": "0c5a52080288c3e7b7cec31a04472521002c3c1c334fcc254871e05c02c312e1",
-          "docs/investigations/2026-09-27-competing-carry-gate.md": "6ce982a60c0e52261ce53f1183f6e66cc3efbfac43343dd77850364c66f7b82e"
+          "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
+          "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda"
         },
-        "reviewed_at": "2026-09-28T01:50:04.795760+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9"
+        "reviewed_at": "2026-09-28T06:22:05.476901+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     },
     {
@@ -1694,7 +1751,15 @@
         "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json",
         "docs/defects/evidence/2026-09-27-carry-selection-options/pipeline-excerpts.txt",
         "dev/summarize-carry-selection.py",
-        "docs/investigations/2026-09-27-carry-profitability-model.md"
+        "docs/investigations/2026-09-27-carry-profitability-model.md",
+        {
+          "glob": "docs/defects/mos-xy16-stale-x-writer-reload.json",
+          "fields": [
+            "status",
+            "summary",
+            "resolution.change"
+          ]
+        }
       ],
       "receipt": {
         "sources": {
@@ -1733,11 +1798,12 @@
           "docs/defects/evidence/2026-09-27-carry-selection-options/analysis.json": "2fcbd6dd20233aa4b2654b671c82b7f98fb52fcf1a7f879dd0a41d35b2524510",
           "docs/defects/evidence/2026-09-27-carry-selection-options/pipeline-excerpts.txt": "a078d73f58d0891c7c384778be62eb830dbd3eef5038a91c8b7f1c47d6ef9c33",
           "dev/summarize-carry-selection.py": "9052eba0683ba951c906e6c3c867ea0a03776609b9d8cda0dd8a418b0166006e",
-          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49"
+          "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776"
         },
-        "reviewed_at": "2026-09-27T10:31:51.251285+00:00",
-        "note": "Final wording review: the runtime subset contains 41 configurations, each selecting between off, always and gated with a writable-storage cap. Clarified that sentence without changing any measurement. Rechecked the dependent summaries and plan: they retain the measured 220-byte gate contribution, prototype overhead and bounded size/runtime claims; no default-policy decision or upstream submission is claimed.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-28T03:24:49.769309+00:00",
+        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -1802,14 +1868,14 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
-          "patches/llvm-mos/0002-321-accum16.patch": "d0efd815fc3771da6c7e07b91efce9dc625cb84a42327688476bc0b763b2f965",
+          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
         },
-        "reviewed_at": "2026-09-27T14:25:10.689995+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T03:36:20.690480+00:00",
+        "note": "Reviewed the changed 0002 sections: only MOSInsertREPSEP and its two MIR regressions differ; all near-index/Y/bank-wrap implementation sections remain byte-identical. Preserved the near-Y and proof-recovery measurements as evidence for their identified September 27 builds. The 0064 review/validation and ready-packet plan still describe their exact upstream extractions and independent-review/publication limits; the new X preservation repair is downstream #321 work and does not close the separate all-XY16 driver observation or carry pressure contract. The increment-1 follow-up now qualifies Vlastack history and links the original-input dual-emulator repair.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
       }
     },
     {
@@ -1906,25 +1972,296 @@
         },
         {
           "glob": "docs/defects/evidence/2026-09-28-farblit-gate/*/*.log"
-        }
+        },
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md"
       ],
       "receipt": {
         "sources": {
           "dev/farblit.sh": "46f48290eb4e7f1e46f38459cc8b23150b331f0cc4fa5f5bf2b801358453209e",
-          "dev/check-farblit-shapes.py": "39983bc20dc8c3f8e301e935a2a1e9a619f46c156cd36fc6c32035ed77554cb4",
-          "dev/test-farblit-shapes.py": "90da71298ccd7a8955f276232c5d302e446834c8c99127489b5a112155a2f81b",
-          "examples/65816/farblit.c": "2f8f61292f3dea191cb5295c13b0b7791a7e99ec242e27f71c0cd45598c7fb0d",
+          "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
+          "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
+          "examples/65816/farblit.c": "1516171c532d55976a21ae6c4acedd070b8ee129d79d8016de10c8321cabf0a3",
           "examples/65816/farblit_press.c": "9be707a0787e58a218d7116284eec80b3d7124d019edbf907dcc0fe3f5aaf51a",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/identity.json": "424231b8e9f20b7d2cd1a76011e080d35e17e84b37080ea9991a4d73abe04838",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/identity.json": "c939c36fefe2d46079294dcdf56d9acd46538ce6e3809337f06d095c8599d691",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
-          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc"
+          "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
         },
-        "reviewed_at": "2026-09-28T00:09:59.687885+00:00",
-        "note": "Reviewed Farblit per-probe shape contracts against both exact toolchain identities, all four reports per build, eight runtime assertions per build and 15 checker tests per build. Current summaries now distinguish the completed gate update from the prior compiler repair and preserved failing aggregate gate. Recorded the old analysis.json source-label error without modifying frozen evidence. The standalone 0064 packet, posted body, validation counts, publication status and feature-series prerequisites remain unchanged. Reviewed Markdown viewing references after removing six document-specific renderers, their templates and HTML; task md is now the shared viewer, historical design links use the retained Git revision, and AGENTS.md still correctly delegates dependency policy to the workflow.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e529-62c6-7fc2-a0c6-357800272c63."
+        "reviewed_at": "2026-09-28T06:22:05.477142+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-28-vlastack-xy16-stale-reload.md",
+      "sources": [
+        "docs/defects/mos-xy16-stale-x-writer-reload.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "5e5d75c0c4494e7d0f10b7bbd0053751e025e041259f27786ede5984e3c1a123"
+        },
+        "reviewed_at": "2026-09-28T03:24:46.830151+00:00",
+        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-28-farblit-payoff.md",
+      "sources": [
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-payoff/*.json"
+        },
+        "docs/defects/evidence/2026-09-28-farblit-payoff/candidate.patch",
+        "docs/defects/evidence/2026-09-28-farblit-payoff/bounds.c",
+        "docs/defects/evidence/2026-09-28-farblit-payoff/measure.py",
+        "docs/defects/evidence/2026-09-28-farblit-payoff/validate.py",
+        "docs/defects/evidence/2026-09-28-farblit-payoff/check_bounds_shapes.py",
+        "docs/defects/evidence/2026-09-28-farblit-payoff/mame.sh",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/evidence/2026-09-28-farblit-payoff/artifact-hashes.json": "b3a9c0a40bc369244dce73c9c3686cc66b0ffaea6d806d69298735e0ca09d48b",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/bounds-shapes.json": "e42e542030754d8d289a634097928677090567e0fb105317e72d0d8ce5e983a3",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/commands.json": "8bd6701be1d5ff32815a700265dca97d274c25ea3f403d0c419f1e531c2aca6c",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/disabled-control.json": "b5ed8e3a119729ab5f27c274469cdcea8ec3896d9fa8b817c10412f6c45d3152",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/frontend-commands.json": "bf549ae70740f38f50359d9ff33c680dcca34c88a78cc72721eb520224f1d29b",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/identity.json": "d3017098b81ffc717c8318c4e2516fe31a84e019a7002274eadfa251c4839ff4",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/prior-work.json": "84074b5ed7289084fa4bac155702c5f0d80a459f9a48932bb3e4b7c9a29cd134",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/profile-audit.json": "a7fdefe4c18bd848528885e0604dc4f4f85e7159b8da3752792a17c346f719e8",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/receipt.json": "728124587cbb9a93e96fe4ae17b27108dd074f38db2660cccff22c3fd8713e0a",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/results.json": "9a285a98b71db5b9c0bc25f7bc1ec712e66b4924b5ee0e1b7f573174f6f951c3",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/validation-commands.json": "64be1bb4dba594612f9f2949917f5f90544868bfd3b144bd5a3c6b5dfcdce415",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/validation.json": "86225e6d882e91a7dfee721a54705268d0425ee3ba13c6d187ba872042de6025",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/word-only-control.json": "a89c81cdf1a67f62517de3ff17efdfdefd54618e5be0c69d9ad22a077a9f8d99",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/candidate.patch": "15c204011da5ca47f4bcf7106484b54b0a975896d5d97e6726b7fff349ef9356",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/bounds.c": "24f765a16b3e8b079a0ccd6a30466f192a825aea34f63deda6930f50906c599f",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/measure.py": "ca8ffcdfabc0ad16d4def74530e986041a0653cf6042947e5ac9e97e4751cdcf",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/validate.py": "acd5f7913b1221fc3a5fe52ebdf5e3cb06168c1b3c6b167b07b8e930d5b06c33",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/check_bounds_shapes.py": "6ebdd5da386a47bf15923274e27f9c4f01f4cb3936f489b0ded9fa8e3fef8bc7",
+          "docs/defects/evidence/2026-09-28-farblit-payoff/mame.sh": "eef6383b29adb315d61f4fd148a1ebeb49ae966470435fb6ee195aee4365b297",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+        },
+        "reviewed_at": "2026-09-28T06:22:08.594626+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-28-farblit-payoff.md",
+      "sources": [
+        "docs/investigations/2026-09-28-farblit-payoff.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+        },
+        "reviewed_at": "2026-09-28T06:22:08.594764+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-28-farblit-range-integration.md",
+      "sources": [
+        {
+          "glob": "docs/defects/evidence/2026-09-28-farblit-range-integration/*.json"
+        },
+        "patches/llvm-mos/0069-mos-far-loop-range.patch",
+        "dev/check-farblit-shapes.py",
+        "dev/test-farblit-shapes.py",
+        "dev/toolchain.sh",
+        "dev/regen-patch.sh",
+        "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py",
+        "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh",
+        "docs/investigations/2026-09-28-far-word-policy.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/artifact-hashes.json": "c02bb72758bd34cda9f5242bd78017e4414f48746669cd67110d509f0f7f7679",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/baseline-commands.json": "11eab926cc8e747f078860c293f1d26e8aada495c2e971161e60269045a3a47c",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/baseline-sweep.json": "bf55db41976665a3503ed3892800cded2f2d0e79884f45d04afc663f5c039ec4",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/candidate-commands.json": "40a972ddd2d2d05294ec738791a2306c7c5c0ae96c18abb1b924b0d9a36f6b2d",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/candidate-sweep.json": "d9992b146cff350bf5639e60a017e94acec861a8357f89ceaf5e52d8d1497b2d",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/disabled-control.json": "659235295db31292af5b0b00a3089b68d726a45e98c74f6b41c90af55ea541cc",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/focused-checks.json": "c058ba1cb04a8e7c0a7836107f3e330d61612134b4f165198ab3be7ff11ceca6",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/identity.json": "6279a633092d8092e15e003449c087090699f03e2269f877c69f2af3130e4653",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/installed-control.json": "50f7581a81058c3147d7f2eed97e2713c983c848d32cbfe2593f72697899651b",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/prior-work.json": "d6a9014d245793b7bb6f4a2131e5356a48ac56940b958c289a45b3880e209f88",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/receipt.json": "ac174f2f6b45c5be3b98f8087bc529f9906ef131fba45423e9be6be20322f80e",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/results.json": "fe3e31eb7c0704a21a819632f7fd0407489fc899c823ec3ebd33094527037241",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+          "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
+          "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
+          "dev/toolchain.sh": "93db87c392f24585ba3594d30f2fc1158ae490c770b5e2a967a7c8bbc6ade19a",
+          "dev/regen-patch.sh": "627623dfa5a7eb020f579c9bff9d1c728697e1de2e2a1b9d14eff200fdaaa063",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
+          "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+        },
+        "reviewed_at": "2026-09-28T06:22:11.179004+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-28-farblit-range-integration.md",
+      "sources": [
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/investigations/2026-09-28-far-word-policy.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30"
+        },
+        "reviewed_at": "2026-09-28T06:22:11.179096+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/investigations/2026-09-28-far-word-policy.md",
+      "sources": [
+        "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
+        "docs/defects/evidence/2026-09-28-far-word-policy/results.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/identity.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json"
+      ],
+      "receipt": {
+        "sources": {
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
+          "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
+          "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json": "5b07db25e6276a425058c17c4c88499dbbccbca9d4676c06244f18db58f2d9a1",
+          "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json": "0be5acc2dd52f062c05482b61531333d4a491b857b1d37b8751c60d943902439"
+        },
+        "reviewed_at": "2026-09-28T06:22:13.633596+00:00",
+        "note": "Reviewed 0070 against retained identities, size/timing results, shapes, dual-emulator logs, installed output equality and patch reconstruction. Updated current native-word status to speed-only O2/O3; Os/Oz and the existing Farblit gate retain byte-identical output. Preserved dated 0069/0066 and 0064 evidence, defect baselines, independent-review boundaries and publication status. The remaining TODO is upstream preparation; no new defect closure or upstream readiness is claimed.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/plans/2026-09-28-far-word-policy.md",
+      "sources": [
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/README.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
+        },
+        "reviewed_at": "2026-09-28T08:07:55.438572+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/review.md",
+      "sources": [
+        "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
+        "patches/llvm-mos/0069-mos-far-loop-range.patch",
+        "docs/investigations/2026-09-28-far-word-policy.md",
+        "docs/investigations/2026-09-28-farblit-payoff.md",
+        "docs/investigations/2026-09-28-farblit-range-integration.md",
+        "docs/pr-preparations/2026-09-26/native-optimization-review.md",
+        "docs/pr-preparations/2026-09-26/feature-held-packages.md",
+        "docs/defects/evidence/2026-09-28-far-word-policy/results.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/trace.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/identity.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/receipt.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/manifest.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/policy-control.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/disabled-control.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/default-control.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/shape-checks.json",
+        "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/destination.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/audit.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/destination-source.tar.gz",
+        "docs/defects/evidence/2026-09-27-mos-carry-timing/emulator-identity.json",
+        "docs/investigations/2026-09-27-mos-carry-timing.md",
+        "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py",
+        "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py"
+      ],
+      "receipt": {
+        "sources": {
+          "patches/llvm-mos/0070-mos-far-word-index-policy.patch": "0d6bd0c8371cd08df56b73279bfce0a66a063b89af9e7c3ee6b520247cc2c53c",
+          "patches/llvm-mos/0069-mos-far-loop-range.patch": "0a3e03130ee3b1e3a8a9be6bba565d92c153f57c16c7e3725fe537e41ad5ede9",
+          "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
+          "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "6c613d5a24b881465057bf1928cf2b8057c1bfda5e8bf55e295fdb11d9168cda",
+          "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
+          "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
+          "docs/defects/evidence/2026-09-28-far-word-policy/trace.json": "ef5faa521845e918a467e762a86dc1fe08a63928cdfc479b07f394ad6f247734",
+          "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
+          "docs/defects/evidence/2026-09-28-far-word-policy/receipt.json": "a47c4aead6fa9ad971b45b682c44b6f685bdf7bb4d8c0a379fca27c4bf831b0c",
+          "docs/defects/evidence/2026-09-28-far-word-policy/manifest.json": "5320d2bb0d855e0d2b6b91e3e6928152cb70912af796f7bb86c38ac4425fd380",
+          "docs/defects/evidence/2026-09-28-far-word-policy/policy-control.json": "cd3bfe1f07a1e6dd118ce911a08ac53f307fa7d5480e75234804788f769e185e",
+          "docs/defects/evidence/2026-09-28-far-word-policy/disabled-control.json": "58df44489bca720b5e7697da05276a0a0711ddc9612d488d436896dfc55b04c0",
+          "docs/defects/evidence/2026-09-28-far-word-policy/default-control.json": "daac29c754faabc1dff41403ca21df1bfe967a8ab8747aed89b44c313052d444",
+          "docs/defects/evidence/2026-09-28-far-word-policy/installed-control.json": "5b07db25e6276a425058c17c4c88499dbbccbca9d4676c06244f18db58f2d9a1",
+          "docs/defects/evidence/2026-09-28-far-word-policy/shape-checks.json": "e0532c556996cde51967b00c43726c1dc2536fdd95d9706c038c725609f8a3e0",
+          "docs/defects/evidence/2026-09-28-far-word-policy/final-lit.json": "0be5acc2dd52f062c05482b61531333d4a491b857b1d37b8751c60d943902439",
+          "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc",
+          "docs/pr-preparations/2026-09-28/far-word-index/audit.json": "0ef7c0468b8eda1f53321cf7b84966d7b21648676756d66cbe541c2eef0d4f81",
+          "docs/pr-preparations/2026-09-28/far-word-index/destination-source.tar.gz": "5357af95e0c31a4247f93336f407f7bb7bc4aa59462fb78dcfebbf09bd630e49",
+          "docs/defects/evidence/2026-09-27-mos-carry-timing/emulator-identity.json": "9d74bf492f4513aaa81b7699fb91d38001547d594d32b8ace9872ff2e780fee2",
+          "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
+          "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py": "af76c7d0d483a6dd1c967bdba316b996a33f748d550754e3aa7a82960df8ce45",
+          "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py": "2ced07c76cfb86b457bd85dbc9f7e698a5dfa2e2ab7903e3c880889a4707d3a8"
+        },
+        "reviewed_at": "2026-09-28T08:07:47.725464+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/review.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "d5f2abfa8448eeec8ca00e4ce2abebf105cae946ef1313dac7907405b0865589"
+        },
+        "reviewed_at": "2026-09-28T08:07:48.044771+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/README.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/review.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/destination.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md": "ca32796bcc72f1ec6e75561dcf4026e7d370ed01c1b1204a2590b2e2db9ff999",
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "d5f2abfa8448eeec8ca00e4ce2abebf105cae946ef1313dac7907405b0865589",
+          "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc"
+        },
+        "reviewed_at": "2026-09-28T08:07:48.323707+00:00",
+        "note": "Clarified prerequisite-series validation as separating required downstream changes into ordered commits, applying them to a pinned upstream base, adding 0069/0070, then building and repeating the relevant correctness, size and runtime comparisons. Explicitly retained the validity and measured scope of existing downstream results. Expanded remaining review questions into independent correctness review, broader application performance, compilation overhead, policy-switch design and preservation of behavior/dependencies in the proposed upstream patch stack. Reviewed linked plan, TODO and current summaries for consistent wording; existing proof, performance figures, historical records and publication status are unchanged. Local links, PR paragraph formatting and whitespace checks pass.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     }
   ]

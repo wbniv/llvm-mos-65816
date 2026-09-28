@@ -1,5 +1,13 @@
 # Farblit checks for each instruction shape
 
+**Speed-policy follow-up, September 28:** [0070 is installed locally](../investigations/2026-09-28-far-word-policy.md). The gate described here builds with `-Os` and retains its native-word fallback; speed-oriented `-O2`/`-O3` builds now fold bounded word loads. Earlier measurements below identify their captured builds. Update attribution: OpenAI Codex CLI 0.157.1 (session source: `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
+
+**Later September 28 follow-up:** the [bounded range proof is integrated and installed](../investigations/2026-09-28-farblit-range-integration.md) as patch 0069. The current gate requires Y8 for both `cp8` accesses in A16 and XY16; native-word `rdw` retains its fallback. All 36 LTO configurations pass both emulators, and 16 checker sensitivity tests pass.
+
+Follow-up attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e61c-c24c-7053-aa56-a4a4e43f12ab`.
+
+## Dated snapshot before range-proof integration
+
 Status: implemented and validated. This implements the [completed reconciliation](../investigations/2026-09-27-farblit-byte-load.md#instruction-shape-reconciliation-2026-09-28); the compiler and its optimization policy are unchanged.
 
 Attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `high` reasoning effort; verified session `01a0e529-62c6-7fc2-a0c6-357800272c63`.
