@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-28",
-  "sourceHash": "7c5294315827dda2b05ebe334bbfa6b591d8f245f4fe39a3bd70acf69da26528",
+  "sourceHash": "1ad13cdbc7e079c29b9c20f0c0426f6644ed8e5c0d1b222dd4bbf13528e08c3e",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -155,6 +155,25 @@
       ],
       "evidenceNote": "",
       "dependsOn": [],
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-native-index-copy-cost",
+      "kind": "defect",
+      "title": "Native index to imaginary-pair copies lack allocation costs",
+      "summary": "Fixed in the extracted native/far prerequisite series by adding costs for four legal X16/Y16-to-Imag16 copy edges. The two unchanged IR regressions and focused allocation MIR fail on the preserved assertions build and pass after the repair. This is not a claim that the installed downstream compiler contains the change.",
+      "localStatus": "fixed",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Independently review with the extracted native/far compiler series; this repair is validated in the candidate and is not installed downstream.",
+      "evidenceNote": "",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-native-index-copy-cost.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+      ],
       "upstreamUrl": null,
       "demoUrls": []
     },
@@ -431,10 +450,11 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Agree the ABI and extract standalone compiler changes.",
+      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/320-upstream-far-pointer-note.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/320-upstream-far-pointer-note.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -448,10 +468,11 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Extract a coherent native-width compiler submission and validate its ABI.",
+      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/321-upstream-native-width-pr.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/321-upstream-native-width-pr.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
