@@ -1,229 +1,239 @@
 | Date | Change |
 |------|--------|
-| [2026-09-28](/home/will/llvm-mos-65816/commit/392aaea3) | Document XY16 stale X reload and curate current TODO |
-| [2026-08-06](/home/will/llvm-mos-65816/commit/bf97f851) | fix(dev): make MAME corpus self-contained |
-| [2026-08-06](/home/will/llvm-mos-65816/commit/5b1d6320) | fix(dev): require real xy16inplace emulator results |
-| [2026-08-04](/home/will/llvm-mos-65816/commit/7d33fe8a) | docs: consolidate orphaned doc-state from completed sessions + today's bookkeeping |
-| [2026-08-03](/home/will/llvm-mos-65816/commit/28144b9f) | docs(plan-index): record the #123 nmitally commit SHA |
-| [2026-08-03](/home/will/llvm-mos-65816/commit/5b80b027) | feat(snes): #123 nmitally — the interrupt CC's first run finds a 65816 width bug |
-| [2026-07-30](/home/will/llvm-mos-65816/commit/29a92f61) | docs(60fps+todo): truncstair F2/F3 done — correct this document's own deferral verdict |
-| [2026-07-27](/home/will/llvm-mos-65816/commit/fab41e78) | docs(plan-index): #128 row + tail creation-order fix (300 plans, coverage complete) |
-| [2026-07-27](/home/will/llvm-mos-65816/commit/f369e6c9) | docs(todo+plan-index): triage the #128 inbox deferral; index the plan |
-| [2026-07-27](/home/will/llvm-mos-65816/commit/e1e5068d) | docs(plan-index): #99c row (299 plans, coverage stays complete) |
-| [2026-07-27](/home/will/llvm-mos-65816/commit/189718f7) | docs(plan-index): clear the drift — rows for all 14 committed-but-unindexed plans (298 total, complete) |
-| [2026-07-27](/home/will/llvm-mos-65816/commit/405e39fd) | docs(99b): plan screenshots (before/waterfall/final) + plan-index row (199 plans) |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/34419296) | docs(plan-index): row for the snesgfx all-virtual dispatch benchmark (198 plans) |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/47b1a2c7) | docs(plan-index): add row for full-rom-galleries-both-sites |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/4ded0870) | docs(todo+plan-index): triage campaign-plan capture (review-gated by design); index row |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/d0556293) | docs(plan-index): add the zp-alloc Imag32 CSR-rename fix row (2bfe4f3) |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/f75e06ad) | docs(todo+plan-index): file the far-read codegen bug; triage; index the plan |
-| [2026-07-26](/home/will/llvm-mos-65816/commit/a25b326a) | docs(todo+plan-index): triage rebase-plan deferrals; add plan-index row |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/092210ac) | docs(plan-index): add #110 borrowlad row (8915348) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/61d625fd) | docs(plan-index): add #109 pcooker row (bb58a0a) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/69962c44) | docs(plan-index): add #108 uarteye row (8b93bc3) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/43e5c927) | docs(plan-index): add #107 bitweave row (303a25c) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/1266212a) | docs(plan-index): add #106 lfsr2 row (bf6ba8c) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/158c2cb7) | docs(plan-index): add #104 modexp256 row (fc8ea58) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/e7061cec) | docs(plan-index): add #103 oddmask row (ac8cb1d) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/3d942b94) | docs(plan-index): add #100 keycmp64 row (00b98f1) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/5a98cd93) | docs(plan-index): add #99 trimerge row (3148b89) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/d4bb34e2) | docs(plan-index): add #98 ucmprank row (b69d3d1) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/bd2d2047) | docs(plan-index): add #96 ropeedit row (3864d44) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/b50b0582) | docs(plan-index): add #95 permscat row (f1c6ac5) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/62464ca6) | docs(plan-index): add #94 rotslab row (3d0691e) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/7e264709) | docs(plan-index): add #105 crcwall row (419830d) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/d917fdbd) | docs(plan-index): add #97 spaceship row (f9ce73a) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/7ce9b0ab) | docs(plan-index): add #93 ovmove row (b7e8281) |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/9be0141f) | docs: cross-link the setjmp fix-analysis report + index the fix plan |
-| [2026-07-02](/home/will/llvm-mos-65816/commit/0c740cc3) | docs(plan-index): add #101 mulov64 row (c0a35bf) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/889898e7) | feat(snes/plyoracle): #92 PlyOracle (Round 5, final pick, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/2717999b) | feat(snes/matcascade): #91 Matrix Cascade (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/3d8281af) | feat(snes/scopeguard): #90 Scope-Guard Ripple Tank (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/98178d10) | feat(snes/adpcm): #89 ADPCM Waverider (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/d6ddf07b) | feat(snes/dctbloom): #88 DCT Bloom (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/abf28e44) | feat(snes/sobel): #87 Sobelscope (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/bba77cf5) | feat(snes/rangecode): #86 Range Coder (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a6c9ffd8) | feat(snes/ulam): #85 Ulam Prime Sieve (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/3e726588) | feat(snes/montorbit): #84 Montgomery Orbit (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/3ab0a2b2) | docs(plan-index): add #83 truncstair row (ZP-alloc miscompile, Compiler-bug) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/478ec59c) | feat(snes/speedcap): #82 Fmin/Fmax Speed Cap (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/23e4f278) | feat(snes/compass): #81 Copysign Compass (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/5ca866df) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/0ccecd9c) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/26c2e18e) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/1f150000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/0f32b198) | docs(plan-index): add #75 satcomet row |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/eecfd2f6) | docs(plan-index): add #76 smulorbit row |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a68142d9) | docs(plan-index): add gallery-categories-netflix row + triage TODO inbox |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/c007bfe8) | docs(plan-index): add #80 fabsridge row |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/8473d5b5) | docs(plan-index): add #73 funnelkal row |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/15492202) | docs(plan-index): point #72 grid3d row at its commit 3676149 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/36761495) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/3a4c2b8f) | docs(plan-index): point #71 msquares row at its commit a8e4ba1 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a8e4ba1c) | #71 Marching-Squares Iso-Contours SNES demo — 16-case edge LUT + edge interpolation (clean positive + rc-undef XFAIL witness) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/44eceb39) | docs(plan-index): point #70 dither row at its commit af56fe3 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/af56fe3d) | #70 Floyd-Steinberg Error-Diffusion Dither SNES demo — forward-carried signed residual (clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/78cbe5aa) | docs(plan-index): point #69 gouraud row at its commit a342c9e |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a342c9e4) | #69 Gouraud Triangle Tumbler SNES demo — barycentric edge-function raster (clean positive + rc-undef XFAIL witness) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/7c457ec3) | docs(plan-index): point #68 perlin row at its commit 5e54c4f |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/5e54c4f6) | #68 Perlin Gradient-Noise Flow Field SNES demo — fade polynomial + gradient dot + lerp (clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/07350249) | docs(plan-index): point #67 huffman row at its commit 5a73244 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/5a732444) | #67 Huffman Decode Reveal SNES demo — bit-stream tree walk (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a8d78455) | docs(plan-index): point #66 editdist row at its commit 15427ec |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/15427ecd) | #66 Edit-Distance DP SNES demo — a 2-D dynamic-programming table (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a6bb81d2) | docs(plan-index): point #65 hull row at its commit ab47d47 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/ab47d47f) | #65 Convex Hull Rubber-Band SNES demo — cross-product orientation tests (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/bb5b5121) | docs(plan-index): point #64 radix row at its commit 6fc0e28 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/6fc0e289) | #64 Radix / Counting Sort SNES demo — a non-comparison sort (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/85bc34fa) | docs(plan-index): point #63 fenwick row at its commit 8d57a11 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/8d57a112) | #63 Fenwick Tree SNES demo — the i & -i low-bit-isolation trick (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/cbef6e27) | docs(plan-index): point #62 percol row at its commit 15a34e9 |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/15a34e98) | #62 Union-Find Percolation SNES demo — disjoint-set path compression (Round 4, clean positive) |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/a6f99150) | docs(plan-index): point #61 dhmix row at its commit c360dfc |
-| [2026-07-01](/home/will/llvm-mos-65816/commit/c360dfc4) | #61 Diffie-Hellman Colour-Mixer SNES demo — 64-bit modexp; CAUGHT + FIXED a real backend bug (Round 4) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/e14e370c) | docs(plan-index): point #60 multibase row at its commit a0455bc |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/a0455bc6) | #60 Multi-Base Clock SNES demo — libc div()/lldiv() div_t struct-return (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/8bc58929) | docs(plan-index): point #59 cosmzoom row at its commit 696a0f9 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/696a0f9b) | #59 Cosmic Zoom Ruler SNES demo — 64-bit integer <-> float conversion (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f4b0141d) | docs(plan-index): point #58 domcol row at its commit eca8cc3 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/eca8cc38) | #58 Complex Domain-Colouring SNES demo — NaN/unordered float compares (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f31aae59) | docs(plan-index): point #57 medfilt row at its commit 76c511d |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/76c511d8) | #57 Median Denoiser SNES demo — branchless min/max/abs network (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/2aa768c4) | docs(plan-index): point #56 rotozoom row at its commit aa7da46 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/aa7da461) | #56 Rotozoom SNES demo — widening multiply-high (G_SMULH/G_UMULH) (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/fe273cc0) | docs(plan-index): point #55 gf256 row at its commit 52b772c |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/52b772c6) | #55 GF(2^8) Galois Field SNES demo — Reed-Solomon carryless multiply (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/18106e83) | docs(plan-index): point #54 bitshuffle row at its commit d2ecd9b |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/d2ecd9b0) | #54 Perfect-Shuffle Transition SNES demo — byte-swap / bit-reverse intrinsics (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/b6ed82a3) | docs(plan-index): point #53 bitcensus row at its commit a2cbe1b |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/a2cbe1ba) | #53 Bit-Census Field SNES demo — bit-population intrinsic family (Round 4, clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/5334d669) | docs(plan-index): point #52 disbits row at its commit 5f28aea |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/5f28aeab) | #52 Cross-Byte-Boundary Bitfield Disassembler SNES demo — final Round-3 demo (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/1d91eb51) | docs(plan-index): point #51 critters row at its commit 0e0ca23 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0e0ca23a) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/38da772d) | docs(plan-index): add counter-sliding title screen row (193 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/fcc842ef) | docs(plan-index): point #50 cgrade row at its commit 4f6558f |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/4f6558fe) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/bd155f84) | docs(plan-index): point #49 lzdec row at its commit 149bfdf |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/149bfdf9) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/d936292a) | docs(plan-index): point #47 nrecip row at its commit be11fd9 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/be11fd9f) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/48f85806) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/3c2c7a5d) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/ba907ad0) | docs(plan-index): point #45 metaball row at its commit 2b0b9a7 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/2b0b9a74) | #45 Union Type-Pun Metaballs SNES demo — Quake fast-inverse-sqrt (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/25b6b8e4) | docs(plan-index): point #43 sodo row at its commit ca16265 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/ca162653) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/256a383d) | docs(plan-index): point #42 duff row at its commit 5698c17 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/5698c173) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0c5df0ab) | docs(plan-index): point #41 poolfx row at its commit a12b00d |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/a12b00d6) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/6e87c016) | docs(plan-index): point #40 crctex row at its commit ad34254 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/ad34254c) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/e92a366f) | docs(plan-index): point #39 divclock row at its commit 4d20e30 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/4d20e302) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/18878317) | docs(plan-index): point #37 seqvm row at its commit e134e54 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/e134e540) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f77a7e3b) | docs(plan-index): point #36 polyfill row at its commit cdb8641 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/cdb86414) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/14fa7546) | docs(plan-index): point #48 iir-scope row at its commit f3e3393 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f3e3393a) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/4e90f145) | docs(plan-index): point #44 hdr-bloom row at its commit 0af9b34 |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0af9b341) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0e899f65) | docs(plan-index): point #38 bf-vm row at its commit f29be2f |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f29be2f0) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/33e5415b) | docs(plan-index): point #33 mandel-double row at its squashed commit 661b01e |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/661b01e5) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/30e3918c) | docs(plan-index): add title-screen VOFS easing row (192 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f5e82623) | docs(plan-index): add title-screen upgrade row (191 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/2f0c3183) | docs(plan-index): add #31 Barnes-Hut row (190 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0eb843f8) | docs(plan-index): add #32 vaprintf row (189 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/b9e7b8c8) | docs(plan-index): add #25 FFT row (188 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/8f275e0f) | docs(plan-index): add title_layer 16×16 font row (186 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/4c7c9def) | docs(plan-index): add #28 Hilbert row (187 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/b4e238ae) | docs(plan-index): add #27 cardioid + #30 TEA rows (186 plans) |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/3e6c825d) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/0cec5170) | docs(fn-plot): update plan + TODO + plan-index for post-ship fixes |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/471d04fc) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
-| [2026-06-30](/home/will/llvm-mos-65816/commit/f74cb6f2) | docs(plan-index): add snesgfx mandel-oop verification row (185 plans) |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/cff089f9) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/91caaa17) | chore: move the blocked #23 L-system demo off main to a branch |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/25358296) | docs(snes): mark #16 Wireframe 3-D Solid done — source recreated + republished |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/6fe6e69f) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/8ed73d1e) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/d5a4f740) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/7172dd9f) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/9b1f1371) | docs(plan-index): add the VBLANK/flicker sweep row (182 plans) |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/48f1c90d) | docs(plan-index): fill #21 Soft-Float Mandelbrot SHA (cd3663a) — cluster fully commit-linked |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/a33bd8ff) | docs(plan-index): batch-refresh the recent demo cluster's commit SHAs |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/14575afb) | docs(plan-index): add the #12 CORDIC Rotator row (close committed-plan drift) |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/2397e743) | docs(snes): #4 Buddhabrot close-out + dedupe burning-ship rows |
-| [2026-06-29](/home/will/llvm-mos-65816/commit/8e6f647f) | feat(snes): #3 Burning Ship fractal — |Re|,|Im|-folding escape-time demo |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/0cabf2df) | feat(snes): #1 Julia Set Explorer — z²+c complex-multiply / far-framebuffer stress demo |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/579ad869) | feat(snes): #15 Raycaster maze — DDA grid-cast, per-column 1/dist divide |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/70e18405) | feat(snes): #9 Lissajous / Harmonograph — damped sin-LUT curve demo |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/30333e0e) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/070328fe) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/6831fac8) | docs(plan-index): add #17 Sorting Race row (f8aff1c) |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/32a4114c) | feat(snes): #7 Doom-fire / heat-field demo — array sweep + PRNG, palette ramp |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/9f3d71e3) | feat(snes): #18 Maze generate + solve — recursion + A* priority-queue heap demo |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/5e02b1ab) | fix(snes): rdiff Gray-Scott 16-bit rework — real reaction-diffusion patterns |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/607c3cb9) | docs(plan-index): backfill #12 CORDIC commit SHA (34fd3ad) + built/published status |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/34fd3ada) | #12 CORDIC rotator SNES demo — multiply-free compiler stress-test |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/189c2be5) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
-| [2026-06-28](/home/will/llvm-mos-65816/commit/c09912a3) | docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/99c14852) | docs(plan-index): add #16 Wireframe 3-D Solid row (56cf11c) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/eb378b15) | docs(plan-index): add SHA b76f8ef for #2 Newton's-method fractal plan row |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/67804be1) | docs(plan-index): add SHA 7bb4f86 for #20 factorial plan row |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/7bb4f865) | feat(snes): #20 Bignum Factorial demo (factorial) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/0ca1c15d) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/fcaa7b83) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/2a2dbc2d) | docs(plan-index): add cache-control headers plan row (77d085b) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/669c44f6) | docs(plan-index): record commit sha for #13 N-body orbits (f0eead4) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/6525579f) | docs(plan-index): record commit sha for #6 1d-ca demo (dce7db4) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/dce7db41) | feat(snes): #6 Rule 90/110 1-D CA scrolling demo (examples/snes/1d-ca.c) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/3fb4c00d) | docs(plan-index): fill commit SHA for #8 rdiff + mark gate-run pending |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/3fcbb63b) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/08c73842) | feat(snes): #14 Double Pendulum chaos demo — semi-implicit Euler + chaos divergence |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/a659f72b) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/72fb2dd7) | chore(plan-index): add #19 π spigot + Monte-Carlo plan row |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/ea42d152) | #11 spirograph: record publish — live at biohack.net/spirograph/ |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/80ff5960) | #11 spirograph: tune EPI scale to fit the canvas (golden 0xB8AA->0x32D4) |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/b5e094ab) | docs(plan-index): add the #11 spirograph demo row |
-| [2026-06-27](/home/will/llvm-mos-65816/commit/2b9924cd) | docs(plan-index): add the Space-Invaders-on-snesgfx plan row (154 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/d9d7f828) | docs(plan-index): add the snesgfx OOP rendering-library plan row (153 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/eeaa1e9a) | docs(plan-index): add the far-pointer G_PHI(p2) backend-gap fix row (152 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/ddeea529) | docs(plan-index): add the Blossom split-screen-HUD row (150 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/1127ddc0) | docs(plan-index): add the far-memset wrong-bank fix row (151 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/2c07c950) | docs(plan-index): add the xy16-cmove stale-XFAIL resolution row (150 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/0034e3ce) | #321: collapse the SNES Mandelbrot demos into one far/16-bit tester |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/2b4d6310) | docs(plan-index): add the full-xy16-backend-fix row (149 plans) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/5f3b3166) | #321 c-torture: finish the full vendoring (ieee/ + builtins/ into the gate) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/952c86c5) | docs: add plan-index row for the Blossom interactive-renderer plan |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/de658f06) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/ec4a80b2) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/798414ad) | docs(plan-index): add the pr15296 ZP-overflow gated-spike plan row (148) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/1ea31e95) | docs(plan-index): index trig Phase 3 (146 rows); triage the DONE Inbox false-positive |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/ff3694c2) | #320 far->near thunk tail folds (-1 B); fix stale far-tail status + regen STACK |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/9ac3917e) | docs(plan-index): index the #321 a16 Phase-3 trigger-check-pass plan (145 rows) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/f59a5d5a) | docs(plan-index): index trig Phase 2 (144 rows); triage the DONE Inbox false-positive |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/840f6402) | docs(plan-index): add the far-data->2-banks gate-formalization plan row |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/56f5d808) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/cf30a736) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/f791491a) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
-| [2026-06-26](/home/will/llvm-mos-65816/commit/40d93f07) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
-| [2026-06-25](/home/will/llvm-mos-65816/commit/840fc171) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
-| [2026-06-25](/home/will/llvm-mos-65816/commit/52acebcd) | docs+todo: triage the auto-captured Csmith deferral + log the closeout commit in plan-index |
-| [2026-06-25](/home/will/llvm-mos-65816/commit/c6130379) | docs: Phase 1 zoom-pyramid verification results, montage, Phase 2 probe + findings |
-| [2026-06-25](/home/will/llvm-mos-65816/commit/fe1a52db) | docs(plan-index): register the interactive Mandelbrot (Mode 7 fly-around) plan |
-| [2026-06-25](/home/will/llvm-mos-65816/commit/d21da90f) | docs: finalize the Mandelbrot plan + register it in the indexes |
-| [2026-06-24](/home/will/llvm-mos-65816/commit/8c14a3ac) | docs: refresh plan-index — 74→127 plans, regenerate from git |
-| [2026-06-19](/home/will/llvm-mos-65816/commit/0d76bfca) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
-| [2026-06-19](/home/will/llvm-mos-65816/commit/f9a33d6e) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
-| [2026-06-19](/home/will/llvm-mos-65816/commit/3be4584f) | #321 docs: add the c-torture differential-suite plan to the plan index |
-| [2026-06-19](/home/will/llvm-mos-65816/commit/8006801e) | #321 docs: add plan index + deferred/rejected-items investigation tables |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/d9593b1d) | Index published Round 8 Cluster D demos |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/083d8d00) | Add Round 8 Cluster D compiler demos |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/392aaea3) | Document XY16 stale X reload and curate current TODO |
+| [2026-08-06](https://github.com/wbniv/llvm-mos-65816/commit/bf97f851) | fix(dev): make MAME corpus self-contained |
+| [2026-08-06](https://github.com/wbniv/llvm-mos-65816/commit/5b1d6320) | fix(dev): require real xy16inplace emulator results |
+| [2026-08-04](https://github.com/wbniv/llvm-mos-65816/commit/7d33fe8a) | docs: consolidate orphaned doc-state from completed sessions + today's bookkeeping |
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/28144b9f) | docs(plan-index): record the #123 nmitally commit SHA |
+| [2026-08-03](https://github.com/wbniv/llvm-mos-65816/commit/5b80b027) | feat(snes): #123 nmitally — the interrupt CC's first run finds a 65816 width bug |
+| [2026-07-30](https://github.com/wbniv/llvm-mos-65816/commit/29a92f61) | docs(60fps+todo): truncstair F2/F3 done — correct this document's own deferral verdict |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/fab41e78) | docs(plan-index): #128 row + tail creation-order fix (300 plans, coverage complete) |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/f369e6c9) | docs(todo+plan-index): triage the #128 inbox deferral; index the plan |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/e1e5068d) | docs(plan-index): #99c row (299 plans, coverage stays complete) |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/189718f7) | docs(plan-index): clear the drift — rows for all 14 committed-but-unindexed plans (298 total, complete) |
+| [2026-07-27](https://github.com/wbniv/llvm-mos-65816/commit/405e39fd) | docs(99b): plan screenshots (before/waterfall/final) + plan-index row (199 plans) |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/34419296) | docs(plan-index): row for the snesgfx all-virtual dispatch benchmark (198 plans) |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/47b1a2c7) | docs(plan-index): add row for full-rom-galleries-both-sites |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/4ded0870) | docs(todo+plan-index): triage campaign-plan capture (review-gated by design); index row |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/d0556293) | docs(plan-index): add the zp-alloc Imag32 CSR-rename fix row (2bfe4f3) |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/f75e06ad) | docs(todo+plan-index): file the far-read codegen bug; triage; index the plan |
+| [2026-07-26](https://github.com/wbniv/llvm-mos-65816/commit/a25b326a) | docs(todo+plan-index): triage rebase-plan deferrals; add plan-index row |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/092210ac) | docs(plan-index): add #110 borrowlad row (8915348) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/61d625fd) | docs(plan-index): add #109 pcooker row (bb58a0a) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/69962c44) | docs(plan-index): add #108 uarteye row (8b93bc3) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/43e5c927) | docs(plan-index): add #107 bitweave row (303a25c) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/1266212a) | docs(plan-index): add #106 lfsr2 row (bf6ba8c) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/158c2cb7) | docs(plan-index): add #104 modexp256 row (fc8ea58) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/e7061cec) | docs(plan-index): add #103 oddmask row (ac8cb1d) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/3d942b94) | docs(plan-index): add #100 keycmp64 row (00b98f1) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/5a98cd93) | docs(plan-index): add #99 trimerge row (3148b89) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/d4bb34e2) | docs(plan-index): add #98 ucmprank row (b69d3d1) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/bd2d2047) | docs(plan-index): add #96 ropeedit row (3864d44) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/b50b0582) | docs(plan-index): add #95 permscat row (f1c6ac5) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/62464ca6) | docs(plan-index): add #94 rotslab row (3d0691e) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/7e264709) | docs(plan-index): add #105 crcwall row (419830d) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/d917fdbd) | docs(plan-index): add #97 spaceship row (f9ce73a) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/7ce9b0ab) | docs(plan-index): add #93 ovmove row (b7e8281) |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/9be0141f) | docs: cross-link the setjmp fix-analysis report + index the fix plan |
+| [2026-07-02](https://github.com/wbniv/llvm-mos-65816/commit/0c740cc3) | docs(plan-index): add #101 mulov64 row (c0a35bf) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/889898e7) | feat(snes/plyoracle): #92 PlyOracle (Round 5, final pick, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/2717999b) | feat(snes/matcascade): #91 Matrix Cascade (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3d8281af) | feat(snes/scopeguard): #90 Scope-Guard Ripple Tank (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/98178d10) | feat(snes/adpcm): #89 ADPCM Waverider (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/d6ddf07b) | feat(snes/dctbloom): #88 DCT Bloom (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/abf28e44) | feat(snes/sobel): #87 Sobelscope (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/bba77cf5) | feat(snes/rangecode): #86 Range Coder (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6c9ffd8) | feat(snes/ulam): #85 Ulam Prime Sieve (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3e726588) | feat(snes/montorbit): #84 Montgomery Orbit (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3ab0a2b2) | docs(plan-index): add #83 truncstair row (ZP-alloc miscompile, Compiler-bug) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/478ec59c) | feat(snes/speedcap): #82 Fmin/Fmax Speed Cap (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/23e4f278) | feat(snes/compass): #81 Copysign Compass (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5ca866df) | feat(snes/mvscrl): #79 Memmove Scroll Slabs (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0ccecd9c) | feat(snes/sbitfld): #78 Signed-Bitfield Terrain Sculptor (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/26c2e18e) | feat(snes/satcast): #77 Saturating-Cast Kaleidoscope (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/1f150000) | feat(snes/rotkal): #74 Rotate-Register Kaleidoscope (Round 5, compiler stress-test) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/0f32b198) | docs(plan-index): add #75 satcomet row |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/eecfd2f6) | docs(plan-index): add #76 smulorbit row |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a68142d9) | docs(plan-index): add gallery-categories-netflix row + triage TODO inbox |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c007bfe8) | docs(plan-index): add #80 fabsridge row |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8473d5b5) | docs(plan-index): add #73 funnelkal row |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/15492202) | docs(plan-index): point #72 grid3d row at its commit 3676149 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/36761495) | #72 3-D Grid Voxel Life SNES demo — multi-dimensional array indexing (clean positive, FINAL Round-4 demo) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/3a4c2b8f) | docs(plan-index): point #71 msquares row at its commit a8e4ba1 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a8e4ba1c) | #71 Marching-Squares Iso-Contours SNES demo — 16-case edge LUT + edge interpolation (clean positive + rc-undef XFAIL witness) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/44eceb39) | docs(plan-index): point #70 dither row at its commit af56fe3 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/af56fe3d) | #70 Floyd-Steinberg Error-Diffusion Dither SNES demo — forward-carried signed residual (clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/78cbe5aa) | docs(plan-index): point #69 gouraud row at its commit a342c9e |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a342c9e4) | #69 Gouraud Triangle Tumbler SNES demo — barycentric edge-function raster (clean positive + rc-undef XFAIL witness) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/7c457ec3) | docs(plan-index): point #68 perlin row at its commit 5e54c4f |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5e54c4f6) | #68 Perlin Gradient-Noise Flow Field SNES demo — fade polynomial + gradient dot + lerp (clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/07350249) | docs(plan-index): point #67 huffman row at its commit 5a73244 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/5a732444) | #67 Huffman Decode Reveal SNES demo — bit-stream tree walk (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a8d78455) | docs(plan-index): point #66 editdist row at its commit 15427ec |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/15427ecd) | #66 Edit-Distance DP SNES demo — a 2-D dynamic-programming table (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6bb81d2) | docs(plan-index): point #65 hull row at its commit ab47d47 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/ab47d47f) | #65 Convex Hull Rubber-Band SNES demo — cross-product orientation tests (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/bb5b5121) | docs(plan-index): point #64 radix row at its commit 6fc0e28 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/6fc0e289) | #64 Radix / Counting Sort SNES demo — a non-comparison sort (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/85bc34fa) | docs(plan-index): point #63 fenwick row at its commit 8d57a11 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/8d57a112) | #63 Fenwick Tree SNES demo — the i & -i low-bit-isolation trick (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/cbef6e27) | docs(plan-index): point #62 percol row at its commit 15a34e9 |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/15a34e98) | #62 Union-Find Percolation SNES demo — disjoint-set path compression (Round 4, clean positive) |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/a6f99150) | docs(plan-index): point #61 dhmix row at its commit c360dfc |
+| [2026-07-01](https://github.com/wbniv/llvm-mos-65816/commit/c360dfc4) | #61 Diffie-Hellman Colour-Mixer SNES demo — 64-bit modexp; CAUGHT + FIXED a real backend bug (Round 4) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e14e370c) | docs(plan-index): point #60 multibase row at its commit a0455bc |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a0455bc6) | #60 Multi-Base Clock SNES demo — libc div()/lldiv() div_t struct-return (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8bc58929) | docs(plan-index): point #59 cosmzoom row at its commit 696a0f9 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/696a0f9b) | #59 Cosmic Zoom Ruler SNES demo — 64-bit integer <-> float conversion (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f4b0141d) | docs(plan-index): point #58 domcol row at its commit eca8cc3 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/eca8cc38) | #58 Complex Domain-Colouring SNES demo — NaN/unordered float compares (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f31aae59) | docs(plan-index): point #57 medfilt row at its commit 76c511d |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/76c511d8) | #57 Median Denoiser SNES demo — branchless min/max/abs network (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2aa768c4) | docs(plan-index): point #56 rotozoom row at its commit aa7da46 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/aa7da461) | #56 Rotozoom SNES demo — widening multiply-high (G_SMULH/G_UMULH) (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fe273cc0) | docs(plan-index): point #55 gf256 row at its commit 52b772c |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/52b772c6) | #55 GF(2^8) Galois Field SNES demo — Reed-Solomon carryless multiply (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/18106e83) | docs(plan-index): point #54 bitshuffle row at its commit d2ecd9b |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d2ecd9b0) | #54 Perfect-Shuffle Transition SNES demo — byte-swap / bit-reverse intrinsics (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b6ed82a3) | docs(plan-index): point #53 bitcensus row at its commit a2cbe1b |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a2cbe1ba) | #53 Bit-Census Field SNES demo — bit-population intrinsic family (Round 4, clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5334d669) | docs(plan-index): point #52 disbits row at its commit 5f28aea |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5f28aeab) | #52 Cross-Byte-Boundary Bitfield Disassembler SNES demo — final Round-3 demo (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/1d91eb51) | docs(plan-index): point #51 critters row at its commit 0e0ca23 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e0ca23a) | #51 Protothread Critter Swarm SNES demo — resumable functions (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/38da772d) | docs(plan-index): add counter-sliding title screen row (193 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/fcc842ef) | docs(plan-index): point #50 cgrade row at its commit 4f6558f |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4f6558fe) | #50 Many-Argument Color-Grade Kernel SNES demo — >register-count arg spill (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/bd155f84) | docs(plan-index): point #49 lzdec row at its commit 149bfdf |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/149bfdf9) | #49 LZ77 Image-Decompress Reveal SNES demo — back-references from own output (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/d936292a) | docs(plan-index): point #47 nrecip row at its commit be11fd9 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/be11fd9f) | #47 Newton-Raphson Reciprocal Floor SNES demo — multiply-only iterative refinement (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/48f85806) | docs(plan-index): point #46 qsortviz row at its commit 3c2c7a5 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3c2c7a5d) | #46 qsort Sort Visualizer SNES demo — caught + FIXED a real backend crash (G_SCMP) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ba907ad0) | docs(plan-index): point #45 metaball row at its commit 2b0b9a7 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2b0b9a74) | #45 Union Type-Pun Metaballs SNES demo — Quake fast-inverse-sqrt (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/25b6b8e4) | docs(plan-index): point #43 sodo row at its commit ca16265 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ca162653) | #43 Signed 64-bit Odometer SNES demo — sign-corrected __divmoddi4 (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/256a383d) | docs(plan-index): point #42 duff row at its commit 5698c17 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/5698c173) | #42 Dissolve Transition (Duff's Device) SNES demo — irreducible loop-switch CFG (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0c5df0ab) | docs(plan-index): point #41 poolfx row at its commit a12b00d |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/a12b00d6) | #41 Free-List Pool Allocator SNES demo — manual free-list slot recycling (clean positive) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/6e87c016) | docs(plan-index): point #40 crctex row at its commit ad34254 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/ad34254c) | #40 Table-Driven CRC32 Procedural Texture SNES demo — 256-entry ROM-LUT byte loop |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e92a366f) | docs(plan-index): point #39 divclock row at its commit 4d20e30 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4d20e302) | #39 Constant-Divisor Clock + Odometer SNES demo — strength-reduction probe (finding) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/18878317) | docs(plan-index): point #37 seqvm row at its commit e134e54 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/e134e540) | #37 Sparse-Switch Step-Sequencer VM SNES demo — comparison-tree opcode dispatch |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f77a7e3b) | docs(plan-index): point #36 polyfill row at its commit cdb8641 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/cdb86414) | #36 Polygon Scanline Fill (VLA) SNES demo — runtime-sized C99 VLA edge table |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/14fa7546) | docs(plan-index): point #48 iir-scope row at its commit f3e3393 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f3e3393a) | #48 IIR Resonant-Filter Scope SNES demo — recursive feedback dependency chain |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4e90f145) | docs(plan-index): point #44 hdr-bloom row at its commit 0af9b34 |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0af9b341) | #44 HDR Additive Bloom SNES demo — saturating / overflow-checked add |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0e899f65) | docs(plan-index): point #38 bf-vm row at its commit f29be2f |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f29be2f0) | #38 Brainfuck Threaded-Code VM SNES demo — computed-goto threaded dispatch |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/33e5415b) | docs(plan-index): point #33 mandel-double row at its squashed commit 661b01e |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/661b01e5) | #33 Double-Precision Mandelbrot SNES demo — 64-bit double soft-float |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/30e3918c) | docs(plan-index): add title-screen VOFS easing row (192 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f5e82623) | docs(plan-index): add title-screen upgrade row (191 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/2f0c3183) | docs(plan-index): add #31 Barnes-Hut row (190 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0eb843f8) | docs(plan-index): add #32 vaprintf row (189 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b9e7b8c8) | docs(plan-index): add #25 FFT row (188 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/8f275e0f) | docs(plan-index): add title_layer 16×16 font row (186 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/4c7c9def) | docs(plan-index): add #28 Hilbert row (187 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/b4e238ae) | docs(plan-index): add #27 cardioid + #30 TEA rows (186 plans) |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/3e6c825d) | snes(#27,#30): times-table cardioid + TEA cipher — __umodsi3 + 32-bit shift/add/XOR |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/0cec5170) | docs(fn-plot): update plan + TODO + plan-index for post-ship fixes |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/471d04fc) | snes(fn-plot): #24 recursive-descent float function plotter — 5-way green |
+| [2026-06-30](https://github.com/wbniv/llvm-mos-65816/commit/f74cb6f2) | docs(plan-index): add snesgfx mandel-oop verification row (185 plans) |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/cff089f9) | docs(plan-index): add #23 L-System Plant + SNES title HDMA rows (184 plans) |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/91caaa17) | chore: move the blocked #23 L-system demo off main to a branch |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/25358296) | docs(snes): mark #16 Wireframe 3-D Solid done — source recreated + republished |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/6fe6e69f) | feat(snes): #29b Truchet (packed bitfields) — bitfield insert/extract stress demo |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8ed73d1e) | feat(snes): #29a Bytecode-VM Turtle — jump-table + function-pointer dispatch demo |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/d5a4f740) | feat(snes): #26 Boids Flock — struct-by-value / aggregate-return ABI stress demo |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/7172dd9f) | feat(snes): #22 64-Bit Avalanche — splitmix64 hash matrix / 64-bit integer libcall stress demo |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/9b1f1371) | docs(plan-index): add the VBLANK/flicker sweep row (182 plans) |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/48f1c90d) | docs(plan-index): fill #21 Soft-Float Mandelbrot SHA (cd3663a) — cluster fully commit-linked |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/a33bd8ff) | docs(plan-index): batch-refresh the recent demo cluster's commit SHAs |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/14575afb) | docs(plan-index): add the #12 CORDIC Rotator row (close committed-plan drift) |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/2397e743) | docs(snes): #4 Buddhabrot close-out + dedupe burning-ship rows |
+| [2026-06-29](https://github.com/wbniv/llvm-mos-65816/commit/8e6f647f) | feat(snes): #3 Burning Ship fractal — |Re|,|Im|-folding escape-time demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/0cabf2df) | feat(snes): #1 Julia Set Explorer — z²+c complex-multiply / far-framebuffer stress demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/579ad869) | feat(snes): #15 Raycaster maze — DDA grid-cast, per-column 1/dist divide |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/70e18405) | feat(snes): #9 Lissajous / Harmonograph — damped sin-LUT curve demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/30333e0e) | feat(snes): #5 Conway's Game of Life — bit-parallel SWAR neighbour sums |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/070328fe) | feat(snes): #10 Fourier epicycles — many-multiply / sin-cos stress demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/6831fac8) | docs(plan-index): add #17 Sorting Race row (f8aff1c) |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/32a4114c) | feat(snes): #7 Doom-fire / heat-field demo — array sweep + PRNG, palette ramp |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/9f3d71e3) | feat(snes): #18 Maze generate + solve — recursion + A* priority-queue heap demo |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/5e02b1ab) | fix(snes): rdiff Gray-Scott 16-bit rework — real reaction-diffusion patterns |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/607c3cb9) | docs(plan-index): backfill #12 CORDIC commit SHA (34fd3ad) + built/published status |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/34fd3ada) | #12 CORDIC rotator SNES demo — multiply-free compiler stress-test |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/189c2be5) | docs(plan-index): add row for the LTO+a16 bitmask misdiagnosis verification plan |
+| [2026-06-28](https://github.com/wbniv/llvm-mos-65816/commit/c09912a3) | docs(upstream): retract LTO+a16 bitmask early-exit issue as a misdiagnosis |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/99c14852) | docs(plan-index): add #16 Wireframe 3-D Solid row (56cf11c) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/eb378b15) | docs(plan-index): add SHA b76f8ef for #2 Newton's-method fractal plan row |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/67804be1) | docs(plan-index): add SHA 7bb4f86 for #20 factorial plan row |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/7bb4f865) | feat(snes): #20 Bignum Factorial demo (factorial) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/0ca1c15d) | docs(plan-index): add SHA fcaa7b8 for #8 rdiff plan row |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/fcaa7b83) | feat(snes): #8 Gray-Scott reaction-diffusion demo (rdiff) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2a2dbc2d) | docs(plan-index): add cache-control headers plan row (77d085b) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/669c44f6) | docs(plan-index): record commit sha for #13 N-body orbits (f0eead4) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/6525579f) | docs(plan-index): record commit sha for #6 1d-ca demo (dce7db4) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/dce7db41) | feat(snes): #6 Rule 90/110 1-D CA scrolling demo (examples/snes/1d-ca.c) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fb4c00d) | docs(plan-index): fill commit SHA for #8 rdiff + mark gate-run pending |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/3fcbb63b) | feat(snes): #8 Gray-Scott reaction-diffusion demo (examples/snes/rdiff.c) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/08c73842) | feat(snes): #14 Double Pendulum chaos demo — semi-implicit Euler + chaos divergence |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/a659f72b) | docs(plan): #13 N-body orbits — Newtonian gravity · Verlet · 1/r² |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/72fb2dd7) | chore(plan-index): add #19 π spigot + Monte-Carlo plan row |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/ea42d152) | #11 spirograph: record publish — live at biohack.net/spirograph/ |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/80ff5960) | #11 spirograph: tune EPI scale to fit the canvas (golden 0xB8AA->0x32D4) |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/b5e094ab) | docs(plan-index): add the #11 spirograph demo row |
+| [2026-06-27](https://github.com/wbniv/llvm-mos-65816/commit/2b9924cd) | docs(plan-index): add the Space-Invaders-on-snesgfx plan row (154 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/d9d7f828) | docs(plan-index): add the snesgfx OOP rendering-library plan row (153 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/eeaa1e9a) | docs(plan-index): add the far-pointer G_PHI(p2) backend-gap fix row (152 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ddeea529) | docs(plan-index): add the Blossom split-screen-HUD row (150 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1127ddc0) | docs(plan-index): add the far-memset wrong-bank fix row (151 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2c07c950) | docs(plan-index): add the xy16-cmove stale-XFAIL resolution row (150 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/0034e3ce) | #321: collapse the SNES Mandelbrot demos into one far/16-bit tester |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/2b4d6310) | docs(plan-index): add the full-xy16-backend-fix row (149 plans) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/5f3b3166) | #321 c-torture: finish the full vendoring (ieee/ + builtins/ into the gate) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/952c86c5) | docs: add plan-index row for the Blossom interactive-renderer plan |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/de658f06) | docs: finish the stale-deferral sweep — propagate Phase-3 closure + fixed crashes |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ec4a80b2) | #320 Phase B: land __call_indir_far stub; fix far-indirect-from-far-caller; fold its tail |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/798414ad) | docs(plan-index): add the pr15296 ZP-overflow gated-spike plan row (148) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/1ea31e95) | docs(plan-index): index trig Phase 3 (146 rows); triage the DONE Inbox false-positive |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/ff3694c2) | #320 far->near thunk tail folds (-1 B); fix stale far-tail status + regen STACK |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/9ac3917e) | docs(plan-index): index the #321 a16 Phase-3 trigger-check-pass plan (145 rows) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f59a5d5a) | docs(plan-index): index trig Phase 2 (144 rows); triage the DONE Inbox false-positive |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/840f6402) | docs(plan-index): add the far-data->2-banks gate-formalization plan row |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/56f5d808) | docs: record scavenger-fix verification + sweep "deferred scavenger" framing (0011/0012) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/cf30a736) | docs(plan-index): add the 2026-06-26 scavenger live-$p fix plan (→ 142) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/f791491a) | docs(plan-index): add the shared plan-index tooling plan row (→ 141) |
+| [2026-06-26](https://github.com/wbniv/llvm-mos-65816/commit/40d93f07) | docs(plan-index): add the 10 plans created since the 2026-06-25 refresh (→ 140) |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/840fc171) | docs: Phase 2 zoom-pyramid verification + HD montage; Findings 2/3; TODO/handoff/index |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/52acebcd) | docs+todo: triage the auto-captured Csmith deferral + log the closeout commit in plan-index |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/c6130379) | docs: Phase 1 zoom-pyramid verification results, montage, Phase 2 probe + findings |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/fe1a52db) | docs(plan-index): register the interactive Mandelbrot (Mode 7 fly-around) plan |
+| [2026-06-25](https://github.com/wbniv/llvm-mos-65816/commit/d21da90f) | docs: finalize the Mandelbrot plan + register it in the indexes |
+| [2026-06-24](https://github.com/wbniv/llvm-mos-65816/commit/8c14a3ac) | docs: refresh plan-index — 74→127 plans, regenerate from git |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/0d76bfca) | #321 c-torture Phase 2 (-O1): 16 confirmed NEW a16/xy16 runtime miscompiles |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/f9a33d6e) | #321 docs: reflect c-torture Phases 0+1 across the index docs |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/3be4584f) | #321 docs: add the c-torture differential-suite plan to the plan index |
+| [2026-06-19](https://github.com/wbniv/llvm-mos-65816/commit/8006801e) | #321 docs: add plan index + deferred/rejected-items investigation tables |
 
 <!--history-meta v1
+d9593b1d	author	Will Norris
+d9593b1d	added	1
+d9593b1d	deleted	1
+d9593b1d	files	1
+083d8d00	author	Will Norris
+083d8d00	added	2
+083d8d00	deleted	0
+083d8d00	files	1
 392aaea3	author	Will Norris
 392aaea3	added	1
 392aaea3	deleted	1
