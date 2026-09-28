@@ -1,0 +1,12 @@
+==> host oracle: spirograph curve hash = 0x32D4
+==> built build/spirograph.sfc (+mos-a16); corpus_result @ WRAM 0x1409
+==> disasm gate (curve hot loop codegen)
+    PASS  __mulsi3=12  __udiv=4  rep/sep=107  (sin/cos-LUT + fixed-point mul + gear divide, native-16)
+==> bsnes-jg: render + framebuffer dump (build/spirograph-jg.png) + assert
+jgxcheck: wrote /work/build/spirograph-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1409 len=2 got=0x32D4 (ran 500 frames, bsnes-jg)
+    PASS  3x bsnes-jg capture byte-identical (bb64fd2743b7672e91f415732056c403fb43452d00d28ba08ea681e2a5ce134a)
+==> MAME (under Xvfb): snapshot + assert (build/spirograph-mame.png)
+    SHOT: PASS corpus=0x32D4 (snapshot at frame 500)
+
+RESULT: PASS — Spirograph rendered on SNES; MAME + bsnes-jg screenshots + curve hash 0x32D4 host == +mos-a16

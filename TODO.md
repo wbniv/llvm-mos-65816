@@ -21,7 +21,6 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 ### Test Bench / CI
 
-- [T3] **Run the 138-demo build-determinism gate sweep.** Run and record the full sweep on the rebuilt fixed toolchain. The corpus, `corpus-a16`, and four demos whose `main` changed beyond the `sec` permutation passed; the complete 138-demo sweep remains open. [Plan and results](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
 
 ### Upstream / Contribution
 

@@ -1,0 +1,11 @@
+==> host oracle: HDR bloom gate hash = 0xF951
+==> built build/hdr-bloom.sfc (+mos-a16); corpus_result @ WRAM 0x98f
+==> disasm gate (saturating / overflow-checked add codegen)
+    PASS  adc=34  carry-branch=10  rep/sep=117  (overflow-checked saturating add, native-16)
+==> bsnes-jg: render + framebuffer dump (build/hdr-bloom-jg.png) + assert
+jgxcheck: wrote /work/build/hdr-bloom-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x98F len=2 got=0xF951 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/hdr-bloom-mame.png)
+    SHOT: PASS corpus=0xF951 (snapshot at frame 500)
+
+RESULT: PASS — HDR additive-bloom rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF951 host == +mos-a16

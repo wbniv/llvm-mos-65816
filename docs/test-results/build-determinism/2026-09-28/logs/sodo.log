@@ -1,0 +1,11 @@
+==> host oracle: sodo gate hash = 0xD2A2
+==> built build/sodo.sfc (+mos-a16); corpus_result @ WRAM 0xa62
+==> disasm gate (signed 64-bit divmod: __divmoddi4, native-16)
+    PASS  signed-64-divmod=1 (__divmoddi4/__divdi3/__moddi3)  unsigned-64=0  rep/sep=25
+==> bsnes-jg: render + framebuffer dump (build/sodo-jg.png) + assert
+jgxcheck: wrote /work/build/sodo-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xA62 len=2 got=0xD2A2 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/sodo-mame.png)
+    SHOT: PASS corpus=0xD2A2 (snapshot at frame 500)
+
+RESULT: PASS — signed-64 odometer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xD2A2 host == +mos-a16

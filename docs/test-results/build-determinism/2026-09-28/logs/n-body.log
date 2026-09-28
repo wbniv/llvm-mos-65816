@@ -1,0 +1,11 @@
+==> host oracle: N-body gate hash = 0xCC65
+==> built build/n-body.sfc (+mos-a16); corpus_result @ WRAM 0x1589
+==> disasm gate (N-body force loop codegen)
+    PASS  __udivsi3=2  __mulsi3=6  rep/sep=93  (1/r² div + 16x16→32 mul, native-16)
+==> bsnes-jg: render + framebuffer dump (build/n-body-jg.png) + assert
+jgxcheck: wrote /work/build/n-body-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1589 len=2 got=0xCC65 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/n-body-mame.png)
+    SHOT: PASS corpus=0xCC65 (snapshot at frame 500)
+
+RESULT: PASS — N-body orbits rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xCC65 host == +mos-a16

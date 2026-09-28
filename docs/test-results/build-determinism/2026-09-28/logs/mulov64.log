@@ -1,0 +1,11 @@
+==> host oracle: mulov64 gate hash = 0x3A69
+==> built build/mulov64.sfc (+mos-a16); corpus_result @ WRAM 0x1435
+==> disasm gate (s64 G_UMULO/SMULO -> G_UMULH/SMULH: __muldi3 + __mulsi3 + rep/sep)
+    PASS  __muldi3=14  __mulsi3=20  rep/sep=11  (s64 mulo/mulh lowering present)
+==> bsnes-jg: render + assert (build/mulov64-jg.png, frame 1500 for developed scatter)
+jgxcheck: wrote /work/build/mulov64-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1435 len=2 got=0x3A69 (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/mulov64-mame.png)
+    SHOT: PASS corpus=0x3A69 (snapshot at frame 500)
+
+RESULT: PASS — 64-bit Multiply-Overflow on SNES; MAME + bsnes-jg + corpus hash 0x3A69 host == +mos-a16

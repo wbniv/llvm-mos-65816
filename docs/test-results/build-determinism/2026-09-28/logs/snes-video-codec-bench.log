@@ -1,0 +1,9 @@
+case            packet_B      decodes
+svx-median          3127           19
+svx-worst           3529           19
+svc-median          3044            0
+svc-worst           4560            0
+lzss-median         2851            3
+lzss-worst          3323            3
+raw-copy            4480          165
+svx-keyframe        3453           20

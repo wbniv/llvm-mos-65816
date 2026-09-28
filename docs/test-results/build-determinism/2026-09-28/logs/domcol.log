@@ -1,0 +1,11 @@
+==> host oracle: domcol gate hash = 0xF3FD
+==> built build/domcol.sfc (+mos-a16); corpus_result @ WRAM 0x13e9
+==> disasm gate (NaN / unordered float compares: __unordsf2 at complex poles)
+    PASS  __unordsf2=2  __divsf3=1  __mulsf3=12  rep/sep=29  (NaN/unordered float compares)
+==> bsnes-jg: render + framebuffer dump (build/domcol-jg.png) + assert
+jgxcheck: wrote /work/build/domcol-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E9 len=2 got=0xF3FD (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/domcol-mame.png)
+    SHOT: PASS corpus=0xF3FD (snapshot at frame 700)
+
+RESULT: PASS — complex domain-colouring rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF3FD host == +mos-a16

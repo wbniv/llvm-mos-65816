@@ -1,0 +1,39 @@
+==> host oracle: irqgate gate hash = 0x24F6
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: a16 verify clean (real object emitted)
+    PASS: xy16 verify clean (real object emitted)
+==> interrupt-envelope order gate on nmi + irq (linked a16 ELF)
+    PASS: nmi brackets its body with the rep #$30 full-width save/restore envelope
+    PASS: irq brackets its body with the rep #$30 full-width save/restore envelope
+    PASS  A shape: 'nmi' present, 135 insns, terminates in rti
+    PASS  B1 entry width: rep	#$30 at insn #0 precedes first width-sensitive 'pha' at #1
+    PASS  B2 save width: rep at insn #0 precedes the A/X/Y save push at #1
+    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (__rc0+250 __rc1+254 __rc0+6 __rc1+1)
+    PASS  C imag: all 8 defined __rc regs are read-before-def and restored
+    PASS  A shape: 'irq' present, 340 insns, terminates in rti
+    PASS  B1 entry width: rep	#$30 at insn #0 precedes first width-sensitive 'pha' at #1
+    PASS  B2 save width: rep at insn #0 precedes the A/X/Y save push at #1
+    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (__rc0+228 __rc1+254 __rc0+28 __rc1+1)
+    PASS  C imag: all 28 defined __rc regs are read-before-def and restored
+==> TIMEUP acknowledge gate
+    PASS: irq reads $4211 (TIMEUP) to acknowledge
+==> native vector-slot gate (ROM image)
+    PASS  $FFE4 COP -> $8033
+    PASS  $FFE6 BRK -> $8032
+    PASS  $FFEA NMI -> $8074
+    PASS  $FFEE IRQ -> $815D
+    PASS  NMI/IRQ slots equal the addresses of the C `nmi`/`irq` handlers
+==> bsnes-jg: default
+jgxcheck: wrote /work/build/irqgate-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+==> bsnes-jg: a16
+jgxcheck: wrote /work/build/irqgate-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+==> bsnes-jg: xy16
+jgxcheck: wrote /work/build/irqgate-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/irqgate-a16-repeat1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/irqgate-a16-repeat2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x24F6 (ran 500 frames, bsnes-jg)
+RESULT: PASS — IRQ Gate; host == default == a16 == xy16 == 0x24F6; a16 3x deterministic

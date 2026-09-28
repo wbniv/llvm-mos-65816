@@ -1,0 +1,11 @@
+==> host oracle: trimerge gate hash = 0xCCCC
+==> built build/trimerge.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> G_SCMP IR probe (llvm.scmp at s32/s64, used as control flow) + a16 rep/sep
+    PASS  llvm.scmp=4  scmp.i64=2  rep/sep=216  (G_SCMP formed incl. s64, drives control flow)
+==> bsnes-jg: render + assert (build/trimerge-jg.png)
+jgxcheck: wrote /work/build/trimerge-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0xCCCC (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/trimerge-mame.png)
+    SHOT: PASS corpus=0xCCCC (snapshot at frame 500)
+
+RESULT: PASS — Three-Way Merge Diff on SNES; MAME + bsnes-jg + corpus hash 0xCCCC host == +mos-a16

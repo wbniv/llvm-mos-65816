@@ -1,0 +1,11 @@
+==> host oracle: ovmove gate hash = 0xA990
+==> built build/ovmove.sfc (+mos-a16); corpus_result @ WRAM 0x1568
+==> disasm gate (G_MEMMOVE -> memmove call; rep/sep for a16; xy16 compile clean)
+    PASS  memmove-refs=4  rep/sep=31  xy16-compile=OK  (both overlap dirs, 16-bit index)
+==> bsnes-jg: render + assert (build/ovmove-jg.png)
+jgxcheck: wrote /work/build/ovmove-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1568 len=2 got=0xA990 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/ovmove-mame.png)
+    SHOT: PASS corpus=0xA990 (snapshot at frame 500)
+
+RESULT: PASS — Overlap-Move Mosaic on SNES; MAME + bsnes-jg + corpus hash 0xA990 host == +mos-a16

@@ -1,0 +1,12 @@
+bands: 45 247 243 41
+==> host oracle: dither gate hash = 0x80C4
+==> built build/dither.sfc (+mos-a16); corpus_result @ WRAM 0x1ce7
+==> disasm gate (Floyd-Steinberg: signed error diffusion — no division, arithmetic shifts)
+    PASS  divide-libcalls=0  shifts=25  rep/sep=82  (no division; incidental index/scene mul=2)
+==> bsnes-jg: render + framebuffer dump (build/dither-jg.png) + assert
+jgxcheck: wrote /work/build/dither-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 2000 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/dither-mame.png)
+    SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+
+RESULT: PASS — FS dither rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x80C4 host == +mos-a16

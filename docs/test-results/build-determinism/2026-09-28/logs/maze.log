@@ -1,0 +1,11 @@
+==> host oracle: maze generate+solve gate hash = 0x0749
+==> built build/maze.sfc (+mos-a16); corpus_result @ WRAM 0xe44
+==> disasm gate (recursion self-call + native-16 codegen)
+    PASS  recursion(maze_divide self-call)=3  rep/sep=236  (genuine recursion + native-16)
+==> bsnes-jg: render + framebuffer dump (build/maze-jg.png) + assert
+jgxcheck: wrote /work/build/maze-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xE44 len=2 got=0x0749 (ran 400 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/maze-mame.png)
+    SHOT: PASS corpus=0x0749 (snapshot at frame 400)
+
+RESULT: PASS — maze gen+solve rendered on SNES; bsnes-jg (+ MAME if present) + corpus hash 0x0749 host == +mos-a16

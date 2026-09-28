@@ -1,0 +1,11 @@
+==> host oracle: fabsridge gate hash = 0x161A
+==> built build/fabsridge.sfc (+mos-a16); corpus_result @ WRAM 0x13ea
+==> disasm gate (G_FABS inline sign-bit AND + tent-map soft-float: __mulsf3, __subsf3, rep/sep)
+    PASS  __mulsf3=5  __subsf3/addsf3=8  rep/sep=12  (tent-map + G_FABS present)
+==> bsnes-jg: render + assert (build/fabsridge-jg.png)
+jgxcheck: wrote /work/build/fabsridge-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EA len=2 got=0x161A (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/fabsridge-mame.png)
+    SHOT: PASS corpus=0x161A (snapshot at frame 500)
+
+RESULT: PASS — Fabs Ridgeline on SNES; MAME + bsnes-jg + corpus hash 0x161A host == +mos-a16

@@ -1,0 +1,12 @@
+==> host oracle: truncstair gate hash = 0x02CA
+==> built build/truncstair.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (G_FPTOSI __fixsfsi + G_SITOFP __floatsisf + __mulsf3 + rep/sep)
+    __fixsfsi=2  __floatsisf=2  __mulsf3=2  rep/sep=9
+    PASS  G_FPTOSI+G_SITOFP confirmed (no truncf/floorf/ceilf libcalls)
+==> bsnes-jg: render + assert (build/truncstair-jg.png)
+jgxcheck: wrote /work/build/truncstair-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x02CA (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/truncstair-mame.png)
+    SHOT: PASS corpus=0x02CA (snapshot at frame 500)
+
+RESULT: PASS — Truncation Staircase on SNES; MAME + bsnes-jg + corpus hash 0x02CA host == +mos-a16

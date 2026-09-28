@@ -627,6 +627,21 @@ if [ "${JG_ONLY:-}" != 1 ] && [ -f "$target_script" ] &&
    grep -Eq '(^|[^[:alnum:]_])require_bios([^[:alnum:]_]|$)' "$target_script"; then
   "$HERE/fetch-spc700.sh"
 fi
+if [ "$TARGET" = determinism-sweep ] && [ -f "$HERE/build-determinism-demo-set.txt" ]; then
+  while IFS= read -r slug; do
+    [ -n "$slug" ] && [[ "$slug" != \#* ]] || continue
+    case "$slug" in
+      spigot) gate=pi ;;
+      mandel-display) gate=mandel-shot ;;
+      hello) gate=smoke ;;
+      *) gate="$slug" ;;
+    esac
+    if [ -f "$HERE/$gate.sh" ] && grep -Eq '(^|[^[:alnum:]_])require_bios([^[:alnum:]_]|$)' "$HERE/$gate.sh"; then
+      "$HERE/fetch-spc700.sh"
+      break
+    fi
+  done < "$HERE/build-determinism-demo-set.txt"
+fi
 
 docker build -t "$IMAGE" -f "$HERE/$DEV_DOCKERFILE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
@@ -668,6 +683,8 @@ docker run --rm \
   ${GALLERY_BENCH_ONLY:+-e GALLERY_BENCH_ONLY} \
   ${GALLERY_START:+-e GALLERY_START} \
   ${GALLERY_RUN_COLOR:+-e GALLERY_RUN_COLOR} \
+  ${APOLLO_REEL_CORPUS:+-e APOLLO_REEL_CORPUS} \
+  ${APOLLO_REEL_RGB_SHA:+-e APOLLO_REEL_RGB_SHA} \
   "$IMAGE" bash "/work/dev/${TARGET}.sh" "${@:2}" \
   2> >(grep -vF 'different data layouts' | cat -s >&2)
 exit $?

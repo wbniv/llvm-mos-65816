@@ -1,0 +1,11 @@
+==> host oracle: Brainfuck VM gate hash = 0x9954
+==> built build/bf-vm.sfc (+mos-a16); corpus_result @ WRAM 0xc46
+==> disasm gate (computed-goto threaded dispatch codegen)
+    PASS  indirect-jmp=2  rep/sep=116  (labels-as-values threaded dispatch, native-16)
+==> bsnes-jg: render + framebuffer dump (build/bf-vm-jg.png) + assert
+jgxcheck: wrote /work/build/bf-vm-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xC46 len=2 got=0x9954 (ran 400 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/bf-vm-mame.png)
+    SHOT: PASS corpus=0x9954 (snapshot at frame 400)
+
+RESULT: PASS — Brainfuck threaded-code VM rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x9954 host == +mos-a16

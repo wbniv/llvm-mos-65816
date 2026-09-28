@@ -1,0 +1,11 @@
+==> host oracle: seqvm gate hash = 0xE8C5
+==> built build/seqvm.sfc (+mos-a16); corpus_result @ WRAM 0x13f1
+==> disasm gate (sparse-switch comparison tree)
+    PASS  compares=23  indirect-jmp=0  rep/sep=41  (comparison tree, not a jump table)
+==> bsnes-jg: render + framebuffer dump (build/seqvm-jg.png) + assert
+jgxcheck: wrote /work/build/seqvm-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F1 len=2 got=0xE8C5 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/seqvm-mame.png)
+    SHOT: PASS corpus=0xE8C5 (snapshot at frame 500)
+
+RESULT: PASS — sparse-switch step-sequencer VM rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xE8C5 host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: TEA gate hash = 0xDF0E
+==> built build/tea.sfc (+mos-a16); corpus_result @ WRAM 0x13ea
+==> disasm gate (32-bit add/XOR/shift chain, multiply-free)
+    PASS  __mulsi3=0  shift_libcalls=0  rep/sep=19  (32-bit add/xor/shift, multiply-free)
+==> bsnes-jg: render + framebuffer dump (build/tea-jg.png) + assert
+jgxcheck: wrote /work/build/tea-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EA len=2 got=0xDF0E (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/tea-mame.png)
+    SHOT: PASS corpus=0xDF0E (snapshot at frame 500)
+
+RESULT: PASS — TEA cipher avalanche rendered on SNES; hash 0xDF0E host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: 64-bit Avalanche gate hash = 0x27EA
+==> built build/avalanche.sfc (+mos-a16); corpus_result @ WRAM 0x20
+==> disasm gate (64-bit integer hash codegen)
+    PASS  __muldi3=2  64-bit-shift=1  __udivdi3=1  rep/sep=20  (64-bit integer, native-16)
+==> bsnes-jg: render + framebuffer dump (build/avalanche-jg.png) + assert
+jgxcheck: wrote /work/build/avalanche-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x27EA (ran 800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/avalanche-mame.png)
+    SHOT: PASS corpus=0x27EA (snapshot at frame 800)
+
+RESULT: PASS — 64-bit Avalanche rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x27EA host == +mos-a16

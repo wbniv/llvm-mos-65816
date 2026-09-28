@@ -1,0 +1,11 @@
+==> host oracle: oddmask gate hash = 0x1FD9
+==> built build/oddmask.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> odd-width-extend probe (G_ZEXT s20/s24/s28 -> s64) + s64 glue + a16 rep/sep
+    PASS  odd-width-zext(s20/s24/s28)=3  __muldi3=1  rep/sep=28  xy16-compile=OK
+==> bsnes-jg: render + assert (build/oddmask-jg.png, frame 1500 for developed scatter)
+jgxcheck: wrote /work/build/oddmask-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x1FD9 (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/oddmask-mame.png)
+    SHOT: PASS corpus=0x1FD9 (snapshot at frame 500)
+
+RESULT: PASS — Odd-Width Mask Sculptor on SNES; MAME + bsnes-jg + corpus hash 0x1FD9 host == +mos-a16

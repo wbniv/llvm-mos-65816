@@ -1,0 +1,11 @@
+==> host oracle: fenwick gate hash = 0x3454
+==> built build/fenwick.sfc (+mos-a16); corpus_result @ WRAM 0x142b
+==> disasm gate (Fenwick i & -i low-bit isolation in the prefix-sum walks)
+    PASS  and=5  mul/div-libcalls=0  rep/sep=56  (i & -i low-bit isolation)
+==> bsnes-jg: render + framebuffer dump (build/fenwick-jg.png) + assert
+jgxcheck: wrote /work/build/fenwick-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x142B len=2 got=0x3454 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/fenwick-mame.png)
+    SHOT: PASS corpus=0x3454 (snapshot at frame 500)
+
+RESULT: PASS — Fenwick tree rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x3454 host == +mos-a16

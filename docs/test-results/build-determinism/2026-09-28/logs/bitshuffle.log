@@ -1,0 +1,11 @@
+==> host oracle: bitshuffle gate hash = 0x2A4A
+==> built build/bitshuffle.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (bit-reverse / byte-swap intrinsics: G_BITREVERSE inline mask-swap cascade)
+    PASS  bitrev-mask #$aa=6  #$cc=8  rep/sep=59  (inline G_BITREVERSE mask-swap cascade)
+==> bsnes-jg: render + framebuffer dump (build/bitshuffle-jg.png) + assert
+jgxcheck: wrote /work/build/bitshuffle-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0x2A4A (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/bitshuffle-mame.png)
+    SHOT: PASS corpus=0x2A4A (snapshot at frame 500)
+
+RESULT: PASS — perfect-shuffle bit-permutation rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x2A4A host == +mos-a16

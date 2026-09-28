@@ -1,0 +1,11 @@
+==> host oracle: cgrade gate hash = 0x783F
+==> built build/cgrade.sfc (+mos-a16); corpus_result @ WRAM 0x13e7
+==> disasm gate (10-argument call, soft-stack argument spill, native-16)
+    PASS  color_grade-refs=219  soft-stack-spill=38  rep/sep=25  (10-arg call, soft-stack arg spill)
+==> bsnes-jg: render + framebuffer dump (build/cgrade-jg.png) + assert
+jgxcheck: wrote /work/build/cgrade-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E7 len=2 got=0x783F (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/cgrade-mame.png)
+    SHOT: PASS corpus=0x783F (snapshot at frame 500)
+
+RESULT: PASS — many-argument color-grade kernel rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x783F host == +mos-a16

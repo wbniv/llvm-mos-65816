@@ -1,0 +1,14 @@
+step 0 pop=44
+step 1 pop=69
+step 2 pop=44
+==> host oracle: grid3d gate hash = 0xFCDE
+==> built build/grid3d.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (multi-dimensional array indexing: grid[z][y][x] stride arithmetic)
+    PASS  g3_a/g3_b-refs=28  shifts=35  rep/sep=98  (multi-dim indexing; stride mul=0)
+==> bsnes-jg: render + framebuffer dump (build/grid3d-jg.png) + assert
+jgxcheck: wrote /work/build/grid3d-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0xFCDE (ran 800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/grid3d-mame.png)
+    SHOT: PASS corpus=0xFCDE (snapshot at frame 900)
+
+RESULT: PASS — 3-D voxel life rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xFCDE host == +mos-a16

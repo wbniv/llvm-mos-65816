@@ -1,0 +1,11 @@
+==> host oracle: qsortviz gate hash = 0x8EA5
+==> built build/qsortviz.sfc (+mos-a16); corpus_result @ WRAM 0xac
+==> disasm gate (libc qsort + fn-ptr comparator callback, native-16)
+    PASS  qsort-refs=1  comparator-refs=79  cmps-fnptr-table=2  rep/sep=43  (qsort + fn-ptr comparator callback)
+==> bsnes-jg: render + framebuffer dump (build/qsortviz-jg.png) + assert
+jgxcheck: wrote /work/build/qsortviz-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xAC len=2 got=0x8EA5 (ran 440 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/qsortviz-mame.png)
+    SHOT: PASS corpus=0x8EA5 (snapshot at frame 500)
+
+RESULT: PASS — qsort + comparator-callback sort visualizer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8EA5 host == +mos-a16

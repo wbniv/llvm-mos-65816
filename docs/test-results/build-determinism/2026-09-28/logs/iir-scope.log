@@ -1,0 +1,11 @@
+==> host oracle: IIR scope gate hash = 0x49BD
+==> built build/iir-scope.sfc (+mos-a16); corpus_result @ WRAM 0x150c
+==> disasm gate (IIR feedback multiply + native-16 codegen)
+    PASS  __mulsi3=2  rep/sep=28  (recursive feedback 32-bit multiply, native-16)
+==> bsnes-jg: render + framebuffer dump (build/iir-scope-jg.png) + assert
+jgxcheck: wrote /work/build/iir-scope-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x150C len=2 got=0x49BD (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/iir-scope-mame.png)
+    SHOT: PASS corpus=0x49BD (snapshot at frame 700)
+
+RESULT: PASS — IIR resonant-filter scope rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x49BD host == +mos-a16

@@ -1,0 +1,12 @@
+==> host oracle: ulam gate hash = 0x1F2F
+==> built build/ulam.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (variable-count shift helpers + rep/sep)
+    shift-ops=12  rep/sep=36
+    PASS  variable-count bit-array shifts present
+==> bsnes-jg: render + assert (build/ulam-jg.png)
+jgxcheck: wrote /work/build/ulam-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x1F2F (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/ulam-mame.png)
+    SHOT: PASS corpus=0x1F2F (snapshot at frame 500)
+
+RESULT: PASS — Ulam Prime Sieve on SNES; MAME + bsnes-jg + corpus hash 0x1F2F host == +mos-a16

@@ -1,0 +1,13 @@
+==> host oracle: shift64seam gate hash = 0x2007
+==> widened-count s64 shift gate
+    PASS: variable shl/lshr/ashr i64 form and verify with an explicitly widened count
+SMOKE: PASS addr=0x7E1409 len=2 got=0x2007 (ran 480 ticks)
+jgxcheck: wrote /work/build/shift64seam-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E1409 len=2 got=0x2007 (ran 480 ticks)
+jgxcheck: wrote /work/build/shift64seam-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E1409 len=2 got=0x2007 (ran 480 ticks)
+jgxcheck: wrote /work/build/shift64seam-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1409 len=2 got=0x2007 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Limb-Seam Barrel; host == default == a16 == xy16 == 0x2007 on MAME + bsnes-jg

@@ -1,0 +1,12 @@
+==> host oracle: rangecode gate hash = 0x6D21
+==> built build/rangecode.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (__mulsi3 + rep/sep (multiply-interval range coder))
+    __mulsi3=1  rep/sep=29
+    PASS  multiply-interval range coder present
+==> bsnes-jg: render + assert (build/rangecode-jg.png)
+jgxcheck: wrote /work/build/rangecode-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x6D21 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/rangecode-mame.png)
+    SHOT: PASS corpus=0x6D21 (snapshot at frame 500)
+
+RESULT: PASS — Range Coder on SNES; MAME + bsnes-jg + corpus hash 0x6D21 host == +mos-a16

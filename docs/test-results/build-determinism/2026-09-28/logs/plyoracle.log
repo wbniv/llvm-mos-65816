@@ -1,0 +1,12 @@
+==> host oracle: plyoracle gate hash = 0x6146
+==> built build/plyoracle.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (negamax self-recursion + rep/sep)
+    po_negamax-calls(recursion)=220  rep/sep=55
+    PASS  negamax alpha-beta recursion present
+==> bsnes-jg: render + assert (build/plyoracle-jg.png)
+jgxcheck: wrote /work/build/plyoracle-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x6146 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/plyoracle-mame.png)
+    SHOT: PASS corpus=0x6146 (snapshot at frame 500)
+
+RESULT: PASS — PlyOracle on SNES; MAME + bsnes-jg + corpus hash 0x6146 host == +mos-a16

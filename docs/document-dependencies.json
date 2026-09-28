@@ -252,6 +252,7 @@
       "document": "TODO.md",
       "sources": [
         "TODO-history-2026-09-28.md",
+        "docs/test-results/build-determinism/2026-09-28/README.md",
         {
           "glob": "docs/defects/*.json",
           "fields": [
@@ -289,7 +290,8 @@
       ],
       "receipt": {
         "sources": {
-          "TODO-history-2026-09-28.md": "2b6ee6419b28e5b9842f316b262190916cddcfe33ecdaaec56528f6fc3bf4aae",
+          "TODO-history-2026-09-28.md": "c68d12fd10f1fad0d714655d12a6bb3b10a1a27ef4da6d564f0022f7cb9854b3",
+          "docs/test-results/build-determinism/2026-09-28/README.md": "ac3242fdf737d23bef81446b2d6ca023bf08e38f6f9bbf8ad12709bf5345b8b6",
           "docs/defects/bitboard-inline-register-pressure.json": "d5681b7571c138338ad68dc13993728f23301f1df875d67c16340d5a29271de7",
           "docs/defects/gisel-inline-asm-register-bounds.json": "df18f3d2225f4a70a5d73a11e0064c547f35a68cd14d8f21c4ceb0a551bc2dd3",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "8de0aa3cab9f6430faa4964ee96f1f19096e7ce6a911a90325c38fac108e6ac0",
@@ -339,9 +341,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T13:21:53.055679+00:00",
-        "note": "Reviewed the 0069/0070 current status, retained full-LTO measurements, and newly added pinned-candidate frozen-IR replay separately. Confirmed the backend replay scope and emulator count against the upstream-series evidence; preserved outstanding independent compiler/ABI series review and submission prerequisites.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T21:53:09.685965+00:00",
+        "note": "Reviewed current pending tasks after completing the 135-demo build-determinism sweep; removed the active T3 item, kept the dated history qualified, and linked the result record. Packaging remains parked.",
+        "attribution": "OpenAI Codex (tool version unknown), model unknown, reasoning effort unknown; session metadata unavailable"
       }
     },
     {

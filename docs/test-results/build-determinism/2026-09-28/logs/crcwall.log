@@ -1,0 +1,11 @@
+==> host oracle: crcwall gate hash = 0x8E47
+==> built build/crcwall.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (DEFAULT-8-bit bit-serial CRC: asl/rol shift-register loop)
+    PASS  default-8bit-compile=OK  asl/rol/lsr/ror=13  (bit-serial shift-register present)
+==> bsnes-jg: render + assert (build/crcwall-jg.png)
+jgxcheck: wrote /work/build/crcwall-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0x8E47 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/crcwall-mame.png)
+    SHOT: PASS corpus=0x8E47 (snapshot at frame 500)
+
+RESULT: PASS — Bit-Serial CRC Wall on SNES; MAME + bsnes-jg + corpus hash 0x8E47 host == +mos-a16

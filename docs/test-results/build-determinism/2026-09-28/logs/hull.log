@@ -1,0 +1,11 @@
+==> host oracle: hull gate hash = 0x84E3
+==> built build/hull.sfc (+mos-a16); corpus_result @ WRAM 0x1449
+==> disasm gate (convex-hull orientation: int32 cross-product sign tests)
+    PASS  __mulsi3=8  cmp=28  rep/sep=135  (int32 cross-product orientation tests)
+==> bsnes-jg: render + framebuffer dump (build/hull-jg.png) + assert
+jgxcheck: wrote /work/build/hull-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1449 len=2 got=0x84E3 (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/hull-mame.png)
+    SHOT: PASS corpus=0x84E3 (snapshot at frame 700)
+
+RESULT: PASS — convex hull rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x84E3 host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: factorial gate hash (50!) = 0x772F
+==> built build/factorial.sfc (+mos-a16); corpus_result @ WRAM 0xfd5
+==> disasm gate (bignum carry-mul codegen)
+    PASS  __mulsi3=1  __udivmodsi4=1  rep/sep=15  (schoolbook carry-mul + native-16)
+==> bsnes-jg: render + framebuffer dump (build/factorial-jg.png) + assert
+jgxcheck: wrote /work/build/factorial-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xFD5 len=2 got=0x772F (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/factorial-mame.png)
+    SHOT: PASS corpus=0x772F (snapshot at frame 500)
+
+RESULT: PASS — bignum factorial rendered on SNES; MAME + bsnes-jg + corpus hash 0x772F host == +mos-a16

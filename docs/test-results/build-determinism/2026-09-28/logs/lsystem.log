@@ -1,0 +1,11 @@
+==> host oracle: L-System Plant gate hash = 0x8073
+==> built build/lsystem.sfc (+mos-a16); corpus_result @ WRAM 0x135d
+==> disasm gate (string-rewriting libcall codegen)
+    PASS  memcpy/memmove=2  strlen=1  __mulsi3=2  rep/sep=83  (string libcalls, native-16)
+==> bsnes-jg: render + framebuffer dump (build/lsystem-jg.png) + assert
+jgxcheck: wrote /work/build/lsystem-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x135D len=2 got=0x8073 (ran 1200 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/lsystem-mame.png)
+    SHOT: PASS corpus=0x8073 (snapshot at frame 1200)
+
+RESULT: PASS — L-System Plant rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8073 host == +mos-a16

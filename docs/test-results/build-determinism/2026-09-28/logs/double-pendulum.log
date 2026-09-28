@@ -1,0 +1,11 @@
+==> host oracle: double-pendulum gate hash = 0xE859
+==> built build/double-pendulum.sfc (+mos-a16); corpus_result @ WRAM 0x1369
+==> disasm gate (double-pendulum coupling __mulsi3 + __divsi3 + rep/sep)
+    PASS  __mulsi3=6  __divsi3=2  rep/sep=83  (ω² coupling + D-divide + native-16)
+==> bsnes-jg: render + framebuffer dump (build/double-pendulum-jg.png) + assert
+jgxcheck: wrote /work/build/double-pendulum-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1369 len=2 got=0xE859 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/double-pendulum-mame.png)
+    SHOT: PASS corpus=0xE859 (snapshot at frame 500)
+
+RESULT: PASS — Double Pendulum on SNES; MAME + bsnes-jg + corpus hash 0xE859 host == +mos-a16

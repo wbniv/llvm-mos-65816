@@ -1,0 +1,11 @@
+==> host oracle: rotozoom gate hash = 0x391B
+==> built build/rotozoom.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (widening multiply-high: Q16.16 q16mul via __muldi3, extend/mul/shift/trunc)
+    PASS  __muldi3=5  __mulsi3=4  SINCOS-refs=4  rep/sep=40  (widening multiply-high)
+==> bsnes-jg: render + framebuffer dump (build/rotozoom-jg.png) + assert
+jgxcheck: wrote /work/build/rotozoom-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0x391B (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/rotozoom-mame.png)
+    SHOT: PASS corpus=0x391B (snapshot at frame 700)
+
+RESULT: PASS — affine rotozoom rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x391B host == +mos-a16

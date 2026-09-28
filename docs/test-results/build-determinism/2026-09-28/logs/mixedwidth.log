@@ -1,0 +1,10 @@
+==> host oracle: mixedwidth gate hash = 0x83B7
+==> per-function feature/disassembly gate
+    PASS: native function brackets M16; forced-default function remains A8
+jgxcheck: wrote /work/build/mixedwidth-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+jgxcheck: wrote /work/build/mixedwidth-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+jgxcheck: wrote /work/build/mixedwidth-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E7 len=2 got=0x83B7 (ran 300 frames, bsnes-jg)
+RESULT: PASS — Split-Personality Link; host == default == a16 == xy16 == 0x83B7

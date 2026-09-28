@@ -1,0 +1,11 @@
+==> host oracle: FFT gate hash = 0x6D7A
+==> built build/fft.sfc (+mos-a16); corpus_result @ WRAM 0x1409
+==> disasm gate (FFT butterfly: __mulsi3 per complex multiply)
+    PASS  __mulsi3=4  rep/sep=66  (FFT butterfly complex multiply + native-16 ops)
+==> bsnes-jg: render + framebuffer dump (build/fft-jg.png) + assert
+jgxcheck: wrote /work/build/fft-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1409 len=2 got=0x6D7A (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/fft-mame.png)
+    SHOT: PASS corpus=0x6D7A (snapshot at frame 500)
+
+RESULT: PASS — FFT spectrum rendered on SNES; hash 0x6D7A host == +mos-a16

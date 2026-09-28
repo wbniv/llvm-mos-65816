@@ -1,0 +1,11 @@
+==> host oracle: disbits gate hash = 0x31D7
+==> built build/disbits.sfc (+mos-a16); corpus_result @ WRAM 0x13e6
+==> disasm gate (cross-byte bitfield extract/insert: shift+mask, native-16, no libcall)
+    PASS  and-masks=5  shifts=23  arith-libcalls=0  rep/sep=20  (cross-byte bitfield shift+mask)
+==> bsnes-jg: render + framebuffer dump (build/disbits-jg.png) + assert
+jgxcheck: wrote /work/build/disbits-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E6 len=2 got=0x31D7 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/disbits-mame.png)
+    SHOT: PASS corpus=0x31D7 (snapshot at frame 500)
+
+RESULT: PASS — cross-byte-boundary bitfield disassembler rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x31D7 host == +mos-a16

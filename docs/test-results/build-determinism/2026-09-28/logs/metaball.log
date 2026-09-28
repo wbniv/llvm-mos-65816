@@ -1,0 +1,11 @@
+==> host oracle: metaball gate hash = 0xAEBE
+==> built build/metaball.sfc (+mos-a16); corpus_result @ WRAM 0x1406
+==> disasm gate (union type-pun fast-inverse-sqrt: __mulsf3 + magic 0x5f3759df + native-16)
+    PASS  __mulsf3=4  magic(#$5f=1 #$37=1)  rep/sep=6  (union type-pun fast-inverse-sqrt)
+==> bsnes-jg: render + framebuffer dump (build/metaball-jg.png) + assert
+jgxcheck: wrote /work/build/metaball-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1406 len=2 got=0xAEBE (ran 900 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/metaball-mame.png)
+    SHOT: PASS corpus=0xAEBE (snapshot at frame 500)
+
+RESULT: PASS — union type-pun fast-inverse-sqrt metaballs rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAEBE host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: 1-D CA gate hash = 0xAB2C
+==> built build/1d-ca.sfc (+mos-a16); corpus_result @ WRAM 0x5a6
+==> disasm gate (ca_step: shift/bool ops, no mul/div, no rep/sep in hot path)
+    PASS  shifts=7  bools=10  bad_mul=0  bad_div=0  (pure shift+bool, no helpers)
+==> bsnes-jg: render + framebuffer dump (build/1d-ca-jg.png) + assert
+jgxcheck: wrote /work/build/1d-ca-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x5A6 len=2 got=0xAB2C (ran 400 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/1d-ca-mame.png)
+    SHOT: PASS corpus=0xAB2C (snapshot at frame 400)
+
+RESULT: PASS — Rule 90/110 CA rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAB2C host == +mos-a16

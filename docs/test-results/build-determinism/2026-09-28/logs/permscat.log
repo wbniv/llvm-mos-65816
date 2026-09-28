@@ -1,0 +1,11 @@
+==> host oracle: permscat gate hash = 0x0C2C
+==> built build/permscat.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (xy16 sta abs,X 16-bit-index scatter; a16 rep/sep; xy16 compile clean)
+    PASS  a16-rep/sep=42  xy16-compile=OK  xy16-sta-abs,X=3  (data-dependent 16-bit scatter index)
+==> bsnes-jg: render + assert (build/permscat-jg.png)
+jgxcheck: wrote /work/build/permscat-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0x0C2C (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/permscat-mame.png)
+    SHOT: PASS corpus=0x0C2C (snapshot at frame 500)
+
+RESULT: PASS — Gather-Scatter Permutation on SNES; MAME + bsnes-jg + corpus hash 0x0C2C host == +mos-a16

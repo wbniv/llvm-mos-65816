@@ -1,0 +1,11 @@
+==> host oracle: uarteye gate hash = 0x3F09
+==> built build/uarteye.sfc (+mos-a16); corpus_result @ WRAM 0x15ea
+==> disasm gate (DEFAULT-8-bit UART framing: asl/rol/lsr/ror carry-rotate shift loop)
+    PASS  default-8bit-compile=OK  asl/rol/lsr/ror=19  (bit-serial shift-register present)
+==> bsnes-jg: render + assert (build/uarteye-jg.png)
+jgxcheck: wrote /work/build/uarteye-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x15EA len=2 got=0x3F09 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/uarteye-mame.png)
+    SHOT: PASS corpus=0x3F09 (snapshot at frame 500)
+
+RESULT: PASS — Bit-Banged UART Eye on SNES; MAME + bsnes-jg + corpus hash 0x3F09 host == +mos-a16

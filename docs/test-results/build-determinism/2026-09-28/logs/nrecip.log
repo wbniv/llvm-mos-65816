@@ -1,0 +1,11 @@
+==> host oracle: nrecip gate hash = 0x044A
+==> built build/nrecip.sfc (+mos-a16); corpus_result @ WRAM 0x13e9
+==> disasm gate (multiply-only Newton-Raphson reciprocal: __mulsi3, no divide, native-16)
+    PASS  __mulsi3=6  divide-libcalls=0  rep/sep=20  (multiply-only Newton reciprocal)
+==> bsnes-jg: render + framebuffer dump (build/nrecip-jg.png) + assert
+jgxcheck: wrote /work/build/nrecip-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E9 len=2 got=0x044A (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/nrecip-mame.png)
+    SHOT: PASS corpus=0x044A (snapshot at frame 500)
+
+RESULT: PASS — Newton-Raphson reciprocal perspective floor rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x044A host == +mos-a16

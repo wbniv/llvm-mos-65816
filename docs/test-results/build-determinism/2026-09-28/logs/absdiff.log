@@ -1,0 +1,10 @@
+==> host oracle: absdiff gate hash = 0x3482
+==> absolute-difference codegen gate
+    PASS: u8, s16, and u32 absolute-difference bodies selected and verified
+jgxcheck: wrote /work/build/absdiff-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+jgxcheck: wrote /work/build/absdiff-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+jgxcheck: wrote /work/build/absdiff-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F7 len=2 got=0x3482 (ran 360 frames, bsnes-jg)
+RESULT: PASS — Motion-Detect Difference Field; host == default == a16 == xy16 == 0x3482

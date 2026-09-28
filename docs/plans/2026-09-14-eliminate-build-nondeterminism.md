@@ -541,8 +541,9 @@ heuristic change. Verify:
   byte-identical to the cherry-picked patch — patch and vendor agree.
 - `main`'s toolchain rebuilt with the fix (`dev/run.sh toolchain`); the released
   `20260914-f9711be` package predates the fix and still carries the ~0.5 % `sec` flip — the next release
-  picks it up. A full 138-demo gate sweep on the fixed toolchain remains open (corpus, corpus-a16 and the
-  four demos whose `main` changed beyond the `sec` permutation were gated; see Phase 1 result).
+  picks it up. This 2026-09-15 landing record predates the full differential sweep. The 2026-09-28
+  [135-demo run](../test-results/build-determinism/2026-09-28/README.md) completed on the fixed toolchain;
+  its three MAME capture failures and per-demo timings are recorded there.
 - Both worktrees torn down 2026‑09‑15 via `dev/worktree-teardown.sh` (`bnd-phase0` 730 M, `bnd-phase1` 13 G reclaimed).
 - Re-verified on `main`'s rebuilt toolchain: `dev/measure-build-determinism.sh --n 200 --arms quiet --demos "dither newton msquares"`
   → `DISTINCT 1` for all three (600 builds, 607 s); `dev/run.sh corpus` 63/63 PASS, `corpus-a16` 62/62 PASS (0 xfail).

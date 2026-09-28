@@ -1,0 +1,11 @@
+==> host oracle: sorting-race gate hash = 0xB28F
+==> built build/sort-race.sfc (+mos-a16); corpus_result @ WRAM 0x1735
+==> disasm gate (recursion + compares + native-16 codegen)
+    PASS  sr_qsort/sr_msort refs=706  cmp=44  rep/sep=250  (recursive sorts + compares, native-16)
+==> bsnes-jg: render + framebuffer dump (build/sort-race-jg.png) + assert
+jgxcheck: wrote /work/build/sort-race-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1735 len=2 got=0xB28F (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/sort-race-mame.png)
+    SHOT: PASS corpus=0xB28F (snapshot at frame 500)
+
+RESULT: PASS — Sorting Race rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xB28F host == +mos-a16

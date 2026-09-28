@@ -1,0 +1,11 @@
+==> host oracle: burning-ship curve hash = 0x6F2D
+==> built build/burning-ship.sfc (+mos-a16); corpus_result @ WRAM 0x580
+==> disasm gate (bs_iter: __mulsi3 + rep/sep, multiply-only — no divide)
+    PASS  __mulsi3=3  rep/sep=25  bad_div=0  (fixed-point multiply, no divide)
+==> bsnes-jg: render + framebuffer dump (build/burning-ship-jg.png) + assert
+jgxcheck: wrote /work/build/burning-ship-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x580 len=2 got=0x6F2D (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/burning-ship-mame.png)
+    
+
+RESULT: FAIL — see the per-emulator lines above

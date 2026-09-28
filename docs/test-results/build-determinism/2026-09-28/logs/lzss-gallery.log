@@ -1,0 +1,86 @@
+==> artwork palette ownership audit
+palette audit: 62 works; artwork indices 3–223; static inks 1–2; sprite reservation 224–255
+==> host codec oracle (-O0 and -O2)
+approach-venice.idx raw=15352 compressed=14122 reduction=8.01% literals=8918 matches=1924 longest=10 hash=0xF9E7
+basket-apples.idx raw=15792 compressed=15234 reduction=3.53% literals=10696 matches=1506 longest=13 hash=0x3C9D
+buffalo-storm.idx raw=15456 compressed=13099 reduction=15.25% literals=7782 matches=2044 longest=18 hash=0xC008
+dragon.idx raw=14608 compressed=15772 reduction=-7.97% literals=13326 matches=367 longest=6 hash=0xEF8C
+earthly-delights.idx raw=16128 compressed=16473 reduction=-2.14% literals=13039 matches=849 longest=18 hash=0x388C
+flower-still-life.idx raw=16128 compressed=13881 reduction=13.93% literals=8657 matches=1949 longest=18 hash=0xA1B3
+fog-mount-desert.idx raw=15552 compressed=14021 reduction=9.84% literals=9499 matches=1569 longest=18 hash=0x2138
+fujisawa-shuku.idx raw=15656 compressed=14342 reduction=8.39% literals=9920 matches=1497 longest=18 hash=0xC1B0
+grand-canal-molo.idx raw=15408 compressed=12528 reduction=18.69% literals=6810 matches=2290 longest=18 hash=0x46AC
+grande-jatte.idx raw=15352 compressed=14463 reduction=5.79% literals=9907 matches=1561 longest=13 hash=0x5F9E
+great-wave.idx raw=15704 compressed=15305 reduction=2.54% literals=11252 matches=1245 longest=18 hash=0x28CD
+harvest-moon.idx raw=15504 compressed=13735 reduction=11.41% literals=8518 matches=1954 longest=17 hash=0x75D4
+home-heron.idx raw=15200 compressed=15566 reduction=-2.41% literals=11911 matches=1019 longest=11 hash=0x3EEA
+houses-parliament.idx raw=16184 compressed=15160 reduction=6.33% literals=10175 matches=1747 longest=11 hash=0xD26F
+ice-skaters.idx raw=16032 compressed=16084 reduction=-0.32% literals=12164 matches=1129 longest=13 hash=0xAE35
+keelmen-moonlight.idx raw=15408 compressed=13360 reduction=13.29% literals=7865 matches=2123 longest=14 hash=0x86D7
+louvre-rain.idx raw=15680 compressed=15778 reduction=-0.63% literals=11701 matches=1230 longest=9 hash=0xB11C
+marly-le-roi.idx raw=15504 compressed=14932 reduction=3.69% literals=10305 matches=1571 longest=10 hash=0x2D77
+mortlake-terrace.idx raw=15552 compressed=15344 reduction=1.34% literals=11323 matches=1226 longest=10 hash=0x9EAD
+mount-akiha.idx raw=15600 compressed=14335 reduction=8.11% literals=9597 matches=1665 longest=18 hash=0x78E1
+mount-corcoran.idx raw=14688 compressed=12436 reduction=15.33% literals=7416 matches=1926 longest=18 hash=0xC12F
+mountain-waterfall.idx raw=16080 compressed=15922 reduction=0.98% literals=11752 matches=1271 longest=15 hash=0xDDF7
+niagara.idx raw=15555 compressed=12405 reduction=20.25% literals=6555 matches=2367 longest=18 hash=0x8BFA
+pantheon-interior.idx raw=15984 compressed=15771 reduction=1.33% literals=11585 matches=1288 longest=16 hash=0xDF5A
+paris-street.idx raw=16128 compressed=15200 reduction=5.75% literals=10579 matches=1552 longest=12 hash=0x70DD
+poppy-field.idx raw=15048 compressed=14861 reduction=1.24% literals=10720 matches=1318 longest=12 hash=0xFDE0
+river-moonlight.idx raw=14784 compressed=13495 reduction=8.72% literals=8750 matches=1718 longest=11 hash=0xE4E5
+sailing-vessels.idx raw=15120 compressed=13177 reduction=12.85% literals=7852 matches=2044 longest=14 hash=0x9EEE
+scholar-landscape.idx raw=14880 compressed=15314 reduction=-2.92% literals=12014 matches=846 longest=18 hash=0x74D6
+self-portrait.idx raw=15904 compressed=16932 reduction=-6.46% literals=13938 matches=589 longest=10 hash=0xFEDE
+ships-calm.idx raw=15080 compressed=13397 reduction=11.16% literals=8181 matches=1973 longest=18 hash=0x99A3
+st-odulphus.idx raw=15048 compressed=13640 reduction=9.36% literals=9041 matches=1632 longest=18 hash=0x5975
+stack-wheat.idx raw=15392 compressed=15709 reduction=-2.06% literals=11991 matches=1044 longest=15 hash=0x75D1
+starry-night.idx raw=15904 compressed=16971 reduction=-6.71% literals=13929 matches=612 longest=9 hash=0xABD9
+stormy-sunset.idx raw=15288 compressed=14367 reduction=6.02% literals=9665 matches=1644 longest=15 hash=0xC2A4
+sunflowers.idx raw=15904 compressed=15822 reduction=0.52% literals=11644 matches=1281 longest=9 hash=0x54CB
+sunset-woods.idx raw=15352 compressed=16107 reduction=-4.92% literals=12976 matches=710 longest=11 hash=0x7512
+tableau-vii.idx raw=15840 compressed=15306 reduction=3.37% literals=11506 matches=1111 longest=18 hash=0x2B30
+thai-buddha-descending.idx raw=14946 compressed=15713 reduction=-5.13% literals=12769 matches=634 longest=10 hash=0xF225
+thai-elephant-duel.idx raw=16000 compressed=16380 reduction=-2.37% literals=12809 matches=927 longest=18 hash=0xE9E9
+thai-hanuman-longka.idx raw=15696 compressed=15684 reduction=0.08% literals=11774 matches=1147 longest=10 hash=0x413B
+thai-hanuman.idx raw=15552 compressed=15563 reduction=-0.07% literals=11654 matches=1154 longest=14 hash=0x6351
+thai-ravan-palace.idx raw=15552 compressed=15800 reduction=-1.59% literals=12144 matches=1006 longest=10 hash=0x7A21
+thai-ravana-war.idx raw=15648 compressed=15171 reduction=3.05% literals=11037 matches=1296 longest=14 hash=0x4F6D
+thai-surasa-hanuman.idx raw=15552 compressed=13966 reduction=10.20% literals=8921 matches=1849 longest=18 hash=0x2C47
+thai-temple-painting.idx raw=12692 compressed=13901 reduction=-9.53% literals=11829 matches=279 longest=5 hash=0xED15
+the-kiss.idx raw=14760 compressed=15632 reduction=-5.91% literals=12661 matches=653 longest=7 hash=0xF873
+the-scream.idx raw=15568 compressed=15255 reduction=2.01% literals=11302 matches=1195 longest=18 hash=0xBCC8
+the-willows.idx raw=15680 compressed=16650 reduction=-6.19% literals=13570 matches=651 longest=8 hash=0xEBB4
+third-of-may.idx raw=15984 compressed=14697 reduction=8.05% literals=9771 matches=1743 longest=11 hash=0xB1BE
+thistles.idx raw=16016 compressed=17075 reduction=-6.61% literals=14186 matches=525 longest=17 hash=0xC676
+tornado-forest.idx raw=15288 compressed=15261 reduction=0.18% literals=11404 matches=1144 longest=12 hash=0xE34C
+view-of-delft.idx raw=15368 compressed=12322 reduction=19.82% literals=6551 matches=2330 longest=18 hash=0xA0DB
+voyage-childhood.idx raw=15656 compressed=13081 reduction=16.45% literals=7857 matches=1996 longest=18 hash=0x9BB6
+voyage-manhood.idx raw=15200 compressed=13334 reduction=12.28% literals=8144 matches=1963 longest=18 hash=0x7B36
+voyage-old-age.idx raw=15504 compressed=12619 reduction=18.61% literals=6608 matches=2440 longest=18 hash=0x6EF9
+voyage-youth.idx raw=15808 compressed=14093 reduction=10.85% literals=9314 matches=1701 longest=18 hash=0x1621
+water-lilies.idx raw=15000 compressed=14986 reduction=0.09% literals=11082 matches=1185 longest=11 hash=0x3894
+wide-river.idx raw=15792 compressed=15046 reduction=4.72% literals=10265 matches=1646 longest=14 hash=0x991B
+wijk-windmill.idx raw=15232 compressed=14390 reduction=5.53% literals=9706 matches=1633 longest=11 hash=0x9ED6
+wivenhoe-park.idx raw=15288 compressed=13806 reduction=9.69% literals=8966 matches=1750 longest=18 hash=0xE430
+wooded-merrymakers.idx raw=15232 compressed=14585 reduction=4.25% literals=10412 matches=1351 longest=17 hash=0xB8F2
+==> target build (+mos-a16, 1 MiB LoROM)
+/work/build/lzss-gallery.sfc: lorom size=1024KiB devices=8Mbit map_mode=0x20 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0x5E0A complement=0xA1F5
+==> producer gate: no non-GPR LDImm destinations (#138)
+  PASS: all 1105 LDImm destinations are GPRs
+NMI opcode audit: PASS (long conditional and 16-bit immediate are explicit)
+decode_bank7e ABI audit: PASS (A-safe PEA/PLB; 08 8b f4 7e 7e ab ab 20 8a 82 ab 28 60)
+bank $00 asset gate: PASS (FONT16=$15:EF29, FONT8=$07:FB54; 5316 B before header)
+==> fast decode gate (GALLERY_BENCH_ONLY, all 62 works)
+/work/build/lzss-gallery-bench.sfc: lorom size=1024KiB devices=8Mbit map_mode=0x20 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0xDC5E complement=0x23A1
+jgxcheck: wrote /work/build/lzss-gallery-bench-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x24 len=2 got=0x5CF0 (ran 30000 frames, bsnes-jg)
+fast decode gate: PASS (all 62 works far-decoded, staged, near-decoded, checksummed)
+jgxcheck: JGX_POLL matched at frame 1002 of 5000 budgeted
+SMOKE: PASS off=0x6D len=2 got=0x0001 (ran 5000 frames, bsnes-jg)
+automatic joypad navigation gate: PASS (Right accepted during foreground decode)
+==> corpus_result @ WRAM 0x60; oracle 0x9512
+jgxcheck: wrote /work/build/lzss-gallery-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x60 len=2 got=0x9512 (ran 700000 frames, bsnes-jg)
+==> reproducible-build check (relink and compare)
+reproducible build: PASS (87faf36eb71529f3107d5413659ebbdbeecc44807d54e5499d75f59b4370e3c1)
+RESULT: PASS — 62-work LZSS gallery host oracle, relink, header and bsnes-jg gate

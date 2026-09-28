@@ -1,0 +1,11 @@
+==> host oracle: CORDIC rotator gate hash = 0x4D41
+==> built build/cordic.sfc (+mos-a16); corpus_result @ WRAM 0x1360
+==> disasm gate (multiply-free CORDIC: zero arithmetic libcalls, native-16)
+    PASS  mul=0 div=0 vshift=0  rep/sep=251  adc/sbc=143  (shift-add only, no libcalls, native-16)
+==> bsnes-jg: render + framebuffer dump (build/cordic-jg.png) + assert
+jgxcheck: wrote /work/build/cordic-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1360 len=2 got=0x4D41 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/cordic-mame.png)
+    SHOT: PASS corpus=0x4D41 (snapshot at frame 500)
+
+RESULT: PASS — CORDIC rotator rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4D41 host == +mos-a16

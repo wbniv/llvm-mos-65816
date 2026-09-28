@@ -1,0 +1,11 @@
+==> host oracle: Truchet bitfields gate hash = 0xB3E6
+==> built build/truchet.sfc (+mos-a16); corpus_result @ WRAM 0x15e6
+==> disasm gate (packed-bitfield insert/extract codegen)
+    PASS  and=13  ora=8  shift=32  rep/sep=69  libcalls=0  (bitfield insert/extract, native-16)
+==> bsnes-jg: render + framebuffer dump (build/truchet-jg.png) + assert
+jgxcheck: wrote /work/build/truchet-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x15E6 len=2 got=0xB3E6 (ran 800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/truchet-mame.png)
+    SHOT: PASS corpus=0xB3E6 (snapshot at frame 800)
+
+RESULT: PASS — Truchet bitfields rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xB3E6 host == +mos-a16

@@ -56,6 +56,11 @@ tasks:
     cmds:
       - dev/run.sh build
 
+  build-determinism-sweep:
+    desc: "Run the fixed 135-demo differential gate set after codegen changes; use before toolchain releases"
+    cmds:
+      - dev/run.sh determinism-sweep {{.CLI_ARGS}}
+
   compile:
     desc: "Compile the SNES example inside the dev container (assumes the image is already built)"
     cmds:

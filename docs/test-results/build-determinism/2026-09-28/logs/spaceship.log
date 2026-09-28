@@ -1,0 +1,11 @@
+==> host oracle: spaceship gate hash = 0xF20F
+==> built build/spaceship.sfc (+mos-a16); corpus_result @ WRAM 0x152f
+==> G_SCMP IR probe (llvm.scmp at s16/s32/s64) + a16 rep/sep
+    PASS  llvm.scmp/ucmp=8  scmp.i64=2  rep/sep=74  (G_SCMP formed incl. s64)
+==> bsnes-jg: render + assert (build/spaceship-jg.png)
+jgxcheck: wrote /work/build/spaceship-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x152F len=2 got=0xF20F (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/spaceship-mame.png)
+    SHOT: PASS corpus=0xF20F (snapshot at frame 500)
+
+RESULT: PASS — Width-Sweep Sort Gallery on SNES; MAME + bsnes-jg + corpus hash 0xF20F host == +mos-a16

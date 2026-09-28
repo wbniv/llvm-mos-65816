@@ -1,0 +1,11 @@
+==> host oracle: radix gate hash = 0x123E
+==> built build/radix.sfc (+mos-a16); corpus_result @ WRAM 0x140a
+==> disasm gate (non-comparison radix sort: histogram + prefix-sum + indexed scatter)
+    PASS  indexed-load/sta=18  mul/div-libcalls=0  rep/sep=57  (histogram/scatter, no compares)
+==> bsnes-jg: render + framebuffer dump (build/radix-jg.png) + assert
+jgxcheck: wrote /work/build/radix-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x140A len=2 got=0x123E (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/radix-mame.png)
+    SHOT: PASS corpus=0x123E (snapshot at frame 500)
+
+RESULT: PASS — radix counting sort rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x123E host == +mos-a16

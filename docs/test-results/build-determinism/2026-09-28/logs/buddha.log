@@ -1,0 +1,15 @@
+sync-platform: refreshed 13 file(s) into /work/build/install/mos-platform
+==> buddha: K_GATE=2000  (frames=6000)
+host grid: K_GATE=2000  cells_hit=3714/16384  max=6  saturated=0
+    host grid: K_GATE=2000  cells_hit=3714/16384  max=6  saturated=0
+==> host reference: grid hash = 0x7C31
+==> built buddha.sfc (+mos-a16); corpus_result @ $22
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: +mos-a16 verify clean (real object emitted)
+==> bsnes-jg: grid gate (corpus == 0x7C31) + framebuffer dump (build/buddha-jg.png)
+jgxcheck: wrote /work/build/buddha-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x22 len=2 got=0x7C31 (ran 6000 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + grid gate (build/buddha-mame.png)
+    SHOT: PASS corpus=0x7C31 (snapshot at frame 6000)
+
+RESULT: PASS — Buddhabrot density on SNES; grid hash 0x7C31 host == +mos-a16 (bsnes-jg + MAME)

@@ -1,0 +1,15 @@
+==> host oracle: mvscrl gate hash = 0x72A7
+==> built build/mvscrl.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (memmove SDK calls + __mulhi3 from fold + rep/sep)
+    memmove-refs=2  rep/sep=30
+    PASS  memmove descending+ascending confirmed (refs=2 >= 2, rep/sep=30 >= 1)
+==> premise gate (the picture reads the memmove buffers)
+    mv_step-calls=1  far-end-reads: upper=1 lower=1
+    PASS  loop steps the memmove and paints its far-end output (upper[7] / lower[0])
+==> bsnes-jg: render + assert (build/mvscrl-jg.png)
+jgxcheck: wrote /work/build/mvscrl-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x72A7 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/mvscrl-mame.png)
+    SHOT: PASS corpus=0x72A7 (snapshot at frame 500)
+
+RESULT: PASS — Descending memmove Scroll Slabs on SNES; MAME + bsnes-jg + corpus hash 0x72A7 host == +mos-a16

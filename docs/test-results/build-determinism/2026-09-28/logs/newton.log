@@ -1,0 +1,11 @@
+==> host oracle: Newton fractal gate_crc = 0x4D8B
+==> built build/newton.sfc (+mos-a16); corpus_result @ WRAM 0x994
+==> disasm gate (complex division + multiply + native-16 mode)
+    PASS  __divsi3=2  __mulsi3=17  rep/sep=67
+==> bsnes-jg: render + framebuffer dump (build/newton-jg.png) + assert
+jgxcheck: wrote /work/build/newton-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x994 len=2 got=0x4D8B (ran 6500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/newton-mame.png)
+    SHOT: PASS corpus=0x4D8B (snapshot at frame 6500)
+
+RESULT: PASS — Newton fractal rendered on SNES; MAME + bsnes-jg + corpus hash 0x4D8B host == +mos-a16

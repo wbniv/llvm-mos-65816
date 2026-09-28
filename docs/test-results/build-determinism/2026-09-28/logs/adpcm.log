@@ -1,0 +1,12 @@
+==> host oracle: adpcm gate hash = 0xCA56
+==> built build/adpcm.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (IMA-ADPCM saturating predictor feedback)
+    rep/sep=46  cmp/branch(clamp)=20
+    PASS  saturating predictor feedback present
+==> bsnes-jg: render + assert (build/adpcm-jg.png)
+jgxcheck: wrote /work/build/adpcm-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0xCA56 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/adpcm-mame.png)
+    SHOT: PASS corpus=0xCA56 (snapshot at frame 500)
+
+RESULT: PASS — ADPCM Waverider on SNES; MAME + bsnes-jg + corpus hash 0xCA56 host == +mos-a16

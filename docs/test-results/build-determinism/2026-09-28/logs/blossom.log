@@ -1,0 +1,15 @@
+sync-platform: refreshed 13 file(s) into /work/build/install/mos-platform
+==> blossom: K_GATE=8000  (frames=1500, script=R:150,DOWN:150,SELECT:2,L:150,UP:150,RIGHT:150,SELECT:2,LEFT:150)
+host grid: maxabs=5895 clamps=0  cells_hit=779/16384  saturated=0
+    host grid: maxabs=5895 clamps=0  cells_hit=779/16384  saturated=0
+==> host reference: grid hash = 0x9047
+==> built blossom.sfc (+mos-a16); corpus@$54 blossom_crc@$56 pad_log@$200
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: +mos-a16 verify clean (real object emitted)
+==> bsnes-jg: grid gate (corpus == 0x9047) + state replay (BLOSSOM) + framebuffer dump
+    SMOKE: PASS off=0x54 len=2 got=0x9047 (ran 1500 frames, bsnes-jg)
+    BLOSSOM: PASS frames=64 nonzero=64 blossom_crc=0x187B (host replay == ROM, bsnes-jg)
+==> MAME (under Xvfb): snapshot + grid gate (build/blossom-mame.png)
+    SHOT: PASS corpus=0x9047 (snapshot at frame 1500)
+
+RESULT: PASS — interactive Hopalong attractor on SNES; grid hash 0x9047 host == +mos-a16 (MAME + bsnes-jg); state-math host == ROM (bsnes-jg)

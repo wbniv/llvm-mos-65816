@@ -1,0 +1,12 @@
+==> host oracle: sbitfld gate hash = 0x40C5
+==> built build/sbitfld.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (G_SEXT_INREG: asl>=3 shift pairs + rep/sep)
+    asl=41  rep/sep=100
+    PASS  signed sext pattern confirmed (asl=41 >= 4, rep/sep=100 >= 1)
+==> bsnes-jg: render + assert (build/sbitfld-jg.png)
+jgxcheck: wrote /work/build/sbitfld-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x40C5 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/sbitfld-mame.png)
+    SHOT: PASS corpus=0x40C5 (snapshot at frame 500)
+
+RESULT: PASS — Signed-Bitfield Terrain on SNES; MAME + bsnes-jg + corpus hash 0x40C5 host == +mos-a16

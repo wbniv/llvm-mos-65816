@@ -1,0 +1,11 @@
+==> host oracle: percol gate hash = 0x025B
+==> built build/percol.sfc (+mos-a16); corpus_result @ WRAM 0x16ef
+==> disasm gate (union-find path-compression: branch-heavy parent[] pointer-chase)
+    PASS  parent-refs=42  branches=22  rep/sep=105  (union-find find/union pointer-chase)
+==> bsnes-jg: render + framebuffer dump (build/percol-jg.png) + assert
+jgxcheck: wrote /work/build/percol-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x16EF len=2 got=0x025B (ran 900 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/percol-mame.png)
+    
+
+RESULT: FAIL — see the per-emulator lines above

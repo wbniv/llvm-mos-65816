@@ -1,0 +1,13 @@
+==> host oracle: bitboard64 gate hash = 0xC074
+==> s64 bit-operation disassembly gate
+    PASS: ctpop/cttz/ctlz i64 intrinsics form and lower to verified inline machine code
+SMOKE: PASS addr=0x7E13F1 len=2 got=0xC074 (ran 480 ticks)
+jgxcheck: wrote /work/build/bitboard64-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13F1 len=2 got=0xC074 (ran 480 ticks)
+jgxcheck: wrote /work/build/bitboard64-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13F1 len=2 got=0xC074 (ran 480 ticks)
+jgxcheck: wrote /work/build/bitboard64-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F1 len=2 got=0xC074 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Bitboard Knight Tour; host == default == a16 == xy16 == 0xC074 on MAME + bsnes-jg

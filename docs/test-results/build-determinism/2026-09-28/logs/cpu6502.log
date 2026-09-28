@@ -1,0 +1,11 @@
+==> host oracle: cpu6502 gate_crc = 0xAC8A
+==> built build/cpu6502.sfc (+mos-a16); corpus_result @ WRAM 0xb6a
+==> opcode dispatch probe (expect jump table in disasm)
+    PASS  jmp_table=4  rep/sep=98
+==> bsnes-jg: render + assert (build/cpu6502-jg.png)
+jgxcheck: wrote /work/build/cpu6502-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xB6A len=2 got=0xAC8A (ran 1000 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/cpu6502-mame.png)
+    SHOT: PASS corpus=0xAC8A (snapshot at frame 1000)
+
+RESULT: PASS — 6502/65C02 CPU Disassembler+Simulator on SNES; gate_crc=0xAC8A host==+mos-a16

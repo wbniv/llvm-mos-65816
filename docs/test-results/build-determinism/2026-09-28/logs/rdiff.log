@@ -1,0 +1,11 @@
+==> host oracle: Gray-Scott gate hash = 0x5555
+==> built build/rdiff.sfc (+mos-a16); corpus_result @ WRAM 0x400
+==> disasm gate (Gray-Scott u*v² mul-add + native-16 codegen)
+    PASS  __mulsi3=6  rep/sep=83  (u*v² fixed-point mul-add, native-16)
+==> bsnes-jg: render + framebuffer dump (build/rdiff-jg.png) + assert
+jgxcheck: wrote /work/build/rdiff-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x400 len=2 got=0x5555 (ran 6000 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/rdiff-mame.png)
+    SHOT: PASS corpus=0x5555 (snapshot at frame 6000)
+
+RESULT: PASS — Gray-Scott rdiff rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x5555 host == +mos-a16

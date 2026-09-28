@@ -1,0 +1,70 @@
+==> 1) host: P0 generator self-check + address-model unit tests
+  PASS: 18 self-checks
+      slots 2 (1 available, reserved [1]), nodes 126, payload 6672 bytes
+      slots 192 (190 available, reserved [129, 130]), nodes 374, payload 890576 bytes (14.2% of the image)
+      decode cells 380 = 192 canonical + 188 mirror; 6 reserved, 374 available; covered 374
+      edges 1122 total, 776 seam-crossing, 739 mirror-addressed, 1122 bank-crossing; min in-degree 1
+  PASS: 69 address-model tests
+
+==> 2) generate the ExHiROM 6 MiB platform + data header, link
+platform snes-cart-seamdemo: /work/build/install/mos-platform/snes-cart-seamdemo/lib/link.ld + /work/build/install/bin/mos-snes-cart-seamdemo.cfg
+header /work/build/seamdemo-gen/seamdemo-data.h: 374 nodes, 374/380 decode cells covered, corpus_result $3277
+decode /work/build/seamdemo-gen/seamdemo-decode.h: 380 cells (host harness only)
+report /work/build/seamdemo-gen/seamdemo-layout.json: 890576 payload bytes
+  linked /work/build/seamdemo.sfc: 6291456 bytes
+
+==> 3) extents: everything the linker wrote is inside the reserved slots
+  linker wrote slots [129]; reserved [129, 130]; last used slot 129 is 100.0% full
+    PASS: all linker output is inside the reserved slots
+
+==> 4) fill the payload, patch header + checksum, structural inspect
+fill /work/build/seamdemo.sfc: 890576 payload bytes, act1 $F0E2 act2 $36B6 act3 $6D21 -> corpus_result $3277
+/work/build/seamdemo.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D ram_size_byte=0x00 cart_type=0x00 checksum=0xBB8F complement=0x4470
+  PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB);physical devices : 32Mbit @ $000000 + 16Mbit @ $400000 header at file : $40FFB0;map mode byte : $25
+
+==> 5) disasm: far fetch + jump-table dispatch + function-pointer ALU table
+  PASS: -verify-machineinstrs clean
+  PASS: 28 far fetch(es) (lda [dp], a7) — the 24-bit cartridge cursor
+  PASS: 1 jump-table dispatch (jmp (abs,X), 7c) — the 16-way switch
+  PASS: 8 __call_indir reference(s) — the function-pointer ALU table
+
+==> 6) host oracle over the BUILT image == the header's baked CRCs
+  act1 CRC $F0E2  (10494 ops, 367 segments, 191 marks)
+  act2 CRC $36B6  (374 nodes, cycle closed)
+  act3 CRC $6D21  (3040 samples over 190 pages)
+  corpus_result $3277  (42811 cartridge reads)
+  PASS: oracle act1 0xF0E2 == header 0xF0E2
+
+==> 6b) host C: the SAME VM source the ROM runs, over the built image
+  act1 CRC $F0E2 (want $F0E2)  ops=10494 segments=367 syncs=51 seam-hits=1 status=$0000
+  act2 CRC $36B6 (want $36B6)  nodes=374 edges=1122 seam=776 mirror=739 status=$0000
+  act3 CRC $6D21 (want $6D21)  samples=3040 (want 3040) pages=190 status=$0000
+  corpus(act1,act2) $0C72 (want $0C72)
+  corpus(act1,act2,act3) $3277 (want $3277)
+  PASS: host C == the generated oracle (all three acts)
+  PASS: host C == Python oracle == the header's baked CRC
+
+==> 5b) pacing: ops/frame achieved on target
+  VM alone (no drawing) : 52 ops/frame
+  shipping build        : 5.61 ops/frame
+                          (canvas_line is the cost: the VM alone manages 52)
+  projected act length  : ~1870 frames = ~31 s
+  PASS: OPS_PER_FRAME=8 is matched to the achievable 5 ops/frame
+
+==> 7) bsnes-jg: all three acts fold, and the cycle latches
+  (act2 0x36B6, act3 0x6D21, three-act corpus_result 0x3277)
+  act1_crc: jgxcheck: wrote /work/build/seamdemo.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x4D len=2 got=0xF0E2 (ran 7200 frames, bsnes-jg)
+  screenshot: /work/build/seamdemo.png
+  act1_status: SMOKE: PASS off=0x41 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  act2_crc: SMOKE: PASS off=0x4F len=2 got=0x36B6 (ran 7200 frames, bsnes-jg)
+  act2_status: SMOKE: PASS off=0x57 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  act3_crc: SMOKE: PASS off=0x47 len=2 got=0x6D21 (ran 7200 frames, bsnes-jg)
+  act3_status: SMOKE: PASS off=0x49 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  cycle_status: SMOKE: PASS off=0x53 len=2 got=0x0000 (ran 7200 frames, bsnes-jg)
+  corpus_result: SMOKE: PASS off=0x51 len=2 got=0x3277 (ran 7200 frames, bsnes-jg)
+==> 7b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (AFA1095D:#000000)
+
+  ROM SHA-256: d99df6aba03178b0916702660ec4c387f61b65a01a2fab6e5cd588bea2f4bac5
+RESULT: PASS — all three acts read the 6 MiB ExHiROM cartridge with different access patterns and folded to the generated oracle: Act 1 marched its 24-bit file PC across the whole image and executed the instruction split across the physical device seam, Act 2 walked the covering cycle through all 374 decode cells (mirrors included) and closed on its entry, Act 3 swept the atlas over every available page — and corpus_result latched the three-act fold

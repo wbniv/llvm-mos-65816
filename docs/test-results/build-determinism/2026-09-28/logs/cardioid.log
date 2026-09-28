@@ -1,0 +1,11 @@
+==> host oracle: cardioid gate hash = 0x523B
+==> built build/cardioid.sfc (+mos-a16); corpus_result @ WRAM 0x170d
+==> disasm gate (modulo-heavy: __mulsi3 + __umodsi3 + rep/sep)
+    PASS  __mulsi3=1  __umodsi3=1  rep/sep=7  (modulo-heavy: k*i + (k*i)%N, libcall 1)
+==> bsnes-jg: render + framebuffer dump (build/cardioid-jg.png) + assert
+jgxcheck: wrote /work/build/cardioid-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x170D len=2 got=0x523B (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/cardioid-mame.png)
+    SHOT: PASS corpus=0x523B (snapshot at frame 500)
+
+RESULT: PASS — cardioid times-table rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x523B host == +mos-a16

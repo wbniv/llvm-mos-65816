@@ -1,0 +1,11 @@
+==> host oracle: dhmix gate hash = 0x69AA
+==> built build/dhmix.sfc (+mos-a16); corpus_result @ WRAM 0x13ec
+==> disasm gate (64-bit modular exponentiation: __umoddi3 + __muldi3 square-and-multiply)
+    PASS  __umoddi3=8  __muldi3=8  rep/sep=29  (64-bit modexp: 64-bit modulo hot op)
+==> bsnes-jg: render + framebuffer dump (build/dhmix-jg.png) + assert
+jgxcheck: wrote /work/build/dhmix-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x69AA (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/dhmix-mame.png)
+    SHOT: PASS corpus=0x69AA (snapshot at frame 700)
+
+RESULT: PASS — Diffie-Hellman colour-mixer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x69AA host == +mos-a16

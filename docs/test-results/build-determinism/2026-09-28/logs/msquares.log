@@ -1,0 +1,12 @@
+crossed-cells=55  empty(0)=56  full(15)=145
+==> host oracle: msquares gate hash = 0x86A7
+==> built build/msquares.sfc (+mos-a16); corpus_result @ WRAM 0x1c69
+==> disasm gate (marching squares: 16-case MS_SEG edge LUT + edge-interpolation divide)
+    PASS  MS_SEG-refs=4  __divsi3=4  rep/sep=196  (16-case edge LUT + edge interpolation)
+==> bsnes-jg: render + framebuffer dump (build/msquares-jg.png) + assert
+jgxcheck: wrote /work/build/msquares-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1C69 len=2 got=0x86A7 (ran 1800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/msquares-mame.png)
+    SHOT: PASS corpus=0x86A7 (snapshot at frame 900)
+
+RESULT: PASS — marching-squares contours rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x86A7 host == +mos-a16

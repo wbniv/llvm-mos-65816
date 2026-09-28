@@ -1,0 +1,12 @@
+==> host oracle: wireframe 3-D hash = 0xE737
+==> built build/wireframe.sfc (+mos-a16); corpus_result @ WRAM 0x142a
+==> disasm gate (matrix-mul + perspective-divide hot loop codegen)
+    PASS  __mulsi3=12  __div=2  rep/sep=131  (3x3 matrix mul + perspective divide, native-16)
+==> bsnes-jg: render + framebuffer dump (build/wireframe-jg.png) + assert
+jgxcheck: wrote /work/build/wireframe-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x142A len=2 got=0xE737 (ran 500 frames, bsnes-jg)
+    PASS  3x bsnes-jg capture byte-identical (9aa0721ad7e6fc2e709b72bc4e6acf216e1547ae05389a16f8640a0d4df68fb7)
+==> MAME (under Xvfb): snapshot + assert (build/wireframe-mame.png)
+    SHOT: PASS corpus=0xE737 (snapshot at frame 500)
+
+RESULT: PASS — 3-D Wireframe rendered on SNES; MAME + bsnes-jg screenshots + 3-D hash 0xE737 host == +mos-a16

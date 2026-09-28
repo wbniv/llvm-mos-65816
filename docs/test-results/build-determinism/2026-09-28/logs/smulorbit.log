@@ -1,0 +1,11 @@
+==> host oracle: smulorbit gate hash = 0xD81B
+==> built build/smulorbit.sfc (+mos-a16); corpus_result @ WRAM 0x1405
+==> disasm gate (G_SMULO: __mulosi4 for int32 path + rep/sep for a16)
+    PASS  __muldi3=1  __mulsi3/hi3=3  rep/sep=29  (G_SMULO s16+s32 lowerMulo present)
+==> bsnes-jg: render + assert (build/smulorbit-jg.png)
+jgxcheck: wrote /work/build/smulorbit-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1405 len=2 got=0xD81B (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/smulorbit-mame.png)
+    SHOT: PASS corpus=0xD81B (snapshot at frame 500)
+
+RESULT: PASS — Signed Multiply-Overflow Orbit on SNES; MAME + bsnes-jg + corpus hash 0xD81B host == +mos-a16

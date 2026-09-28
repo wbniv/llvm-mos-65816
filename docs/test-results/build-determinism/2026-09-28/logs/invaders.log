@@ -1,0 +1,20 @@
+sync-platform: refreshed 13 file(s) into /work/build/install/mos-platform
+==> host oracle: attract CRC16=0x9D57
+==> built default + a16; corpus_result @ WRAM 0x20
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: default verify clean (real object emitted)
+    PASS: a16 verify clean (real object emitted)
+==> MAME assert: invaders.sfc
+    SMOKE: PASS addr=0x7E0020 len=2 got=0x9D57 (ran 1800 ticks)
+==> MAME assert: invaders-a16.sfc
+    SMOKE: PASS addr=0x7E0020 len=2 got=0x9D57 (ran 1800 ticks)
+==> bsnes-jg assert: invaders.sfc
+SMOKE: PASS off=0x20 len=2 got=0x9D57 (ran 1800 frames, bsnes-jg)
+==> bsnes-jg assert: invaders-a16.sfc
+jgxcheck: wrote /work/build/invaders-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x9D57 (ran 1800 frames, bsnes-jg)
+    bsnes determinism: PASS (3x byte-identical)
+==> MAME (under Xvfb): snapshot (build/invaders-mame.png)
+    SHOT: PASS corpus=0x9D57 (snapshot at frame 1800)
+
+RESULT: PASS — Space Invaders attract CRC 0x9D57: host == default == a16 on MAME + bsnes-jg; screenshots in build/invaders-{mame,jg}.png

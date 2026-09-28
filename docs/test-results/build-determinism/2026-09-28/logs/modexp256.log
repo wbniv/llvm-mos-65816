@@ -1,0 +1,11 @@
+==> host oracle: modexp256 gate hash = 0x31D4
+==> built build/modexp256.sfc (+mos-a16); corpus_result @ WRAM 0x39
+==> disasm gate (s64 (un)merge glue: __muldi3 + rep/sep; xy16 compile clean)
+    PASS  __muldi3=2  rep/sep=83  xy16-compile=OK  (256-bit modmul on the s64 glue)
+==> bsnes-jg: render + assert (build/modexp256-jg.png, frame 1500 for developed scatter)
+jgxcheck: wrote /work/build/modexp256-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0x31D4 (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/modexp256-mame.png)
+    SHOT: PASS corpus=0x31D4 (snapshot at frame 1500)
+
+RESULT: PASS — 256-bit Modular Exponentiation on SNES; MAME + bsnes-jg + corpus hash 0x31D4 host == +mos-a16

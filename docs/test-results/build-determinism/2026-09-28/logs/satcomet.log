@@ -1,0 +1,11 @@
+==> host oracle: satcomet gate hash = 0xC2AF
+==> built build/satcomet.sfc (+mos-a16); corpus_result @ WRAM 0x14ff
+==> disasm gate (G_*ADDSAT/*SUBSAT branchless min/max clamp: cmp+rep/sep)
+    PASS  cmp/cpx/cpy=18  rep/sep=63  (sat clamp comparisons + a16 mode)
+==> bsnes-jg: render + assert (build/satcomet-jg.png)
+jgxcheck: wrote /work/build/satcomet-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x14FF len=2 got=0xC2AF (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/satcomet-mame.png)
+    SHOT: PASS corpus=0xC2AF (snapshot at frame 500)
+
+RESULT: PASS — Saturating Comet Trails on SNES; MAME + bsnes-jg + corpus hash 0xC2AF host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: huffman gate hash = 0xE8E4
+==> built build/huffman.sfc (+mos-a16); corpus_result @ WRAM 0x144b
+==> disasm gate (Huffman bit-stream tree walk: shift bit-reader + HF_KID/HF_SYM tree descent)
+    PASS  bit-shifts=22  tree-refs=5  rep/sep=54  (bit-stream reader + tree descent)
+==> bsnes-jg: render + framebuffer dump (build/huffman-jg.png) + assert
+jgxcheck: wrote /work/build/huffman-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x144B len=2 got=0xE8E4 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/huffman-mame.png)
+    SHOT: PASS corpus=0xE8E4 (snapshot at frame 500)
+
+RESULT: PASS — Huffman decode reveal rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xE8E4 host == +mos-a16

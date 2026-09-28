@@ -1,0 +1,11 @@
+==> host oracle: keycmp64 gate hash = 0xB8AD
+==> built build/keycmp64.sfc (+mos-a16); corpus_result @ WRAM 0x14eb
+==> G_SCMP-s64 IR probe (llvm.scmp.i64, chained x2) + a16 rep/sep
+    PASS  llvm.scmp=3  scmp.i64=3  rep/sep=48  (chained s64 three-way compare, x2)
+==> bsnes-jg: render + assert (build/keycmp64-jg.png)
+jgxcheck: wrote /work/build/keycmp64-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x14EB len=2 got=0xB8AD (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/keycmp64-mame.png)
+    SHOT: PASS corpus=0xB8AD (snapshot at frame 500)
+
+RESULT: PASS — 64-bit Multi-Key Record Sort on SNES; MAME + bsnes-jg + corpus hash 0xB8AD host == +mos-a16

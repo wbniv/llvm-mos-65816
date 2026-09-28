@@ -1,0 +1,11 @@
+==> host oracle: pcooker gate hash = 0xEE6D
+==> built build/pcooker.sfc (+mos-a16); corpus_result @ WRAM 0x39
+==> disasm gate (a16: __mulsi3 + __divsi3 the compare lives across; rep/sep pressure)
+    PASS  __mulsi3=6  __divsi3=4  rep/sep=35  (compare-live-across-calls pressure)
+==> bsnes-jg: render + assert (build/pcooker-jg.png, frame 1500 for developed field)
+jgxcheck: wrote /work/build/pcooker-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xEE6D (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/pcooker-mame.png)
+    SHOT: PASS corpus=0xEE6D (snapshot at frame 1500)
+
+RESULT: PASS — Pressure-Cooker Fixed-Point Evaluator on SNES; MAME + bsnes-jg + corpus hash 0xEE6D host == +mos-a16

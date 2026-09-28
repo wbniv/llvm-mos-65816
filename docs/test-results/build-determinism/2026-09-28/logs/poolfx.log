@@ -1,0 +1,11 @@
+==> host oracle: poolfx gate hash = 0x2B9B
+==> built build/poolfx.sfc (+mos-a16); corpus_result @ WRAM 0x1629
+==> disasm gate (free-list pool allocator: indexed slot chase, native-16, no libcall)
+    PASS  ldy-indexed=45  arith-libcalls=0  rep/sep=102  (free-list slot chase, native-16, pure pointer arith)
+==> bsnes-jg: render + framebuffer dump (build/poolfx-jg.png) + assert
+jgxcheck: wrote /work/build/poolfx-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1629 len=2 got=0x2B9B (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/poolfx-mame.png)
+    SHOT: PASS corpus=0x2B9B (snapshot at frame 500)
+
+RESULT: PASS — free-list particle fountain rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x2B9B host == +mos-a16

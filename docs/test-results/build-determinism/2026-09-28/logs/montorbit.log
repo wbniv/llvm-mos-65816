@@ -1,0 +1,12 @@
+==> host oracle: montorbit gate hash = 0xBA9B
+==> built build/montorbit.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (__mulsi3 + rep/sep; assert NO __udivsi3/__umodsi3 — division-free)
+    __mulsi3/__mulhi3=5  rep/sep=14  division-libcalls=0 (want 0)
+    PASS  Montgomery modmul confirmed (multiply+shift+mask, division-free)
+==> bsnes-jg: render + assert (build/montorbit-jg.png)
+jgxcheck: wrote /work/build/montorbit-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0xBA9B (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/montorbit-mame.png)
+    SHOT: PASS corpus=0xBA9B (snapshot at frame 500)
+
+RESULT: PASS — Montgomery Orbit on SNES; MAME + bsnes-jg + corpus hash 0xBA9B host == +mos-a16

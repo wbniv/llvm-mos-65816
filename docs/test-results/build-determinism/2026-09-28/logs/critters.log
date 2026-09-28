@@ -1,0 +1,11 @@
+==> host oracle: critters gate hash = 0xAD9F
+==> built build/critters.sfc (+mos-a16); corpus_result @ WRAM 0x14ed
+==> disasm gate (protothread: lc-dispatch resumable function, native-16, no libcall)
+    PASS  critter_step-refs=62  jmp=7  wide-arith-libcalls=0  rep/sep=51  (resumable protothread; lc-dispatch resume)
+==> bsnes-jg: render + framebuffer dump (build/critters-jg.png) + assert
+jgxcheck: wrote /work/build/critters-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x14ED len=2 got=0xAD9F (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/critters-mame.png)
+    SHOT: PASS corpus=0xAD9F (snapshot at frame 500)
+
+RESULT: PASS — protothread critter swarm rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xAD9F host == +mos-a16

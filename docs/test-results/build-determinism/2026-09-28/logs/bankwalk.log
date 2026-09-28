@@ -1,0 +1,9 @@
+==> host oracle: 0x4ED7
+    PASS: far loads + 24-bit pointer arithmetic verify
+SMOKE: PASS addr=0x7E13E6 len=2 got=0x4ED7 (ran 480 ticks)
+jgxcheck: wrote /work/build/bankwalk-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E6 len=2 got=0x4ED7 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13E6 len=2 got=0x4ED7 (ran 480 ticks)
+jgxcheck: wrote /work/build/bankwalk-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E6 len=2 got=0x4ED7 (ran 480 frames, bsnes-jg)
+RESULT: PASS — BankWalk host == a16 == xy16 == 0x4ED7

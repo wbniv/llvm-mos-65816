@@ -1,0 +1,13 @@
+==> host oracle: llabs64 gate hash = 0x8490
+==> signed i64 absolute-value gate
+    PASS: i64 absolute value forms and verifies
+SMOKE: PASS addr=0x7E13F9 len=2 got=0x8490 (ran 480 ticks)
+jgxcheck: wrote /work/build/llabs64-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13F9 len=2 got=0x8490 (ran 480 ticks)
+jgxcheck: wrote /work/build/llabs64-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13F9 len=2 got=0x8490 (ran 480 ticks)
+jgxcheck: wrote /work/build/llabs64-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F9 len=2 got=0x8490 (ran 480 frames, bsnes-jg)
+RESULT: PASS — Seismograph Absolute Trace; host == default == a16 == xy16 == 0x8490 on MAME + bsnes-jg

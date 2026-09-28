@@ -1,0 +1,11 @@
+==> host oracle: Boids gate hash = 0xA8AB
+==> built build/boids.sfc (+mos-a16); corpus_result @ WRAM 0x6c6
+==> disasm gate (struct-by-value / aggregate-return ABI codegen)
+    PASS  by-value-calls=544  __mulsi3=6  __divsi3=4  rep/sep=152  (aggregate-return ABI, native-16)
+==> bsnes-jg: render + framebuffer dump (build/boids-jg.png) + assert
+jgxcheck: wrote /work/build/boids-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x6C6 len=2 got=0xA8AB (ran 1400 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/boids-mame.png)
+    SHOT: PASS corpus=0xA8AB (snapshot at frame 1400)
+
+RESULT: PASS — Boids flock rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xA8AB host == +mos-a16

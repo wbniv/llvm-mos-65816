@@ -1,0 +1,11 @@
+==> host oracle: harmonograph curve hash = 0x0EBB
+==> built build/harmonograph.sfc (+mos-a16); corpus_result @ WRAM 0x1421
+==> disasm gate (harmo_point: __mulsi3 + rep/sep, multiply-only — no divide)
+    PASS  __mulsi3=2  rep/sep=50  bad_div=0  (sin-LUT + fixed-point multiply, no divide)
+==> bsnes-jg: render + framebuffer dump (build/harmonograph-jg.png) + assert
+jgxcheck: wrote /work/build/harmonograph-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1421 len=2 got=0x0EBB (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/harmonograph-mame.png)
+    SHOT: PASS corpus=0x0EBB (snapshot at frame 400)
+
+RESULT: PASS — Harmonograph rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x0EBB host == +mos-a16

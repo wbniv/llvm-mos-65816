@@ -1,0 +1,11 @@
+==> host oracle: Barnes-Hut gate hash = 0xEF0B
+==> built build/bhut.sfc (+mos-a16); corpus_result @ WRAM 0x13e7
+==> disasm gate (pointer-chasing tree walk + mul/div gravity kernel)
+    PASS  __mulsi3=5  __divsi3=4  bh_force_refs=440  rep/sep=181  (tree walk + gravity)
+==> bsnes-jg: render + framebuffer dump (build/bhut-jg.png) + assert
+jgxcheck: wrote /work/build/bhut-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E7 len=2 got=0xEF0B (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/bhut-mame.png)
+    SHOT: PASS corpus=0xEF0B (snapshot at frame 500)
+
+RESULT: PASS — Barnes-Hut galaxy rendered on SNES; hash 0xEF0B host == +mos-a16

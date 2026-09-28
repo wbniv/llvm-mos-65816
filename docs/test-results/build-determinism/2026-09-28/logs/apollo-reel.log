@@ -1,0 +1,49 @@
+==> 1) asset bake reproduces the recorded corpus SHA-256
+  PASS: RGB24 corpus 0db7a75b7a87b0fd4a4eb5573c3c10d180369d2b688681c5769ca3966785000d
+frames=600 packets=2099115 seek=17080 loop=3673 padding=0 total=2119868 max=3673
+  tiles  sha256 fe2497baf18fd235761f391f806b31e510ae09e397fd88da397ee9277ca60231
+  stream sha256 b9c6f9fe9be9a189f68b554ad9eb8656f445a7a63bec46cb0db7bf1aa078444c
+  stream bytes  2119868
+
+==> 2) whole-loop byte-correct decode (all 600 frames + loop delta)
+     [self-test builds; the published ROMs skip this boot pass by design]
+  PASS: slow corpus gate: SMOKE: PASS off=0x26 len=1 got=0x00 (ran 9000 frames, bsnes-jg)
+  PASS: fastrom corpus gate: SMOKE: PASS off=0x26 len=1 got=0x00 (ran 9000 frames, bsnes-jg)
+  PASS: slow (published) composite health: SMOKE: PASS off=0x27 len=4 got=0x00000000 (ran 9000 frames, bsnes-jg)
+  PASS: fastrom (published) composite health: SMOKE: PASS off=0x27 len=4 got=0x00000000 (ran 9000 frames, bsnes-jg)
+
+==> 2b) negative control: one flipped stream byte must FAIL the gate
+  flipped stream byte 400000: 0x44 -> 0x45
+  PASS: corrupted stream rejected: SMOKE: FAIL off=0x26 len=1 got=0x02 want=0x00
+
+==> 3) cadence: presented frames per 600 VBlanks (1-VBlank operating point)
+  build       presented    vblanks     per600      slips
+  slow              600        600        600          0
+  fastrom           600        600        600          0
+  (reported, not gated — a slower number on this content is the measurement)
+
+==> 3b) the DISPLAYED frame rate, not just the internal counter
+  PASS: gauge reads 60.0 at VBlank 300
+  PASS: gauge reads 60.0 at VBlank 9000
+  displayed string: 60.0
+
+==> 4a) -verify-machineinstrs clean (-fno-lto, so codegen actually runs)
+  PASS: no verifier complaints (real object emitted)
+
+==> 4b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (CEA5E004:#000000)
+
+==> 6) REGRESSION GUARD: the published ROM shows a picture promptly
+<stdin>:4: DeprecationWarning: Image.Image.getdata is deprecated and will be removed in Pillow 14 (2027-10-15). Use get_flattened_data instead.
+  at VBlank 180 (~3.0s): black=30.8%  unique_colours=124
+  PASS: picture is up well before the first loop completes
+
+==> 5) frame capture
+jgxcheck: JGX_POLL matched at frame 329 of 9000 budgeted
+jgxcheck: wrote /work/build/apollo-daylight.png (256x224 from native 512x240, yoff=0)
+  PASS: captured frame 96: SMOKE: PASS off=0x31 len=2 got=0x0096 (ran 9000 frames, bsnes-jg)
+
+SLOW_ROM=/work/build/apollo-daylight-slow.sfc
+ROM=/work/build/apollo-daylight.sfc
+ROM_SHA256=d8cd70f6632790b214d6f92698019088f74674967133dfede3723b83d728d65f
+GATE: PASS

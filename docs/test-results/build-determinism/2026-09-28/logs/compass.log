@@ -1,0 +1,12 @@
+==> host oracle: compass gate hash = 0xB9CB
+==> built build/compass.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (G_FCOPYSIGN inline AND/OR + G_IS_FPCLASS + rep/sep)
+    __floatsisf=2  rep/sep=35
+    PASS  copysign path confirmed (__floatsisf=2 >= 2, rep/sep=35 >= 1)
+==> bsnes-jg: render + assert (build/compass-jg.png)
+jgxcheck: wrote /work/build/compass-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0xB9CB (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/compass-mame.png)
+    SHOT: PASS corpus=0xB9CB (snapshot at frame 500)
+
+RESULT: PASS — Copysign Compass on SNES; MAME + bsnes-jg + corpus hash 0xB9CB host == +mos-a16

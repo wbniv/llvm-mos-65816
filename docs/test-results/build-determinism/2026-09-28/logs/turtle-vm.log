@@ -1,0 +1,11 @@
+==> host oracle: Bytecode-VM Turtle gate hash = 0x4007
+==> built build/turtle-vm.sfc (+mos-a16); corpus_result @ WRAM 0x171f
+==> disasm gate (jump-table + function-pointer dispatch codegen)
+    PASS  jump-table=1  __call_indir=1  __mulsi3=2  rep/sep=156  (indirect dispatch, native-16)
+==> bsnes-jg: render + framebuffer dump (build/turtle-vm-jg.png) + assert
+jgxcheck: wrote /work/build/turtle-vm-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x171F len=2 got=0x4007 (ran 600 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/turtle-vm-mame.png)
+    SHOT: PASS corpus=0x4007 (snapshot at frame 600)
+
+RESULT: PASS — Bytecode-VM Turtle rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4007 host == +mos-a16

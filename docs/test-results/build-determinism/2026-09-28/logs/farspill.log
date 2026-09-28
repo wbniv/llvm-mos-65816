@@ -1,0 +1,11 @@
+==> host oracle: farspill gate hash = 0x7F3B
+==> Imag32 spill and producer gates
+    PASS: 7 four-byte Imag32 slots expand to 28 stores / 28 reloads
+    PASS: all 16 LDImm destinations are hardware GPRs
+SMOKE: PASS addr=0x7E13E9 len=2 got=0x7F3B (ran 420 ticks)
+jgxcheck: wrote /work/build/farspill-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E9 len=2 got=0x7F3B (ran 420 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13E9 len=2 got=0x7F3B (ran 420 ticks)
+jgxcheck: wrote /work/build/farspill-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E9 len=2 got=0x7F3B (ran 420 frames, bsnes-jg)
+RESULT: PASS — Far-Spill Stress; host == a16 == xy16 == 0x7F3B on MAME + bsnes-jg

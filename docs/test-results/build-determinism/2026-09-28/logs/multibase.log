@@ -1,0 +1,11 @@
+==> host oracle: multibase gate hash = 0x371A
+==> built build/multibase.sfc (+mos-a16); corpus_result @ WRAM 0x835
+==> disasm gate (libc div()/lldiv() div_t/lldiv_t by-value: aggregate-return ABI + G_SDIVREM)
+    PASS  div-calls=1  lldiv-calls=1  rep/sep=48  (div_t/lldiv_t by-value aggregate return)
+==> bsnes-jg: render + framebuffer dump (build/multibase-jg.png) + assert
+jgxcheck: wrote /work/build/multibase-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x835 len=2 got=0x371A (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/multibase-mame.png)
+    SHOT: PASS corpus=0x371A (snapshot at frame 700)
+
+RESULT: PASS — multi-base clock rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x371A host == +mos-a16

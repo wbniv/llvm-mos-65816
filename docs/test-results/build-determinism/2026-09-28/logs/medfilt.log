@@ -1,0 +1,11 @@
+==> host oracle: medfilt gate hash = 0x87FE
+==> built build/medfilt.sfc (+mos-a16); corpus_result @ WRAM 0x14e9
+==> disasm gate (branchless min/max median network: G_UMIN/G_UMAX select lowering + abs)
+    PASS  cmp=11  mul/div-libcalls=0  rep/sep=39  (min/max select network, no libcall)
+==> bsnes-jg: render + framebuffer dump (build/medfilt-jg.png) + assert
+jgxcheck: wrote /work/build/medfilt-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x14E9 len=2 got=0x87FE (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/medfilt-mame.png)
+    SHOT: PASS corpus=0x87FE (snapshot at frame 500)
+
+RESULT: PASS — median denoiser rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x87FE host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: Hilbert gate hash = 0x5999
+==> built build/hilbert.sfc (+mos-a16); corpus_result @ WRAM 0x13ee
+==> disasm gate (variable-count 32-bit shifts: __ashlsi3 / __lshrsi3)
+    PASS  __ashlsi3+__lshrsi3=5  rep/sep=28  __mulsi3=0  (variable-count 32-bit shifts)
+==> bsnes-jg: render + framebuffer dump (build/hilbert-jg.png) + assert
+jgxcheck: wrote /work/build/hilbert-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x5999 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/hilbert-mame.png)
+    SHOT: PASS corpus=0x5999 (snapshot at frame 500)
+
+RESULT: PASS — Hilbert curve rendered on SNES; hash 0x5999 host == +mos-a16

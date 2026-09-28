@@ -1,0 +1,12 @@
+area=537 covered=272 avg_I=146
+==> host oracle: gouraud gate hash = 0xC5E9
+==> built build/gouraud.sfc (+mos-a16); corpus_result @ WRAM 0x13e6
+==> disasm gate (Gouraud: 3 edge-function cross products + per-pixel barycentric divide)
+    PASS  __mulsi3=11  __divsi3=1  rep/sep=214  (edge functions + barycentric divide)
+==> bsnes-jg: render + framebuffer dump (build/gouraud-jg.png) + assert
+jgxcheck: wrote /work/build/gouraud-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E6 len=2 got=0xC5E9 (ran 1500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/gouraud-mame.png)
+    SHOT: PASS corpus=0xC5E9 (snapshot at frame 900)
+
+RESULT: PASS — Gouraud triangle rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xC5E9 host == +mos-a16

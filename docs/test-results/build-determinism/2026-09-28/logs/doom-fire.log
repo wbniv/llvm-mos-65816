@@ -1,0 +1,11 @@
+==> host oracle: Doom-fire gate hash = 0x3C59
+==> built build/doom-fire.sfc (+mos-a16); corpus_result @ WRAM 0x302
+==> disasm gate (xorshift16 PRNG + array sweep, native-16, multiply-free)
+    PASS  eor=6  asl/lsr=8  rep/sep=25  (xorshift16 + array sweep, native-16)
+==> bsnes-jg: render + framebuffer dump (build/doom-fire-jg.png) + assert
+jgxcheck: wrote /work/build/doom-fire-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x302 len=2 got=0x3C59 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/doom-fire-mame.png)
+    SHOT: PASS corpus=0x3C59 (snapshot at frame 500)
+
+RESULT: PASS — Doom-fire rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x3C59 host == +mos-a16

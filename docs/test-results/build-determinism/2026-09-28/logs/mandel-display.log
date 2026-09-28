@@ -1,0 +1,11 @@
+sync-platform: refreshed 13 file(s) into /work/build/install/mos-platform
+==> mandel-shot: grid 64x56, N=15
+==> host reference: CRC16=0x204F (build/mandel-host.png)
+==> built build/mandel-display.sfc (+mos-a16); corpus_result @ WRAM 0x580
+==> bsnes-jg: render + framebuffer dump (build/mandel-jg.png)
+jgxcheck: wrote /work/build/mandel-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x580 len=2 got=0x204F (ran 5800 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/mandel-mame.png)
+    SHOT: PASS corpus=0x204F (snapshot at frame 5800)
+
+RESULT: PASS — Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots match host (CRC 0x204F)

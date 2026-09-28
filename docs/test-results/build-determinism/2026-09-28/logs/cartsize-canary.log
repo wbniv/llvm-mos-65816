@@ -1,0 +1,387 @@
+==> 1) host model + tooling unit tests
+  PASS: 69 address-model tests
+  PASS: 41 header/checksum fixture tests
+
+######## hirom4 — hirom 4M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-hirom4: /work/build/install/mos-platform/snes-cart-hirom4/lib/link.ld + /work/build/install/bin/mos-snes-cart-hirom4.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 5 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-hirom4.sfc: 4194304 bytes
+fill /work/build/cartsize-hirom4.sfc: 4194304 bytes, code $008000-$00FFFF, 5 canaries verified, 2 spans verified
+    BANK_SPAN        file $01FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B4BB
+    MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $3D91
+/work/build/cartsize-hirom4.sfc: hirom size=4096KiB devices=32Mbit map_mode=0x21 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x79BD complement=0x8642
+==> 3) structural inspection
+  PASS: file length : 4194304 bytes (0x400000, 32 Mbit / 4 MiB);physical devices : 32Mbit @ $000000 header at file : $00FFB0;map mode byte : $21
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x48EE
+==> 5) MAME: corpus_result == 0x48EE and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x48EE (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-hirom4.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x48EE (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-hirom4.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 13e72d803020ac3e3a250fc3193740626f3e46196225be03503685474ca10b3a
+
+######## exhirom6 — exhirom 6M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-exhirom6: /work/build/install/mos-platform/snes-cart-exhirom6/lib/link.ld + /work/build/install/bin/mos-snes-cart-exhirom6.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 8 canaries, 4 spans (12 segments), 4 mirror probes
+  linked /work/build/cartsize-exhirom6.sfc: 6291456 bytes
+fill /work/build/cartsize-exhirom6.sfc: 6291456 bytes, code $408000-$40FFFF, 8 canaries verified, 4 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $3D91
+    EDGE_4M          file $3FFE00 +1024   2 segment(s) across 2 bank(s) -> fold $BBC8
+    ROM2_BANK_SPAN   file $41FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B272
+/work/build/cartsize-exhirom6.sfc: exhirom size=6144KiB devices=32Mbit+16Mbit map_mode=0x25 rom_size_byte=0x0D ram_size_byte=0x00 cart_type=0x00 checksum=0xC5F0 complement=0x3A0F
+==> 3) structural inspection
+  PASS: file length : 6291456 bytes (0x600000, 48 Mbit / 6 MiB);physical devices : 32Mbit @ $000000 + 16Mbit @ $400000 header at file : $40FFB0;map mode byte : $25
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xA274
+==> 5) MAME: corpus_result == 0xA274 and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xA274 (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-exhirom6.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xA274 (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-exhirom6.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 6cc47856250f08128fe8501d74ac0633f7374df5c4b93d959404833d5132a818
+
+######## exhirom8 — exhirom 8M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-exhirom8: /work/build/install/mos-platform/snes-cart-exhirom8/lib/link.ld + /work/build/install/bin/mos-snes-cart-exhirom8.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 14 canaries, 4 spans (12 segments), 3 mirror probes
+  linked /work/build/cartsize-exhirom8.sfc: 8388608 bytes
+fill /work/build/cartsize-exhirom8.sfc: 8388608 bytes, code $408000-$40FFFF, 14 canaries verified, 4 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $3D91
+    EDGE_4M          file $3FFE00 +1024   2 segment(s) across 2 bank(s) -> fold $BBC8
+    ROM2_BANK_SPAN   file $41FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B272
+/work/build/cartsize-exhirom8.sfc: exhirom size=8192KiB devices=64Mbit map_mode=0x25 rom_size_byte=0x0D ram_size_byte=0x00 cart_type=0x00 checksum=0x7D0A complement=0x82F5
+==> 3) structural inspection
+  PASS: file length : 8388608 bytes (0x800000, 64 Mbit / 8 MiB);physical devices : 64Mbit @ $000000 header at file : $40FFB0;map mode byte : $25
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x29B9
+==> 5) MAME: corpus_result == 0x29B9 and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x29B9 (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-exhirom8.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x29B9 (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-exhirom8.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 1fb2cf38ff9b08122eae173157296f353b6ff7741f796a94638a6c3fdd83f5e1
+
+######## lorom512k_slow — lorom 512K (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom512k_slow: /work/build/install/mos-platform/snes-cart-lorom512k_slow/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom512k_slow.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 1 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom512k_slow.sfc: 524288 bytes
+fill /work/build/cartsize-lorom512k_slow.sfc: 524288 bytes, code $000000-$007FFF, 1 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $00FF80 +131328 6 segment(s) across 6 bank(s) -> fold $3654
+/work/build/cartsize-lorom512k_slow.sfc: lorom size=512KiB devices=4096Kbit map_mode=0x20 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0xB60D complement=0x49F2
+==> 3) structural inspection
+  PASS: file length : 524288 bytes (0x80000, 4 Mbit / 512 KiB);physical devices : 4096Kbit @ $000000 header at file : $007FB0;map mode byte : $20
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x044F
+==> 5) MAME: corpus_result == 0x044F and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x044F (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom512k_slow.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x044F (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom512k_slow.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: f9e814bace081a47313660afd461d6bb177fb7db4c6d30bb78b65ec9b5184c96
+
+######## lorom512k_fast — lorom 512K (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom512k_fast: /work/build/install/mos-platform/snes-cart-lorom512k_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom512k_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 1 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom512k_fast.sfc: 524288 bytes
+fill /work/build/cartsize-lorom512k_fast.sfc: 524288 bytes, code $000000-$007FFF, 1 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $00FF80 +131328 6 segment(s) across 6 bank(s) -> fold $3654
+/work/build/cartsize-lorom512k_fast.sfc: lorom (fast) size=512KiB devices=4096Kbit map_mode=0x30 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0xB61D complement=0x49E2
+==> 3) structural inspection
+  PASS: file length : 524288 bytes (0x80000, 4 Mbit / 512 KiB);physical devices : 4096Kbit @ $000000 header at file : $007FB0;map mode byte : $30
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x044F
+==> 5) MAME: corpus_result == 0x044F and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x044F (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom512k_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x044F (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom512k_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 1d6e9113629ba89bcdd3322a8ac0ccbe614ab74fdf6f7b6b61e7ebc855b25e09
+
+######## lorom1m_slow — lorom 1M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom1m_slow: /work/build/install/mos-platform/snes-cart-lorom1m_slow/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom1m_slow.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 1 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom1m_slow.sfc: 1048576 bytes
+fill /work/build/cartsize-lorom1m_slow.sfc: 1048576 bytes, code $000000-$007FFF, 1 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $00FF80 +131328 6 segment(s) across 6 bank(s) -> fold $3654
+/work/build/cartsize-lorom1m_slow.sfc: lorom size=1024KiB devices=8Mbit map_mode=0x20 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0xB70C complement=0x48F3
+==> 3) structural inspection
+  PASS: file length : 1048576 bytes (0x100000, 8 Mbit / 1 MiB);physical devices : 8Mbit @ $000000 header at file : $007FB0;map mode byte : $20
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xB04E
+==> 5) MAME: corpus_result == 0xB04E and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xB04E (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom1m_slow.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xB04E (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom1m_slow.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 7cf640615c70dee5063e8b7fb0e435b1305794d5485a4e7f2634bce6a4008e17
+
+######## lorom1m_fast — lorom 1M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom1m_fast: /work/build/install/mos-platform/snes-cart-lorom1m_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom1m_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 1 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom1m_fast.sfc: 1048576 bytes
+fill /work/build/cartsize-lorom1m_fast.sfc: 1048576 bytes, code $000000-$007FFF, 1 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $00FF80 +131328 6 segment(s) across 6 bank(s) -> fold $3654
+/work/build/cartsize-lorom1m_fast.sfc: lorom (fast) size=1024KiB devices=8Mbit map_mode=0x30 rom_size_byte=0x0A ram_size_byte=0x00 cart_type=0x00 checksum=0xB71C complement=0x48E3
+==> 3) structural inspection
+  PASS: file length : 1048576 bytes (0x100000, 8 Mbit / 1 MiB);physical devices : 8Mbit @ $000000 header at file : $007FB0;map mode byte : $30
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xB04E
+==> 5) MAME: corpus_result == 0xB04E and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xB04E (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom1m_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xB04E (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom1m_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 802c6ffb0d1bd87b2cf236c992a3b9aa3cd38a14364481159c0737631bab9339
+
+######## lorom3m_slow — lorom 3M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom3m_slow: /work/build/install/mos-platform/snes-cart-lorom3m_slow/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom3m_slow.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 4 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom3m_slow.sfc: 3145728 bytes
+fill /work/build/cartsize-lorom3m_slow.sfc: 3145728 bytes, code $000000-$007FFF, 4 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $0FFF80 +131328 6 segment(s) across 6 bank(s) -> fold $9B71
+/work/build/cartsize-lorom3m_slow.sfc: lorom size=3072KiB devices=16Mbit+8Mbit map_mode=0x20 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x71D4 complement=0x8E2B
+==> 3) structural inspection
+  PASS: file length : 3145728 bytes (0x300000, 24 Mbit / 3 MiB);physical devices : 16Mbit @ $000000 + 8Mbit @ $200000 header at file : $007FB0;map mode byte : $20
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x6FFB
+==> 5) MAME: corpus_result == 0x6FFB and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x6FFB (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom3m_slow.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x6FFB (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom3m_slow.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 9bf65c888570778263eb42214385d62d8158849709881cb2a2550157a9b58efb
+
+######## lorom3m_fast — lorom 3M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom3m_fast: /work/build/install/mos-platform/snes-cart-lorom3m_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom3m_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 4 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom3m_fast.sfc: 3145728 bytes
+fill /work/build/cartsize-lorom3m_fast.sfc: 3145728 bytes, code $000000-$007FFF, 4 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $0FFF80 +131328 6 segment(s) across 6 bank(s) -> fold $9B71
+/work/build/cartsize-lorom3m_fast.sfc: lorom (fast) size=3072KiB devices=16Mbit+8Mbit map_mode=0x30 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x71E4 complement=0x8E1B
+==> 3) structural inspection
+  PASS: file length : 3145728 bytes (0x300000, 24 Mbit / 3 MiB);physical devices : 16Mbit @ $000000 + 8Mbit @ $200000 header at file : $007FB0;map mode byte : $30
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x6FFB
+==> 5) MAME: corpus_result == 0x6FFB and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x6FFB (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom3m_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x6FFB (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom3m_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 87a536608e9af0bbbfa4e6fdcd816bc043cf82866670daf0386c04821330c506
+
+######## lorom4m_slow — lorom 4M (slow ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom4m_slow: /work/build/install/mos-platform/snes-cart-lorom4m_slow/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom4m_slow.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 6 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom4m_slow.sfc: 4194304 bytes
+fill /work/build/cartsize-lorom4m_slow.sfc: 4194304 bytes, code $000000-$007FFF, 6 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 6 bank(s) -> fold $3D91
+/work/build/cartsize-lorom4m_slow.sfc: lorom size=4096KiB devices=32Mbit map_mode=0x20 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x7942 complement=0x86BD
+==> 3) structural inspection
+  PASS: file length : 4194304 bytes (0x400000, 32 Mbit / 4 MiB);physical devices : 32Mbit @ $000000 header at file : $007FB0;map mode byte : $20
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xA5EE
+==> 5) MAME: corpus_result == 0xA5EE and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xA5EE (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom4m_slow.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xA5EE (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom4m_slow.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: cbdee346697ad05ef349df4ce62533acceed6a89f5401a2391d04faa190fb483
+
+######## lorom4m_fast — lorom 4M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-lorom4m_fast: /work/build/install/mos-platform/snes-cart-lorom4m_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-lorom4m_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 6 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-lorom4m_fast.sfc: 4194304 bytes
+fill /work/build/cartsize-lorom4m_fast.sfc: 4194304 bytes, code $000000-$007FFF, 6 canaries verified, 2 spans verified
+    BANK_SPAN        file $00FF00 +1024   2 segment(s) across 2 bank(s) -> fold $CC1E
+    MULTIBANK_SPAN   file $1FFF80 +131328 6 segment(s) across 6 bank(s) -> fold $3D91
+/work/build/cartsize-lorom4m_fast.sfc: lorom (fast) size=4096KiB devices=32Mbit map_mode=0x30 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x7952 complement=0x86AD
+==> 3) structural inspection
+  PASS: file length : 4194304 bytes (0x400000, 32 Mbit / 4 MiB);physical devices : 32Mbit @ $000000 header at file : $007FB0;map mode byte : $30
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xA5EE
+==> 5) MAME: corpus_result == 0xA5EE and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xA5EE (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-lorom4m_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xA5EE (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-lorom4m_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 0317589afae4396dae99c0bf4f8eb0665680b1289db9483b47f85c2d15760fe8
+
+######## hirom512k_fast — hirom 512K (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-hirom512k_fast: /work/build/install/mos-platform/snes-cart-hirom512k_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-hirom512k_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 2 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-hirom512k_fast.sfc: 524288 bytes
+fill /work/build/cartsize-hirom512k_fast.sfc: 524288 bytes, code $008000-$00FFFF, 2 canaries verified, 2 spans verified
+    BANK_SPAN        file $01FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B4BB
+    MULTIBANK_SPAN   file $01FF80 +131328 6 segment(s) across 4 bank(s) -> fold $01A8
+/work/build/cartsize-hirom512k_fast.sfc: hirom (fast) size=512KiB devices=4096Kbit map_mode=0x31 rom_size_byte=0x09 ram_size_byte=0x00 cart_type=0x00 checksum=0x19F5 complement=0xE60A
+==> 3) structural inspection
+  PASS: file length : 524288 bytes (0x80000, 4 Mbit / 512 KiB);physical devices : 4096Kbit @ $000000 header at file : $00FFB0;map mode byte : $31
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0xC1CA
+==> 5) MAME: corpus_result == 0xC1CA and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0xC1CA (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-hirom512k_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0xC1CA (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-hirom512k_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: 95e98a89138db61e6594747105f95cd7c3033fc54affdc377bae8f25a703cb3b
+
+######## hirom2m_fast — hirom 2M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-hirom2m_fast: /work/build/install/mos-platform/snes-cart-hirom2m_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-hirom2m_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 3 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-hirom2m_fast.sfc: 2097152 bytes
+fill /work/build/cartsize-hirom2m_fast.sfc: 2097152 bytes, code $008000-$00FFFF, 3 canaries verified, 2 spans verified
+    BANK_SPAN        file $01FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B4BB
+    MULTIBANK_SPAN   file $0FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $9B71
+/work/build/cartsize-hirom2m_fast.sfc: hirom (fast) size=2048KiB devices=16Mbit map_mode=0x31 rom_size_byte=0x0B ram_size_byte=0x00 cart_type=0x00 checksum=0x7078 complement=0x8F87
+==> 3) structural inspection
+  PASS: file length : 2097152 bytes (0x200000, 16 Mbit / 2 MiB);physical devices : 16Mbit @ $000000 header at file : $00FFB0;map mode byte : $31
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x98FA
+==> 5) MAME: corpus_result == 0x98FA and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x98FA (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-hirom2m_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x98FA (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-hirom2m_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: bca2b093fe0cad8a4ea6978359b71b0b6218fbf71236f81ee1ef46bc0bf42515
+
+######## hirom3m_fast — hirom 3M (fast ROM) ########
+==> 2) generate the platform layout + descriptor header, link, fill, checksum
+platform snes-cart-hirom3m_fast: /work/build/install/mos-platform/snes-cart-hirom3m_fast/lib/link.ld + /work/build/install/bin/mos-snes-cart-hirom3m_fast.cfg
+header /work/build/cartsize-gen/cartsize-canary-data.h: 5 canaries, 2 spans (8 segments), 2 mirror probes
+  linked /work/build/cartsize-hirom3m_fast.sfc: 3145728 bytes
+fill /work/build/cartsize-hirom3m_fast.sfc: 3145728 bytes, code $008000-$00FFFF, 5 canaries verified, 2 spans verified
+    BANK_SPAN        file $01FF00 +1024   2 segment(s) across 2 bank(s) -> fold $B4BB
+    MULTIBANK_SPAN   file $0FFF80 +131328 6 segment(s) across 4 bank(s) -> fold $9B71
+/work/build/cartsize-hirom3m_fast.sfc: hirom (fast) size=3072KiB devices=16Mbit+8Mbit map_mode=0x31 rom_size_byte=0x0C ram_size_byte=0x00 cart_type=0x00 checksum=0x788B complement=0x8774
+==> 3) structural inspection
+  PASS: file length : 3145728 bytes (0x300000, 24 Mbit / 3 MiB);physical devices : 16Mbit @ $000000 + 8Mbit @ $200000 header at file : $00FFB0;map mode byte : $31
+==> 4) disasm: the far cursor is a real 24-bit indirect-long read
+  PASS: -verify-machineinstrs clean
+  PASS: far load (lda [dp], a7) present
+  generated oracle: 0x330D
+==> 5) MAME: corpus_result == 0x330D and canary_status == 0x0000
+SMOKE: PASS addr=0x7E0020 len=2 got=0x330D (ran 600 ticks)
+SMOKE: PASS addr=0x7E0200 len=2 got=0x0000 (ran 600 ticks)
+==> 6) bsnes-jg: the same two assertions, independently
+  corpus_result: jgxcheck: wrote /work/build/cartsize-hirom3m_fast.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x330D (ran 1800 frames, bsnes-jg)
+  screenshot: /work/build/cartsize-hirom3m_fast.png
+  canary_status: SMOKE: PASS off=0x200 len=2 got=0x0000 (ran 1800 frames, bsnes-jg)
+==> 6b) picture is independent of power-on entropy (None/Low/High x2)
+  PASS: one picture across all six boots (11D41DC5:#00FF28)
+  ROM SHA-256: dc31681e7ac4fa1ce00412029dc857bf1b2b4828dcb6b056553b5ffcd27f8d72
+
+RESULT: PASS — every decoded window, accepted mirror and cross-bank/cross-device span of the HiROM 4 MiB and ExHiROM 6/8 MiB canary cartridges reads the modelled byte, both emulators agree

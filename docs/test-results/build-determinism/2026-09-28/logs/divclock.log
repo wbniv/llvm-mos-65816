@@ -1,0 +1,11 @@
+==> host oracle: divclock gate hash = 0xF72E
+==> built build/divclock.sfc (+mos-a16); corpus_result @ WRAM 0x13ed
+==> disasm gate (constant-divisor division retained as libcall — no magic-reciprocal SR on soft-multiply)
+    PASS  udiv-libcall=5  rep/sep=27  (constant divides retained as division libcalls; NOT strength-reduced — the finding)
+==> bsnes-jg: render + framebuffer dump (build/divclock-jg.png) + assert
+jgxcheck: wrote /work/build/divclock-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13ED len=2 got=0xF72E (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/divclock-mame.png)
+    SHOT: PASS corpus=0xF72E (snapshot at frame 500)
+
+RESULT: PASS — constant-divisor clock/odometer rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xF72E host == +mos-a16

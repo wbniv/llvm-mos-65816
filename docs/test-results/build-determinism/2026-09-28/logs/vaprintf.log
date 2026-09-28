@@ -1,0 +1,11 @@
+==> host oracle: vaprintf gate hash = 0xE1F3
+==> built build/vaprintf.sfc (+mos-a16); corpus_result @ WRAM 0x13ef
+==> disasm gate (va_arg variadic ABI: 4× mini_sprintf calls, 9 va_arg reads)
+    PASS  jsr_calls=7  rep/sep=78  (va_arg variadic formatter: 4 mini_sprintf calls)
+==> bsnes-jg: render + framebuffer dump (build/vaprintf-jg.png) + assert
+jgxcheck: wrote /work/build/vaprintf-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EF len=2 got=0xE1F3 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/vaprintf-mame.png)
+    SHOT: PASS corpus=0xE1F3 (snapshot at frame 500)
+
+RESULT: PASS — va_arg Lissajous rendered on SNES; hash 0xE1F3 host == +mos-a16

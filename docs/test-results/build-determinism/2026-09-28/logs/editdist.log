@@ -1,0 +1,11 @@
+==> host oracle: editdist gate hash = 0xFB59
+==> built build/editdist.sfc (+mos-a16); corpus_result @ WRAM 0x15eb
+==> disasm gate (2-D DP table: D[i][j] min-recurrence + backtrack)
+    PASS  indexed-load/sta=41  cmp=11  rep/sep=129  (2-D DP table min-recurrence + backtrack)
+==> bsnes-jg: render + framebuffer dump (build/editdist-jg.png) + assert
+jgxcheck: wrote /work/build/editdist-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x15EB len=2 got=0xFB59 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/editdist-mame.png)
+    SHOT: PASS corpus=0xFB59 (snapshot at frame 500)
+
+RESULT: PASS — edit-distance DP rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xFB59 host == +mos-a16

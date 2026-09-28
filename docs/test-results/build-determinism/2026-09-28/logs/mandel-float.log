@@ -1,0 +1,11 @@
+==> host oracle: soft-float Mandelbrot gate hash = 0x4169
+==> built build/mandel-float.sfc (+mos-a16); corpus_result @ WRAM 0x200
+==> disasm gate (soft-float escape-time codegen)
+    PASS  __mulsf3=8  __add/subsf3=12  rep/sep=44  (IEEE-754 soft-float, native-16)
+==> bsnes-jg: render + framebuffer dump (build/mandel-float-jg.png) + assert
+jgxcheck: wrote /work/build/mandel-float-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x200 len=2 got=0x4169 (ran 2200 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/mandel-float-mame.png)
+    SHOT: PASS corpus=0x4169 (snapshot at frame 2200)
+
+RESULT: PASS — soft-float Mandelbrot rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x4169 host == +mos-a16

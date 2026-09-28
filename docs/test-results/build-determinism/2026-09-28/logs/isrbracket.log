@@ -1,0 +1,25 @@
+==> host oracle: isrbracket gate hash = 0x1014
+==> interrupt envelope + long native-width bracket gate
+    PASS: ISR outer envelope and native-width tunnel present
+SMOKE: PASS addr=0x7E13EC len=2 got=0x1014 (ran 1400 ticks)
+jgxcheck: wrote /work/build/isrbracket-default-jg1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-default-jg2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-default-jg3.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13EC len=2 got=0x1014 (ran 1400 ticks)
+jgxcheck: wrote /work/build/isrbracket-a16-jg1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-a16-jg2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-a16-jg3.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+SMOKE: PASS addr=0x7E13EC len=2 got=0x1014 (ran 1400 ticks)
+jgxcheck: wrote /work/build/isrbracket-xy16-jg1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-xy16-jg2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+jgxcheck: wrote /work/build/isrbracket-xy16-jg3.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x1014 (ran 1400 frames, bsnes-jg)
+RESULT: PASS — Mid-Bracket Interrupt Torture; host == default == a16 == xy16 == 0x1014; bsnes-jg 3x deterministic

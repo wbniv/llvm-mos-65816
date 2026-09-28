@@ -1,0 +1,11 @@
+==> host oracle: cosmzoom gate hash = 0x502F
+==> built build/cosmzoom.sfc (+mos-a16); corpus_result @ WRAM 0x13f0
+==> disasm gate (64-bit integer <-> float conversion: __floatundisf/__fixunssfdi/__floatdisf/__fixsfdi)
+    PASS  __floatundisf=2  __fixunssfdi=1  __floatdisf=1  rep/sep=29  (64-bit int<->float conversion)
+==> bsnes-jg: render + framebuffer dump (build/cosmzoom-jg.png) + assert
+jgxcheck: wrote /work/build/cosmzoom-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F0 len=2 got=0x502F (ran 1400 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/cosmzoom-mame.png)
+    
+
+RESULT: FAIL — see the per-emulator lines above

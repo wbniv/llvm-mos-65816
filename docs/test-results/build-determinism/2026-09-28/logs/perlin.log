@@ -1,0 +1,11 @@
+==> host oracle: perlin gate hash = 0xA72D
+==> built build/perlin.sfc (+mos-a16); corpus_result @ WRAM 0x13e8
+==> disasm gate (Perlin noise: fade polynomial + gradient dot + lerp, permutation table)
+    PASS  __mulsi3=15  PN_PERM-refs=9  rep/sep=65  (fade polynomial + gradient dot + lerp)
+==> bsnes-jg: render + framebuffer dump (build/perlin-jg.png) + assert
+jgxcheck: wrote /work/build/perlin-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E8 len=2 got=0xA72D (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/perlin-mame.png)
+    SHOT: PASS corpus=0xA72D (snapshot at frame 500)
+
+RESULT: PASS — Perlin gradient noise rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xA72D host == +mos-a16

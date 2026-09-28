@@ -1,0 +1,11 @@
+==> host oracle: borrowlad gate hash = 0x1BE3
+==> built build/borrowlad.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (a16: sec + sbc borrow chain; rep/sep)
+    PASS  sbc=4  sec=1  rep/sep=37  (128-bit borrow chain with the set-i1 carry-in)
+==> bsnes-jg: render + assert (build/borrowlad-jg.png)
+jgxcheck: wrote /work/build/borrowlad-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x1BE3 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/borrowlad-mame.png)
+    SHOT: PASS corpus=0x1BE3 (snapshot at frame 500)
+
+RESULT: PASS — Borrow-Ladder Odometer on SNES; MAME + bsnes-jg + corpus hash 0x1BE3 host == +mos-a16

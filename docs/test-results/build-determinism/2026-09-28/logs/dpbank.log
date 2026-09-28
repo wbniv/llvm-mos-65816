@@ -1,0 +1,31 @@
+==> host oracle: dpbank gate hash = 0x4D5F
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: a16 verify clean (real object emitted)
+    PASS: xy16 verify clean (real object emitted)
+==> interrupt-envelope order gate on nmi (linked a16 ELF, D+DBR contract)
+    PASS: nmi carries the full A/X/Y + D/DBR save, C-ABI re-establishment, and restore
+    PASS  A shape: 'nmi' present, 332 insns, terminates in rti
+    PASS  B1 entry width: rep	#$30 at insn #0 precedes first width-sensitive 'pha' at #1
+    PASS  B2 save width: rep at insn #0 precedes the A/X/Y save push at #1
+    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (__rc0+230 __rc1+254 __rc0+26 __rc1+1)
+    PASS  C imag: all 26 defined __rc regs are read-before-def and restored
+==> native vector-slot gate (ROM image)
+    PASS  $FFE4 COP -> $8033
+    PASS  $FFE6 BRK -> $8032
+    PASS  $FFEA NMI -> $8074
+    PASS  $FFEE IRQ -> $8030
+    PASS  NMI slot equals the address of the C `nmi` handler
+==> bsnes-jg: default
+jgxcheck: wrote /work/build/dpbank-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+==> bsnes-jg: a16
+jgxcheck: wrote /work/build/dpbank-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+==> bsnes-jg: xy16
+jgxcheck: wrote /work/build/dpbank-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/dpbank-a16-repeat1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/dpbank-a16-repeat2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0xBD len=2 got=0x4D5F (ran 500 frames, bsnes-jg)
+RESULT: PASS — dpbank; host == default == a16 == xy16 == 0x4D5F; a16 3x deterministic; 20 D-window + 20 B-window NMI landings per run

@@ -1,0 +1,11 @@
+==> host oracle: polyfill gate hash = 0x8ED9
+==> built build/polyfill.sfc (+mos-a16); corpus_result @ WRAM 0x13ea
+==> disasm gate (VLA scanline fill: divide / multiply / native-16)
+    PASS  __divsi3/__udivsi3=1  __mulsi3=3  rep/sep=97  (crossing divide + vertex mul, native-16)
+==> bsnes-jg: render + framebuffer dump (build/polyfill-jg.png) + assert
+jgxcheck: wrote /work/build/polyfill-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EA len=2 got=0x8ED9 (ran 700 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/polyfill-mame.png)
+    SHOT: PASS corpus=0x8ED9 (snapshot at frame 700)
+
+RESULT: PASS — polygon scanline fill (VLA) rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x8ED9 host == +mos-a16

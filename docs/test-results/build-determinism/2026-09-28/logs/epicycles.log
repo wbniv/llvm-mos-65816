@@ -1,0 +1,11 @@
+==> host oracle: Fourier-epicycles gate hash = 0x4F6C
+==> built build/epicycles.sfc (+mos-a16); corpus_result @ WRAM 0x13ee
+==> disasm gate (complex-multiply + native-16, no divide)
+    PASS  __mulsi3=4  rep/sep=32  divide=0  (complex multiply + native-16, divide-free)
+==> bsnes-jg: render + framebuffer dump (build/epicycles-jg.png) + assert
+jgxcheck: wrote /work/build/epicycles-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EE len=2 got=0x4F6C (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/epicycles-mame.png)
+    SHOT: PASS corpus=0x4F6C (snapshot at frame 500)
+
+RESULT: PASS — Fourier epicycles rendered on SNES; bsnes-jg (+ MAME if present) + corpus hash 0x4F6C host == +mos-a16

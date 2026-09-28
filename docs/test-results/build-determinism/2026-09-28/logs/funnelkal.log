@@ -1,0 +1,11 @@
+==> host oracle: funnelkal gate hash = 0xEED4
+==> built build/funnelkal.sfc (+mos-a16); corpus_result @ WRAM 0x13ea
+==> disasm gate (G_FSHL/G_FSHR two-source funnel shift: ora combines halves, rep/sep for a16)
+    PASS  ora=2  shifts=23  rep/sep=59  (funnel-shift expansion present)
+==> bsnes-jg: render + framebuffer dump (build/funnelkal-jg.png) + assert
+jgxcheck: wrote /work/build/funnelkal-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EA len=2 got=0xEED4 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/funnelkal-mame.png)
+    SHOT: PASS corpus=0xEED4 (snapshot at frame 500)
+
+RESULT: PASS — Funnel-Shift Kaleidoscope on SNES; MAME + bsnes-jg + corpus hash 0xEED4 host == +mos-a16

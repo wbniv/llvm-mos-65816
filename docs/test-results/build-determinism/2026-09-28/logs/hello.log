@@ -1,0 +1,4 @@
+==> MAME version: 0.285 (unknown)
+==> smoke: hello.sfc  symbol=sentinel  expect=0x42
+SMOKE: PASS addr=0x7E0020 len=1 got=0x42 (ran 60 ticks)
+==> smoke PASS

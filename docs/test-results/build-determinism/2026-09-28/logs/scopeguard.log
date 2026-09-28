@@ -1,0 +1,12 @@
+==> host oracle: scopeguard gate hash = 0x05A3
+==> built build/scopeguard.sfc (+mos-a16); corpus_result @ WRAM 0x31
+==> disasm gate (cleanup scope-exit fan-out: multiple sg_guard call sites)
+    cleanup-calls(sg_guard)=31  rep/sep=30
+    PASS  cleanup scope-exit fan-out present (>=3 call sites)
+==> bsnes-jg: render + assert (build/scopeguard-jg.png)
+jgxcheck: wrote /work/build/scopeguard-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x31 len=2 got=0x05A3 (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/scopeguard-mame.png)
+    SHOT: PASS corpus=0x05A3 (snapshot at frame 500)
+
+RESULT: PASS — Scope-Guard Ripple Tank on SNES; MAME + bsnes-jg + corpus hash 0x05A3 host == +mos-a16

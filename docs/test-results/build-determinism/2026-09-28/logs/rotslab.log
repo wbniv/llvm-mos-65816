@@ -1,0 +1,11 @@
+==> host oracle: rotslab gate hash = 0xB93A
+==> built build/rotslab.sfc (+mos-a16); corpus_result @ WRAM 0x16e8
+==> disasm gate (rep/sep width brackets around 16-bit buffer access; xy16 compile clean)
+    PASS  rep/sep=49  xy16-compile=OK  (M/X width brackets around 16-bit reversal access)
+==> bsnes-jg: render + assert (build/rotslab-jg.png)
+jgxcheck: wrote /work/build/rotslab-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x16E8 len=2 got=0xB93A (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/rotslab-mame.png)
+    SHOT: PASS corpus=0xB93A (snapshot at frame 500)
+
+RESULT: PASS — In-Place Block Rotate on SNES; MAME + bsnes-jg + corpus hash 0xB93A host == +mos-a16

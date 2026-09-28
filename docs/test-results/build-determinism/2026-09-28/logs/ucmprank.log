@@ -1,0 +1,11 @@
+==> host oracle: ucmprank gate hash = 0x4CDD
+==> built build/ucmprank.sfc (+mos-a16); corpus_result @ WRAM 0x20
+==> G_UCMP IR probe (llvm.ucmp at u16/u32/u64) + a16 rep/sep
+    PASS  llvm.ucmp=6  ucmp.i64=2  scmp=0  rep/sep=74  (G_UCMP formed incl. u64, no signed leak)
+==> bsnes-jg: render + assert (build/ucmprank-jg.png)
+jgxcheck: wrote /work/build/ucmprank-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x20 len=2 got=0x4CDD (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/ucmprank-mame.png)
+    SHOT: PASS corpus=0x4CDD (snapshot at frame 500)
+
+RESULT: PASS — Unsigned Rank Percentile Field on SNES; MAME + bsnes-jg + corpus hash 0x4CDD host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: crctex gate hash = 0xDBBA
+==> built build/crctex.sfc (+mos-a16); corpus_result @ WRAM 0x13e6
+==> disasm gate (256-entry ROM-LUT CRC32 indexed byte loop)
+    PASS  CRC32_TAB-refs=2  eor=10  rep/sep=23  (256-entry ROM LUT indexed byte loop)
+==> bsnes-jg: render + framebuffer dump (build/crctex-jg.png) + assert
+jgxcheck: wrote /work/build/crctex-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13E6 len=2 got=0xDBBA (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/crctex-mame.png)
+    SHOT: PASS corpus=0xDBBA (snapshot at frame 500)
+
+RESULT: PASS — CRC32 procedural texture rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xDBBA host == +mos-a16

@@ -1,0 +1,11 @@
+==> host oracle: fn-plot gate hash = 0x2EBE
+==> built build/fn-plot.sfc (+mos-a16); corpus_result @ WRAM 0x13ec
+==> disasm gate (soft-float libcalls + recursive calls + native-16)
+    PASS  __mulsf3=5  __divsf3=1  __fixsfsi=0  rep/sep=53
+==> bsnes-jg: render + framebuffer dump (build/fn-plot-jg.png) + assert
+jgxcheck: wrote /work/build/fn-plot-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13EC len=2 got=0x2EBE (ran 500 frames, bsnes-jg)
+==> MAME (Xvfb): snapshot + assert (build/fn-plot-mame.png)
+    SHOT: PASS corpus=0x2EBE (snapshot at frame 500)
+
+RESULT: PASS — fn-plot rendered on SNES; corpus hash 0x2EBE host == +mos-a16

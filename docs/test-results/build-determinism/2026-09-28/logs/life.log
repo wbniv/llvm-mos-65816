@@ -1,0 +1,11 @@
+==> host oracle: Conway's Life gate hash = 0xDDF1
+==> built build/life.sfc (+mos-a16); corpus_result @ WRAM 0x1387
+==> disasm gate (life_step: shift/bool ops, no mul/div)
+    PASS  shifts=22  bools=51  bad_mul=0  bad_div=0  (pure shift+bool, no helpers)
+==> bsnes-jg: render + framebuffer dump (build/life-jg.png) + assert
+jgxcheck: wrote /work/build/life-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1387 len=2 got=0xDDF1 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/life-mame.png)
+    SHOT: PASS corpus=0xDDF1 (snapshot at frame 400)
+
+RESULT: PASS — Conway's Life rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xDDF1 host == +mos-a16

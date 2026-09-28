@@ -1,0 +1,12 @@
+==> host oracle: rotkal gate hash = 0x300C
+==> built build/rotkal.sfc (+mos-a16); corpus_result @ WRAM 0x13f2
+==> disasm gate (G_ROTL/G_ROTR constant+runtime: asl/ror/rol count + rep/sep)
+    ror=7  rol=11  ror+rol=18  rep/sep=26
+    PASS  rotate lowering confirmed (ror+rol=18 >= 8, rep/sep=26 >= 1)
+==> bsnes-jg: render + framebuffer dump (build/rotkal-jg.png) + assert
+jgxcheck: wrote /work/build/rotkal-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x13F2 len=2 got=0x300C (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/rotkal-mame.png)
+    SHOT: PASS corpus=0x300C (snapshot at frame 500)
+
+RESULT: PASS — Rotate-Register Kaleidoscope on SNES; MAME + bsnes-jg + corpus hash 0x300C host == +mos-a16

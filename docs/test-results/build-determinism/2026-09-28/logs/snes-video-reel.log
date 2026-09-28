@@ -1,0 +1,16 @@
+using checked-in full reel asset
+packed 2360380 stream bytes at file $010000; ROM=4194304 bytes
+jgxcheck: wrote /work/build/svx2-video-reel.png (256x224 from native 512x240, yoff=0)
+cadence gate: first present at VBlank 180 (reference 179); expecting 0x777 presentations in 4000
+displayed FPS gauge: 30.0 at VBlank 248 and 4000
+jgxcheck: JGX_POLL matched at frame 1978 of 4000 budgeted
+jgxcheck: JGX_POLL matched at frame 1978 of 4000 budgeted
+jgxcheck: JGX_POLL matched at frame 800 of 4000 budgeted
+jgxcheck: wrote /work/build/svx2-video-reel-cut-one.png (256x224 from native 512x240, yoff=0)
+jgxcheck: JGX_POLL matched at frame 1400 of 4000 budgeted
+jgxcheck: wrote /work/build/svx2-video-reel-cut-two.png (256x224 from native 512x240, yoff=0)
+jgxcheck: JGX_POLL matched at frame 396 of 4000 budgeted
+jgxcheck: wrote /work/build/svx2-video-reel.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x2F len=4 got=0x00000000 (ran 4000 frames, bsnes-jg)
+SMOKE: PASS off=0x39 len=2 got=0x0777 (ran 4000 frames, bsnes-jg)
+ROM=/work/build/svx2-video-reel.sfc

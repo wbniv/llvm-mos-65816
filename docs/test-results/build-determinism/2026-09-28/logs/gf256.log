@@ -1,0 +1,11 @@
+==> host oracle: gf256 gate hash = 0xC028
+==> built build/gf256.sfc (+mos-a16); corpus_result @ WRAM 0x1408
+==> disasm gate (GF(2^8) carryless multiply: log/antilog table lookups + XOR, no carry chain)
+    PASS  GF_EXP=17  GF_LOG=5  eor=16  mul/div-libcalls=0  rep/sep=42  (table-based carryless multiply)
+==> bsnes-jg: render + framebuffer dump (build/gf256-jg.png) + assert
+jgxcheck: wrote /work/build/gf256-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x1408 len=2 got=0xC028 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/gf256-mame.png)
+    SHOT: PASS corpus=0xC028 (snapshot at frame 500)
+
+RESULT: PASS — GF(2^8) finite-field rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0xC028 host == +mos-a16

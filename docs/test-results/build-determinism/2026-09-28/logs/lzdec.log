@@ -1,0 +1,11 @@
+==> host oracle: lzdec gate hash = 0x0100
+==> built build/lzdec.sfc (+mos-a16); corpus_result @ WRAM 0x14e9
+==> disasm gate (LZ77 back-reference byte-stream decoder, native-16, no libcall)
+    PASS  LZ_STREAM-refs=6  sta=41  arith-libcalls=0  rep/sep=53  (LZ back-ref decoder)
+==> bsnes-jg: render + framebuffer dump (build/lzdec-jg.png) + assert
+jgxcheck: wrote /work/build/lzdec-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x14E9 len=2 got=0x0100 (ran 500 frames, bsnes-jg)
+==> MAME (under Xvfb): snapshot + assert (build/lzdec-mame.png)
+    SHOT: PASS corpus=0x0100 (snapshot at frame 500)
+
+RESULT: PASS — LZ77 image-decompress reveal rendered on SNES; MAME + bsnes-jg screenshots + corpus hash 0x0100 host == +mos-a16

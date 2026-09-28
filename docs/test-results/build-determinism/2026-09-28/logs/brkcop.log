@@ -1,0 +1,37 @@
+==> host oracle: brkcop gate hash = 0xA34C
+==> -verify-machineinstrs (-fno-lto, so codegen actually runs)
+    PASS: a16 verify clean (real object emitted)
+    PASS: xy16 verify clean (real object emitted)
+==> interrupt-envelope order gate on brk + cop (linked a16 ELF)
+    PASS: brk brackets its body with the rep #$30 full-width save/restore envelope
+    PASS: cop brackets its body with the rep #$30 full-width save/restore envelope
+    PASS  A shape: 'brk' present, 88 insns, terminates in rti
+    PASS  B1 entry width: rep	#$30 at insn #0 precedes first width-sensitive 'pha' at #1
+    PASS  B2 save width: rep at insn #0 precedes the A/X/Y save push at #1
+    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (__rc0+253 __rc1+254 __rc0+3 __rc1+1)
+    PASS  C imag: all 5 defined __rc regs are read-before-def and restored
+    PASS  A shape: 'cop' present, 88 insns, terminates in rti
+    PASS  B1 entry width: rep	#$30 at insn #0 precedes first width-sensitive 'pha' at #1
+    PASS  B2 save width: rep at insn #0 precedes the A/X/Y save push at #1
+    PASS  C0 soft-stack ptr: __rc0/__rc1 adjustments balance to 0 (__rc0+253 __rc1+254 __rc0+3 __rc1+1)
+    PASS  C imag: all 5 defined __rc regs are read-before-def and restored
+==> native vector-slot gate (ROM image)
+    PASS  $FFE4 COP -> $8103
+    PASS  $FFE6 BRK -> $8074
+    PASS  $FFEA NMI -> $8031
+    PASS  $FFEE IRQ -> $8030
+    PASS  COP/BRK slots equal the addresses of the C `cop`/`brk` handlers
+==> bsnes-jg: default
+jgxcheck: wrote /work/build/brkcop-default-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+==> bsnes-jg: a16
+jgxcheck: wrote /work/build/brkcop-a16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+==> bsnes-jg: xy16
+jgxcheck: wrote /work/build/brkcop-xy16-jg.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/brkcop-a16-repeat1.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+jgxcheck: wrote /work/build/brkcop-a16-repeat2.png (256x224 from native 512x240, yoff=0)
+SMOKE: PASS off=0x39 len=2 got=0xA34C (ran 500 frames, bsnes-jg)
+RESULT: PASS — Software Vectors; host == default == a16 == xy16 == 0xA34C; a16 3x deterministic
