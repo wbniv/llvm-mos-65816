@@ -84,19 +84,20 @@ ROM_DIR="${ROM_DIR:-$SITE/public/play/roms}"
 [ -d "$DB" ]       || { echo "FATAL: no bsnes-jg Database at $DB"; exit 1; }
 [ -f "$MANIFEST" ] || { echo "FATAL: no manifest at $MANIFEST"; exit 1; }
 
-# The cache covers the complete verifier implementation, emulator, game database, and
-# caller-selected JGX settings. Display-only progress settings do not affect verdicts.
+# The cache covers the verdict contract, emulator, game database, and caller-selected
+# JGX settings. Bump the contract version when invocation or PASS/FAIL logic changes;
+# display-only progress edits leave successful checks reusable.
 cache_context=""
 if [ -n "$CACHE_DIR" ]; then
   mkdir -p "$CACHE_DIR"
-  cache_context=$(python3 - "$ROOT/dev/verify-web-roms.sh" "$JGX" "$DB" <<'PY_CACHE'
+  cache_context=$(python3 - "$JGX" "$DB" <<'PY_CACHE'
 import hashlib, os, pathlib, sys
 h = hashlib.sha256()
-for name in sys.argv[1:3]:
-    path = pathlib.Path(name)
-    h.update(path.name.encode() + b"\0")
-    h.update(path.read_bytes())
-db = pathlib.Path(sys.argv[3])
+h.update(b"verify-web-roms-verdict-v1\0")
+path = pathlib.Path(sys.argv[1])
+h.update(path.name.encode() + b"\0")
+h.update(path.read_bytes())
+db = pathlib.Path(sys.argv[2])
 for path in sorted(p for p in db.rglob("*") if p.is_file()):
     h.update(str(path.relative_to(db)).encode() + b"\0")
     h.update(path.read_bytes())
@@ -169,6 +170,14 @@ total=$(printf '%s\n' "$ROWS" | awk 'NF {n++} END {print n+0}')
 progress() {
   task_progress "$total" "$1" VERIFY "$2"
 }
+progress_done() {
+  local done=$((pass+fail+missing))
+  progress "$done" "PASS $pass | FAIL $fail | MISSING $missing"
+  # The next emulator owns the terminal's live line; keep this completed count above it.
+  if [ -t "$TASK_PROGRESS_FD" ] && [ "$done" -lt "$total" ]; then
+    printf '\n' >&"$TASK_PROGRESS_FD"
+  fi
+}
 
 pass=0; fail=0; missing=0; failed=""
 while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract_hash; do
@@ -177,7 +186,8 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract
   rom="$ROM_DIR/$id.sfc"
   if [ ! -f "$rom" ]; then
     task_clear
-    printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
+    printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1))
+    progress_done; continue
   fi
   cache_file=""
   if [ -n "$CACHE_DIR" ]; then
@@ -187,7 +197,8 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract
     if [ -f "$cache_file" ]; then
       task_clear
       printf 'EMU %s.sfc || cached verification (%s frames)\n' "$id" "$frames"
-      pass=$((pass+1)); continue
+      pass=$((pass+1))
+      progress_done; continue
     fi
   fi
   if [ "$mode" = "live-record" ]; then
@@ -199,7 +210,8 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract
     task_clear
     detail=$(JGXOUT="$out" record_check "$id" 2>&1) || {
       printf '  %-16s FAIL  live-record: %s\n' "$id" "$detail"
-      fail=$((fail+1)); failed="$failed $id"; continue
+      fail=$((fail+1)); failed="$failed $id"
+      progress_done; continue
     }
   else
     out=$(JGX_BLANKSCAN=1 JGX_BLANKSCAN_ROWS="$blankscan_rows" \
@@ -229,9 +241,10 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract
     printf '%s\n' "$out" | tail -3 | sed 's/^/                     /' || true
     fail=$((fail+1)); failed="$failed $id"
   fi
+  progress_done
 done <<< "$ROWS"
 
-progress "$((pass+fail+missing))" 'verification finished'
+if [ "$total" -eq 0 ]; then progress 0 'verification finished'; fi
 echo
 echo "verify-web-roms: $pass passed, $fail failed, $missing missing"
 overall=0
