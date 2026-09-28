@@ -315,9 +315,9 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-28T02:02:05.134570+00:00",
-        "note": "Reviewed the newly isolated XY16 X-writer defect against current priority, upstream, handoff, dashboard, and carry-scheduling summaries; updated the priority, handoff, and dashboard curation; retained dated scheduler measurements and upstream validation scopes. Follow-up TODO cleanup review: preserved the pre-cleanup staged source byte for byte in the dated snapshot; retained 36 active actions, removed the completed Open and Done entries and triaged Inbox comments from the live queue, moved the still-open dashboard verification into Test Bench, and separated local repair from upstream extraction and publication. Reviewed direct dependent summaries and historical references; merged #562/#579 remain out of Open. No compiler status or publication claim was added by the cleanup. Hook replay during this cleanup produced two non-work captures from dated plans: the native-s16 EQ sentence is a scope invariant, and title-entropy gate wiring is already completed. Both fingerprints are retained in the ledger; the live Inbox was removed again. The archive banner records their disposition while its preserved source body retains its original hash.",
-        "attribution": "OpenAI Codex API agent 0.157.1; exact model ID unknown (GPT-6 family stated by session); reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9 Cleanup review: OpenAI Codex (agent/tool version unknown), exact model ID/version unknown (GPT-6 family per session instruction), reasoning effort unknown."
+        "reviewed_at": "2026-09-28T05:10:43.274159+00:00",
+        "note": "Reviewed the gallery navigation plan and retirement disposition; removed the stale chevron/repack action from the current queue while retaining dated evidence in TODO-history.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-luna, medium reasoning effort"
       }
     },
     {

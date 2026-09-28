@@ -26,8 +26,6 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [T3] **Make short compiler-bug videos with the published `cpu6502` demo.** Show each chosen failing and repaired execution through the on-screen gates and registers; verify clips against the retained defect evidence. [Demo plan](docs/plans/2026-07-02-102-snes-cpu6502.md).
 
-- [T3] **Finish the `lzss-gallery` gravity chevrons and repack tracker.** Gate the updated navigation and palette against the existing 26-work oracle `0x3D44`. [Plan](docs/plans/2026-07-27-128-lzss-gallery-gravity-chevrons.md).
-
 ### Test Bench / CI
 
 - [T3] **Run the 138-demo build-determinism gate sweep.** Check for a later complete run first; otherwise define the demo set, run each differential gate on a compiler containing the fix, and record the results. The [original plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md) only covered the corpus and four demos.
