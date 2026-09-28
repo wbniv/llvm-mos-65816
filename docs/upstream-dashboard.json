@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-28",
-  "sourceHash": "56db5c9e34e6f6c3e05dc013dc1a5dee78f8d7868cf20712c3776a70994fddcb",
+  "sourceHash": "7c5294315827dda2b05ebe334bbfa6b591d8f245f4fe39a3bd70acf69da26528",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -211,12 +211,13 @@
       "dependsOn": [
         "opt:0063"
       ],
-      "nextStep": "Extract with #321 and 0063, reconcile the destination, and obtain independent review before submission.",
+      "nextStep": "Preparation and independent review are complete. Publish when requested under the #321 hold; merge requires #321 and 0063.",
       "evidenceNote": "",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-store-profitability.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-27-broader-near-store-profitability.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0065-mos-near-store-profitability.patch"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/patches/llvm-mos/0065-mos-near-store-profitability.patch",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "upstreamUrl": null,
       "demoUrls": []

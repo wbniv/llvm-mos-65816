@@ -1,0 +1,11 @@
+{
+  "source_commit": "75926742e3e13e26a17ef6e7837efb869caec0dc",
+  "source_tree": "508a36dbcb01dba15c0372430767fb2337e0fc04",
+  "tools": {
+    "llvm-mc": "93b95353664c9ef1b041469b6ca64215b7c591d1d1c1e293d59c51c2373c4759",
+    "llc": "f1597923f6cea0e42f6377e16bf5da70ae7318f89b0ab0b61d4a7a2b7d446d56",
+    "llvm-objdump": "5dedd140c9f44697447c2ee9e9f65dda25a7868ef7c7d9bcb5040b70073dc37d",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b"
+  }
+}

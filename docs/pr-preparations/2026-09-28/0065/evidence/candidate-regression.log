@@ -1,0 +1,9 @@
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,DEFAULT
+default: PASS
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -mattr=+mos-a16 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,NATIVE
+a16: PASS
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs -mattr=+mos-a16,+mos-xy16 /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll -o -
+/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck /home/will/llvm-mos-65816/docs/defects/evidence/2026-09-27-near-store-profitability/a16-near-store-profit.ll --check-prefixes=BYTE,NATIVE
+xy16: PASS

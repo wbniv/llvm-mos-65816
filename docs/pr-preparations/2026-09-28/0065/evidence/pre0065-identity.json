@@ -1,0 +1,13 @@
+{
+  "source_commit": "461a6fa1d92d46874e19107dcd1608c67fffedc3",
+  "destination": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "tools": {
+    "llvm-mc": "93b95353664c9ef1b041469b6ca64215b7c591d1d1c1e293d59c51c2373c4759",
+    "llc": "48d63dfbff695fe0f6bf2684ddbd84722420b74c0780fe8c4b7397e015b5dbfe",
+    "llvm-objdump": "5dedd140c9f44697447c2ee9e9f65dda25a7868ef7c7d9bcb5040b70073dc37d",
+    "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+    "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b"
+  },
+  "series_baseline_commit": "a06f4b2e43b7a787a64e0a3299fe890ab8347697",
+  "source_comment_reconciliation": "diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp\nindex e3b79ae545c4..a548870466cc 100644\n--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp\n+++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp\n@@ -2397,7 +2397,7 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {\n // selector: a direct (look-through) constant, and \u2014 the common case \u2014 a\n // G_MERGE_VALUES of two byte constants (a 16-bit immediate is split into lo/hi\n // bytes before selection; getIConstantVRegValWithLookThrough does NOT look\n-// through the merge, so reconstruct it here). Used to fold `var OP const` into\n+// through the merge, so reconstruct it here). Enables folding `var OP const` into\n // the *Imm16 forms instead of materializing the constant into an Imag16 pair.\n static std::optional<int64_t> getImm16Operand(Register R,\n                                               MachineRegisterInfo &MRI) {\n"
+}

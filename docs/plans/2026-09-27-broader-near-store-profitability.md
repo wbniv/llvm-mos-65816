@@ -8,6 +8,12 @@ Plan and subsequent work: OpenAI Codex CLI 0.157.1 (`codex-tui`), model
 `01a0e0ee-df60-7d80-8629-5ad167a8c407`. Earlier contributors retain the credits
 in the linked records.
 
+## Upstream preparation follow-up — September 28, 2026
+
+The [0065 review packet](../pr-preparations/2026-09-28/0065/README.md) completes extraction with native-only #321 prerequisites and 0063, reconciliation against upstream `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`, fresh validation, and a separate independent 0065 review. The extracted series passes 145 supported MOS tests; the 486-function replay has 72 smaller and zero larger results, loaded pointers remain native at 17 B versus 22 B, and all six emulator assertions return `0xFA36`. The compiler PR remains unposted, its #321/0063 merge dependencies remain explicit, and the native feature posting hold remains in force. The September 27 implementation, binaries, baselines, and measurements below are preserved dated evidence.
+
+Preparation attribution: OpenAI Codex CLI 0.158.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e75a-a9ed-7372-9bac-b19b732a46a2`.
+
 ## Repository delivery and remaining upstream work
 
 The implementation, regression tests, retained evidence and current summaries
@@ -16,7 +22,7 @@ and pushed to `wbniv/llvm-mos-65816` branch `main` on September 27. The commit
 passed the comment-history, defect-evidence, document-dependency and SNES
 display-quality hooks. T3 implementation and validation are complete.
 
-Before submitting 0065 to the compiler upstream:
+**September 27 prerequisite list (completed by the September 28 packet above):**
 
 1. Extract it with the #321 native-width prerequisites and 0063.
 2. Reconcile and validate the extracted change against the exact destination
@@ -279,7 +285,8 @@ The first command intentionally fails the optimization expectations. The patch
 round trip recreates the live MOS directory and focused tests. Regeneration only
 lengthened 0002's Git index hash abbreviations; its non-index content was checked
 byte for byte and the original artifact was retained. No source change was folded
-into 0002. Compiler #321 extraction, destination reconciliation and independent
-review remain prerequisites for upstream submission of 0065.
+into 0002. At this September 27 checkpoint, compiler #321 extraction, destination
+reconciliation and independent review remained prerequisites; the September 28
+follow-up above records their completion for this packet.
 
 Installed-toolchain confirmation: installed Clang SHA-256 is `55ed2de7987a0785d8f960d9d304d89d0fff5801469e70832f27cad6d299c825`. It differs from the preserved candidate by exactly one byte: installation removes the trailing colon from the ELF RUNPATH string. All four runtime gates pass again with the installed tools; an additional xy16 bsnes-jg run also returns 0xFA36. The refreshed tool set repeats 179 MOS passes and two unsupported tests. [Installed identities and results](../defects/evidence/2026-09-27-near-store-profitability/installed/results.json).

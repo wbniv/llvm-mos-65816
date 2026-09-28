@@ -1,0 +1,107 @@
+{
+  "destination": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "commits": [
+    "55ef9c1bdc675ce8e44cb0d8b116a7b11f385540 [MOS] Extract opt-in native widths and near-memory prerequisites",
+    "a06f4b2e43b7a787a64e0a3299fe890ab8347697 [MOS] Share near byte stores with an ABI unit increment",
+    "75926742e3e13e26a17ef6e7837efb869caec0dc [MOS] Keep profitable near stores in byte registers"
+  ],
+  "patches": {
+    "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "e3b8d88ac74aab8addefeac63f4227ba74c45e4d2d893c708a59d2cf531f81ce",
+    "patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch": "58bbec6387956fef27ab72bd8f8aaf8a2f3fbc24e8a6f492909041c1a37d2fe8",
+    "patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch": "2e0d1d0bc186fc18be7055ecd1ed3efe3d87db43985c378db94db99c0dbb9f86"
+  },
+  "roundtrip_tree": "508a36dbcb01dba15c0372430767fb2337e0fc04",
+  "expected_tree": "508a36dbcb01dba15c0372430767fb2337e0fc04",
+  "commands": [
+    {
+      "command": [
+        "read-tree",
+        "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "--check",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch"
+      ],
+      "exit_code": 0,
+      "output": "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch:216: new blank line at EOF.\n+\nwarning: 1 line adds whitespace errors.\n"
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "--check",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "--check",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "/home/will/llvm-mos-65816/docs/pr-preparations/2026-09-28/0065/patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "write-tree"
+      ],
+      "exit_code": 0,
+      "output": "508a36dbcb01dba15c0372430767fb2337e0fc04\n"
+    },
+    {
+      "command": [
+        "rev-parse",
+        "HEAD^{tree}"
+      ],
+      "exit_code": 0,
+      "output": "508a36dbcb01dba15c0372430767fb2337e0fc04\n"
+    },
+    {
+      "command": [
+        "log",
+        "-3",
+        "--format=%H %s"
+      ],
+      "exit_code": 0,
+      "output": "75926742e3e13e26a17ef6e7837efb869caec0dc [MOS] Keep profitable near stores in byte registers\na06f4b2e43b7a787a64e0a3299fe890ab8347697 [MOS] Share near byte stores with an ABI unit increment\n55ef9c1bdc675ce8e44cb0d8b116a7b11f385540 [MOS] Extract opt-in native widths and near-memory prerequisites\n"
+    }
+  ],
+  "comment_history": "PASS"
+}

@@ -1,0 +1,19 @@
+{
+  "CMAKE_BUILD_TYPE": "Release",
+  "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+  "CMAKE_CXX_FLAGS": "",
+  "CMAKE_C_COMPILER": "/usr/bin/clang",
+  "CMAKE_C_FLAGS": "",
+  "LLVM_DEFAULT_TARGET_TRIPLE": "x86_64-unknown-linux-gnu",
+  "LLVM_ENABLE_ASSERTIONS": "ON",
+  "LLVM_ENABLE_PROJECTS": "",
+  "LLVM_EXPERIMENTAL_TARGETS_TO_BUILD": "MOS",
+  "LLVM_OPTIMIZED_TABLEGEN": "OFF",
+  "LLVM_TARGETS_TO_BUILD": "X86;ARM;AArch64",
+  "LLVM_TARGET_ARCH": "host",
+  "LLVM_USE_LINKER": "lld",
+  "build_method": "Independent sparse source worktree and copied warm cache; changed source and generated MOS tables rebuilt in llvm-mos-65816-dev container. Existing installed compiler and historical evidence untouched.",
+  "source_mount": "/work/build/register-exhaustion-src",
+  "build_mount": "/work/build/0029-cross-target-build",
+  "baseline_source_comment_only_difference": "pre0065-identity.json records the sole comment rewrite between the compiled comparison baseline and series commit 2."
+}

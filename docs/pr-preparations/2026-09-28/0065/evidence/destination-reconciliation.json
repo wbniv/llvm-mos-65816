@@ -1,0 +1,51 @@
+{
+  "upstream_repository": "llvm-mos/llvm-mos",
+  "destination": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "local_repository_head": "9a2ece34d42da89ff02eb0e8fb98b2f42251de63",
+  "source_artifacts": {
+    "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+    "patches/llvm-mos/0051-mos-zp-byte-index.patch": "a556854efd35934b4c9d4554ff85fc083ca5145426cd20f3a6bd237fb5ab2c6c",
+    "patches/llvm-mos/0055-mos-native-wide-anyext.patch": "d9195b63ff4dab33b7c7ba7550b5322b85de88234f1a0abd299e61ba4ee826f4",
+    "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
+    "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
+    "patches/llvm-mos/0065-mos-near-store-profitability.patch": "000678601f84da4ba74e98542d69e33a629e0331518f1522d22e5380c9650e17",
+    "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586"
+  },
+  "canonical_record": "docs/defects/mos-near-store-profitability.json",
+  "prior_work": {
+    "search_terms": [
+      "0065",
+      "near-store profitability",
+      "loaded pointer",
+      "legalizeAddSub",
+      "legalizeLoadStore16",
+      "isByteBuiltStoreValue",
+      "isByteIndirectStore"
+    ],
+    "local_assessment": "The fixed missed optimization is complete in local 0065 (4d7136cb); original baseline, loaded-pointer experiment, measurements and runtime evidence remain unchanged. 0063 alone covers positive-unit absolute sharing and does not certify 0065.",
+    "destination_assessment": "No HasAccum16, HasIndex16, native G_LOAD16/G_STORE16 pseudos or near-store profitability helpers on exact destination. legalizeCustom invokes byte-oriented legalizeAddSub/legalizeLoad/legalizeStore. Native profitability has no entry point until the extracted #321 prerequisites are present. This is not a stock upstream compiler defect.",
+    "history_assessment": "The local destination checkout is shallow. GitHub API supplies the latest 20 changes to MOSLegalizerInfo.cpp back through November 2023, including #577 three-way compares and August 2026 vector scalarization. Neither native widths nor 0065 is present. Destination #571 register-number changes require native DWARF reconciliation.",
+    "preserved_destination_contracts": [
+      "Vector scalarization",
+      "Wide-constant/INT64_MIN add-sub checks",
+      "Default byte-mode sign-fill lowering",
+      "DWARF register numbering"
+    ],
+    "extraction_dependencies": [
+      "Native-width model, selector, mode insertion, frame/spill/scavenger support from 0002",
+      "0045 native immediate width printing adapted to destination printer",
+      "0051 byte-index guard and tests",
+      "0055 wide any-extension legalization and tests",
+      "0062 near-memory atomic guards only",
+      "0063 absolute unit increment sharing"
+    ],
+    "excluded": [
+      "#320 address spaces, packed pointers, far calling conventions, Imag32, far memory operations",
+      "Far word/index optimizations 0061/0062",
+      "Independent MOSRecoverNearNoWrap pass and proof-recovery test",
+      "SNES implementation and platform configs",
+      "Unrelated COP assembler opcode support"
+    ]
+  },
+  "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2."
+}

@@ -10,7 +10,6 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 ### M2 — Optimizing Payoff
 
-- [T4] **Prepare 0065 near-store profitability for upstream review.** Extract the completed optimization with its #321 prerequisites, reconcile the exact destination revision, validate the extracted patch and obtain independent review. Preserve the local completion evidence and loaded-pointer fallback; the earlier 0063 review does not cover 0065. [Remaining upstream work](docs/plans/2026-09-27-broader-near-store-profitability.md#repository-delivery-and-remaining-upstream-work) · [Submission prerequisites](docs/pr-preparations/2026-09-26/feature-held-packages.md).
 
 - [T4] **Resolve the carry-scheduling pressure contract and profitability choice.** Compare a cheaper predictor and shared-frontend implementation with the measured 0064 policies on unseen inputs, then choose a default only with correctness and size evidence. The current compiler defaults to `always`; the separate XY16 `vlastack_sim` miscompile is [fixed locally](docs/defects/mos-xy16-stale-x-writer-reload.json). [Canonical pressure record](docs/defects/mos-carry-scheduling-pressure.json) · [profitability report](docs/investigations/2026-09-27-carry-profitability-model.md).
 

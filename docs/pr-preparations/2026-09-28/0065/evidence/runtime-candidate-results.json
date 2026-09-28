@@ -1,0 +1,56 @@
+[
+  {
+    "mode": "default",
+    "core": "mame",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "70c1930ed9849d708e3dc7f100521a523a6ef2b9ba83cec958c2991f286417cb"
+  },
+  {
+    "mode": "default",
+    "core": "bsnes-jg",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "70c1930ed9849d708e3dc7f100521a523a6ef2b9ba83cec958c2991f286417cb"
+  },
+  {
+    "mode": "a16",
+    "core": "mame",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "96f8b3d55155aa983d9ede8fa5c2dc105bd69d942bd3cb6421d440b0b2af7752"
+  },
+  {
+    "mode": "a16",
+    "core": "bsnes-jg",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "96f8b3d55155aa983d9ede8fa5c2dc105bd69d942bd3cb6421d440b0b2af7752"
+  },
+  {
+    "mode": "xy16",
+    "core": "mame",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "96f8b3d55155aa983d9ede8fa5c2dc105bd69d942bd3cb6421d440b0b2af7752"
+  },
+  {
+    "mode": "xy16",
+    "core": "bsnes-jg",
+    "got": 64054,
+    "expected": 64054,
+    "address": 517,
+    "size": 2,
+    "rom_sha256": "96f8b3d55155aa983d9ede8fa5c2dc105bd69d942bd3cb6421d440b0b2af7752"
+  }
+]

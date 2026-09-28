@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "041e5aa49ac00f30188e61d55967a3d6b813a372e6a23800852cf2c77077c53a",
+          "docs/upstream-dashboard-curation.json": "d702d7c201afe22301ee7bc7762fa6d1a82e6633f88d334611966dbf724c2fb9",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -104,7 +104,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "b68076045549e48e86f7867d933f423ede9b711ed3732d82ea83e9aca35126fb"
+          "docs/upstream-dashboard.json": "ef3de6dd9c7e272bc1503748acbb2dc0e3b550fde9b3869884ea91d7eeb4d615"
         }
       }
     },
@@ -125,13 +125,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "8a49e48226454c4bae64768fdfeb810e35f69721eb8f242be97152809ba1b7b6",
+          "docs/upstream-pending-work.md": "0e0af09295b7a308dd3e7a43498129fbd7c35259a1a6608e8a4cb8c525dea3c8",
           "docs/upstream-dashboard-graph-map.json": "57d7e15eb94aacc348797642d0108baf166f47599c0b915e4d1568f8ff6884ab",
-          "docs/upstream-dashboard.json": "b68076045549e48e86f7867d933f423ede9b711ed3732d82ea83e9aca35126fb",
+          "docs/upstream-dashboard.json": "ef3de6dd9c7e272bc1503748acbb2dc0e3b550fde9b3869884ea91d7eeb4d615",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "0a39996bbb6269306c9743ad4bd9ae8c3989978e2e6e48c97aa26e015586579c"
+          "docs/upstream-dashboard-graph.json": "2d53cafdb581b73a73a28982f04bbee6ddddb75b6de4b4b53a8850d69e85e505"
         }
       }
     },
@@ -283,7 +283,8 @@
         "docs/plans/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -315,12 +316,12 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
+          "docs/pr-preparations/2026-09-26/README.md": "c4bdef3c36df41e5791dfcc485fb50be213e97786a25ac58d5c355243f00b627",
           "docs/plans/2026-09-26-live-upstream-dashboard.md": "d3219df087ecd4c0bb640995f168d5c5d1c0b8e352f765544d228be269c95b5c",
           "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
           "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c1aabd8329cde2cbbd9bed51afe3938f87a773e66ebc68a62ee6473dd7cd27eb",
@@ -333,11 +334,12 @@
           "docs/plans/2026-09-28-farblit-range-integration.md": "819f534e7a52ea0984b4ec7c55f03f53d11f3f34d753b62fe7af59992bbabafb",
           "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
-          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T10:43:57.518114+00:00",
-        "note": "Reviewed the combined queue after integrating a0398b09. Preserve the user-requested retirement of the live outage check and its separate local fallback evidence; production outage behavior remains unverified. Both 0069 and 0070 entries now record completed downstream independent AI source review and the resolved opcode assertion finding: 156 wrong substitutions rejected and four focused files passing. Additional coverage, prerequisite extraction and validation/review of the exact upstream stack remain pending. Preserved earlier evidence and contributor attribution.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T12:06:31.269139+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -367,7 +369,8 @@
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -396,10 +399,10 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
+          "docs/pr-preparations/2026-09-26/README.md": "c4bdef3c36df41e5791dfcc485fb50be213e97786a25ac58d5c355243f00b627",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
@@ -408,11 +411,12 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
           "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
-          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T09:21:43.866994+00:00",
-        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T12:06:31.362397+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -442,7 +446,8 @@
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -471,10 +476,10 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
+          "docs/pr-preparations/2026-09-26/README.md": "c4bdef3c36df41e5791dfcc485fb50be213e97786a25ac58d5c355243f00b627",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
@@ -483,11 +488,12 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
           "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
-          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T09:21:43.872141+00:00",
-        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T12:06:31.366743+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -624,7 +630,8 @@
         "docs/investigations/2026-09-28-farblit-range-integration.md",
         "docs/investigations/2026-09-28-far-word-policy.md",
         "docs/pr-preparations/2026-09-28/far-word-index/README.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -633,11 +640,11 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
+          "docs/pr-preparations/2026-09-26/README.md": "c4bdef3c36df41e5791dfcc485fb50be213e97786a25ac58d5c355243f00b627",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
@@ -646,11 +653,12 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
           "docs/investigations/2026-09-28-far-word-policy.md": "357098dc1364498f67c86ba67cb66dab9b78fe59465d4a4152a4feb6a33cca6b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "38222af1df804fb69c4cb9e633cd57418f4d4cfe6c1388c7bc4f9f5795a9c8aa",
-          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
+          "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T09:21:44.262512+00:00",
-        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T12:06:31.731667+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -895,7 +903,8 @@
         "docs/pr-preparations/2026-09-26/0064-submission.json",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
-        "docs/pr-preparations/2026-09-27/0068-validation.md"
+        "docs/pr-preparations/2026-09-27/0068-validation.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -904,7 +913,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "aec20fb67e8fec8ba69ed079a483c968d90ba7de673525f414664271e104d5ac",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -925,13 +934,14 @@
           "docs/pr-preparations/2026-09-26/0060-pr-body.md": "b33197276fec8fcbf7b8b4c060fef908dda5ffb8843d027eb4185650249b6630",
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
-          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T05:25:46.152879+00:00",
-        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
+        "reviewed_at": "2026-09-28T12:06:34.200854+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -1400,7 +1410,8 @@
         "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json",
         "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
@@ -1410,12 +1421,13 @@
           "docs/pr-preparations/2026-09-26/0028-review.md": "5f7f18fd7ac754e97f2d505da0343fe11fadbd55b5fd9f543b2e80df56da4d18",
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "afa16c12e77d50dd08de59b2d751e1553dc71d8073b42a46489fd417c9a970ee",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-27T14:25:09.352786+00:00",
-        "note": "Reviewed near-index proof recovery against the preserved matching-input baseline/candidate, post-LSR IR, 1236-case final replay, 48 affected-program runtime checks, twelve near checks and gallery result. Updated TODO, handoff, current compiler summaries and held feature packet/index. The earlier near-Y/bank-wrap records and 178-test packet remain dated correctness evidence; the public discovery map still describes those two correctness defects. Carry scheduling, independent compiler fixes and their publication states are unchanged by this optimization. Native-width extraction and independent review remain pending. Census explicitly retains nine growing configurations and 39 failures in both arms.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; verified session 01a0e315-89ed-7e70-b7dc-fcc2940366d9."
+        "reviewed_at": "2026-09-28T12:06:34.772602+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -1427,21 +1439,23 @@
         "docs/plans/2026-09-26-mos-carry-scheduling.md",
         "docs/investigations/2026-09-27-near-y-decoder.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
-        "docs/pr-preparations/2026-09-27/0068-validation.md"
+        "docs/pr-preparations/2026-09-27/0068-validation.md",
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
+          "docs/pr-preparations/2026-09-26/README.md": "c4bdef3c36df41e5791dfcc485fb50be213e97786a25ac58d5c355243f00b627",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "aec20fb67e8fec8ba69ed079a483c968d90ba7de673525f414664271e104d5ac",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/investigations/2026-09-27-near-y-decoder.md": "a0ecc3015fa737dea5093a532b6f20430e3be379cfad00d3c4cc8d816060e8fb",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
-          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153"
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T05:25:52.758858+00:00",
-        "note": "Final review of integrated range-only proof, 26 MIR cases, 192 verified objects, 36 LTO ROM configurations on both emulators, repeated profiles, exact installed/disabled controls, patch reconstruction and installed gate. Confirmed Y8 cp8 with native-word fallback, O2 XY16 size growth, five known opt startup failures, and distinct 524288-byte HiROM / 32768-byte pressure LoROM capacities. Current entry points and summaries agree with the completed local integration. Dated baselines, original contributors, standalone 0064 extraction/test counts, retained posted body and withdrawn publication status remain unchanged; independent review and upstream prerequisites remain follow-up work.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e61c-c24c-7053-aa56-a4a4e43f12ab"
+        "reviewed_at": "2026-09-28T12:06:34.869456+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -1556,7 +1570,11 @@
         "dev/check-near-store-profitability.py",
         "examples/65816/a16storebroad.c",
         "dev/a16storebroad.sh",
-        "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json"
+        "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/series.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json"
       ],
       "receipt": {
         "sources": {
@@ -1573,11 +1591,15 @@
           "dev/check-near-store-profitability.py": "fa875476dd4e4848adae11ab64dc408ac1335198b167e0e990375289b8230cb4",
           "examples/65816/a16storebroad.c": "1317d7cb46e4bfef98777aee6aa496fc37030031c95270f3e88cbe88bbf33047",
           "dev/a16storebroad.sh": "5865b0d6c8d91c51c13a38398e24c1085f707f33cce9f85e62b87c8e00f5ae62",
-          "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json": "02e215b42f575a60dabb7a774bc02560843d780b6853f07d7b5058842028af13"
+          "docs/defects/evidence/2026-09-27-near-store-profitability/census-summary.json": "02e215b42f575a60dabb7a774bc02560843d780b6853f07d7b5058842028af13",
+          "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
+          "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json": "450cc488aa8f8dac0e4daa05f6a0eb8c001bf3202850fa5e801366d724b5678a",
+          "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
         },
-        "reviewed_at": "2026-09-27T08:07:43.946975+00:00",
-        "note": "Reviewed carry-related claims against 0067 and the retained gate evidence. The gate recovers the 32 original growth cases and the 30 measured SNES timing costs, but default promotion is rejected: 6.81 percent aggregate-saving loss and four growth configurations without fewer carry materializations. Always remains default; the original generic defect remains a workaround, and no independent review or new upstream submission is claimed. Current-stack compile-time samples overlap, and the 512-vector 6502 kernel timing includes its common driver. The XY16 VLA mismatch reproduces on the preserved baseline and every policy; its cause remains unisolated. Earlier build-pair timings, baseline hashes, attribution and the withdrawn posted PR body remain unchanged. The near-store completion and build instructions are unaffected; registry references remain descriptions of retained hook output. Reviewed the new causal explanation of constant, provisional frame and boundary carries and the rejected refinements, including the limitations of static restore counts.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e126-2178-79f3-adba-51b951fb1f96"
+        "reviewed_at": "2026-09-28T12:06:36.452560+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -1626,23 +1648,25 @@
             "summary",
             "resolution.change"
           ]
-        }
+        },
+        "docs/pr-preparations/2026-09-28/0065/README.md"
       ],
       "receipt": {
         "sources": {
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
-          "docs/plans/2026-09-27-broader-near-store-profitability.md": "77a9d9f0b5b7d089e388a6ce029c5af9664f910050eec8b48903cb7b5192d868",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
-          "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776"
+          "docs/defects/mos-xy16-stale-x-writer-reload.json": "a2bee9ac8c7795eb2cad5cb9988f64a329888f890aca4e76105bec5b68b01776",
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-28T03:25:07.363701+00:00",
-        "note": "Reviewed the X-preservation repair against retained original-input red/green on both emulators, focused MIR and stack/flags runtime evidence. Updated the original report, open-task entry and current Vlastack summaries; qualified earlier VLA mismatch text as dated evidence. The carry pressure contract, dated size/timing measurements, withdrawn PR and #321 submission requirements remain separate. Recorded five opt registration failures without claiming full-suite success.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
+        "reviewed_at": "2026-09-28T12:06:36.750202+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -2224,7 +2248,7 @@
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "3a200e68b10cdcc3f1e03e72f6352054d1a83fa0be89d646e38a2a097f5ed768",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "678a949b7dfdfc7379d9b3302337150231e3d305e75cb7c72ee319cfd5bb7985",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "aec20fb67e8fec8ba69ed079a483c968d90ba7de673525f414664271e104d5ac",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/trace.json": "ef5faa521845e918a467e762a86dc1fe08a63928cdfc479b07f394ad6f247734",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
@@ -2245,9 +2269,9 @@
           "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py": "2ced07c76cfb86b457bd85dbc9f7e698a5dfa2e2ab7903e3c880889a4707d3a8",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "bea133721634e7bab84c90684e56cc49197a1ca72e6c1aade3fdd69f01345bff"
         },
-        "reviewed_at": "2026-09-28T09:21:51.738504+00:00",
-        "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T12:06:38.559197+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     },
     {
@@ -2320,6 +2344,129 @@
         "reviewed_at": "2026-09-28T09:21:52.886538+00:00",
         "note": "Reviewed the assertion-only 0069 change and preserved baseline against the exact compiler/FileCheck identities. All 78 expectations now have explicit opcode boundaries: 156/156 single-token wrong substitutions are rejected, versus 52/156 with the original checks (104 false acceptances); both versions accept all three real outputs. Four focused lit files pass. Closed REVIEW-INTERACTION-01 in the aggregate review, PR packet, TODO, plans and current summaries, while retaining original reviewer reports, adjudication, hashes and performance evidence. Reviewed dependent Farblit and carry records: their shell-gate/emulator counts, compiler-defect statuses, carry publication/review state, optimization policy and dated evidence are unaffected by this MIR assertion correction. Additional focused coverage and validation/review of the eventual extracted upstream stack remain pending. Registered the new sensitivity evidence as inputs to the maintained independent-review summary.",
         "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/0065/independent-review.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/0065/patches/*.patch",
+        "docs/pr-preparations/2026-09-28/0065/validate.py",
+        "docs/pr-preparations/2026-09-28/0065/runtime.py",
+        "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/series.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/candidate-identity.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-identity.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "e3b8d88ac74aab8addefeac63f4227ba74c45e4d2d893c708a59d2cf531f81ce",
+          "docs/pr-preparations/2026-09-28/0065/patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch": "58bbec6387956fef27ab72bd8f8aaf8a2f3fbc24e8a6f492909041c1a37d2fe8",
+          "docs/pr-preparations/2026-09-28/0065/patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch": "2e0d1d0bc186fc18be7055ecd1ed3efe3d87db43985c378db94db99c0dbb9f86",
+          "docs/pr-preparations/2026-09-28/0065/validate.py": "5d8e4c7208001d4d60c942f03543bacfcafcc87b73ee4a69d26f85016860fd88",
+          "docs/pr-preparations/2026-09-28/0065/runtime.py": "10d9414858c3e0bf52df277b7b8055cd4e5637f0eba6b82651ec492c6053384c",
+          "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json": "450cc488aa8f8dac0e4daa05f6a0eb8c001bf3202850fa5e801366d724b5678a",
+          "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-identity.json": "df6c40c68ec3eee72e4bcb909c014331ee4a5ac1d1a5c468d94b1d2ec2c0b677",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-identity.json": "ceaea119681a67eb31ad6f1583ed42cf8cd744b656d58a355413158007577969"
+        },
+        "reviewed_at": "2026-09-28T12:06:39.011010+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/0065/README.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/0065/patches/*.patch",
+        "docs/pr-preparations/2026-09-28/0065/validate.py",
+        "docs/pr-preparations/2026-09-28/0065/runtime.py",
+        "docs/pr-preparations/2026-09-28/0065/evidence/*.json",
+        "docs/pr-preparations/2026-09-28/0065/independent-review.md",
+        "docs/plans/2026-09-27-broader-near-store-profitability.md",
+        "docs/defects/mos-near-store-profitability.json",
+        "docs/pr-preparations/2026-09-28/0065/micro-inputs.tar.gz",
+        "docs/pr-preparations/2026-09-28/0065/evidence/*.tar.gz",
+        "docs/pr-preparations/2026-09-28/0065/evidence/*.log",
+        "docs/pr-preparations/2026-09-28/0065/evidence/*.txt"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "e3b8d88ac74aab8addefeac63f4227ba74c45e4d2d893c708a59d2cf531f81ce",
+          "docs/pr-preparations/2026-09-28/0065/patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch": "58bbec6387956fef27ab72bd8f8aaf8a2f3fbc24e8a6f492909041c1a37d2fe8",
+          "docs/pr-preparations/2026-09-28/0065/patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch": "2e0d1d0bc186fc18be7055ecd1ed3efe3d87db43985c378db94db99c0dbb9f86",
+          "docs/pr-preparations/2026-09-28/0065/validate.py": "5d8e4c7208001d4d60c942f03543bacfcafcc87b73ee4a69d26f85016860fd88",
+          "docs/pr-preparations/2026-09-28/0065/runtime.py": "10d9414858c3e0bf52df277b7b8055cd4e5637f0eba6b82651ec492c6053384c",
+          "docs/pr-preparations/2026-09-28/0065/evidence/artifact-hashes.json": "6ae5d6b8d345afb6d6e3cda81d35371f69c4d25d4850fedf3d0f9e9c48cfb87e",
+          "docs/pr-preparations/2026-09-28/0065/evidence/build-configuration.json": "8b0db7bc9954eae24b8c0df55d38c3550085987656b4734ac3ee19fddbd0dcd0",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-identity.json": "df6c40c68ec3eee72e4bcb909c014331ee4a5ac1d1a5c468d94b1d2ec2c0b677",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-suite.json": "6d7552d548f4e0d3cf5576cb747df4f25f447ec70ad5b1b2b347929fd5efad01",
+          "docs/pr-preparations/2026-09-28/0065/evidence/destination-legalizer-history.json": "d5668016ff52b2583e29b2176cd2d7ed2274aa4aa744f932194de6627b91d300",
+          "docs/pr-preparations/2026-09-28/0065/evidence/destination-reconciliation.json": "328c1a8c89bec2430884f54d7cf05563821c734153570e28cf8d1d2bf88d7604",
+          "docs/pr-preparations/2026-09-28/0065/evidence/dwarf-spec-search.json": "086f2108ed227f08fa42aa55c036ddb6faadd1f958a4b726e912e3918e0ea88a",
+          "docs/pr-preparations/2026-09-28/0065/evidence/independent-review.json": "450cc488aa8f8dac0e4daa05f6a0eb8c001bf3202850fa5e801366d724b5678a",
+          "docs/pr-preparations/2026-09-28/0065/evidence/loaded-pointer-results.json": "ae80b78ccb717dc72e601b7059598447884149cdb388dec7b8a2f6d342f75dd6",
+          "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-identity.json": "ceaea119681a67eb31ad6f1583ed42cf8cd744b656d58a355413158007577969",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-suite.json": "0eae5577a8fa6f166ff82585a4d92753db6334fcf4bb81787f6fbfc5db7e7ef2",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-environment.json": "f1323091cf81d3bb57025bfc723e60cc936eb69678142f1e18f0b7f8d81d382e",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-identity.json": "24f2aea2481100a84a88b6edfc1d10880afd9a58e217ba8776313902c6ef95e2",
+          "docs/pr-preparations/2026-09-28/0065/evidence/series.json": "4e73fa3210ef23f059256a82b3487b5c24d46b9c8468b5f0b30de8648ca70c62",
+          "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
+          "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
+          "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
+          "docs/pr-preparations/2026-09-28/0065/micro-inputs.tar.gz": "a38a3741c52433428aff50e8899fc66dd7bcdd5c5f0be77709e931028db8bc42",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-micro.tar.gz": "0f65febc8b49f727c029202fd13426efb860226280857fb1326465e1cb4e5cce",
+          "docs/pr-preparations/2026-09-28/0065/evidence/loaded-pointer.tar.gz": "c94d3095c945264267e3c602e18be6fb6a49a79c1362f702adad8d9b63005047",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-micro.tar.gz": "1da89435bcaf4d0cc3118a1a85d6423a9711a5d1c8a5f3e9fc5285591a25adfa",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate.tar.gz": "55eb53b4abbfdecdf5750dd0b1db25e15f4b643f9a3416a28c33790ab02aae6f",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-build.log": "07ca5d599e6ad74df2fcec450bc1645a22d0cc1e5c2724236e06af778d80bb25",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-regression.log": "40018d9bb6f095de954c78a235c8a2add7233946940aa2fb409aaa05681f1911",
+          "docs/pr-preparations/2026-09-28/0065/evidence/candidate-suite.log": "1bc6b31ec872b1ef82ea90a685f939a492ba0b25bd8ca736eec1ded5aad98fef",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-build.log": "ac44ed6c920af223647e5c915430622c7f785efeb31d9778266097e9ee20bc41",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-regression.log": "2ab6bf0849d8bc1c8b722cd18b83c2a59e7453d9dc18daf1442411723691240f",
+          "docs/pr-preparations/2026-09-28/0065/evidence/pre0065-suite.log": "3d3a925bb9c5a81ec6e7c45360a41cb10a4a002b956b412516b65a02082767b2",
+          "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSLegalizerInfo.cpp.txt": "af98159c08a79e88eaacfddc16ce0ccd1826d263b119cc9c4f6dd70198633929",
+          "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSRegisterInfo.td.txt": "a96ed543ff671dfb59a66d55756681fddc48342c5ea987a09d12d7c02e4e76c9",
+          "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSTargetMachine.cpp.txt": "a10b1fe04db6fb3f33f502e62e1f653543ac1e5e9188c824e1234e0e5b4ce3ba"
+        },
+        "reviewed_at": "2026-09-28T12:06:39.551211+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/0065/pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/pr-preparations/2026-09-28/0065/independent-review.md",
+        "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json",
+        "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b",
+          "docs/pr-preparations/2026-09-28/0065/independent-review.md": "9565edc35f6117f18b5600f3b70c5c05d98d57f566794dfd93d38a4c3e873112",
+          "docs/pr-preparations/2026-09-28/0065/evidence/measurements.json": "87632ca0e5dfaad2321405f0883ed2810339454ba1d9e220dc21843daa3194b3",
+          "docs/pr-preparations/2026-09-28/0065/evidence/runtime-candidate-results.json": "85290bd0595ee3f22876d5dfc6582ee8dc6b8a74983ff5f7bad6763bb34c55d4"
+        },
+        "reviewed_at": "2026-09-28T12:06:39.551431+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
+      }
+    },
+    {
+      "document": "docs/321-upstream-native-width-pr.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/0065/README.md"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
+        },
+        "reviewed_at": "2026-09-28T12:06:39.551454+00:00",
+        "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
+        "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
       }
     }
   ]

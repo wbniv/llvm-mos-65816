@@ -1,0 +1,1142 @@
+{
+  "schema": 1,
+  "date": "2026-09-28",
+  "verdict": "approve_0065_for_upstream_review_with_explicit_native_prerequisites",
+  "reviewer": {
+    "tool": "OpenAI Codex CLI",
+    "tool_version": "0.158.0",
+    "originator": "codex-tui",
+    "model": "gpt-6-astra",
+    "reasoning_effort": "xhigh",
+    "agent": "/root/review_0065",
+    "session": "01a0e79c-b9af-7ed3-acf5-19074d8d761a",
+    "metadata_verification": "session_meta and reviewer turn_context in /home/will/.codex/sessions/2026/09/28/rollout-2026-09-28T17-43-23-01a0e79c-b9af-7ed3-acf5-19074d8d761a.jsonl"
+  },
+  "destination": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "candidate_commit": "75926742e3e13e26a17ef6e7837efb869caec0dc",
+  "candidate_tree": "508a36dbcb01dba15c0372430767fb2337e0fc04",
+  "scope": "Independent review of extracted 0065, its compiler prerequisite boundaries and focused native behavior. Does not reuse 0063 approval or approve the entire #321 feature, native LLDB integration, #320, or SNES platform submission.",
+  "source_assessment": {
+    "atomic": "Atomic stores are excluded before splitting or arithmetic-coordinated replacement; native word memory operands retain unordered ordering.",
+    "volatile": "Byte loads are not duplicated and precede low/high stores; replacement word stores retain the original MMO.",
+    "calls": "Only zero-size ADJCALLSTACKUP is ignored. Calls, inline assembly, nonzero teardown and unsupported uses retain fallbacks.",
+    "worklist": "Indirect decrement builds an observed G_STORE16_INDIR replacement at the original store and erases the generic operation.",
+    "loaded_pointer": "The destination must trace to a physical Imag16 argument copy. A loaded pointer fails this gate and retains native lowering.",
+    "destination": "Exact destination has no native profitability entry point. Extraction preserves upstream scalarization, wide-constant overflow checks and default sign-fill lowering.",
+    "purity": "No extracted far address spaces, packed pointers, far CC, Imag32, far memory operations, COP addition, proof-recovery pass, or SNES platform code."
+  },
+  "resolved_findings": [
+    {
+      "item": "Native DWARF mapping",
+      "resolution": "Native A/X/Y use 0x01000000/1/2; internal high bytes have DwarfNumbers=[-1].",
+      "reference": "https://www.llvm-mos.org/wiki/DWARF_specification",
+      "retrieval": "Official-page content retrieved through web search index; direct page fetch returned HTTP 403.",
+      "local_search_evidence": "build/0065-review-independent/dwarf-spec-search.json"
+    },
+    {
+      "item": "Imported historical comments and far-only comment residue",
+      "resolution": "Final patch additions describe current compiler contracts."
+    },
+    {
+      "item": "Empty-input validation success",
+      "resolution": "validate.py rejects no IR inputs and no parsed function measurements."
+    }
+  ],
+  "nonblocking_findings": [
+    {
+      "item": "Blank line at EOF",
+      "path": "llvm/lib/Target/MOS/MOSFeatures.td:38",
+      "detail": "Frozen prerequisite patch applies successfully with one whitespace warning. git diff --check HEAD~3 HEAD returns 2 for the same new blank line at EOF. The coordinator retained the frozen artifacts."
+    }
+  ],
+  "driver_review": "Reviewed validate.py and runtime.py. Runtime MAME/bsnes argument order and WRAM address conversion match tools/a16_fuzz.py; fixture object code is produced by supplied llc with LTO disabled. No independent runtime execution was performed by this reviewer.",
+  "replay": {
+    "toolchains": {
+      "pre0065": {
+        "llc_path": "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+        "llc_sha256": "48d63dfbff695fe0f6bf2684ddbd84722420b74c0780fe8c4b7397e015b5dbfe",
+        "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+      },
+      "candidate": {
+        "llc_path": "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+        "llc_sha256": "f1597923f6cea0e42f6377e16bf5da70ae7318f89b0ab0b61d4a7a2b7d446d56",
+        "version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n"
+      }
+    },
+    "runs": [
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-default.out",
+        "output_sha256": "bca86e66c8eb3b480df77ef14fa4215751716978b0aa64c52a917e19fcc82356",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 1,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-a16.out",
+        "output_sha256": "d13a9c04a4d3c8b7f4069496d3b25713036334c9fd02b480ffd1a7d0cca110da",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-a16.log",
+        "log_sha256": "74cc4cf4fd5f9b71d9ac0dda4fb0556341bd78e3695b1550ab627cd62eccdc01",
+        "diagnostics": "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:14:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:41:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:28:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:60:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:47:11: error: NATIVE: expected string not found in input\n; NATIVE: dex\n          ^\n<stdin>:90:20: note: scanning from here\n .size indirect_decrement, .Lfunc_end2-indirect_decrement\n                   ^\n<stdin>:90:49: note: possible intended match here\n .size indirect_decrement, .Lfunc_end2-indirect_decrement\n                                                ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:63:14: error: BYTE-NEXT: is not on the line after the previous match\n; BYTE-NEXT: sta (__rc{{[0-9]+}})\n             ^\n<stdin>:109:2: note: 'next' match was here\n sta (__rc20)\n ^\n<stdin>:104:13: note: previous match ended here\n jsr produce\n            ^\n<stdin>:105:1: note: non-matching line after previous match is here\n sta __rc2\n^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:76:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:125:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:91:9: error: BYTE: expected string not found in input\n; BYTE: lda byte\n        ^\n<stdin>:135:24: note: scanning from here\nindirect_byte_absolute: ; @indirect_byte_absolute\n                       ^\n<stdin>:137:2: note: possible intended match here\n ldx byte\n ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:107:14: error: BYTE-NEXT: is not on the line after the previous match\n; BYTE-NEXT: sta (__rc2)\n             ^\n<stdin>:157:2: note: 'next' match was here\n sta (__rc2)\n ^\n<stdin>:152:13: note: previous match ended here\n lda (__rc4)\n            ^\n<stdin>:153:1: note: non-matching line after previous match is here\n stz __rc5\n^\n\nInput file: <stdin>\nCheck file: /home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll\n\n-dump-input=help explains the following input dump.\n\nInput was:\n<<<<<<\n            .\n            .\n            .\n           32:  .zeropage __rc31 \n           33:  .file \"a16-near-store-profit.ll\" \n           34:  .text \n           35:  .globl absolute_decrement ; -- Begin function absolute_decrement \n           36:  .type absolute_decrement,@function \n           37: absolute_decrement: ; @absolute_decrement \nnot:14'0                         {                         search range start (exclusive)\n           38: ; %bb.0: \n           39:  sta __rc2 \n           40:  stx __rc3 \n           41:  rep #32 \nnot:14'1        !~~       error: no match expected\n           42:  lda __rc2 \n           43:  sta g \nnot:14'2        }       search range end (exclusive)\n           44:  lda __rc2 \n           45:  dec \n           46:  sta __rc2 \n           47:  sep #32 \n           48:  ldx __rc3 \n           49:  lda __rc2 \n           50:  rts \n           51: .Lfunc_end0: \n           52:  .size absolute_decrement, .Lfunc_end0-absolute_decrement \n           53:  ; -- End function \n           54:  .globl indirect_increment ; -- Begin function indirect_increment \n           55:  .type indirect_increment,@function \n           56: indirect_increment: ; @indirect_increment \nnot:28'0                         {                         search range start (exclusive)\n           57: ; %bb.0: \n           58:  sta __rc4 \n           59:  stx __rc5 \n           60:  rep #32 \nnot:28'1        !~~       error: no match expected\n           61:  lda __rc4 \n           62:  sta (__rc2) \nnot:28'2        }             search range end (exclusive)\n           63:  lda __rc4 \n           64:  inc \n           65:  sta __rc2 \n           66:  sep #32 \n           67:  ldx __rc3 \n            .\n            .\n            .\n           85:  sep #32 \n           86:  ldx __rc3 \n           87:  lda __rc2 \n           88:  rts \n           89: .Lfunc_end2: \n           90:  .size indirect_decrement, .Lfunc_end2-indirect_decrement \ncheck:47'0                       {                                         search range start (exclusive)\ncheck:47'1                                                                 error: no match found in search range\ncheck:47'2                                                     ?           possible intended match\n           91:  ; -- End function \n           92:  .globl indirect_call_result ; -- Begin function indirect_call_result \n           93:  .type indirect_call_result,@function \n           94: indirect_call_result: ; @indirect_call_result \ncheck:47'3                          }                          search range end (exclusive)\n           95: ; %bb.0: \n           96:  ldx __rc20 \n           97:  phx \n           98:  ldx __rc21 \n           99:  phx \n          100:  ldx __rc2 \n          101:  stx __rc20 \n          102:  ldx __rc3 \n          103:  stx __rc21 \n          104:  jsr produce \nnext:63'0                 {   search range start (exclusive)\n          105:  sta __rc2 \n          106:  stx __rc3 \n          107:  rep #32 \n          108:  lda __rc2 \n          109:  sta (__rc20) \nnext:63'1       !~~~~~~~~~~~   error: match on wrong line\n          110:  sep #32 \n          111:  plx \n          112:  stx __rc21 \n          113:  plx \n          114:  stx __rc20 \n          115:  rts \n          116: .Lfunc_end3: \n          117:  .size indirect_call_result, .Lfunc_end3-indirect_call_result \n          118:  ; -- End function \n          119:  .globl indirect_byte_argument ; -- Begin function indirect_byte_argument \n          120:  .type indirect_byte_argument,@function \n          121: indirect_byte_argument: ; @indirect_byte_argument \nnext:63'2                             }                            search range end (exclusive)\nnot:76'0                             {                             search range start (exclusive)\n          122: ; %bb.0: \n          123:  sta __rc4 \n          124:  stz __rc5 \n          125:  rep #32 \nnot:76'1        !~~       error: no match expected\n          126:  lda __rc4 \n          127:  sta (__rc2) \nnot:76'2        }             search range end (exclusive)\n          128:  sep #32 \n          129:  rts \n          130: .Lfunc_end4: \n          131:  .size indirect_byte_argument, .Lfunc_end4-indirect_byte_argument \n          132:  ; -- End function \n          133:  .globl indirect_byte_absolute ; -- Begin function indirect_byte_absolute \n          134:  .type indirect_byte_absolute,@function \n          135: indirect_byte_absolute: ; @indirect_byte_absolute \ncheck:91'0                           {                             search range start (exclusive)\ncheck:91'1                                                         error: no match found in search range\n          136: ; %bb.0: \n          137:  ldx byte \ncheck:91'2      ?          possible intended match\n          138:  stz __rc5 \n          139:  stx __rc4 \n          140:  rep #32 \n          141:  lda __rc4 \n          142:  sta (__rc2) \n          143:  sep #32 \n          144:  rts \n          145: .Lfunc_end5: \n          146:  .size indirect_byte_absolute, .Lfunc_end5-indirect_byte_absolute \n          147:  ; -- End function \n          148:  .globl indirect_byte_pointer ; -- Begin function indirect_byte_pointer \n          149:  .type indirect_byte_pointer,@function \n          150: indirect_byte_pointer: ; @indirect_byte_pointer \ncheck:91'3                           }                           search range end (exclusive)\n          151: ; %bb.0: \n          152:  lda (__rc4) \nnext:107'0                {   search range start (exclusive)\n          153:  stz __rc5 \n          154:  sta __rc4 \n          155:  rep #32 \n          156:  lda __rc4 \n          157:  sta (__rc2) \nnext:107'1      !~~~~~~~~~~   error: match on wrong line\n          158:  sep #32 \n          159:  rts \n          160: .Lfunc_end6: \n          161:  .size indirect_byte_pointer, .Lfunc_end6-indirect_byte_pointer \n          162:  ; -- End function \n          163:  .globl loaded_pointer ; -- Begin function loaded_pointer \n          164:  .type loaded_pointer,@function \n          165: loaded_pointer: ; @loaded_pointer \nnext:107'2                    }                    search range end (exclusive)\n          166: ; %bb.0: \n          167:  sta __rc4 \n          168:  stx __rc5 \n          169:  rep #32 \n          170:  lda (__rc2) \n            .\n            .\n            .\n>>>>>>\n"
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 1,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-xy16.out",
+        "output_sha256": "d13a9c04a4d3c8b7f4069496d3b25713036334c9fd02b480ffd1a7d0cca110da",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit.ll-xy16.log",
+        "log_sha256": "74cc4cf4fd5f9b71d9ac0dda4fb0556341bd78e3695b1550ab627cd62eccdc01",
+        "diagnostics": "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:14:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:41:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:28:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:60:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:47:11: error: NATIVE: expected string not found in input\n; NATIVE: dex\n          ^\n<stdin>:90:20: note: scanning from here\n .size indirect_decrement, .Lfunc_end2-indirect_decrement\n                   ^\n<stdin>:90:49: note: possible intended match here\n .size indirect_decrement, .Lfunc_end2-indirect_decrement\n                                                ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:63:14: error: BYTE-NEXT: is not on the line after the previous match\n; BYTE-NEXT: sta (__rc{{[0-9]+}})\n             ^\n<stdin>:109:2: note: 'next' match was here\n sta (__rc20)\n ^\n<stdin>:104:13: note: previous match ended here\n jsr produce\n            ^\n<stdin>:105:1: note: non-matching line after previous match is here\n sta __rc2\n^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:76:13: error: BYTE-NOT: excluded string found in input\n; BYTE-NOT: rep\n            ^\n<stdin>:125:2: note: found here\n rep #32\n ^~~\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:91:9: error: BYTE: expected string not found in input\n; BYTE: lda byte\n        ^\n<stdin>:135:24: note: scanning from here\nindirect_byte_absolute: ; @indirect_byte_absolute\n                       ^\n<stdin>:137:2: note: possible intended match here\n ldx byte\n ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll:107:14: error: BYTE-NEXT: is not on the line after the previous match\n; BYTE-NEXT: sta (__rc2)\n             ^\n<stdin>:157:2: note: 'next' match was here\n sta (__rc2)\n ^\n<stdin>:152:13: note: previous match ended here\n lda (__rc4)\n            ^\n<stdin>:153:1: note: non-matching line after previous match is here\n stz __rc5\n^\n\nInput file: <stdin>\nCheck file: /home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll\n\n-dump-input=help explains the following input dump.\n\nInput was:\n<<<<<<\n            .\n            .\n            .\n           32:  .zeropage __rc31 \n           33:  .file \"a16-near-store-profit.ll\" \n           34:  .text \n           35:  .globl absolute_decrement ; -- Begin function absolute_decrement \n           36:  .type absolute_decrement,@function \n           37: absolute_decrement: ; @absolute_decrement \nnot:14'0                         {                         search range start (exclusive)\n           38: ; %bb.0: \n           39:  sta __rc2 \n           40:  stx __rc3 \n           41:  rep #32 \nnot:14'1        !~~       error: no match expected\n           42:  lda __rc2 \n           43:  sta g \nnot:14'2        }       search range end (exclusive)\n           44:  lda __rc2 \n           45:  dec \n           46:  sta __rc2 \n           47:  sep #32 \n           48:  ldx __rc3 \n           49:  lda __rc2 \n           50:  rts \n           51: .Lfunc_end0: \n           52:  .size absolute_decrement, .Lfunc_end0-absolute_decrement \n           53:  ; -- End function \n           54:  .globl indirect_increment ; -- Begin function indirect_increment \n           55:  .type indirect_increment,@function \n           56: indirect_increment: ; @indirect_increment \nnot:28'0                         {                         search range start (exclusive)\n           57: ; %bb.0: \n           58:  sta __rc4 \n           59:  stx __rc5 \n           60:  rep #32 \nnot:28'1        !~~       error: no match expected\n           61:  lda __rc4 \n           62:  sta (__rc2) \nnot:28'2        }             search range end (exclusive)\n           63:  lda __rc4 \n           64:  inc \n           65:  sta __rc2 \n           66:  sep #32 \n           67:  ldx __rc3 \n            .\n            .\n            .\n           85:  sep #32 \n           86:  ldx __rc3 \n           87:  lda __rc2 \n           88:  rts \n           89: .Lfunc_end2: \n           90:  .size indirect_decrement, .Lfunc_end2-indirect_decrement \ncheck:47'0                       {                                         search range start (exclusive)\ncheck:47'1                                                                 error: no match found in search range\ncheck:47'2                                                     ?           possible intended match\n           91:  ; -- End function \n           92:  .globl indirect_call_result ; -- Begin function indirect_call_result \n           93:  .type indirect_call_result,@function \n           94: indirect_call_result: ; @indirect_call_result \ncheck:47'3                          }                          search range end (exclusive)\n           95: ; %bb.0: \n           96:  ldx __rc20 \n           97:  phx \n           98:  ldx __rc21 \n           99:  phx \n          100:  ldx __rc2 \n          101:  stx __rc20 \n          102:  ldx __rc3 \n          103:  stx __rc21 \n          104:  jsr produce \nnext:63'0                 {   search range start (exclusive)\n          105:  sta __rc2 \n          106:  stx __rc3 \n          107:  rep #32 \n          108:  lda __rc2 \n          109:  sta (__rc20) \nnext:63'1       !~~~~~~~~~~~   error: match on wrong line\n          110:  sep #32 \n          111:  plx \n          112:  stx __rc21 \n          113:  plx \n          114:  stx __rc20 \n          115:  rts \n          116: .Lfunc_end3: \n          117:  .size indirect_call_result, .Lfunc_end3-indirect_call_result \n          118:  ; -- End function \n          119:  .globl indirect_byte_argument ; -- Begin function indirect_byte_argument \n          120:  .type indirect_byte_argument,@function \n          121: indirect_byte_argument: ; @indirect_byte_argument \nnext:63'2                             }                            search range end (exclusive)\nnot:76'0                             {                             search range start (exclusive)\n          122: ; %bb.0: \n          123:  sta __rc4 \n          124:  stz __rc5 \n          125:  rep #32 \nnot:76'1        !~~       error: no match expected\n          126:  lda __rc4 \n          127:  sta (__rc2) \nnot:76'2        }             search range end (exclusive)\n          128:  sep #32 \n          129:  rts \n          130: .Lfunc_end4: \n          131:  .size indirect_byte_argument, .Lfunc_end4-indirect_byte_argument \n          132:  ; -- End function \n          133:  .globl indirect_byte_absolute ; -- Begin function indirect_byte_absolute \n          134:  .type indirect_byte_absolute,@function \n          135: indirect_byte_absolute: ; @indirect_byte_absolute \ncheck:91'0                           {                             search range start (exclusive)\ncheck:91'1                                                         error: no match found in search range\n          136: ; %bb.0: \n          137:  ldx byte \ncheck:91'2      ?          possible intended match\n          138:  stz __rc5 \n          139:  stx __rc4 \n          140:  rep #32 \n          141:  lda __rc4 \n          142:  sta (__rc2) \n          143:  sep #32 \n          144:  rts \n          145: .Lfunc_end5: \n          146:  .size indirect_byte_absolute, .Lfunc_end5-indirect_byte_absolute \n          147:  ; -- End function \n          148:  .globl indirect_byte_pointer ; -- Begin function indirect_byte_pointer \n          149:  .type indirect_byte_pointer,@function \n          150: indirect_byte_pointer: ; @indirect_byte_pointer \ncheck:91'3                           }                           search range end (exclusive)\n          151: ; %bb.0: \n          152:  lda (__rc4) \nnext:107'0                {   search range start (exclusive)\n          153:  stz __rc5 \n          154:  sta __rc4 \n          155:  rep #32 \n          156:  lda __rc4 \n          157:  sta (__rc2) \nnext:107'1      !~~~~~~~~~~   error: match on wrong line\n          158:  sep #32 \n          159:  rts \n          160: .Lfunc_end6: \n          161:  .size indirect_byte_pointer, .Lfunc_end6-indirect_byte_pointer \n          162:  ; -- End function \n          163:  .globl loaded_pointer ; -- Begin function loaded_pointer \n          164:  .type loaded_pointer,@function \n          165: loaded_pointer: ; @loaded_pointer \nnext:107'2                    }                    search range end (exclusive)\n          166: ; %bb.0: \n          167:  sta __rc4 \n          168:  stx __rc5 \n          169:  rep #32 \n          170:  lda (__rc2) \n            .\n            .\n            .\n>>>>>>\n"
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-default.out",
+        "output_sha256": "7a92e68f91975f4755e4d41302af5aa37079f919aa1b9199e1c9d89d310563be",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-a16.out",
+        "output_sha256": "377faf83313f36e8748e4a4e844169e13fd3990ffd61075e71c07f727303376f",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-xy16.out",
+        "output_sha256": "2f23ebbaed69c72e0f7b6fd40919f7fd57a54d763015d9516988dbf4f32dbdca",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-boundaries.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-default.out",
+        "output_sha256": "c39807e326b0caa0b8f1105e0b8f3b52a49a598494c38205fd3a6c77c529a65d",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 1,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-a16.out",
+        "output_sha256": "0047e65c056ee481a8186e84caea31ede823c0b0ef1ac3bac08025eafd86f752",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-a16.log",
+        "log_sha256": "d0eb2e927bf6b8be921b53f521590e4b4fc1444eeab3f2e0d48ac65cc02b2f0e",
+        "diagnostics": "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir:38:10: error: BYTE: expected string not found in input\n ; BYTE: G_STORE_INDIR {{.*}} :: (volatile store (s8))\n         ^\n<stdin>:106:31: note: scanning from here\nname: literal_sub_indirect_inc\n                              ^\n<stdin>:177:15: note: possible intended match here\n G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1)\n              ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir:67:15: error: BYTE-NEXT: expected string not found in input\n ; BYTE-NEXT: {{%[0-9]+}}:_(s8), {{%[0-9]+}}:_(s8) = G_DEC\n              ^\n<stdin>:258:68: note: scanning from here\n G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1)\n                                                                   ^\n<stdin>:259:2: note: possible intended match here\n %5:_(s16) = G_SUB %3, %4\n ^\n\nInput file: <stdin>\nCheck file: /home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir\n\n-dump-input=help explains the following input dump.\n\nInput was:\n<<<<<<\n            .\n            .\n            .\n          101:  $a = COPY %10(s8) \n          102:  $x = COPY %11(s8) \n          103:  RTS implicit $a, implicit $x \n          104: ... \n          105: --- \n          106: name: literal_sub_indirect_inc \ncheck:38'0                                  {   search range start (exclusive)\ncheck:38'1                                      error: no match found in search range\n          107: alignment: 1 \n          108: exposesReturnsTwice: false \n          109: legalized: true \n          110: regBankSelected: false \n          111: selected: false \n            .\n            .\n            .\n          172:  %1:_(s8) = COPY $a \n          173:  %2:_(s8) = COPY $x \n          174:  %3:_(s16) = G_MERGE_VALUES %1(s8), %2(s8) \n          175:  %8:_(s8) = G_CONSTANT i8 -1 \n          176:  %4:_(s16) = G_MERGE_VALUES %8(s8), %8(s8) \n          177:  G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1) \ncheck:38'2                   ?                                                       possible intended match\n          178:  %5:_(s16) = G_SUB %3, %4 \n          179:  %6:_(s8), %7:_(s8) = G_UNMERGE_VALUES %5(s16) \n          180:  $a = COPY %6(s8) \n          181:  $x = COPY %7(s8) \n          182:  RTS implicit $a, implicit $x \n          183: ... \n          184: --- \n          185: name: literal_sub_indirect_dec \ncheck:38'3                                   }  search range end (exclusive)\n          186: alignment: 1 \n          187: exposesReturnsTwice: false \n          188: legalized: true \n          189: regBankSelected: false \n          190: selected: false \n            .\n            .\n            .\n          253:  %2:_(s8) = COPY $x \n          254:  %3:_(s16) = G_MERGE_VALUES %1(s8), %2(s8) \n          255:  %8:_(s8) = G_CONSTANT i8 1 \n          256:  %9:_(s8) = G_CONSTANT i8 0 \n          257:  %4:_(s16) = G_MERGE_VALUES %8(s8), %9(s8) \n          258:  G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1) \nnext:67'0                                                                        {   search range start (exclusive)\nnext:67'1                                                                            error: no match found in search range\n          259:  %5:_(s16) = G_SUB %3, %4 \nnext:67'2       ?                          possible intended match\n          260:  %6:_(s8), %7:_(s8) = G_UNMERGE_VALUES %5(s16) \n          261:  $a = COPY %6(s8) \n          262:  $x = COPY %7(s8) \n          263:  RTS implicit $a, implicit $x \n          264: ... \nnext:67'3          } search range end (exclusive)\n>>>>>>\n"
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 1,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-xy16.out",
+        "output_sha256": "3e95f3c03c5dff8cb216bc93b6012d979a70c8933ba79ad10a7e0f5d74f63982",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-near-store-profit-sub.mir-xy16.log",
+        "log_sha256": "d0eb2e927bf6b8be921b53f521590e4b4fc1444eeab3f2e0d48ac65cc02b2f0e",
+        "diagnostics": "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir:38:10: error: BYTE: expected string not found in input\n ; BYTE: G_STORE_INDIR {{.*}} :: (volatile store (s8))\n         ^\n<stdin>:106:31: note: scanning from here\nname: literal_sub_indirect_inc\n                              ^\n<stdin>:177:15: note: possible intended match here\n G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1)\n              ^\n/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir:67:15: error: BYTE-NEXT: expected string not found in input\n ; BYTE-NEXT: {{%[0-9]+}}:_(s8), {{%[0-9]+}}:_(s8) = G_DEC\n              ^\n<stdin>:258:68: note: scanning from here\n G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1)\n                                                                   ^\n<stdin>:259:2: note: possible intended match here\n %5:_(s16) = G_SUB %3, %4\n ^\n\nInput file: <stdin>\nCheck file: /home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir\n\n-dump-input=help explains the following input dump.\n\nInput was:\n<<<<<<\n            .\n            .\n            .\n          101:  $a = COPY %10(s8) \n          102:  $x = COPY %11(s8) \n          103:  RTS implicit $a, implicit $x \n          104: ... \n          105: --- \n          106: name: literal_sub_indirect_inc \ncheck:38'0                                  {   search range start (exclusive)\ncheck:38'1                                      error: no match found in search range\n          107: alignment: 1 \n          108: exposesReturnsTwice: false \n          109: legalized: true \n          110: regBankSelected: false \n          111: selected: false \n            .\n            .\n            .\n          172:  %1:_(s8) = COPY $a \n          173:  %2:_(s8) = COPY $x \n          174:  %3:_(s16) = G_MERGE_VALUES %1(s8), %2(s8) \n          175:  %8:_(s8) = G_CONSTANT i8 -1 \n          176:  %4:_(s16) = G_MERGE_VALUES %8(s8), %8(s8) \n          177:  G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1) \ncheck:38'2                   ?                                                       possible intended match\n          178:  %5:_(s16) = G_SUB %3, %4 \n          179:  %6:_(s8), %7:_(s8) = G_UNMERGE_VALUES %5(s16) \n          180:  $a = COPY %6(s8) \n          181:  $x = COPY %7(s8) \n          182:  RTS implicit $a, implicit $x \n          183: ... \n          184: --- \n          185: name: literal_sub_indirect_dec \ncheck:38'3                                   }  search range end (exclusive)\n          186: alignment: 1 \n          187: exposesReturnsTwice: false \n          188: legalized: true \n          189: regBankSelected: false \n          190: selected: false \n            .\n            .\n            .\n          253:  %2:_(s8) = COPY $x \n          254:  %3:_(s16) = G_MERGE_VALUES %1(s8), %2(s8) \n          255:  %8:_(s8) = G_CONSTANT i8 1 \n          256:  %9:_(s8) = G_CONSTANT i8 0 \n          257:  %4:_(s16) = G_MERGE_VALUES %8(s8), %9(s8) \n          258:  G_STORE16_INDIR %3(s16), %0(p0) :: (volatile store (s16), align 1) \nnext:67'0                                                                        {   search range start (exclusive)\nnext:67'1                                                                            error: no match found in search range\n          259:  %5:_(s16) = G_SUB %3, %4 \nnext:67'2       ?                          possible intended match\n          260:  %6:_(s8), %7:_(s8) = G_UNMERGE_VALUES %5(s16) \n          261:  $a = COPY %6(s8) \n          262:  $x = COPY %7(s8) \n          263:  RTS implicit $a, implicit $x \n          264: ... \nnext:67'3          } search range end (exclusive)\n>>>>>>\n"
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-default.out",
+        "output_sha256": "d8b92530f0aeb0fa550d690a2ffc2de1155d98365bc6d397ac82d21eb7b17856",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-a16.out",
+        "output_sha256": "3d8598b622841c57808ca0c0f3f493455078882fb5be3d4d8185110cce72098f",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-xy16.out",
+        "output_sha256": "224b9d708003ea415f633c810c745ce7871270250ec82f6b5ca07433da602cc8",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-byte-store.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-default.out",
+        "output_sha256": "fc0869ac192f937f46449d86a92cfda8c872dc6c0fcae5325678de58a72a8dd9",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-a16.out",
+        "output_sha256": "84c98c0c8b366ff36b630d98d618bf70015d7c25e335ca5d3c92e0793911dcf1",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "pre0065",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/pre0065/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-xy16.out",
+        "output_sha256": "84c98c0c8b366ff36b630d98d618bf70015d7c25e335ca5d3c92e0793911dcf1",
+        "log_path": "build/0065-review-independent/final-pre0065-a16-indirect-byte-store.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-default.out",
+        "output_sha256": "bca86e66c8eb3b480df77ef14fa4215751716978b0aa64c52a917e19fcc82356",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-a16.out",
+        "output_sha256": "562bfc7e985a3834db6ceb8bec0ad1ef092b122651bc6ea569cd6fa86a4a259b",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit.ll",
+        "input_sha256": "eb8e3e7f111d13f579e7b44c2e80ef5282f72a3d9c723bbe5760b88487b60351",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-xy16.out",
+        "output_sha256": "562bfc7e985a3834db6ceb8bec0ad1ef092b122651bc6ea569cd6fa86a4a259b",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-default.out",
+        "output_sha256": "7a92e68f91975f4755e4d41302af5aa37079f919aa1b9199e1c9d89d310563be",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-a16.out",
+        "output_sha256": "377faf83313f36e8748e4a4e844169e13fd3990ffd61075e71c07f727303376f",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-boundaries.ll",
+        "input_sha256": "5955ed51217e0b7ef37ad11e847739616d07d7d1292b1f858eedcc830ff4c095",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-boundaries.ll",
+          "--check-prefixes=CHECK,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-xy16.out",
+        "output_sha256": "2f23ebbaed69c72e0f7b6fd40919f7fd57a54d763015d9516988dbf4f32dbdca",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-boundaries.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-default.out",
+        "output_sha256": "c39807e326b0caa0b8f1105e0b8f3b52a49a598494c38205fd3a6c77c529a65d",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-a16.out",
+        "output_sha256": "cc98edf65e6f7de518947dd2b033a4a5bbcbbe88c3b51c0c32182c67aa94920c",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-near-store-profit-sub.mir",
+        "input_sha256": "92b60ad3625b33461a610e647323135352243f5c420f915b67624521d5d08650",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-run-pass=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-near-store-profit-sub.mir",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-xy16.out",
+        "output_sha256": "3fbed4f0c95b6e2292354c4a0536ba4a2e316aec5b8fee9e561edb5a8c0e6c92",
+        "log_path": "build/0065-review-independent/final-candidate-a16-near-store-profit-sub.mir-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-default.out",
+        "output_sha256": "d8b92530f0aeb0fa550d690a2ffc2de1155d98365bc6d397ac82d21eb7b17856",
+        "log_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-a16.out",
+        "output_sha256": "3d8598b622841c57808ca0c0f3f493455078882fb5be3d4d8185110cce72098f",
+        "log_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-byte-store.ll",
+        "input_sha256": "8c07e7270e51d2d3c8a49e0e7259d210d3378629962b08888754dc354c2a0480",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-xy16.out",
+        "output_sha256": "224b9d708003ea415f633c810c745ce7871270250ec82f6b5ca07433da602cc8",
+        "log_path": "build/0065-review-independent/final-candidate-a16-byte-store.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "default",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,DEFAULT"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-default.out",
+        "output_sha256": "fc0869ac192f937f46449d86a92cfda8c872dc6c0fcae5325678de58a72a8dd9",
+        "log_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-default.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "a16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-a16.out",
+        "output_sha256": "84c98c0c8b366ff36b630d98d618bf70015d7c25e335ca5d3c92e0793911dcf1",
+        "log_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-a16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      },
+      {
+        "phase": "candidate",
+        "file": "a16-indirect-byte-store.ll",
+        "input_sha256": "1607896bdf7b1a250d95ab237c27766a7ede958fb53f3da21e9e63d40991c8d3",
+        "mode": "xy16",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "-o",
+          "-"
+        ],
+        "filecheck_command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/FileCheck",
+          "/home/will/llvm-mos-65816/build/0065-upstream/source/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll",
+          "--check-prefixes=BYTE,NATIVE"
+        ],
+        "compiler_exit_code": 0,
+        "filecheck_exit_code": 0,
+        "output_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-xy16.out",
+        "output_sha256": "84c98c0c8b366ff36b630d98d618bf70015d7c25e335ca5d3c92e0793911dcf1",
+        "log_path": "build/0065-review-independent/final-candidate-a16-indirect-byte-store.ll-xy16.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "diagnostics": ""
+      }
+    ],
+    "patches": {
+      "docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "e3b8d88ac74aab8addefeac63f4227ba74c45e4d2d893c708a59d2cf531f81ce",
+      "docs/pr-preparations/2026-09-28/0065/patches/0002-MOS-Share-near-byte-stores-with-an-ABI-unit-incremen.patch": "58bbec6387956fef27ab72bd8f8aaf8a2f3fbc24e8a6f492909041c1a37d2fe8",
+      "docs/pr-preparations/2026-09-28/0065/patches/0003-MOS-Keep-profitable-near-stores-in-byte-registers.patch": "2e0d1d0bc186fc18be7055ecd1ed3efe3d87db43985c378db94db99c0dbb9f86"
+    }
+  },
+  "extended_controls": {
+    "input_path": "build/0065-review-independent/controls.ll",
+    "input_sha256": "1d3199dcc836216832d0f59021a867f5eafd4e53e87b0fb1a821c38c3e25ebb7",
+    "input_text": "@g = global i16 0, align 2\n@byte = global i8 0\n\ndeclare i16 @produce()\ndeclare void @opaque()\ndeclare i16 @produce_many(i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16, i16)\n\n; A returned call result retains both original bytes through the indirect store.\ndefine i16 @call_result_return(ptr %p) {\n  %v = call i16 @produce()\n  store volatile i16 %v, ptr %p, align 1\n  ret i16 %v\n}\n\n; Each atomic word store remains one memory instruction alongside unit arithmetic.\ndefine i16 @atomic_indirect_increment(ptr %p, i16 %v) #0 {\n  store atomic i16 %v, ptr %p unordered, align 2\n  %r = add i16 %v, 1\n  ret i16 %r\n}\n\ndefine i16 @atomic_indirect_decrement(ptr %p, i16 %v) #0 {\n  store atomic i16 %v, ptr %p unordered, align 2\n  %r = sub i16 %v, 1\n  ret i16 %r\n}\n\ndefine i16 @atomic_absolute_decrement(i16 %v) #0 {\n  store atomic i16 %v, ptr @g unordered, align 2\n  %r = sub i16 %v, 1\n  ret i16 %r\n}\n\n; Intervening inline assembly can clobber the ABI byte registers.\ndefine void @byte_across_asm(ptr %p, i8 %v) {\n  call void asm sideeffect \"\", \"~{a},~{x},~{y}\"()\n  %w = zext i8 %v to i16\n  store volatile i16 %w, ptr %p, align 1\n  ret void\n}\n\n; A branch permits an intervening call before the byte value reaches the store.\ndefine void @byte_cross_block(ptr %p, i8 %v, i1 %cond) {\n  br i1 %cond, label %call, label %store\ncall:\n  call void @opaque()\n  br label %store\nstore:\n  %w = zext i8 %v to i16\n  store volatile i16 %w, ptr %p, align 1\n  ret void\n}\n\n; Multiple indirect stores consume the same word alongside a byte-returned step.\ndefine i16 @two_indirect_increment(ptr %p, ptr %q, i16 %v) {\n  store volatile i16 %v, ptr %p, align 1\n  store volatile i16 %v, ptr %q, align 1\n  %r = add i16 %v, 1\n  ret i16 %r\n}\n\n; A loaded destination pointer retains native materialization and a native store.\ndefine i16 @loaded_pointer_decrement(ptr %pp, i16 %v) {\n  %p = load ptr, ptr %pp, align 1\n  store volatile i16 %v, ptr %p, align 1\n  %r = sub i16 %v, 1\n  ret i16 %r\n}\n\n; The byte load must precede every destination write when source and destination alias.\ndefine void @byte_volatile_alias(ptr %p) {\n  %p1 = getelementptr i8, ptr %p, i16 1\n  %v = load volatile i8, ptr %p1, align 1\n  %w = zext i8 %v to i16\n  store volatile i16 %w, ptr %p, align 1\n  ret void\n}\n\n; A native consumer of the increment and an original-value return retain word lowering.\ndefine i16 @indirect_increment_return_original(ptr %p, i16 %v) {\n  store volatile i16 %v, ptr %p, align 1\n  %r = add i16 %v, 1\n  store volatile i16 %r, ptr @g, align 2\n  ret i16 %v\n}\n\n; A nonzero outgoing argument frame is outside the zero-size teardown predicate.\ndefine void @nonzero_call_frame(ptr %p) {\n  %v = call i16 @produce_many(i16 1, i16 2, i16 3, i16 4, i16 5, i16 6, i16 7, i16 8, i16 9, i16 10, i16 11, i16 12, i16 13, i16 14, i16 15, i16 16, i16 17, i16 18, i16 19, i16 20)\n  store volatile i16 %v, ptr %p, align 1\n  ret void\n}\n\nattributes #0 = { \"target-features\"=\"+mos-a16\" }\n",
+    "runs": [
+      {
+        "mode": "default",
+        "stage": "asm",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-default-asm.s"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-default-asm.s",
+        "output_sha256": "00468c19d5866ba8968928128f0b2cbb97a7978a66be7681d15671c71b764fff",
+        "log_path": "build/0065-review-independent/final-controls-default-asm.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "default",
+        "stage": "legalizer",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-default-legalizer.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-default-legalizer.mir",
+        "output_sha256": "6387498e79ec5d1c80384777726b3e9598f1c13cd060a74e0027f7c55ce2a457",
+        "log_path": "build/0065-review-independent/final-controls-default-legalizer.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "default",
+        "stage": "irtranslator",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-stop-after=irtranslator",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-default-irtranslator.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-default-irtranslator.mir",
+        "output_sha256": "4a385751a85572a6a7b25a979fb7bfa26a58e18949ce31cf20b2dd0e56f972a8",
+        "log_path": "build/0065-review-independent/final-controls-default-irtranslator.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "a16",
+        "stage": "asm",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-a16-asm.s"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-a16-asm.s",
+        "output_sha256": "92c1c8db212da2eb1d64180b42e4f13a6f731ca4684a853caceb0060015223b9",
+        "log_path": "build/0065-review-independent/final-controls-a16-asm.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "a16",
+        "stage": "legalizer",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-a16-legalizer.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-a16-legalizer.mir",
+        "output_sha256": "83481eedd8b21abe208195f14067e3daf73a189a96062b37d0996fea6d41deaa",
+        "log_path": "build/0065-review-independent/final-controls-a16-legalizer.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "a16",
+        "stage": "irtranslator",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16",
+          "-stop-after=irtranslator",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-a16-irtranslator.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-a16-irtranslator.mir",
+        "output_sha256": "ec00596af55c818ff247d9cf3ad092dd4591a7f6cd089f7404c6d2e55ba8d669",
+        "log_path": "build/0065-review-independent/final-controls-a16-irtranslator.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "xy16",
+        "stage": "asm",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-xy16-asm.s"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-xy16-asm.s",
+        "output_sha256": "92c1c8db212da2eb1d64180b42e4f13a6f731ca4684a853caceb0060015223b9",
+        "log_path": "build/0065-review-independent/final-controls-xy16-asm.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "xy16",
+        "stage": "legalizer",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-stop-after=legalizer",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-xy16-legalizer.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-xy16-legalizer.mir",
+        "output_sha256": "5bfadced3776329bc738f4883fe2bb49954b556da3fd3d0598565c5a9d83e3f9",
+        "log_path": "build/0065-review-independent/final-controls-xy16-legalizer.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "mode": "xy16",
+        "stage": "irtranslator",
+        "command": [
+          "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+          "-mtriple=mos",
+          "-mcpu=mosw65816",
+          "-verify-machineinstrs",
+          "-mattr=+mos-a16,+mos-xy16",
+          "-stop-after=irtranslator",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/controls.ll",
+          "-o",
+          "/home/will/llvm-mos-65816/build/0065-review-independent/final-controls-xy16-irtranslator.mir"
+        ],
+        "exit_code": 0,
+        "output_path": "build/0065-review-independent/final-controls-xy16-irtranslator.mir",
+        "output_sha256": "39d10bdbd41fa754648ffada429980b57ab7145e41695a97d3eb4d379b5fdbc8",
+        "log_path": "build/0065-review-independent/final-controls-xy16-irtranslator.log",
+        "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "checks": {
+      "a16": {
+        "atomic_indirect_increment": true,
+        "atomic_indirect_decrement": true,
+        "atomic_absolute_decrement": true,
+        "byte_across_asm": true,
+        "byte_cross_block": true,
+        "loaded_pointer_decrement": true,
+        "indirect_increment_return_original": true,
+        "nonzero_call_frame": true,
+        "two_indirect_increment": true,
+        "nonzero_teardown_exercised": true,
+        "call_result_return": true,
+        "byte_volatile_alias": true
+      },
+      "xy16": {
+        "atomic_indirect_increment": true,
+        "atomic_indirect_decrement": true,
+        "atomic_absolute_decrement": true,
+        "byte_across_asm": true,
+        "byte_cross_block": true,
+        "loaded_pointer_decrement": true,
+        "indirect_increment_return_original": true,
+        "nonzero_call_frame": true,
+        "two_indirect_increment": true,
+        "nonzero_teardown_exercised": true,
+        "call_result_return": true,
+        "byte_volatile_alias": true
+      }
+    }
+  },
+  "summary": {
+    "pre0065_filecheck_pass": 11,
+    "pre0065_expected_filecheck_failure": 4,
+    "candidate_filecheck_pass": 15,
+    "candidate_filecheck_failure": 0,
+    "compiler_failures": 0,
+    "candidate_extended_compiler_runs": 9,
+    "candidate_extended_compiler_failures": 0,
+    "candidate_extended_native_assertions": 24
+  },
+  "limitations": [
+    "Focused independent compiler checks are not a new full MOS suite, corpus measurement or emulator run.",
+    "Native LLDB volatility/unwinding integration is outside this review.",
+    "The existing September 27 completion, runtime and loaded-pointer cost evidence keeps its original attribution and binaries."
+  ]
+}

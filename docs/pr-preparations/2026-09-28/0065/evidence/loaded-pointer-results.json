@@ -1,0 +1,410 @@
+[
+  {
+    "input": "a16-bytes.ll",
+    "sha256": "e3638efdf1c8e3e1f86f6ef4524a406f5ccced7bd323b73909f6075a2d2550ad",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-verify-machineinstrs",
+      "-mattr=+mos-a16",
+      "-filetype=obj",
+      "build/0065-upstream/loaded-pointer/a16-bytes.ll",
+      "-o",
+      "build/0065-upstream/loaded-pointer/a16-bytes.o"
+    ],
+    "functions": [
+      {
+        "name": "simple",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "vol",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "ret",
+        "bytes": 12,
+        "path_cyc": 26
+      },
+      {
+        "name": "twice",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "abs_and_indir",
+        "bytes": 19,
+        "path_cyc": 38
+      },
+      {
+        "name": "offset",
+        "bytes": 15,
+        "path_cyc": 30
+      },
+      {
+        "name": "indexed",
+        "bytes": 31,
+        "path_cyc": 61
+      },
+      {
+        "name": "call",
+        "bytes": 48,
+        "path_cyc": 98
+      },
+      {
+        "name": "conditional",
+        "bytes": 52,
+        "path_cyc": 103
+      },
+      {
+        "name": "result",
+        "bytes": 31,
+        "path_cyc": 64
+      },
+      {
+        "name": "add",
+        "bytes": 17,
+        "path_cyc": 33
+      },
+      {
+        "name": "copy",
+        "bytes": 11,
+        "path_cyc": 24
+      },
+      {
+        "name": "mixed",
+        "bytes": 18,
+        "path_cyc": 37
+      },
+      {
+        "name": "native_context",
+        "bytes": 25,
+        "path_cyc": 45
+      },
+      {
+        "name": "loadptr",
+        "bytes": 22,
+        "path_cyc": 50
+      },
+      {
+        "name": "byte_value",
+        "bytes": 9,
+        "path_cyc": 20
+      },
+      {
+        "name": "third",
+        "bytes": 16,
+        "path_cyc": 32
+      }
+    ]
+  },
+  {
+    "input": "a16-native.ll",
+    "sha256": "15a0af7695e6c9a74ffac21bf96069411c790efd441cc688ccfea7da3dfe67b3",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-verify-machineinstrs",
+      "-mattr=+mos-a16",
+      "-filetype=obj",
+      "build/0065-upstream/loaded-pointer/a16-native.ll",
+      "-o",
+      "build/0065-upstream/loaded-pointer/a16-native.o"
+    ],
+    "functions": [
+      {
+        "name": "simple",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "vol",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "ret",
+        "bytes": 12,
+        "path_cyc": 26
+      },
+      {
+        "name": "twice",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "abs_and_indir",
+        "bytes": 19,
+        "path_cyc": 38
+      },
+      {
+        "name": "offset",
+        "bytes": 15,
+        "path_cyc": 30
+      },
+      {
+        "name": "indexed",
+        "bytes": 31,
+        "path_cyc": 61
+      },
+      {
+        "name": "call",
+        "bytes": 48,
+        "path_cyc": 98
+      },
+      {
+        "name": "conditional",
+        "bytes": 52,
+        "path_cyc": 103
+      },
+      {
+        "name": "result",
+        "bytes": 31,
+        "path_cyc": 64
+      },
+      {
+        "name": "add",
+        "bytes": 17,
+        "path_cyc": 33
+      },
+      {
+        "name": "copy",
+        "bytes": 11,
+        "path_cyc": 24
+      },
+      {
+        "name": "mixed",
+        "bytes": 18,
+        "path_cyc": 37
+      },
+      {
+        "name": "native_context",
+        "bytes": 25,
+        "path_cyc": 45
+      },
+      {
+        "name": "loadptr",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "byte_value",
+        "bytes": 9,
+        "path_cyc": 20
+      },
+      {
+        "name": "third",
+        "bytes": 16,
+        "path_cyc": 32
+      }
+    ]
+  },
+  {
+    "input": "xy16-bytes.ll",
+    "sha256": "7fdacee6506e61a90ce86f2f5f1d46fab89c71d932f59956486d891c8854c56e",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-verify-machineinstrs",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-filetype=obj",
+      "build/0065-upstream/loaded-pointer/xy16-bytes.ll",
+      "-o",
+      "build/0065-upstream/loaded-pointer/xy16-bytes.o"
+    ],
+    "functions": [
+      {
+        "name": "simple",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "vol",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "ret",
+        "bytes": 12,
+        "path_cyc": 26
+      },
+      {
+        "name": "twice",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "abs_and_indir",
+        "bytes": 19,
+        "path_cyc": 38
+      },
+      {
+        "name": "offset",
+        "bytes": 15,
+        "path_cyc": 30
+      },
+      {
+        "name": "indexed",
+        "bytes": 28,
+        "path_cyc": 55
+      },
+      {
+        "name": "call",
+        "bytes": 48,
+        "path_cyc": 98
+      },
+      {
+        "name": "conditional",
+        "bytes": 52,
+        "path_cyc": 103
+      },
+      {
+        "name": "result",
+        "bytes": 31,
+        "path_cyc": 64
+      },
+      {
+        "name": "add",
+        "bytes": 17,
+        "path_cyc": 33
+      },
+      {
+        "name": "copy",
+        "bytes": 16,
+        "path_cyc": 34
+      },
+      {
+        "name": "mixed",
+        "bytes": 18,
+        "path_cyc": 37
+      },
+      {
+        "name": "native_context",
+        "bytes": 25,
+        "path_cyc": 45
+      },
+      {
+        "name": "loadptr",
+        "bytes": 22,
+        "path_cyc": 50
+      },
+      {
+        "name": "byte_value",
+        "bytes": 9,
+        "path_cyc": 20
+      },
+      {
+        "name": "third",
+        "bytes": 16,
+        "path_cyc": 32
+      }
+    ]
+  },
+  {
+    "input": "xy16-native.ll",
+    "sha256": "26ea487c9e37eecb4f2006957991c7c5e29f3d7dbe63169d1fe88e85a7484a7d",
+    "command": [
+      "/home/will/llvm-mos-65816/build/0065-upstream/candidate/bin/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-verify-machineinstrs",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-filetype=obj",
+      "build/0065-upstream/loaded-pointer/xy16-native.ll",
+      "-o",
+      "build/0065-upstream/loaded-pointer/xy16-native.o"
+    ],
+    "functions": [
+      {
+        "name": "simple",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "vol",
+        "bytes": 8,
+        "path_cyc": 20
+      },
+      {
+        "name": "ret",
+        "bytes": 12,
+        "path_cyc": 26
+      },
+      {
+        "name": "twice",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "abs_and_indir",
+        "bytes": 19,
+        "path_cyc": 38
+      },
+      {
+        "name": "offset",
+        "bytes": 15,
+        "path_cyc": 30
+      },
+      {
+        "name": "indexed",
+        "bytes": 28,
+        "path_cyc": 55
+      },
+      {
+        "name": "call",
+        "bytes": 48,
+        "path_cyc": 98
+      },
+      {
+        "name": "conditional",
+        "bytes": 52,
+        "path_cyc": 103
+      },
+      {
+        "name": "result",
+        "bytes": 31,
+        "path_cyc": 64
+      },
+      {
+        "name": "add",
+        "bytes": 17,
+        "path_cyc": 33
+      },
+      {
+        "name": "copy",
+        "bytes": 16,
+        "path_cyc": 34
+      },
+      {
+        "name": "mixed",
+        "bytes": 18,
+        "path_cyc": 37
+      },
+      {
+        "name": "native_context",
+        "bytes": 25,
+        "path_cyc": 45
+      },
+      {
+        "name": "loadptr",
+        "bytes": 17,
+        "path_cyc": 38
+      },
+      {
+        "name": "byte_value",
+        "bytes": 9,
+        "path_cyc": 20
+      },
+      {
+        "name": "third",
+        "bytes": 16,
+        "path_cyc": 32
+      }
+    ]
+  }
+]

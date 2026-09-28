@@ -1,0 +1,7 @@
+{
+  "llc_sha256": "f1597923f6cea0e42f6377e16bf5da70ae7318f89b0ab0b61d4a7a2b7d446d56",
+  "frontend_sha256": "167401dbc007b08f4326904285b59eb837516e4e6a4abbdedcdb4b0b0f880946",
+  "fixture_sha256": "1317d7cb46e4bfef98777aee6aa496fc37030031c95270f3e88cbe88bbf33047",
+  "lto": false,
+  "expected": 64054
+}

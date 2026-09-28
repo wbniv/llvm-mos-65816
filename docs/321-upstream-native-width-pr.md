@@ -8,6 +8,12 @@ There is no upstream pull request for `patches/llvm-mos/0002-321-accum16.patch`.
 
 For now, keep developing and regenerating the complete native-width implementation as holistic patch `0002`. The interrupt-width fix and its LLVM regression belong there. Do not update GitHub or wald3n.com until the user explicitly chooses to post the draft PR.
 
+## September 28 extraction for 0065 review
+
+The [0065 packet](pr-preparations/2026-09-28/0065/README.md) contains a native-only compiler prerequisite extraction on upstream `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`, followed by 0063 and 0065. It reconciles destination guards and DWARF register numbers, passes the MOS suites and targeted emulator checks, and has a separate independent 0065 review. It excludes #320 content and SNES platform code. This satisfies the 0065 preparation task; it does not certify the complete native feature's debugger/SDK integration or lift the posting hold. The full feature review structure and broader posting gates below remain applicable.
+
+Preparation: OpenAI Codex CLI 0.158.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e75a-a9ed-7372-9bac-b19b732a46a2`.
+
 ## Proposed title
 
 `[MOS][65816] Add opt-in native accumulator and index-register widths`
@@ -33,7 +39,7 @@ The commits may be reviewed independently, but the intended upstream vehicle is 
 
 ## Extraction audit: `0002` is not the PR diff
 
-The current 6,154-line/34-file patch round-trips the live fork correctly, but it was generated from a shared MOS backend tree and contains #320/far-pointer work in addition to #321 native-width work. It must not be pushed verbatim or merely divided at file boundaries.
+The earlier blueprint audit recorded a 6,154-line/34-file patch that round-tripped the then-current fork correctly, but it was generated from a shared MOS backend tree and contains #320/far-pointer work in addition to #321 native-width work. It must not be pushed verbatim or merely divided at file boundaries.
 
 Explicit cross-series content appears in at least these files:
 

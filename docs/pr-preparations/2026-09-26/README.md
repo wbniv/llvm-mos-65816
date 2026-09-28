@@ -111,7 +111,7 @@ OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning e
 
 **September 27 near-index follow-up:** [overflow-proof recovery](../../investigations/2026-09-27-near-index-overflow-proofs.md) is implemented locally in `0002`; its own evidence covers the optimization, and #321 extraction and independent review remain pending.
 
-**September 27 near-store follow-up:** [0065 and the T3 completion record](../../plans/2026-09-27-broader-near-store-profitability.md) add measured local optimizations. Compiler #321 extraction, destination reconciliation and independent review remain open; this artifact is not covered by the original 0063 review.
+**September 27 near-store follow-up:** [0065 and the T3 completion record](../../plans/2026-09-27-broader-near-store-profitability.md) add measured local optimizations. Those opening preparation gates were completed in the [September 28 extracted packet](../2026-09-28/0065/README.md), with its own independent 0065 review. The PR is unposted and the native feature posting hold remains; the original 0063 review retains its earlier scope.
 
 The [feature-held ledger](feature-held-packages.md) covers 0013, 0051, 0052,
 0055, and 0061–0063, plus 0028's explicit presentation hold. Their implementations

@@ -1,0 +1,118 @@
+From a06f4b2e43b7a787a64e0a3299fe890ab8347697 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 18:13:36 +0700
+Subject: [PATCH 2/3] [MOS] Share near byte stores with an ABI unit increment
+
+Extract completed downstream patch 0063 as the explicit prerequisite for 0065. Its increment-only scope and existing implementation evidence are retained.
+
+Extraction assistance: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2.
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp | 66 +++++++++++++++++++++++-
+ llvm/test/CodeGen/MOS/a16-byte-store.ll  |  6 +--
+ 2 files changed, 67 insertions(+), 5 deletions(-)
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 877e6a91147b..659e0cf9d443 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -868,8 +868,54 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+   assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+   const LLT Ty = MRI.getType(Dst);
+-  if (STI.hasAccum16() && Ty == LLT::scalar(16))
+-    return true; // legal as-is; selected natively (selectAlu16Native)
++  if (STI.hasAccum16() && Ty == LLT::scalar(16)) {
++    // When an ABI byte pair is stored before a one-step arithmetic use, the
++    // byte increment/decrement can keep A:X live through the direct byte store.
++    // No wide value needs to be materialized for this local sequence.
++    auto RHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
++    const MachineInstr *Def = MRI.getVRegDef(Src);
++    bool ByteSequence = RHS && RHS->Value.isOne() && Def &&
++                        Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++                        Def->getParent() == MI.getParent() &&
++                        MRI.getType(Def->getOperand(1).getReg()) == S8;
++    if (ByteSequence) {
++      auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
++        const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
++        return ByteDef && ByteDef->isCopy() &&
++               ByteDef->getOperand(1).getReg() == PhysReg;
++      };
++      ByteSequence = isABIByte(Def->getOperand(1).getReg(), MOS::A) &&
++                     isABIByte(Def->getOperand(2).getReg(), MOS::X);
++    }
++    unsigned Stores = 0;
++    if (ByteSequence) {
++      for (MachineInstr &Use : MRI.use_nodbg_instructions(Src)) {
++        if (&Use == &MI || Use.getOpcode() == TargetOpcode::G_UNMERGE_VALUES)
++          continue;
++        if (Use.getOpcode() != TargetOpcode::G_STORE ||
++            Use.getParent() != MI.getParent() ||
++            Use.getIterator() == MI.getIterator()) {
++          ByteSequence = false;
++          break;
++        }
++        const auto &Store = cast<GStore>(Use);
++        if (Store.isAtomic() ||
++            !matchAbsoluteAddressing(MRI, Store.getPointerReg())) {
++          ByteSequence = false;
++          break;
++        }
++        ++Stores;
++      }
++      if (Stores == 0)
++        ByteSequence = false;
++      for (auto I = std::next(Def->getIterator()); ByteSequence &&
++           I != MI.getIterator(); ++I)
++        if (I->isCall() || I->isInlineAsm())
++          ByteSequence = false;
++    }
++    if (!ByteSequence)
++      return true; // selected natively (selectAlu16Native)
++  }
+ 
+   auto RHSConst =
+       getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+@@ -2093,6 +2139,22 @@ bool MOSLegalizerInfo::legalizeLoadStore16(LegalizerHelper &Helper,
+       switch (Use.getOpcode()) {
+       case TargetOpcode::G_UNMERGE_VALUES:
+         return true;
++      case TargetOpcode::G_ADD:
++      case TargetOpcode::G_SUB: {
++        if (Use.getOperand(1).getReg() != Value)
++          return false;
++        auto isABIByte = [&](Register Byte, MCRegister PhysReg) {
++          const MachineInstr *ByteDef = getDefIgnoringCopies(Byte, MRI);
++          return ByteDef && ByteDef->isCopy() &&
++                 ByteDef->getOperand(1).getReg() == PhysReg;
++        };
++        if (!isABIByte(Def->getOperand(1).getReg(), MOS::A) ||
++            !isABIByte(Def->getOperand(2).getReg(), MOS::X))
++          return false;
++        auto Step = getIConstantVRegValWithLookThrough(
++            Use.getOperand(2).getReg(), MRI);
++        return Step && Step->Value.isOne();
++      }
+       case MOS::G_STORE16_ABS:
+         return none_of(Use.memoperands(), [](const MachineMemOperand *MMO) {
+           return MMO->isAtomic();
+diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+index d9c2a64528c6..ec8228bc2bde 100644
+--- a/llvm/test/CodeGen/MOS/a16-byte-store.ll
++++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+@@ -87,13 +87,13 @@ define void @store_copy() {
+   ret void
+ }
+ 
+-; A byte-built argument with a native arithmetic use already needs Imag16.
++; A byte-built argument stored before a unit increment can stay in A:X.
+ define i16 @store_mixed(i16 %value) {
+ ; NATIVE-LABEL: store_mixed:
+-; NATIVE: rep #32
++; NATIVE-NOT: rep #32
+ ; NATIVE: sta g
++; NATIVE: stx g+1
+ ; NATIVE: inc
+-; NATIVE: sep #32
+ ; NATIVE: rts
+ ; DEFAULT-LABEL: store_mixed:
+ ; DEFAULT-NOT: rep

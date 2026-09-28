@@ -1,0 +1,4385 @@
+{
+  "comparisons": 486,
+  "counts": {
+    "smaller": 72,
+    "same": 414
+  },
+  "bytes_saved": 282,
+  "default_objects_byte_identical": true,
+  "rows": [
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "absolute_decrement",
+      "mode": "a16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "volatile_increment",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "volatile_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_add_two",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_increment_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_return_call",
+      "mode": "a16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_call_increment",
+      "mode": "a16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_load",
+      "mode": "a16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "a16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_native",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_return",
+      "mode": "a16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "a16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-a16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "absolute_decrement",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "volatile_increment",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "volatile_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_add_two",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_increment_result",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_decrement_result",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_twice_increment",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_return_call",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_call_increment",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_load",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_native",
+      "mode": "default",
+      "before": 32,
+      "after": 32,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_return",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_call",
+      "mode": "default",
+      "before": 42,
+      "after": 42,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "indirect_byte_twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "default",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "absolute_decrement_call",
+      "mode": "default",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-default.ll",
+      "name": "absolute_decrement_native",
+      "mode": "default",
+      "before": 47,
+      "after": 47,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "absolute_decrement",
+      "mode": "xy16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "volatile_increment",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "volatile_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_add_two",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_increment_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_return_call",
+      "mode": "xy16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_call_increment",
+      "mode": "xy16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_load",
+      "mode": "xy16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "xy16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_native",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_return",
+      "mode": "xy16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "xy16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-O2-xy16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "absolute_decrement",
+      "mode": "a16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "volatile_increment",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "volatile_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_add_two",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_increment_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_return_call",
+      "mode": "a16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_call_increment",
+      "mode": "a16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_load",
+      "mode": "a16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "a16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_native",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_return",
+      "mode": "a16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "a16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-a16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "absolute_decrement",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "volatile_increment",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "volatile_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_add_two",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_increment_result",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_decrement_result",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_twice_increment",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_return_call",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_call_increment",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_load",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_native",
+      "mode": "default",
+      "before": 32,
+      "after": 32,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_return",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_call",
+      "mode": "default",
+      "before": 42,
+      "after": 42,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "indirect_byte_twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "default",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "absolute_decrement_call",
+      "mode": "default",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-default.ll",
+      "name": "absolute_decrement_native",
+      "mode": "default",
+      "before": 47,
+      "after": 47,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "absolute_decrement",
+      "mode": "xy16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "volatile_increment",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "volatile_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_add_two",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_increment_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_return_call",
+      "mode": "xy16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_call_increment",
+      "mode": "xy16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_load",
+      "mode": "xy16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "xy16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_native",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_return",
+      "mode": "xy16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "xy16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Os-xy16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "absolute_decrement",
+      "mode": "a16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "volatile_increment",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "volatile_decrement",
+      "mode": "a16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_add_two",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_increment_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "a16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_return_call",
+      "mode": "a16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_call_increment",
+      "mode": "a16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_load",
+      "mode": "a16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "a16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_native",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_return",
+      "mode": "a16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "a16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "a16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-a16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "absolute_decrement",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "volatile_increment",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "volatile_decrement",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_add_two",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_increment_result",
+      "mode": "default",
+      "before": 22,
+      "after": 22,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_decrement_result",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_twice_increment",
+      "mode": "default",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_return_call",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_call_increment",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_load",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_native",
+      "mode": "default",
+      "before": 32,
+      "after": 32,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_return",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_call",
+      "mode": "default",
+      "before": 42,
+      "after": 42,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "indirect_byte_twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "default",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "absolute_decrement_call",
+      "mode": "default",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-default.ll",
+      "name": "absolute_decrement_native",
+      "mode": "default",
+      "before": 47,
+      "after": 47,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "absolute_decrement",
+      "mode": "xy16",
+      "before": 24,
+      "after": 14,
+      "delta": -10,
+      "static_cycle_delta": -21
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "volatile_increment",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "volatile_decrement",
+      "mode": "xy16",
+      "before": 22,
+      "after": 21,
+      "delta": -1,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_add_two",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_increment_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_decrement_result",
+      "mode": "xy16",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_twice_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_return_call",
+      "mode": "xy16",
+      "before": 38,
+      "after": 35,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_call_increment",
+      "mode": "xy16",
+      "before": 37,
+      "after": 37,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_load",
+      "mode": "xy16",
+      "before": 16,
+      "after": 13,
+      "delta": -3,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_pointer",
+      "mode": "xy16",
+      "before": 15,
+      "after": 11,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_native",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_return",
+      "mode": "xy16",
+      "before": 17,
+      "after": 14,
+      "delta": -3,
+      "static_cycle_delta": -5
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "indirect_byte_twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "loaded_pointer_byte",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "loaded_pointer_increment",
+      "mode": "xy16",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "absolute_decrement_call",
+      "mode": "xy16",
+      "before": 39,
+      "after": 39,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "broad-Oz-xy16.ll",
+      "name": "absolute_decrement_native",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -12
+    },
+    {
+      "input": "context-O2-a16.ll",
+      "name": "across_call",
+      "mode": "a16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-a16.ll",
+      "name": "before_call",
+      "mode": "a16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-a16.ll",
+      "name": "through_pointer",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-default.ll",
+      "name": "across_call",
+      "mode": "default",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 40,
+      "after": 40,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-default.ll",
+      "name": "before_call",
+      "mode": "default",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-default.ll",
+      "name": "through_pointer",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-xy16.ll",
+      "name": "across_call",
+      "mode": "xy16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-xy16.ll",
+      "name": "before_call",
+      "mode": "xy16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-O2-xy16.ll",
+      "name": "through_pointer",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-a16.ll",
+      "name": "across_call",
+      "mode": "a16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-a16.ll",
+      "name": "before_call",
+      "mode": "a16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-a16.ll",
+      "name": "through_pointer",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-default.ll",
+      "name": "across_call",
+      "mode": "default",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 40,
+      "after": 40,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-default.ll",
+      "name": "before_call",
+      "mode": "default",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-default.ll",
+      "name": "through_pointer",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-xy16.ll",
+      "name": "across_call",
+      "mode": "xy16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-xy16.ll",
+      "name": "before_call",
+      "mode": "xy16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Os-xy16.ll",
+      "name": "through_pointer",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-a16.ll",
+      "name": "across_call",
+      "mode": "a16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-a16.ll",
+      "name": "before_call",
+      "mode": "a16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-a16.ll",
+      "name": "through_pointer",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-default.ll",
+      "name": "across_call",
+      "mode": "default",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 40,
+      "after": 40,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-default.ll",
+      "name": "before_call",
+      "mode": "default",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 35,
+      "after": 35,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-default.ll",
+      "name": "through_pointer",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-xy16.ll",
+      "name": "across_call",
+      "mode": "xy16",
+      "before": 30,
+      "after": 30,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 24,
+      "after": 24,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-xy16.ll",
+      "name": "before_call",
+      "mode": "xy16",
+      "before": 10,
+      "after": 10,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "context-Oz-xy16.ll",
+      "name": "through_pointer",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "simple",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "vol",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "ret",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "abs_and_indir",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "offset",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "indexed",
+      "mode": "a16",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "result",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "loadptr",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "byte_value",
+      "mode": "a16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-O2-a16.ll",
+      "name": "third",
+      "mode": "a16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "simple",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "vol",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "ret",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "abs_and_indir",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "offset",
+      "mode": "default",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "indexed",
+      "mode": "default",
+      "before": 55,
+      "after": 55,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "call",
+      "mode": "default",
+      "before": 50,
+      "after": 50,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 54,
+      "after": 54,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "result",
+      "mode": "default",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 33,
+      "after": 33,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "loadptr",
+      "mode": "default",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "byte_value",
+      "mode": "default",
+      "before": 9,
+      "after": 9,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-default.ll",
+      "name": "third",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "simple",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "vol",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "ret",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "abs_and_indir",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "offset",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "indexed",
+      "mode": "xy16",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "result",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "loadptr",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "byte_value",
+      "mode": "xy16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-O2-xy16.ll",
+      "name": "third",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "simple",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "vol",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "ret",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "abs_and_indir",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "offset",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "indexed",
+      "mode": "a16",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "result",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "loadptr",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "byte_value",
+      "mode": "a16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Os-a16.ll",
+      "name": "third",
+      "mode": "a16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "simple",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "vol",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "ret",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "abs_and_indir",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "offset",
+      "mode": "default",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "indexed",
+      "mode": "default",
+      "before": 55,
+      "after": 55,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "call",
+      "mode": "default",
+      "before": 50,
+      "after": 50,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 54,
+      "after": 54,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "result",
+      "mode": "default",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 33,
+      "after": 33,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "loadptr",
+      "mode": "default",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "byte_value",
+      "mode": "default",
+      "before": 9,
+      "after": 9,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-default.ll",
+      "name": "third",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "simple",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "vol",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "ret",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "abs_and_indir",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "offset",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "indexed",
+      "mode": "xy16",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "result",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "loadptr",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "byte_value",
+      "mode": "xy16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Os-xy16.ll",
+      "name": "third",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "simple",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "vol",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "ret",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "twice",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "abs_and_indir",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "offset",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "indexed",
+      "mode": "a16",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "call",
+      "mode": "a16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "conditional",
+      "mode": "a16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "result",
+      "mode": "a16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "native_context",
+      "mode": "a16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "loadptr",
+      "mode": "a16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "byte_value",
+      "mode": "a16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Oz-a16.ll",
+      "name": "third",
+      "mode": "a16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "simple",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "vol",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "ret",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "twice",
+      "mode": "default",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "abs_and_indir",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "offset",
+      "mode": "default",
+      "before": 26,
+      "after": 26,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "indexed",
+      "mode": "default",
+      "before": 55,
+      "after": 55,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "call",
+      "mode": "default",
+      "before": 50,
+      "after": 50,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "conditional",
+      "mode": "default",
+      "before": 54,
+      "after": 54,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "result",
+      "mode": "default",
+      "before": 31,
+      "after": 31,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "native_context",
+      "mode": "default",
+      "before": 33,
+      "after": 33,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "loadptr",
+      "mode": "default",
+      "before": 20,
+      "after": 20,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "byte_value",
+      "mode": "default",
+      "before": 9,
+      "after": 9,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-default.ll",
+      "name": "third",
+      "mode": "default",
+      "before": 21,
+      "after": 21,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "simple",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "vol",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "ret",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "twice",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "abs_and_indir",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "offset",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "indexed",
+      "mode": "xy16",
+      "before": 28,
+      "after": 28,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "call",
+      "mode": "xy16",
+      "before": 48,
+      "after": 48,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "conditional",
+      "mode": "xy16",
+      "before": 52,
+      "after": 52,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "result",
+      "mode": "xy16",
+      "before": 36,
+      "after": 31,
+      "delta": -5,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 22,
+      "after": 18,
+      "delta": -4,
+      "static_cycle_delta": -7
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "native_context",
+      "mode": "xy16",
+      "before": 25,
+      "after": 25,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "loadptr",
+      "mode": "xy16",
+      "before": 17,
+      "after": 17,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "byte_value",
+      "mode": "xy16",
+      "before": 13,
+      "after": 9,
+      "delta": -4,
+      "static_cycle_delta": -8
+    },
+    {
+      "input": "indirect-Oz-xy16.ll",
+      "name": "third",
+      "mode": "xy16",
+      "before": 16,
+      "after": 16,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "set",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "vset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "pset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "iset",
+      "mode": "a16",
+      "before": 43,
+      "after": 43,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "bit",
+      "mode": "a16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "zero",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "multiple",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "passthrough",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-a16.ll",
+      "name": "callresult",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "set",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "vset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "pset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "iset",
+      "mode": "default",
+      "before": 60,
+      "after": 60,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "bit",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "zero",
+      "mode": "default",
+      "before": 7,
+      "after": 7,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "multiple",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "passthrough",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-default.ll",
+      "name": "callresult",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "set",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "vset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "pset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "iset",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "bit",
+      "mode": "xy16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "zero",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "multiple",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "passthrough",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-O2-xy16.ll",
+      "name": "callresult",
+      "mode": "xy16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "set",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "vset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "pset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "iset",
+      "mode": "a16",
+      "before": 43,
+      "after": 43,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "bit",
+      "mode": "a16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "zero",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "multiple",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "passthrough",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-a16.ll",
+      "name": "callresult",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "set",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "vset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "pset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "iset",
+      "mode": "default",
+      "before": 60,
+      "after": 60,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "bit",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "zero",
+      "mode": "default",
+      "before": 7,
+      "after": 7,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "multiple",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "passthrough",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-default.ll",
+      "name": "callresult",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "set",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "vset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "pset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "iset",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "bit",
+      "mode": "xy16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "zero",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "multiple",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "passthrough",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Os-xy16.ll",
+      "name": "callresult",
+      "mode": "xy16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "set",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "vset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "pset",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "iset",
+      "mode": "a16",
+      "before": 43,
+      "after": 43,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "copy",
+      "mode": "a16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "add",
+      "mode": "a16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "bit",
+      "mode": "a16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "zero",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "multiple",
+      "mode": "a16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "mixed",
+      "mode": "a16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "passthrough",
+      "mode": "a16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-a16.ll",
+      "name": "callresult",
+      "mode": "a16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "set",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "vset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "pset",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "iset",
+      "mode": "default",
+      "before": 60,
+      "after": 60,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "copy",
+      "mode": "default",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "add",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "bit",
+      "mode": "default",
+      "before": 14,
+      "after": 14,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "zero",
+      "mode": "default",
+      "before": 7,
+      "after": 7,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "multiple",
+      "mode": "default",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "mixed",
+      "mode": "default",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "passthrough",
+      "mode": "default",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-default.ll",
+      "name": "callresult",
+      "mode": "default",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "set",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "vset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "pset",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "iset",
+      "mode": "xy16",
+      "before": 34,
+      "after": 34,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "copy",
+      "mode": "xy16",
+      "before": 13,
+      "after": 13,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "add",
+      "mode": "xy16",
+      "before": 19,
+      "after": 19,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "bit",
+      "mode": "xy16",
+      "before": 18,
+      "after": 18,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "zero",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "multiple",
+      "mode": "xy16",
+      "before": 15,
+      "after": 15,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "mixed",
+      "mode": "xy16",
+      "before": 12,
+      "after": 12,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "passthrough",
+      "mode": "xy16",
+      "before": 8,
+      "after": 8,
+      "delta": 0,
+      "static_cycle_delta": 0
+    },
+    {
+      "input": "shapes-Oz-xy16.ll",
+      "name": "callresult",
+      "mode": "xy16",
+      "before": 11,
+      "after": 11,
+      "delta": 0,
+      "static_cycle_delta": 0
+    }
+  ]
+}
