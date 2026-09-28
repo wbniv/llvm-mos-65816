@@ -59,7 +59,6 @@ The [submission tracker](docs/upstream-contribution-status.md) owns PR state and
 
 ### Distribution / Packaging
 
-- [T4] **Verify the published Windows toolchain package on real Windows.** The linux-arm64 package passed under QEMU, and the interim linux-arm64 and Windows x86-64 packages are already published; the Windows package has structural and codegen-identity checks, while functional compilation remains deferred because Wine cannot run the mingw LLVM binary. Run the warning-free `-Os` compiler check on real Windows and record the result before the next package release. [Plan and package evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 ## Watch
 
@@ -69,6 +68,8 @@ Review these when their stated trigger occurs; they are not ready-to-run tasks.
 - **A16/ZP pressure:** reopen the rejected `Ac16` residency idea only if a realistic new overflow reproduces; the measured spike gave no pressure relief and grew code. Investigate a different remedy first. [Verdict](docs/investigations/2026-06-26-a16-phase3-prera-residency-spike.md).
 
 ## Parked
+
+- **Verify and publish the cross-platform toolchain packages.** Parked 2026-09-28 at the user’s request. Linux arm64 and Windows x86-64 packages are built; the real-Windows functional compiler check and publication remain. [Plan and completed build evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 - **Recheck the factorial stall only if certainty is needed.** Run the pre-`3ab028e` gate under LTO and record the outcome; the retained analysis favors a timing explanation and does not establish a compiler defect. [Evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
 
