@@ -1,0 +1,468 @@
+[0/32] cd /work/build/llvm-mos/tools/llvm-objcopy && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-objcopy" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-objcopy
+[1/32] cd /work/build/llvm-mos/tools/llvm-readobj && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-readobj" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-readobj
+[3/32] Generating ../../bin/llvm-ranlib
+[4/32] cd /work/build/llvm-mos/tools/llvm-ar && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-ar" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/llvm-ar
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/llvm-ar" to "$ORIGIN/../lib"
+[5/32] cd /work/build/llvm-mos/tools/llvm-symbolizer && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-symbolizer" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-symbolizer
+[6/32] Linking CXX executable bin/llvm-nm
+[7/32] cd /work/build/llvm-mos/tools/llvm-ar && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-ranlib" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:66 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:57 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating llvm-ranlib
+[8/32] Clobbering bootstrap build and stamp directories
+[9/32] Performing build step for 'builtins-mos-unknown-unknown'
+[0/1] Re-running CMake...
+-- cmake c compiler target: mos-unknown-unknown
+-- Builtin supported architectures: mos
+-- Performing additional configure checks with target flags: -nostdinc++ -Wno-c2y-extensions -fno-builtin -fvisibility=hidden -fomit-frame-pointer
+-- Configuring done (0.2s)
+-- Generating done (0.0s)
+-- Build files have been written to: /work/build/llvm-mos/runtimes/builtins-mos-unknown-unknown-bins
+ninja: no work to do.
+[10/32] cd /work/build/llvm-mos/tools/lld/tools/lld && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="lld" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/lld
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/lld" to "$ORIGIN/../lib"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:66 (include)
+  /work/build/llvm-mos/tools/lld/cmake_install.cmake:52 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:82 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating lld-link
+-- Creating ld.lld
+-- Creating ld64.lld
+-- Creating wasm-ld
+[11/32] No install step for 'builtins-mos-unknown-unknown'
+[12/32] cd /work/build/llvm-mos/tools/clang/lib/Headers && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="clang-resource-headers" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/builtins.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/endian.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/float.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__float_float.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__float_header_macro.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__float_infinity_nan.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/inttypes.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/iso646.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/limits.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/module.modulemap
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdalign.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdarg.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg___gnuc_va_list.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg___va_copy.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg_header_macro.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg_va_arg.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg_va_copy.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stdarg_va_list.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdatomic.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdbool.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdcountof.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdckdint.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stddef.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stddefer.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_header_macro.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_max_align_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_null.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_nullptr_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_offsetof.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_ptrdiff_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_rsize_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_size_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_unreachable.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_wchar_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__stddef_wint_t.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdint.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/stdnoreturn.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/tgmath.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/unwind.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/varargs.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/arm_acle.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/arm_cmse.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/armintr.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/arm64intr.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/arm_neon_sve_bridge.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_builtin_vars.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_math.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_cmath.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_complex_builtins.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_device_functions.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_intrinsics.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_texture_intrinsics.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_libdevice_declares.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_math_forward_declares.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_cuda_runtime_wrapper.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hexagon_circ_brev_intrinsics.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hexagon_protos.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hexagon_types.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hvx_hexagon_protos.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_hip_libdevice_declares.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_hip_cmath.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_hip_math.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_hip_stdlib.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_hip_runtime_wrapper.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/larchintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/lasxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/lsxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/msa.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/opencl-c.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/opencl-c-base.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/altivec.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amo.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/htmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/htmxlintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_bitmanip.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_crypto.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_ntlh.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/andes_vector.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_corev_alu.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_mips.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/riscv_nds.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sifive_vector.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_spirv_builtins.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_spirv_libdevice_declares.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__clang_spirv_math.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/s390intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/vecintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/velintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/velintrin_gen.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/velintrin_approx.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/adcintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/adxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ammintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxavx512intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxcomplexintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxfp16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxfp8intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxmovrsintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amxtf32intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512bf16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512convertintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512minmaxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512niintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512satcvtdsintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2_512satcvtintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2bf16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2convertintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2copyintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2minmaxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2niintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2satcvtdsintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx10_2satcvtintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512bf16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512bitalgintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512bwintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512cdintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512dqintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512fintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512fp16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512ifmaintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512ifmavlintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vbmi2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vbmiintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vbmivlintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlbf16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlbitalgintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlbwintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlcdintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vldqintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlfp16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlvbmi2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlvnniintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vlvp2intersectintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vnniintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vp2intersectintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vpopcntdqintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avx512vpopcntdqvlintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxifmaintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxneconvertintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxvnniint16intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxvnniint8intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/avxvnniintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/bmi2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/bmiintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cetintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cldemoteintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/clflushoptintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/clwbintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/clzerointrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cmpccxaddintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/crc32intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/emmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/enqcmdintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/f16cintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/fma4intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/fmaintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/fxsrintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/gfniintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hresetintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ia32intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/immintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/invpcidintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/keylockerintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/lwpintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/lzcntintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/mm3dnow.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/mmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/movdirintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/movrs_avx10_2_512intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/movrs_avx10_2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/movrsintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/mwaitxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/nmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/pconfigintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/pkuintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/pmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/popcntintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/prfchiintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/prfchwintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ptrauth.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ptwriteintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/raointintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/rdpruintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/rdseedintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/rtmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/serializeintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sgxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sha512intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/shaintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sm3intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sm4intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/sm4evexintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/smmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/tbmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/tmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/tsxldtrkintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/uintrintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/usermsrintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/vaesintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/vpclmulqdqintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/waitpkgintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/wbnoinvdintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__wmmintrin_aes.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/wmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/__wmmintrin_pclmul.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/x86gprintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/x86intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xopintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xsavecintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xsaveintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xsaveoptintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xsavesintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/xtestintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cet.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cpuid.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amdhsa_abi.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/gpuintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/nvptxintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/amdgpuintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/spirvintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/wasm_simd128.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/intrin0.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/vadefs.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/yvals_core.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/mm_malloc.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hlsl_alias_intrinsics_gen.inc
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/hlsl_inline_intrinsics_gen.inc
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/algorithm
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/cmath
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/complex
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/new
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/bits/c++config.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/bits/shared_ptr_base.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/bits/basic_string.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/bits/basic_string.tcc
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/cuda_wrappers/__utility/declval.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/mmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/xmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/mm_malloc.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/emmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/pmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/tmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/smmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/nmmintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/bmiintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/bmi2intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/immintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/x86intrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/ppc_wrappers/x86gprintrin.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/assert.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/stdio.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/stdlib.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/string.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/ctype.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/inttypes.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_libc_wrappers/time.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/math.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/cmath
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/complex
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/complex.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/__clang_openmp_device_functions.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/complex_cmath.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/openmp_wrappers/new
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_offload_wrappers/__llvm_offload.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_offload_wrappers/__llvm_offload_host.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/llvm_offload_wrappers/__llvm_offload_device.h
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/include/zos_wrappers/builtins.h
+[13/32] Completed 'builtins-mos-unknown-unknown'
+[14/32] cd /work/build/llvm-mos/tools/clang/tools/driver && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="clang" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/clang-23
+-- Up-to-date: /work/build/llvm-mos-install/bin/clang
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/clang-23" to "$ORIGIN/../lib"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:79 (include)
+  /work/build/llvm-mos/tools/clang/tools/cmake_install.cmake:52 (include)
+  /work/build/llvm-mos/tools/clang/cmake_install.cmake:62 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:87 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating clang++
+-- Creating clang-cpp
+-- Creating mos-clang
+-- Creating mos-clang++
+-- Creating mos-clang-cpp
+[16/32] Linking CXX executable bin/llvm-dwarfdump
+[17/32] cd /work/build/llvm-mos/tools/clang/tools/clang-format && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="clang-format" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/clang-format
+-- Up-to-date: /work/build/llvm-mos-install/share/clang/clang-format-bbedit.applescript
+-- Up-to-date: /work/build/llvm-mos-install/share/clang/clang-format-diff.py
+-- Up-to-date: /work/build/llvm-mos-install/share/clang/clang-format-sublime.py
+-- Up-to-date: /work/build/llvm-mos-install/share/clang/clang-format.el
+-- Up-to-date: /work/build/llvm-mos-install/share/clang/clang-format.py
+-- Up-to-date: /work/build/llvm-mos-install/bin/git-clang-format
+[18/32] cd /work/build/llvm-mos/tools/clang/tools/clang-scan-deps && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="clang-scan-deps" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/clang-scan-deps
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/clang-scan-deps" to "$ORIGIN/../lib"
+[19/32] cd /work/build/llvm-mos/tools/clang/tools/clang-refactor && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="clang-refactor" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/clang-refactor
+[20/32] cd /work/build/llvm-mos/tools/llvm-cxxfilt && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-cxxfilt" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-cxxfilt
+[21/32] cd /work/build/llvm-mos/tools/llvm-dwarfdump && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-dwarfdump" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/llvm-dwarfdump
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/llvm-dwarfdump" to "$ORIGIN/../lib"
+[22/32] cd /work/build/llvm-mos/tools/llvm-mc && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-mc" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/llvm-mc
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/llvm-mc" to "$ORIGIN/../lib"
+[23/32] cd /work/build/llvm-mos/tools/llvm-mlb && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-mlb" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-mlb
+[24/32] cd /work/build/llvm-mos/tools/llvm-nm && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-nm" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/llvm-nm
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/llvm-nm" to "$ORIGIN/../lib"
+[25/32] cd /work/build/llvm-mos/tools/llvm-objcopy && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-strip" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:66 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:352 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating llvm-strip
+[26/32] cd /work/build/llvm-mos/tools/llvm-objdump && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-objdump" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Installing: /work/build/llvm-mos-install/bin/llvm-objdump
+-- Set non-toolchain portion of runtime path of "/work/build/llvm-mos-install/bin/llvm-objdump" to "$ORIGIN/../lib"
+[27/32] cd /work/build/llvm-mos/tools/llvm-readobj && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-readelf" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:66 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:397 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating llvm-readelf
+[28/32] cd /work/build/llvm-mos/tools/llvm-size && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-size" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-size
+[29/32] cd /work/build/llvm-mos/tools/llvm-strings && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-strings" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Up-to-date: /work/build/llvm-mos-install/bin/llvm-strings
+[30/32] cd /work/build/llvm-mos/tools/llvm-symbolizer && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="llvm-addr2line" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+CMake Warning (dev) at /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:433 (message):
+  Unable to determine default CMAKE_INSTALL_LIBDIR directory because no
+  target architecture is known.  Please enable at least one language before
+  including GNUInstallDirs.
+Call Stack (most recent call first):
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (_GNUInstallDirs_LIBDIR_get_default)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:276 (cmake_language)
+  /usr/share/cmake-4.2/Modules/GNUInstallDirs.cmake:525 (_GNUInstallDirs_cache_path)
+  /work/vendor/llvm-mos/llvm/cmake/modules/LLVMInstallSymlink.cmake:8 (include)
+  cmake_install.cmake:66 (include)
+  /work/build/llvm-mos/tools/cmake_install.cmake:457 (include)
+  /work/build/llvm-mos/cmake_install.cmake:132 (include)
+This warning is for project developers.  Use -Wno-dev to suppress it.
+
+-- Creating llvm-addr2line
+[31/32] cd /work/build/llvm-mos/runtimes && /usr/bin/cmake -DCMAKE_INSTALL_COMPONENT="builtins-mos-unknown-unknown" -P /work/build/llvm-mos/cmake_install.cmake
+-- Install configuration: "Release"
+-- Install configuration: "MinSizeRel"
+-- Up-to-date: /work/build/llvm-mos-install/lib/clang/23/lib/mos-unknown-unknown/libclang_rt.builtins.a

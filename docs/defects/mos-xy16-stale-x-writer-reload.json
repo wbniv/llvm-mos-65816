@@ -2,12 +2,13 @@
   "schema": 1,
   "id": "mos-xy16-stale-x-writer-reload",
   "title": "XY16 width restoration reloads an overwritten X-writer source",
-  "status": "confirmed",
-  "summary": "The pre-gate XY16 compiler returns 0xD3BD for vlastack_sim instead of the host/A16 oracle 0xD77B. MOSInsertREPSEP clones an LDX from $rs1 after an index-width narrowing, although intervening stores have replaced $rs1 ($rc2:$rc3) with the vs_nruns destination pointer. The indexed stream read uses that pointer as its offset and every row count becomes 8. No repair or green candidate is claimed.",
+  "status": "fixed",
+  "summary": "MOSInsertREPSEP now saves the actual 16-bit X value before narrowing and restores it before a full-width reader, without replaying a mutable or arithmetic writer. The unchanged original XY16 -Os LTO input returns 0xD77B on MAME and bsnes-jg at 1200 frames; the preserved baseline returns 0xD3BD on both. Focused MIR, live-flags/hard-stack runtime cases, and the earlier XY16 in-place-memmove gate pass.",
   "report": "docs/investigations/2026-09-28-vlastack-xy16-stale-reload.md",
   "reproducer_origin": "original",
   "attribution": [
-    "Investigation and evidence: OpenAI Codex API agent 0.157.1, exact model ID unknown (GPT-6 family stated by session), reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9. Model ID and reasoning effort were not exposed by session metadata. Earlier work is credited in the linked reports."
+    "Investigation and evidence: OpenAI Codex API agent 0.157.1, exact model ID unknown (GPT-6 family stated by session), reasoning effort unknown; session 01a0e5a0-9b2c-7c81-9f0b-d154ff8783d9. Model ID and reasoning effort were not exposed by session metadata. Earlier work is credited in the linked reports.",
+    "Repair, validation and closure: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e5e8-7760-7383-a39a-629f539d24fa."
   ],
   "prior_work": {
     "disposition": "distinct_from_related",
@@ -42,7 +43,8 @@
     "evidence": {
       "path": "docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/prior-work-audit.md",
       "sha256": "d7dc3bf60a16aafa337aff70a14f103dc73a23b42b5946a36db901a3de2156b9"
-    }
+    },
+    "repair_reconciliation": "September 28 repair rechecked the canonical record, original reports and follow-ups, TODO/upstream summaries, Git history (e6433296 and 2689b74d), patch 0002 and the live pass. The stale-writer implementation remained present; no standalone repair existed. Preserved the pre-edit llc and pass source under build/xy16-x-preserve/baseline. This extends the existing causal record; it does not reopen the earlier high-byte-loss or accumulator-spill defects."
   },
   "baseline": {
     "command": "build/jgxcheck docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/baseline/rom.sfc vendor/bsnes-jg/Database 0x200 2 0xD77B 1200",
@@ -131,7 +133,153 @@
     {
       "path": "docs/defects/evidence/2026-09-27-competing-carry-gate/vlastack-observation.json",
       "sha256": "8bd88380ee3dc6adc231c79f85e6033ffdb0e3bafb7dfade249feb89b53cb63b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/repair.diff",
+      "sha256": "fd046772044eec2a232ebbe82bf05e1db887b770d54416500740ed077e76d9b8"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/identity.json",
+      "sha256": "95fbd50bd67e590aded85ce72154efb27cb36f78d3fc5b7650abd0146498f3b2"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-run.json",
+      "sha256": "5b9dc32e333851e08de279ee452087c675a7e1ff4413c58d9826d841c0766f24"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-bsnes.log",
+      "sha256": "43dd0ca05fbdb005b406d08d68f73fd1514954262275ce6b6c03c36a372ce0b3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-mame.log",
+      "sha256": "338a8f28799d90f728720fc5b638fd121960b0709f9eb5d77445c464b6a46c84"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-bsnes.log",
+      "sha256": "0244e88e067353066b705d6f31067ac4f1b9c0a8664c52473e897a5baf99ff3d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-mame.log",
+      "sha256": "f5fa9d0b384df02e22dce20e3323f821a5ddfec03b73808a10bbb0bcdb1159b6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc",
+      "sha256": "40d1f3e4bf43bc822c4a40e9c9bca21527b0a17b6b89a092f49497e5e5828874"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.map",
+      "sha256": "cac14f0e8df5f0cbdb97e028eab821ace515cbc301fbff5c2b27611072022270"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/checks.json",
+      "sha256": "8a0fb1cc1e0a801c3b2ed2f0fff5ed2cba20531e51245466af808980197541cc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/runtime.log",
+      "sha256": "075c134da08370b870d544159224e95a1ebe2478cfaf5fc87299de065ae7e3ac"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/xy16inplace.log",
+      "sha256": "7a8ddcce53c7b53044a915d0d25df8c4778436899bb45259515b5509e8388d8a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/host.log",
+      "sha256": "1b8de334c1aa8cf6f3947a7bd9f69659b19d57549167ba9bf8adfac3cf00e140"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/original-verify.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/original-mir.log",
+      "sha256": "a74fdb719df171958423be4b24bb2d1a26948ef5820034c56e0f6bd70dd706f3"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/original-normalized.mir.gz",
+      "sha256": "ce7f0d36272d325ad41951c222a0e0e30d0c5e483661f25b27f3ba07a7cc0a49"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-original.mir.gz",
+      "sha256": "b6c032d6a3f8f2a9c5362024c7ef867849ecb7bf9e4dbaa5505c527969bf6624"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-original.mir.gz",
+      "sha256": "f211a2058848f9f09b69961624caf76674e6b9497030d4269f6ad07d0457f98d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/insert-rep-sep-cloned-kills.mir",
+      "sha256": "f9eea766d7d294aadeae55fd852ba992095bfb171b423cbbaed9c5dc16f74b97"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/insert-rep-sep-stack.mir",
+      "sha256": "fc905dec63b8e22f23afa28fb293eec2166748beb126f11e33f865e19fa4b05a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-insert-rep-sep-cloned-kills-check.log",
+      "sha256": "dbfde2f2f8680d0759a8d81f81bde2302532164a2e6fe9f80a3018fc87dacc62"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/baseline-insert-rep-sep-stack-check.log",
+      "sha256": "28568d6b26be223faf18c26f1933ae1df6802b056ffbf72cffd21030952747df"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/lit.log",
+      "sha256": "ae05f41532acced4890a23db5544053f2754300da4076c3910d8bfa2288ab6bc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/lit.json",
+      "sha256": "0cdb5ed8e0f6ddc34f5f8de5ef32691a2f6663494fe662be974b00a7c3436f77"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/roundtrip.log",
+      "sha256": "175987e2e336e41b0c49a6a8f85c0d3599834e6a6f1146924785c527309bdbf3"
     }
   ],
-  "unknowns": "The repair has not been implemented. A correct restoration must preserve the original X value across the 16-to-8-to-16 width transition even when the prior writer source is subsequently modified; cloned-writer replay is insufficient. The broader effect of the same pattern on other programs is unmeasured. The retained MIR is from an otherwise identical non-LTO compile for pass isolation; the linked LTO object and ROM show the same instruction sequence."
+  "unknowns": "The full MOS suites report 179 passes, two unsupported and five opt startup failures from duplicate registration of mos-recover-near-nowrap; those IR tests do not execute MOSInsertREPSEP. No full-suite green claim is made. This repair handles intra-block X preservation and known byte/word hard-stack pushes/pulls. Opaque hard-stack operations and shuffles beyond the 8-bit stack-relative range are diagnosed, rather than assigned an unproved stack layout. Wider performance and cross-block X/Y preservation are outside this validation. Standalone parsing of the original MIR rejects mos-static stack IDs; the normalized replay is explicitly derived evidence, while the original C and baseline stay immutable.",
+  "resolution": {
+    "change": "patches/llvm-mos/0002-321-accum16.patch: MOSInsertREPSEP::preserveX and pending-narrowing tracking; retained exact implementation in docs/defects/evidence/2026-09-28-xy16-x-preserve/repair.diff",
+    "causal_explanation": "PHX saves the value before SEP clears X.high. PLX restores it before a full-width use, even if a Y operation already restored the width. Byte definitions and regmask clobbers end the old X lifetime. Where NZ is live or original stack bytes surround the spill, stack-relative moves preserve A/P and the original byte/word pushes and pulls while removing the saved X word. The overwritten $rs1 source is never reread.",
+    "trigger_check": "The same retained C source/header and XY16 -Os LTO configuration fail on the preserved pre-gate compiler and pass on the identified installed candidate. The focused overwritten-source MIR fails FileCheck on the preserved pre-edit llc and passes with this change. A separate flags/stack MIR object executes 32 repetitions with default, A16 and XY16 C callers on both emulators. Original pre-pass MIR is also replayed after only normalizing unsupported mos-static frame metadata; all machine instructions remain unchanged.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/input/examples/snes/corpus/vlastack_sim.c",
+      "sha256": "a066a361b8d961cac4d1dfde476c661131ba68e6e3b4cd98af5bfedccdd6a075"
+    },
+    "candidate": {
+      "command": "dev/container.sh -- python3 docs/defects/evidence/2026-09-28-xy16-x-preserve/verify-original.py",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "cpu": "mosw65816",
+        "features": [
+          "+mos-xy16"
+        ],
+        "optimization": "Os",
+        "lto": true,
+        "carry_policy": "pre-gate",
+        "emulator": "bsnes-jg",
+        "frames": 1200,
+        "expected": "0xD77B"
+      },
+      "configuration_note": "The baseline term pre-gate denotes its ungated computed-carry preference. The candidate explicitly selects mos-carry-sched=always in both Clang and LTO; the original ROM is byte-identical to the candidate built with its default always policy.",
+      "toolchain_location": "build/xy16-x-preserve/candidate-install/bin; installed from build/llvm-mos and also active in build/llvm-mos-install",
+      "toolchain_sha256": "31e6fbb5bed359ce67973e7630a2b399157f0e6781d5cd54d64713b32a542f90",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/input/examples/snes/corpus/vlastack_sim.c",
+        "sha256": "a066a361b8d961cac4d1dfde476c661131ba68e6e3b4cd98af5bfedccdd6a075"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-bsnes.log",
+        "sha256": "0244e88e067353066b705d6f31067ac4f1b9c0a8664c52473e897a5baf99ff3d"
+      },
+      "exit_code": 0,
+      "observed": "0xD77B",
+      "mame_log": {
+        "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-mame.log",
+        "sha256": "f5fa9d0b384df02e22dce20e3323f821a5ddfec03b73808a10bbb0bcdb1159b6"
+      },
+      "receipt": {
+        "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-run.json",
+        "sha256": "5b9dc32e333851e08de279ee452087c675a7e1ff4413c58d9826d841c0766f24"
+      }
+    }
+  }
 }

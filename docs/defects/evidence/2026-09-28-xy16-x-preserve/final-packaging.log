@@ -1,0 +1,3 @@
+Final patch SHA-256: dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b
+PASS: final patch reverses cleanly against the live pass and both focused MIR files.
+PASS: every other patch section is byte-identical to HEAD; index metadata and section order were retained after full-stack regeneration.

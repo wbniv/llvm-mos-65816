@@ -1,0 +1,313 @@
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-as in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cgdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-link in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto2 in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profdata in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-sim in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml2obj in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find verify-uselistorder in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/llvm-mos/bin
+llvm-lit: /work/vendor/llvm-mos/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/llvm-mos/bin
+-- Testing: 186 tests, 8 workers --
+Testing:  0..
+FAIL: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (4 of 186)
+******************** TEST 'LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# executed command: /work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# |  #0 0x00005f53fdcd5908 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/llvm-mos/bin/opt+0xaeb908)
+# |  #1 0x00005f53fdcd2ac5 llvm::sys::RunSignalHandlers() (/work/build/llvm-mos/bin/opt+0xae8ac5)
+# |  #2 0x00005f53fdcd69a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007d8c0876dcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007d8c087ce1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007d8c0876db7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007d8c087508ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x00005f53fdcd1535 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/llvm-mos/bin/opt+0xae7535)
+# |  #8 0x00005f53fdcd1376 (/work/build/llvm-mos/bin/opt+0xae7376)
+# |  #9 0x00005f53fdcc6bfd (/work/build/llvm-mos/bin/opt+0xadcbfd)
+# | #10 0x00005f53fdd66d54 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #11 0x00005f53fdd67e0c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/llvm-mos/bin/opt+0xb7de0c)
+# | #12 0x00007d8c087d1514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #13 0x00007d8c087d1589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #14 0x00005f53fe87110a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #15 0x00005f53fdf913f9 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #16 0x00005f53fdcad8c9 optMain (/work/build/llvm-mos/bin/opt+0xac38c9)
+# | #17 0x00007d8c08752601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #18 0x00007d8c08752718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #19 0x00005f53fdca9f65 _start (/work/build/llvm-mos/bin/opt+0xabff65)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+Testing:  0.. 10
+FAIL: LLVM :: CodeGen/MOS/indexiv.ll (5 of 186)
+******************** TEST 'LLVM :: CodeGen/MOS/indexiv.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/llvm-mos/bin/opt -passes=mos-indexiv -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll
+# executed command: /work/build/llvm-mos/bin/opt -passes=mos-indexiv -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/llvm-mos/bin/opt -passes=mos-indexiv -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll
+# |  #0 0x000055869e8bb908 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/llvm-mos/bin/opt+0xaeb908)
+# |  #1 0x000055869e8b8ac5 llvm::sys::RunSignalHandlers() (/work/build/llvm-mos/bin/opt+0xae8ac5)
+# |  #2 0x000055869e8bc9a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x0000704183e9bcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x0000704183efc1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x0000704183e9bb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x0000704183e7e8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000055869e8b7535 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/llvm-mos/bin/opt+0xae7535)
+# |  #8 0x000055869e8b7376 (/work/build/llvm-mos/bin/opt+0xae7376)
+# |  #9 0x000055869e8acbfd (/work/build/llvm-mos/bin/opt+0xadcbfd)
+# | #10 0x000055869e94cd54 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #11 0x000055869e94de0c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/llvm-mos/bin/opt+0xb7de0c)
+# | #12 0x0000704183eff514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #13 0x0000704183eff589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #14 0x000055869f45710a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #15 0x000055869eb773f9 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #16 0x000055869e8938c9 optMain (/work/build/llvm-mos/bin/opt+0xac38c9)
+# | #17 0x0000704183e80601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #18 0x0000704183e80718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #19 0x000055869e88ff65 _start (/work/build/llvm-mos/bin/opt+0xabff65)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indexiv.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+Testing:  0.. 10.
+FAIL: LLVM :: CodeGen/MOS/nonreentrant.ll (6 of 186)
+******************** TEST 'LLVM :: CodeGen/MOS/nonreentrant.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll
+# executed command: /work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/llvm-mos/bin/opt -passes=mos-nonreentrant,verify -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll
+# |  #0 0x000061f720bd0908 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/llvm-mos/bin/opt+0xaeb908)
+# |  #1 0x000061f720bcdac5 llvm::sys::RunSignalHandlers() (/work/build/llvm-mos/bin/opt+0xae8ac5)
+# |  #2 0x000061f720bd19a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007e403e99bcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007e403e9fc1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007e403e99bb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007e403e97e8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000061f720bcc535 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/llvm-mos/bin/opt+0xae7535)
+# |  #8 0x000061f720bcc376 (/work/build/llvm-mos/bin/opt+0xae7376)
+# |  #9 0x000061f720bc1bfd (/work/build/llvm-mos/bin/opt+0xadcbfd)
+# | #10 0x000061f720c61d54 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #11 0x000061f720c62e0c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/llvm-mos/bin/opt+0xb7de0c)
+# | #12 0x00007e403e9ff514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #13 0x00007e403e9ff589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #14 0x000061f72176c10a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #15 0x000061f720e8c3f9 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #16 0x000061f720ba88c9 optMain (/work/build/llvm-mos/bin/opt+0xac38c9)
+# | #17 0x00007e403e980601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #18 0x00007e403e980718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #19 0x000061f720ba4f65 _start (/work/build/llvm-mos/bin/opt+0xabff65)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/nonreentrant.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+Testing:  0.. 10.. 
+FAIL: LLVM :: CodeGen/MOS/leaf-20231021.ll (7 of 186)
+******************** TEST 'LLVM :: CodeGen/MOS/leaf-20231021.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/llvm-mos/bin/opt -O2 -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# executed command: /work/build/llvm-mos/bin/opt -O2 -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/llvm-mos/bin/opt -O2 -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# |  #0 0x00005b298bee5908 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/llvm-mos/bin/opt+0xaeb908)
+# |  #1 0x00005b298bee2ac5 llvm::sys::RunSignalHandlers() (/work/build/llvm-mos/bin/opt+0xae8ac5)
+# |  #2 0x00005b298bee69a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007224911c6cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007224912271ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007224911c6b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007224911a98ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x00005b298bee1535 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/llvm-mos/bin/opt+0xae7535)
+# |  #8 0x00005b298bee1376 (/work/build/llvm-mos/bin/opt+0xae7376)
+# |  #9 0x00005b298bed6bfd (/work/build/llvm-mos/bin/opt+0xadcbfd)
+# | #10 0x00005b298bf76d54 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #11 0x00005b298bf77e0c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/llvm-mos/bin/opt+0xb7de0c)
+# | #12 0x000072249122a514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #13 0x000072249122a589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #14 0x00005b298ca8110a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #15 0x00005b298c1a13f9 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #16 0x00005b298bebd8c9 optMain (/work/build/llvm-mos/bin/opt+0xac38c9)
+# | #17 0x00007224911ab601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #18 0x00007224911ab718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #19 0x00005b298beb9f65 _start (/work/build/llvm-mos/bin/opt+0xabff65)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+Testing:  0.. 10.. 20.
+FAIL: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (8 of 186)
+******************** TEST 'LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/llvm-mos/bin/opt -passes=indvars -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll | /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# executed command: /work/build/llvm-mos/bin/opt -passes=indvars -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/llvm-mos/bin/opt -passes=indvars -verify-each -S /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# |  #0 0x00005a2a74786908 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/llvm-mos/bin/opt+0xaeb908)
+# |  #1 0x00005a2a74783ac5 llvm::sys::RunSignalHandlers() (/work/build/llvm-mos/bin/opt+0xae8ac5)
+# |  #2 0x00005a2a747879a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x000074829f668cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x000074829f6c91ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x000074829f668b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x000074829f64b8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x00005a2a74782535 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/llvm-mos/bin/opt+0xae7535)
+# |  #8 0x00005a2a74782376 (/work/build/llvm-mos/bin/opt+0xae7376)
+# |  #9 0x00005a2a74777bfd (/work/build/llvm-mos/bin/opt+0xadcbfd)
+# | #10 0x00005a2a74817d54 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #11 0x00005a2a74818e0c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/llvm-mos/bin/opt+0xb7de0c)
+# | #12 0x000074829f6cc514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #13 0x000074829f6cc589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #14 0x00005a2a7532210a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #15 0x00005a2a74a423f9 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #16 0x00005a2a7475e8c9 optMain (/work/build/llvm-mos/bin/opt+0xac38c9)
+# | #17 0x000074829f64d601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #18 0x000074829f64d718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #19 0x00005a2a7475af65 _start (/work/build/llvm-mos/bin/opt+0xabff65)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/llvm-mos/bin/FileCheck /work/vendor/llvm-mos/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+Testing:  0.. 10.. 20.. 30.. 40.. 50.. 60.. 70.. 80.. 90..
+********************
+Failed Tests (5):
+  LLVM :: CodeGen/MOS/indexiv.ll
+  LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll
+  LLVM :: CodeGen/MOS/leaf-20231021.ll
+  LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll
+  LLVM :: CodeGen/MOS/nonreentrant.ll
+
+
+Testing Time: 5.55s
+
+Total Discovered Tests: 186
+  Unsupported:   2 (1.08%)
+  Passed     : 179 (96.24%)
+  Failed     :   5 (2.69%)

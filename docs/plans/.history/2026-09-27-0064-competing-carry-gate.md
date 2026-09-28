@@ -1,29 +1,10 @@
 | Date | Change |
 |------|--------|
-| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/86dbb3ee) | mos: investigate carry profitability and prototype size selection |
-| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/b65bb853) | docs: present carry scheduling as an LLVM investigation |
-| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/c3c1967c) | mos: add and measure experimental competing-carry gate |
-| [2026-09-27](https://github.com/wbniv/llvm-mos-65816/commit/1bd2a347) | docs(plan): gate 0064 to regions with competing carries |
+| [2026-09-28](https://github.com/wbniv/llvm-mos-65816/commit/6bf02c1) | Park Windows package verification |
 
 <!--history-meta v1
-86dbb3ee	author	Will Norris
-86dbb3ee	added	1
-86dbb3ee	deleted	1
-86dbb3ee	files	1
-86dbb3ee	body	Screen three pre-allocation pressure models on 139 configurations. Each\nloses aggregate savings and increases total positive growth; preserve the\npatches and measurements without changing the shipped scheduler default.\n\nImplement complete-object size selection and inspect 3,592 frozen census\nconfigurations. Adding gated to off/always selects it in 55 configurations\nand saves another 220 bytes. Record writable-storage constraints and the\nlimits of object-level selection.\n\nMeasure 260 oracle-checked emulator executions and compilation overhead\non six inputs. The prototype takes 3.25-4.12 times single-always wall time;\nthis includes repeated compilation and evidence collection, not the cost\nof a proposed integrated LLVM implementation. Retain linked-section\nchecks, source and binary identities, MIR, objects and raw timing logs.\n\nBoth experimental builds pass 181 MOS tests with two unsupported. Four\nselector contract tests, relocated replay and patch roundtrips pass.\nUpdate the LLVM-facing investigation, canonical pressure record, current\nsummaries and document dependencies without an upstream default verdict.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
-b65bb853	author	Will Norris
-b65bb853	added	6
-b65bb853	deleted	4
-b65bb853	files	1
-b65bb853	body	Present the measured saving and individual-growth trade-offs without\nselecting or rejecting an upstream default. Identify the 5% threshold as\nhistorical local planning and preserve the initial assessment and frozen\nmeasurements. The current compiler default remains documented as an\nimplementation fact.\n\nAdd completed-output selection at compilation-unit and function granularity,\nshared zero-page allocation constraints, linked-size verification, and a\nnarrower A16/ordinary-6502 gate as implementation options. Recommend further\nexperiments, with compilation cost and upstream suitability left open.\n\nDerive mode subsets and hypothetical selection totals reproducibly from the\nretained census. A16 and ordinary-6502 samples have no growing functions;\nwhole-object minima would save 214124 bytes with off/always and 214344 bytes\nwith all three policies. Qualify these calculations as unimplemented\nselections and disclose function growth hidden by object-level savings.\n\nUpdate the canonical record, current summaries and generated views. Preserve\nthe withdrawn PR body, baseline artifacts and previous contributors' credits.\n\nValidation: derived totals agree with the retained census summaries; local\nreport links and paragraph formatting pass; comment, structured evidence,\ndocument dependency and repository pre-commit checks pass. No compiler or\nruntime behavior changes and no new upstream submission.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
-c3c1967c	author	Will Norris
-c3c1967c	added	9
-c3c1967c	deleted	5
-c3c1967c	files	1
-c3c1967c	body	Add patch 0067 with off, always and gated scheduling policies. The gate\nexcludes cheap constants, provisional frame carries and boundary users,\nthen requires potentially overlapping computed carries. Preserve always\nas the default because the full evaluation rejects default promotion.\n\nThe 3,720-configuration census has 3,592 successful three-way comparisons\nand no policy-specific compile failures. Gated recovers the 32 original\ngrowing configurations, but gives up 6.81% of the aggregate saving and\nleaves four growth cases without fewer carry materializations.\n\nRetain measured runtime and compile-time results, exact inputs, identities,\nROMs and profiles. All 30 originally growing SNES cases recover off-policy\nclock counts; the targeted sum/rotate gains remain. Compile-time ranges\noverlap, so make no compile-speed claim. Qualify the XY16 VLA oracle\nmismatch reproduced on the preserved baseline and all three policies.\n\nDocument the causal explanation, rejected refinements and acceptance\noutcome; update current summaries and generated views while preserving\ndated baselines and the withdrawn upstream packet.\n\nValidation: 181 MOS tests pass (2 unsupported); 4 counter tests pass;\n32 always-policy outputs match the preserved pre-gate compiler; 64 final\npolicy comparisons match the frozen measured arms; patch application\nreproduces all four final source/test files. Runtime passes 78/79 corpus\ninputs and all 50 signed-32-bit fuzz seeds, with the baseline VLA mismatch\nretained. Structured evidence and documentation dependency checks pass.\n\nAI attribution: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra,\nxhigh reasoning effort; verified session\n01a0e126-2178-79f3-adba-51b951fb1f96.
-1bd2a347	author	Will Norris
-1bd2a347	added	116
-1bd2a347	deleted	0
-1bd2a347	files	1
-1bd2a347	body	Plan the follow-up that would remove 0064's 32 growing corpus configurations\n(208 B total) without giving up its wins: count carry saves per growing\nfunction from the retained disassembly, then, if none were removed, skip the\ncomputed-carry term in regions where carries cannot compete. Add the ranked\nT4 TODO item linking the plan and record the plan in the document inventory.\n\nDocumentation only; code work waits for Fable. Claude Code 2.1.280 using\nClaude Opus 5.5 (claude-opus-5-5), medium reasoning effort; session\n65695418-7e9b-45bd-92e3-2ecfd88ecf0b.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_017sAprvTwtKFJHKgQmr1qgr
+6bf02c1	author	Will Norris
+6bf02c1	added	130
+6bf02c1	deleted	0
+6bf02c1	files	1
 -->

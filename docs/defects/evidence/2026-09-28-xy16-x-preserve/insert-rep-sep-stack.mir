@@ -1,0 +1,130 @@
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs %s -o - | FileCheck %s
+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -start-before=mos-insert-rep-sep -verify-machineinstrs -filetype=obj %s -o %t.o
+
+# These functions also run in the SNES hard-stack gate. The gate checks their
+# byte returns, stores at $11ff/$1300/$1301, flags, and the caller's stack.
+---
+name: stack_pop_byte
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; Put the saved X word below the byte consumed by PL.
+    ; CHECK-LABEL: name: stack_pop_byte
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: LDA_StackRelative 6, implicit-def $a
+    ; CHECK-NEXT: STA_StackRelative 4, implicit $a
+    ; CHECK: STA_StackRelative 5, implicit $a16
+    ; CHECK: $y = PL
+    ; CHECK: PLX_Implied implicit-def $x16
+    $y = LDImm 123
+    PH killed $y
+    $x16 = LDXImm16 511
+    $y = PL
+    STAbs killed $y, 4864
+    $a = LDAbsXIdx 4096, killed $x16
+    RTS implicit $a
+...
+---
+name: stack_push_byte
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; Extract X from beneath an outstanding byte push and keep that byte.
+    ; CHECK-LABEL: name: stack_push_byte
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: PH killed $y
+    ; CHECK: LDA_StackRelative 5, implicit-def $a16
+    ; CHECK-NEXT: $x16 = TAX16 $a16
+    ; CHECK: STA_StackRelative 5, implicit $a16
+    ; CHECK: $a = LDAbsXIdx 4096, killed $x16
+    ; CHECK: $y = PL
+    $x16 = LDXImm16 511
+    $y = LDImm 123
+    PH killed $y
+    $a = LDAbsXIdx 4096, killed $x16
+    $y = PL
+    STAbs killed $y, 4865
+    RTS implicit $a
+...
+---
+name: stack_pop_word
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; The original two-byte pull must preserve both A bytes for the store.
+    ; CHECK-LABEL: name: stack_pop_word
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: LDA_StackRelative 6, implicit-def $a16
+    ; CHECK-NEXT: STA_StackRelative 4, implicit $a16
+    ; CHECK: STA_StackRelative 6, implicit $a16
+    ; CHECK: $a16 = PLA16
+    ; CHECK: PLX_Implied implicit-def $x16
+    ; CHECK-NEXT: STAbsXIdx16 killed $a16, 4096, killed $x16
+    $y16 = LDYImm16 43899
+    $a16 = TYA16 killed $y16
+    PHA16 killed $a16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    $a16 = PLA16
+    STAbsXIdx16 killed $a16, 4096, killed $x16
+    $a = LDImm 123
+    RTS implicit $a
+...
+---
+name: stack_push_word
+tracksRegLiveness: true
+body: |
+  bb.0:
+    ; A word pushed inside the narrow region remains intact after X restores.
+    ; CHECK-LABEL: name: stack_push_word
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: PHA16 killed $a16
+    ; CHECK: LDA_StackRelative 6, implicit-def $a16
+    ; CHECK-NEXT: $x16 = TAX16 $a16
+    ; CHECK: STA_StackRelative 6, implicit $a16
+    ; CHECK: $a = LDAbsXIdx 4096, killed $x16
+    ; CHECK: $a16 = PLA16
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    $y16 = LDYImm16 43899
+    $a16 = TYA16 killed $y16
+    PHA16 killed $a16
+    $a = LDAbsXIdx 4096, killed $x16
+    STAbs killed $a, 4866
+    $a16 = PLA16
+    STAbs16 killed $a16, 4867
+    $a = LDImm 123
+    RTS implicit $a
+...
+---
+name: stack_live_nz
+tracksRegLiveness: true
+body: |
+  bb.0:
+    successors: %bb.1, %bb.2
+    ; Z=1 from CPY must reach the branch even though the restored X is nonzero.
+    ; CHECK-LABEL: name: stack_live_nz
+    ; CHECK: PHX_Implied implicit $x16
+    ; CHECK: $c = CMPImm $y, 1, implicit-def $z
+    ; CHECK: PH $p
+    ; CHECK: LDA_StackRelative 4, implicit-def $a16
+    ; CHECK-NEXT: $x16 = TAX16 $a16
+    ; CHECK: $p = PL
+    ; CHECK-NEXT: STAbsXIdx16 killed $a16, 4096, killed $x16
+    ; CHECK: BR %bb.1, killed $z, 1
+    $x16 = LDXImm16 511
+    $y = LDImm 1
+    $y16 = LDYImm16 43899
+    $a16 = TYA16 killed $y16
+    $y = LDImm 1
+    $c = CMPImm $y, 1, implicit-def $z
+    STAbsXIdx16 killed $a16, 4096, killed $x16
+    BR %bb.1, killed $z, 1
+    BRA %bb.2
+  bb.1:
+    $a = LDImm 123
+    RTS implicit $a
+  bb.2:
+    $a = LDImm 0
+    RTS implicit $a
+...
