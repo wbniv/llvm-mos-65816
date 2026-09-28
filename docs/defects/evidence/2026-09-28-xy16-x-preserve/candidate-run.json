@@ -1,0 +1,68 @@
+{
+  "commands": [
+    {
+      "command": [
+        "/work/build/xy16-x-preserve/candidate-install/bin/mos-clang",
+        "--config",
+        "/work/build/install/bin/mos-snes.cfg",
+        "-mcpu=mosw65816",
+        "-Xclang",
+        "-target-feature",
+        "-Xclang",
+        "+mos-xy16",
+        "-Os",
+        "-mllvm",
+        "-mos-carry-sched=always",
+        "-Wl,-mllvm,-mos-carry-sched=always",
+        "-Wl,--save-temps",
+        "-Wl,-Map=/work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.map",
+        "-o",
+        "/work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc",
+        "/work/docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/input/examples/snes/corpus/vlastack_sim.c"
+      ],
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-build.log"
+    },
+    {
+      "command": [
+        "python3",
+        "/work/tools/snes-checksum.py",
+        "/work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc"
+      ],
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-checksum.log"
+    },
+    {
+      "command": [
+        "/work/build/jgxcheck",
+        "/work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc",
+        "/work/vendor/bsnes-jg/Database",
+        "0x200",
+        "2",
+        "0xD77B",
+        "1200"
+      ],
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-bsnes.log"
+    },
+    {
+      "command": [
+        "bash",
+        "-c",
+        "source dev/_emu.sh; require_bios; SMOKE_SETTLE=1200 SMOKE_SECONDS=25 run_assert /work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc /work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.map corpus_result 0xD77B"
+      ],
+      "exit_code": 0,
+      "log": "docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate-mame.log"
+    }
+  ],
+  "sha256": {
+    "/work/build/xy16-x-preserve/candidate-install/bin/clang-23": "31e6fbb5bed359ce67973e7630a2b399157f0e6781d5cd54d64713b32a542f90",
+    "/work/build/xy16-x-preserve/candidate-install/bin/lld": "f81c301ed9ee87eceac0bc1e2b3209662a8909e011ebf4d54711bb06a70858c0",
+    "/work/build/xy16-x-preserve/candidate-install/bin/llc": "cfbd4478040a1c4b36adbb2cdd7374a454e01f2676f0e8488aa5623d1b9a4e0a",
+    "/work/docs/defects/evidence/2026-09-28-xy16-x-preserve/candidate.sfc": "40d1f3e4bf43bc822c4a40e9c9bca21527b0a17b6b89a092f49497e5e5828874",
+    "/work/docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/input/examples/snes/corpus/vlastack_sim.c": "a066a361b8d961cac4d1dfde476c661131ba68e6e3b4cd98af5bfedccdd6a075",
+    "/work/build/jgxcheck": "4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f",
+    "/usr/games/mame": "b8de871c99effd28e90c426b811694811bcb533741189f93ad63a962621ae40c"
+  },
+  "exit_code": 0
+}

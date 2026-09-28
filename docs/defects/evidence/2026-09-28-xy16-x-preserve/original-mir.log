@@ -1,0 +1,4 @@
+error: docs/defects/evidence/2026-09-28-vlastack-xy16-stale-reload/baseline/pre-repsep.mir:619:11: StackID is not supported by target
+  - { id: 0, name: '', type: spill-slot, offset: 0, size: 2, alignment: 1, 
+          ^
+

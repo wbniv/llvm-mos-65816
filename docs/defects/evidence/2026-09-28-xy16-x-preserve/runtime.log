@@ -1,0 +1,12 @@
+/work/build/xy16-x-preserve/runtime/stack-default.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xEC5D complement=0x13A2
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+/work/build/xy16-x-preserve/runtime/stack-a16.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF897 complement=0x0768
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+/work/build/xy16-x-preserve/runtime/stack-xy16.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xF897 complement=0x0768
+SMOKE: PASS addr=0x7E0020 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x20 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)
+/work/build/xy16-x-preserve/runtime/original.sfc: lorom size=32KiB devices=256Kbit map_mode=0x20 rom_size_byte=0x05 ram_size_byte=0x00 cart_type=0x00 checksum=0xB09B complement=0x4F64
+SMOKE: PASS addr=0x7E0200 len=2 got=0xD77B (ran 1200 ticks)
+SMOKE: PASS off=0x200 len=2 got=0xD77B (ran 1200 frames, bsnes-jg)

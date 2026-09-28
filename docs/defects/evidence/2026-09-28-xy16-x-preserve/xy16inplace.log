@@ -1,0 +1,15 @@
+    CAP=1700 default = 0x90AA
+    SMOKE: PASS off=0x8A4 len=2 got=0x90AA (ran 600 frames, bsnes-jg)
+    CAP=1700 a16 = 0x90AA
+    SMOKE: PASS off=0x8A4 len=2 got=0x90AA (ran 600 frames, bsnes-jg)
+    CAP=1700 xy16 = 0x90AA
+    SMOKE: PASS off=0x8A4 len=2 got=0x90AA (ran 600 frames, bsnes-jg)
+    CAP=200 default = 0xDEBD
+    SMOKE: PASS off=0x2C8 len=2 got=0xDEBD (ran 600 frames, bsnes-jg)
+    CAP=200 a16 = 0xDEBD
+    SMOKE: PASS off=0x2C8 len=2 got=0xDEBD (ran 600 frames, bsnes-jg)
+    CAP=200 xy16 = 0xDEBD
+    SMOKE: PASS off=0x2C8 len=2 got=0xDEBD (ran 600 frames, bsnes-jg)
+    -verify xy16 clean
+
+RESULT: PASS — in-place memmove/memcpy over a 16-bit-indexed buffer: default==a16==xy16 on bsnes-jg (CAP 1700 & 200), -verify clean

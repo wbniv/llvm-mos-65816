@@ -773,10 +773,10 @@ index 4e7ff5b20..ba6a46222 100644
  } // namespace llvm
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
 new file mode 100644
-index 000000000..a65bc8f2f
+index 000000000000..bc183c0cc2dc
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.cpp
-@@ -0,0 +1,710 @@
+@@ -0,0 +1,819 @@
 +//===-- MOSInsertREPSEP.cpp - Insert 65816 REP/SEP for 16-bit mode --------===//
 +//
 +// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
@@ -831,6 +831,7 @@ index 000000000..a65bc8f2f
 +#include "llvm/ADT/DenseMap.h"
 +#include "llvm/ADT/SmallPtrSet.h"
 +#include "llvm/ADT/SmallVector.h"
++#include "llvm/CodeGen/LivePhysRegs.h"
 +#include "llvm/CodeGen/MachineBasicBlock.h"
 +#include "llvm/CodeGen/MachineFunction.h"
 +#include "llvm/CodeGen/MachineInstrBuilder.h"
@@ -1108,6 +1109,9 @@ index 000000000..a65bc8f2f
 +          .addImm(XFlagBit);
 +  }
 +
++  void preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
++                 MachineInstr &Reader, bool SaveM16, bool RestoreM16);
++
 +  // Seed a block at `EntryIsM16`/`EntryIsX16` and walk it, inserting REP/SEP
 +  // only where the next width-requiring instruction disagrees with the running
 +  // width. Does NOT force a width at block exit — the running widths flow out.
@@ -1121,81 +1125,186 @@ index 000000000..a65bc8f2f
 +
 +} // namespace
 +
++// Count byte pushes and pulls so the spill can sit below every original byte
++// the region consumes. Explicit stack addresses and opaque stack changes need
++// a separate lowering: adding a hidden word must not change what they access.
++static std::pair<unsigned, unsigned> getStackDepths(MachineInstr &Begin,
++                                                    MachineInstr &End) {
++  int Depth = 0, MinDepth = 0;
++  for (auto I = Begin.getIterator(); I != End.getIterator(); ++I) {
++    switch (I->getOpcode()) {
++    case MOS::PH:
++      ++Depth;
++      break;
++    case MOS::PHA16:
++      Depth += 2;
++      break;
++    case MOS::PL:
++      --Depth;
++      break;
++    case MOS::PLA16:
++      Depth -= 2;
++      break;
++    default:
++      if (I->isCall() || I->isInlineAsm() ||
++          (!I->getDesc().isPseudo() && I->getOpcode() != MOS::REP_Immediate &&
++           I->getOpcode() != MOS::SEP_Immediate))
++        report_fatal_error("cannot preserve live 16-bit X across an opaque "
++                           "hard-stack operation");
++    }
++    MinDepth = std::min(MinDepth, Depth);
++  }
++  unsigned Before = -MinDepth, After = Depth - MinDepth;
++  if (Before > 250 || After > 250)
++    report_fatal_error("16-bit X preservation exceeds stack-relative range");
++  return {Before, After};
++}
++
++void MOSInsertREPSEP::preserveX(MachineBasicBlock &MBB, MachineInstr &Narrow,
++                                MachineInstr &Reader, bool SaveM16,
++                                bool RestoreM16) {
++  auto [Before, After] = getStackDepths(Narrow, Reader);
++  BuildMI(MBB, Narrow, Narrow.getDebugLoc(), TII->get(MOS::PHX_Implied))
++      .addReg(MOS::X16, RegState::Implicit);
++
++  auto LiveBefore = [&](MachineInstr &MI, LivePhysRegs &Live) {
++    Live.addLiveOuts(MBB);
++    for (auto I = MBB.rbegin(); &*I != &MI; ++I)
++      Live.stepBackward(*I);
++    Live.stepBackward(MI);
++  };
++  // Each shuffle uses A16 as a courier and preserves A/P in three bytes above
++  // the spill. PLP restores the exact incoming flags and accumulator width.
++  auto SaveAP = [&](MachineInstr &MI, bool M16, const LivePhysRegs &Live) {
++    bool PLive = Live.contains(MOS::C) || Live.contains(MOS::N) ||
++                 Live.contains(MOS::Z) || Live.contains(MOS::V);
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PH))
++        .addReg(MOS::P, getUndefRegState(!PLive));
++    if (!M16)
++      BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::REP_Immediate))
++          .addImm(MFlagBit);
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PHA16))
++        .addReg(MOS::A16, getUndefRegState(!Live.contains(MOS::A) &&
++                                           !Live.contains(MOS::B)));
++  };
++  auto Load = [&](MachineInstr &MI, unsigned Offset, Register Reg) {
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::LDA_StackRelative))
++        .addImm(Offset)
++        .addReg(Reg, RegState::ImplicitDefine);
++  };
++  auto Store = [&](MachineInstr &MI, unsigned Offset, Register Reg) {
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::STA_StackRelative))
++        .addImm(Offset)
++        .addReg(Reg, RegState::Implicit);
++  };
++  auto SwitchM = [&](MachineInstr &MI, bool Wide) {
++    BuildMI(MBB, MI, MI.getDebugLoc(),
++            TII->get(Wide ? MOS::REP_Immediate : MOS::SEP_Immediate))
++        .addImm(MFlagBit);
++  };
++  auto RestoreAP = [&](MachineInstr &MI) {
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PLA16), MOS::A16);
++    BuildMI(MBB, MI, MI.getDebugLoc(), TII->get(MOS::PL), MOS::P);
++  };
++
++  if (Before) {
++    // Move the original bytes above X so any unmatched pulls consume their
++    // own values. Copy toward smaller offsets before writing X at the bottom.
++    LivePhysRegs SaveLive(*TRI);
++    LiveBefore(Narrow, SaveLive);
++    SaveAP(Narrow, SaveM16, SaveLive);
++    unsigned I = 0;
++    for (; I + 1 < Before; I += 2) {
++      Load(Narrow, 6 + I, MOS::A16);
++      Store(Narrow, 4 + I, MOS::A16);
++    }
++    if (I < Before) {
++      SwitchM(Narrow, false);
++      Load(Narrow, 6 + I, MOS::A);
++      Store(Narrow, 4 + I, MOS::A);
++      SwitchM(Narrow, true);
++    }
++    BuildMI(MBB, Narrow, Narrow.getDebugLoc(), TII->get(MOS::TXA16), MOS::A16)
++        .addReg(MOS::X16);
++    Store(Narrow, 4 + Before, MOS::A16);
++    RestoreAP(Narrow);
++  }
++
++  LivePhysRegs Live(*TRI);
++  LiveBefore(Reader, Live);
++  if (!After && !Live.contains(MOS::N) && !Live.contains(MOS::Z)) {
++    BuildMI(MBB, Reader, Reader.getDebugLoc(), TII->get(MOS::PLX_Implied))
++        .addReg(MOS::X16, RegState::ImplicitDefine);
++    return;
++  }
++
++  // The stack is [A.lo, A.hi, P, original bytes..., X.lo, X.hi]. Load X,
++  // then shift the prefix two bytes toward larger offsets, copying backward
++  // to handle overlap. Discarding the first word removes the spill; A/P and
++  // every original stack byte then occupy their required positions.
++  SaveAP(Reader, RestoreM16, Live);
++  Load(Reader, 4 + After, MOS::A16);
++  BuildMI(MBB, Reader, Reader.getDebugLoc(), TII->get(MOS::TAX16), MOS::X16)
++      .addReg(MOS::A16);
++  unsigned I = 3 + After;
++  for (; I >= 2; I -= 2) {
++    Load(Reader, I - 1, MOS::A16);
++    Store(Reader, I + 1, MOS::A16);
++  }
++  if (I) {
++    SwitchM(Reader, false);
++    Load(Reader, 1, MOS::A);
++    Store(Reader, 3, MOS::A);
++    SwitchM(Reader, true);
++  }
++  BuildMI(MBB, Reader, Reader.getDebugLoc(), TII->get(MOS::PLA16), MOS::A16);
++  RestoreAP(Reader);
++}
++
 +bool MOSInsertREPSEP::placeIntraBlock(MachineBasicBlock &MBB, bool EntryIsM16,
 +                                      bool EntryIsX16) {
 +  bool Changed = false;
 +  bool M16 = EntryIsM16, X16 = EntryIsX16;
 +
-+  // Track whether a SEP #$10 was inserted since the last instruction that
-+  // established a fresh 16-bit X value. When true, X's high byte has been
-+  // zeroed by the SEP; any subsequent XW_X16 instruction that READS X (rather
-+  // than writing a new value into X) will see the wrong address/value. Fix:
-+  // insert a clone of the most recent X-defining instruction (LastX16Writer)
-+  // immediately after the REP that re-enters 16-bit X mode, before the READ.
-+  //
-+  // Background: on the 65816, SEP #$10 physically zeroes the high bytes of
-+  // both X and Y. A REP #$10 later makes the full 16-bit register accessible
-+  // again but does NOT restore the high byte -- it stays 0. Any instruction
-+  // that relied on a prior 16-bit X value (e.g. `lda abs,X16` for buf[i]
-+  // where i>=256) will therefore use the wrong index.
-+  //
-+  // The lsystem #23 demo found this: `ldx __rc24` (16-bit) loaded i into X,
-+  // then `ldy #imm` (string addr pre-load) forced X=8 via SEP, then `lda
-+  // buf,x` (16-bit X) got X.high=0, reading buf[i & 0xFF] instead of buf[i].
-+  bool X16Corrupted = false; // set on X:16→8 (SEP), cleared on fresh X write
-+  MachineInstr *LastX16Writer =
-+      nullptr; // most recent XW_X16 instruction that defines X
++  // SEP clears X.high. Remember the first narrowing until X is overwritten
++  // or a full-width reader needs the value. Save the value itself at that
++  // narrowing; neither a mutable load source nor an arithmetic writer can be
++  // replayed to recover it. Delaying insertion avoids spills for dead values.
++  MachineInstr *Narrow = nullptr;
++  bool SaveM16 = false;
 +
 +  for (MachineInstr &MI : MBB) {
 +    MWidth MW = requiredWidth(MI);
 +    XWidth XW = HasIndex16 ? requiredXWidth(MI, TRI) : XW_None;
-+    if (MW == MW_None && XW == XW_None)
-+      continue;
 +    bool WantM16 = (MW == MW_None) ? M16 : resolveIsM16(MW);
 +    bool WantX16 = (XW == XW_None) ? X16 : resolveIsX16(XW);
 +    bool MC = (WantM16 != M16), XC = (WantX16 != X16);
 +
-+    // X:16→8 transition: SEP #$10 zeroes the high bytes of both X and Y.
-+    if (XC && X16 && !WantX16)
-+      X16Corrupted = true;
-+
-+    // X:8→16 transition: REP #$10 is about to be inserted. If X was corrupted
-+    // by a prior SEP and the triggering instruction READS X as a 16-bit value
-+    // (rather than writing a fresh value into X), its high byte is 0 — wrong.
-+    // Insert a clone of the last instruction that set X to a valid 16-bit value
-+    // immediately after the REP (before MI) to restore the correct X content.
-+    if (XC && !X16 && WantX16 && X16Corrupted && LastX16Writer != nullptr &&
-+        MI.readsRegister(MOS::X, TRI)) {
-+      // insertSwitch below will place REP before MI; we then insert the reload
-+      // before MI too — so the order in the stream becomes [REP, Reload, MI].
-+      insertSwitch(MBB, MI, WantM16, WantX16, MC, XC);
-+      M16 = WantM16;
-+      X16 = WantX16;
-+      Changed = true;
-+      MachineInstr *Reload = MBB.getParent()->CloneMachineInstr(LastX16Writer);
-+      // The restored value extends the source register's lifetime beyond the
-+      // original writer. Kill flags on either copy would make a later restore
-+      // look like an undefined physical-register read.
-+      LastX16Writer->clearKillInfo();
-+      Reload->clearKillInfo();
-+      MBB.insert(MI, Reload);
-+      X16Corrupted = false;
-+      continue; // skip the redundant insertSwitch at the bottom
-+    }
-+
 +    if (MC || XC) {
++      auto Prev = MI.getIterator();
++      bool AtBegin = Prev == MBB.begin();
++      if (!AtBegin)
++        --Prev;
 +      insertSwitch(MBB, MI, WantM16, WantX16, MC, XC);
++      if (XC && X16 && !WantX16 && !Narrow) {
++        Narrow = &*(AtBegin ? MBB.begin() : std::next(Prev));
++        SaveM16 = M16;
++      }
 +      M16 = WantM16;
 +      X16 = WantX16;
 +      Changed = true;
 +    }
 +
-+    // After processing: if this XW_X16 instruction defines X, it establishes a
-+    // fresh 16-bit X value — any prior corruption is gone.
-+    if (HasIndex16 && XW == XW_X16 && MI.definesRegister(MOS::X, TRI)) {
-+      LastX16Writer = &MI;
-+      X16Corrupted = false;
++    if (Narrow && XW == XW_X16 && MI.readsRegister(MOS::X16, TRI)) {
++      preserveX(MBB, *Narrow, MI, SaveM16, M16);
++      Narrow = nullptr;
++      Changed = true;
 +    }
++
++    // A byte definition also ends the old value's lifetime. Check reads first
++    // so a tied full-width operation receives its input before replacing it.
++    if (MI.modifiesRegister(MOS::X16, TRI))
++      Narrow = nullptr;
 +  }
 +  return Changed;
 +}
@@ -7883,31 +7992,169 @@ index 0000000000000000000000000000000000000000..3bfb2aacec899f526ec389e38aa6ded7
 +}
 diff --git a/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir b/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
 new file mode 100644
-index 000000000..009947eb4
+index 000000000000..f193abc81071
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,160 @@
 +# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs %s -o - | FileCheck %s
 +
 +---
-+name:            restore_x16_clears_source_kills
++name:            restore_x16_preserves_value
 +tracksRegLiveness: true
 +body:             |
 +  bb.0:
 +    liveins: $rs1
 +
-+    ; Reloading X after SEP extends $rs1's lifetime through both X definitions.
-+    ; CHECK-LABEL: name: restore_x16_clears_source_kills
-+    ; CHECK: renamable $x16 = LDXImag16 renamable $rs1
-+    ; CHECK: renamable $x16 = LDXImag16 renamable $rs1
-+    ; CHECK: renamable $x16 = LDXImag16 renamable $rs1
-+    ; CHECK-NOT: LDXImag16 killed renamable $rs1
-+    renamable $x16 = LDXImag16 killed renamable $rs1
++    ; Each narrowing preserves X itself; the killed load source stays dead.
++    ; CHECK-LABEL: name: restore_x16_preserves_value
++    ; CHECK: $x16 = LDXImag16 killed $rs1
++    ; CHECK-NEXT: PHX_Implied implicit $x16
++    ; CHECK-NEXT: SEP_Immediate 16
++    ; CHECK-NEXT: $y = LDImm 1
++    ; CHECK-NEXT: REP_Immediate 48
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: dead $a16 = TXA16 $x16
++    ; CHECK-NEXT: PHX_Implied implicit $x16
++    ; CHECK-NEXT: SEP_Immediate 48
++    ; CHECK-NEXT: $y = LDImm 2
++    ; CHECK-NEXT: REP_Immediate 48
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: $a16 = TXA16 killed $x16
++    $x16 = LDXImag16 killed $rs1
 +    $y = LDImm 1
-+    dead renamable $a16 = TXA16 renamable $x16
++    dead $a16 = TXA16 $x16
 +    $y = LDImm 2
-+    renamable $a16 = TXA16 killed renamable $x16
++    $a16 = TXA16 killed $x16
 +    RTS implicit $a16
++...
++---
++name:            overwritten_source
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    liveins: $rs1
++
++    ; The byte stores replace both aliases of the original index source.
++    ; CHECK-LABEL: name: overwritten_source
++    ; CHECK: $x16 = LDXImag16 killed $rs1
++    ; CHECK-NEXT: PHX_Implied implicit $x16
++    ; CHECK-NEXT: SEP_Immediate 16
++    ; CHECK: $rc3 = STImag8 killed $y
++    ; CHECK-NEXT: REP_Immediate 16
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
++    $x16 = LDXImag16 killed $rs1
++    $y = LDImm 4
++    $rc2 = STImag8 $y
++    $y = LDImm 2
++    $rc3 = STImag8 killed $y
++    $a = LDAbsXIdx 2048, killed $x16
++    RTS implicit $a
++...
++---
++name:            arithmetic_writer
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    ; An increment's result must be preserved without executing it twice.
++    ; CHECK-LABEL: name: arithmetic_writer
++    ; CHECK: $x16 = INX16 $x16
++    ; CHECK-NEXT: PHX_Implied implicit $x16
++    ; CHECK: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
++    $x16 = LDXImm16 511
++    $x16 = INX16 $x16
++    $y = LDImm 1
++    $a = LDAbsXIdx 2048, killed $x16
++    RTS implicit $a
++...
++---
++name:            y_widens_before_x_reader
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    ; Restoring the width for Y does not restore X's saved high byte.
++    ; CHECK-LABEL: name: y_widens_before_x_reader
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: $y16 = LDYImm16 513
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: $a = LDAbsXIdx 2048, killed $x16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    $y16 = LDYImm16 513
++    $a = LDAbsXIdx 2048, killed $x16
++    RTS implicit $a
++...
++---
++name:            byte_definition_ends_value
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    ; A byte write replaces X, including its zeroed high byte.
++    ; CHECK-LABEL: name: byte_definition_ends_value
++    ; CHECK-NOT: PHX_Implied
++    ; CHECK-NOT: PLX_Implied
++    ; CHECK: RTS
++    $x16 = LDXImm16 511
++    $x = LDImm 42
++    $a = LDAbsXIdx 2048, killed $x16
++    RTS implicit $a
++...
++---
++name:            nested_stack
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    liveins: $a
++
++    ; The saved X word sits beneath a balanced byte push/pull pair.
++    ; CHECK-LABEL: name: nested_stack
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: PH $y
++    ; CHECK-NEXT: $y = PL
++    ; CHECK-NEXT: REP_Immediate 16
++    ; CHECK-NEXT: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    PH $y
++    $y = PL
++    STAbsXIdx $a, 2048, killed $x16
++    RTS
++...
++---
++name:            live_nz
++tracksRegLiveness: true
++body:             |
++  bb.0:
++    liveins: $a
++
++    ; A store keeps the comparison's Z live. Restore X, A, and P while
++    ; consuming the saved word, so the caller sees the original hard stack.
++    ; CHECK-LABEL: name: live_nz
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: $c = CMPImm $y, 1, implicit-def $z
++    ; CHECK-NEXT: REP_Immediate 16
++    ; CHECK-NEXT: PH $p
++    ; CHECK-NEXT: REP_Immediate 32
++    ; CHECK-NEXT: PHA16 $a16
++    ; CHECK-NEXT: LDA_StackRelative 4, implicit-def $a16
++    ; CHECK-NEXT: $x16 = TAX16 $a16
++    ; CHECK-NEXT: LDA_StackRelative 2, implicit-def $a16
++    ; CHECK-NEXT: STA_StackRelative 4, implicit $a16
++    ; CHECK-NEXT: SEP_Immediate 32
++    ; CHECK-NEXT: LDA_StackRelative 1, implicit-def $a
++    ; CHECK-NEXT: STA_StackRelative 3, implicit $a
++    ; CHECK-NEXT: REP_Immediate 32
++    ; CHECK-NEXT: $a16 = PLA16
++    ; CHECK-NEXT: $a16 = PLA16
++    ; CHECK-NEXT: $p = PL
++    ; CHECK-NEXT: STAbsXIdx $a, 2048, killed $x16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    $c = CMPImm $y, 1, implicit-def $z
++    STAbsXIdx $a, 2048, killed $x16
++    RTS implicit $z
 +...
 diff --git a/llvm/test/CodeGen/MOS/interrupt-width-65816.ll b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
 new file mode 100644
@@ -8306,3 +8553,139 @@ index 0000000000000000000000000000000000000000..bed35ca6844e7a6c27ea25cdee8e3433
 +exit:                                             ; preds = %loop
 +  ret void
 +}
+diff --git a/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir b/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir
+new file mode 100644
+index 000000000000..c421564b55aa
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir
+@@ -0,0 +1,130 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=mos-insert-rep-sep -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -start-before=mos-insert-rep-sep -verify-machineinstrs -filetype=obj %s -o %t.o
++
++# These functions also run in the SNES hard-stack gate. The gate checks their
++# byte returns, stores at $11ff/$1300/$1301, flags, and the caller's stack.
++---
++name: stack_pop_byte
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; Put the saved X word below the byte consumed by PL.
++    ; CHECK-LABEL: name: stack_pop_byte
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: LDA_StackRelative 6, implicit-def $a
++    ; CHECK-NEXT: STA_StackRelative 4, implicit $a
++    ; CHECK: STA_StackRelative 5, implicit $a16
++    ; CHECK: $y = PL
++    ; CHECK: PLX_Implied implicit-def $x16
++    $y = LDImm 123
++    PH killed $y
++    $x16 = LDXImm16 511
++    $y = PL
++    STAbs killed $y, 4864
++    $a = LDAbsXIdx 4096, killed $x16
++    RTS implicit $a
++...
++---
++name: stack_push_byte
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; Extract X from beneath an outstanding byte push and keep that byte.
++    ; CHECK-LABEL: name: stack_push_byte
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: PH killed $y
++    ; CHECK: LDA_StackRelative 5, implicit-def $a16
++    ; CHECK-NEXT: $x16 = TAX16 $a16
++    ; CHECK: STA_StackRelative 5, implicit $a16
++    ; CHECK: $a = LDAbsXIdx 4096, killed $x16
++    ; CHECK: $y = PL
++    $x16 = LDXImm16 511
++    $y = LDImm 123
++    PH killed $y
++    $a = LDAbsXIdx 4096, killed $x16
++    $y = PL
++    STAbs killed $y, 4865
++    RTS implicit $a
++...
++---
++name: stack_pop_word
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; The original two-byte pull must preserve both A bytes for the store.
++    ; CHECK-LABEL: name: stack_pop_word
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: LDA_StackRelative 6, implicit-def $a16
++    ; CHECK-NEXT: STA_StackRelative 4, implicit $a16
++    ; CHECK: STA_StackRelative 6, implicit $a16
++    ; CHECK: $a16 = PLA16
++    ; CHECK: PLX_Implied implicit-def $x16
++    ; CHECK-NEXT: STAbsXIdx16 killed $a16, 4096, killed $x16
++    $y16 = LDYImm16 43899
++    $a16 = TYA16 killed $y16
++    PHA16 killed $a16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    $a16 = PLA16
++    STAbsXIdx16 killed $a16, 4096, killed $x16
++    $a = LDImm 123
++    RTS implicit $a
++...
++---
++name: stack_push_word
++tracksRegLiveness: true
++body: |
++  bb.0:
++    ; A word pushed inside the narrow region remains intact after X restores.
++    ; CHECK-LABEL: name: stack_push_word
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: PHA16 killed $a16
++    ; CHECK: LDA_StackRelative 6, implicit-def $a16
++    ; CHECK-NEXT: $x16 = TAX16 $a16
++    ; CHECK: STA_StackRelative 6, implicit $a16
++    ; CHECK: $a = LDAbsXIdx 4096, killed $x16
++    ; CHECK: $a16 = PLA16
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    $y16 = LDYImm16 43899
++    $a16 = TYA16 killed $y16
++    PHA16 killed $a16
++    $a = LDAbsXIdx 4096, killed $x16
++    STAbs killed $a, 4866
++    $a16 = PLA16
++    STAbs16 killed $a16, 4867
++    $a = LDImm 123
++    RTS implicit $a
++...
++---
++name: stack_live_nz
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1, %bb.2
++    ; Z=1 from CPY must reach the branch even though the restored X is nonzero.
++    ; CHECK-LABEL: name: stack_live_nz
++    ; CHECK: PHX_Implied implicit $x16
++    ; CHECK: $c = CMPImm $y, 1, implicit-def $z
++    ; CHECK: PH $p
++    ; CHECK: LDA_StackRelative 4, implicit-def $a16
++    ; CHECK-NEXT: $x16 = TAX16 $a16
++    ; CHECK: $p = PL
++    ; CHECK-NEXT: STAbsXIdx16 killed $a16, 4096, killed $x16
++    ; CHECK: BR %bb.1, killed $z, 1
++    $x16 = LDXImm16 511
++    $y = LDImm 1
++    $y16 = LDYImm16 43899
++    $a16 = TYA16 killed $y16
++    $y = LDImm 1
++    $c = CMPImm $y, 1, implicit-def $z
++    STAbsXIdx16 killed $a16, 4096, killed $x16
++    BR %bb.1, killed $z, 1
++    BRA %bb.2
++  bb.1:
++    $a = LDImm 123
++    RTS implicit $a
++  bb.2:
++    $a = LDImm 0
++    RTS implicit $a
++...

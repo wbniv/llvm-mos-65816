@@ -1,0 +1,317 @@
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:12:11: error: CHECK: expected string not found in input
+ ; CHECK: $x16 = LDXImag16 killed $rs1
+          ^
+<stdin>:45:34: note: scanning from here
+name: restore_x16_preserves_value
+                                 ^
+<stdin>:102:2: note: possible intended match here
+ $x16 = LDXImag16 $rs1
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:41:11: error: CHECK: expected string not found in input
+ ; CHECK: $x16 = LDXImag16 killed $rs1
+          ^
+<stdin>:117:25: note: scanning from here
+name: overwritten_source
+                        ^
+<stdin>:174:2: note: possible intended match here
+ $x16 = LDXImag16 $rs1
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:64:16: error: CHECK-NEXT: expected string not found in input
+ ; CHECK-NEXT: PHX_Implied implicit $x16
+               ^
+<stdin>:243:19: note: scanning from here
+ $x16 = INX16 $x16
+                  ^
+<stdin>:250:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:80:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:253:31: note: scanning from here
+name: y_widens_before_x_reader
+                              ^
+<stdin>:315:2: note: possible intended match here
+ RTS implicit $a
+ ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:114:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:383:19: note: scanning from here
+name: nested_stack
+                  ^
+<stdin>:439:4: note: possible intended match here
+ REP_Immediate 16
+   ^
+/home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir:137:11: error: CHECK: expected string not found in input
+ ; CHECK: PHX_Implied implicit $x16
+          ^
+<stdin>:452:14: note: scanning from here
+name: live_nz
+             ^
+<stdin>:517:2: note: possible intended match here
+ RTS implicit $z
+ ^
+
+Input file: <stdin>
+Check file: /home/will/llvm-mos-65816/vendor/llvm-mos/llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir
+
+-dump-input=help explains the following input dump.
+
+Input was:
+<<<<<<
+             .
+             .
+             .
+            40:  } 
+            41:   
+            42:  attributes #0 = { "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" } 
+            43: ... 
+            44: --- 
+            45: name: restore_x16_preserves_value 
+check:12'0                                       X error: no match found
+            46: alignment: 1 
+check:12'0      ~~~~~~~~~~~~~
+            47: exposesReturnsTwice: false 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+            48: legalized: false 
+check:12'0      ~~~~~~~~~~~~~~~~~
+            49: regBankSelected: false 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~
+            50: selected: false 
+check:12'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+            97: body: | 
+check:12'0      ~~~~~~~~
+            98:  bb.0: 
+check:12'0      ~~~~~~~
+            99:  liveins: $rs1 
+check:12'0      ~~~~~~~~~~~~~~~
+           100:   
+check:12'0      ~~
+           101:  REP_Immediate 16 
+check:12'0      ~~~~~~~~~~~~~~~~~~
+           102:  $x16 = LDXImag16 $rs1 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~
+check:12'1       ?                      possible intended match
+           103:  SEP_Immediate 16 
+check:12'0      ~~~~~~~~~~~~~~~~~~
+           104:  $y = LDImm 1 
+check:12'0      ~~~~~~~~~~~~~~
+           105:  REP_Immediate 48 
+check:12'0      ~~~~~~~~~~~~~~~~~~
+           106:  $x16 = LDXImag16 $rs1 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           107:  dead $a16 = TXA16 $x16 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           112:  $a16 = TXA16 killed $x16 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+           113:  SEP_Immediate 48 
+check:12'0      ~~~~~~~~~~~~~~~~~~
+           114:  RTS implicit $a16 
+check:12'0      ~~~~~~~~~~~~~~~~~~~
+           115: ... 
+check:12'0      ~~~~
+           116: --- 
+check:12'0      ~~~~
+           117: name: overwritten_source 
+check:12'0      ~~~~~~~~~~~~~~~~~~~~~~~~
+check:41'0                              X error: no match found
+           118: alignment: 1 
+check:41'0      ~~~~~~~~~~~~~
+           119: exposesReturnsTwice: false 
+check:41'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           120: legalized: false 
+check:41'0      ~~~~~~~~~~~~~~~~~
+           121: regBankSelected: false 
+check:41'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           122: selected: false 
+check:41'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           169: body: | 
+check:41'0      ~~~~~~~~
+           170:  bb.0: 
+check:41'0      ~~~~~~~
+           171:  liveins: $rs1 
+check:41'0      ~~~~~~~~~~~~~~~
+           172:   
+check:41'0      ~~
+           173:  REP_Immediate 16 
+check:41'0      ~~~~~~~~~~~~~~~~~~
+           174:  $x16 = LDXImag16 $rs1 
+check:41'0      ~~~~~~~~~~~~~~~~~~~~~~~
+check:41'1       ?                      possible intended match
+           175:  SEP_Immediate 16 
+check:41'0      ~~~~~~~~~~~~~~~~~~
+           176:  $y = LDImm 4 
+check:41'0      ~~~~~~~~~~~~~~
+           177:  $rc2 = STImag8 $y 
+check:41'0      ~~~~~~~~~~~~~~~~~~~
+           178:  $y = LDImm 2 
+check:41'0      ~~~~~~~~~~~~~~
+           179:  $rc3 = STImag8 killed $y 
+check:41'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           238: machineFunctionInfo: {} 
+           239: body: | 
+           240:  bb.0: 
+           241:  REP_Immediate 16 
+           242:  $x16 = LDXImm16 511 
+           243:  $x16 = INX16 $x16 
+next:64'0                         X error: no match found
+           244:  SEP_Immediate 16 
+next:64'0       ~~~~~~~~~~~~~~~~~~
+           245:  $y = LDImm 1 
+next:64'0       ~~~~~~~~~~~~~~
+           246:  REP_Immediate 16 
+next:64'0       ~~~~~~~~~~~~~~~~~~
+           247:  $x16 = INX16 $x16 
+next:64'0       ~~~~~~~~~~~~~~~~~~~
+           248:  $a = LDAbsXIdx 2048, killed $x16 
+next:64'0       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           249:  SEP_Immediate 16 
+next:64'0       ~~~~~~~~~~~~~~~~~~
+           250:  RTS implicit $a 
+next:64'0       ~~~~~~~~~~~~~~~~~
+next:64'1        ?                possible intended match
+           251: ... 
+next:64'0       ~~~~
+           252: --- 
+next:64'0       ~~~~
+           253: name: y_widens_before_x_reader 
+next:64'0       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+check:80'0                                    X error: no match found
+           254: alignment: 1 
+check:80'0      ~~~~~~~~~~~~~
+           255: exposesReturnsTwice: false 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           256: legalized: false 
+check:80'0      ~~~~~~~~~~~~~~~~~
+           257: regBankSelected: false 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~
+           258: selected: false 
+check:80'0      ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           310:  $y = LDImm 1 
+check:80'0      ~~~~~~~~~~~~~~
+           311:  REP_Immediate 16 
+check:80'0      ~~~~~~~~~~~~~~~~~~
+           312:  $y16 = LDYImm16 513 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~
+           313:  $a = LDAbsXIdx 2048, killed $x16 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           314:  SEP_Immediate 16 
+check:80'0      ~~~~~~~~~~~~~~~~~~
+           315:  RTS implicit $a 
+check:80'0      ~~~~~~~~~~~~~~~~~
+check:80'1       ?                possible intended match
+           316: ... 
+check:80'0      ~~~~
+           317: --- 
+check:80'0      ~~~~
+           318: name: byte_definition_ends_value 
+check:80'0      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           319: alignment: 1 
+           320: exposesReturnsTwice: false 
+             .
+             .
+             .
+           378:  $a = LDAbsXIdx 2048, killed $x16 
+           379:  SEP_Immediate 16 
+           380:  RTS implicit $a 
+           381: ... 
+           382: --- 
+           383: name: nested_stack 
+check:114'0                       X error: no match found
+           384: alignment: 1 
+check:114'0     ~~~~~~~~~~~~~
+           385: exposesReturnsTwice: false 
+check:114'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           386: legalized: false 
+check:114'0     ~~~~~~~~~~~~~~~~~
+           387: regBankSelected: false 
+check:114'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           388: selected: false 
+check:114'0     ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           434: machineFunctionInfo: {} 
+check:114'0     ~~~~~~~~~~~~~~~~~~~~~~~~
+           435: body: | 
+check:114'0     ~~~~~~~~
+           436:  bb.0: 
+check:114'0     ~~~~~~~
+           437:  liveins: $a 
+check:114'0     ~~~~~~~~~~~~~
+           438:   
+check:114'0     ~~
+           439:  REP_Immediate 16 
+check:114'0     ~~~~~~~~~~~~~~~~~~
+check:114'1        ?               possible intended match
+           440:  $x16 = LDXImm16 511 
+check:114'0     ~~~~~~~~~~~~~~~~~~~~~
+           441:  SEP_Immediate 16 
+check:114'0     ~~~~~~~~~~~~~~~~~~
+           442:  $y = LDImm 1 
+check:114'0     ~~~~~~~~~~~~~~
+           443:  PH $y 
+check:114'0     ~~~~~~~
+           444:  $y = PL 
+check:114'0     ~~~~~~~~~
+             .
+             .
+             .
+           447:  STAbsXIdx $a, 2048, killed $x16 
+check:114'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           448:  SEP_Immediate 16 
+check:114'0     ~~~~~~~~~~~~~~~~~~
+           449:  RTS 
+check:114'0     ~~~~~
+           450: ... 
+check:114'0     ~~~~
+           451: --- 
+check:114'0     ~~~~
+           452: name: live_nz 
+check:114'0     ~~~~~~~~~~~~~
+check:137'0                  X error: no match found
+           453: alignment: 1 
+check:137'0     ~~~~~~~~~~~~~
+           454: exposesReturnsTwice: false 
+check:137'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           455: legalized: false 
+check:137'0     ~~~~~~~~~~~~~~~~~
+           456: regBankSelected: false 
+check:137'0     ~~~~~~~~~~~~~~~~~~~~~~~
+           457: selected: false 
+check:137'0     ~~~~~~~~~~~~~~~~
+             .
+             .
+             .
+           512:  $c = CMPImm $y, 1, implicit-def $z 
+check:137'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           513:  REP_Immediate 16 
+check:137'0     ~~~~~~~~~~~~~~~~~~
+           514:  $x16 = LDXImm16 511 
+check:137'0     ~~~~~~~~~~~~~~~~~~~~~
+           515:  STAbsXIdx $a, 2048, killed $x16 
+check:137'0     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           516:  SEP_Immediate 16 
+check:137'0     ~~~~~~~~~~~~~~~~~~
+           517:  RTS implicit $z 
+check:137'0     ~~~~~~~~~~~~~~~~~
+check:137'1      ?                possible intended match
+           518: ... 
+check:137'0     ~~~~
+>>>>>>
