@@ -1,0 +1,7 @@
+{
+  "tested_binary_sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe",
+  "rebuilt_binary_sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe",
+  "equal": true,
+  "packaged_head": "886adb9c01f3121f089a18c8bf9dbb2530ab6419",
+  "packaged_tree": "93340b041175094cf1433e246de2a7bf7965d005"
+}

@@ -1,0 +1,56 @@
+[
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.s"
+    ],
+    "exit_code": -6
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-stop-before=greedy",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.mir"
+    ],
+    "exit_code": 0
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.s"
+    ],
+    "exit_code": -6
+  },
+  {
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-stop-before=greedy",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.mir"
+    ],
+    "exit_code": 0
+  }
+]

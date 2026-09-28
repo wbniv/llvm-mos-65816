@@ -1,0 +1,409 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll'
+  source_filename = "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @table = external addrspace(2) global [256 x i8]
+  @output = external addrspace(2) global [256 x i8]
+  @index8 = external global i8
+  @sink16 = external global i16
+  
+  ; Function Attrs: norecurse
+  define i8 @load_byte(i8 %index) #0 {
+    %offset = zext i8 %index to i32
+    %ptr = getelementptr i8, ptr addrspace(2) @table, i32 %offset
+    %value = load i8, ptr addrspace(2) %ptr, align 1
+    ret i8 %value
+  }
+  
+  ; Function Attrs: norecurse
+  define void @store_byte(i8 %index, i8 %value) #0 {
+    %offset = zext i8 %index to i32
+    %ptr = getelementptr i8, ptr addrspace(2) @output, i32 %offset
+    store i8 %value, ptr addrspace(2) %ptr, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define i8 @load_byte_wide_index(i16 %index) #0 {
+    %offset = zext i16 %index to i32
+    %ptr = getelementptr i8, ptr addrspace(2) @table, i32 %offset
+    %value = load i8, ptr addrspace(2) %ptr, align 1
+    ret i8 %value
+  }
+  
+  ; Function Attrs: norecurse
+  define void @load_memory_index() #0 {
+    %index = load volatile i8, ptr @index8, align 1
+    %offset = zext i8 %index to i32
+    %ptr = getelementptr i8, ptr addrspace(2) @table, i32 %offset
+    %value = load i8, ptr addrspace(2) %ptr, align 1
+    %wide = zext i8 %value to i16
+    store volatile i16 %wide, ptr @sink16, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @store_memory_index(i8 %value) #0 {
+    %index = load volatile i8, ptr @index8, align 1
+    %offset = zext i8 %index to i32
+    %ptr = getelementptr i8, ptr addrspace(2) @output, i32 %offset
+    store i8 %value, ptr addrspace(2) %ptr, align 1
+    ret void
+  }
+  
+  attributes #0 = { norecurse "nonreentrant" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" }
+...
+---
+name:            load_byte
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: xc, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a
+  
+    %0:xc = COPY $a
+    %4:ac = LDAbsLongIdx @table, %0 :: (load (s8) from %ir.ptr, addrspace 2)
+    $a = COPY %4
+    RTS implicit $a
+...
+---
+name:            store_byte
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: xc, preferred-register: '', flags: [  ] }
+  - { id: 1, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a, $x
+  
+    %0:xc = COPY $a
+    %1:ac = COPY $x
+    STAbsLongIdx %1, @output, %0 :: (store (s8) into %ir.ptr, addrspace 2)
+    RTS
+...
+---
+name:            load_byte_wide_index
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 1, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 2, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 7, class: xc16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a, $x
+  
+    undef %0.sublo:imag16 = COPY $a
+    %0.subhi:imag16 = COPY $x
+    %7:xc16 = COPY %0
+    %6:ac = LDAbsLongXIdx @table, %7 :: (load (s8) from %ir.ptr, addrspace 2)
+    $a = COPY %6
+    RTS implicit $a
+...
+---
+name:            load_memory_index
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: xc, preferred-register: '', flags: [  ] }
+  - { id: 11, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 12, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    %10:xc = LDAbs @index8 :: (volatile dereferenceable load (s8) from @index8)
+    %8:ac = LDAbsLongIdx @table, %10 :: (load (s8) from %ir.ptr, addrspace 2)
+    undef %6.subhi:imag16 = LDZ
+    %6.sublo:imag16 = COPY %8
+    %12:ac16 = LDAImag16 %6
+    STAbs16 %12, @sink16 :: (volatile store (s16) into @sink16, align 1)
+    RTS
+...
+---
+name:            store_memory_index
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: xc, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a
+  
+    %0:ac = COPY $a
+    %7:xc = LDAbs @index8 :: (volatile dereferenceable load (s8) from @index8)
+    STAbsLongIdx %0, @output, %7 :: (store (s8) into %ir.ptr, addrspace 2)
+    RTS
+...

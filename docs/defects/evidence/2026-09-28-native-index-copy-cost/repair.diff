@@ -1,0 +1,98 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index c590adbf515f..ed844172c709 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -1353,6 +1353,15 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+   if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
+   }
++  if (AreClasses(MOS::Xc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Xc16RegClass) ||
++      AreClasses(MOS::Yc16RegClass, MOS::Imag16RegClass) ||
++      AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
++    // LDX/LDY/STX/STY dp with a 16-bit index transfers two bytes in four
++    // cycles. REP/SEP placement depends on surrounding instructions and is
++    // not part of the individual copy cost.
++    return MOSInstrCost(2, 4);
++  }
+   if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+     // An Imag32 copy costs four byte copies, matching copyPhysRegImpl's
+     // recursive decomposition into two Imag16 copies.
+diff --git a/llvm/test/CodeGen/MOS/native-index-copy-cost.mir b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+new file mode 100644
+index 000000000000..9b2bb80ce6d1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-index-copy-cost.mir
+@@ -0,0 +1,72 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=greedy,virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s
++
++# Native index registers and imaginary pairs support equal-width copies in both
++# directions. Allocation must cost each of these legal copy edges.
++
++---
++name: x_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: x_from_pair
++    ; CHECK: $x16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:xc16 = COPY %0
++    $x16 = COPY %1
++    RTS implicit $x16
++...
++
++---
++name: x_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $x16
++    ; CHECK-LABEL: name: x_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $x16
++    %0:xc16 = COPY $x16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
++...
++
++---
++name: y_from_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1
++    ; CHECK-LABEL: name: y_from_pair
++    ; CHECK: $y16 = COPY{{( killed)?( renamable)?}} $rs
++    %0:imag16 = COPY $rs1
++    %1:yc16 = COPY %0
++    $y16 = COPY %1
++    RTS implicit $y16
++...
++
++---
++name: y_to_pair
++legalized: true
++regBankSelected: true
++selected: true
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $y16
++    ; CHECK-LABEL: name: y_to_pair
++    ; CHECK: $rs{{[0-9]+}} = COPY{{( killed)?( renamable)?}} $y16
++    %0:yc16 = COPY $y16
++    %1:imag16 = COPY %0
++    $rs1 = COPY %1
++    RTS implicit $rs1
++...

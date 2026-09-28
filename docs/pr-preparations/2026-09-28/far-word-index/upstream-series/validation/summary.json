@@ -1,0 +1,90 @@
+{
+  "configurations": 58,
+  "mame_passes": 58,
+  "bsnes_passes": 58,
+  "repeat_profiles_equal": 58,
+  "size_default_object_equal_baseline": true,
+  "farblit": [
+    {
+      "mode": "a16",
+      "opt": "Os",
+      "baseline_bytes": 1960,
+      "enabled_bytes": 2024,
+      "baseline_clocks": 308862,
+      "enabled_clocks": 289722,
+      "clock_reduction_percent": 6.2,
+      "default_object_equal_baseline": true
+    },
+    {
+      "mode": "a16",
+      "opt": "Oz",
+      "baseline_bytes": 2153,
+      "enabled_bytes": 2153,
+      "baseline_clocks": 387408,
+      "enabled_clocks": 387408,
+      "clock_reduction_percent": 0.0,
+      "default_object_equal_baseline": true
+    },
+    {
+      "mode": "a16",
+      "opt": "O2",
+      "baseline_bytes": 3279,
+      "enabled_bytes": 3168,
+      "baseline_clocks": 308350,
+      "enabled_clocks": 284374,
+      "clock_reduction_percent": 7.78,
+      "default_object_equal_baseline": false
+    },
+    {
+      "mode": "a16",
+      "opt": "O3",
+      "baseline_bytes": 15912,
+      "enabled_bytes": 15878,
+      "baseline_clocks": 379936,
+      "enabled_clocks": 350972,
+      "clock_reduction_percent": 7.62,
+      "default_object_equal_baseline": false
+    },
+    {
+      "mode": "xy16",
+      "opt": "Os",
+      "baseline_bytes": 1934,
+      "enabled_bytes": 1908,
+      "baseline_clocks": 284878,
+      "enabled_clocks": 262416,
+      "clock_reduction_percent": 7.88,
+      "default_object_equal_baseline": true
+    },
+    {
+      "mode": "xy16",
+      "opt": "Oz",
+      "baseline_bytes": 1955,
+      "enabled_bytes": 1955,
+      "baseline_clocks": 317710,
+      "enabled_clocks": 317710,
+      "clock_reduction_percent": 0.0,
+      "default_object_equal_baseline": true
+    },
+    {
+      "mode": "xy16",
+      "opt": "O2",
+      "baseline_bytes": 3214,
+      "enabled_bytes": 3185,
+      "baseline_clocks": 289654,
+      "enabled_clocks": 267036,
+      "clock_reduction_percent": 7.81,
+      "default_object_equal_baseline": false
+    },
+    {
+      "mode": "xy16",
+      "opt": "O3",
+      "baseline_bytes": 14360,
+      "enabled_bytes": 14379,
+      "baseline_clocks": 356092,
+      "enabled_clocks": 334228,
+      "clock_reduction_percent": 6.14,
+      "default_object_equal_baseline": false
+    }
+  ],
+  "scope": "Frozen post-LTO IR backend replay; existing SDK/linker; -disable-spill-hoist in both builds. Bounds/pressure exclusive-main counts omit called work."
+}

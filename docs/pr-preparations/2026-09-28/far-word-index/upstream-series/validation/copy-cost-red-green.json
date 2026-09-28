@@ -1,0 +1,106 @@
+[
+  {
+    "stage": "baseline",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+    "input_sha256": "ff42cc372c63897cffd491c5e9ab06b8439e1faa59364474dd86fadc74b4a017",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-far-global-long-x.output"
+    ],
+    "exit_code": -6,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-far-global-long-x.log"
+  },
+  {
+    "stage": "baseline",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+    "input_sha256": "2480ca994cabeff20ebda3b444e7e6a3cfaf0ada27ea1517ed72313b02eaca10",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-far-native-word.output"
+    ],
+    "exit_code": -6,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-far-native-word.log"
+  },
+  {
+    "stage": "baseline",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/native-index-copy-cost.mir",
+    "input_sha256": "cb96fda9fe499b5e159f7d5a16944ec4e89f9ff0f6c90a8cc9df159097c46986",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-run-pass=greedy,virtregrewriter",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/native-index-copy-cost.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-native-index-copy-cost.output"
+    ],
+    "exit_code": -6,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-native-index-copy-cost.log"
+  },
+  {
+    "stage": "candidate",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+    "input_sha256": "ff42cc372c63897cffd491c5e9ab06b8439e1faa59364474dd86fadc74b4a017",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-far-global-long-x.output"
+    ],
+    "exit_code": 0,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-far-global-long-x.log"
+  },
+  {
+    "stage": "candidate",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+    "input_sha256": "2480ca994cabeff20ebda3b444e7e6a3cfaf0ada27ea1517ed72313b02eaca10",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-far-native-word.output"
+    ],
+    "exit_code": 0,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-far-native-word.log"
+  },
+  {
+    "stage": "candidate",
+    "input": "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/native-index-copy-cost.mir",
+    "input_sha256": "cb96fda9fe499b5e159f7d5a16944ec4e89f9ff0f6c90a8cc9df159097c46986",
+    "command": [
+      "/home/will/llvm-mos-65816/build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-run-pass=greedy,virtregrewriter",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/native-index-copy-cost.mir",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-native-index-copy-cost.output"
+    ],
+    "exit_code": 0,
+    "log": "/home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-candidate-native-index-copy-cost.log"
+  }
+]

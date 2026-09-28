@@ -1,0 +1,32 @@
+{
+  "method": "Identical captured post-LTO IR, llc object generation, existing SDK/linker; no new frontend or LTO run",
+  "binaries": {
+    ".scratch/far-word-policy/baseline/bin/mos-clang": "e03d6fa3f0722b07b86db8c970d9a1d9bca6bde3287010a55cc3fd7ca234cadf",
+    "build/far-word-upstream/build/bin/llvm-objdump": "95e8bb00f7ba79c38baf24cf61e050b6ea02d026b2ae734f28ba93f634b50c20",
+    ".scratch/carry-timing/jgxcycles-verified": "e294aed948506ab5b131afa983b6c82d838707949f84e1f6720e9cfea3e114ba",
+    "build/far-word-upstream/pre0070/llc": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f",
+    "build/far-word-upstream/candidate/llc": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe"
+  },
+  "inputs": {
+    ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.sfc.0.5.precodegen.bc": "410dfc3c74ecb939e167d83db28983989c5d5b4013e5bcb2962edccbcb442d19",
+    ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.sfc.0.5.precodegen.bc": "1f070ca4fb6708a2dc2a7e11cef9bd3c1c4ff21b824b214dc1280a5a30719aa0",
+    ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.sfc.0.5.precodegen.bc": "4a882aa0c70d2a5fb7c82a92658cb89e9b36a1b33762b88b0e42960bb01d6c59",
+    ".scratch/far-word-policy/runs/baseline-farblit-a16-O3.sfc.0.5.precodegen.bc": "6b5705e6ebedd6459fd6b6b1fe39892be592dfbd3b464deff4c4f5962f78ffdb",
+    ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.sfc.0.5.precodegen.bc": "27f4b80155c5152ce1bea049575df19e160c6ed9d7d5537c69934c5a270db287",
+    ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.sfc.0.5.precodegen.bc": "9dd98f5f1b65c7b3940967dd2243675b722e51a49cf9b8631fde83c4993e4720",
+    ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.sfc.0.5.precodegen.bc": "2778881b113614293aa9cfa0617c30eb6d275321661f57195f0d0c9d61a69643",
+    ".scratch/far-word-policy/runs/baseline-farblit-xy16-O3.sfc.0.5.precodegen.bc": "9069d1e0633b06e213243d124604e85f0157f11747f01718a7748ade39be96c9",
+    ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.sfc.0.5.precodegen.bc": "866d2fc2c614f2189494f766d3b7378dc1b8f4ec1177387b92718c3057540f05",
+    ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.sfc.0.5.precodegen.bc": "793bfb547a26efc29eed95d74f7286f749fe69143d165b2cfb5abbdc898d2345",
+    ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.sfc.0.5.precodegen.bc": "1274d6a887dde35b9db3c60f069ab7710cab01fb620c4e94a1f4da5a948f0cee",
+    ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.sfc.0.5.precodegen.bc": "168ca82a2e8cf3e18ccdfc9b840fd9b5175137fbc58dc0c54d51d66db0238f38",
+    ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.sfc.0.5.precodegen.bc": "34469899fdcad426e6a95e9c604b74b5638cd6be35ec706cb5a24bb0719f8cfc",
+    ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.sfc.0.5.precodegen.bc": "234617d1c2dee53cc203b3e7113d63214db3382b61b72f20a56abaab44ffae30",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.sfc.0.5.precodegen.bc": "1c92377089e60261ed8b75cebff0c3bf112ce8bd68d98aecc822ad8d1fa229e0",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.sfc.0.5.precodegen.bc": "c84529e8e6e63c7ead1c62d4fa38c0c90cbb76b6aa349a45b1849b2bb00e3569",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.sfc.0.5.precodegen.bc": "5d25e59544ac0a230edc01ce7b67e9a79759d9ae908b98d243f3abd9fa7d2646",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.sfc.0.5.precodegen.bc": "b9ac46b7594dfcdc1d008300d1fb628c87b8532ccf972144e475b3a39dadb605",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.sfc.0.5.precodegen.bc": "8090a109285a06340e23221fa52f732814627ac5bf5d46a19341b96e8726f216",
+    ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.sfc.0.5.precodegen.bc": "f271bfc09ca4d8967786a4fecb8cfd6c2dbfc2b8696e68d357e06ce0ca7d1440"
+  }
+}

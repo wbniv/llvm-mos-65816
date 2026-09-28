@@ -1,0 +1,32 @@
+[
+  {
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=x86_64",
+      "-enable-subreg-liveness",
+      "-run-pass=greedy,virtregrewriter",
+      "-verify-machineinstrs",
+      "build/far-word-upstream/x86-regressions/virtregrewriter-x86-copy-contracts.mir",
+      "-o",
+      "-"
+    ],
+    "compile_status": 0,
+    "check_status": 0,
+    "input_sha256": "c5b2da74af50a3b855e719ab023cbc8d04421118bc681bcbe1061bb9b7abc169"
+  },
+  {
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=x86_64",
+      "-enable-subreg-liveness",
+      "-run-pass=greedy,virtregrewriter",
+      "-verify-machineinstrs",
+      "build/far-word-upstream/x86-regressions/virtregrewriter-x86-undef-high-byte-result.mir",
+      "-o",
+      "-"
+    ],
+    "compile_status": 0,
+    "check_status": 0,
+    "input_sha256": "22bca8d6a976886fbe800a2697eae2fdf6cbe57335636581bc3232683d47e852"
+  }
+]

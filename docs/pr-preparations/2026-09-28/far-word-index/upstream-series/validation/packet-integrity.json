@@ -1,0 +1,9 @@
+{
+  "archives_verified": 3,
+  "input_members_verified": 25,
+  "validation_members_verified": 938,
+  "patches_verified": 14,
+  "final_head": "886adb9c01f3121f089a18c8bf9dbb2530ab6419",
+  "final_tree": "93340b041175094cf1433e246de2a7bf7965d005",
+  "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+}

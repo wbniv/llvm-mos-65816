@@ -1,0 +1,767 @@
+From 092aa16eb4df25fab235e7d7568f797d6ecab237 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:05:07 +0700
+Subject: [PATCH 12/14] [MOS] Fold bounded native far word loads in
+ speed-optimized functions
+
+Admit plain two-byte far loads to the all-users indexed-address walk.
+Require the final byte of every sibling to fit Y8; reject atomic,
+escaping, call-separated, and unsupported uses. Reuse the original
+bounded offset expression and existing M16/Y8 pseudo.
+
+Default to speed at O2/O3, excluding optsize/minsize/optnone. Retain
+hidden off/all controls for experiments. The downstream evidence and
+its size tradeoffs are retained in the far-word-index preparation packet;
+they are not measurements of this rebased compiler.
+
+Implementation, extraction, and validation: OpenAI Codex CLI 0.157.1
+(session source vscode), model gpt-6-astra, xhigh reasoning effort;
+verified session 01a0e67f-298f-7a21-80af-06f867085f84.
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp  | 110 +++--
+ llvm/test/CodeGen/MOS/far-word-policy.mir | 530 ++++++++++++++++++++++
+ 2 files changed, 603 insertions(+), 37 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/far-word-policy.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 7a0de406eff0..bd442bc90c88 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -56,6 +56,7 @@
+ #include "llvm/Support/CommandLine.h"
+ #include "llvm/Support/ErrorHandling.h"
+ #include "llvm/Support/MathExtras.h"
++#include "llvm/Target/TargetMachine.h"
+ 
+ using namespace llvm;
+ using namespace TargetOpcode;
+@@ -2943,36 +2944,57 @@ static uint64_t getFarOffsetMax(Register Reg, const MachineRegisterInfo &MRI,
+   }
+   return Max;
+ }
++enum class FarWordIndexPolicy { Off, Speed, All };
++static cl::opt<FarWordIndexPolicy> FarWordIndex(
++    "mos-far-word-index", cl::Hidden, cl::init(FarWordIndexPolicy::Speed),
++    cl::desc("Fold bounded native far word loads into Y8 indexing"),
++    cl::values(clEnumValN(FarWordIndexPolicy::Off, "off",
++                          "Retain explicit pointers"),
++               clEnumValN(FarWordIndexPolicy::Speed, "speed",
++                          "Enable in functions optimized for speed"),
++               clEnumValN(FarWordIndexPolicy::All, "all",
++                          "Enable regardless of size attributes")));
++
++static bool isPlainFarWordLoad(const MachineInstr &MI,
++                               const MachineRegisterInfo &MRI) {
++  const auto *Load = dyn_cast<GLoad>(&MI);
++  return Load && MRI.getType(Load->getReg(0)) == LLT::scalar(16) &&
++         Load->getMemSize() == LocationSize::precise(2);
++}
++
+ // The pointer add disappears only when every use is a non-atomic access, or
+ // a constant non-negative displacement leading exclusively to such accesses.
+ // MaxEnd includes each access's final byte. Escapes and selected fallbacks keep
+ // the add alive and must reject the entire group.
+-static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+-                                          const MachineInstr &VDef,
+-                                          Register Ptr, uint64_t Disp,
+-                                          uint64_t &MaxEnd,
+-                                          unsigned &NumAccesses,
+-                                          bool FnMayCall, unsigned Depth) {
++static bool allUsesAreFoldableFarAccesses(
++    const MachineRegisterInfo &MRI, const MachineInstr &VDef, Register Ptr,
++    uint64_t Disp, uint64_t &MaxEnd, unsigned &NumAccesses, bool FnMayCall,
++    bool AllowWord, bool &HasWord, unsigned Depth) {
+   // Bound the walk and the displacement; neither limit can admit a fold that a
+   // deeper/larger walk would reject — hitting one just declines.
+   if (Depth > 4 || Disp > 0xFFFF)
+     return false;
+   for (const MachineInstr &U : MRI.use_nodbg_instructions(Ptr)) {
+     if (const auto *LS = dyn_cast<GLoadStore>(&U)) {
+-      if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() || LS->isAtomic() ||
+-          MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8))
++      if (LS->getPointerReg() != Ptr || !U.hasOneMemOperand() ||
++          LS->isAtomic() ||
++          (MRI.getType(U.getOperand(0).getReg()) != LLT::scalar(8) &&
++           !(AllowWord && isPlainFarWordLoad(U, MRI))))
+         return false;
++      HasWord |= isPlainFarWordLoad(U, MRI);
+       if (const auto *St = dyn_cast<GStore>(LS))
+-        if (St->getValueReg() == Ptr) // the pointer is the stored VALUE: escapes
++        if (St->getValueReg() ==
++            Ptr) // the pointer is the stored VALUE: escapes
+           return false;
+       LocationSize Sz = LS->getMemSize();
+-      if (!Sz.hasValue() || Sz.isScalable() || Sz.getValue().getFixedValue() == 0)
++      if (!Sz.hasValue() || Sz.isScalable() ||
++          Sz.getValue().getFixedValue() == 0)
+         return false;
+       if (FnMayCall && !noCallBetween(VDef, U, MRI)) // (e)
+         return false;
+       ++NumAccesses;
+-      MaxEnd = std::max<uint64_t>(MaxEnd,
+-                                  Disp + Sz.getValue().getFixedValue() - 1);
++      MaxEnd =
++          std::max<uint64_t>(MaxEnd, Disp + Sz.getValue().getFixedValue() - 1);
+       continue;
+     }
+     if (const auto *PA = dyn_cast<GPtrAdd>(&U)) {
+@@ -2981,9 +3003,9 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+       auto C = getIConstantVRegValWithLookThrough(PA->getOffsetReg(), MRI);
+       if (!C || C->Value.isNegative() || C->Value.getActiveBits() > 16)
+         return false;
+-      if (!allUsesAreFoldableFarAccesses(MRI, VDef, PA->getReg(0),
+-                                         Disp + C->Value.getZExtValue(), MaxEnd,
+-                                         NumAccesses, FnMayCall, Depth + 1))
++      if (!allUsesAreFoldableFarAccesses(
++              MRI, VDef, PA->getReg(0), Disp + C->Value.getZExtValue(), MaxEnd,
++              NumAccesses, FnMayCall, AllowWord, HasWord, Depth + 1))
+         return false;
+       continue;
+     }
+@@ -3000,16 +3022,22 @@ static bool allUsesAreFoldableFarAccesses(const MachineRegisterInfo &MRI,
+ // pressure. Calls must not separate the add from its accesses; multiple
+ // accesses require a call-free function to avoid repeated spilled-base reloads.
+ // Prefer an 8-bit Y whenever the remaining users fit it.
+-static bool tryFarRuntimeIndexFold(
+-    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI,
+-    Register Addr, int64_t ConstOffset,
+-    function_ref<bool(Register)> IsAbsoluteAddress) {
++static bool
++tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                       GLoadStore &MI, Register Addr, int64_t ConstOffset,
++                       function_ref<bool(Register)> IsAbsoluteAddress) {
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+ 
+-  // The indexed pseudos below carry one byte. A native word access must retain
+-  // its own lowering, and wider siblings must not keep a partially folded add.
+-  if (MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
++  const Function &F = Builder.getMF().getFunction();
++  const bool AllowWord =
++      STI.hasAccum16() &&
++      (FarWordIndex == FarWordIndexPolicy::All ||
++       (FarWordIndex == FarWordIndexPolicy::Speed && !F.hasOptSize() &&
++        !F.hasOptNone() &&
++        Builder.getMF().getTarget().getOptLevel() >= CodeGenOptLevel::Default));
++  const bool Word = AllowWord && isPlainFarWordLoad(MI, MRI);
++  if (!Word && MRI.getType(MI.getOperand(0).getReg()) != LLT::scalar(8))
+     return false;
+ 
+   // (a)
+@@ -3028,7 +3056,7 @@ static bool tryFarRuntimeIndexFold(
+     return false;
+ 
+   // (b) range proof on the offset itself, before the (costlier) user walk.
+-  const uint64_t Limit = STI.hasIndex16() ? 0xFFFF : 0xFF;
++  uint64_t Limit = !Word && STI.hasIndex16() ? 0xFFFF : 0xFF;
+   const uint64_t MaxOff =
+       FarLoopRange ? getFarOffsetMax(Off, MRI, *VT, *MI.getParent())
+                    : VT->getKnownBits(Off).getMaxValue().getLimitedValue();
+@@ -3043,12 +3071,17 @@ static bool tryFarRuntimeIndexFold(
+       FnMayCall |= mayBecomeCall(I, MRI);
+   uint64_t MaxEnd = 0;
+   unsigned NumAccesses = 0;
++  bool HasWord = false;
+   if (!allUsesAreFoldableFarAccesses(MRI, *V, Addr, 0, MaxEnd, NumAccesses,
+-                                     FnMayCall, 0))
++                                     FnMayCall, AllowWord, HasWord, 0))
+     return false;
+   // (f)
+   if (NumAccesses > 1 && FnMayCall)
+     return false;
++  // Native word pseudos consume Y8. Every sibling must fit that same limit,
++  // including a byte access visited before the word access.
++  if (HasWord)
++    Limit = 0xFF;
+   if (MaxOff + MaxEnd > Limit)
+     return false;
+   // This access is one of V's users, so its displacement is inside the walk.
+@@ -3058,15 +3091,18 @@ static bool tryFarRuntimeIndexFold(
+   const LLT IdxTy = LLT::scalar(Wide ? 16 : 8);
+   Register Idx = Builder.buildZExtOrTrunc(IdxTy, Off).getReg(0);
+   if (ConstOffset)
+-    Idx = Builder.buildAdd(IdxTy, Idx, Builder.buildConstant(IdxTy, ConstOffset))
+-              .getReg(0);
++    Idx =
++        Builder.buildAdd(IdxTy, Idx, Builder.buildConstant(IdxTy, ConstOffset))
++            .getReg(0);
+ 
+   const bool IsLoad = isa<GLoad>(MI);
+-  unsigned Opcode =
+-      Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16 : MOS::G_STORE_FAR_INDIR_IDX16)
+-           : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX : MOS::G_STORE_FAR_INDIR_IDX);
++  unsigned Opcode = Word   ? MOS::G_LOAD16_FAR_INDIR_IDX
++                    : Wide ? (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX16
++                                     : MOS::G_STORE_FAR_INDIR_IDX16)
++                           : (IsLoad ? MOS::G_LOAD_FAR_INDIR_IDX
++                                     : MOS::G_STORE_FAR_INDIR_IDX);
+   Builder.buildInstr(Opcode)
+-      .add(MI.getOperand(0))  // dst (load) / value (store)
++      .add(MI.getOperand(0))   // dst (load) / value (store)
+       .addUse(V->getBaseReg()) // far pointer -> Imag32 ZP quad
+       .addUse(Idx)             // proven-in-range byte offset -> Y
+       .addMemOperand(*MI.memoperands_begin());
+@@ -3074,8 +3110,9 @@ static bool tryFarRuntimeIndexFold(
+   return true;
+ }
+ 
+-bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
+-    LegalizerHelper &Helper, MachineRegisterInfo &MRI, GLoadStore &MI) const {
++bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(LegalizerHelper &Helper,
++                                                       MachineRegisterInfo &MRI,
++                                                       GLoadStore &MI) const {
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+ 
+   Register Addr = MI.getPointerReg();
+@@ -3099,11 +3136,10 @@ bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(
+ 
+   // Fold the range-proven runtime offset and displacement together when the
+   // pointer add can disappear, preserving the offset's integer arithmetic.
+-  if (tryFarRuntimeIndexFold(Helper, MRI, MI, Addr, ConstOffset,
+-                             [&](Register R) {
+-                               return matchAbsoluteAddressing(MRI, R)
+-                                   .has_value();
+-                             }))
++  if (tryFarRuntimeIndexFold(
++          Helper, MRI, MI, Addr, ConstOffset, [&](Register R) {
++            return matchAbsoluteAddressing(MRI, R).has_value();
++          }))
+     return true;
+ 
+   // (b) Only the zero-proof displacement window.
+diff --git a/llvm/test/CodeGen/MOS/far-word-policy.mir b/llvm/test/CodeGen/MOS/far-word-policy.mir
+new file mode 100644
+index 000000000000..3d4d61b30081
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-word-policy.mir
+@@ -0,0 +1,530 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SPEED
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O3 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SPEED
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=OFF
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O1 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=OFF
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -mos-far-word-index=speed -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SPEED
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -mos-far-word-index=speed -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=SPEED
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -mos-far-word-index=all -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=ALL
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -mos-far-word-index=all -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=ALL
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -mos-far-word-index=off -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=OFF
++#
++# The final byte of every sibling must fit Y8, including when the byte access
++# is visited before a word. Speed policy respects function size and no-opt
++# attributes. Wrapping and non-unit inductions retain explicit word pointers.
++--- |
++  define void @word_speed()  { ret void }
++  define void @word_size() optsize { ret void }
++  define void @word_minsize() minsize optsize { ret void }
++  define void @word_noopt() noinline optnone { ret void }
++  define void @word129()  { ret void }
++  define void @word_wrap()  { ret void }
++  define void @word_nonunit()  { ret void }
++  define void @word_fullcycle()  { ret void }
++  define void @mixed_1_1()  { ret void }
++  define void @mixed_1_0()  { ret void }
++  define void @mixed_2_1()  { ret void }
++  define void @mixed_2_0()  { ret void }
++...
++# SPEED-LABEL: name: word_speed
++# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# ALL-LABEL: name: word_speed
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: word_speed
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_speed
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_size
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_size
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: word_size
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_size
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_minsize
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_minsize
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: word_minsize
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_minsize
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_noopt
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_noopt
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: word_noopt
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_noopt
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word129
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word129
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: word129
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word129
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 129
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_wrap
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_wrap
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: word_wrap
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_wrap
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 250
++    %end:_(s8) = G_CONSTANT i8 6
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_nonunit
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_nonunit
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: word_nonunit
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_nonunit
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 2
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: word_fullcycle
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: word_fullcycle
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: word_fullcycle
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: word_fullcycle
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 0
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: mixed_1_1
++# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# ALL-LABEL: name: mixed_1_1
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: mixed_1_1
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: mixed_1_1
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %extra:_(s32) = G_CONSTANT i32 1
++    %byteptr:_(p2) = G_PTR_ADD %ptr, %extra(s32)
++    %byte:_(s8) = G_LOAD %byteptr(p2) :: (volatile load (s8), addrspace 2)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: mixed_1_0
++# SPEED: = G_LOAD16_FAR_INDIR_IDX
++# ALL-LABEL: name: mixed_1_0
++# ALL: = G_LOAD16_FAR_INDIR_IDX
++# OFF-LABEL: name: mixed_1_0
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: mixed_1_0
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %extra:_(s32) = G_CONSTANT i32 1
++    %byteptr:_(p2) = G_PTR_ADD %ptr, %extra(s32)
++    %byte:_(s8) = G_LOAD %byteptr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: mixed_2_1
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: mixed_2_1
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: mixed_2_1
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: mixed_2_1
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %extra:_(s32) = G_CONSTANT i32 2
++    %byteptr:_(p2) = G_PTR_ADD %ptr, %extra(s32)
++    %byte:_(s8) = G_LOAD %byteptr(p2) :: (volatile load (s8), addrspace 2)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...
++
++# SPEED-LABEL: name: mixed_2_0
++# SPEED: = G_LOAD16_FAR_INDIR{{ }}
++# ALL-LABEL: name: mixed_2_0
++# ALL: = G_LOAD16_FAR_INDIR{{ }}
++# OFF-LABEL: name: mixed_2_0
++# OFF: = G_LOAD16_FAR_INDIR{{ }}
++---
++name: mixed_2_0
++tracksRegLiveness: true
++body: |
++  bb.0:
++    successors: %bb.1
++    liveins: $rs0, $rs2
++    %lo:_(s16) = COPY $rs0
++    %hi:_(s16) = COPY $rs2
++    %raw:_(s32) = G_MERGE_VALUES %lo(s16), %hi(s16)
++    %base:_(p2) = G_INTTOPTR %raw(s32)
++    %start:_(s8) = G_CONSTANT i8 0
++    %end:_(s8) = G_CONSTANT i8 128
++    %step:_(s8) = G_CONSTANT i8 1
++    %carry:_(s1) = G_CONSTANT i1 1
++    %disp:_(s32) = G_CONSTANT i32 0
++    %shift:_(s32) = G_CONSTANT i32 1
++    %wrapadd:_(s8) = G_CONSTANT i8 248
++    G_BR %bb.1
++  bb.1:
++    successors: %bb.1, %bb.2
++    %iv:_(s8) = G_PHI %start(s8), %bb.0, %next(s8), %bb.1
++    %wide:_(s32) = G_ZEXT %iv(s8)
++    %off:_(s32) = G_SHL %wide, %shift
++    %ptr:_(p2) = G_PTR_ADD %base, %off(s32)
++    %addr:_(p2) = G_PTR_ADD %ptr, %disp(s32)
++    %value:_(s16) = G_LOAD %addr(p2) :: (volatile load (s16), addrspace 2)
++    %extra:_(s32) = G_CONSTANT i32 2
++    %byteptr:_(p2) = G_PTR_ADD %ptr, %extra(s32)
++    %byte:_(s8) = G_LOAD %byteptr(p2) :: (volatile load (s8), addrspace 2)
++    %next:_(s8) = G_ADD %iv, %step
++    %sub:_(s8), %carryout:_(s1), %negative:_(s1), %overflow:_(s1), %zero:_(s1) = G_SBC %next, %end, %carry
++    G_BRCOND_IMM %zero(s1), %bb.1, 0
++    G_BR %bb.2
++  bb.2:
++    RTS
++...

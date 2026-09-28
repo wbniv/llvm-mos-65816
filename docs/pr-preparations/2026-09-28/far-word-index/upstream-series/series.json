@@ -1,0 +1,124 @@
+{
+  "destination": "https://github.com/llvm-mos/llvm-mos",
+  "base": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "head": "886adb9c01f3121f089a18c8bf9dbb2530ab6419",
+  "head_tree": "93340b041175094cf1433e246de2a7bf7965d005",
+  "patch_count": 14,
+  "roundtrip": "Every patch applies with git apply --cached --whitespace=error and reproduces its recorded source tree",
+  "commits": [
+    {
+      "order": 1,
+      "patch": "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch",
+      "sha256": "efeac99dabbae71b8f61161b4d809d1229bf2713eca622f07ada3fa04ea56887",
+      "source_commit": "450823797b44a84d25b2de436b120bbca75260c8",
+      "tree": "f70275b99ad0e28806b1dbbcc0786e8188f323b7",
+      "subject": "[MOS] Extract opt-in native widths and near-memory prerequisites"
+    },
+    {
+      "order": 2,
+      "patch": "patches/0002-MOS-Honor-explicit-address-widths-for-constant-opera.patch",
+      "sha256": "c5fb912a52a1c011e28d6548eb7dfe3c5a5fcdf7bb2d744dee681143255dd366",
+      "source_commit": "e4f2374a6dd4ec7e41b15ea826726d1eefd81edf",
+      "tree": "69313a5ff934fabe11b146a33d9bbe3cb50fda54",
+      "subject": "[MOS] Honor explicit address widths for constant operands"
+    },
+    {
+      "order": 3,
+      "patch": "patches/0003-MOS-Preserve-long-address-widths-in-printed-assembly.patch",
+      "sha256": "591c1256c46e95dc9d3a485228e2411f91d9fed50975a836b08c762834f75f11",
+      "source_commit": "0adc1d8bb3ece25c37bc744bcdabd4ac5a0dfde3",
+      "tree": "503ebd60ef6765b12afdaa08cd37e2ca68d4866e",
+      "subject": "[MOS] Preserve long address widths in printed assembly"
+    },
+    {
+      "order": 4,
+      "patch": "patches/0004-MOS-Extract-far-data-addressing-and-bounded-runtime-.patch",
+      "sha256": "bf1882168ed68c102a81263c3f4fb60f58db436fe9f7d6d9693ced8cdeeff7ae",
+      "source_commit": "0e97992e1a66f8d363634540c21218dfad262d1f",
+      "tree": "c32c43f47ef7215a5cb24cf27e2ce4d2becbdc5c",
+      "subject": "[MOS] Extract far data addressing and bounded runtime indexing"
+    },
+    {
+      "order": 5,
+      "patch": "patches/0005-MOS-Select-far-absolute-indexed-byte-accesses.patch",
+      "sha256": "af1629d8e948cb80b7af681a1c67b78bdb30de00515cd31caa90e1241d3eade7",
+      "source_commit": "b6701bb03d0dc5b6139978bdc7a4a075694832e1",
+      "tree": "d0b3e08d0dc76dfa111606bd1f0034a0057f4f87",
+      "subject": "[MOS] Select far absolute indexed byte accesses"
+    },
+    {
+      "order": 6,
+      "patch": "patches/0006-MOS-Select-native-accumulator-far-word-accesses.patch",
+      "sha256": "f78cb257a18f328bb670efbfe963dd64d285cb1eb5d47c3b3f31781913c088c1",
+      "source_commit": "23785eaa2d445926d32e87506264a7e374e3bbe8",
+      "tree": "17032755d5e66fd28116d180e93a10add73f9951",
+      "subject": "[MOS] Select native accumulator far word accesses"
+    },
+    {
+      "order": 7,
+      "patch": "patches/0007-MOS-Select-far-extending-load-addresses-within-the-l.patch",
+      "sha256": "61d5bbd23c75cdac2549a4f7bc2f15bed78ad7c54db2e2c938817581bcbbe652",
+      "source_commit": "cd0e18359d6ea1022f78c3ef01b5504fd5816141",
+      "tree": "87b51bd13fbdc2a3151de12249f990ba42908ee9",
+      "subject": "[MOS] Select far extending-load addresses within the legalizer worklist"
+    },
+    {
+      "order": 8,
+      "patch": "patches/0008-MOS-Prove-bounded-byte-loop-ranges-for-far-runtime-i.patch",
+      "sha256": "677d03ff8c0b5ebea99fba46f10e19ec8861692229558bf834b437fb1b5f4bd1",
+      "source_commit": "0b9b52e5d3cd1b220db10d2bc1054560adf49ebf",
+      "tree": "f5d77b7784f60dd6f1dd64d6ca2be63e0b42ec34",
+      "subject": "[MOS] Prove bounded byte-loop ranges for far runtime indexing"
+    },
+    {
+      "order": 9,
+      "patch": "patches/0009-MOS-Cost-native-index-copies-to-imaginary-register-p.patch",
+      "sha256": "4c38367a3be08e8c3f6048c8c48eb35f21272d999334a0157861a3a0c274c193",
+      "source_commit": "5796df8e20f3b210237f8a9b0315dd9dfa676064",
+      "tree": "47f084566817e3cbab8124b984a8e2d43bee56d9",
+      "subject": "[MOS] Cost native index copies to imaginary register pairs"
+    },
+    {
+      "order": 10,
+      "patch": "patches/0010-MOS-Preserve-all-four-bytes-when-spilling-far-pointe.patch",
+      "sha256": "a9be816369cc07bc4502c3f5a302cc01db92cff2eee60b9c876cf8f7bf3fb6aa",
+      "source_commit": "eaea9178369d300326c6ef7da9ba3cbf9d0e5e49",
+      "tree": "dd1eaea55bbbf98019ae9ec879341310e01b4913",
+      "subject": "[MOS] Preserve all four bytes when spilling far-pointer quads"
+    },
+    {
+      "order": 11,
+      "patch": "patches/0011-CodeGen-Preserve-undefined-lane-definitions-in-ident.patch",
+      "sha256": "b49856a28ea977f26d640a44172e1b0b511d854aff55ec49979d17946c4778c5",
+      "source_commit": "11baf69da7178e9ecc226e210b63ef3fc8a50791",
+      "tree": "7623a060761bec4781ce66828ae266ad21194a32",
+      "subject": "[CodeGen] Preserve undefined lane definitions in identity copies"
+    },
+    {
+      "order": 12,
+      "patch": "patches/0012-MOS-Fold-bounded-native-far-word-loads-in-speed-opti.patch",
+      "sha256": "1811a3dc336fc7d5cfd32324739335ed538ddd495a4eedb871f5670b27ae5db9",
+      "source_commit": "092aa16eb4df25fab235e7d7568f797d6ecab237",
+      "tree": "ff65f1ab422cf01e760d97fa7dbd49da487df1b4",
+      "subject": "[MOS] Fold bounded native far word loads in speed-optimized functions"
+    },
+    {
+      "order": 13,
+      "patch": "patches/0013-MOS-Check-far-word-boundaries-operands-and-loop-proo.patch",
+      "sha256": "370bbf35bbb0f649539f82527eeb1e330a8afcedb85f9f36739b593ebf15896d",
+      "source_commit": "ef0a194ccc0b060fe2f996adbc6486fe7b2c4d0e",
+      "tree": "d357826985c7566828c197ed95bea3527746d642",
+      "subject": "[MOS] Check far-word boundaries, operands, and loop-proof limits"
+    },
+    {
+      "order": 14,
+      "patch": "patches/0014-MOS-Assert-shared-base-and-index-for-mixed-far-loads.patch",
+      "sha256": "f3c74c3b4a228703cc1046a75f4eecd5572963cea94e154792e99e80899c3170",
+      "source_commit": "886adb9c01f3121f089a18c8bf9dbb2530ab6419",
+      "tree": "93340b041175094cf1433e246de2a7bf7965d005",
+      "subject": "[MOS] Assert shared base and index for mixed far loads"
+    }
+  ],
+  "source_history_bundle_sha256": "262da030fac219bd89ec1677e647dffec2a29568804d4861338439aaa25bcbf6",
+  "attribution": "Extraction and validation: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; session 01a0e67f-298f-7a21-80af-06f867085f84. Earlier credits retained in patch messages."
+}

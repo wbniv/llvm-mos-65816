@@ -2,6 +2,7 @@
 
 **Status: local working draft, September 28, 2026.** The user requested an evolving PR explanation that ties design and development choices to evidence for a demanding compiler audience, with diagrams where useful. Patch 0070 is integrated and installed downstream; this packet prepares its presentation within the native/far compiler series.
 
+- [Extracted upstream series](upstream-series.md): ordered compiler patches on the pinned destination, assertions-build evidence, dependency reconciliation, and separately identified backend replay.
 - [PR body](pr-body.md): proposed behavior, proof diagram, measured tradeoffs, and limitations.
 - [Author review and evidence guide](review.md): choice-to-evidence mapping, exact source contracts, destination audit, reproduction, and remaining work.
 - [Independent AI correctness review](independent-review.md): three source reviews, the resolved P2 regression-assertion finding and its executed sensitivity evidence, the preserved adjudication, and follow-up coverage.
@@ -15,14 +16,11 @@ Update the body and review when an implementation choice or measured result chan
 
 The body uses local evidence links while it is being developed. Before posting into llvm-mos, publish the evidence on the authorized branch and replace those links with immutable commit URLs that resolve outside this repository. Keep prose paragraphs and list-item paragraphs on one physical line. The Mermaid diagram is native GitHub Markdown; no separate image artifact is required.
 
-## Next iteration
+## Current preparation and next review
 
-1. Address the [additional coverage recommendations](independent-review.md#additional-coverage-recommendations): word endpoints, operands and mixed siblings, rejection paths, range-proof boundaries, and a compact IR integration case. Three separate AI source reviews found no valid-input compiler correctness defect. [REVIEW-INTERACTION-01 is resolved](independent-review.md#correction-and-executed-sensitivity-checks): 78 explicit opcode boundaries, all 156 wrong substitutions rejected, all three correct outputs accepted, and four focused files passing.
-2. Pull the required far-pointer and native-width compiler/ABI changes for #320/#321 out of the larger fork into focused, ordered commits. Apply them to a pinned upstream revision, then add 0069 and 0070. Record the exact commits so reviewers receive a complete, reproducible patch stack.
-3. Build that compiler and repeat the relevant correctness, code-size, and runtime comparisons. This checks that separating and rebasing the changes preserves their behavior and that no dependency was missed. **The existing downstream results remain valid; this additional validation covers the precise code proposed for upstream.** [Detailed steps](review.md#what-testing-the-proposed-upstream-patch-stack-means). Keep the O3 size tradeoff and the size-mode ablation in the report. Assess compilation overhead and independent application cases before claiming broader profitability.
-4. Finalize public evidence links and posting text after those results. Merge order follows the compiler/ABI prerequisites. The SNES platform remains on its [separate submission track](../../../upstream-pending-work.md#snes--separate-platform-track).
+The [extracted-series packet](upstream-series.md) now supplies concrete ordered commits on upstream `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`, an assertions-enabled build, expanded boundary/operand/integration coverage, and a fresh workload replay. Its execution identified missing prerequisites and a new native index copy-cost case; each is reconciled with prior work and has retained evidence. See that packet for the exact completed matrix and remaining limits.
 
-The [remaining review questions](review.md#remaining-development-and-review-questions) cover added coverage, broader application performance, compilation overhead, whether to retain the hidden policy switch, and whether the proposed upstream patch stack preserves behavior and includes all dependencies. Independent review of that eventual extracted stack remains necessary.
+The original [independent downstream review](independent-review.md) and opcode-assertion correction remain valid for their recorded source. They do not certify the larger extracted series. Next, independently review that complete compiler/ABI candidate, settle the listed feature/ABI contracts, and publish immutable evidence links before filing. Compiler overhead and independent-application profitability remain unmeasured. SNES implementation/platform code remains on its [separate submission track](../../../upstream-pending-work.md#snes--separate-platform-track).
 
 Preparation and source/measurement audit: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
 

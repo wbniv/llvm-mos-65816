@@ -1491,6 +1491,11 @@
     {
       "path": "docs/defects/evidence/2026-09-25-coalescing-0015/source-archive.json",
       "sha256": "ad3f013e54c9cfc26e8840a23f00f7c9a5f999a5042415a052ea4f0fd8f0123b"
+    },
+    {
+      "path": "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation-artifacts.tar.xz",
+      "sha256": "92e92d0811e336295992cae03bfb5ca3b258748a00eab5fe8b87e6e3ef8b435e",
+      "description": "September 28 upstream extraction: the boundary fixture function word_pressure reports an undefined rc4 after virtual-register rewriting when 0028 is omitted (runtime-without0028/baseline-bounds-a16-Os-compile.log); the archive retains its compiler identity, commands and 0028-missing-pre-rewriter.mir. Including the existing 0028 repair clears this diagnostic; a separate spill-hoisting assertion in main requires the existing driver setting -disable-spill-hoist. The final same-input backend matrix passes both emulators. This is an additional extraction observation, not a new causal-defect record, a replacement baseline, or a claim that 0028 repairs spill hoisting. OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84."
     }
   ]
 }

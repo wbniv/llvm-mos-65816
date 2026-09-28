@@ -1,0 +1,1006 @@
+[
+  {
+    "name": "baseline-farblit-a16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-a16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-a16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-a16-O3",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O3",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-O3.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-a16-O3.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-a16-O3",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O3",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-a16-O3.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-a16-O3.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-xy16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-xy16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit-xy16-O3",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O3",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-O3.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit-xy16-O3.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit-xy16-O3",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O3",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit-xy16-O3.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit-xy16-O3.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-a16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-a16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-a16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-xy16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-bounds-xy16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-bounds-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-bounds-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-bounds-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-bounds-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-bounds-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-bounds-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-a16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-a16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-a16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-a16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-a16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-a16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-a16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-a16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-a16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-a16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-xy16-Os",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-xy16-Os",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Os.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-xy16-Os.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-xy16-Oz",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-Oz.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-xy16-Oz.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "baseline-farblit_press-xy16-O2",
+    "command": [
+      "build/far-word-upstream/pre0070/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/baseline-farblit_press-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "default-farblit_press-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/default-farblit_press-xy16-O2.o"
+    ],
+    "exit_code": 0
+  },
+  {
+    "name": "all-farblit_press-xy16-O2",
+    "command": [
+      "build/far-word-upstream/candidate/llc",
+      "-mtriple=mos",
+      "-mcpu=mosw65816",
+      "-mattr=+mos-a16,+mos-xy16",
+      "-verify-machineinstrs",
+      "-disable-spill-hoist",
+      "-O2",
+      "-filetype=obj",
+      "-mos-far-word-index=all",
+      ".scratch/far-word-policy/runs/baseline-farblit_press-xy16-O2.sfc.0.5.precodegen.bc",
+      "-o",
+      "build/far-word-upstream/compile-matrix/all-farblit_press-xy16-O2.o"
+    ],
+    "exit_code": 0
+  }
+]

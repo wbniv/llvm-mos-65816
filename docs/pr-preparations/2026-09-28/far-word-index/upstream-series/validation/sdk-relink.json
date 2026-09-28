@@ -1,0 +1,912 @@
+[
+  {
+    "name": "baseline-farblit-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-a16-Os.sfc"
+    ],
+    "rom_sha256": "5fdc21056c47c8477e3b02b7beedcc09c5b838a20b5bcca290e387bf2b3ebc1a",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-a16-Os.sfc"
+    ],
+    "rom_sha256": "5fdc21056c47c8477e3b02b7beedcc09c5b838a20b5bcca290e387bf2b3ebc1a",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-a16-Os.sfc"
+    ],
+    "rom_sha256": "230d263ef592fdc668dd0c13a320bed55c4de518e50652cb71445d2019a43518",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-a16-Oz.sfc"
+    ],
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-a16-Oz.sfc"
+    ],
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-a16-Oz.sfc"
+    ],
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-a16-O2.sfc"
+    ],
+    "rom_sha256": "1f8ae1bdf03f17ceddc1255e6d0f6975c6cf5a2a056a0666ce8de53303944feb",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-a16-O2.sfc"
+    ],
+    "rom_sha256": "2ca6e70707a5eeef4334e088c954119270d35e32b8666d5b279fc704e6a3830d",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-a16-O2.sfc"
+    ],
+    "rom_sha256": "2ca6e70707a5eeef4334e088c954119270d35e32b8666d5b279fc704e6a3830d",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-a16-O3",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-a16-O3.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-a16-O3.sfc"
+    ],
+    "rom_sha256": "a628cd94c9f4e6060ca5d51464322718a4ec91dc267e6b8d077f48f57db42c7f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-a16-O3",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-a16-O3.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-a16-O3.sfc"
+    ],
+    "rom_sha256": "b8ff1d0700a6ff182971d1a11199b0b84ad3c667036a3ef4f7c79a74c07d9f27",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-xy16-Os.sfc"
+    ],
+    "rom_sha256": "9b7a5d2da23081e52b61814975defc215ee4f484ffce95672c06bb8eb43ec4fd",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-xy16-Os.sfc"
+    ],
+    "rom_sha256": "9b7a5d2da23081e52b61814975defc215ee4f484ffce95672c06bb8eb43ec4fd",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-xy16-Os.sfc"
+    ],
+    "rom_sha256": "6c57045813d13fbe05851c0c062bfa025b13f46b1526caee105657fd41d13487",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-xy16-O2.sfc"
+    ],
+    "rom_sha256": "20cf58f9ef3e3869d2b08ae0e49a6cb8bdc7416eab8aba94ab413c7faf894344",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-xy16-O2.sfc"
+    ],
+    "rom_sha256": "5a60299baa1891716863dd575afc010f7984a56fc1b3f66d515eaaef4acf1a78",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit-xy16-O2.sfc"
+    ],
+    "rom_sha256": "5a60299baa1891716863dd575afc010f7984a56fc1b3f66d515eaaef4acf1a78",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit-xy16-O3",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit-xy16-O3.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit-xy16-O3.sfc"
+    ],
+    "rom_sha256": "b556afddb6b00b5d75354620342f0b368aa0302de3ab2b9996f69dd5ce9dfd21",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit-xy16-O3",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit-xy16-O3.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit-xy16-O3.sfc"
+    ],
+    "rom_sha256": "e5e1f5de8c761ed910e1276dc27425b00b27b78edc3504d94505786ddc7b4da1",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-a16-Os.sfc"
+    ],
+    "rom_sha256": "da59f40eb6f0a5421510518b450c359d90cbe67021b339a15e50e3918de99caf",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-a16-Os.sfc"
+    ],
+    "rom_sha256": "da59f40eb6f0a5421510518b450c359d90cbe67021b339a15e50e3918de99caf",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-a16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-a16-Os.sfc"
+    ],
+    "rom_sha256": "3544ca74742a805f9b756a9000aff955e7cd3f241b2179292b1bf79edadc3345",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-a16-Oz.sfc"
+    ],
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-a16-Oz.sfc"
+    ],
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-a16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-a16-Oz.sfc"
+    ],
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-a16-O2.sfc"
+    ],
+    "rom_sha256": "1b8e2c2d50cb6e3cd4cde74180529c72e72f849ad4ca8c36a4c487b571d8a4aa",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-a16-O2.sfc"
+    ],
+    "rom_sha256": "ba7cff429cc716d6882db627f4cc36505035068c21adaf22bcfc3be7fcc226ca",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-a16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-a16-O2.sfc"
+    ],
+    "rom_sha256": "ba7cff429cc716d6882db627f4cc36505035068c21adaf22bcfc3be7fcc226ca",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-xy16-Os.sfc"
+    ],
+    "rom_sha256": "7908b4a56080ad34bcf1058a6f0d80250c4b8d702227c3b66c38cf51e4579a80",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-xy16-Os.sfc"
+    ],
+    "rom_sha256": "7908b4a56080ad34bcf1058a6f0d80250c4b8d702227c3b66c38cf51e4579a80",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-xy16-Os.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-xy16-Os.sfc"
+    ],
+    "rom_sha256": "0d272ce2ec634153cf547663902bb119396ccc96adc0c6837cebb4c6cda37041",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-xy16-Oz.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-bounds-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-bounds-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-bounds-xy16-O2.sfc"
+    ],
+    "rom_sha256": "92358b92182d17239be9203233d13f17abfdaf582f18ba159c612c7264cf79d4",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-bounds-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-bounds-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-bounds-xy16-O2.sfc"
+    ],
+    "rom_sha256": "405792c6e64ee978ea80305d6bc0b797f38b414601acb25a9f5869a44a4e4f43",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-bounds-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes-hirom.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-bounds-xy16-O2.o",
+      "/home/will/llvm-mos-65816/build/farblit_tbl.s",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-bounds-xy16-O2.sfc"
+    ],
+    "rom_sha256": "405792c6e64ee978ea80305d6bc0b797f38b414601acb25a9f5869a44a4e4f43",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-a16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-a16-Os.sfc"
+    ],
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-a16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-a16-Os.sfc"
+    ],
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-a16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-a16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-a16-Os.sfc"
+    ],
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-a16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-a16-Oz.sfc"
+    ],
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-a16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-a16-Oz.sfc"
+    ],
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-a16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-a16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-a16-Oz.sfc"
+    ],
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-a16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-a16-O2.sfc"
+    ],
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-a16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-a16-O2.sfc"
+    ],
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-a16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-a16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-a16-O2.sfc"
+    ],
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-xy16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-xy16-Os.sfc"
+    ],
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-xy16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-xy16-Os.sfc"
+    ],
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-xy16-Os",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-xy16-Os.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-xy16-Os.sfc"
+    ],
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-xy16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-xy16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-xy16-Oz",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-xy16-Oz.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-xy16-Oz.sfc"
+    ],
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "baseline-farblit_press-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/baseline-farblit_press-xy16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/baseline-farblit_press-xy16-O2.sfc"
+    ],
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "default-farblit_press-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/default-farblit_press-xy16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/default-farblit_press-xy16-O2.sfc"
+    ],
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173",
+    "matches_executed_rom": true
+  },
+  {
+    "name": "all-farblit_press-xy16-O2",
+    "command": [
+      "/home/will/llvm-mos-65816/.scratch/far-word-policy/baseline/bin/mos-clang",
+      "--config",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/link-sdk/bin/mos-snes.cfg",
+      "-mcpu=mosw65816",
+      "-fno-lto",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/runtime/all-farblit_press-xy16-O2.o",
+      "-o",
+      "/home/will/llvm-mos-65816/build/far-word-upstream/sdk-relink/all-farblit_press-xy16-O2.sfc"
+    ],
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173",
+    "matches_executed_rom": true
+  }
+]

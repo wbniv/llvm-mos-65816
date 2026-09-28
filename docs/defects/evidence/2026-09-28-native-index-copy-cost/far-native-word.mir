@@ -1,0 +1,924 @@
+--- |
+  ; ModuleID = '/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll'
+  source_filename = "/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-native-word.ll"
+  target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
+  target triple = "mos"
+  
+  @farword = external addrspace(2) global i16
+  @nearword = external global i16
+  @fararray = external addrspace(2) global [256 x i16]
+  
+  ; Function Attrs: norecurse
+  define void @far_global_copy() #0 {
+    %value = load volatile i16, ptr addrspace(2) @farword, align 1
+    store volatile i16 %value, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_global_store() #0 {
+    %value = load volatile i16, ptr @nearword, align 1
+    %sum = add i16 %value, 1
+    store volatile i16 %sum, ptr addrspace(2) @farword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_runtime_load(ptr addrspace(2) %pointer) #0 {
+    %value = load volatile i16, ptr addrspace(2) %pointer, align 1
+    %sum = add i16 %value, 1
+    store volatile i16 %sum, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_runtime_store(ptr addrspace(2) %pointer) #0 {
+    %value = load volatile i16, ptr @nearword, align 1
+    %sum = add i16 %value, 1
+    store volatile i16 %sum, ptr addrspace(2) %pointer, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_global_word_indexed(i8 %index) #0 {
+    %offset = zext i8 %index to i32
+    %pointer = getelementptr i8, ptr addrspace(2) @farword, i32 %offset
+    %value = load volatile i16, ptr addrspace(2) %pointer, align 1
+    store volatile i16 %value, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_runtime_word_indexed(ptr addrspace(2) %base) #0 {
+    %pointer = getelementptr i8, ptr addrspace(2) %base, i32 1
+    %value = load volatile i16, ptr addrspace(2) %pointer, align 1
+    store volatile i16 %value, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_scaled_word(i8 %index) #0 {
+    %offset = zext i8 %index to i32
+    %pointer = getelementptr [2 x i8], ptr addrspace(2) @fararray, i32 %offset
+    %value = load volatile i16, ptr addrspace(2) %pointer, align 1
+    store volatile i16 %value, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_scaled_word_wide(i16 %index) #0 {
+    %offset = zext i16 %index to i32
+    %pointer = getelementptr [2 x i8], ptr addrspace(2) @fararray, i32 %offset
+    %value = load volatile i16, ptr addrspace(2) %pointer, align 1
+    store volatile i16 %value, ptr @nearword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define void @far_byte_argument(i16 %value) #0 {
+    store i16 %value, ptr addrspace(2) @farword, align 1
+    ret void
+  }
+  
+  ; Function Attrs: norecurse
+  define i16 @far_byte_return() #0 {
+    %value = load i16, ptr addrspace(2) @farword, align 1
+    ret i16 %value
+  }
+  
+  attributes #0 = { norecurse "nonreentrant" "target-cpu"="mosw65816" "target-features"="+mos-a16,+mos-xy16" }
+...
+---
+name:            far_global_copy
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 4, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    %4:ac16 = LDAbsLong16 @farword :: (volatile dereferenceable load (s16) from @farword, align 1, addrspace 2)
+    %0:imag16 = STAImag16 %4
+    %3:ac16 = LDAImag16 %0
+    STAbs16 %3, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_global_store
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: any, preferred-register: '', flags: [  ] }
+  - { id: 3, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: any, preferred-register: '', flags: [  ] }
+  - { id: 6, class: any, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 8, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 9, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 10, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 11, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    %11:ac16 = LDAbs16 @nearword :: (volatile dereferenceable load (s16) from @nearword, align 1)
+    %0:imag16 = STAImag16 %11
+    %9:ac16 = LDAImag16 %0
+    %9:ac16 = INCAcc16 %9
+    %3:imag16 = STAImag16 %9
+    %7:ac16 = LDAImag16 %3
+    STAbsLong16 %7, @farword :: (volatile store (s16) into @farword, align 1, addrspace 2)
+    RTS
+...
+---
+name:            far_runtime_load
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: any, preferred-register: '', flags: [  ] }
+  - { id: 3, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: any, preferred-register: '', flags: [  ] }
+  - { id: 6, class: any, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 8, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 9, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 10, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $rl1
+  
+    %0:imag32 = COPY $rl1
+    %10:ac16 = LDIndirLong16 %0 :: (volatile load (s16) from %ir.pointer, align 1, addrspace 2)
+    %1:imag16 = STAImag16 %10
+    %9:ac16 = LDAImag16 %1
+    %9:ac16 = INCAcc16 %9
+    %3:imag16 = STAImag16 %9
+    %7:ac16 = LDAImag16 %3
+    STAbs16 %7, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_runtime_store
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 1, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: any, preferred-register: '', flags: [  ] }
+  - { id: 4, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 5, class: any, preferred-register: '', flags: [  ] }
+  - { id: 6, class: any, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 8, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 9, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 10, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 11, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $rl1
+  
+    %0:imag32 = COPY $rl1
+    %11:ac16 = LDAbs16 @nearword :: (volatile dereferenceable load (s16) from @nearword, align 1)
+    %1:imag16 = STAImag16 %11
+    %9:ac16 = LDAImag16 %1
+    %9:ac16 = INCAcc16 %9
+    %4:imag16 = STAImag16 %9
+    %7:ac16 = LDAImag16 %4
+    STIndirLong16 %7, %0 :: (volatile store (s16) into %ir.pointer, align 1, addrspace 2)
+    RTS
+...
+---
+name:            far_global_word_indexed
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: xc, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a
+  
+    %0:xc = COPY $a
+    %7:ac16 = LDAbsLongIdx16 @farword, %0 :: (volatile load (s16) from %ir.pointer, align 1, addrspace 2)
+    %4:imag16 = STAImag16 %7
+    %6:ac16 = LDAImag16 %4
+    STAbs16 %6, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_runtime_word_indexed
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: yc, preferred-register: '', flags: [  ] }
+  - { id: 6, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $rl1
+  
+    %0:imag32 = COPY $rl1
+    %5:yc = LDImm 1
+    %7:ac16 = LDIndirLongIdx16 %0, %5 :: (volatile load (s16) from %ir.pointer, align 1, addrspace 2)
+    %3:imag16 = STAImag16 %7
+    %6:ac16 = LDAImag16 %3
+    STAbs16 %6, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_scaled_word
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+  - { id: 8, class: _, preferred-register: '', flags: [  ] }
+  - { id: 9, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 12, class: _, preferred-register: '', flags: [  ] }
+  - { id: 13, class: any, preferred-register: '', flags: [  ] }
+  - { id: 14, class: _, preferred-register: '', flags: [  ] }
+  - { id: 15, class: anyi8, preferred-register: '', flags: [  ] }
+  - { id: 16, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 17, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 18, class: xc16, preferred-register: '', flags: [  ] }
+  - { id: 19, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 20, class: ac16, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a
+  
+    undef %9.sublo:imag16 = COPY $a
+    %9.subhi:imag16 = LDZ
+    %20:ac16 = LDAImag16 %9
+    %20:ac16 = ASLAcc16 %20, implicit-def dead $c
+    %11:imag16 = STAImag16 %20
+    %18:xc16 = COPY %11
+    %17:ac16 = LDAbsLongXIdx16 @fararray, %18 :: (volatile load (s16) from %ir.pointer, align 1, addrspace 2)
+    %6:imag16 = STAImag16 %17
+    %16:ac16 = LDAImag16 %6
+    STAbs16 %16, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_scaled_word_wide
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 2, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: any, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 8, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 9, class: _, preferred-register: '', flags: [  ] }
+  - { id: 10, class: _, preferred-register: '', flags: [  ] }
+  - { id: 11, class: any, preferred-register: '', flags: [  ] }
+  - { id: 12, class: imag32, preferred-register: '', flags: [  ] }
+  - { id: 13, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 14, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 15, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 16, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 17, class: _, preferred-register: '', flags: [  ] }
+  - { id: 18, class: _, preferred-register: '', flags: [  ] }
+  - { id: 19, class: _, preferred-register: '', flags: [  ] }
+  - { id: 20, class: _, preferred-register: '', flags: [  ] }
+  - { id: 21, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 22, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 23, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 24, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 25, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 26, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 27, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 28, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 29, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 30, class: _, preferred-register: '', flags: [  ] }
+  - { id: 31, class: _, preferred-register: '', flags: [  ] }
+  - { id: 32, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 33, class: _, preferred-register: '', flags: [  ] }
+  - { id: 34, class: _, preferred-register: '', flags: [  ] }
+  - { id: 35, class: _, preferred-register: '', flags: [  ] }
+  - { id: 36, class: _, preferred-register: '', flags: [  ] }
+  - { id: 37, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 38, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 39, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 40, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 41, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 42, class: cc, preferred-register: '', flags: [  ] }
+  - { id: 43, class: imag8, preferred-register: '', flags: [  ] }
+  - { id: 44, class: _, preferred-register: '', flags: [  ] }
+  - { id: 45, class: _, preferred-register: '', flags: [  ] }
+  - { id: 46, class: _, preferred-register: '', flags: [  ] }
+  - { id: 47, class: _, preferred-register: '', flags: [  ] }
+  - { id: 48, class: _, preferred-register: '', flags: [  ] }
+  - { id: 49, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 50, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 51, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 52, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 53, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 54, class: _, preferred-register: '', flags: [  ] }
+  - { id: 55, class: _, preferred-register: '', flags: [  ] }
+  - { id: 56, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 57, class: ac16, preferred-register: '', flags: [  ] }
+  - { id: 58, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 59, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 60, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 61, class: vc, preferred-register: '', flags: [  ] }
+  - { id: 62, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 63, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 64, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 65, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 66, class: gpr, preferred-register: '', flags: [  ] }
+  - { id: 67, class: imag16, preferred-register: '', flags: [  ] }
+  - { id: 68, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 69, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 70, class: aimag8, preferred-register: '', flags: [  ] }
+  - { id: 71, class: aimag8, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a, $x
+  
+    %68:aimag8 = COPY $a
+    %69:aimag8 = COPY $x
+    %29:cc = LDImm1 0
+    %68:aimag8, %42:cc = ASL %68
+    %37:imag8 = COPY %68
+    %69:aimag8, %42:cc = ROL %69, %42
+    %39:imag8 = COPY %69
+    %71:aimag8 = LDZ
+    %70:aimag8 = LDZ
+    %70:aimag8, %42:cc = ROL %70, %42
+    %41:imag8 = COPY %70
+    %71:aimag8, dead %42:cc = ROL %71, %42
+    %43:imag8 = COPY %71
+    %21:ac = LDImm target-flags(<unknown target flag>) @fararray
+    %23:ac = LDImm target-flags(<unknown target flag>) @fararray
+    %21:ac, %22:cc, dead %61:vc = ADCImag8 %21, %37, %29
+    %23:ac, %24:cc, dead %60:vc = ADCImag8 %23, %39, %22
+    undef %12.sublo:imag32 = COPY %21
+    %25:ac = LDImm target-flags(<unknown target flag>) @fararray
+    %12.subhi:imag32 = COPY %23
+    %27:ac = LDImm 0
+    %25:ac, %26:cc, dead %59:vc = ADCImag8 %25, %41, %24
+    %27:ac, dead %28:cc, dead %58:vc = ADCImag8 %27, %43, %26
+    %12.subhi16_then_sublo:imag32 = COPY %25
+    %12.subhi16_then_subhi:imag32 = COPY %27
+    %57:ac16 = LDIndirLong16 %12 :: (volatile load (s16) from %ir.pointer, align 1, addrspace 2)
+    %8:imag16 = STAImag16 %57
+    %56:ac16 = LDAImag16 %8
+    STAbs16 %56, @nearword :: (volatile store (s16) into @nearword, align 1)
+    RTS
+...
+---
+name:            far_byte_argument
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 2, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: _, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: _, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    liveins: $a, $x
+  
+    %1:ac = COPY $a
+    %2:ac = COPY $x
+    STAbsLong %1, @farword :: (store (s8) into @farword, addrspace 2)
+    STAbsLong %2, @farword + 1 :: (store (s8) into @farword + 1, addrspace 2)
+    RTS
+...
+---
+name:            far_byte_return
+alignment:       1
+exposesReturnsTwice: false
+legalized:       true
+regBankSelected: true
+selected:        true
+failedISel:      false
+tracksRegLiveness: true
+hasWinCFI:       false
+noPhis:          true
+isSSA:           false
+noVRegs:         false
+hasFakeUses:     false
+callsEHReturn:   false
+callsUnwindInit: false
+hasEHContTarget: false
+hasEHScopes:     false
+hasEHFunclets:   false
+isOutlined:      false
+debugInstrRef:   false
+failsVerification: false
+tracksDebugUserValues: false
+registers:
+  - { id: 0, class: _, preferred-register: '', flags: [  ] }
+  - { id: 1, class: _, preferred-register: '', flags: [  ] }
+  - { id: 2, class: _, preferred-register: '', flags: [  ] }
+  - { id: 3, class: _, preferred-register: '', flags: [  ] }
+  - { id: 4, class: ac, preferred-register: '', flags: [  ] }
+  - { id: 5, class: _, preferred-register: '', flags: [  ] }
+  - { id: 6, class: _, preferred-register: '', flags: [  ] }
+  - { id: 7, class: ac, preferred-register: '', flags: [  ] }
+liveins:         []
+frameInfo:
+  isFrameAddressTaken: false
+  isReturnAddressTaken: false
+  hasStackMap:     false
+  hasPatchPoint:   false
+  stackSize:       0
+  offsetAdjustment: 0
+  maxAlignment:    1
+  adjustsStack:    false
+  hasCalls:        false
+  framePointerPolicy: none
+  stackProtector:  ''
+  functionContext: ''
+  maxCallFrameSize: 4294967295
+  cvBytesOfCalleeSavedRegisters: 0
+  hasOpaqueSPAdjustment: false
+  hasVAStart:      false
+  hasMustTailInVarArgFunc: false
+  hasTailCall:     false
+  isCalleeSavedInfoValid: false
+  localFrameSize:  0
+fixedStack:      []
+stack:           []
+entry_values:    []
+callSites:       []
+debugValueSubstitutions: []
+constants:       []
+machineFunctionInfo: {}
+body:             |
+  bb.0 (%ir-block.0):
+    %4:ac = LDAbsLong @farword :: (dereferenceable load (s8) from @farword, addrspace 2)
+    %7:ac = LDAbsLong @farword + 1 :: (dereferenceable load (s8) from @farword + 1, addrspace 2)
+    $x = COPY %7
+    $a = COPY %4
+    RTS implicit $a, implicit killed $x
+...

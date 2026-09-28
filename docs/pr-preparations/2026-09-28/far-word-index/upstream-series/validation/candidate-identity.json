@@ -1,0 +1,12 @@
+{
+  "source_before_format_rebase": "73a8090330fc342dcb3df6672935d8dc4f877c97",
+  "sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe",
+  "note": "Final source differs from the original tested source only by a four-line present-contract comment replacement in MOSRegisterInfo.cpp. Rebuilding the final packaged tree produces a byte-identical llc; see comment-polish.json. The native feature EOF blank line was already removed before the original candidate build.",
+  "llc_version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+  "local_binary": "/home/will/llvm-mos-65816/build/far-word-upstream/candidate/llc",
+  "build_type": "Release with assertions",
+  "runtime_additional_flag": "-disable-spill-hoist (existing driver setting; 0033 excluded)",
+  "packaged_commit": "886adb9c01f3121f089a18c8bf9dbb2530ab6419",
+  "packaged_tree": "93340b041175094cf1433e246de2a7bf7965d005",
+  "final_rebuild_binary_equal": true
+}

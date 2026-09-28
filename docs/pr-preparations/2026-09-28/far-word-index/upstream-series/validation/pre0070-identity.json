@@ -1,0 +1,10 @@
+{
+  "commit": "4649576a2a56510a409cdd322353e832c702351f",
+  "sha256": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f",
+  "llc_version": "LLVM (http://llvm.org/):\n  LLVM version 24.0.0git\n  Optimized build with assertions.\n  Default target: x86_64-unknown-linux-gnu\n  Host CPU: tigerlake\n\n  Registered Targets:\n    aarch64    - AArch64 (little endian)\n    aarch64_32 - AArch64 (little endian ILP32)\n    aarch64_be - AArch64 (big endian)\n    arm        - ARM\n    arm64      - ARM64 (little endian)\n    arm64_32   - ARM64 (little endian ILP32)\n    armeb      - ARM (big endian)\n    mos        - MOS Technologies 65xx and variants\n    thumb      - Thumb\n    thumbeb    - Thumb (big endian)\n    x86        - 32-bit X86: Pentium-Pro and above\n    x86-64     - 64-bit X86: EM64T and AMD64\n",
+  "local_binary": "/home/will/llvm-mos-65816/build/far-word-upstream/pre0070/llc",
+  "build_type": "Release with assertions",
+  "runtime_additional_flag": "-disable-spill-hoist (existing driver setting; 0033 excluded)",
+  "packaged_equivalent": "11baf69da7178e9ecc226e210b63ef3fc8a50791",
+  "packaged_equivalence_note": "Relative to the recorded build commit, the packaged prerequisite tree contains only the native feature EOF blank-line cleanup and the four-line MOSRegisterInfo present-contract comment replacement; no executable source changes."
+}

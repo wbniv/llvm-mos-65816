@@ -1,10 +1,12 @@
 # Native far-word indexing: author review and evidence guide
 
-**September 28, 2026 — local PR preparation.** The implementation and measurements are retained in the [0070 investigation](../../../investigations/2026-09-28-far-word-policy.md). This document audits their use in the [working PR body](pr-body.md), adds a pinned upstream source inspection, and records unresolved questions. The [separate independent AI review](independent-review.md) now records three source assessments and the resolved P2 weakness in the 0069 opcode assertions, with matching-input sensitivity evidence. No upstream extraction is certified.
+**September 28, 2026 — local PR preparation.** The implementation and measurements are retained in the [0070 investigation](../../../investigations/2026-09-28-far-word-policy.md). This document audits their use in the [working PR body](pr-body.md), adds a pinned upstream source inspection, and records unresolved questions. The [separate independent AI review](independent-review.md) now records three source assessments and the resolved P2 weakness in the 0069 opcode assertions, with matching-input sensitivity evidence. A concrete [upstream extraction and execution record](upstream-series.md) is now available; independent review of that complete series remains pending.
 
 Author preparation: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The original range-proof and payoff investigations retain their own verified credits.
 
-## Choices and their evidence
+## Choices and their downstream evidence
+
+The tables and allocation trace in this section retain the original downstream compiler identity. The [extracted candidate](upstream-series.md#rebased-runtime-and-size-evidence) has its own build, controls, and measurements; the working PR body uses those new results.
 
 | Choice | Evidence bearing on it | What that evidence permits us to conclude |
 | --- | --- | --- |
@@ -79,7 +81,7 @@ flowchart TD
     D --> E["Build and test the exact patch stack proposed for upstream"]
 ```
 
-This diagram is the relevant logical dependency chain, not a claim that four standalone patches reproduce the complete build. The [feature package tracker](../../2026-09-26/feature-held-packages.md) also records 0061 as a prerequisite of 0062. The current full downstream stack remains the measured baseline. This pass inspected upstream source and existing evidence; it did not build that destination, refresh the full MOS suite, or perform independent review.
+This diagram is the relevant logical dependency chain, not a claim that four standalone patches reproduce the complete build. The [feature package tracker](../../2026-09-26/feature-held-packages.md) also records 0061 as a prerequisite of 0062. The current full downstream stack remains the measured baseline. That original source-audit pass did not build the destination or perform independent review. The later [extraction record](upstream-series.md) supplies the assertions build and MOS suite execution; independent review of the full extracted stack remains pending.
 
 ### What testing the proposed upstream patch stack means
 
@@ -92,7 +94,7 @@ The additional validation consists of these steps:
 3. Add the bounded range proof in 0069 and the word-indexing policy in 0070.
 4. Build that compiler and repeat the relevant correctness, code-size, and runtime comparisons, using the same inputs and identified baseline/candidate builds.
 
-This checks whether splitting and rebasing the changes preserves their behavior and whether any dependency was missed. **The existing downstream results remain valid.** The additional measurements would cover the precise code reviewers receive. That build and comparison have not yet been performed.
+This checks whether splitting and rebasing the changes preserves their behavior and whether any dependency was missed. **The existing downstream results remain valid.** The additional measurements would cover the precise code reviewers receive. The [new extraction record](upstream-series.md) now identifies the ordered patches, build, additional checks, prerequisite reconciliation, and exact scope of the completed comparison. Its frozen-IR backend replay is distinct from the earlier downstream full-LTO experiment.
 
 **Opening readiness:** prepare a concrete compiler/ABI extraction with identified commits, relevant regression and measurement results, independent review, and publicly resolvable evidence links. **Merge order:** the prerequisite compiler/ABI series must supply the paths and contracts used here. Published SNES demonstrations may be cited during compiler review; SNES implementation/platform code follows its separate tracker.
 
@@ -109,13 +111,13 @@ The [evidence manifest](../../../defects/evidence/2026-09-28-far-word-policy/man
 | [Shape archive](../../../defects/evidence/2026-09-28-far-word-policy/shapes.tar.gz), [shape summary](../../../defects/evidence/2026-09-28-far-word-policy/shape-checks.json) | Ensures runtime success is accompanied by the intended M16/Y8 addressing and negative-case behavior. |
 | [Final lit results](../../../defects/evidence/2026-09-28-far-word-policy/final-lit.json), [integration receipt](../../../defects/evidence/2026-09-28-far-word-policy/receipt.json) | Identifies the completed focused checks, output controls, installation, and unsupported assertion-only check. |
 
-For local replay, restore the recorded `.scratch/far-word-policy` layout and verify its binaries against `identity.json`. The existing runners accept `baseline`, `all`, `speed`, `off`, and `default`; the main runner uses the initial candidate for explicit policies and the final policy build for `default`. LTO overrides are forwarded to both Clang and lld. Consult the captured command JSON rather than substituting whatever compiler is installed later. Binaries remain local; rebuilding externally requires the captured vendor base and overlays, SDK/toolchain environment, and the separately retained calibrated probe. Public reproduction instructions must be completed for the eventual extraction.
+For local replay, restore the recorded `.scratch/far-word-policy` layout and verify its binaries against `identity.json`. The existing runners accept `baseline`, `all`, `speed`, `off`, and `default`; the main runner uses the initial candidate for explicit policies and the final policy build for `default`. LTO overrides are forwarded to both Clang and lld. Consult the captured command JSON rather than substituting whatever compiler is installed later. Binaries remain local; rebuilding externally requires the captured vendor base and overlays, SDK/toolchain environment, and the separately retained calibrated probe. The extracted candidate has a separate [reproduction guide](upstream-series/REPRODUCE.md), with standalone LLVM checks and explicitly scoped SDK/emulator requirements.
 
 ## Remaining development and review questions
 
 Current downstream correctness and performance results remain valid. These questions identify the independent assessment, missing measurements, and design decisions still needed for upstream preparation:
 
-- **Correctness follow-up:** three separate AI source reviews found no valid-input compiler correctness defect in the published downstream implementation. [REVIEW-INTERACTION-01](independent-review.md#correction-and-executed-sensitivity-checks) is resolved: exact opcode boundaries reject all 156 wrong substitutions, preserve the three passing outputs, and pass the four focused regression files. Additional word-endpoint, operand, guard, and range-boundary cases are recommended. Review the eventual extracted upstream stack separately; its implementation and dependencies may differ.
+- **Correctness follow-up:** three separate AI source reviews found no valid-input compiler correctness defect in the published downstream implementation. [REVIEW-INTERACTION-01](independent-review.md#correction-and-executed-sensitivity-checks) is resolved: exact opcode boundaries reject all 156 wrong substitutions, preserve the three passing outputs, and pass the four focused regression files. The extracted stack adds word-endpoint, operand, guard, range-boundary and compact IR cases. Review the [complete candidate](upstream-series.md) separately; its prerequisites include a newly repaired native-index allocation cost.
 
 - **Broader performance:** do other applications with eligible loops benefit from the speed default? Most speed evidence comes from Farblit, O3 covers one fixture, and only two fixtures change code in the 16-fixture census. Additional workloads are needed to support broader profitability claims.
 
@@ -123,7 +125,7 @@ Current downstream correctness and performance results remain valid. These quest
 
 - **Option design:** should upstream retain the hidden `off|speed|all` switch? It supports the current controlled comparisons and experiments; retaining it as a permanent upstream option still needs a design decision.
 
-- **Patch preparation:** does separating and rebasing the required changes preserve their behavior and include every dependency? Build and test the proposed upstream patch stack as described above. Remove incidental formatting changes where practical, and keep measurements for any substantive revision separately identified.
+- **Patch preparation:** does separating and rebasing the required changes preserve their behavior and include every dependency? The extraction and identified build are now concrete; review the [recorded results and residual contracts](upstream-series.md) and keep each subsequent revision’s measurements separately identified.
 
 Use these questions to direct further work. Do not broaden the claims by accumulating repeated controls, suppressing a size regression, or promoting the source audit into a claim of destination validation.
 

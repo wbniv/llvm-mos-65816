@@ -904,7 +904,8 @@
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
         "docs/pr-preparations/2026-09-27/0068-validation.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "receipt": {
         "sources": {
@@ -1411,7 +1412,8 @@
         "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
         "docs/plans/2026-09-27-broader-near-store-profitability.md",
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "receipt": {
         "sources": {
@@ -1649,7 +1651,9 @@
             "resolution.change"
           ]
         },
-        "docs/pr-preparations/2026-09-28/0065/README.md"
+        "docs/pr-preparations/2026-09-28/0065/README.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/defects/mos-native-index-copy-cost.json"
       ],
       "receipt": {
         "sources": {
@@ -2238,7 +2242,8 @@
         "docs/investigations/2026-09-27-mos-carry-timing.md",
         "docs/defects/evidence/2026-09-28-far-word-policy/sweep.py",
         "docs/defects/evidence/2026-09-28-far-word-policy/sweep-o3.py",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "receipt": {
         "sources": {
@@ -2278,7 +2283,8 @@
       "document": "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
       "sources": [
         "docs/pr-preparations/2026-09-28/far-word-index/review.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "receipt": {
         "sources": {
@@ -2296,7 +2302,10 @@
         "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md",
         "docs/pr-preparations/2026-09-28/far-word-index/review.md",
         "docs/pr-preparations/2026-09-28/far-word-index/destination.json",
-        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/0069-pr-body.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/REPRODUCE.md"
       ],
       "receipt": {
         "sources": {
@@ -2324,7 +2333,8 @@
         "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
         "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-sensitivity.py",
         "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/results.json",
-        "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz"
+        "docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/artifacts.tar.xz",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
       ],
       "receipt": {
         "sources": {
@@ -2467,6 +2477,87 @@
         "reviewed_at": "2026-09-28T12:06:39.551454+00:00",
         "note": "Reviewed the isolated 0065 publication against the approved three-patch packet, pinned destination, identities, matching-input results, suite, measurements and runtime limits. Updated completion/publication distinctions and preserved the #321 hold and merge prerequisites. The far-word author review retains its 0069/0070 scope; its only changed dependency is the shared ledger confirming separate 0065 preparation, which does not certify the far-word extraction. Existing published 0069 findings and earlier attribution are preserved.",
         "attribution": "OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/artifact-manifest.json",
+        {
+          "glob": "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/*.json"
+        },
+        "docs/defects/mos-native-index-copy-cost.json",
+        "docs/defects/mos-coalescing-rc-undef.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json": "b34607f04be182c5e8e3192d74f58223cb3a83b9cdeb3e96bc7a426e46945141",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/artifact-manifest.json": "68a195fe37dd306ada12cc58a7b897c1581a067c2f558e44879029b12790e0a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/accepted-suite.json": "a371036ffcc9bd69faf7e53f6e3ffa8482512a34e52d3438d74386ce849dda47",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/candidate-identity.json": "29375ac7a45b1bf53b605dc044d69b234e11c9b37d6392029e7f2e0b6b792fdc",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/comment-polish.json": "9137637e38e2efe0b52ab719c9e0f940268592e274aadebc8d16a00980edb1ab",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/compile-matrix.json": "b43e4ad1ddc5299a0c71319a94b1e1bd07bd616eebb0b8727a6226a08f0fc6a0",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/copy-cost-red-green.json": "7d257b1fa923a7b1ff1143c3c9b0f0c565a49d2ae41615ec552c9119d20b6948",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/packet-integrity.json": "8811e39d160138dcf2dcb82b9270925371451ea547834049059a5f3ee0cbbc59",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/pre0070-identity.json": "871ab03fd505c7c0808ec9e8ec1fa8cdfea81b8e8842f9789a3e0a0d0c011c12",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/runtime-identity.json": "194c400750784638ec76107c95d8ed1ce71b294fc9d3aeb381a14b82c39a803f",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/runtime-results.json": "400a39337ecb80a16428206a97bfb991d6037a323a6e9111815950f4290c16d5",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sdk-identity.json": "acb545ac025fcea13e9bfa58dd95ff9d209ea9457ec6880e328bd154f8fc678e",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sdk-relink.json": "95bebab18b282496f1c1daedd3b76ac8ea99078aed6c56310b05579393baa1a2",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sensitivity.json": "fa374bdbbb4f99ebebdd279d161d8ec6b35f095ddeeaa6bfd99af2f4f799b703",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/summary.json": "f823b0565304457c556dfb504627bcdaee29d7e80457afbe35ebcc2a75ca10b7",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/x86-0028.json": "feec89ce343c04f4eb2fec7733d62b3d34962c7f56e84faf865760e74b4da514",
+          "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
+          "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a"
+        },
+        "reviewed_at": "2026-09-28T12:59:28.957274+00:00",
+        "note": "Reviewed the pinned 14-patch extraction, matching-input copy-cost repair and prior-work reconciliation, 160 MOS passes plus one unsupported file, two generic X86 RUNs, 228 wrong-opcode rejections, and 58 dual-emulator configurations with repeated profiles. Updated PR bodies, summaries and plans to distinguish the extracted frozen-IR backend replay from the preserved downstream full-LTO measurements. Reconciled final source/binary identities, patch/tree reconstruction, archive hashes and SDK relink receipts. New copy-cost repair is candidate-only; the whole compiler/ABI extraction remains pending independent review, with A8, far-ABI exhaustion, runtime length, DWARF, spill-hoisting and profitability limits explicit. Reviewed dependent Farblit gate, carry and earlier experiment records: their captured outputs, counts, compiler identities, independent-review scopes and publication states remain unchanged. The existing 0028 record gains a qualified observation without changing its original baseline or status. No upstream posting, downstream installation, SNES submission or website deployment is claimed. Reviewed the older feature-held ledger and package index: updated 0061/0062 extraction status while preserving all independent-review, excluded-feature and explicit 0028 publication holds. Increment-1/2 and standalone-ready packets retain their dated evidence and readiness scope.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/REPRODUCE.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/artifact-manifest.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/runtime.py",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/check-sensitivity.py",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/candidate-identity.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/pre0070-identity.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/comment-polish.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json": "b34607f04be182c5e8e3192d74f58223cb3a83b9cdeb3e96bc7a426e46945141",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/artifact-manifest.json": "68a195fe37dd306ada12cc58a7b897c1581a067c2f558e44879029b12790e0a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/runtime.py": "3419fc863950333ff14e34973d6e403fad94cb27103f3e5f259f69748668216c",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/check-sensitivity.py": "88d6988c6320553d981cc760e934b899c888ba77e7aff33bb806f63016beee9a",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/candidate-identity.json": "29375ac7a45b1bf53b605dc044d69b234e11c9b37d6392029e7f2e0b6b792fdc",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/pre0070-identity.json": "871ab03fd505c7c0808ec9e8ec1fa8cdfea81b8e8842f9789a3e0a0d0c011c12",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/comment-polish.json": "9137637e38e2efe0b52ab719c9e0f940268592e274aadebc8d16a00980edb1ab"
+        },
+        "reviewed_at": "2026-09-28T12:59:29.406917+00:00",
+        "note": "Reviewed the pinned 14-patch extraction, matching-input copy-cost repair and prior-work reconciliation, 160 MOS passes plus one unsupported file, two generic X86 RUNs, 228 wrong-opcode rejections, and 58 dual-emulator configurations with repeated profiles. Updated PR bodies, summaries and plans to distinguish the extracted frozen-IR backend replay from the preserved downstream full-LTO measurements. Reconciled final source/binary identities, patch/tree reconstruction, archive hashes and SDK relink receipts. New copy-cost repair is candidate-only; the whole compiler/ABI extraction remains pending independent review, with A8, far-ABI exhaustion, runtime length, DWARF, spill-hoisting and profitability limits explicit. Reviewed dependent Farblit gate, carry and earlier experiment records: their captured outputs, counts, compiler identities, independent-review scopes and publication states remain unchanged. The existing 0028 record gains a qualified observation without changing its original baseline or status. No upstream posting, downstream installation, SNES submission or website deployment is claimed. Reviewed the older feature-held ledger and package index: updated 0061/0062 extraction status while preserving all independent-review, excluded-feature and explicit 0028 publication holds. Increment-1/2 and standalone-ready packets retain their dated evidence and readiness scope.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+      }
+    },
+    {
+      "document": "docs/pr-preparations/2026-09-28/far-word-index/0069-pr-body.md",
+      "sources": [
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json",
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sensitivity.json"
+      ],
+      "receipt": {
+        "sources": {
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/series.json": "b34607f04be182c5e8e3192d74f58223cb3a83b9cdeb3e96bc7a426e46945141",
+          "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/validation/sensitivity.json": "fa374bdbbb4f99ebebdd279d161d8ec6b35f095ddeeaa6bfd99af2f4f799b703"
+        },
+        "reviewed_at": "2026-09-28T12:59:29.500758+00:00",
+        "note": "Reviewed the pinned 14-patch extraction, matching-input copy-cost repair and prior-work reconciliation, 160 MOS passes plus one unsupported file, two generic X86 RUNs, 228 wrong-opcode rejections, and 58 dual-emulator configurations with repeated profiles. Updated PR bodies, summaries and plans to distinguish the extracted frozen-IR backend replay from the preserved downstream full-LTO measurements. Reconciled final source/binary identities, patch/tree reconstruction, archive hashes and SDK relink receipts. New copy-cost repair is candidate-only; the whole compiler/ABI extraction remains pending independent review, with A8, far-ABI exhaustion, runtime length, DWARF, spill-hoisting and profitability limits explicit. Reviewed dependent Farblit gate, carry and earlier experiment records: their captured outputs, counts, compiler identities, independent-review scopes and publication states remain unchanged. The existing 0028 record gains a qualified observation without changing its original baseline or status. No upstream posting, downstream installation, SNES submission or website deployment is claimed. Reviewed the older feature-held ledger and package index: updated 0061/0062 extraction status while preserving all independent-review, excluded-feature and explicit 0028 publication holds. Increment-1/2 and standalone-ready packets retain their dated evidence and readiness scope.",
+        "attribution": "OpenAI Codex CLI 0.157.1 (recorded session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
       }
     }
   ]

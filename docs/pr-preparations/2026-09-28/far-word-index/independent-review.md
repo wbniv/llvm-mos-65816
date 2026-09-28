@@ -2,7 +2,7 @@
 
 **September 28, 2026: source review complete; P2 regression-check finding resolved.** Three separate AI reviewers found no valid-input compiler correctness defect in the inspected implementation. The combined-contract review identified missing opcode boundaries in 0069's FileCheck patterns. All 78 assertions now have explicit boundaries; all 156 wrong-opcode substitutions are rejected, the three correct outputs pass, and four focused regression files pass. The executed follow-up is recorded below.
 
-Initial review repository commit: `0eae3e7a0c42b1d20c482c154ec3716a3674ad1c`. Patch hashes, source/archive comparisons, reviewer identities, report hashes, and audit inputs are retained in [basis.json](independent-review/basis.json). At the initial review, the live legalizer and both MIR files matched the [retained final source archive](../../../defects/evidence/2026-09-28-far-word-policy/source.tar.gz) byte for byte. The raw reports preserve their original workspace paths; that archive contains the legalizer and both MIR sources named in those paths. This review covers the downstream implementation at that identity; the proposed upstream prerequisite stack remains unbuilt and unreviewed as a complete extracted series.
+Initial review repository commit: `0eae3e7a0c42b1d20c482c154ec3716a3674ad1c`. Patch hashes, source/archive comparisons, reviewer identities, report hashes, and audit inputs are retained in [basis.json](independent-review/basis.json). At the initial review, the live legalizer and both MIR files matched the [retained final source archive](../../../defects/evidence/2026-09-28-far-word-policy/source.tar.gz) byte for byte. The raw reports preserve their original workspace paths; that archive contains the legalizer and both MIR sources named in those paths. This review covers the downstream implementation at that identity; the [upstream prerequisite stack](upstream-series.md) now has a separate build and execution record, and remains unreviewed as a complete extracted series.
 
 ## Finding and resolution
 
@@ -56,7 +56,7 @@ python3 docs/pr-preparations/2026-09-28/far-word-index/opcode-check-fix/check-se
   --output /tmp/far-loop-opcode-evidence/replay.json
 ```
 
-Using `baseline-checks.mir` instead must return exit 1 and report 104 accepted wrong opcodes. **REVIEW-INTERACTION-01 is resolved for the downstream regression.** The additional coverage recommendations and validation of the eventual upstream stack remain separate work.
+Using `baseline-checks.mir` instead must return exit 1 and report 104 accepted wrong opcodes. **REVIEW-INTERACTION-01 is resolved for the downstream regression.** The later [extracted candidate](upstream-series.md) adds focused coverage and a separate validation record; independent review of the complete series remains pending.
 
 Assertion correction, sensitivity checks, focused lit execution, and closure record: OpenAI Codex CLI **0.157.1** (recorded session source `vscode`), model **`gpt-6-astra`**, **`xhigh`** reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
 
@@ -75,7 +75,7 @@ These assessments assume valid SSA MIR and the declared instruction operand cont
 
 ## Additional coverage recommendations
 
-These are P3 coverage gaps, with no demonstrated implementation failure:
+These were P3 coverage gaps, with no demonstrated implementation failure in the reviewed source. The extracted candidate now adds checks across the five categories below; its [execution record](upstream-series.md) identifies their exact scope, including the limited feature-disabled case. The original requests remain recorded here:
 
 1. **Word endpoint:** directly compare maximum starting offsets 254 and 255 for a two-byte load. The 255 case isolates the final-byte guard; the existing 256 case can be rejected by the earlier starting-offset check.
 2. **Operands and mixed siblings:** capture the original base, computed index, memory operand, byte sibling form, and removal of the wide pointer addition. Opcode-only checks cannot catch a type-correct substitution of the wrong operand.
@@ -83,7 +83,7 @@ These are P3 coverage gaps, with no demonstrated implementation failure:
 4. **Range-proof boundaries:** cover reversed PHI input order, multiple external predecessors, a narrow nonwrapping shift, and the expression-recursion boundary.
 5. **A compact IR integration case:** use a runtime base, independently bounded offset, and live native-word consumer to exercise 0070 without depending on 0069's loop matcher.
 
-Broader profitability, compilation overhead, permanent option design, and construction/testing of the proposed upstream series remain separate development questions in the [author evidence guide](review.md#remaining-development-and-review-questions).
+Broader profitability, compilation overhead, permanent option design, and independent review of the proposed upstream series remain separate development questions in the [author evidence guide](review.md#remaining-development-and-review-questions).
 
 ## Review independence and adjudication
 

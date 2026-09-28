@@ -113,6 +113,8 @@ OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning e
 
 **September 27 near-store follow-up:** [0065 and the T3 completion record](../../plans/2026-09-27-broader-near-store-profitability.md) add measured local optimizations. Those opening preparation gates were completed in the [September 28 extracted packet](../2026-09-28/0065/README.md), with its own independent 0065 review. The PR is unposted and the native feature posting hold remains; the original 0063 review retains its earlier scope.
 
+**September 28 far-word follow-up:** the [pinned 14-patch candidate](../2026-09-28/far-word-index/upstream-series.md) supplies the far/native prerequisite extraction and 0069/0070 build, regressions and frozen-IR runtime replay. The complete compiler/ABI series still needs independent review and resolution of its listed scope contracts. This does not change opening readiness for the excluded feature packages. Update: OpenAI Codex CLI 0.157.1 (recorded session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
+
 The [feature-held ledger](feature-held-packages.md) covers 0013, 0051, 0052,
 0055, and 0061–0063, plus 0028's explicit presentation hold. Their implementations
 are reviewed, but unresolved #320/#321 compiler/ABI extraction is not merely a

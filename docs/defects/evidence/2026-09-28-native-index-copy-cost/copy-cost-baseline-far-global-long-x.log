@@ -1,0 +1,33 @@
+Unexpected physical register copy.
+UNREACHABLE executed at /work/build/register-exhaustion-src/llvm/lib/Target/MOS/MOSRegisterInfo.cpp:1422!
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: /home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs /home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll -o /home/will/llvm-mos-65816/build/far-word-upstream/copy-cost-baseline-far-global-long-x.output
+1.	Running pass 'Function Pass Manager' on module '/home/will/llvm-mos-65816/build/far-word-upstream/allocation-baseline/far-global-long-x.ll'.
+2.	Running pass 'Greedy Register Allocator' on function '@load_byte_wide_index'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00006478d59d82bb llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 43
+1  llc       0x00006478d59d5141 llvm::sys::RunSignalHandlers() + 369
+2  llc       0x00006478d59d90cb
+3  libc.so.6 0x00007a4cedc45cb0
+4  libc.so.6 0x00007a4cedca61ac pthread_kill + 284
+5  libc.so.6 0x00007a4cedc45b7e gsignal + 30
+6  libc.so.6 0x00007a4cedc288ec abort + 39
+7  llc       0x00006478d5933a7f
+8  llc       0x00006478d3fc91c6
+9  llc       0x00006478d3fc75b2
+10 llc       0x00006478d488ec26
+11 llc       0x00006478d48c0c26
+12 llc       0x00006478d48c14b7
+13 llc       0x00006478d488a97a llvm::RegAllocBase::allocatePhysRegs() + 714
+14 llc       0x00006478d48b3137
+15 llc       0x00006478d48c61d9
+16 llc       0x00006478d4673319 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 649
+17 llc       0x00006478d4c05650 llvm::FPPassManager::runOnFunction(llvm::Function&) + 1120
+18 llc       0x00006478d4c0d752 llvm::FPPassManager::runOnModule(llvm::Module&) + 50
+19 llc       0x00006478d4c06414 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2228
+20 llc       0x00006478d35bc74b
+21 llc       0x00006478d35b9a13 main + 1443
+22 libc.so.6 0x00007a4cedc2a601
+23 libc.so.6 0x00007a4cedc2a718 __libc_start_main + 136
+24 llc       0x00006478d35b8c25 _start + 37
