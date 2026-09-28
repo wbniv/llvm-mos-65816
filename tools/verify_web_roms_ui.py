@@ -9,7 +9,10 @@ import shutil
 import signal
 import subprocess
 import sys
+import time
 import tty
+
+from task_progress import style_progress_line
 
 
 def clean(line):
@@ -21,21 +24,34 @@ class Display:
         self.active = False
         self.last = None
 
-    def update(self, overall, emulator):
+    def update(self, overall, emulator, pace):
         width = max(0, shutil.get_terminal_size().columns - 1)
-        rows = (clean(overall)[:width], clean(emulator)[:width])
+        rows = tuple(style_progress_line(clean(line), width)
+                     for line in (overall, emulator, pace))
         if rows == self.last:
             return
         if not self.active:
-            os.write(2, b"\n")  # Reserve two lines below the existing terminal output.
+            os.write(2, b"\n\n")  # Reserve three lines below the existing terminal output.
             self.active = True
-        os.write(2, ("\r\x1b[1A\r\x1b[K" + rows[0] + "\n\r\x1b[K" + rows[1]).encode())
+        os.write(2, ("\r\x1b[2A\r\x1b[K" + rows[0] + "\n\r\x1b[K" + rows[1]
+                     + "\n\r\x1b[K" + rows[2]).encode())
         self.last = rows
 
     def close(self):
         if self.active:
-            os.write(2, b"\r\x1b[1A\r\x1b[K\n\r\x1b[K\r\x1b[1A")
+            os.write(2, b"\r\x1b[2A\r\x1b[K\n\r\x1b[K\n\r\x1b[K\r\x1b[2A")
             self.active = False
+
+
+def pace_line(samples):
+    if not samples:
+        return "PACE | collecting a five-second sample"
+    recent = samples[-16:]
+    scale = max(recent)
+    glyphs = "▁▂▃▄▅▆▇█"
+    bars = "".join(glyphs[min(7, (value * 8 - 1) // scale)] if value else "·"
+                   for value in recent)
+    return f"PACE {bars} | {samples[-1]} ROMs / 5s | peak {max(samples)}"
 
 
 def stop(proc):
@@ -63,6 +79,10 @@ def run(command, display):
     messages = []
     overall = "VERIFY | preparing ROM checks"
     emulator = "EMU | waiting for first ROM"
+    sampled_at = time.monotonic()
+    sampled_done = 0
+    done = 0
+    samples = []
     selector = selectors.DefaultSelector()
     for fd in streams:
         selector.register(fd, selectors.EVENT_READ)
@@ -109,8 +129,18 @@ def run(command, display):
                     else:
                         os.close(fd)
             pending = clean(buffers[read_fd].decode(errors="replace"))
-            display.update(pending if pending.startswith("VERIFY ") else overall,
-                           pending if pending.startswith("EMU ") else emulator)
+            shown_overall = pending if pending.startswith("VERIFY ") else overall
+            count = re.search(r"\b(\d+)/(\d+) complete\b", shown_overall)
+            if count:
+                done = int(count.group(1))
+            now = time.monotonic()
+            if now - sampled_at >= 5:
+                samples.append(max(0, done - sampled_done))
+                sampled_done = done
+                sampled_at = now
+            display.update(shown_overall,
+                           pending if pending.startswith("EMU ") else emulator,
+                           pace_line(samples))
         return proc.wait(), messages
     finally:
         selector.close()

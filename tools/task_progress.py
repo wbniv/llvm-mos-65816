@@ -3,12 +3,41 @@
 import argparse
 from contextlib import contextmanager
 import os
+import re
 import selectors
+import shutil
 import signal
 import subprocess
 import sys
 import threading
 import time
+
+
+def style_progress_line(line, width):
+    """Render a single terminal row without changing progress snapshots or verdicts."""
+    line = re.sub(r"\[([#-]{20})\]", lambda match:
+                  "│" + match.group(1).replace("#", "█").replace("-", "░") + "│", line)
+    line = line[:max(0, width)]
+    if "NO_COLOR" in os.environ:
+        return line
+    label = line.split(" ", 1)[0]
+    color = {"VERIFY": "36", "EMU": "35", "PACE": "32", "BUILD": "34",
+             "REBUILD": "33", "LIVE": "36", "DEPLOY": "34"}.get(label, "36")
+    if line.startswith(label + " "):
+        line = f"\x1b[1;{color}m{label}\x1b[0m" + line[len(label):]
+    if label == "PACE":
+        line = re.sub(r"([▁▂▃▄▅▆▇█·]+)(?= \|)",
+                      lambda match: f"\x1b[1;32m{match.group(1)}\x1b[0m", line)
+    line = re.sub(r"│([█░]{20})│", lambda match:
+                  f"\x1b[{color}m│\x1b[1;{color}m{match.group(1).split('░')[0]}"
+                  f"\x1b[2;37m{'░' * match.group(1).count('░')}\x1b[{color}m│\x1b[0m", line)
+    def paint_status(match):
+        tone = "32" if match.group(1) == "PASS" else (
+            "2;37" if match.group(2) == "0" else
+            "31" if match.group(1) == "FAIL" else "33")
+        return f"\x1b[{tone}m{match.group(0)}\x1b[0m"
+    line = re.sub(r"\b(PASS|FAIL|MISSING) (\d+)\b", paint_status, line)
+    return line
 
 
 class Progress:
@@ -37,6 +66,7 @@ class Progress:
                 f"{percent:3d}% {completed}/{self.total} complete | "
                 f"{max(0, self.total-completed)} remaining | {elapsed}s | {detail}")
         if self.terminal:
+            line = style_progress_line(line, shutil.get_terminal_size().columns - 1)
             line = "\r\033[K" + line + ("\n" if completed >= self.total else "")
         else:
             line = "progress snapshot: " + line + "\n"
