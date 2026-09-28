@@ -2314,6 +2314,40 @@ tasks:
       - task: mandel-mame
         vars: { ROM: cardioid }
 
+  vawidth:
+    desc: "#156 Round 8 Cluster D: promoted 8-bit, 16/32/64-bit and pointer va_arg slots; host/default/a16/xy16 differential, both emulators and machine verifier."
+    cmds:
+      - dev/run.sh vawidth
+
+  sretrec:
+    desc: "#157 Round 8 Cluster D: recursive 64-bit aggregate returns through sret; host/default/a16/xy16 differential, both emulators and machine verifier."
+    cmds:
+      - dev/run.sh sretrec
+
+  arityfan:
+    desc: "#158 Round 8 Cluster D: runtime indirect calls through one to four argument signatures; host/default/a16/xy16 differential, both emulators and machine verifier."
+    cmds:
+      - dev/run.sh arityfan
+
+  extload:
+    desc: "#159 Round 8 Cluster D: signed and unsigned extending-load width matrix; host/default/a16/xy16 differential, both emulators and machine verifier."
+    cmds:
+      - dev/run.sh extload
+
+  ascast:
+    desc: "#160 Round 8 Cluster D: repeated near/far address-space casts and runtime read; host/+mos-a16 differential, both emulators and machine verifier."
+    cmds:
+      - dev/run.sh ascast
+
+  round8d:
+    desc: "Build and gate Round 8 Cluster D (#156–#160) in sequence; publication remains separate."
+    cmds:
+      - dev/run.sh vawidth
+      - dev/run.sh sretrec
+      - dev/run.sh arityfan
+      - dev/run.sh extload
+      - dev/run.sh ascast
+
   # --- Generated reference docs (from the HAL headers + the backend TableGen) ---
 
   gen-docs:

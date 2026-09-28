@@ -1774,6 +1774,21 @@ have compiled cleanly and covered less than it claimed. #155 drives both operand
 its gate asserts every one of the 18 cells fired both outcomes; with that, all six opcodes appear three
 times each (one per width) in all three modes.
 
-Still deferred: **#156–#160** — `va_arg` width sweep, recursive `sret`, indirect-call arity fan,
-extending-load sign matrix, address-space cast ladder.
+## Cluster D (#156–#160) — ABI shapes and extending loads, BUILT + gated 2026-09-28
 
+Built under the [Cluster D plan](../plans/2026-09-28-round8-cluster-d-abi-and-memory-widths.md).
+All five gates passed against host results on MAME and bsnes-jg, with machine verification clean in
+the tested modes. #156–#159 were verified in default, `+mos-a16`, and `+mos-xy16`; #160 uses the
+dedicated `+mos-a16` gate because its 32-bit far pointer is unavailable in the default mode.
+
+| Demo | Gate | Result |
+|---|---|---|
+| **#156 `vawidth`** | Promoted 8-bit, 16/32/64-bit, and pointer arguments read through one `va_list` | `0x3D17`; `G_VASTART=1`, 7 argument loads; 5-way differential and both emulators pass. |
+| **#157 `sretrec`** | 64-bit aggregate returned through recursive frames | `0x01AB`; recursive self-call and sret retained; 5-way differential and both emulators pass. |
+| **#158 `arityfan`** | Runtime function-pointer table with one through four arguments | `0xA09E`; all four indirect signatures execute; 5-way differential and both emulators pass. |
+| **#159 `extload`** | Signed and unsigned loads across wider integer widths | `0xF97F`; six `G_SEXTLOAD` and six `G_ZEXTLOAD`; 5-way differential and both emulators pass. |
+| **#160 `ascast`** | Repeated near/far casts followed by a runtime far read | `0xF1BD`; `G_ADDRSPACE_CAST` retained; host/A16 and both emulators pass. |
+
+The nearby #154 register-allocation failure was fixed by patch 0029, and the extending-load
+worklist failure was fixed locally by patch 0066; neither reproduced in this cluster. All five ROMs
+were built locally, and their sources and gates are published on the compiler repository's `main` branch.

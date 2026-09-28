@@ -551,6 +551,16 @@ Targets:
              corpus_result (ovmatrix_gate_crc 0xD4D0) == host on MAME + bsnes-jg + a structure
              gate (>=3 of each of the six opcodes in all three modes; 18/18 two-sided cells),
              screenshots both (build/ovmatrix-{mame,jg}.png). 5-way: corpus-a16 (ovmatrix_sim).
+  vawidth    #156 Round 8 Cluster D: promoted 8-bit plus 16/32/64-bit and pointer va_arg slots;
+             host/default/a16/xy16 differential, both emulators and structure/MIR checks.
+  sretrec    #157 Round 8 Cluster D: recursive 64-bit aggregate returns through sret; host/target
+             differential, both emulators, recursive sret shape and machine verifier.
+  arityfan   #158 Round 8 Cluster D: runtime indirect calls through 1–4 argument signatures;
+             host/target differential, both emulators, indirect-call shape and machine verifier.
+  extload    #159 Round 8 Cluster D: signed/unsigned extending-load width matrix; host/target
+             differential, both emulators, G_SEXTLOAD/G_ZEXTLOAD and machine verifier.
+  ascast     #160 Round 8 Cluster D: repeated near/far address-space casts and runtime read;
+             host/+mos-a16 differential, both emulators, cast structure and machine verifier.
   repro      clean-room: fresh checkout, then build + corpus in it (host-side)
 
 Extra ARGS are forwarded to the in-container script (e.g. `fuzz N seed`) or, for
