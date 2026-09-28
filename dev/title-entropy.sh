@@ -39,6 +39,7 @@ while [ $# -gt 0 ]; do
 done
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
+source "$ROOT/dev/task-progress.sh"
 JGX=${JGX:-$ROOT/build/jgxcheck}
 DB=${JGX_DB:-$ROOT/vendor/bsnes-jg/Database}
 [ -x "$JGX" ] || { echo "FATAL: no jgxcheck at $JGX (run: dev/run.sh mandel-oop once to build it)"; exit 1; }
@@ -46,20 +47,32 @@ DB=${JGX_DB:-$ROOT/vendor/bsnes-jg/Database}
 
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 fail=0
+read -r -a frame_list <<< "${FRAMES//,/ }"
+render_total=$((${#frame_list[@]} * (RUNS+1)))
+render_done=0
+render_skipped=0
 
 echo "==> title-entropy: $(basename "$ROM") — $RUNS entropy-1 runs per frame vs the entropy-0 reference"
 for F in ${FRAMES//,/ }; do
+  task_progress "$render_total" "$render_done" TITLE "$(basename "$ROM") | frame $F | reference"
   # The WRAM assert arguments are irrelevant here (this gate reads the PICTURE), so they are the
   # mandel-oop defaults and a SMOKE FAIL at a pre-corpus frame is expected and ignored.
   JGX_ENTROPY=0 "$JGX" "$ROM" "$DB" 897 2 204F "$F" "$TMP/ref.png" >/dev/null 2>&1 || true
-  [ -s "$TMP/ref.png" ] || { echo "  frame $F: FAIL — entropy-0 render produced no PNG"; fail=1; continue; }
+  render_done=$((render_done+1))
+  [ -s "$TMP/ref.png" ] || {
+    echo "  frame $F: FAIL — entropy-0 render produced no PNG"
+    fail=1; render_skipped=$((render_skipped+RUNS)); render_done=$((render_done+RUNS)); continue
+  }
   REF=$(sha256sum "$TMP/ref.png" | cut -c1-12)
   bad=0
   for ((i = 0; i < RUNS; i++)); do
+    task_progress "$render_total" "$render_done" TITLE \
+      "$(basename "$ROM") | frame $F | entropy 1 | repetition $((i+1))/$RUNS"
     rm -f "$TMP/run.png"
     JGX_ENTROPY=1 "$JGX" "$ROM" "$DB" 897 2 204F "$F" "$TMP/run.png" >/dev/null 2>&1 || true
     got=$(sha256sum "$TMP/run.png" 2>/dev/null | cut -c1-12 || true)
     [ "$got" = "$REF" ] || bad=$((bad + 1))
+    render_done=$((render_done+1))
   done
   if [ "$bad" -eq 0 ]; then
     printf '  frame %4s: PASS  %d/%d entropy-1 runs == entropy-0 %s\n' "$F" "$RUNS" "$RUNS" "$REF"
@@ -68,6 +81,7 @@ for F in ${FRAMES//,/ }; do
     fail=1
   fi
 done
+task_progress "$render_total" "$render_done" TITLE "finished | skipped $render_skipped | failed $fail"
 
 [ "$fail" -eq 0 ] && echo "TITLE-ENTROPY: PASS" || echo "TITLE-ENTROPY: FAIL"
 exit "$fail"

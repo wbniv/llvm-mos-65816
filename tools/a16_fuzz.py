@@ -990,8 +990,17 @@ def _run_emu(cmd, timeout, env=None):
     """subprocess.run for an emulator, but in its own process group so a timeout reaps the
     whole tree (emulator + any children it forked). Returns a CompletedProcess and re-raises
     subprocess.TimeoutExpired (after killing the group), so callers' handling is unchanged."""
+    progress_fds = ()
+    descriptor = os.environ.get("JGX_PROGRESS_FD")
+    if descriptor:
+        try:
+            fd = int(descriptor)
+            os.fstat(fd)
+            progress_fds = (fd,)
+        except (ValueError, OSError):
+            pass
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                         text=True, env=env, start_new_session=True)
+                         text=True, env=env, start_new_session=True, pass_fds=progress_fds)
     _LIVE_EMUS.add(p)
     try:
         out, err = p.communicate(timeout=timeout)

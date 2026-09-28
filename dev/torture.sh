@@ -17,6 +17,7 @@ usage() {
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT=/work
+source "$ROOT/dev/task-progress.sh"
 TOOL="${MOS_TOOLCHAIN:-$ROOT/build/llvm-mos-install}/bin"
 INSCOPE="$ROOT/examples/65816/torture/inscope.tsv"
 [ -x "$TOOL/mos-clang" ] || { echo "FATAL: no from-source toolchain at $TOOL (run: dev/run.sh toolchain)"; exit 1; }

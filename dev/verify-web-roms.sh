@@ -54,6 +54,7 @@ USAGE
   exit 0;; esac
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+source "$ROOT/dev/task-progress.sh"
 SITE="$HOME/biohack.net"
 MANIFEST=""
 ROM_DIR=""
@@ -135,9 +136,15 @@ print(f"{name}: repacked on-SNES to {z} B == host oracle")
 PY
 }
 
+total=$(printf '%s\n' "$ROWS" | awk 'NF {n++} END {print n+0}')
+progress() {
+  task_progress "$total" "$1" VERIFY "$2"
+}
+
 pass=0; fail=0; missing=0; failed=""
 while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   [ -n "$id" ] || continue
+  progress "$((pass+fail+missing))" "verifying $id ($frames frames)"
   rom="$ROM_DIR/$id.sfc"
   if [ ! -f "$rom" ]; then
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
@@ -181,6 +188,7 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   fi
 done <<< "$ROWS"
 
+progress "$((pass+fail+missing))" 'verification finished'
 echo
 echo "verify-web-roms: $pass passed, $fail failed, $missing missing"
 overall=0
@@ -201,18 +209,20 @@ if [ "$TITLE_ENTROPY" -eq 1 ]; then
   te_pass=0; te_fail=0; te_missing=0; te_failed=""
   while IFS=$'\t' read -r id _; do
     [ -n "$id" ] || continue
+    progress "$((te_pass+te_fail+te_missing))" "title entropy: $id"
     rom="$ROM_DIR/$id.sfc"
     if [ ! -f "$rom" ]; then
-      printf '  %-16s MISSING %s\n' "$id" "$rom"; te_missing=$((te_missing+1)); continue
+        printf '  %-16s MISSING %s\n' "$id" "$rom"; te_missing=$((te_missing+1)); continue
     fi
     out=$(JGX="$JGX" JGX_DB="$DB" "$TE" "$rom" --runs "$TE_RUNS" --frames "$TE_FRAMES" 2>&1) || {
-      printf '  %-16s FAIL  title-entropy\n' "$id"
+        printf '  %-16s FAIL  title-entropy\n' "$id"
       printf '%s\n' "$out" | sed 's/^/                     /'
       te_fail=$((te_fail+1)); te_failed="$te_failed $id"; continue
     }
     printf '  %-16s PASS  title-entropy (3 frames x %s runs)\n' "$id" "$TE_RUNS"
     te_pass=$((te_pass+1))
   done <<< "$ROWS"
+  progress "$((te_pass+te_fail+te_missing))" 'title entropy finished'
   echo
   echo "title-entropy: $te_pass passed, $te_fail failed, $te_missing missing"
   if [ "$te_fail" -ne 0 ]; then echo "TITLE-ENTROPY FAILED:$te_failed"; overall=1; fi

@@ -24,6 +24,7 @@ See docs/plans/2026-06-19-321-c-torture-execute-differential-suite.md (Phase 1).
 import argparse
 import random
 import subprocess
+from task_progress import Progress
 import sys
 import tempfile
 from pathlib import Path
@@ -204,11 +205,16 @@ def main():
     xfails = load_xfails()
     tally = {"PASS": 0, "FAIL": 0, "SKIP": 0, "XFAIL": 0}
     fails = []
-    for name in names:
+    progress = Progress(len(names), "TORTURE")
+    errors = 0
+    for completed, name in enumerate(names):
+        progress.update(completed, name + " | " + " ".join(f"{k} {v}" for k, v in tally.items()))
         test = SRCDIR / name
         if not test.exists():
+            errors += 1
             print("  %-22s ERROR  not found" % name); continue
-        status, detail = evaluate(test, shim_obj, args.opt, want_bsnes)
+        with progress.watch(name):
+            status, detail = evaluate(test, shim_obj, args.opt, want_bsnes)
         # A confirmed-miscompile in the expected-fail manifest is XFAIL, not FAIL, so the gate
         # stays green-modulo-known while each backlog defect is triaged + fixed. An UNEXPECTED pass
         # (status PASS but listed) is surfaced as XPASS — the row should be removed (defect fixed).
@@ -223,6 +229,7 @@ def main():
         if status == "FAIL":
             fails.append((name, detail))
 
+    progress.update(len(names), "finished | " + " ".join(f"{k} {v}" for k, v in tally.items()) + f" ERROR {errors}")
     xp = tally.get("XPASS", 0)
     print("==> torture-run: %d PASS, %d FAIL, %d SKIP, %d XFAIL%s (of %d)"
           % (tally["PASS"], tally["FAIL"], tally["SKIP"], tally["XFAIL"],

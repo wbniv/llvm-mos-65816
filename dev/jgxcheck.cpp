@@ -18,6 +18,7 @@
 #include <bsnes.hpp>
 #include "settings.hpp"  // SuperFamicom::configuration — entropy is not on the public Bsnes API
 #include "png_write.h"   // dependency-free RGB8 PNG writer (shared with tools/mandel-render.c)
+#include "task_progress.h"
 
 #if defined(JGX_VIEW) || defined(JGX_ZOOM) || defined(JGX_BLOSSOM) || defined(JGX_NAV)
 // Interactive-demo input differential (built only by dev/mandel-interactive.sh / dev/mandel-zoom.sh
@@ -452,8 +453,13 @@ int main(int argc, char **argv) {
   FrameFp last = prev;
   int changes = 0, first_change = -1, last_change = -1;
 
+  const std::string progress_path(rompath);
+  TaskProgress frame_progress(progress_path.substr(progress_path.find_last_of('/') + 1), frames);
+  int frames_completed = 0;
   for (int i = 0; i < frames; ++i) {
     Bsnes::run();
+    frames_completed = i + 1;
+    if (frames_completed % 60 == 0) frame_progress.update(frames_completed);
     if (blankscan) blacktop.push_back(leading_black_rows());
     if (framescan) {
       FrameFp f = frame_fingerprint();
@@ -479,6 +485,7 @@ int main(int argc, char **argv) {
       if (v == want) { polled_at = i + 1; break; }
     }
   }
+  frame_progress.update(frames_completed, polled_at >= 0 ? "matched; stopped early" : "frame budget finished", true);
   if (poll) {
     if (polled_at >= 0)
       fprintf(stderr, "jgxcheck: JGX_POLL matched at frame %d of %d budgeted\n", polled_at, frames);

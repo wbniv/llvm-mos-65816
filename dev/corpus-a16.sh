@@ -17,6 +17,7 @@ usage() { echo "Usage: dev/run.sh corpus-a16   # examples/snes/corpus/*.c under 
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT=/work
+source "$ROOT/dev/task-progress.sh"
 MANIFEST="$ROOT/examples/snes/corpus/expected.tsv"
 TOOL="${MOS_TOOLCHAIN:-$ROOT/build/llvm-mos-install}/bin"
 [ -f "$MANIFEST" ] || { echo "no manifest: $MANIFEST"; exit 1; }
@@ -35,13 +36,15 @@ export BSNES_FRAMES="${BSNES_FRAMES:-1000}"
 
 echo "==> corpus-a16: $(basename "$MANIFEST")  (default == +mos-a16 == +mos-xy16, MAME + bsnes-jg; settle=$SMOKE_SETTLE)"
 pass=0; fail=0; xfail=0; total=0
+selected=$(awk '$1 !~ /^#/ && $2 == "corpus_result" {n++} END {print n+0}' "$MANIFEST")
 # `desc` soaks up the rest of each line; the `|| [ -n … ]` guard handles a final line
 # with no trailing newline. Only corpus_result rows run (skips hello.c's `sentinel`).
 while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
   case "${cfile:-}" in ''|\#*) continue ;; esac          # skip blanks + comments
   [ "$symbol" = "corpus_result" ] || continue            # skip hello.c (sentinel smoke)
   total=$((total + 1)); name="$(basename "$cfile" .c)"
-  out="$(python3 "$ROOT/tools/a16_fuzz.py" check --src "$ROOT/examples/snes/$cfile" \
+  out="$(task_run "$selected" "$((total-1))" A16 "$name | PASS $pass FAIL $fail XFAIL $xfail" \
+         python3 "$ROOT/tools/a16_fuzz.py" check --src "$ROOT/examples/snes/$cfile" \
          --name "corpus-$name" --expected "$expected" "${NOBSNES[@]}" 2>&1)" && rc=0 || rc=$?
   if printf '%s\n' "$out" | grep -q 'known issue'; then
     printf '  %-10s XFAIL  %s\n' "$name" "$(printf '%s\n' "$out" | grep -o 'known issue \[[^]]*\]' | head -1)"; xfail=$((xfail + 1))
@@ -53,4 +56,5 @@ while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
 done < "$MANIFEST"
 
 echo "==> corpus-a16: $pass/$total passed, $xfail xfail"
+task_progress "$selected" "$total" A16 "finished | PASS $pass FAIL $fail XFAIL $xfail"
 [ "$fail" -eq 0 ]

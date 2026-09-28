@@ -19,6 +19,7 @@ usage() { echo "Usage: dev/run.sh xcheck-suite [PREFIX]   # bsnes-jg-only (JG_ON
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT=/work
+source "$ROOT/dev/task-progress.sh"
 BUILD="$ROOT/build"
 INSTALL="$BUILD/install"
 TOOL="${MOS_TOOLCHAIN:-$BUILD/llvm-mos-install}/bin"
@@ -43,7 +44,7 @@ if [ -n "$PREFIX" ]; then
 fi
 [ -n "${TESTS[0]:-}" ] || { echo "FATAL: no jgxcheck-carrying test matches PREFIX='$PREFIX'"; exit 1; }
 
-echo "==> bsnes-jg-only (JG_ONLY) confirmation — ${#TESTS[@]} value test(s)${PREFIX:+ matching '$PREFIX'}, serial, nice -n 19"
+echo "==> bsnes-jg-only (JG_ONLY) confirmation — ${#TESTS[@]} value test(s)${PREFIX:+ matching $PREFIX}, serial, nice -n 19"
 echo "    MAME leg skipped; deterministic bsnes-jg leg only. logs: $LOGDIR/"
 echo
 
@@ -51,7 +52,8 @@ pass=0; fail=0; skipped=0; bad=()
 for t in "${TESTS[@]}"; do
   name="$(basename "$t" .sh)"
   log="$LOGDIR/$name.log"
-  if JG_ONLY=1 nice -n 19 bash "$t" >"$log" 2>&1; then
+  if JG_ONLY=1 task_run "${#TESTS[@]}" "$((pass+fail+skipped))" XCHECK \
+      "$name | PASS $pass FAIL $fail SKIP $skipped" nice -n 19 bash "$t" >"$log" 2>&1; then
     ec=0
   else
     ec=$?
@@ -75,6 +77,7 @@ done
 
 echo
 total=${#TESTS[@]}
+task_progress "$total" "$((pass+fail+skipped))" XCHECK "finished | PASS $pass FAIL $fail SKIP $skipped"
 if [ "$fail" -eq 0 ] && [ "$skipped" -eq 0 ]; then
   echo "RESULT: PASS — $pass/$total bsnes-jg value tests agree (second emulator confirmed, MAME not run)"
   exit 0

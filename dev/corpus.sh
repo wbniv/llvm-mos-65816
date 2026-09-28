@@ -13,6 +13,7 @@ usage() { echo "Usage: dev/run.sh corpus   # assert every examples/snes/corpus/*
 [ "${1-}" = "-h" ] || [ "${1-}" = "--help" ] && usage
 
 ROOT=/work
+source "$ROOT/dev/task-progress.sh"
 # shellcheck disable=SC1091 # container-absolute shared helper
 . "$ROOT/dev/_emu.sh"
 
@@ -40,10 +41,13 @@ echo "==> corpus: build $(basename "$MANIFEST") with $MOS_CLANG"
 
 # Build every manifest row, including hello.c. This is intentionally scoped to
 # the manifest rather than invoking the all-examples SDK build.
+selected=$(awk 'NF && $1 !~ /^#/ {n++} END {print n+0}' "$MANIFEST")
+built=0
 while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
   case "${cfile:-}" in ''|\#*) continue ;; esac
   src="$ROOT/examples/snes/$cfile"
   name="$(basename "$cfile" .c)"
+  task_progress "$selected" "$built" 'CORPUS build' "$name"
   rom="$BUILD/$name.sfc"
   map="$BUILD/$name.map"
   [ -f "$src" ] || { echo "FATAL: manifest source missing: $src"; exit 1; }
@@ -56,7 +60,9 @@ while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
     exit 1
   fi
   printf '  %-18s built\n' "$name"
+  built=$((built+1))
 done < "$MANIFEST"
+task_progress "$selected" "$built" 'CORPUS build' finished
 
 echo "==> corpus: run $(basename "$MANIFEST") (MAME settle=$SMOKE_SETTLE, backstop=${SMOKE_SECONDS}s)"
 
@@ -66,6 +72,7 @@ pass=0; fail=0; total=0
 while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
   case "${cfile:-}" in ''|\#*) continue ;; esac     # skip blanks + comments
   total=$((total + 1))
+  task_progress "$selected" "$((total-1))" 'CORPUS run' "$cfile | PASS $pass FAIL $fail"
   name="$(basename "$cfile" .c)"
   rom="$BUILD/$name.sfc"
   map="$BUILD/$name.map"
@@ -80,4 +87,5 @@ while read -r cfile symbol expected desc || [ -n "${cfile:-}" ]; do
 done < "$MANIFEST"
 
 echo "==> corpus: $pass/$total passed"
+task_progress "$selected" "$total" 'CORPUS run' "finished | PASS $pass FAIL $fail"
 [ "$fail" -eq 0 ]

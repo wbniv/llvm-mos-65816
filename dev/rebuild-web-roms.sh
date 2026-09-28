@@ -2,8 +2,8 @@
 # dev/rebuild-web-roms.sh — batch-recompile SNES demo ROMs for the web, IN ONE CONTAINER.
 #
 # Runs inside the llvm-mos-65816-dev image (invoke via: dev/run.sh rebuild-web-roms <slug>...).
-# For each slug it maps slug->source .c, auto-derives the feature flag from that demo's dev/<src>.sh
-# (so +mos-a16 vs default-8 stays correct without hardcoding), compiles build/<slug>.sfc with -Os, and
+# For each slug it maps slug->source .c, uses the cartridge's build recipe,
+# compiles build/<slug>.sfc, and
 # fixes the SNES checksum. NO gate / emulator / render — that is the slow part and is unnecessary for a
 # gate-neutral change (e.g. a shared title-font swap). Verify one representative demo with the full
 # dev/run.sh <demo> gate separately.
@@ -70,9 +70,23 @@ done
 
 ok=0; fail=0; skip=0; failed=""
 for slug in "${SLUGS[@]}"; do
+  case "$slug" in
+    bankwalk|farptrcmp|lzss-gallery|seamdemo|cartsize-hirom-4m|cartsize-exhirom-6m|cartsize-exhirom-8m|apollo-daylight|svx2-fastrom-video)
+      if bash "$ROOT/dev/rebuild-special-web-rom.sh" "$slug" >"$BUILD/$slug.buildlog" 2>&1; then
+        echo "OK    $slug  (special cartridge recipe, a16)"
+        ok=$((ok+1))
+      else
+        echo "FAIL  $slug  (special cartridge recipe; see build/$slug.buildlog)"
+        fail=$((fail+1)); failed="$failed $slug"
+      fi
+      continue ;;
+  esac
   src="${SRCMAP[$slug]:-$slug}"
   c="$ROOT/examples/snes/$src.c"
-  if [ ! -f "$c" ]; then echo "SKIP  $slug (no examples/snes/$src.c)"; skip=$((skip+1)); continue; fi
+  if [ ! -f "$c" ]; then
+    echo "FAIL  $slug  (no build recipe or examples/snes/$src.c)"
+    fail=$((fail+1)); failed="$failed $slug"; continue
+  fi
 
   # Binary assets (gfx/palette blobs) → objcopy to .o and link.
   assets=(); asfail=0
@@ -85,8 +99,7 @@ for slug in "${SLUGS[@]}"; do
   done
   if [ "$asfail" = 1 ]; then fail=$((fail+1)); failed="$failed $slug"; continue; fi
 
-  # shellcheck disable=SC2086
-  xtra=( ${EXTRA_CFLAGS[$slug]:-} )
+  read -r -a xtra <<< "${EXTRA_CFLAGS[$slug]:-}"
   # Platform from the SOURCE marker (same rule as dev/build.sh and the per-demo gates): a demo needing a
   # second bank for far rodata self-declares `snes-far-platform`. Default stays plain snes, so a demo
   # that already fits keeps its single 32 KB bank and does NOT grow to 64 KB.
