@@ -22,15 +22,11 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [T4] **Investigate the A16 Farblit `cp8` range proof.** Not started. The compiler bounds `j + 8` at 263 although this loop visits `j = 0..47`, so the source load computes its pointer explicitly in A16. Investigate a sound loop-range proof or address canonicalization that permits Y8 indexing while preserving integer wrapping and bank crossing. Measure code size and runtime; retain the existing fallback until the candidate is proved correct and worthwhile. [Range limitation and evidence](docs/investigations/2026-09-27-farblit-byte-load.md#controlled-byte-split-experiment).
 
-- [T3] **Build the remaining Round 8 compiler stress demos (#156–#160).** Clusters A–C (#142–#155) are built and gated; the five remaining paths are drafted in the [coverage audit](docs/investigations/2026-06-27-compiler-stress-test-demo-ideas.md). Build each with host/target differential, emulator, and machine-verifier checks. Keep publication as a separate action. [Cluster A plan](docs/plans/2026-09-16-round8-unentered-backend-paths.md).
-
-- [T3] **Make short compiler-bug videos with the published `cpu6502` demo.** Show each chosen failing and repaired execution through the on-screen gates and registers; verify clips against the retained defect evidence. [Demo plan](docs/plans/2026-07-02-102-snes-cpu6502.md).
-
 ### Test Bench / CI
 
-- [T3] **Run the 138-demo build-determinism gate sweep.** Check for a later complete run first; otherwise define the demo set, run each differential gate on a compiler containing the fix, and record the results. The [original plan](docs/plans/2026-09-14-eliminate-build-nondeterminism.md) only covered the corpus and four demos.
+- [T3] **Run the 138-demo build-determinism gate sweep.** Run and record the full sweep on the rebuilt fixed toolchain. The corpus, `corpus-a16`, and four demos whose `main` changed beyond the `sec` permutation passed; the complete 138-demo sweep remains open. [Plan and results](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
 
-- [verify T2] **Check the live upstream dashboard release.** Record keyboard-only navigation, JavaScript-disabled behavior, and a forced GitHub outage against the published page; the [release plan](docs/plans/2026-09-26-live-upstream-dashboard.md#release-checks-recorded-2026-09-26) says these checks remain open. Then record PASS/FAIL in that plan.
+- [verify T2] **Complete the live upstream dashboard outage check.** Keyboard-only navigation and JavaScript-disabled rendering passed on the published page on 2026-09-28. Still force the server-side GitHub fetch to fail and verify the stale-data fallback, then update the [release plan](docs/plans/2026-09-26-live-upstream-dashboard.md#published-page-checks-recorded-2026-09-28).
 
 ### Upstream / Contribution
 
@@ -63,7 +59,7 @@ The [submission tracker](docs/upstream-contribution-status.md) owns PR state and
 
 ### Distribution / Packaging
 
-- [T4] **Verify and publish the cross-platform toolchain packages.** Linux arm64 and Windows x86-64 packages are built; run the functional compiler check on real Windows before publication, then record package identities and results. The Wine check cannot run the mingw LLVM binary. [Plan and completed build evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
+- [T4] **Verify the published Windows toolchain package on real Windows.** The linux-arm64 package passed under QEMU, and the interim linux-arm64 and Windows x86-64 packages are already published; the Windows package has structural and codegen-identity checks, while functional compilation remains deferred because Wine cannot run the mingw LLVM binary. Run the warning-free `-Os` compiler check on real Windows and record the result before the next package release. [Plan and package evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 ## Watch
 

@@ -315,8 +315,8 @@
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "ba27176b7771cd200e5129ceb707e3298f9f5f0dfc2bf0157c736ca6e6fecc56"
         },
-        "reviewed_at": "2026-09-28T05:10:43.274159+00:00",
-        "note": "Reviewed the gallery navigation plan and retirement disposition; removed the stale chevron/repack action from the current queue while retaining dated evidence in TODO-history.",
+        "reviewed_at": "2026-09-28T05:33:26.643110+00:00",
+        "note": "Reviewed the current queue against Round 8 Cluster D results, the archived video idea, the nondeterminism sweep record, the published dashboard checks, and cross-platform package status. Removed completed/archived tasks, updated the remaining verification wording, and retained the open full sweep and real-Windows gate.",
         "attribution": "OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-luna, medium reasoning effort"
       }
     },
