@@ -24,6 +24,7 @@
 #   dev/verify-web-roms.sh --site DIR
 #   dev/verify-web-roms.sh --manifest FILE --rom-dir DIR
 #   dev/verify-web-roms.sh --only huffman,maze
+#   dev/verify-web-roms.sh --cache-dir build/verify-web-roms-cache
 #
 # --title-entropy adds a second, OPT-IN leg: dev/title-entropy.sh (see that script's header) over
 # the same published ROM set, at the budget decided in
@@ -38,7 +39,7 @@ set -euo pipefail
 
 case "${1-}" in -h|--help)
   cat <<'USAGE'
-Usage: dev/verify-web-roms.sh [--site DIR] [--manifest FILE --rom-dir DIR] [--only slug[,slug...]] [--title-entropy]
+Usage: dev/verify-web-roms.sh [--site DIR] [--manifest FILE --rom-dir DIR] [--only slug[,slug...]] [--cache-dir DIR] [--title-entropy]
 
 Replays every ROM in <site>/public/play/roms against its manifest.json self-check in bsnes-jg and
 scans each for force-blank bleed. Exits 1 if any demo mismatches or shows a black-band spike.
@@ -47,6 +48,7 @@ scans each for force-blank bleed. Exits 1 if any demo mismatches or shows a blac
   --manifest FILE  manifest path (overrides --site's default)
   --rom-dir DIR    ROM directory (overrides --site's default)
   --only LIST      comma-separated slugs instead of the whole manifest
+  --cache-dir DIR  reuse passing checks for identical ROM, manifest check, and verifier
   --title-entropy  also run dev/title-entropy.sh over the same ROM set (3 frames × 8 runs each —
                    see the header comment). OFF by default: slow (100+ ROMs), run explicitly or
                    with --only to scope it down.
@@ -59,6 +61,7 @@ SITE="$HOME/biohack.net"
 MANIFEST=""
 ROM_DIR=""
 ONLY=""
+CACHE_DIR=""
 TITLE_ENTROPY=0
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -66,6 +69,7 @@ while [ $# -gt 0 ]; do
     --manifest) MANIFEST="$2"; shift 2;;
     --rom-dir) ROM_DIR="$2"; shift 2;;
     --only) ONLY="$2"; shift 2;;
+    --cache-dir) CACHE_DIR="$2"; shift 2;;
     --title-entropy) TITLE_ENTROPY=1; shift;;
     *) echo "unknown arg: $1" >&2; exit 2;;
   esac
@@ -80,6 +84,30 @@ ROM_DIR="${ROM_DIR:-$SITE/public/play/roms}"
 [ -d "$DB" ]       || { echo "FATAL: no bsnes-jg Database at $DB"; exit 1; }
 [ -f "$MANIFEST" ] || { echo "FATAL: no manifest at $MANIFEST"; exit 1; }
 
+# The cache covers the complete verifier implementation, emulator, game database, and
+# caller-selected JGX settings. Display-only progress settings do not affect verdicts.
+cache_context=""
+if [ -n "$CACHE_DIR" ]; then
+  mkdir -p "$CACHE_DIR"
+  cache_context=$(python3 - "$ROOT/dev/verify-web-roms.sh" "$JGX" "$DB" <<'PY_CACHE'
+import hashlib, os, pathlib, sys
+h = hashlib.sha256()
+for name in sys.argv[1:3]:
+    path = pathlib.Path(name)
+    h.update(path.name.encode() + b"\0")
+    h.update(path.read_bytes())
+db = pathlib.Path(sys.argv[3])
+for path in sorted(p for p in db.rglob("*") if p.is_file()):
+    h.update(str(path.relative_to(db)).encode() + b"\0")
+    h.update(path.read_bytes())
+for key, value in sorted(os.environ.items()):
+    if key.startswith("JGX_") and key not in ("JGX_PROGRESS", "JGX_PROGRESS_FD"):
+        h.update((key + "=" + value + "\0").encode())
+print(h.hexdigest())
+PY_CACHE
+  )
+fi
+
 # A `live-record` self-check (the gallery's "verify the artwork on screen" button) is not a scalar
 # compare, so it cannot be replayed as one: the ROM publishes WHICH work is on screen alongside what
 # it repacked that work to, and the assertion is `ok == 1 && z == oracle[work]` against a table the
@@ -90,9 +118,9 @@ ROM_DIR="${ROM_DIR:-$SITE/public/play/roms}"
 # Headless, this deterministically lands on the FIRST work: the machine starts at frame 0 with the
 # record zeroed, exactly as the browser's `?verify=1` path does. Reproducible, not display-dependent.
 #
-# id<TAB>off<TAB>len<TAB>want<TAB>frames<TAB>mode<TAB>base<TAB>blankscan_rows
+# id<TAB>off<TAB>len<TAB>want<TAB>frames<TAB>mode<TAB>base<TAB>blankscan_rows<TAB>contract_hash
 ROWS=$(ONLY="$ONLY" python3 - "$MANIFEST" <<'PY'
-import json, os, sys
+import hashlib, json, os, sys
 only = {s for s in os.environ.get("ONLY", "").split(",") if s}
 for r in json.load(open(sys.argv[1]))["roms"]:
     sc = r.get("selfcheck")
@@ -106,6 +134,7 @@ for r in json.load(open(sys.argv[1]))["roms"]:
     else:
         row = [r["id"], str(sc["off"]), str(sc["len"]), str(sc["want"]), str(sc["frames"]),
                "scalar", "-", str(sc.get("blankscanRows", 4))]
+    row.append(hashlib.sha256(json.dumps(sc, sort_keys=True).encode()).hexdigest())
     print("\t".join(row))
 PY
 )
@@ -142,13 +171,24 @@ progress() {
 }
 
 pass=0; fail=0; missing=0; failed=""
-while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
+while IFS=$'\t' read -r id off len want frames mode base blankscan_rows contract_hash; do
   [ -n "$id" ] || continue
   progress "$((pass+fail+missing))" "verifying $id ($frames frames)"
   rom="$ROM_DIR/$id.sfc"
   if [ ! -f "$rom" ]; then
     task_clear
     printf '  %-16s MISSING %s\n' "$id" "$rom"; missing=$((missing+1)); continue
+  fi
+  cache_file=""
+  if [ -n "$CACHE_DIR" ]; then
+    rom_hash=$(sha256sum "$rom" | awk '{print $1}')
+    cache_key=$(printf '%s\n' "$cache_context" "$rom_hash" "$contract_hash" | sha256sum | awk '{print $1}')
+    cache_file="$CACHE_DIR/$id-$cache_key.pass"
+    if [ -f "$cache_file" ]; then
+      task_clear
+      printf 'EMU %s.sfc || cached verification (%s frames)\n' "$id" "$frames"
+      pass=$((pass+1)); continue
+    fi
   fi
   if [ "$mode" = "live-record" ]; then
     # JGX_POLL: `frames` is the player's budget, not a rendezvous — stop the instant the record
@@ -177,10 +217,10 @@ while IFS=$'\t' read -r id off len want frames mode base blankscan_rows; do
   smoke=$(printf '%s' "$out" | grep -oE 'SMOKE: (PASS|FAIL)' | head -1 || true)
   blank=$(printf '%s' "$out" | grep -oE 'BLANKSCAN: (PASS|FAIL)' | head -1 || true)
   if [ "$smoke" = "SMOKE: PASS" ] && [ "$blank" = "BLANKSCAN: PASS" ]; then
-    if [ -n "$detail" ]; then
-      printf '  %-16s PASS  (%s frames, %s)\n' "$id" "$frames" "$detail"
-    else
-      printf '  %-16s PASS  (%s frames, want %s)\n' "$id" "$frames" "$want"
+    if [ -n "$cache_file" ]; then
+      cache_tmp="$cache_file.tmp.$$"
+      printf 'passed\n' > "$cache_tmp"
+      mv "$cache_tmp" "$cache_file"
     fi
     pass=$((pass+1))
   else

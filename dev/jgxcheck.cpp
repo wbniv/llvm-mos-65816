@@ -485,7 +485,9 @@ int main(int argc, char **argv) {
       if (v == want) { polled_at = i + 1; break; }
     }
   }
-  frame_progress.update(frames_completed, polled_at >= 0 ? "matched; stopped early" : "frame budget finished", true, true);
+  char expected[32];
+  snprintf(expected, sizeof(expected), "want 0x%0*X", (int)(2 * len), want);
+  frame_progress.update(frames_completed, expected, true, true);
   if (poll) {
     if (polled_at >= 0)
       fprintf(stderr, "jgxcheck: JGX_POLL matched at frame %d of %d budgeted\n", polled_at, frames);

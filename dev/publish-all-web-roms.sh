@@ -163,18 +163,35 @@ python3 "$ROOT/dev/sync-manifest-offsets.py" \
   --symbol svx2-fastrom-video=video_reel_composite_health
 python3 "$ROOT/dev/sync-manifest-offsets.py" \
   --manifest "$candidate/indri-manifest.json" --rom-dir "$candidate/indri-roms" \
-  --symbol lzss-gallery=gallery_last_z \
   --symbol apollo-daylight=apollo_reel_health \
   --symbol svx2-fastrom-video=video_reel_composite_health
 
 echo "==> verifying biohack.net (site 1/2)"
 phase 3 'verify biohack.net'
 "$ROOT/dev/verify-web-roms.sh" --manifest "$candidate/biohack-manifest.json" \
-  --rom-dir "$candidate/biohack-roms"
-echo "==> verifying indri.studio (site 2/2)"
+  --rom-dir "$candidate/biohack-roms" --cache-dir "$ROOT/build/verify-web-roms-cache"
+# Both candidate directories point at the same rebuilt ROMs. Replay an Indri check only
+# when its self-check contract differs from the one already verified for biohack.net.
+mapfile -t indri_only_ids < <(python3 - "$candidate/biohack-manifest.json" "$candidate/indri-manifest.json" <<'PY_IDS'
+import json, sys
+with open(sys.argv[1]) as f:
+    bio = {r["id"]: r.get("selfcheck") for r in json.load(f)["roms"]}
+with open(sys.argv[2]) as f:
+    indri = json.load(f)["roms"]
+for rom in indri:
+    check = rom.get("selfcheck")
+    if check and check != bio.get(rom["id"]):
+        print(rom["id"])
+PY_IDS
+)
+echo "==> verifying indri.studio (site 2/2): ${#indri_only_ids[@]} distinct check(s)"
 phase 4 'verify indri.studio'
-"$ROOT/dev/verify-web-roms.sh" --manifest "$candidate/indri-manifest.json" \
-  --rom-dir "$candidate/indri-roms"
+if [ "${#indri_only_ids[@]}" -gt 0 ]; then
+  indri_only=$(IFS=,; echo "${indri_only_ids[*]}")
+  "$ROOT/dev/verify-web-roms.sh" --manifest "$candidate/indri-manifest.json" \
+    --rom-dir "$candidate/indri-roms" --only "$indri_only" \
+    --cache-dir "$ROOT/build/verify-web-roms-cache"
+fi
 
 # Only verified candidates enter the site checkouts.
 for slug in "${SLUGS[@]}"; do

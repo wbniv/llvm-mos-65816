@@ -37,6 +37,13 @@ public:
     if (!force && interval < (terminal ? 2 : 30)) return;
     previous = now;
     auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - started).count();
+    if (finished) {
+      fprintf(stream, "%sEMU %s || %d frames | %llds | %s\n",
+              terminal ? "\r\033[K" : "", label.c_str(), done,
+              static_cast<long long>(elapsed), state);
+      fflush(stream);
+      return;
+    }
     int percent = total > 0 ? done * 100 / total : 100;
     if (percent > 100) percent = 100;
     int filled = percent / 5;
@@ -44,7 +51,7 @@ public:
     fprintf(stream, "%sEMU %s [%s] %d%% %d/%d frames | %llds | %s%s",
             terminal ? "\r\033[K" : "", label.c_str(), bar.c_str(), percent,
             done, total, static_cast<long long>(elapsed), state,
-            terminal && !finished ? "" : "\n");
+            terminal ? "" : "\n");
     fflush(stream);
   }
 };
