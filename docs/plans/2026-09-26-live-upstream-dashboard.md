@@ -434,6 +434,12 @@ review can follow without changing the data contract.
 - **PASS:** Local browser captures showed aligned collapsed and expanded work
   rows, and the graph rendered with linked work nodes.
 
-Keyboard-only navigation, a browser run with JavaScript disabled, and a forced
-GitHub outage remain follow-up checks for the current release. They were not
-claimed by the completed checks above.
+As of the 2026-09-26 release record, keyboard-only navigation, JavaScript-disabled
+rendering, and a forced GitHub outage remained follow-up checks. Later results
+and the user's retirement decision are recorded below.
+
+### Local failure simulation and retirement 2026-09-28
+
+The user retired the live outage-check task. A local Wrangler worker using the dashboard code was given an invalid `GITHUB_STATUS_TOKEN`, forcing its server-side GitHub GraphQL request to fail while the page and status endpoint were requested normally. The status endpoint returned HTTP 200 with `githubCheckedAt: null`, `githubSnapshotAt: 2026-09-27`, `githubSource: "bundled"`, `githubStale: true`, and the GitHub refresh error. The page returned HTTP 200 and rendered the snapshot date, stale-data label, and refresh error. This confirms the local worker's bundled fallback; it does not verify the deployed worker or its cached last-successful snapshot. No production secret or configuration was changed. The production outage check remains unverified and retired at the user's request.
+
+Verification and retirement record: OpenAI Codex, agent/tool version unknown, exact model ID unknown, reasoning effort unknown; session metadata unavailable.

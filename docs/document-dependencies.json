@@ -315,7 +315,7 @@
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
           "docs/pr-preparations/2026-09-26/README.md": "ecf853403f41d59e1b3b5861b2e3e68e89d51acd9633b6a84f2770dee53cc83d",
-          "docs/plans/2026-09-26-live-upstream-dashboard.md": "89ce9574135abebecef8b15a8df096963778f1b2059092e0f0f351fd0e7af927",
+          "docs/plans/2026-09-26-live-upstream-dashboard.md": "d3219df087ecd4c0bb640995f168d5c5d1c0b8e352f765544d228be269c95b5c",
           "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
           "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
@@ -333,9 +333,9 @@
           "docs/investigations/2026-09-28-far-word-policy.md": "927d9c25eb259ef9d73686b3b434f6f649dfb0723966ad6d1443d4f6bc137e30",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a52e42e356756d07cd4edf0d1866b7c9c924a0dcb23eb35e82dca0524de708f4"
         },
-        "reviewed_at": "2026-09-28T08:25:03.124885+00:00",
-        "note": "Reviewed the merged compiler queue against the published dashboard plan, the existing XY16 repair record, and the 0069/0070 investigations and PR packet. Dashboard automation remains parked; completed gallery and Round 8 work stays retired; package verification remains parked. Native-word integration is complete downstream, while independent review and building/testing the proposed upstream prerequisite stack remain pending. Expressed the runtime reductions as fewer master clocks and retained size tradeoffs and unchanged size-mode defaults. Existing dated evidence and contributor attribution are preserved.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-28T09:10:19.126234+00:00",
+        "note": "Reviewed the current TODO and updated release record after retiring the live outage-check task at the user's request. Local fallback is recorded; production behavior remains unverified.",
+        "attribution": "OpenAI Codex, agent/tool version unknown, exact model ID unknown, reasoning effort unknown (session metadata unavailable)."
       }
     },
     {

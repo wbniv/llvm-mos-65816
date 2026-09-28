@@ -24,8 +24,6 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [T3] **Run the 138-demo build-determinism gate sweep.** Run and record the full sweep on the rebuilt fixed toolchain. The corpus, `corpus-a16`, and four demos whose `main` changed beyond the `sec` permutation passed; the complete 138-demo sweep remains open. [Plan and results](docs/plans/2026-09-14-eliminate-build-nondeterminism.md).
 
-- [verify T2] **Complete the live upstream dashboard outage check.** Keyboard-only navigation and JavaScript-disabled rendering passed on the published page on 2026-09-28. Still force the server-side GitHub fetch to fail and verify the stale-data fallback, then update the [release plan](docs/plans/2026-09-26-live-upstream-dashboard.md#published-page-checks-recorded-2026-09-28).
-
 ### Upstream / Contribution
 
 The [submission tracker](docs/upstream-contribution-status.md) owns PR state and posting order. A local fix marked complete elsewhere in this repository does not mean its upstream extraction, review, or publication is complete.
@@ -67,7 +65,9 @@ Review these when their stated trigger occurs; they are not ready-to-run tasks.
 
 ## Parked
 
-- **Verify and publish the cross-platform toolchain packages.** Parked 2026-09-28 at the user’s request. Linux arm64 and Windows x86-64 packages are built; the real-Windows functional compiler check and publication remain. [Plan and completed build evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
+- **Live upstream dashboard outage check.** Retired 2026-09-28 at the user's request. A local Wrangler failure simulation showed the bundled snapshot and stale warning remain visible; the production worker's outage behavior remains unverified. [Release record](docs/plans/2026-09-26-live-upstream-dashboard.md#local-failure-simulation-and-retirement-2026-09-28).
+
+- **Verify and publish the cross-platform toolchain packages.** Parked 2026-09-28 at the user's request. Linux arm64 and Windows x86-64 packages are built; the real-Windows functional compiler check and publication remain. [Plan and completed build evidence](docs/plans/2026-06-25-cross-platform-toolchain-builds.md).
 
 - **Recheck the factorial stall only if certainty is needed.** Run the pre-`3ab028e` gate under LTO and record the outcome; the retained analysis favors a timing explanation and does not establish a compiler defect. [Evidence](docs/plans/2026-06-28-321-verify-lto-a16-bitmask-early-exit-diagnosis.md).
 
