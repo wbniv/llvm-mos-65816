@@ -21,7 +21,7 @@ The stock destination has no no-wrap checks on its near-index folds. The proof r
 
 The recovery logic matches `0002`. The extraction differs in these ways:
 
-- The pass argument is `mos-near-nowrap-recovery`. In `0002` it equals the `-mos-recover-near-nowrap` switch, and `opt` aborts at startup because it registers every legacy pass name as an option. The [option-collision record](../../../defects/mos-near-nowrap-option-clash.json) preserves the failing downstream `opt`; `0002` is not yet repaired. The test adds an `opt` startup RUN line.
+- The pass argument is `mos-near-nowrap-recovery`. In `0002` it equals the `-mos-recover-near-nowrap` switch, and `opt` aborts at startup because it registers every legacy pass name as an option. The [option-collision record](../../../defects/mos-near-nowrap-option-clash.json) preserves the failing downstream `opt`. `0002` now carries the same rename and ID insertion, and the record is closed with matching-input red/green. The test adds an `opt` startup RUN line.
 - The pass is inserted after LSR by ID, and its header exports `MOSRecoverNearNoWrapID`. The earlier instance-based insertion leaked the pass whenever LSR was absent.
 - The index width comes from the data layout rather than a literal 16.
 - An `LLVM_DEBUG` line names the proof that fired: the recurrence or the ordering.

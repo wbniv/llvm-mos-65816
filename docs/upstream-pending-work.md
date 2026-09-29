@@ -31,7 +31,7 @@ Current near-decoder and withdrawal update: OpenAI Codex CLI 0.157.1 (`codex-tui
 
 Publication: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0dd01-d72e-76f2-bf27-a796e0f7d994`.
 
-The [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json) is fixed locally in `0002`. Fused byte/word Y accesses preserve the index across allocation; a [separate address-wrap guard](defects/mos-near-index-bank-wrap.json) prevents negative near offsets from carrying into DBR+1. The unchanged 62-work benchmark now returns `0x5CF0`. [Causal comparison and regression evidence](investigations/2026-09-27-near-y-decoder.md) retain the baseline and fusion-only failures. Both repairs belong to the native-width feature series. [Near-index proof recovery](investigations/2026-09-27-near-index-overflow-proofs.md) is also implemented locally in `0002`, with 33,159 B of aggregate corpus savings. Its [September 29 upstream packet](pr-preparations/2026-09-29/near-index-proofs/README.md) extracts it onto `06bc967d2668` with independent review; the PR is unposted and follows the same feature-series submission gates. Extraction found an [`opt` option collision](defects/mos-near-nowrap-option-clash.json) still present in `0002` and a [prerequisite X-preservation defect](defects/mos-xy16-preserve-x-p-save.json) that the #321 series must repair.
+The [XY16 gallery / near-Y failure](defects/mos-xy16-near-indirect-y-clobber.json) is fixed locally in `0002`. Fused byte/word Y accesses preserve the index across allocation; a [separate address-wrap guard](defects/mos-near-index-bank-wrap.json) prevents negative near offsets from carrying into DBR+1. The unchanged 62-work benchmark now returns `0x5CF0`. [Causal comparison and regression evidence](investigations/2026-09-27-near-y-decoder.md) retain the baseline and fusion-only failures. Both repairs belong to the native-width feature series. [Near-index proof recovery](investigations/2026-09-27-near-index-overflow-proofs.md) is also implemented locally in `0002`, with 33,159 B of aggregate corpus savings. Its [September 29 upstream packet](pr-preparations/2026-09-29/near-index-proofs/README.md) extracts it onto `06bc967d2668` with independent review; the PR is unposted and follows the same feature-series submission gates. Extraction found an [`opt` option collision](defects/mos-near-nowrap-option-clash.json), since repaired in `0002` as well, and a [prerequisite X-preservation defect](defects/mos-xy16-preserve-x-p-save.json) that the #321 series must repair.
 
 The [runtime `[dp],Y` increment 2](plans/2026-09-25-dpy-indexed-phase2-increment2.md)
 is implemented and verified locally on top of `8c19c703`. Its new checks and
@@ -537,7 +537,7 @@ flowchart TD
     NEARY[Near Y16 index preservation: fixed locally] --> WIDTH
     NEARBANK[Near-address bank wrapping: fixed locally] --> WIDTH
     NEARPROOF[Near-index overflow proofs: upstream packet reviewed] --> WIDTH
-    OPTCLASH[Near no-wrap opt option collision: repaired in extraction, open in 0002] --> NEARPROOF
+    OPTCLASH[Near no-wrap opt option collision: repaired] --> NEARPROOF
     PRESERVEX[XY16 preserveX status save: needs repair] --> WIDTH
     FARDONE --> FARSDK[Integrate far SDK support]
     SDKMERGE --> FARSDK
@@ -555,8 +555,8 @@ flowchart TD
   end
   classDef fixed fill:#e8f5e9,stroke:#297b3c,color:#173d21
   classDef openDefect fill:#fff0ef,stroke:#bc3b32,color:#70231d
-  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY,NEARY,NEARBANK,NEARPROOF,NULLSTREAM fixed
-  class OPTCLASH,PRESERVEX openDefect
+  class REDUCER,COALESCE0015,RETFRAME,COALESCE,ASMMULTI,MCWIDTH,MOSFIX,SAVERANGE,GISBOUNDS,DAGBOUNDS,INTTYPE,VECTORPARTS,SHIFTFIX,NATIVEPRINT,DPY,NEARY,NEARBANK,NEARPROOF,NULLSTREAM,OPTCLASH fixed
+  class PRESERVEX openDefect
 ```
 
 ## Independent simulator discussion

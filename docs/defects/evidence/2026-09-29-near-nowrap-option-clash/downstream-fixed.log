@@ -1,0 +1,3 @@
+2026-09-29T22:31:23Z COMMAND: build/near-nowrap-option-clash/candidate/opt -passes=verify -disable-output docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll
+opt sha256: 21c22b87d520a4cf1fdd852adfff76e8a2d740da0d6973afa8313d68ffbe27fc
+EXIT: 0

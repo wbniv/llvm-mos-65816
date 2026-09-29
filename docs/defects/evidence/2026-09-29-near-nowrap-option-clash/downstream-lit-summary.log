@@ -1,0 +1,6 @@
+2026-09-29T22:32:57Z COMMAND: dev/container.sh -- sh -c 'ulimit -c 0; bash /work/dev/lit.sh'  (build/llvm-mos tools, rebuilt from vendor with the ported pass)
+llc sha256: 9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2
+opt sha256: 21c22b87d520a4cf1fdd852adfff76e8a2d740da0d6973afa8313d68ffbe27fc
+Total Discovered Tests: 189
+  Unsupported:   3 (1.59%)
+  Passed     : 186 (98.41%)

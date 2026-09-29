@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "819cc34ce7fa531e5ef705aa99dd56de78fe9a40201be0fb6ac4883cb805e59c",
+          "docs/upstream-dashboard-curation.json": "e95e521f210c239b7cc643fb2b9ec8efeff2b964d6f07b3b90d96132949215e9",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -90,7 +90,7 @@
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "docs/defects/mos-near-nowrap-option-clash.json": "e7ee7efa6486f08d7d72e9dad790caf6de0b7000e88ab3f12fe04c5ab0b5904a",
+          "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
           "docs/defects/mos-near-store-profitability.json": "6a0b7c7f64c9e27e393842bb8e13dd51bdd2d0b8c5bd76ca95e8c9216a560586",
           "docs/defects/mos-null-output-streamer-crash.json": "2f3b8b7a504f34bfeef759b11c7fe2c841205edc712f12669a21addfd1cc57f1",
           "docs/defects/mos-trunc-imag8-i1.json": "b641199538419b27eb01060ad5bce1794b61b6054073be1a3a4ceec0b16b4bc5",
@@ -107,7 +107,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "0d3fd8eff161e074217614a0644466bce08221cb71bd90312b5733f35deca8f8"
+          "docs/upstream-dashboard.json": "f534e9dfc8c5b4352dbe4b897194c409dd7728873ed8f8c105a65d3144b519f0"
         }
       }
     },
@@ -128,13 +128,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "dec73d0865bd2cbe7786ed4f8f16772e1bb5c90b478564fa2d63cd97970242da",
+          "docs/upstream-pending-work.md": "359d86bccf680ffec57420edec7686a4b16d0ea93793fcb87ecfc47763dfc751",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "0d3fd8eff161e074217614a0644466bce08221cb71bd90312b5733f35deca8f8",
+          "docs/upstream-dashboard.json": "f534e9dfc8c5b4352dbe4b897194c409dd7728873ed8f8c105a65d3144b519f0",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "f0d65ffef4522b0eef1a8fc7e9836e470c37800897169f2f89761ab7f839ffde"
+          "docs/upstream-dashboard-graph.json": "95e4cb3655016923aedbf075763300a18c79fbe2da2eea0f3c0a956b31d55b01"
         }
       }
     },
@@ -306,7 +306,7 @@
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
-          "docs/defects/mos-near-nowrap-option-clash.json": "4d407a8371532189bd35590b7f1811209cfb60cbe130895bb62b3361137767a2",
+          "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
@@ -335,18 +335,18 @@
           "docs/plans/2026-09-27-0064-competing-carry-gate.md": "c1aabd8329cde2cbbd9bed51afe3938f87a773e66ebc68a62ee6473dd7cd27eb",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/plans/2026-09-28-farblit-payoff.md": "a29f2fa74aa769dbd2d987983bead2344cc3f9413020462036b6bc69c5723ace",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
-          "docs/plans/2026-09-28-farblit-range-integration.md": "3573b7f421e963dd419a058022ec883752b73177ab7730cb5cd1a4442fc7357d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
+          "docs/plans/2026-09-28-farblit-range-integration.md": "a82f8e761715ded36c11f3843ede0a9cae6cf49ce9a6bc4c0f2b14d80e42d98a",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T14:12:44.589635+00:00",
-        "note": "Completed near-index packet item removed. The two new confirmed defects are tracked in their records, the upstream tracker and the dashboard; their TODO entries await ranking by the user.",
+        "reviewed_at": "2026-09-29T22:46:34.310530+00:00",
+        "note": "Reviewed after the option-collision closure and farblit plan note: TODO has no entry for the collision; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -394,7 +394,7 @@
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
-          "docs/defects/mos-near-nowrap-option-clash.json": "4d407a8371532189bd35590b7f1811209cfb60cbe130895bb62b3361137767a2",
+          "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
@@ -418,15 +418,15 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T14:11:40.521601+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:36:41.849506+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -474,7 +474,7 @@
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
-          "docs/defects/mos-near-nowrap-option-clash.json": "4d407a8371532189bd35590b7f1811209cfb60cbe130895bb62b3361137767a2",
+          "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
           "docs/defects/mos-near-store-profitability.json": "a4fbcc0ce82055c7b4ec974894ab252bec0d610e9de9413bf33618c7f7fc5232",
           "docs/defects/mos-null-output-streamer-crash.json": "2e105ff88c036a2c63523ae979a3243b44fa87a2eb88eb860d98ab74f1ed0a7f",
           "docs/defects/mos-trunc-imag8-i1.json": "fdfdf4a814f173c809b6320dd8c7aa033f0e8cf9c0c02643cdea82522a985cc4",
@@ -498,15 +498,15 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T14:11:40.525799+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:36:41.845469+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -663,15 +663,15 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
           "docs/investigations/2026-09-27-carry-profitability-model.md": "ce17e667a661167f33dc9ae987acf623b834e7d3997d32a012017fa3cbd9bc49",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T14:11:41.056118+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:36:39.645882+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -711,7 +711,7 @@
       "receipt": {
         "sources": {
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment1.md": "36337397c1d7b44b6f377307e0249a7c1949824b1c32e6f7bd5ac327e530c043",
-          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
           "patches/llvm-mos/0061-mos-far-global-long-x.patch": "c3fcae16d1e50d5f0eb97e33368672671cea7cb029e3567caa173f98279d99a9",
           "patches/llvm-mos/0062-mos-native-far-word.patch": "90ef140c82330e3115443acc71bc48ef50d5ebe99e78c2939dfe6c37a1f33236",
           "patches/llvm-mos/0063-mos-near-shared-store.patch": "90ce87eb40a11216f79f8c46b5876c9930a8589ab920024421aa5eb031ee68ca",
@@ -738,10 +738,10 @@
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-29T14:13:44.679729+00:00",
-        "note": "Reviewed against the new defect records and packet: no statement here concerns near-index recovery, the opt option collision or preserveX; no change needed.",
+        "reviewed_at": "2026-09-29T22:37:49.007041+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -807,11 +807,11 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "01de7d900d2fcd8dfc94effbd8b681dfaf0289e966f33b655b009fcd93caf4db",
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "c8a007978ff4a8ab41af034e2a0d5b88ee7f7a5809905146ed1930ca8d477933",
           "docs/defects/mos-near-index-bank-wrap.json": "176d486b67e3a1636603078ec71aa5900a5bd492cc44f80cd771a586a96cf74a",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-28T13:24:15.511899+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:25.738038+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -855,11 +855,11 @@
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-28T13:24:15.690087+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:27.025777+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -928,7 +928,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "c98b148f04650504d70554580fb4614dd956ef4c9cd6a0d9d44b4d8fe5031534",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -950,13 +950,13 @@
           "AGENTS.md": "d459d0f127f64555e03c6bb437e4276a2ea822e25b36272e925cadd7aeed849b",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-29T14:11:43.339365+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:37:51.429176+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1439,12 +1439,12 @@
           "docs/pr-preparations/2026-09-26/validation/runs/post-ready-validation-llvm/0028/receipt.json": "8f839da3204ff874d3e50d3770646d2196e0ee0608974175a1d16794df11c834",
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912",
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-29T14:11:43.844829+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:36:41.571303+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1463,7 +1463,7 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "c98b148f04650504d70554580fb4614dd956ef4c9cd6a0d9d44b4d8fe5031534",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
@@ -1471,8 +1471,8 @@
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T14:13:45.344353+00:00",
-        "note": "Reviewed against the new defect records and packet: no statement here concerns near-index recovery, the opt option collision or preserveX; no change needed.",
+        "reviewed_at": "2026-09-29T22:37:46.716041+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1501,10 +1501,10 @@
           "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md": "646801575b8bdb7cf1192d9b9a7b6639167ae605f55ba10630e23fa857312e1c",
           "docs/upstream-late-opt-nongpr-ldimm-pr.md": "21daa88239609e10c3e047eaecefa7b064b8365363b707beff121c85acf10620",
           "docs/upstream-zp-alloc-deterministic-pr.md": "d17cc42b2f454700c831fde9d9ed66fcb3375e18b0172006aa471a129ce0c1d8",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
         },
-        "reviewed_at": "2026-09-29T14:11:44.458267+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:37:46.361864+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1521,12 +1521,12 @@
         "sources": {
           "docs/defects/mos-xy16-near-indirect-y-clobber.json": "289f74a2269bfd3d133e87d66557b84f5b9f535a34702f6101db6a7a9614d6cf",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
-          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
-          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "f7753112cc7c956e70fed0769be85b45bf4edd3f17a982ac859bc52af0f32912"
+          "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e"
         },
-        "reviewed_at": "2026-09-29T14:11:44.552614+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:37:51.429871+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1735,12 +1735,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-28T13:24:20.200652+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:24.765730+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -1786,11 +1786,11 @@
           "docs/investigations/2026-09-27-mos-carry-timing.md": "40c19658171134ef708af82542c6e9a5c327d5086a9ae76cb43427195239b83c",
           "docs/investigations/2026-09-27-farblit-byte-load.md": "b9e90f8739ccb006e7fa59fc836d19d5bcd65281db52840eb73b31489445f4ac",
           "docs/investigations/2026-09-27-competing-carry-gate.md": "a69e49749b76048e40e3e8194a7e8d66b8d841c0c505fe4f1f878964065f3549",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d"
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27"
         },
-        "reviewed_at": "2026-09-28T13:24:20.200861+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:26.149341+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -1922,13 +1922,13 @@
       "receipt": {
         "sources": {
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
-          "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+          "patches/llvm-mos/0002-321-accum16.patch": "0293dfde9cdcc77e6add252d273ffbf5650d979732deb69af7d8cef4e487e4c3",
           "dev/check-near-index-proofs.py": "8f514c4c8625bb8fdc08447deb44dd027a32090c37dc4176399eab0f427d498e",
           "dev/measure-near-index-proofs.py": "92edad8239dab0056f32e3e41377ead7c3b5f58964e22752ce19027c7aab3aa6",
           "docs/defects/evidence/2026-09-27-near-proofs/census.json": "cf0c8052264e31e0e11d12726e9c76826bccde8909d281b67a39abf1377a275f"
         },
-        "reviewed_at": "2026-09-29T14:11:44.932674+00:00",
-        "note": "Updated for the September 29 near-index upstream packet: pointers to the packet, the opt option-collision record and the preserveX record; statuses match the records.",
+        "reviewed_at": "2026-09-29T22:36:40.152235+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -2043,12 +2043,12 @@
           "docs/defects/evidence/2026-09-28-farblit-gate/installed/tests.log": "90debc766aa220db4baca618ed81ce9ac21c3d8c1d1312c00e2960cede4be9ab",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/runtime.log": "cf2ff26c86f3e5c8d8870d29e9621691051e6b3d071a1f30eea378782a628ad7",
           "docs/defects/evidence/2026-09-28-farblit-gate/preserved/tests.log": "856c8166467a168e3f8430d977d8aaeac918ca904444dac7e116a5ec629752bc",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-28T13:24:20.201055+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:26.263480+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2101,12 +2101,12 @@
           "docs/defects/evidence/2026-09-28-farblit-payoff/validate.py": "acd5f7913b1221fc3a5fe52ebdf5e3cb06168c1b3c6b167b07b8e930d5b06c33",
           "docs/defects/evidence/2026-09-28-farblit-payoff/check_bounds_shapes.py": "6ebdd5da386a47bf15923274e27f9c4f01f4cb3936f489b0ded9fa8e3fef8bc7",
           "docs/defects/evidence/2026-09-28-farblit-payoff/mame.sh": "eef6383b29adb315d61f4fd148a1ebeb49ae966470435fb6ee195aee4365b297",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-28T13:24:20.864982+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:25.532815+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2119,12 +2119,12 @@
       "receipt": {
         "sources": {
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b"
         },
-        "reviewed_at": "2026-09-28T13:24:20.959377+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:43:26.263299+00:00",
+        "note": "Reviewed after a dated note in the farblit range investigation: nothing here concerns the opt option collision; no change needed.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2161,15 +2161,15 @@
           "dev/check-farblit-shapes.py": "7d269e6bc3cfe78fbc879dea21a603a7a6d3702fcf84dacf3ca768b2a45dffbc",
           "dev/test-farblit-shapes.py": "6aec2be784efc7c11243e2c9edd16aed5a3ddfae88cc3d3a46b0c82ef5da834e",
           "dev/toolchain.sh": "93db87c392f24585ba3594d30f2fc1158ae490c770b5e2a967a7c8bbc6ade19a",
-          "dev/regen-patch.sh": "627623dfa5a7eb020f579c9bff9d1c728697e1de2e2a1b9d14eff200fdaaa063",
+          "dev/regen-patch.sh": "dca510f69fb0698a6e6094bf27004b22eb8e90396f26a02f514c3811b12a92c2",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/sweep.py": "62c23cc56c896cabf04764d8497adf3ecd7ea7171f1f931b381050188329ea70",
           "docs/defects/evidence/2026-09-28-farblit-range-integration/mame.sh": "23f32197ab6868c9d0d3aab05d15552a5dcd03042a652b44fabf0ee0eb5a7e3e",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-28T13:24:21.510216+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:36:40.940335+00:00",
+        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2181,13 +2181,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-28T13:24:21.510316+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-29T22:42:11.193542+00:00",
+        "note": "Dated opt-failure sentence now links the closed option-collision record.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2269,9 +2269,9 @@
           "patches/llvm-mos/0069-mos-far-loop-range.patch": "b8cf66b5d34754134818b400837dfd4b7d37dc2984ca6427ed543291ab850c09",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
-          "docs/investigations/2026-09-28-farblit-range-integration.md": "fd98b4066123eee96fbfefc8cd6d419e5713c0178f97175cb794203634ca1e1d",
+          "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "c98b148f04650504d70554580fb4614dd956ef4c9cd6a0d9d44b4d8fe5031534",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/trace.json": "ef5faa521845e918a467e762a86dc1fe08a63928cdfc479b07f394ad6f247734",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
@@ -2293,8 +2293,8 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-29T14:13:47.424760+00:00",
-        "note": "Reviewed against the new defect records and packet: no statement here concerns near-index recovery, the opt option collision or preserveX; no change needed.",
+        "reviewed_at": "2026-09-29T22:37:53.190327+00:00",
+        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },

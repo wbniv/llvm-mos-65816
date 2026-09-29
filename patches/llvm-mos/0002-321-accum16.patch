@@ -1,5 +1,5 @@
 diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
-index 584cc0c4c8cd6e5a12769fe9010815dca989b47a..4a87ac655effda89aada43881e379e8fa6b5e92e 100644
+index 584cc0c4c8cd..4a87ac655eff 100644
 --- a/llvm/lib/Target/MOS/CMakeLists.txt
 +++ b/llvm/lib/Target/MOS/CMakeLists.txt
 @@ -31,6 +31,7 @@ add_llvm_target(MOSCodeGen
@@ -19,7 +19,7 @@ index 584cc0c4c8cd6e5a12769fe9010815dca989b47a..4a87ac655effda89aada43881e379e8f
    MOSRegisterBankInfo.cpp
    MOSRegisterInfo.cpp
 diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
-index 9389a4291..3b69550a7 100644
+index 9389a4291b3e..3b69550a7064 100644
 --- a/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
 +++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSAsmBackend.cpp
 @@ -174,6 +174,23 @@ bool MOSAsmBackend::fixupNeedsRelaxationAdvanced(const MCFragment &F,
@@ -47,10 +47,10 @@ index 9389a4291..3b69550a7 100644
  }
 
 diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
-index 66964b1fe0a07f899e2fdbe1b9985c796c0d5fa1..336c68b079402447738af1aae8ef28ba6417cc66 100644
+index 66964b1fe0a0..2433911dd4b9 100644
 --- a/llvm/lib/Target/MOS/MOS.h
 +++ b/llvm/lib/Target/MOS/MOS.h
-@@ -23,10 +23,13 @@ void initializeMOSCombinerPass(PassRegistry &);
+@@ -23,10 +23,12 @@ void initializeMOSCombinerPass(PassRegistry &);
  void initializeMOSCopyOptPass(PassRegistry &);
  void initializeMOSIndexIVPass(PassRegistry &);
  void initializeMOSInsertCopiesPass(PassRegistry &);
@@ -60,12 +60,11 @@ index 66964b1fe0a07f899e2fdbe1b9985c796c0d5fa1..336c68b079402447738af1aae8ef28ba
  void initializeMOSLowerSelectPass(PassRegistry &);
  void initializeMOSNonReentrantPass(PassRegistry &);
 +void initializeMOSRecoverNearNoWrapPass(PassRegistry &);
-+Pass *createMOSRecoverNearNoWrapPass();
  void initializeMOSPostRAScavengingPass(PassRegistry &);
  void initializeMOSShiftRotateChainPass(PassRegistry &);
  void initializeMOSStaticStackAllocPass(PassRegistry &);
 diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
-index dd5b16b80..ea200c1c5 100644
+index dd5b16b807b5..ea200c1c555e 100644
 --- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 +++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
 @@ -59,6 +59,9 @@ public:
@@ -175,7 +174,7 @@ index dd5b16b80..ea200c1c5 100644
    if (MCInst OutInst; lowerPseudoInstExpansion(MI, OutInst)) {
      EmitToStreamer(*OutStreamer, OutInst);
 diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
-index f5462d324..af5878397 100644
+index f5462d3247a9..af58783971f6 100644
 --- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
 @@ -97,11 +97,65 @@ struct MOSOutgoingValueHandler : CallLowering::OutgoingValueHandler {
@@ -355,7 +354,7 @@ index f5462d324..af5878397 100644
    }
 
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
-index 993ce3787..8a47e8635 100644
+index 993ce3787622..8a47e863537c 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.cpp
 @@ -12,7 +12,86 @@
@@ -446,7 +445,7 @@ index 993ce3787..8a47e8635 100644
 +  return true;
 +}
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.h b/llvm/lib/Target/MOS/MOSCallingConv.h
-index 80fa4df37..4f5ec22aa 100644
+index 80fa4df3729a..4f5ec22aa23c 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.h
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.h
 @@ -30,6 +30,34 @@ bool CC_MOS_VarArgs(unsigned ValNo, MVT ValVT, MVT LocVT,
@@ -485,7 +484,7 @@ index 80fa4df37..4f5ec22aa 100644
 
  #endif // not LLVM_LIB_TARGET_MOS_MOSCALLINGCONV_H
 diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
-index b03bcd284..a15ef4710 100644
+index b03bcd284365..a15ef4710341 100644
 --- a/llvm/lib/Target/MOS/MOSCallingConv.td
 +++ b/llvm/lib/Target/MOS/MOSCallingConv.td
 @@ -58,6 +58,45 @@ let Entry = 1 in {
@@ -535,7 +534,7 @@ index b03bcd284..a15ef4710 100644
    // an 8-bit slot like an i8 value -- NOT the 16-bit RS pair the generic CCIfPtr rule
    // below would assign, which yields an illegal size-mismatched COPY ((p1) = COPY
 diff --git a/llvm/lib/Target/MOS/MOSCombiner.cpp b/llvm/lib/Target/MOS/MOSCombiner.cpp
-index bff8495ed..087920a7b 100644
+index bff8495ed611..087920a7beae 100644
 --- a/llvm/lib/Target/MOS/MOSCombiner.cpp
 +++ b/llvm/lib/Target/MOS/MOSCombiner.cpp
 @@ -443,6 +443,39 @@ void MOSCombinerImpl::applyStoreToMemset(MachineInstr &MI,
@@ -579,7 +578,7 @@ index bff8495ed..087920a7b 100644
                                      BuildFnTy &MatchInfo) const {
    auto LHS = getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
 diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
-index 76d7409c1..561097194 100644
+index 76d7409c1f1b..561097194218 100644
 --- a/llvm/lib/Target/MOS/MOSFeatures.td
 +++ b/llvm/lib/Target/MOS/MOSFeatures.td
 @@ -19,3 +19,44 @@ def FeatureStaticStack :
@@ -628,7 +627,7 @@ index 76d7409c1..561097194 100644
 +    "mos-farcc-stack", "HasFarCCStack", "true",
 +    "Far-pointer CC variant (d): pass/return a far pointer on the 65816 hardware stack.">;
 diff --git a/llvm/lib/Target/MOS/MOSFrameLowering.cpp b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
-index cd0d8fae2..204cb37d5 100644
+index cd0d8fae27c1..204cb37d5623 100644
 --- a/llvm/lib/Target/MOS/MOSFrameLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
 @@ -285,6 +285,38 @@ void MOSFrameLowering::emitPrologue(MachineFunction &MF,
@@ -690,7 +689,7 @@ index cd0d8fae2..204cb37d5 100644
 
  uint64_t MOSFrameLowering::staticSize(const MachineFrameInfo &MFI) const {
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
-index 42b275080..3271f9801 100644
+index 42b275080f88..3271f980152c 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
 @@ -38,7 +38,7 @@ using namespace llvm;
@@ -746,7 +745,7 @@ index 42b275080..3271f9801 100644
  }
 
 diff --git a/llvm/lib/Target/MOS/MOSISelLowering.h b/llvm/lib/Target/MOS/MOSISelLowering.h
-index 4e7ff5b20..ba6a46222 100644
+index 4e7ff5b2015d..ba6a46222be0 100644
 --- a/llvm/lib/Target/MOS/MOSISelLowering.h
 +++ b/llvm/lib/Target/MOS/MOSISelLowering.h
 @@ -45,6 +45,8 @@ public:
@@ -1598,7 +1597,7 @@ index 000000000000..bc183c0cc2dc
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInsertREPSEP.h b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 new file mode 100644
-index 000000000..34f7e16f3
+index 000000000000..34f7e16f3588
 --- /dev/null
 +++ b/llvm/lib/Target/MOS/MOSInsertREPSEP.h
 @@ -0,0 +1,25 @@
@@ -1628,7 +1627,7 @@ index 000000000..34f7e16f3
 +
 +#endif // LLVM_LIB_TARGET_MOS_MOSINSERTREPSEP_H
 diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
-index 12d05bed4..ba38163ae 100644
+index 12d05bed418f..ba38163ae084 100644
 --- a/llvm/lib/Target/MOS/MOSInstrFormats.td
 +++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
 @@ -57,6 +57,21 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
@@ -1670,7 +1669,7 @@ index 12d05bed4..ba38163ae 100644
 
  /// Matching CC1_NoImmediate, but with cc = 11. Common match for 6502X.
 diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
-index 29032a1e3..21d4bdaa6 100644
+index 29032a1e32ea..21d4bdaa6c75 100644
 --- a/llvm/lib/Target/MOS/MOSInstrGISel.td
 +++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
 @@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
@@ -1853,7 +1852,7 @@ index 29032a1e3..21d4bdaa6 100644
  // argument is an 8-bit scalar. Additionally expects a MachineMemOperand.
  def G_STORE_INDIR_IDX : MOSGenericInstruction {
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
-index 6850ed4ab..fa621b8e1 100644
+index 6850ed4ab963..fa621b8e1dda 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
 @@ -352,6 +352,11 @@ MOSInstrInfo::getBranchDestBlock(const MachineInstr &MI) const {
@@ -2040,7 +2039,7 @@ index 6850ed4ab..fa621b8e1 100644
      SmallVectorImpl<MachineOperand> &Cond) const {
    // Condition includes all arguments except the branch target.
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
-index d8377bc8b..880709364 100644
+index d8377bc8b441..880709364cdd 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.h
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
 @@ -146,6 +146,7 @@ private:
@@ -2067,7 +2066,7 @@ index d8377bc8b..880709364 100644
  enum TargetIndex {
    TI_STATIC_STACK,
 diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.td b/llvm/lib/Target/MOS/MOSInstrInfo.td
-index a71519559..b080bc3c6 100644
+index a71519559a50..b080bc3c6006 100644
 --- a/llvm/lib/Target/MOS/MOSInstrInfo.td
 +++ b/llvm/lib/Target/MOS/MOSInstrInfo.td
 @@ -65,24 +65,38 @@ defm INC : CC2_NonShift<0b111, "inc">;
@@ -2156,7 +2155,7 @@ index a71519559..b080bc3c6 100644
 
  } // Predicates = [HasW65816]
 diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
-index 715766180..ff015ada5 100644
+index 715766180b8c..ff015ada51d8 100644
 --- a/llvm/lib/Target/MOS/MOSInstrLogical.td
 +++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
 @@ -65,6 +65,23 @@ class MOSLogicalInstr : Instruction {
@@ -2806,7 +2805,7 @@ index 715766180..ff015ada5 100644
 +  dag OutOperandList = (outs Ac16:$dst);
 +}
 diff --git a/llvm/lib/Target/MOS/MOSInstrPseudos.td b/llvm/lib/Target/MOS/MOSInstrPseudos.td
-index 21910cfea..e3fece8b0 100644
+index 21910cfeab37..e3fece8b0616 100644
 --- a/llvm/lib/Target/MOS/MOSInstrPseudos.td
 +++ b/llvm/lib/Target/MOS/MOSInstrPseudos.td
 @@ -359,4 +359,52 @@ let mayLoad = true in {
@@ -2863,7 +2862,7 @@ index 21910cfea..e3fece8b0 100644
 +  }
  }
 diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
-index 9712a96e9..8306f4264 100644
+index 9712a96e9e44..8306f4264e34 100644
 --- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 +++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
 @@ -83,6 +83,9 @@ private:
@@ -4302,7 +4301,7 @@ index 9712a96e9..8306f4264 100644
      Opcode = MOS::STAbsIdx;
      break;
 diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
-index d13429a71..0e357b030 100644
+index d13429a713db..0e357b030d97 100644
 --- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 +++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
 @@ -50,6 +50,7 @@ public:
@@ -4434,7 +4433,7 @@ index d13429a71..0e357b030 100644
    if (MBB.size() < 2)
      return false;
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
-index 6356fa587..4592a1194 100644
+index 6356fa58723c..4592a11942da 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
 @@ -25,7 +25,10 @@
@@ -6136,7 +6135,7 @@ index 6356fa587..4592a1194 100644
    Result = Helper.createMemLibcall(MRI, MI, LocObserver);
    if (Result == LegalizerHelper::Legalized) {
 diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
-index aedc5b41b..040412dd1 100644
+index aedc5b41b337..040412dd1b45 100644
 --- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 +++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
 @@ -38,6 +38,18 @@ public:
@@ -6195,7 +6194,7 @@ index aedc5b41b..040412dd1 100644
                                      MachineRegisterInfo &MRI, GLoadStore &MI,
                                      bool ZP) const;
 diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
-index c236b9d32..7c3abcc07 100644
+index c236b9d322b5..7c3abcc077bb 100644
 --- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 +++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
 @@ -497,16 +497,14 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
@@ -6223,8 +6222,148 @@ index c236b9d32..7c3abcc07 100644
    }
    case MOS::INWImag:
    case MOS::DEWImag: {
+diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+new file mode 100644
+index 000000000000..2eb1e8165c3e
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+@@ -0,0 +1,105 @@
++//===-- MOSRecoverNearNoWrap.cpp - MOS near address no-wrap proofs --------===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file defines the MOS pass that records unsigned no-wrap proofs on near
++// byte addresses immediately after loop strength reduction. LSR rebuilds
++// address arithmetic without the original IR flags, while its preserved
++// ScalarEvolution can still show that the rebuilt address does not wrap. The
++// 65816 needs that proof to fold a near addition into indexed addressing,
++// because indexed addressing carries into the next data bank.
++//
++//===----------------------------------------------------------------------===//
++
++#include "MOSRecoverNearNoWrap.h"
++
++#include "MOS.h"
++#include "MOSTargetMachine.h"
++#include "llvm/Analysis/LoopInfo.h"
++#include "llvm/Analysis/LoopPass.h"
++#include "llvm/Analysis/ScalarEvolution.h"
++#include "llvm/Analysis/ScalarEvolutionExpressions.h"
++#include "llvm/CodeGen/TargetPassConfig.h"
++#include "llvm/IR/Instructions.h"
++#include "llvm/InitializePasses.h"
++#include "llvm/Support/CommandLine.h"
++#include "llvm/Support/Debug.h"
++
++#define DEBUG_TYPE "mos-near-nowrap-recovery"
++
++using namespace llvm;
++
++static cl::opt<bool> RecoverNearNoWrap(
++    "mos-recover-near-nowrap", cl::Hidden, cl::init(true),
++    cl::desc("Recover unsigned no-wrap proofs for near byte GEPs after LSR"));
++
++namespace {
++class MOSRecoverNearNoWrap : public LoopPass {
++public:
++  static char ID;
++  MOSRecoverNearNoWrap() : LoopPass(ID) {
++    initializeMOSRecoverNearNoWrapPass(*PassRegistry::getPassRegistry());
++  }
++
++  void getAnalysisUsage(AnalysisUsage &AU) const override {
++    AU.addRequired<TargetPassConfig>();
++    AU.addRequired<ScalarEvolutionWrapperPass>();
++    AU.setPreservesAll();
++  }
++
++  bool runOnLoop(Loop *L, LPPassManager &) override {
++    if (!RecoverNearNoWrap || skipLoop(L))
++      return false;
++    const Function &F = *L->getHeader()->getParent();
++    unsigned IndexWidth = F.getDataLayout().getIndexSizeInBits(0);
++    const auto &TM = getAnalysis<TargetPassConfig>().getTM<MOSTargetMachine>();
++    if (!TM.getSubtargetImpl(F)->hasW65816())
++      return false;
++    auto &SE = getAnalysis<ScalarEvolutionWrapperPass>().getSE();
++    bool Changed = false;
++    for (BasicBlock *BB : L->blocks()) {
++      for (Instruction &I : *BB) {
++        auto *GEP = dyn_cast<GetElementPtrInst>(&I);
++        if (!GEP || !GEP->getType()->isPointerTy() ||
++            GEP->getAddressSpace() != 0 || GEP->hasNoUnsignedWrap() ||
++            !GEP->getSourceElementType()->isIntegerTy(8) ||
++            GEP->getNumIndices() != 1 ||
++            !GEP->getOperand(1)->getType()->isIntegerTy(IndexWidth))
++          continue;
++
++        // A single byte index of pointer width has no scaling, truncation, or
++        // intermediate additions. Its unsigned sum cannot wrap exactly when
++        // the result is at least the base. Use LSR's preserved ScalarEvolution
++        // facts before another pass invalidates them.
++        const SCEV *Address = SE.getSCEV(GEP);
++        const SCEV *Base = SE.getSCEV(GEP->getPointerOperand());
++        const auto *AR = dyn_cast<SCEVAddRecExpr>(Address);
++        // A nuw recurrence never decreases from its start in unsigned order.
++        bool FromBase = AR && AR->hasNoUnsignedWrap() && AR->getStart() == Base;
++        if (FromBase ||
++            SE.isKnownPredicate(ICmpInst::ICMP_UGE, Address, Base)) {
++          LLVM_DEBUG(dbgs() << "Recovered nuw from "
++                            << (FromBase ? "recurrence" : "ordering") << ": "
++                            << *GEP << '\n');
++          GEP->setNoWrapFlags(GEP->getNoWrapFlags() |
++                              GEPNoWrapFlags::noUnsignedWrap());
++          Changed = true;
++        }
++      }
++    }
++    return Changed;
++  }
++};
++} // namespace
++
++char MOSRecoverNearNoWrap::ID = 0;
++char &llvm::MOSRecoverNearNoWrapID = MOSRecoverNearNoWrap::ID;
++INITIALIZE_PASS_BEGIN(MOSRecoverNearNoWrap, DEBUG_TYPE,
++                      "MOS recover near address no-wrap proofs", false, false)
++INITIALIZE_PASS_DEPENDENCY(ScalarEvolutionWrapperPass)
++INITIALIZE_PASS_END(MOSRecoverNearNoWrap, DEBUG_TYPE,
++                    "MOS recover near address no-wrap proofs", false, false)
+diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h
+new file mode 100644
+index 000000000000..d709887f39e9
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h
+@@ -0,0 +1,23 @@
++//===-- MOSRecoverNearNoWrap.h - MOS near no-wrap proofs --------*- C++ -*-===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file declares the MOS pass that records unsigned no-wrap proofs on near
++// byte addresses rebuilt by loop strength reduction.
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
++#define LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
++
++namespace llvm {
++
++extern char &MOSRecoverNearNoWrapID;
++
++} // end namespace llvm
++
++#endif // not LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
 diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
-index 868f6c712..b62986d09 100644
+index 868f6c71270a..b62986d09ab4 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
 @@ -11,4 +11,14 @@
@@ -6244,7 +6383,7 @@ index 868f6c712..b62986d09 100644
 +// narrowed by the legalizer and never reach selection as a single 32-bit vreg.
 +def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Imag32, Ac16, Fakei32, Fakei64]>;
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
-index 8e9b57fc9..fc9f9baf9 100644
+index 8e9b57fc9669..fc9f9baf9a7a 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
 @@ -20,8 +20,10 @@
@@ -6821,7 +6960,7 @@ index 8e9b57fc9..fc9f9baf9 100644
    // rotates.  This may cause expensive ASL zp's to be used when ASL A would
    // have sufficed. It's better to do arithmetic in A and then copy it out.
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
-index 1d2f8027e..4374d26d8 100644
+index 1d2f8027e01c..4374d26d8f55 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
 @@ -77,6 +77,15 @@ public:
@@ -6841,7 +6980,7 @@ index 1d2f8027e..4374d26d8 100644
 
    bool shouldCoalesce(MachineInstr *MI, const TargetRegisterClass *SrcRC,
 diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
-index fe863f0a9..ba96b6022 100644
+index fe863f0a98bb..ba96b6022307 100644
 --- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
 +++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
 @@ -96,6 +96,38 @@ def P : MOSReg<12, "P"> {
@@ -6901,7 +7040,7 @@ index fe863f0a9..ba96b6022 100644
  def AImag8 : MOSReg8Class<(add Imag8, A)>;
  let isPressureFineGrained = true in {
 diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
-index 6d303255c..870fb5200 100644
+index 6d303255c67f..870fb52004e8 100644
 --- a/llvm/lib/Target/MOS/MOSSubtarget.h
 +++ b/llvm/lib/Target/MOS/MOSSubtarget.h
 @@ -115,6 +115,34 @@ public:
@@ -6955,7 +7094,7 @@ index 6d303255c..870fb5200 100644
    // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
    // no variable, so we instead bind pseudo features to this variable.
 diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
-index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8b79cdc28 100644
+index ceb0afe8a654..6f8f5deb7874 100644
 --- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 +++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
 @@ -29,6 +29,7 @@
@@ -6966,7 +7105,7 @@ index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8
  #include "llvm/Transforms/Scalar/IndVarSimplify.h"
  #include "llvm/Transforms/Utils.h"
 
-@@ -39,6 +40,7 @@
+@@ -39,12 +40,14 @@
  #include "MOSIndexIV.h"
  #include "MOSInsertCopies.h"
  #include "MOSInternalize.h"
@@ -6974,7 +7113,14 @@ index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8
  #include "MOSLateOptimization.h"
  #include "MOSLowerSelect.h"
  #include "MOSMachineFunctionInfo.h"
-@@ -61,7 +63,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+ #include "MOSMachineScheduler.h"
+ #include "MOSNonReentrant.h"
+ #include "MOSPostRAScavenging.h"
++#include "MOSRecoverNearNoWrap.h"
+ #include "MOSShiftRotateChain.h"
+ #include "MOSStaticStackAlloc.h"
+ #include "MOSTargetObjectFile.h"
+@@ -61,7 +64,9 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
    initializeGlobalISel(PR);
    initializeMOSCombinerPass(PR);
    initializeMOSCopyOptPass(PR);
@@ -6984,7 +7130,7 @@ index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8
    initializeMOSInternalizePass(PR);
    initializeMOSLateOptimizationPass(PR);
    initializeMOSLowerSelectPass(PR);
-@@ -72,11 +76,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+@@ -72,11 +77,13 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
    initializeMOSZeroPageAllocPass(PR);
  }
 
@@ -7002,17 +7148,17 @@ index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8
 
  /// Processes a CPU name.
  static StringRef getCPU(StringRef CPU) {
-@@ -230,6 +236,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
+@@ -230,6 +237,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
  }
 
  void MOSPassConfig::addIRPasses() {
 +  // Consume LSR's ScalarEvolution facts while its loop analysis is preserved.
 +  std::unique_ptr<Pass> LSR(createLoopStrengthReducePass());
-+  insertPass(LSR->getPassID(), createMOSRecoverNearNoWrapPass());
++  insertPass(LSR->getPassID(), &MOSRecoverNearNoWrapID);
    if (getOptLevel() != CodeGenOptLevel::None)
      addPass(createMOSNonReentrantPass());
    TargetPassConfig::addIRPasses();
-@@ -325,7 +334,13 @@ void MOSPassConfig::addPreSched2() {
+@@ -325,7 +335,13 @@ void MOSPassConfig::addPreSched2() {
      addPass(createMOSStaticStackAllocPass());
  }
 
@@ -7028,7 +7174,7 @@ index ceb0afe8a654ce9ffe0967a5cf1eeaa007ccc2a0..f739efd47b47c1b930b177dffb233bb8
  namespace {
 
 diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
-index 2fb996716..cdb29e3bc 100644
+index 2fb9967160e5..cdb29e3bc941 100644
 --- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 +++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
 @@ -385,7 +385,21 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
@@ -7114,7 +7260,7 @@ index 2fb996716..cdb29e3bc 100644
      // size-2 candidate is used.
 diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
 new file mode 100644
-index 000000000..d9c2a6452
+index 000000000000..d9c2a64528c6
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
 @@ -0,0 +1,161 @@
@@ -7281,7 +7427,7 @@ index 000000000..d9c2a6452
 +}
 diff --git a/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
 new file mode 100644
-index 000000000..91b7adc66
+index 000000000000..91b7adc661cd
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
 @@ -0,0 +1,187 @@
@@ -7474,7 +7620,7 @@ index 000000000..91b7adc66
 +attributes #0 = { "target-features"="+mos-a16" }
 diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 new file mode 100644
-index 0000000000000000000000000000000000000000..3bfb2aacec899f526ec389e38aa6ded7ba4753ed
+index 000000000000..3bfb2aacec89
 --- /dev/null
 +++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
 @@ -0,0 +1,512 @@
@@ -8156,403 +8302,6 @@ index 000000000000..f193abc81071
 +    STAbsXIdx $a, 2048, killed $x16
 +    RTS implicit $z
 +...
-diff --git a/llvm/test/CodeGen/MOS/interrupt-width-65816.ll b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
-new file mode 100644
-index 000000000..17a137a5e
---- /dev/null
-+++ b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
-@@ -0,0 +1,34 @@
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 < %s | FileCheck %s
-+
-+; A 65816 interrupt inherits M/X from the interrupted instruction, and D and
-+; DBR from the interrupted code (which may legally have moved them via inline
-+; asm). Save full A/X/Y in a known 16-bit mode, save D and DBR, and establish
-+; the complete C ABI state (M8/X8, D=0, DBR=0 — the latter derived from the
-+; hardware-forced PBR=0 via phk/plb) before any compiled code runs; restore
-+; everything in reverse before RTI, which restores the stacked P.
-+; Runnable end-to-end reproducers and explanation:
-+; https://biohack.net/snes/nmitally/ (M/X) and the #141 dpbank demo (D/DBR).
-+
-+define void @isr() "interrupt" {
-+; CHECK-LABEL: isr:
-+; CHECK:       rep #48
-+; CHECK-NEXT:  pha
-+; CHECK-NEXT:  phx
-+; CHECK-NEXT:  phy
-+; CHECK-NEXT:  phb
-+; CHECK-NEXT:  phd
-+; CHECK-NEXT:  pea 0
-+; CHECK-NEXT:  pld
-+; CHECK-NEXT:  phk
-+; CHECK-NEXT:  plb
-+; CHECK-NEXT:  sep #48
-+; CHECK:       cld
-+; CHECK:       rep #48
-+; CHECK-NEXT:  pld
-+; CHECK-NEXT:  plb
-+; CHECK-NEXT:  ply
-+; CHECK-NEXT:  plx
-+; CHECK-NEXT:  pla
-+; CHECK-NEXT:  rti
-+  ret void
-+}
-diff --git a/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
-new file mode 100644
-index 000000000..13d1aa2e1
---- /dev/null
-+++ b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
-@@ -0,0 +1,37 @@
-+# REQUIRES: asserts
-+# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer,mos-combiner -verify-machineinstrs -o - %s | FileCheck %s
-+#
-+# tryAbsoluteIndexedAddressing rewrites every use of an 8-active-bit s16 offset
-+# to an explicitly zero-extended s16 (G_TRUNC + G_CONSTANT 0 + G_MERGE_VALUES)
-+# and then hands the store to selectIndirectAddressing. The users it rewrites in
-+# place can be CSE-able; each rewrite must go through the legalizer's observer
-+# so that GISelCSEInfo re-profiles them. The G_ADD below is legal under +mos-a16
-+# and is legalized before the store (bottom-up), so it survives to the end of the
-+# legalizer with its rewritten operand. Without the observer notification its
-+# CSE node keeps the profile of the original operand and the post-legalizer
-+# mos-combiner's CSEInfo::verify() asserts ("CSEInfo is not consistent") — in the
-+# full pipeline that stale node makes a later G_TRUNC lookup hit or miss with the
-+# heap layout, i.e. a non-reproducible build (the `sec` placement flip in the
-+# SNES title-card demos' _title_blank).
-+---
-+name: indexed_offset_rewrite_notifies_observer
-+body: |
-+  bb.0:
-+    liveins: $rs0, $rs2, $rs4, $rc0
-+    ; CHECK-LABEL: name: indexed_offset_rewrite_notifies_observer
-+    ; CHECK: [[LO:%[0-9]+]]:_(s8) = G_TRUNC {{%[0-9]+}}(s16)
-+    ; CHECK-NEXT: [[MERGE:%[0-9]+]]:_(s16) = G_MERGE_VALUES [[LO]](s8), {{%[0-9]+}}(s8)
-+    ; CHECK-NEXT: G_STORE_INDIR_IDX {{%[0-9]+}}(s8), {{%[0-9]+}}(p0), [[LO]] :: (store (s8))
-+    ; CHECK-NEXT: G_ADD [[MERGE]], {{%[0-9]+}}
-+    %0:_(p0) = COPY $rs0
-+    %1:_(s16) = COPY $rs2
-+    %2:_(s16) = COPY $rs4
-+    %3:_(s8) = COPY $rc0
-+    %4:_(s16) = G_CONSTANT i16 255
-+    %5:_(s16) = G_AND %1, %4
-+    %6:_(p0) = G_PTR_ADD %0, %5
-+    G_STORE %3(s8), %6(p0) :: (store (s8))
-+    %7:_(s16) = G_ADD %5, %2
-+    $rs0 = COPY %7(s16)
-+    RTS implicit $rs0
-+...
-diff --git a/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
-new file mode 100644
-index 000000000..079715374
---- /dev/null
-+++ b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
-@@ -0,0 +1,120 @@
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -stop-after=instruction-select -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=MIR
-+
-+; A 16-bit runtime index in an Imag16 pair must become one fused operation.
-+; The fusion keeps an X8 spill or reload from clearing the high byte of Y
-+; between its load and the near (zp),Y access.
-+
-+target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
-+
-+define i8 @near_load(ptr %p, i16 %i) {
-+; MIR-LABEL: name: near_load
-+; MIR: LDIndirYIdxFused {{.*}}implicit-def $y16 :: (load (s8)
-+; CHECK-LABEL: near_load:
-+; CHECK: rep #16
-+; CHECK-NEXT: ldy __rc{{[0-9]+}}
-+; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
-+; CHECK-NEXT: sep #16
-+; CHECK: rts
-+  %q = getelementptr nuw i8, ptr %p, i16 %i
-+  %v = load i8, ptr %q
-+  ret i8 %v
-+}
-+
-+define void @near_store(ptr %p, i16 %i, i8 %v) {
-+; MIR-LABEL: name: near_store
-+; MIR: STIndirYIdxFused {{.*}}implicit-def $y16 :: (store (s8)
-+; CHECK-LABEL: near_store:
-+; CHECK: rep #16
-+; CHECK-NEXT: ldy __rc{{[0-9]+}}
-+; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
-+; CHECK-NEXT: sep #16
-+; CHECK: rts
-+  %q = getelementptr nuw i8, ptr %p, i16 %i
-+  store i8 %v, ptr %q
-+  ret void
-+}
-+
-+; Word accesses require M=16 as well as X=16. The Y load must remain adjacent
-+; to the access while the value enters or leaves the accumulator separately.
-+define i16 @near_load_word(ptr %p, i16 %i) {
-+; MIR-LABEL: name: near_load_word
-+; MIR: LDIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile load (s16)
-+; CHECK-LABEL: near_load_word:
-+; CHECK: rep #48
-+; CHECK-NEXT: ldy __rc{{[0-9]+}}
-+; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
-+; CHECK: sep #48
-+; CHECK: rts
-+  %q = getelementptr nuw i8, ptr %p, i16 %i
-+  %v = load volatile i16, ptr %q, align 1
-+  ret i16 %v
-+}
-+
-+define void @near_store_word(ptr %p, i16 %i, i16 %v) {
-+; MIR-LABEL: name: near_store_word
-+; MIR: STIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile store (s16)
-+; CHECK-LABEL: near_store_word:
-+; CHECK: ldy __rc{{[0-9]+}}
-+; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
-+; CHECK: sep #48
-+; CHECK: rts
-+  %q = getelementptr nuw i8, ptr %p, i16 %i
-+  store volatile i16 %v, ptr %q, align 1
-+  ret void
-+}
-+
-+; Near pointer arithmetic truncates the address to 16 bits. Inbounds permits a
-+; negative offset, while native (dp),Y carries an unsigned sum into DBR.
-+; Form the full near address before the access when unsigned wrap is possible.
-+define i8 @near_load_wrapping(ptr %p, i16 %i) {
-+; MIR-LABEL: name: near_load_wrapping
-+; MIR-NOT: LDIndirYIdx
-+; MIR: LDIndir {{.*}} :: (load (s8)
-+; CHECK-LABEL: near_load_wrapping:
-+; CHECK-NOT: ),y
-+; CHECK: lda (__rc{{[0-9]+}})
-+; CHECK: rts
-+  %q = getelementptr inbounds i8, ptr %p, i16 %i
-+  %v = load i8, ptr %q
-+  ret i8 %v
-+}
-+
-+define void @near_store_wrapping(ptr %p, i16 %i, i8 %v) {
-+; MIR-LABEL: name: near_store_wrapping
-+; MIR-NOT: STIndirYIdx
-+; MIR: STIndir {{.*}} :: (store (s8)
-+; CHECK-LABEL: near_store_wrapping:
-+; CHECK-NOT: ),y
-+; CHECK: sta (__rc{{[0-9]+}})
-+; CHECK: rts
-+  %q = getelementptr i8, ptr %p, i16 %i
-+  store i8 %v, ptr %q
-+  ret void
-+}
-+
-+define i16 @near_load_word_wrapping(ptr %p, i16 %i) {
-+; MIR-LABEL: name: near_load_word_wrapping
-+; MIR-NOT: LDIndirYIdx
-+; MIR: LDAIndir16 {{.*}} :: (volatile load (s16)
-+; CHECK-LABEL: near_load_word_wrapping:
-+; CHECK-NOT: ),y
-+; CHECK: lda (__rc{{[0-9]+}})
-+; CHECK: rts
-+  %q = getelementptr inbounds i8, ptr %p, i16 %i
-+  %v = load volatile i16, ptr %q, align 1
-+  ret i16 %v
-+}
-+
-+define void @near_store_word_wrapping(ptr %p, i16 %i, i16 %v) {
-+; MIR-LABEL: name: near_store_word_wrapping
-+; MIR-NOT: STIndirYIdx
-+; MIR: STAIndir16 {{.*}} :: (volatile store (s16)
-+; CHECK-LABEL: near_store_word_wrapping:
-+; CHECK-NOT: ),y
-+; CHECK: sta (__rc{{[0-9]+}})
-+; CHECK: rts
-+  %q = getelementptr i8, ptr %p, i16 %i
-+  store volatile i16 %v, ptr %q, align 1
-+  ret void
-+}
-diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
-index cc766817e..270c169d1 100644
---- a/llvm/test/MC/MOS/all-65816-opcodes.s
-+++ b/llvm/test/MC/MOS/all-65816-opcodes.s
-@@ -84,7 +84,6 @@
-
- 	mvn	#$ea, #$ea              ; CHECK: encoding: [0x54,0xea,0xea]
- 	mvp	#$ea, #$ea              ; CHECK: encoding: [0x44,0xea,0xea]
--
- 	pea	$eaea                   ; CHECK: encoding: [0xf4,0xea,0xea]
- 	pei	($ea)                   ; CHECK: encoding: [0xd4,0xea]
- 	per	$eaea                   ; CHECK: encoding: [0x62,0xea,0xea]
-@@ -105,3 +104,4 @@
- 	xce                             ; CHECK: encoding: [0xfb]
-
- 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]
-+	cop #$5a                        ; CHECK: encoding: [0x02,0x5a]
-diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
-new file mode 100644
-index 0000000000000000000000000000000000000000..0a219fb221bb6f69d51eee05d9107efcf4b3b489
---- /dev/null
-+++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
-@@ -0,0 +1,89 @@
-+//===-- MOSRecoverNearNoWrap.cpp - Preserve near address proofs ------------===//
-+//
-+// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
-+// See https://llvm.org/LICENSE.txt for license information.
-+// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
-+//
-+//===----------------------------------------------------------------------===//
-+
-+#include "MOS.h"
-+#include "MOSTargetMachine.h"
-+#include "llvm/Analysis/LoopInfo.h"
-+#include "llvm/Analysis/LoopPass.h"
-+#include "llvm/Analysis/ScalarEvolution.h"
-+#include "llvm/Analysis/ScalarEvolutionExpressions.h"
-+#include "llvm/CodeGen/TargetPassConfig.h"
-+#include "llvm/IR/Instructions.h"
-+#include "llvm/InitializePasses.h"
-+#include "llvm/Support/CommandLine.h"
-+
-+using namespace llvm;
-+
-+static cl::opt<bool> RecoverNearNoWrap(
-+    "mos-recover-near-nowrap", cl::Hidden, cl::init(true),
-+    cl::desc("Recover unsigned no-wrap proofs for near byte GEPs after LSR"));
-+
-+namespace {
-+class MOSRecoverNearNoWrap : public LoopPass {
-+public:
-+  static char ID;
-+  MOSRecoverNearNoWrap() : LoopPass(ID) {
-+    initializeMOSRecoverNearNoWrapPass(*PassRegistry::getPassRegistry());
-+  }
-+
-+  void getAnalysisUsage(AnalysisUsage &AU) const override {
-+    AU.addRequired<TargetPassConfig>();
-+    AU.addRequired<ScalarEvolutionWrapperPass>();
-+    AU.setPreservesAll();
-+  }
-+
-+  bool runOnLoop(Loop *L, LPPassManager &) override {
-+    if (!RecoverNearNoWrap || skipLoop(L))
-+      return false;
-+    const Function &F = *L->getHeader()->getParent();
-+    const auto &TM = getAnalysis<TargetPassConfig>().getTM<MOSTargetMachine>();
-+    if (!TM.getSubtargetImpl(F)->hasW65816())
-+      return false;
-+    auto &SE = getAnalysis<ScalarEvolutionWrapperPass>().getSE();
-+    bool Changed = false;
-+    for (BasicBlock *BB : L->blocks()) {
-+      for (Instruction &I : *BB) {
-+        auto *GEP = dyn_cast<GetElementPtrInst>(&I);
-+        if (!GEP || !GEP->getType()->isPointerTy() ||
-+            GEP->getAddressSpace() != 0 || GEP->hasNoUnsignedWrap() ||
-+            !GEP->getSourceElementType()->isIntegerTy(8) ||
-+            GEP->getNumIndices() != 1 ||
-+            !GEP->getOperand(1)->getType()->isIntegerTy(16))
-+          continue;
-+
-+        // A single byte index of pointer width has no scaling, truncation, or
-+        // intermediate additions. Its unsigned sum cannot wrap exactly when
-+        // the result is at least the base. Use LSR's preserved ScalarEvolution
-+        // facts before another pass invalidates them.
-+        const SCEV *Address = SE.getSCEV(GEP);
-+        const SCEV *Base = SE.getSCEV(GEP->getPointerOperand());
-+        const auto *AR = dyn_cast<SCEVAddRecExpr>(Address);
-+        // A nuw recurrence never decreases from its start in unsigned order.
-+        bool FromBase = AR && AR->hasNoUnsignedWrap() && AR->getStart() == Base;
-+        if (FromBase || SE.isKnownPredicate(ICmpInst::ICMP_UGE, Address, Base)) {
-+          GEP->setNoWrapFlags(GEP->getNoWrapFlags() |
-+                              GEPNoWrapFlags::noUnsignedWrap());
-+          Changed = true;
-+        }
-+      }
-+    }
-+    return Changed;
-+  }
-+};
-+} // namespace
-+
-+char MOSRecoverNearNoWrap::ID = 0;
-+INITIALIZE_PASS_BEGIN(MOSRecoverNearNoWrap, "mos-recover-near-nowrap",
-+                      "MOS recover near address no-wrap proofs", false, false)
-+INITIALIZE_PASS_DEPENDENCY(ScalarEvolutionWrapperPass)
-+INITIALIZE_PASS_END(MOSRecoverNearNoWrap, "mos-recover-near-nowrap",
-+                    "MOS recover near address no-wrap proofs", false, false)
-+
-+Pass *llvm::createMOSRecoverNearNoWrapPass() {
-+  return new MOSRecoverNearNoWrap();
-+}
-diff --git a/llvm/test/CodeGen/MOS/near-index-proofs.ll b/llvm/test/CodeGen/MOS/near-index-proofs.ll
-new file mode 100644
-index 0000000000000000000000000000000000000000..bed35ca6844e7a6c27ea25cdee8e3433ec1c07a3
---- /dev/null
-+++ b/llvm/test/CodeGen/MOS/near-index-proofs.ll
-@@ -0,0 +1,70 @@
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -mos-recover-near-nowrap=false -verify-machineinstrs < %s | FileCheck %s --check-prefix=DISABLED
-+
-+; RUN: llc -mtriple=mos -mcpu=mosw65816 -stop-after=mos-recover-near-nowrap -o - %s | FileCheck %s --check-prefix=IR
-+
-+; RUN: llc -mtriple=mos -mcpu=mos6502 -stop-after=mos-recover-near-nowrap -o - %s | FileCheck %s --check-prefix=PLAIN
-+
-+; The inbounds byte loop has an unsigned no-wrap address recurrence. Its
-+; destination index must retain that proof across loop strength reduction.
-+; PLAIN-LABEL: define void @far_rt_blit
-+; PLAIN: getelementptr i8, ptr %dst, i16
-+; IR-LABEL: define void @far_rt_blit
-+; IR: getelementptr nuw i8, ptr %dst, i16
-+; CHECK-LABEL: far_rt_blit:
-+; CHECK-NOT: adc
-+; CHECK: lda [__rc{{[0-9]+}}],y
-+; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
-+; CHECK: rts
-+; DISABLED-LABEL: far_rt_blit:
-+; DISABLED: adc
-+; DISABLED: sta (__rc{{[0-9]+}})
-+; DISABLED: rts
-+target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
-+
-+define void @far_rt_blit(i32 %a, ptr %dst) {
-+entry:
-+  %p = inttoptr i32 %a to ptr addrspace(2)
-+  br label %loop
-+
-+loop:                                             ; preds = %loop, %entry
-+  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
-+  %x = zext i8 %j to i32
-+  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
-+  %v = load i8, ptr addrspace(2) %q, align 1
-+  %d = getelementptr inbounds i8, ptr %dst, i8 %j
-+  store i8 %v, ptr %d, align 1
-+  %j1 = add nuw nsw i8 %j, 1
-+  %c = icmp eq i8 %j1, 64
-+  br i1 %c, label %exit, label %loop
-+
-+exit:                                             ; preds = %loop
-+  ret void
-+}
-+
-+; An unflagged near GEP permits wrapping even with a nonnegative loop index.
-+; IR-LABEL: define void @wrapping_blit
-+; IR: getelementptr i8, ptr %dst, i16
-+; CHECK-LABEL: wrapping_blit:
-+; CHECK: adc
-+; CHECK: sta (__rc{{[0-9]+}}){{$}}
-+; CHECK: rts
-+define void @wrapping_blit(i32 %a, ptr %dst) {
-+entry:
-+  %p = inttoptr i32 %a to ptr addrspace(2)
-+  br label %loop
-+
-+loop:                                             ; preds = %loop, %entry
-+  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
-+  %x = zext i8 %j to i32
-+  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
-+  %v = load i8, ptr addrspace(2) %q, align 1
-+  %d = getelementptr i8, ptr %dst, i8 %j
-+  store i8 %v, ptr %d, align 1
-+  %j1 = add nuw nsw i8 %j, 1
-+  %c = icmp eq i8 %j1, 64
-+  br i1 %c, label %exit, label %loop
-+
-+exit:                                             ; preds = %loop
-+  ret void
-+}
 diff --git a/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir b/llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir
 new file mode 100644
 index 000000000000..c421564b55aa
@@ -8689,3 +8438,356 @@ index 000000000000..c421564b55aa
 +    $a = LDImm 0
 +    RTS implicit $a
 +...
+diff --git a/llvm/test/CodeGen/MOS/interrupt-width-65816.ll b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
+new file mode 100644
+index 000000000000..17a137a5e255
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
+@@ -0,0 +1,34 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 < %s | FileCheck %s
++
++; A 65816 interrupt inherits M/X from the interrupted instruction, and D and
++; DBR from the interrupted code (which may legally have moved them via inline
++; asm). Save full A/X/Y in a known 16-bit mode, save D and DBR, and establish
++; the complete C ABI state (M8/X8, D=0, DBR=0 — the latter derived from the
++; hardware-forced PBR=0 via phk/plb) before any compiled code runs; restore
++; everything in reverse before RTI, which restores the stacked P.
++; Runnable end-to-end reproducers and explanation:
++; https://biohack.net/snes/nmitally/ (M/X) and the #141 dpbank demo (D/DBR).
++
++define void @isr() "interrupt" {
++; CHECK-LABEL: isr:
++; CHECK:       rep #48
++; CHECK-NEXT:  pha
++; CHECK-NEXT:  phx
++; CHECK-NEXT:  phy
++; CHECK-NEXT:  phb
++; CHECK-NEXT:  phd
++; CHECK-NEXT:  pea 0
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  phk
++; CHECK-NEXT:  plb
++; CHECK-NEXT:  sep #48
++; CHECK:       cld
++; CHECK:       rep #48
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  plb
++; CHECK-NEXT:  ply
++; CHECK-NEXT:  plx
++; CHECK-NEXT:  pla
++; CHECK-NEXT:  rti
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+new file mode 100644
+index 000000000000..13d1aa2e1475
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+@@ -0,0 +1,37 @@
++# REQUIRES: asserts
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer,mos-combiner -verify-machineinstrs -o - %s | FileCheck %s
++#
++# tryAbsoluteIndexedAddressing rewrites every use of an 8-active-bit s16 offset
++# to an explicitly zero-extended s16 (G_TRUNC + G_CONSTANT 0 + G_MERGE_VALUES)
++# and then hands the store to selectIndirectAddressing. The users it rewrites in
++# place can be CSE-able; each rewrite must go through the legalizer's observer
++# so that GISelCSEInfo re-profiles them. The G_ADD below is legal under +mos-a16
++# and is legalized before the store (bottom-up), so it survives to the end of the
++# legalizer with its rewritten operand. Without the observer notification its
++# CSE node keeps the profile of the original operand and the post-legalizer
++# mos-combiner's CSEInfo::verify() asserts ("CSEInfo is not consistent") — in the
++# full pipeline that stale node makes a later G_TRUNC lookup hit or miss with the
++# heap layout, i.e. a non-reproducible build (the `sec` placement flip in the
++# SNES title-card demos' _title_blank).
++---
++name: indexed_offset_rewrite_notifies_observer
++body: |
++  bb.0:
++    liveins: $rs0, $rs2, $rs4, $rc0
++    ; CHECK-LABEL: name: indexed_offset_rewrite_notifies_observer
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = G_TRUNC {{%[0-9]+}}(s16)
++    ; CHECK-NEXT: [[MERGE:%[0-9]+]]:_(s16) = G_MERGE_VALUES [[LO]](s8), {{%[0-9]+}}(s8)
++    ; CHECK-NEXT: G_STORE_INDIR_IDX {{%[0-9]+}}(s8), {{%[0-9]+}}(p0), [[LO]] :: (store (s8))
++    ; CHECK-NEXT: G_ADD [[MERGE]], {{%[0-9]+}}
++    %0:_(p0) = COPY $rs0
++    %1:_(s16) = COPY $rs2
++    %2:_(s16) = COPY $rs4
++    %3:_(s8) = COPY $rc0
++    %4:_(s16) = G_CONSTANT i16 255
++    %5:_(s16) = G_AND %1, %4
++    %6:_(p0) = G_PTR_ADD %0, %5
++    G_STORE %3(s8), %6(p0) :: (store (s8))
++    %7:_(s16) = G_ADD %5, %2
++    $rs0 = COPY %7(s16)
++    RTS implicit $rs0
++...
+diff --git a/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll b/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+new file mode 100644
+index 000000000000..25ea5ccca3e1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+@@ -0,0 +1,42 @@
++; REQUIRES: asserts
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -debug-only=mos-near-nowrap-recovery -o /dev/null < %s 2>&1 | FileCheck %s
++
++; Each near address is recovered by a specific proof: a nuw recurrence that
++; starts at the GEP's base, or the unsigned ordering of result and base when
++; the recurrence has no nuw flag.
++
++; CHECK: Recovered nuw from recurrence: {{.*}}getelementptr i8, ptr %dst, i16
++; CHECK: Recovered nuw from ordering: {{.*}}getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16
++; CHECK-NOT: Recovered nuw
++
++define void @inbounds_fill(ptr %dst, i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %d = getelementptr inbounds i8, ptr %dst, i8 %j
++  store volatile i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++define void @ordered_const_base(i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]
++  %a = getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16 %j
++  store volatile i8 %v, ptr %a, align 1
++  %j1 = add nuw nsw i16 %j, 1
++  %c = icmp eq i16 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/near-index-proofs.ll b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+new file mode 100644
+index 000000000000..a5c77459fb25
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+@@ -0,0 +1,73 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -mos-recover-near-nowrap=false -verify-machineinstrs < %s | FileCheck %s --check-prefix=DISABLED
++
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -stop-after=mos-near-nowrap-recovery -o - %s | FileCheck %s --check-prefix=IR
++
++; RUN: llc -mtriple=mos -mcpu=mos6502 -stop-after=mos-near-nowrap-recovery -o - %s | FileCheck %s --check-prefix=PLAIN
++; opt accepts each registered legacy pass name as an option, so the pass
++; name must differ from the -mos-recover-near-nowrap switch.
++; RUN: opt -passes=verify -disable-output < %s
++
++; The inbounds byte loop has an unsigned no-wrap address recurrence. Its
++; destination index must retain that proof across loop strength reduction.
++; PLAIN-LABEL: define void @far_rt_blit
++; PLAIN: getelementptr i8, ptr %dst, i16
++; IR-LABEL: define void @far_rt_blit
++; IR: getelementptr nuw i8, ptr %dst, i16
++; CHECK-LABEL: far_rt_blit:
++; CHECK-NOT: adc
++; CHECK: lda [__rc{{[0-9]+}}],y
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: rts
++; DISABLED-LABEL: far_rt_blit:
++; DISABLED: adc
++; DISABLED: sta (__rc{{[0-9]+}})
++; DISABLED: rts
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define void @far_rt_blit(i32 %a, ptr %dst) {
++entry:
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:                                             ; preds = %loop, %entry
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %x = zext i8 %j to i32
++  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
++  %v = load i8, ptr addrspace(2) %q, align 1
++  %d = getelementptr inbounds i8, ptr %dst, i8 %j
++  store i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:                                             ; preds = %loop
++  ret void
++}
++
++; An unflagged near GEP permits wrapping even with a nonnegative loop index.
++; IR-LABEL: define void @wrapping_blit
++; IR: getelementptr i8, ptr %dst, i16
++; CHECK-LABEL: wrapping_blit:
++; CHECK: adc
++; CHECK: sta (__rc{{[0-9]+}}){{$}}
++; CHECK: rts
++define void @wrapping_blit(i32 %a, ptr %dst) {
++entry:
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:                                             ; preds = %loop, %entry
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %x = zext i8 %j to i32
++  %q = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %x
++  %v = load i8, ptr addrspace(2) %q, align 1
++  %d = getelementptr i8, ptr %dst, i8 %j
++  store i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:                                             ; preds = %loop
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
+new file mode 100644
+index 000000000000..079715374a17
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/xy16-near-indir-y.ll
+@@ -0,0 +1,120 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -stop-after=instruction-select -verify-machineinstrs -o - %s | FileCheck %s --check-prefix=MIR
++
++; A 16-bit runtime index in an Imag16 pair must become one fused operation.
++; The fusion keeps an X8 spill or reload from clearing the high byte of Y
++; between its load and the near (zp),Y access.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-p3:24:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define i8 @near_load(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load
++; MIR: LDIndirYIdxFused {{.*}}implicit-def $y16 :: (load (s8)
++; CHECK-LABEL: near_load:
++; CHECK: rep #16
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
++; CHECK-NEXT: sep #16
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define void @near_store(ptr %p, i16 %i, i8 %v) {
++; MIR-LABEL: name: near_store
++; MIR: STIndirYIdxFused {{.*}}implicit-def $y16 :: (store (s8)
++; CHECK-LABEL: near_store:
++; CHECK: rep #16
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK-NEXT: sep #16
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  store i8 %v, ptr %q
++  ret void
++}
++
++; Word accesses require M=16 as well as X=16. The Y load must remain adjacent
++; to the access while the value enters or leaves the accumulator separately.
++define i16 @near_load_word(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_word
++; MIR: LDIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile load (s16)
++; CHECK-LABEL: near_load_word:
++; CHECK: rep #48
++; CHECK-NEXT: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: lda (__rc{{[0-9]+}}),y
++; CHECK: sep #48
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  %v = load volatile i16, ptr %q, align 1
++  ret i16 %v
++}
++
++define void @near_store_word(ptr %p, i16 %i, i16 %v) {
++; MIR-LABEL: name: near_store_word
++; MIR: STIndirYIdx16Fused {{.*}}implicit-def $y16 :: (volatile store (s16)
++; CHECK-LABEL: near_store_word:
++; CHECK: ldy __rc{{[0-9]+}}
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: sep #48
++; CHECK: rts
++  %q = getelementptr nuw i8, ptr %p, i16 %i
++  store volatile i16 %v, ptr %q, align 1
++  ret void
++}
++
++; Near pointer arithmetic truncates the address to 16 bits. Inbounds permits a
++; negative offset, while native (dp),Y carries an unsigned sum into DBR.
++; Form the full near address before the access when unsigned wrap is possible.
++define i8 @near_load_wrapping(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_wrapping
++; MIR-NOT: LDIndirYIdx
++; MIR: LDIndir {{.*}} :: (load (s8)
++; CHECK-LABEL: near_load_wrapping:
++; CHECK-NOT: ),y
++; CHECK: lda (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr inbounds i8, ptr %p, i16 %i
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define void @near_store_wrapping(ptr %p, i16 %i, i8 %v) {
++; MIR-LABEL: name: near_store_wrapping
++; MIR-NOT: STIndirYIdx
++; MIR: STIndir {{.*}} :: (store (s8)
++; CHECK-LABEL: near_store_wrapping:
++; CHECK-NOT: ),y
++; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr i8, ptr %p, i16 %i
++  store i8 %v, ptr %q
++  ret void
++}
++
++define i16 @near_load_word_wrapping(ptr %p, i16 %i) {
++; MIR-LABEL: name: near_load_word_wrapping
++; MIR-NOT: LDIndirYIdx
++; MIR: LDAIndir16 {{.*}} :: (volatile load (s16)
++; CHECK-LABEL: near_load_word_wrapping:
++; CHECK-NOT: ),y
++; CHECK: lda (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr inbounds i8, ptr %p, i16 %i
++  %v = load volatile i16, ptr %q, align 1
++  ret i16 %v
++}
++
++define void @near_store_word_wrapping(ptr %p, i16 %i, i16 %v) {
++; MIR-LABEL: name: near_store_word_wrapping
++; MIR-NOT: STIndirYIdx
++; MIR: STAIndir16 {{.*}} :: (volatile store (s16)
++; CHECK-LABEL: near_store_word_wrapping:
++; CHECK-NOT: ),y
++; CHECK: sta (__rc{{[0-9]+}})
++; CHECK: rts
++  %q = getelementptr i8, ptr %p, i16 %i
++  store volatile i16 %v, ptr %q, align 1
++  ret void
++}
+diff --git a/llvm/test/MC/MOS/all-65816-opcodes.s b/llvm/test/MC/MOS/all-65816-opcodes.s
+index cc766817ec26..270c169d16f0 100644
+--- a/llvm/test/MC/MOS/all-65816-opcodes.s
++++ b/llvm/test/MC/MOS/all-65816-opcodes.s
+@@ -84,7 +84,6 @@
+
+ 	mvn	#$ea, #$ea              ; CHECK: encoding: [0x54,0xea,0xea]
+ 	mvp	#$ea, #$ea              ; CHECK: encoding: [0x44,0xea,0xea]
+-
+ 	pea	$eaea                   ; CHECK: encoding: [0xf4,0xea,0xea]
+ 	pei	($ea)                   ; CHECK: encoding: [0xd4,0xea]
+ 	per	$eaea                   ; CHECK: encoding: [0x62,0xea,0xea]
+@@ -105,3 +104,4 @@
+ 	xce                             ; CHECK: encoding: [0xfb]
+
+ 	wdm #$ea                        ; CHECK: encoding: [0x42,0xea]
++	cop #$5a                        ; CHECK: encoding: [0x02,0x5a]

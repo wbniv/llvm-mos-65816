@@ -19,6 +19,6 @@ Attribution: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh
 5. Integrate standalone patch 0069 and the Y8 copy expectation, rebuild/install, reconstruct the patch stack, and verify installed outputs against the tested candidate. The installed compiler reproduces 96 objects and 18 ROMs; its disabled option reproduces the baseline set.
 6. Preserve evidence and attribution, update current entry points, and review document dependencies.
 
-The range proof is enabled locally. Native-word indexing remains experimental. The full MOS suite retains five known `opt` startup failures; independent review and exact-upstream preparation are separate follow-up work.
+The range proof is enabled locally. Native-word indexing remains experimental. The full MOS suite retained five known `opt` startup failures ([fixed September 29](../defects/mos-near-nowrap-option-clash.json)); independent review and exact-upstream preparation are separate follow-up work.
 
 Independent-review coordination and summary update: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.

@@ -62,7 +62,7 @@ All **36 LTO ROM configurations pass MAME and bsnes**: three fixtures × two mod
 
 The original shell gate passes on both the isolated candidate and installed compiler: eight emulator assertions each, all 27 marked main accesses and two pressure accesses per mode, and plain/debug instruction and relocation equivalence. The checker has **16 passing sensitivity tests**, including rejection of a widened `cp8` index. [Installed gate log](../defects/evidence/2026-09-28-farblit-range-integration/installed-gate.log) and [receipt](../defects/evidence/2026-09-28-farblit-range-integration/receipt.json).
 
-The wider MOS code-generation suite reports **127 passed, two unsupported, five failed**. All five failures are the previously documented `opt` startup collision for `mos-recover-near-nowrap`; they never execute the range proof. The reused `opt` identity and prior-work reconciliation are retained. The new MIR file separately passes. This is not a fully green MOS-suite result.
+The wider MOS code-generation suite reports **127 passed, two unsupported, five failed**. All five failures are the previously documented `opt` startup collision for `mos-recover-near-nowrap`; they never execute the range proof. (Update, September 29: that collision is [fixed in `0002`](../defects/mos-near-nowrap-option-clash.json), and the downstream suites no longer fail.) The reused `opt` identity and prior-work reconciliation are retained. The new MIR file separately passes. This is not a fully green MOS-suite result.
 
 ## Integration and reproduction
 

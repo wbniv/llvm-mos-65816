@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "reviewedAt": "2026-09-29",
-  "sourceHash": "3caee46745296233b115cbcc4f7d999afd9ccae556fe7883bccb9a1b8af92bb4",
+  "reviewedAt": "2026-09-30",
+  "sourceHash": "fa65d20cbb9e37a5cf2a81f697c9e9a8a05bb1939e63ed98b8663317492560f1",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -226,13 +226,13 @@
       "id": "defect:mos-near-nowrap-option-clash",
       "kind": "defect",
       "title": "opt aborts at startup: near no-wrap recovery pass and its switch share one option name",
-      "summary": "MOSRecoverNearNoWrap registers its legacy pass argument and its -mos-recover-near-nowrap cl::opt under the same string. opt turns every registered legacy pass into a command-line option, so any opt binary containing the MOS target aborts with \"Option 'mos-recover-near-nowrap' registered more than once\" before reading input. llc and clang are unaffected. Downstream 0002 still carries the collision; the upstream extraction names the pass mos-near-nowrap-recovery and keeps the switch.",
-      "localStatus": "qualified",
+      "summary": "MOSRecoverNearNoWrap registered its legacy pass argument and its -mos-recover-near-nowrap cl::opt under the same string. opt turns every registered legacy pass into a command-line option, so any opt containing the MOS target aborted at startup before reading input; llc and clang were unaffected. The pass is now named mos-near-nowrap-recovery and inserted by ID, in 0002 and in the upstream extraction; the switch keeps its name. The preserved downstream opt aborts on verify.ll and the rebuilt one exits 0; the downstream MOS suites now pass 186 with 3 unsupported and no failures.",
+      "localStatus": "fixed",
       "publicationStatus": "not-applicable",
       "dependsOn": [
         "defect:mos-near-index-overflow-proofs"
       ],
-      "nextStep": "The upstream extraction already names the pass separately. Port that rename and ID-based insertion to 0002, rebuild opt, and rerun the full MOS suites.",
+      "nextStep": "Repaired in 0002 and in the upstream extraction; the upstream fix posts with the near-index recovery patch.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-near-nowrap-option-clash.json",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-09-27-near-index-overflow-proofs.md"

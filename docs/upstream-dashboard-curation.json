@@ -1,5 +1,5 @@
 {
-  "reviewedAt": "2026-09-29",
+  "reviewedAt": "2026-09-30",
   "defectOverrides": {
     "mos-near-store-profitability": {
       "id": "opt:near-store-broad",
@@ -207,7 +207,7 @@
       "dependsOn": [
         "defect:mos-near-index-overflow-proofs"
       ],
-      "nextStep": "The upstream extraction already names the pass separately. Port that rename and ID-based insertion to 0002, rebuild opt, and rerun the full MOS suites.",
+      "nextStep": "Repaired in 0002 and in the upstream extraction; the upstream fix posts with the near-index recovery patch.",
       "evidencePaths": [
         "docs/defects/mos-near-nowrap-option-clash.json",
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md"

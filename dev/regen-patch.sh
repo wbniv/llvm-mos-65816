@@ -110,6 +110,7 @@ TESTRELS=(
   "llvm/test/CodeGen/MOS/far-indir-indexed.ll"         # #321 Ph2 inc 1: [dp],y (b7/97) selection + its negative gate cases
   "llvm/test/CodeGen/MOS/xy16-near-indir-y.ll"
   "llvm/test/CodeGen/MOS/near-index-proofs.ll"
+  "llvm/test/CodeGen/MOS/near-index-proofs-debug.ll"
   "llvm/test/CodeGen/MOS/far-global-long-x.ll"
   "llvm/test/CodeGen/MOS/far-absolute-extload.mir"
   "llvm/test/CodeGen/MOS/far-native-word.ll"

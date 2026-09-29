@@ -2,17 +2,17 @@
   "schema": 1,
   "id": "mos-near-nowrap-option-clash",
   "title": "opt aborts at startup: near no-wrap recovery pass and its switch share one option name",
-  "status": "confirmed",
+  "status": "fixed",
   "reproducer_origin": "original",
   "report": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
-  "summary": "MOSRecoverNearNoWrap registers its legacy pass argument and its -mos-recover-near-nowrap cl::opt under the same string. opt turns every registered legacy pass into a command-line option, so any opt binary containing the MOS target aborts with \"Option 'mos-recover-near-nowrap' registered more than once\" before reading input. llc and clang are unaffected. Downstream 0002 still carries the collision; the upstream extraction names the pass mos-near-nowrap-recovery and keeps the switch.",
+  "summary": "MOSRecoverNearNoWrap registered its legacy pass argument and its -mos-recover-near-nowrap cl::opt under the same string. opt turns every registered legacy pass into a command-line option, so any opt containing the MOS target aborted at startup before reading input; llc and clang were unaffected. The pass is now named mos-near-nowrap-recovery and inserted by ID, in 0002 and in the upstream extraction; the switch keeps its name. The preserved downstream opt aborts on verify.ll and the rebuilt one exits 0; the downstream MOS suites now pass 186 with 3 unsupported and no failures.",
   "attribution": [
     "Structured record, preserved baseline and extraction repair: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
-    "Earlier sightings are credited in docs/investigations/2026-09-28-farblit-range-integration.md and docs/defects/mos-xy16-stale-x-writer-reload.json."
+    "Earlier sightings are credited in docs/investigations/2026-09-28-farblit-range-integration.md and docs/defects/mos-xy16-stale-x-writer-reload.json.",
+    "Downstream repair and closure: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
   ],
   "unknowns": [
-    "The exact vendor dirty state linked into the preserved downstream opt was not captured; the diagnostic names the colliding string.",
-    "Downstream 0002 is not yet repaired; the installed toolchain does not ship opt."
+    "The exact vendor dirty state linked into the preserved downstream baseline opt was not captured; its diagnostic names the colliding string."
   ],
   "prior_work": {
     "disposition": "distinct_from_related",
@@ -76,6 +76,14 @@
     {
       "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/extracted-final.log",
       "sha256": "7d3c27373a9d55bb0e07d7e8ed2ffa223eed435b5379597943e7d2418941d65a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/downstream-fixed.log",
+      "sha256": "caa26a6d84da4de307e8cb7683358be00aab11e243d5f137efeba5ecd16ba038"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/downstream-lit-summary.log",
+      "sha256": "f0adf9f40e7ea71ca55f7f056984220f9e49101625879a0806fedfb4bb98a19d"
     }
   ],
   "additional_runs": [
@@ -95,5 +103,35 @@
       },
       "result": "The same verify.ll command exits 134 with the duplicate-registration signature on the first extraction and 0 on the final extraction, whose pass argument is mos-near-nowrap-recovery. MOS CodeGen+MC suites: first extraction 139 passed, 5 failed (the five opt-based tests), 1 unsupported; repaired extraction 144 passed, 1 unsupported. The extracted regression adds an opt startup RUN line."
     }
-  ]
+  ],
+  "resolution": {
+    "change": "patches/llvm-mos/0002-321-accum16.patch (pass argument DEBUG_TYPE mos-near-nowrap-recovery, ID-based insertion after LSR, MOSRecoverNearNoWrap.h) and patch 2 of docs/pr-preparations/2026-09-29/near-index-proofs",
+    "causal_explanation": "PassNameParser registers every legacy pass argument as an opt option. INITIALIZE_PASS used \"mos-recover-near-nowrap\", the same name as the cl::opt switch, so opt reported a duplicate registration and aborted during target initialization. Distinct names remove the duplicate; llc and clang never instantiate the parser, which is why they were unaffected.",
+    "trigger_check": "The same opt -passes=verify command on the retained verify.ll exits 134 with the duplicate-registration signature on the preserved baseline and 0 on the rebuilt downstream opt. near-index-proofs.ll carries an opt startup RUN line, and the five opt-based MOS lit tests pass again.",
+    "regression": {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll",
+      "sha256": "375d7bdbbd7ad3a8382da9edeeb55a76f29f22356bfa1d7a76ed448367f9c539"
+    },
+    "candidate": {
+      "command": "build/near-nowrap-option-clash/candidate/opt -passes=verify -disable-output docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll",
+      "working_directory": "/home/will/llvm-mos-65816",
+      "configuration": {
+        "tool": "opt",
+        "pass_pipeline": "verify",
+        "target_initialization": "all targets, including MOS",
+        "expected": "opt starts and verifies the module"
+      },
+      "toolchain_location": "build/near-nowrap-option-clash/candidate/opt (hard link of build/llvm-mos/bin/opt rebuilt 2026-09-29 from vendor with the updated 0002)",
+      "toolchain_sha256": "21c22b87d520a4cf1fdd852adfff76e8a2d740da0d6973afa8313d68ffbe27fc",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll",
+        "sha256": "375d7bdbbd7ad3a8382da9edeeb55a76f29f22356bfa1d7a76ed448367f9c539"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/downstream-fixed.log",
+        "sha256": "caa26a6d84da4de307e8cb7683358be00aab11e243d5f137efeba5ecd16ba038"
+      },
+      "exit_code": 0
+    }
+  }
 }

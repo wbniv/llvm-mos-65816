@@ -34,7 +34,7 @@ The [packet](../pr-preparations/2026-09-29/near-index-proofs/README.md) holds th
 - **Driver parity.** The destination driver passes `-disable-spill-hoist`, so the final replay and runtime use it. The plain-`llc` replay is kept separately because it hits the known spill-hoist scratch-register defect.
 - **Operations.** Aborting configurations filled the disk with systemd core dumps. Every later run used `ulimit -c 0`.
 
-Follow-ups for `TODO.md` await ranking: port the pass rename and ID insertion to `0002`, and repair `preserveX`.
+Follow-ups: `0002` now carries the pass rename and ID insertion, and the option-collision record is closed. The `preserveX` repair still needs a ranked `TODO.md` entry.
 
 ## Verification
 
