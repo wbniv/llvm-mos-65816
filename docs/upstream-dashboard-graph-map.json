@@ -148,6 +148,14 @@
     "NULLSTREAM": {
       "workId": "defect:mos-null-output-streamer-crash",
       "label": "0068 null-output streamer"
+    },
+    "OPTCLASH": {
+      "workId": "defect:mos-near-nowrap-option-clash",
+      "label": "Near no-wrap opt option collision"
+    },
+    "PRESERVEX": {
+      "workId": "defect:mos-xy16-preserve-x-p-save",
+      "label": "XY16 preserveX status save"
     }
   },
   "tracks": [

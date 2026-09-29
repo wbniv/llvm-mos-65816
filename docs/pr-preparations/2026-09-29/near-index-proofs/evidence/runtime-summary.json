@@ -1,0 +1,9 @@
+{
+  "jobs": 201,
+  "core_checks_pass": 394,
+  "core_checks_mismatch": 0,
+  "compile_failed_both": 4,
+  "compile_failed_candidate_only": 0,
+  "other_failures": 0,
+  "changed_code_builds": 183
+}

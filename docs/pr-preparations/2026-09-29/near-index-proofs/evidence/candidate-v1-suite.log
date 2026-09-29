@@ -1,0 +1,461 @@
+2026-09-29T12:45:34Z toolset=candidate llc=5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b source=98984efd54651c2a9bb08e8a3022dc21ab29ff0a
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/0029-cross-target-build/bin
+-- Testing: 145 tests, 8 workers --
+PASS: LLVM :: CodeGen/MOS/zp-byte-index.ll (1 of 145)
+PASS: LLVM :: CodeGen/MOS/fcmp.ll (2 of 145)
+PASS: LLVM :: CodeGen/MOS/shift-rotate.ll (3 of 145)
+PASS: LLVM :: CodeGen/MOS/anyext-masked-byte.ll (4 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector.mir (5 of 145)
+PASS: LLVM :: CodeGen/MOS/scmp-ucmp.ll (6 of 145)
+PASS: LLVM :: CodeGen/MOS/hello-world.ll (7 of 145)
+PASS: LLVM :: CodeGen/MOS/inc-dec.ll (8 of 145)
+PASS: LLVM :: CodeGen/MOS/vector-scalarize.ll (9 of 145)
+PASS: LLVM :: MC/MOS/eflags.s (10 of 145)
+PASS: LLVM :: CodeGen/MOS/jump-table-limit.ll (11 of 145)
+PASS: LLVM :: CodeGen/MOS/a16-byte-store.ll (12 of 145)
+PASS: LLVM :: CodeGen/MOS/anyext-wide.mir (13 of 145)
+PASS: LLVM :: CodeGen/MOS/integer-compare.ll (14 of 145)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65ce02.ll (15 of 145)
+PASS: LLVM :: CodeGen/MOS/a16-indirect-byte-store.ll (16 of 145)
+PASS: LLVM :: CodeGen/MOS/char-stats-norecurse.ll (17 of 145)
+PASS: LLVM :: CodeGen/MOS/legalizer-indexed-offset-observer.mir (18 of 145)
+PASS: LLVM :: CodeGen/MOS/xy16-near-indir-y.ll (19 of 145)
+PASS: LLVM :: CodeGen/MOS/prologepilog-ir.mir (20 of 145)
+PASS: LLVM :: CodeGen/MOS/add-sub.ll (21 of 145)
+PASS: LLVM :: CodeGen/MOS/store-zero.ll (22 of 145)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-65ce02.mir (23 of 145)
+PASS: LLVM :: CodeGen/MOS/char-stats.ll (24 of 145)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (25 of 145)
+PASS: LLVM :: CodeGen/MOS/legalizer.mir (26 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-opt-loop.mir (27 of 145)
+PASS: LLVM :: CodeGen/MOS/combiner.mir (28 of 145)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-stack.mir (29 of 145)
+PASS: LLVM :: MC/MOS/modifiers.s (30 of 145)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (31 of 145)
+PASS: LLVM :: CodeGen/MOS/static-stack.ll (32 of 145)
+PASS: LLVM :: CodeGen/MOS/prologepilog.mir (33 of 145)
+PASS: LLVM :: CodeGen/MOS/a16-immediate-width.ll (34 of 145)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65c02.ll (35 of 145)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-bra.mir (36 of 145)
+PASS: LLVM :: CodeGen/MOS/print-int.ll (37 of 145)
+PASS: LLVM :: CodeGen/MOS/zp-alloc.ll (38 of 145)
+PASS: LLVM :: CodeGen/MOS/no-csr.ll (39 of 145)
+PASS: LLVM :: CodeGen/MOS/coalesce-remat.ll (40 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-opt-chain.mir (41 of 145)
+PASS: LLVM :: CodeGen/MOS/cmp-select.ll (42 of 145)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (43 of 145)
+PASS: LLVM :: CodeGen/MOS/inc-dec-6502x.ll (44 of 145)
+PASS: LLVM :: CodeGen/MOS/near-index-proofs.ll (45 of 145)
+PASS: LLVM :: MC/MOS/branch-range-boundary.s (46 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir (47 of 145)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-deterministic.ll (48 of 145)
+PASS: LLVM :: CodeGen/MOS/immediate-remat.ll (49 of 145)
+PASS: LLVM :: CodeGen/MOS/call-lowering-spc700.mir (50 of 145)
+PASS: LLVM :: CodeGen/MOS/call-lowering.mir (51 of 145)
+PASS: LLVM :: CodeGen/MOS/asm-printer.mir (52 of 145)
+PASS: LLVM :: MC/MOS/branch-range-matrix-bcc8.s (53 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir (54 of 145)
+PASS: LLVM :: MC/MOS/brk-signature.s (55 of 145)
+PASS: LLVM :: CodeGen/MOS/scavenger-65c02.mir (56 of 145)
+PASS: LLVM :: MC/MOS/addressing-modes-65816.s (57 of 145)
+PASS: LLVM :: MC/MOS/bit-branch-target-r65c02.s (58 of 145)
+PASS: LLVM :: CodeGen/MOS/shift-rotate-chain.mir (59 of 145)
+PASS: LLVM :: CodeGen/MOS/legalizer-huc6280.mir (60 of 145)
+PASS: LLVM :: CodeGen/MOS/light-spill.ll (61 of 145)
+PASS: LLVM :: CodeGen/MOS/legalizer-ir.mir (62 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir (63 of 145)
+PASS: LLVM :: MC/MOS/zeropage.s (64 of 145)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll (65 of 145)
+PASS: LLVM :: CodeGen/MOS/ret-global-addr.ll (66 of 145)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-spc700.mir (67 of 145)
+PASS: LLVM :: CodeGen/MOS/late-opt-65816.mir (68 of 145)
+PASS: LLVM :: CodeGen/MOS/scavenger.mir (69 of 145)
+PASS: LLVM :: CodeGen/MOS/callee-saved-regs.ll (70 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir (71 of 145)
+PASS: LLVM :: CodeGen/MOS/dp-pointer-arg.ll (72 of 145)
+PASS: LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll (73 of 145)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir (74 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir.mir (75 of 145)
+PASS: LLVM :: CodeGen/MOS/insert-copies.mir (76 of 145)
+PASS: LLVM :: CodeGen/MOS/asm-printer-spc700.mir (77 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir (78 of 145)
+PASS: LLVM :: CodeGen/MOS/regalloc.mir (79 of 145)
+PASS: LLVM :: CodeGen/MOS/trivial.ll (80 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-opt.mir (81 of 145)
+PASS: LLVM :: CodeGen/MOS/inlineasm-constraint.mir (82 of 145)
+PASS: LLVM :: CodeGen/MOS/postrapseudos.mir (83 of 145)
+PASS: LLVM :: CodeGen/MOS/finalize-isel.mir (84 of 145)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (85 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg.mir (86 of 145)
+PASS: LLVM :: CodeGen/MOS/commute.mir (87 of 145)
+PASS: LLVM :: CodeGen/MOS/late-opt.mir (88 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir (89 of 145)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (90 of 145)
+PASS: LLVM :: CodeGen/MOS/asm-printer-huc6280.mir (91 of 145)
+PASS: LLVM :: CodeGen/MOS/asm-printer-ir.mir (92 of 145)
+PASS: LLVM :: CodeGen/MOS/lower-select.mir (93 of 145)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir (94 of 145)
+PASS: LLVM :: CodeGen/MOS/legalizer-65c02.mir (95 of 145)
+PASS: LLVM :: CodeGen/MOS/late-opt-65c02.mir (96 of 145)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-spc700.mir (97 of 145)
+PASS: LLVM :: CodeGen/MOS/call-lowering-stack.mir (98 of 145)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (99 of 145)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (100 of 145)
+PASS: LLVM :: CodeGen/MOS/interrupt-width-65816.ll (101 of 145)
+PASS: LLVM :: CodeGen/MOS/internalize.mir (102 of 145)
+PASS: LLVM :: MC/MOS/zp-regression.s (103 of 145)
+PASS: LLVM :: MC/MOS/align-nop.s (104 of 145)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (105 of 145)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir (106 of 145)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65ce02.s (107 of 145)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65816.s (108 of 145)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (109 of 145)
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (110 of 145)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (111 of 145)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (112 of 145)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (113 of 145)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (114 of 145)
+PASS: LLVM :: MC/MOS/asm-errors.s (115 of 145)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (116 of 145)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (117 of 145)
+PASS: LLVM :: MC/MOS/do-copy-data.s (118 of 145)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (119 of 145)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (120 of 145)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (121 of 145)
+PASS: LLVM :: MC/MOS/do-init-array.s (122 of 145)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (123 of 145)
+PASS: LLVM :: MC/MOS/do-init-stack.s (124 of 145)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (125 of 145)
+PASS: LLVM :: MC/MOS/do-fini-array.s (126 of 145)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (127 of 145)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (128 of 145)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (129 of 145)
+PASS: LLVM :: MC/MOS/inst-lda.s (130 of 145)
+UNSUPPORTED: LLVM :: CodeGen/MOS/getchar-regression.ll (131 of 145)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (132 of 145)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (133 of 145)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (134 of 145)
+PASS: LLVM :: MC/MOS/trivial.s (135 of 145)
+PASS: LLVM :: CodeGen/MOS/zeropage.ll (136 of 145)
+FAIL: LLVM :: CodeGen/MOS/nonreentrant.ll (137 of 145)
+******************** TEST 'LLVM :: CodeGen/MOS/nonreentrant.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll
+# executed command: /work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll
+# |  #0 0x000056f06ccac0ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/0029-cross-target-build/bin/opt+0x215c0ab)
+# |  #1 0x000056f06cca8e11 llvm::sys::RunSignalHandlers() (/work/build/0029-cross-target-build/bin/opt+0x2158e11)
+# |  #2 0x000056f06ccacefb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007eb29f353cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007eb29f3b41ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007eb29f353b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007eb29f3368ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000056f06cc81e45 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x2131e45)
+# |  #8 0x000056f06cc81c86 (/work/build/0029-cross-target-build/bin/opt+0x2131c86)
+# |  #9 0x000056f06ccda0dd (/work/build/0029-cross-target-build/bin/opt+0x218a0dd)
+# | #10 0x000056f06cccaad1 llvm::cl::AddLiteralOption(llvm::cl::Option&, llvm::StringRef) (/work/build/0029-cross-target-build/bin/opt+0x217aad1)
+# | #11 0x000056f06cd44fb4 void llvm::cl::parser<llvm::PassInfo const*>::addLiteralOption<llvm::PassInfo const*>(llvm::StringRef, llvm::PassInfo const* const&, llvm::StringRef) Pass.cpp:0:0
+# | #12 0x000056f06cd44bb1 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #13 0x000056f06cd45f1c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x21f5f1c)
+# | #14 0x00007eb29f3b7514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #15 0x00007eb29f3b7589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #16 0x000056f06e76201a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #17 0x000056f06e6e7261 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #18 0x000056f06cc75907 optMain (/work/build/0029-cross-target-build/bin/opt+0x2125907)
+# | #19 0x00007eb29f338601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #20 0x00007eb29f338718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #21 0x000056f06cc75165 _start (/work/build/0029-cross-target-build/bin/opt+0x2125165)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/branch-relaxation.mir (138 of 145)
+FAIL: LLVM :: CodeGen/MOS/indexiv.ll (139 of 145)
+******************** TEST 'LLVM :: CodeGen/MOS/indexiv.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/0029-cross-target-build/bin/opt -passes=mos-indexiv -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll
+# executed command: /work/build/0029-cross-target-build/bin/opt -passes=mos-indexiv -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/0029-cross-target-build/bin/opt -passes=mos-indexiv -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll
+# |  #0 0x000055f6795670ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/0029-cross-target-build/bin/opt+0x215c0ab)
+# |  #1 0x000055f679563e11 llvm::sys::RunSignalHandlers() (/work/build/0029-cross-target-build/bin/opt+0x2158e11)
+# |  #2 0x000055f679567efb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007c110d0c1cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007c110d1221ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007c110d0c1b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007c110d0a48ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000055f67953ce45 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x2131e45)
+# |  #8 0x000055f67953cc86 (/work/build/0029-cross-target-build/bin/opt+0x2131c86)
+# |  #9 0x000055f6795950dd (/work/build/0029-cross-target-build/bin/opt+0x218a0dd)
+# | #10 0x000055f679585ad1 llvm::cl::AddLiteralOption(llvm::cl::Option&, llvm::StringRef) (/work/build/0029-cross-target-build/bin/opt+0x217aad1)
+# | #11 0x000055f6795fffb4 void llvm::cl::parser<llvm::PassInfo const*>::addLiteralOption<llvm::PassInfo const*>(llvm::StringRef, llvm::PassInfo const* const&, llvm::StringRef) Pass.cpp:0:0
+# | #12 0x000055f6795ffbb1 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #13 0x000055f679600f1c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x21f5f1c)
+# | #14 0x00007c110d125514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #15 0x00007c110d125589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #16 0x000055f67b01d01a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #17 0x000055f67afa2261 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #18 0x000055f679530907 optMain (/work/build/0029-cross-target-build/bin/opt+0x2125907)
+# | #19 0x00007c110d0a6601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #20 0x00007c110d0a6718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #21 0x000055f679530165 _start (/work/build/0029-cross-target-build/bin/opt+0x2125165)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indexiv.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+FAIL: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (140 of 145)
+******************** TEST 'LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# executed command: /work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/0029-cross-target-build/bin/opt -passes=mos-nonreentrant,verify -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# |  #0 0x00005ac52ffd20ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/0029-cross-target-build/bin/opt+0x215c0ab)
+# |  #1 0x00005ac52ffcee11 llvm::sys::RunSignalHandlers() (/work/build/0029-cross-target-build/bin/opt+0x2158e11)
+# |  #2 0x00005ac52ffd2efb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007a43bb296cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007a43bb2f71ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007a43bb296b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007a43bb2798ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x00005ac52ffa7e45 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x2131e45)
+# |  #8 0x00005ac52ffa7c86 (/work/build/0029-cross-target-build/bin/opt+0x2131c86)
+# |  #9 0x00005ac5300000dd (/work/build/0029-cross-target-build/bin/opt+0x218a0dd)
+# | #10 0x00005ac52fff0ad1 llvm::cl::AddLiteralOption(llvm::cl::Option&, llvm::StringRef) (/work/build/0029-cross-target-build/bin/opt+0x217aad1)
+# | #11 0x00005ac53006afb4 void llvm::cl::parser<llvm::PassInfo const*>::addLiteralOption<llvm::PassInfo const*>(llvm::StringRef, llvm::PassInfo const* const&, llvm::StringRef) Pass.cpp:0:0
+# | #12 0x00005ac53006abb1 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #13 0x00005ac53006bf1c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x21f5f1c)
+# | #14 0x00007a43bb2fa514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #15 0x00007a43bb2fa589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #16 0x00005ac531a8801a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #17 0x00005ac531a0d261 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #18 0x00005ac52ff9b907 optMain (/work/build/0029-cross-target-build/bin/opt+0x2125907)
+# | #19 0x00007a43bb27b601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #20 0x00007a43bb27b718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #21 0x00005ac52ff9b165 _start (/work/build/0029-cross-target-build/bin/opt+0x2125165)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/nonreentrant-nointerrupts.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (141 of 145)
+PASS: LLVM :: MC/MOS/addr-asciz.s (142 of 145)
+FAIL: LLVM :: CodeGen/MOS/leaf-20231021.ll (143 of 145)
+******************** TEST 'LLVM :: CodeGen/MOS/leaf-20231021.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/0029-cross-target-build/bin/opt -O2 -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# executed command: /work/build/0029-cross-target-build/bin/opt -O2 -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/0029-cross-target-build/bin/opt -O2 -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# |  #0 0x000064ed598830ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/0029-cross-target-build/bin/opt+0x215c0ab)
+# |  #1 0x000064ed5987fe11 llvm::sys::RunSignalHandlers() (/work/build/0029-cross-target-build/bin/opt+0x2158e11)
+# |  #2 0x000064ed59883efb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x0000791df52bccb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x0000791df531d1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x0000791df52bcb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x0000791df529f8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000064ed59858e45 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x2131e45)
+# |  #8 0x000064ed59858c86 (/work/build/0029-cross-target-build/bin/opt+0x2131c86)
+# |  #9 0x000064ed598b10dd (/work/build/0029-cross-target-build/bin/opt+0x218a0dd)
+# | #10 0x000064ed598a1ad1 llvm::cl::AddLiteralOption(llvm::cl::Option&, llvm::StringRef) (/work/build/0029-cross-target-build/bin/opt+0x217aad1)
+# | #11 0x000064ed5991bfb4 void llvm::cl::parser<llvm::PassInfo const*>::addLiteralOption<llvm::PassInfo const*>(llvm::StringRef, llvm::PassInfo const* const&, llvm::StringRef) Pass.cpp:0:0
+# | #12 0x000064ed5991bbb1 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #13 0x000064ed5991cf1c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x21f5f1c)
+# | #14 0x0000791df5320514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #15 0x0000791df5320589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #16 0x000064ed5b33901a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #17 0x000064ed5b2be261 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #18 0x000064ed5984c907 optMain (/work/build/0029-cross-target-build/bin/opt+0x2125907)
+# | #19 0x0000791df52a1601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #20 0x0000791df52a1718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #21 0x000064ed5984c165 _start (/work/build/0029-cross-target-build/bin/opt+0x2125165)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/leaf-20231021.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/whole-program-zp.ll (144 of 145)
+FAIL: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (145 of 145)
+******************** TEST 'LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/0029-cross-target-build/bin/opt -passes=indvars -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# executed command: /work/build/0029-cross-target-build/bin/opt -passes=indvars -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# .---command stderr------------
+# | : CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+# | LLVM ERROR: inconsistency in registered CommandLine options
+# | PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+# | Stack dump:
+# | 0.	Program arguments: /work/build/0029-cross-target-build/bin/opt -passes=indvars -verify-each -S /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# |  #0 0x000057e3b91b50ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/work/build/0029-cross-target-build/bin/opt+0x215c0ab)
+# |  #1 0x000057e3b91b1e11 llvm::sys::RunSignalHandlers() (/work/build/0029-cross-target-build/bin/opt+0x2158e11)
+# |  #2 0x000057e3b91b5efb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+# |  #3 0x00007fa4e6175cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+# |  #4 0x00007fa4e61d61ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+# |  #5 0x00007fa4e6175b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+# |  #6 0x00007fa4e61588ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+# |  #7 0x000057e3b918ae45 llvm::report_fatal_error(llvm::Twine const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x2131e45)
+# |  #8 0x000057e3b918ac86 (/work/build/0029-cross-target-build/bin/opt+0x2131c86)
+# |  #9 0x000057e3b91e30dd (/work/build/0029-cross-target-build/bin/opt+0x218a0dd)
+# | #10 0x000057e3b91d3ad1 llvm::cl::AddLiteralOption(llvm::cl::Option&, llvm::StringRef) (/work/build/0029-cross-target-build/bin/opt+0x217aad1)
+# | #11 0x000057e3b924dfb4 void llvm::cl::parser<llvm::PassInfo const*>::addLiteralOption<llvm::PassInfo const*>(llvm::StringRef, llvm::PassInfo const* const&, llvm::StringRef) Pass.cpp:0:0
+# | #12 0x000057e3b924dbb1 llvm::PassNameParser::passRegistered(llvm::PassInfo const*) Pass.cpp:0:0
+# | #13 0x000057e3b924ef1c llvm::PassRegistry::registerPass(llvm::PassInfo const&, bool) (/work/build/0029-cross-target-build/bin/opt+0x21f5f1c)
+# | #14 0x00007fa4e61d9514 (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9514)
+# | #15 0x00007fa4e61d9589 __pthread_once (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa9589)
+# | #16 0x000057e3bac6b01a llvm::initializeMOSRecoverNearNoWrapPass(llvm::PassRegistry&) MOSRecoverNearNoWrap.cpp:0:0
+# | #17 0x000057e3babf0261 LLVMInitializeMOSTarget MOSTargetMachine.cpp:0:0
+# | #18 0x000057e3b917e907 optMain (/work/build/0029-cross-target-build/bin/opt+0x2125907)
+# | #19 0x00007fa4e615a601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+# | #20 0x00007fa4e615a718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+# | #21 0x000057e3b917e165 _start (/work/build/0029-cross-target-build/bin/opt+0x2125165)
+# `-----------------------------
+# error: command failed with exit status: -6
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/indvar-simplify-20230930.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+********************
+Failed Tests (5):
+  LLVM :: CodeGen/MOS/indexiv.ll
+  LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll
+  LLVM :: CodeGen/MOS/leaf-20231021.ll
+  LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll
+  LLVM :: CodeGen/MOS/nonreentrant.ll
+
+
+Testing Time: 2.44s
+
+Total Discovered Tests: 145
+  Unsupported:   1 (0.69%)
+  Passed     : 139 (95.86%)
+  Failed     :   5 (3.45%)

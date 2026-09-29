@@ -1,0 +1,3 @@
+2026-09-29T13:24:12Z COMMAND: build/near-proof-upstream/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj  docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+llc sha256: b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45
+EXIT: 0

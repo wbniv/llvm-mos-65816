@@ -1,0 +1,8 @@
+2026-09-29T13:52:32Z COMMAND: build/near-proof-upstream/baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -start-after=loop-reduce  -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.recovered.ll -o /dev/null
+llc sha256: b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.25  (0x61c0f8ba6e30)
+- instruction: PH $p
+LLVM ERROR: Found 1 machine code errors.
+EXIT: 134

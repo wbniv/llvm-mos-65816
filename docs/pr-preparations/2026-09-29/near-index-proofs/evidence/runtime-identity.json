@@ -1,0 +1,426 @@
+{
+  "llc_sha256": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+  "compare_llc_sha256": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+  "llc_flags": [
+    "-disable-spill-hoist"
+  ],
+  "frames": 1000,
+  "frontend_sha256": "167401dbc007b08f4326904285b59eb837516e4e6a4abbdedcdb4b0b0f880946",
+  "linker_sha256": "c01cf29df4df3b27bfdd6dc23a360f71305c6a95b9ce283b98d664743a43338c",
+  "config_sha256": "f12c5b6aecb6cf483a505d2edc338886028ea9c93f0ae638b0ee237398012205",
+  "lto": false,
+  "fixtures": {
+    "examples/65816/near-y-decode.c": {
+      "sha256": "d7d5d6cdb7f698b30d7ebb2ec06d9339b91e4142ab38603267b954537136c684",
+      "expected": "0x5CF0",
+      "oracle": "fixture",
+      "opt": "-Oz"
+    },
+    "docs/pr-preparations/2026-09-29/near-index-proofs/near-index-wrap-near.c": {
+      "sha256": "7ca394246ef9f879dbc7ef094d4c76203da5879072edcaff978d4a01cef46a2b",
+      "expected": "0x5CF0",
+      "oracle": "fixture",
+      "opt": "-Oz"
+    },
+    "examples/snes/corpus/backtrack_sim.c": {
+      "sha256": "21a1ff4e48b53d62fce1b9e7f8820e0c82ca91cff6383c7e15ecd3c85103688d",
+      "expected": "0x7336",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/bf_vm_sim.c": {
+      "sha256": "a212453ccaeb5537583524e8b0a740a2c53bda154af9ab2abd1c3dc8d5f45b70",
+      "expected": "0x9954",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/bhut_sim.c": {
+      "sha256": "11ec0a90729e2e2ac13237da3731aaf97728ff433cfe7d4a75d9943c3a15d38c",
+      "expected": "0xEF0B",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/bigbyval_sim.c": {
+      "sha256": "445edbfd363424c06bc5f4f56bfffa1a608c1ba4c5657f0ddb7caf296aba8b88",
+      "expected": "0xBD6B",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/boids_sim.c": {
+      "sha256": "55de8e8a254c838d324cb2420e5284c8bd491bb6747cd28454c445799aa821f4",
+      "expected": "0xA8AB",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/borrowlad_sim.c": {
+      "sha256": "1a46ee620023b40acfe19b3f5ce55694b6fda2757cad5a335b011e5c4d233549",
+      "expected": "0x1BE3",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/bsearchviz_sim.c": {
+      "sha256": "3a5038393e41c1a90cc1c39355dce16c1545631e3c3b9d56ffe16a0f93581b33",
+      "expected": "0x7FF5",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/byvaledge_sim.c": {
+      "sha256": "436cc8cf0630da175427382b710b0f433b3e24014d6c893aa77dfb761decdcad",
+      "expected": "0x4FAB",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/crctex_sim.c": {
+      "sha256": "caa7e5159cf3b8fc5b03d580236595cc0848a38c79b2d621dfe4afeb2663318c",
+      "expected": "0xDBBA",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/critters_sim.c": {
+      "sha256": "4fb9534807dc61ab7ad892f5483b4b4adf716bfd6643878c66f36f6a24cb2849",
+      "expected": "0xAD9F",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/csrjmp_sim.c": {
+      "sha256": "c2567ff377471e80b3cf97f168017931a5dd00a9d24ec0c33bb514d4931a55ad",
+      "expected": "0xADD8",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/dblbridge_sim.c": {
+      "sha256": "aef3d6b3df2aa0529eee45d490cac54bf03ca47adba2c17adbb15dbdb8929794",
+      "expected": "0xF829",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/dctbloom_sim.c": {
+      "sha256": "0bff20bbbf723a42bb45272c38d90b34731c3cff7c4555da49a7d6c125f4b170",
+      "expected": "0x5364",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/dither_sim.c": {
+      "sha256": "bb0fc4338a5c5fe2326450fa7d1b5afa086ae9c7db3231395f7623fbb68e6a5b",
+      "expected": "0x80C4",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/divclock_sim.c": {
+      "sha256": "0a1103bb0fb40594e173fa553f6312c47066a9bc7da58349e52df2367b3516cd",
+      "expected": "0xF72E",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/doom-fire_sim.c": {
+      "sha256": "250dbe138f931948932ca15b39bbfe36a6dc2ec64a77176fa02d228a80a18b47",
+      "expected": "0x3C59",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/duff_sim.c": {
+      "sha256": "33effd631731db763773679a2b0c1851f1a22949ee71f75fd1889af98e9032d1",
+      "expected": "0x5531",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/fenwick_sim.c": {
+      "sha256": "d49dc1982e31fffca6a03cf07beeb3f39f7a96d6bbf330753226fb0fc2640cc7",
+      "expected": "0x3454",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/gf256_sim.c": {
+      "sha256": "75198b0ebad791d415b9a040fd7203fc0ca17db0ef3f5e0cf450c0d7234504ef",
+      "expected": "0xC028",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/gouraud_sim.c": {
+      "sha256": "65e90734ddc788cd0a409447244a6401402568cd8e0ba0275c3925fe8b456f05",
+      "expected": "0xC5E9",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/grid3d_sim.c": {
+      "sha256": "8c730481d59183a03a873598caee9e1ba882a8f6bf15aad67c8db55571eff5fd",
+      "expected": "0xFCDE",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/harmonograph_sim.c": {
+      "sha256": "094141b8c5fb11b06cc2b9ee65987d1525110045947b21171e5afa59903aef84",
+      "expected": "0x0EBB",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/hull_sim.c": {
+      "sha256": "33ec4474ee532ddae011455136eeefde40a2b34629262f96c124be35987960d8",
+      "expected": "0x84E3",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/invaders_sim.c": {
+      "sha256": "41a422489cc74faed6c31c4579834341d292e20a50dc912184498609094790be",
+      "expected": "0x9D57",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/jt256_sim.c": {
+      "sha256": "dc041d113e47c677f5ff62db7e708fa0de9487d98f4d488587db2ca6e3e41918",
+      "expected": "0xB8CC",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/jtedge_sim.c": {
+      "sha256": "7f746185c76fff7f548e7d28dffe2f8bcf62dd1ca353186350c62bccc15b55ce",
+      "expected": "0xC199",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/jtsparse_sim.c": {
+      "sha256": "af5aaa8acaa87bf1d42e4abd121b81e078fef445376922c26d7226fbf358b9e7",
+      "expected": "0xA131",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/julia_sim.c": {
+      "sha256": "53090e7b3bc646a3d21c3a1d690c504e919f21c89c0c9359a2368c3f74ba7294",
+      "expected": "0x3490",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/keycmp64_sim.c": {
+      "sha256": "a9ad4e3b401efdc5934780fd91b771bb7d65f219079ea30c5d440fe71eacb5c0",
+      "expected": "0xB8AD",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/life_sim.c": {
+      "sha256": "e3ea45046ba72e195a93d9dd47a60eba33d30b61d328c306f6be3d362c5d24c0",
+      "expected": "0xDDF1",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/lzdec_sim.c": {
+      "sha256": "fe25a9fb17174e6cbd4215b5f622ffbf6ec6f75a51ab998d86c4af3efabc0a45",
+      "expected": "0x0100",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/mandel-double_sim.c": {
+      "sha256": "ea022d39213407cc7a466c2715e2076d371816584c3c0932b629e584ab807799",
+      "expected": "0x0EDF",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/mandel-float_sim.c": {
+      "sha256": "39878ae866cb17f18fec83c27c241acf8ccdfd00eec37e3fbc2b9a27bcd74900",
+      "expected": "0x4169",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/maze_sim.c": {
+      "sha256": "4e21bb5d4da600ac838341dd6558fb5876b04760f2a4cb58e0bff384827ec6c1",
+      "expected": "0x0749",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/medfilt_sim.c": {
+      "sha256": "eb595301766b86b62bd3cc177b042d49ed7d048e4f22aed413e7215b5332ae38",
+      "expected": "0x87FE",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/modexp256_sim.c": {
+      "sha256": "fabe7dac5728af00469976fa8f5cb3e64827e1dade67d042aefbfeb9b5c2c1fe",
+      "expected": "0x31D4",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/msquares_sim.c": {
+      "sha256": "fbaf5b9554f1459a9d8a7414966fa1a8d5e01932e28e8e099847bfc63dd74161",
+      "expected": "0x86A7",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/multibase_sim.c": {
+      "sha256": "d85cf9c6ee60adbd17bdb3c2ac4e860ac320c25b4c8498347d09cb1f4f6060a5",
+      "expected": "0x371A",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/mvscrl_sim.c": {
+      "sha256": "970f687a55a77ae3e1d4fc517f0d5ad272efc2bb2ea2bee2127218473bae9169",
+      "expected": "0x72A7",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/n-body_sim.c": {
+      "sha256": "d19a9184e842afbd3f50b73d2b58abc616cfb233f6324f968c83b14b0702d8fd",
+      "expected": "0xCC65",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/nbody_sim.c": {
+      "sha256": "7bcab78ab295b04c6623605240373f3b7c09539f4ad843b564a0b15af0e8cb17",
+      "expected": "0xCC65",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/ovmove_sim.c": {
+      "sha256": "fd019fd95a5b278a5e8a94b27619e756adc8caf7ad56e1e0cdc820e054848cc3",
+      "expected": "0xA990",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/percol_sim.c": {
+      "sha256": "87740eb4a1afc6ede0c729448831f5ea875be32ce5e61d5261c4365055be0414",
+      "expected": "0x025B",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/perlin_sim.c": {
+      "sha256": "aabaebccc02c910ac33be9773e2c7dca9882e804a64ffdd2ff19aa4c2951a879",
+      "expected": "0xA72D",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/permscat_sim.c": {
+      "sha256": "9d94508193dad8e3665f1094418af024c47ea5e1bddf7b8b7c370b8e2b8b60cd",
+      "expected": "0x0C2C",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/plyoracle_sim.c": {
+      "sha256": "c10c73a8b94ebca8c96cb7b2bc700cb0f53c9577137c48e1c78e3c9dfba308b6",
+      "expected": "0x6146",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/polyfill_sim.c": {
+      "sha256": "74ea6a893ec227f77c60a90058956264fd9fb0d97f9c15677b43a2528e5a871a",
+      "expected": "0x8ED9",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/poolfx_sim.c": {
+      "sha256": "127200ca64b795ad6ac6d58da972c9bd64ea7d9635ce43611e83501a651c8329",
+      "expected": "0x2B9B",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/qsortviz_sim.c": {
+      "sha256": "646005e399a170efbf15ee9997b52603a6f10aaaba646f47d4c54ab8d90c90f6",
+      "expected": "0x8EA5",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/radix_sim.c": {
+      "sha256": "efea463639a764479aec2cd2ed8447dc3a49f59e3d5f51249f12ca3fb0332416",
+      "expected": "0x123E",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/rdiff_sim.c": {
+      "sha256": "2de73e616207fedecb5dad5ee6045969ed5768d7efbd83f0aeae5bb25dbc3c0e",
+      "expected": "0x5555",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/rotkal_sim.c": {
+      "sha256": "2e7e5c3e0f4546187c2bc9e2125120936179da3c25aef5d5f7bbf325b84901e1",
+      "expected": "0x300C",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/satcast_sim.c": {
+      "sha256": "7baf8d9d727215ffe49ccdc1a5aea396511b2b30c91b80f6ffaa8156bb41e3e4",
+      "expected": "0xC8CF",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/satcomet_sim.c": {
+      "sha256": "91a8b74a636b463b2be87ac59dc9a4b42f592d091f634d3276cdcd70a3d663d6",
+      "expected": "0xC2AF",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/sbitfld_sim.c": {
+      "sha256": "c1e1e54c4516934dbbd1eb8f0c03c16abaa37b6a24c3f631cd378582f5631224",
+      "expected": "0x40C5",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/sodo_sim.c": {
+      "sha256": "63f02ba36b0415b3886d1130f2fff0bf810ff1718ddcc6bee657dc8edeb2b6a7",
+      "expected": "0xD2A2",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/sort-race_sim.c": {
+      "sha256": "68fb644643b443768c14b5b60eb7d7d26923d0f0e7bd373dbb819114cf22b7aa",
+      "expected": "0xB28F",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/speedcap_sim.c": {
+      "sha256": "df05abbff96507da2dc08c1b04aea9568e0ba0329e2f8d1089d19c8e911482c0",
+      "expected": "0x0116",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/strcmprace_sim.c": {
+      "sha256": "0ee5d8302311cc348ac844c0c6105e254bf99699bdcde4fa49742b6ffb8130e4",
+      "expected": "0xF0BA",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/structs.c": {
+      "sha256": "bfcb83ea9e1e96787967aacbc01aa70df45b6d57b3972ff5deaa12319a3d8e87",
+      "expected": "0x0340",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/trapguard_sim.c": {
+      "sha256": "83957418af58ce0d577e3ed3781518800cf75e2ced0312c32392b660de3b8506",
+      "expected": "0x2C2D",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/trimerge_sim.c": {
+      "sha256": "1b06b9afb468b2ca1bc0c361d9c829f075f05e46a0bfa237e0eb3d57a275f835",
+      "expected": "0xCCCC",
+      "oracle": "host",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/truchet_sim.c": {
+      "sha256": "87608cede8af8e761b5ec73225a35af8c8c0d4a679033e379ae85849ae15b6f5",
+      "expected": "0xB3E6",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/vlanest_sim.c": {
+      "sha256": "6c19f79c8219f03e6ae13f8d1a4091b500a64fd2c02bbc48a2ca3ad84db03f4a",
+      "expected": "0x153B",
+      "oracle": "manifest",
+      "opt": "-Os"
+    },
+    "examples/snes/corpus/vlastack_sim.c": {
+      "sha256": "a066a361b8d961cac4d1dfde476c661131ba68e6e3b4cd98af5bfedccdd6a075",
+      "expected": "0xD77B",
+      "oracle": "manifest",
+      "opt": "-Os"
+    }
+  },
+  "skipped": [
+    {
+      "source": "examples/snes/corpus/hdr_bloom_sim.c",
+      "reason": "no manifest or buildable host oracle"
+    },
+    {
+      "source": "examples/snes/corpus/iir_scope_sim.c",
+      "reason": "no manifest or buildable host oracle"
+    }
+  ]
+}

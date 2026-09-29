@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-29",
+  "searches": [
+    "rg -n -i 'registered more than once|recover-near-nowrap' docs TODO.md patches dev",
+    "git log --oneline -S'registered more than once'",
+    "rg -n 'mos-recover-near-nowrap' vendor/llvm-mos/llvm/lib/Target/MOS",
+    "git log --oneline -- patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "findings": [
+    {
+      "path": "docs/defects/evidence/2026-09-28-farblit-range-integration/prior-work.json",
+      "observation": "full_suite_failure_audit: five opt startup failures from duplicate registration of mos-recover-near-nowrap; decision: retain and qualify the suite result, no causal record or repair."
+    },
+    {
+      "path": "docs/investigations/2026-09-28-farblit-range-integration.md",
+      "observation": "127 passed, two unsupported, five failed; all five are the opt startup collision."
+    },
+    {
+      "path": "docs/defects/mos-xy16-stale-x-writer-reload.json",
+      "observation": "unknowns: 179 passes, two unsupported and five opt startup failures from duplicate registration; no full-suite green claim."
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-28-xy16-x-preserve/lit.json",
+      "observation": "leaf-20231021.ll and four other opt-based tests abort with the same CommandLine Error on build/llvm-mos/bin/opt."
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-27-near-proofs/lit-final.log",
+      "observation": "The September 27 proof-recovery validation passed 183 tests, including the five opt-based tests. The opt used by that run could not have registered this pass; its hash was not recorded."
+    },
+    {
+      "path": "patches/llvm-mos/0002-321-accum16.patch",
+      "observation": "Introduced by 6c5907b4 (Recover near-index proofs and record the null-output streamer repair): the cl::opt and the INITIALIZE_PASS argument share the string mos-recover-near-nowrap."
+    },
+    {
+      "path": "destination 06bc967d2668",
+      "observation": "Upstream has no MOSRecoverNearNoWrap; the collision exists only where this pass is carried (downstream 0002 and the first extracted revision)."
+    }
+  ],
+  "no_structured_record": "rg over docs/defects/*.json finds the collision only in unknowns/audit text; no record has it as its causal defect.",
+  "decision": "First structured record for a repeatedly observed but unrecorded defect (historical_migration). It is distinct from mos-near-index-overflow-proofs, whose codegen contract it does not affect: llc and clang do not instantiate the legacy pass-name option parser."
+}

@@ -1,0 +1,4 @@
+Recovered nuw from recurrence:   %scevgep1 = getelementptr i8, ptr %src, i16 %0
+Recovered nuw from recurrence:   %scevgep = getelementptr i8, ptr %dst, i16 %1
+Recovered nuw from recurrence:   %scevgep = getelementptr i8, ptr @buf, i16 %0
+Recovered nuw from ordering:   %scevgep = getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16 %0

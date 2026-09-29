@@ -1,0 +1,450 @@
+From 980fe1f29381a212e585df81e537ed21bcfe4a68 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Tue, 29 Sep 2026 19:44:55 +0700
+Subject: [PATCH 2/2] [MOS] Recover near-index no-wrap proofs after loop
+ strength reduction
+
+On the 65816, indexed addressing carries into the next data bank, so a near pointer addition can fold into an index only when its unsigned sum cannot wrap. Loop strength reduction rebuilds byte addresses without their original inbounds flags. Copy and fill loops then form every address explicitly instead of using (zp),y or abs,x.
+
+Immediately after LSR, record nuw on scalar address-space-0 byte GEPs with a single 16-bit index when ScalarEvolution shows that the result is at least the base: either the address is a nuw recurrence starting at that base, or the unsigned comparison is proven directly. This shape has no scaling, truncation or intermediate sum, so its unsigned addition does not wrap exactly when the result is at least the base. The pass adds only nuw, runs only for 65816 subtargets, and leaves other GEPs to their existing flags and known bits. -mos-recover-near-nowrap=false disables it; the pass itself is named mos-near-nowrap-recovery, because opt accepts every legacy pass name as an option.
+
+Implementation: OpenAI Codex CLI 0.157.1 (codex-tui), model gpt-6-astra, high reasoning effort; session 01a0e315-89ed-7e70-b7dc-fcc2940366d9. Upstream extraction, header split and near-only tests: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/CMakeLists.txt            |   1 +
+ llvm/lib/Target/MOS/MOS.h                     |   1 +
+ llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp  | 105 +++++++++++
+ llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h    |  23 +++
+ llvm/lib/Target/MOS/MOSTargetMachine.cpp      |   6 +
+ .../CodeGen/MOS/near-index-proofs-debug.ll    |  42 +++++
+ llvm/test/CodeGen/MOS/near-index-proofs.ll    | 163 ++++++++++++++++++
+ 7 files changed, 341 insertions(+)
+ create mode 100644 llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+ create mode 100644 llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h
+ create mode 100644 llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+ create mode 100644 llvm/test/CodeGen/MOS/near-index-proofs.ll
+
+diff --git a/llvm/lib/Target/MOS/CMakeLists.txt b/llvm/lib/Target/MOS/CMakeLists.txt
+index 0c61451ec655..53e80afbe32b 100644
+--- a/llvm/lib/Target/MOS/CMakeLists.txt
++++ b/llvm/lib/Target/MOS/CMakeLists.txt
+@@ -48,6 +48,7 @@ add_llvm_target(MOSCodeGen
+   MOSMachineScheduler.cpp
+   MOSNonReentrant.cpp
+   MOSPostRAScavenging.cpp
++  MOSRecoverNearNoWrap.cpp
+   MOSRegAlloc.cpp
+   MOSRegisterBankInfo.cpp
+   MOSRegisterInfo.cpp
+diff --git a/llvm/lib/Target/MOS/MOS.h b/llvm/lib/Target/MOS/MOS.h
+index 011b5871337f..c5eb1e17570a 100644
+--- a/llvm/lib/Target/MOS/MOS.h
++++ b/llvm/lib/Target/MOS/MOS.h
+@@ -31,6 +31,7 @@ void initializeMOSLateOptimizationPass(PassRegistry &);
+ void initializeMOSLowerSelectPass(PassRegistry &);
+ void initializeMOSNonReentrantPass(PassRegistry &);
+ void initializeMOSPostRAScavengingPass(PassRegistry &);
++void initializeMOSRecoverNearNoWrapPass(PassRegistry &);
+ void initializeMOSRegAllocPass(PassRegistry &);
+ void initializeMOSShiftRotateChainPass(PassRegistry &);
+ void initializeMOSStaticStackAllocPass(PassRegistry &);
+diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+new file mode 100644
+index 000000000000..2eb1e8165c3e
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp
+@@ -0,0 +1,105 @@
++//===-- MOSRecoverNearNoWrap.cpp - MOS near address no-wrap proofs --------===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file defines the MOS pass that records unsigned no-wrap proofs on near
++// byte addresses immediately after loop strength reduction. LSR rebuilds
++// address arithmetic without the original IR flags, while its preserved
++// ScalarEvolution can still show that the rebuilt address does not wrap. The
++// 65816 needs that proof to fold a near addition into indexed addressing,
++// because indexed addressing carries into the next data bank.
++//
++//===----------------------------------------------------------------------===//
++
++#include "MOSRecoverNearNoWrap.h"
++
++#include "MOS.h"
++#include "MOSTargetMachine.h"
++#include "llvm/Analysis/LoopInfo.h"
++#include "llvm/Analysis/LoopPass.h"
++#include "llvm/Analysis/ScalarEvolution.h"
++#include "llvm/Analysis/ScalarEvolutionExpressions.h"
++#include "llvm/CodeGen/TargetPassConfig.h"
++#include "llvm/IR/Instructions.h"
++#include "llvm/InitializePasses.h"
++#include "llvm/Support/CommandLine.h"
++#include "llvm/Support/Debug.h"
++
++#define DEBUG_TYPE "mos-near-nowrap-recovery"
++
++using namespace llvm;
++
++static cl::opt<bool> RecoverNearNoWrap(
++    "mos-recover-near-nowrap", cl::Hidden, cl::init(true),
++    cl::desc("Recover unsigned no-wrap proofs for near byte GEPs after LSR"));
++
++namespace {
++class MOSRecoverNearNoWrap : public LoopPass {
++public:
++  static char ID;
++  MOSRecoverNearNoWrap() : LoopPass(ID) {
++    initializeMOSRecoverNearNoWrapPass(*PassRegistry::getPassRegistry());
++  }
++
++  void getAnalysisUsage(AnalysisUsage &AU) const override {
++    AU.addRequired<TargetPassConfig>();
++    AU.addRequired<ScalarEvolutionWrapperPass>();
++    AU.setPreservesAll();
++  }
++
++  bool runOnLoop(Loop *L, LPPassManager &) override {
++    if (!RecoverNearNoWrap || skipLoop(L))
++      return false;
++    const Function &F = *L->getHeader()->getParent();
++    unsigned IndexWidth = F.getDataLayout().getIndexSizeInBits(0);
++    const auto &TM = getAnalysis<TargetPassConfig>().getTM<MOSTargetMachine>();
++    if (!TM.getSubtargetImpl(F)->hasW65816())
++      return false;
++    auto &SE = getAnalysis<ScalarEvolutionWrapperPass>().getSE();
++    bool Changed = false;
++    for (BasicBlock *BB : L->blocks()) {
++      for (Instruction &I : *BB) {
++        auto *GEP = dyn_cast<GetElementPtrInst>(&I);
++        if (!GEP || !GEP->getType()->isPointerTy() ||
++            GEP->getAddressSpace() != 0 || GEP->hasNoUnsignedWrap() ||
++            !GEP->getSourceElementType()->isIntegerTy(8) ||
++            GEP->getNumIndices() != 1 ||
++            !GEP->getOperand(1)->getType()->isIntegerTy(IndexWidth))
++          continue;
++
++        // A single byte index of pointer width has no scaling, truncation, or
++        // intermediate additions. Its unsigned sum cannot wrap exactly when
++        // the result is at least the base. Use LSR's preserved ScalarEvolution
++        // facts before another pass invalidates them.
++        const SCEV *Address = SE.getSCEV(GEP);
++        const SCEV *Base = SE.getSCEV(GEP->getPointerOperand());
++        const auto *AR = dyn_cast<SCEVAddRecExpr>(Address);
++        // A nuw recurrence never decreases from its start in unsigned order.
++        bool FromBase = AR && AR->hasNoUnsignedWrap() && AR->getStart() == Base;
++        if (FromBase ||
++            SE.isKnownPredicate(ICmpInst::ICMP_UGE, Address, Base)) {
++          LLVM_DEBUG(dbgs() << "Recovered nuw from "
++                            << (FromBase ? "recurrence" : "ordering") << ": "
++                            << *GEP << '\n');
++          GEP->setNoWrapFlags(GEP->getNoWrapFlags() |
++                              GEPNoWrapFlags::noUnsignedWrap());
++          Changed = true;
++        }
++      }
++    }
++    return Changed;
++  }
++};
++} // namespace
++
++char MOSRecoverNearNoWrap::ID = 0;
++char &llvm::MOSRecoverNearNoWrapID = MOSRecoverNearNoWrap::ID;
++INITIALIZE_PASS_BEGIN(MOSRecoverNearNoWrap, DEBUG_TYPE,
++                      "MOS recover near address no-wrap proofs", false, false)
++INITIALIZE_PASS_DEPENDENCY(ScalarEvolutionWrapperPass)
++INITIALIZE_PASS_END(MOSRecoverNearNoWrap, DEBUG_TYPE,
++                    "MOS recover near address no-wrap proofs", false, false)
+diff --git a/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h
+new file mode 100644
+index 000000000000..d709887f39e9
+--- /dev/null
++++ b/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.h
+@@ -0,0 +1,23 @@
++//===-- MOSRecoverNearNoWrap.h - MOS near no-wrap proofs --------*- C++ -*-===//
++//
++// Part of LLVM-MOS, under the Apache License v2.0 with LLVM Exceptions.
++// See https://llvm.org/LICENSE.txt for license information.
++// SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
++//
++//===----------------------------------------------------------------------===//
++//
++// This file declares the MOS pass that records unsigned no-wrap proofs on near
++// byte addresses rebuilt by loop strength reduction.
++//
++//===----------------------------------------------------------------------===//
++
++#ifndef LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
++#define LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
++
++namespace llvm {
++
++extern char &MOSRecoverNearNoWrapID;
++
++} // end namespace llvm
++
++#endif // not LLVM_LIB_TARGET_MOS_MOSRECOVERNEARNOWRAP_H
+diff --git a/llvm/lib/Target/MOS/MOSTargetMachine.cpp b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+index bdee4974c55f..6f38d9c25831 100644
+--- a/llvm/lib/Target/MOS/MOSTargetMachine.cpp
++++ b/llvm/lib/Target/MOS/MOSTargetMachine.cpp
+@@ -30,6 +30,7 @@
+ #include "llvm/Support/CodeGen.h"
+ #include "llvm/Support/CommandLine.h"
+ #include "llvm/Transforms/InstCombine/InstCombine.h"
++#include "llvm/Transforms/Scalar.h"
+ #include "llvm/Transforms/Scalar/IndVarSimplify.h"
+ #include "llvm/Transforms/Utils.h"
+ 
+@@ -49,6 +50,7 @@
+ #include "MOSMachineScheduler.h"
+ #include "MOSNonReentrant.h"
+ #include "MOSPostRAScavenging.h"
++#include "MOSRecoverNearNoWrap.h"
+ #include "MOSRegAlloc.h"
+ #include "MOSShiftRotateChain.h"
+ #include "MOSStaticStackAlloc.h"
+@@ -80,6 +82,7 @@ extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+   initializeMOSLowerSelectPass(PR);
+   initializeMOSNonReentrantPass(PR);
+   initializeMOSPostRAScavengingPass(PR);
++  initializeMOSRecoverNearNoWrapPass(PR);
+   initializeMOSRegAllocPass(PR);
+   initializeMOSShiftRotateChainPass(PR);
+   initializeMOSStaticStackAllocPass(PR);
+@@ -242,6 +245,9 @@ TargetPassConfig *MOSTargetMachine::createPassConfig(PassManagerBase &PM) {
+ }
+ 
+ void MOSPassConfig::addIRPasses() {
++  // Consume LSR's ScalarEvolution facts while its loop analysis is preserved.
++  std::unique_ptr<Pass> LSR(createLoopStrengthReducePass());
++  insertPass(LSR->getPassID(), &MOSRecoverNearNoWrapID);
+   if (getOptLevel() != CodeGenOptLevel::None)
+     addPass(createMOSNonReentrantPass());
+   TargetPassConfig::addIRPasses();
+diff --git a/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll b/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+new file mode 100644
+index 000000000000..25ea5ccca3e1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+@@ -0,0 +1,42 @@
++; REQUIRES: asserts
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -debug-only=mos-near-nowrap-recovery -o /dev/null < %s 2>&1 | FileCheck %s
++
++; Each near address is recovered by a specific proof: a nuw recurrence that
++; starts at the GEP's base, or the unsigned ordering of result and base when
++; the recurrence has no nuw flag.
++
++; CHECK: Recovered nuw from recurrence: {{.*}}getelementptr i8, ptr %dst, i16
++; CHECK: Recovered nuw from ordering: {{.*}}getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16
++; CHECK-NOT: Recovered nuw
++
++define void @inbounds_fill(ptr %dst, i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %d = getelementptr inbounds i8, ptr %dst, i8 %j
++  store volatile i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++define void @ordered_const_base(i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]
++  %a = getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16 %j
++  store volatile i8 %v, ptr %a, align 1
++  %j1 = add nuw nsw i16 %j, 1
++  %c = icmp eq i16 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/near-index-proofs.ll b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+new file mode 100644
+index 000000000000..c3e478def5ca
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-proofs.ll
+@@ -0,0 +1,163 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mos-recover-near-nowrap=false -verify-machineinstrs < %s | FileCheck %s --check-prefix=DISABLED
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -stop-after=mos-near-nowrap-recovery < %s | FileCheck %s --check-prefix=IR
++; RUN: llc -mtriple=mos -mcpu=mos6502 -stop-after=mos-near-nowrap-recovery < %s | FileCheck %s --check-prefix=PLAIN
++; opt accepts each registered legacy pass name as an option, so the pass
++; name must differ from the -mos-recover-near-nowrap switch.
++; RUN: opt -passes=verify -disable-output < %s
++
++; 65816 indexed addressing carries into the next data bank, so a near address
++; addition folds into an index only with an unsigned no-wrap proof. Loop
++; strength reduction rebuilds these byte addresses without their inbounds
++; flags; the recovered nuw flag lets them use indexed addressing again.
++
++@buf = global [64 x i8] zeroinitializer
++
++; Both inbounds addresses start at their base and count up by one.
++; IR-LABEL: define void @near_copy
++; IR: getelementptr nuw i8, ptr %src, i16
++; IR: getelementptr nuw i8, ptr %dst, i16
++; PLAIN-LABEL: define void @near_copy
++; PLAIN: getelementptr i8, ptr %src, i16
++; PLAIN: getelementptr i8, ptr %dst, i16
++; CHECK-LABEL: near_copy:
++; CHECK-NOT: adc
++; CHECK: lda (__rc{{[0-9]+}}),y
++; CHECK-NEXT: sta (__rc{{[0-9]+}}),y
++; CHECK: rts
++; DISABLED-LABEL: near_copy:
++; DISABLED: adc
++; DISABLED: lda (__rc{{[0-9]+}}){{$}}
++; DISABLED: sta (__rc{{[0-9]+}}){{$}}
++; DISABLED: rts
++define void @near_copy(ptr %src, ptr %dst) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %s = getelementptr inbounds i8, ptr %src, i8 %j
++  %v = load i8, ptr %s, align 1
++  %d = getelementptr inbounds i8, ptr %dst, i8 %j
++  store i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++; A fixed buffer regains absolute indexed addressing.
++; IR-LABEL: define void @global_fill
++; IR: getelementptr nuw i8, ptr @buf, i16
++; CHECK-LABEL: global_fill:
++; CHECK-NOT: adc
++; CHECK: sta buf,x
++; CHECK: rts
++; DISABLED-LABEL: global_fill:
++; DISABLED: adc
++; DISABLED: sta (__rc{{[0-9]+}}){{$}}
++; DISABLED: rts
++define void @global_fill(i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %d = getelementptr inbounds i8, ptr @buf, i8 %j
++  store volatile i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++; Without inbounds, the near address may wrap even with a nonnegative index,
++; so it must still be formed before an unindexed store.
++; IR-LABEL: define void @wrapping_fill
++; IR: getelementptr i8, ptr %dst, i16
++; CHECK-LABEL: wrapping_fill:
++; CHECK: adc
++; CHECK: sta (__rc{{[0-9]+}}){{$}}
++; CHECK: rts
++define void @wrapping_fill(ptr %dst, i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]
++  %d = getelementptr i8, ptr %dst, i8 %j
++  store volatile i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i8 %j, 1
++  %c = icmp eq i8 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++; A pointer-increment recurrence does not start at the GEP's base; no flag is
++; recorded without a direct ordering proof.
++; IR-LABEL: define void @pointer_step
++; IR-NOT: getelementptr nuw
++; IR: getelementptr i8, ptr %{{.+}}, i16 1
++; IR-NOT: getelementptr nuw
++; IR: ret void
++define void @pointer_step(ptr %dst, i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]
++  %d = getelementptr inbounds i8, ptr %dst, i16 %j
++  store volatile i8 %v, ptr %d, align 1
++  %j1 = add nuw nsw i16 %j, 1
++  %c = icmp eq i16 %j1, 300
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++; The recurrence starting at the constant base 0xFF00 carries no nuw flag, but
++; the unsigned ordering proof shows that 64 byte steps stay below 0x10000.
++; IR-LABEL: define void @ordered_const_base
++; IR: getelementptr nuw i8, ptr inttoptr (i16 -256 to ptr), i16
++define void @ordered_const_base(i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]
++  %a = getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16 %j
++  store volatile i8 %v, ptr %a, align 1
++  %j1 = add nuw nsw i16 %j, 1
++  %c = icmp eq i16 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
++
++; From 0xFFF0 the same loop wraps at its 16th store, so no flag is recorded.
++; IR-LABEL: define void @wrapping_const_base
++; IR: getelementptr i8, ptr inttoptr (i16 -16 to ptr), i16
++define void @wrapping_const_base(i8 %v) {
++entry:
++  br label %loop
++
++loop:
++  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]
++  %a = getelementptr i8, ptr inttoptr (i16 -16 to ptr), i16 %j
++  store volatile i8 %v, ptr %a, align 1
++  %j1 = add nuw nsw i16 %j, 1
++  %c = icmp eq i16 %j1, 64
++  br i1 %c, label %exit, label %loop
++
++exit:
++  ret void
++}
+-- 
+2.53.0
+

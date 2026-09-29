@@ -1,0 +1,67 @@
+{
+  "upstream_repository": "llvm-mos/llvm-mos",
+  "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+  "destination_checked": "2026-09-29T11:25Z via gh api repos/llvm-mos/llvm-mos/commits/main",
+  "previous_packet_destination": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "commits_since_previous_destination": [
+    {
+      "sha": "84a8f72ab2e3",
+      "title": "feat(GlobalISel): implement debug info salvaging for G_MERGE_VALUES (#570)",
+      "files": [
+        "llvm/lib/CodeGen/CodeGenCommonISel.cpp",
+        "llvm/lib/CodeGen/GlobalISel/Utils.cpp",
+        "llvm/test/CodeGen/X86/GlobalISel/x86-calllowering-dbg-trunc.ll"
+      ]
+    },
+    {
+      "sha": "0861021b1158",
+      "title": "[MOS] Accept an optional BRK signature operand (#586)",
+      "files": [
+        "llvm/lib/Target/MOS/MOSInstrInfo.td",
+        "llvm/test/MC/MOS/brk-signature.s"
+      ]
+    },
+    {
+      "sha": "06bc967d2668",
+      "title": "Introduce the experimental MOS SSA register allocation pipeline (#605)",
+      "files": [
+        "llvm/lib/Target/MOS/CMakeLists.txt",
+        "llvm/lib/Target/MOS/MOS.h",
+        "llvm/lib/Target/MOS/MOSTargetMachine.cpp",
+        "MOSConventionalSSA/MOSImagRegAlloc/MOSRegAlloc sources"
+      ]
+    }
+  ],
+  "source_artifacts": {
+    "patches/llvm-mos/0002-321-accum16.patch": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+    "docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "e3b8d88ac74aab8addefeac63f4227ba74c45e4d2d893c708a59d2cf531f81ce",
+    "docs/defects/mos-near-index-overflow-proofs.json": "768215bffbab11a429f2aa7addbe188a1fc22f2f350c61e92ebf024d00b92204",
+    "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0"
+  },
+  "prior_work": {
+    "search_terms": [
+      "MOSRecoverNearNoWrap",
+      "mos-recover-near-nowrap",
+      "canFoldNearIndex",
+      "NoUWrap",
+      "LoopStrengthReduce",
+      "nowrap",
+      "nuw"
+    ],
+    "local_assessment": "Completed downstream in 6c5907b4 and carried in 0002; canonical record mos-near-index-overflow-proofs (fixed missed optimization) retains the baseline, census and runtime evidence. The 0065 prerequisite extraction explicitly excluded this pass. A pass-registration defect found during this extraction is recorded separately as mos-near-nowrap-option-clash.",
+    "destination_assessment": "Stock 06bc967d2668 has no MOSRecoverNearNoWrap, no canFoldNearIndex and no NoUWrap/NoUSWrap/hasW65816 checks in tryAbsoluteIndexedAddressing or selectIndirectAddressing; its MOS target does not reference LSR. The bank-wrap guard, and therefore the need for recovered proofs, arrives with patch 1. MOSIndexIV runs in the middle-end loop pipeline, before codegen LSR, and does not restore flags that LSR later drops. IRTranslator transfers GEP nuw/nusw to G_PTR_ADD NoUWrap/NoUSWrap.",
+    "pipeline_assessment": "#605 adds LLVM_MOS_EXPERIMENTAL_REGALLOC_DEFAULT (CMake option OFF) and -mos-experimental-regalloc. With the default, addIRPasses and the conventional register-allocation pipeline are unchanged apart from the new pass registration; the experimental allocator was not exercised with native widths or this pass.",
+    "scev_assessment": "The destination LLVM has SCEVUse use-specific no-wrap flags (86ab6d6e2ecf reports no in-tree setter yet). ScalarEvolution::getSCEV returns const SCEV *, so the pass reads node-level flags only.",
+    "upstream_history": "GitHub searches of llvm-mos/llvm-mos commits and pull requests for nowrap, no-wrap, LSR, strength reduction, nuw and 65816 found only generic LLVM merges and unrelated MOS work; no existing upstream change recovers these flags."
+  },
+  "series": {
+    "patch_1": "Rebased 0065 prerequisite; added/removed lines identical to the reviewed 0065 patch 1 (range-diff in evidence/prerequisite-range-diff.txt shows context-only changes).",
+    "patch_2": "MOSRecoverNearNoWrap, its header, registration after LSR and near-index-proofs.ll."
+  },
+  "excluded": [
+    "#320 address spaces and far memory (the retained downstream regression loads through addrspace(2); the upstream test is near-only)",
+    "0063 and 0065 near-store profitability",
+    "SNES implementation and platform configuration"
+  ],
+  "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+}

@@ -1,0 +1,3 @@
+2026-09-29T13:24:14Z COMMAND: build/llvm-mos/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj  docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+llc sha256: cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7
+EXIT: 0

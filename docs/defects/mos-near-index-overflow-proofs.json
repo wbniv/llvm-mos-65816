@@ -218,5 +218,40 @@
     "Census has 1197 paired successful builds out of 1236 configurations; 39 configurations fail with recovery both disabled and enabled. No new failures; nine object/mode configurations grow.",
     "The initial candidate measured the size census. All 1236 configurations were replayed with the preserved final compiler: all 1197 successful objects have identical code/relocation hashes, and all 39 failing configurations retain their exit status."
   ],
-  "validation_summary": "Final MOS suites: 183 passed, two unsupported. Final near runtime matrix: 12/12. All 16 corpus programs with changed generated code: 48/48 across default/A16/XY16, using manifest or freshly compiled host oracles. Gallery: 0x5CF0 after 30000 frames on initial candidate. Final corpus replay: 1236/1236 matching outcomes and successful object hashes. Final compiler/linker installed with matching hashes."
+  "validation_summary": "Final MOS suites: 183 passed, two unsupported. Final near runtime matrix: 12/12. All 16 corpus programs with changed generated code: 48/48 across default/A16/XY16, using manifest or freshly compiled host oracles. Gallery: 0x5CF0 after 30000 frames on initial candidate. Final corpus replay: 1236/1236 matching outcomes and successful object hashes. Final compiler/linker installed with matching hashes.",
+  "additional_runs": [
+    {
+      "kind": "upstream_extraction",
+      "date": "2026-09-29",
+      "source_revision": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+      "patches": [
+        {
+          "path": "docs/pr-preparations/2026-09-29/near-index-proofs/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch",
+          "sha256": "613285e82e683a91fcf2ed2a938ff9c62817655e472e294ae2b938329388f134"
+        },
+        {
+          "path": "docs/pr-preparations/2026-09-29/near-index-proofs/patches/0002-MOS-Recover-near-index-no-wrap-proofs-after-loop-str.patch",
+          "sha256": "4930beb64e2625c15335d432dbab4152f583b0a8bbaedd314ae9f74f291eb310"
+        }
+      ],
+      "report": "docs/pr-preparations/2026-09-29/near-index-proofs/README.md",
+      "identity": {
+        "path": "docs/pr-preparations/2026-09-29/near-index-proofs/evidence/identity.json",
+        "sha256": "f3d52717a3bba8d6384dea7e3c7e5e826d61a51b36357f1e87b19e5f39842be5"
+      },
+      "regression_log": {
+        "path": "docs/pr-preparations/2026-09-29/near-index-proofs/evidence/regression.log",
+        "sha256": "21ac39e946d8fb6f9c74e6e57d175b573a001e519d66afca23dafb02b6cf4adc"
+      },
+      "replay_summary": {
+        "path": "docs/pr-preparations/2026-09-29/near-index-proofs/evidence/replay-summary.json",
+        "sha256": "898bd7173c161fb777d3b1799ee755cb5e2d636eb47cfd4cdfcfa0a5cbefc5a4"
+      },
+      "runtime_summary": {
+        "path": "docs/pr-preparations/2026-09-29/near-index-proofs/evidence/runtime-summary.json",
+        "sha256": "c957eb703f4d90fc8ea1123c1568455dfd44360fb552c973d5e5b3b4f2e57c2c"
+      },
+      "result": "Extracted onto upstream 06bc967d2668 after the rebased #321 prerequisite. The near-only regression and a proof-path test fail on the prerequisite alone and pass with the pass; MOS CodeGen+MC 145 passed, 1 unsupported. Frozen-IR replay with the driver flags: 1045 paired configurations, 499 smaller, 39 larger (2453 B), net -69616 B; recovery disabled reproduces the prerequisite code everywhere. Runtime: 394/394 MAME and bsnes-jg checks for 65 changed corpus programs and two near fixtures in three modes. Extraction differs from 0002 in pass argument name (fixes mos-near-nowrap-option-clash), ID-based insertion, data-layout index width and a debug line; recovery logic is unchanged. The replay also found mos-xy16-preserve-x-p-save in the prerequisite. Independent review approved with changes; findings fixed."
+    }
+  ]
 }

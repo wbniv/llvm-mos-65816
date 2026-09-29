@@ -1,0 +1,3 @@
+2026-09-29T13:25:22Z COMMAND: build/near-proof-upstream/candidate/bin/opt -passes=verify -disable-output docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll
+opt sha256: 52e181a85a35a38703f37dd93288dccaf6fc862c44c164a55c8c633347b2470d
+EXIT: 0

@@ -1,0 +1,62 @@
+{
+  "downstream_opt": {
+    "preserved_path": "build/near-nowrap-option-clash/baseline/opt",
+    "origin": "hard link of build/llvm-mos/bin/opt taken 2026-09-29; file time 2026-09-28T03:12:17Z",
+    "sha256": "07fa3ee03c79d9b0c538cdfacd0bde5c7c1684f23651d62ca49c02ec8b7378e6",
+    "vendor_head": "8be0546128a55e78c63ca571d466aa72a782cd36",
+    "patch_0002_sha256": "dcc587682f9b0ce4caf1a0f20ed8eb32500cb1b2ff3593502b9350b627c4693b",
+    "source_lines": "vendor/llvm-mos/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp lines 23, 81 and 84 use the same string \"mos-recover-near-nowrap\" for the cl::opt and the INITIALIZE_PASS argument",
+    "binary_to_source_link": "The binary reproduces the duplicate-registration diagnostic naming that string; its exact vendor dirty state at link time was not captured."
+  },
+  "extracted_series": {
+    "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+    "packet": "docs/pr-preparations/2026-09-29/near-index-proofs/README.md",
+    "suites": {
+      "extracted_v1": {
+        "first_line": "2026-09-29T12:45:34Z toolset=candidate llc=5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b source=98984efd54651c2a9bb08e8a3022dc21ab29ff0a",
+        "totals": {
+          "Unsupported": 1,
+          "Passed": 139,
+          "Failed": 5
+        },
+        "failures": [
+          "CodeGen/MOS/nonreentrant.ll",
+          "CodeGen/MOS/indexiv.ll",
+          "CodeGen/MOS/nonreentrant-nointerrupts.ll",
+          "CodeGen/MOS/leaf-20231021.ll",
+          "CodeGen/MOS/indvar-simplify-20230930.ll"
+        ],
+        "source_commit": "98984efd54651c2a9bb08e8a3022dc21ab29ff0a",
+        "opt_sha256": "6eb96b3b76ab115f46a1a9101c9843799dbace7797da781ff16720a16a2d0934",
+        "llc_sha256": "5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b (binary removed after capture; hash retained)"
+      },
+      "extracted_final": {
+        "first_line": "2026-09-29T13:20:17Z toolset=candidate llc=c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64 source=43e1c4d6d5eae794c9559d2135e5ef2b7daf80e3",
+        "totals": {
+          "Unsupported": 1,
+          "Passed": 144
+        },
+        "failures": [],
+        "source_commit": "43e1c4d6d5eae794c9559d2135e5ef2b7daf80e3",
+        "opt_sha256": "52e181a85a35a38703f37dd93288dccaf6fc862c44c164a55c8c633347b2470d",
+        "llc_sha256": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64"
+      },
+      "extracted_baseline_patch1_only": {
+        "first_line": "2026-09-29T12:45:30Z toolset=baseline llc=b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45 source=98984efd54651c2a9bb08e8a3022dc21ab29ff0a",
+        "totals": {
+          "Unsupported": 1,
+          "Passed": 143,
+          "Failed": 1
+        },
+        "failures": [
+          "CodeGen/MOS/near-index-proofs.ll"
+        ],
+        "source_commit": "fbf0a82fd70a92963cb2dcea10ae93d660e27b64",
+        "opt_sha256": "4f7feda2a59c3bf65388327e0100ee90804d1169a70d261b4ca7ce31824a2d11",
+        "llc_sha256": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45"
+      }
+    },
+    "intermediate_fix": "Revision 2987f4d1 first renamed the pass argument (opt e00726e1, suite 144 passed / 1 unsupported); the final revision 43e1c4d6 keeps that name and inserts the pass by ID."
+  },
+  "input_sha256": "375d7bdbbd7ad3a8382da9edeeb55a76f29f22356bfa1d7a76ed448367f9c539"
+}

@@ -1,0 +1,347 @@
+{
+  "modes": {
+    "default": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 363,
+      "baseline_bytes": 1897560,
+      "candidate_bytes": 1886875,
+      "delta": -10685,
+      "smaller": 164,
+      "larger": 29,
+      "code_changed": 194,
+      "baseline_only_failures": 1,
+      "candidate_only_failures": 0,
+      "both_arms_failed": 48
+    },
+    "a16": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 342,
+      "baseline_bytes": 1567212,
+      "candidate_bytes": 1538141,
+      "delta": -29071,
+      "smaller": 167,
+      "larger": 5,
+      "code_changed": 173,
+      "baseline_only_failures": 2,
+      "candidate_only_failures": 0,
+      "both_arms_failed": 68
+    },
+    "xy16": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 340,
+      "baseline_bytes": 1548207,
+      "candidate_bytes": 1518347,
+      "delta": -29860,
+      "smaller": 168,
+      "larger": 5,
+      "code_changed": 174,
+      "baseline_only_failures": 2,
+      "candidate_only_failures": 1,
+      "both_arms_failed": 69
+    }
+  },
+  "disabled_matches_baseline": 1046,
+  "disabled_compared": 1046,
+  "disabled_exit_mismatches": 0,
+  "larger": [
+    {
+      "source": "examples/65816/a16cmpaudit.c",
+      "mode": "a16",
+      "growth": 575,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "a16",
+      "growth": 112,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/msquares_sim.c",
+      "mode": "a16",
+      "growth": 3,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "a16",
+      "growth": 30,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "a16",
+      "growth": 93,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/absdiff.c",
+      "mode": "default",
+      "growth": 2,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/avalanche.c",
+      "mode": "default",
+      "growth": 1,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/bitboard64.c",
+      "mode": "default",
+      "growth": 543,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/bitcensus.c",
+      "mode": "default",
+      "growth": 6,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/burning-ship.c",
+      "mode": "default",
+      "growth": 12,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/byvaledge_sim.c",
+      "mode": "default",
+      "growth": 16,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/critters_sim.c",
+      "mode": "default",
+      "growth": 9,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "default",
+      "growth": 19,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/fenwick_sim.c",
+      "mode": "default",
+      "growth": 4,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/hull_sim.c",
+      "mode": "default",
+      "growth": 51,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/keycmp64_sim.c",
+      "mode": "default",
+      "growth": 7,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/mandel-double_sim.c",
+      "mode": "default",
+      "growth": 49,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/mandel-float_sim.c",
+      "mode": "default",
+      "growth": 2,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/msquares_sim.c",
+      "mode": "default",
+      "growth": 46,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/multibase_sim.c",
+      "mode": "default",
+      "growth": 73,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "default",
+      "growth": 48,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/polyfill_sim.c",
+      "mode": "default",
+      "growth": 9,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/poolfx_sim.c",
+      "mode": "default",
+      "growth": 104,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "default",
+      "growth": 139,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/cpu6502.c",
+      "mode": "default",
+      "growth": 42,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "default",
+      "growth": 21,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/hdr-bloom.c",
+      "mode": "default",
+      "growth": 22,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/hull.c",
+      "mode": "default",
+      "growth": 8,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/matcascade.c",
+      "mode": "default",
+      "growth": 17,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/newton.c",
+      "mode": "default",
+      "growth": 22,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/poolfx.c",
+      "mode": "default",
+      "growth": 12,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/shift64seam.c",
+      "mode": "default",
+      "growth": 15,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/snes-video-reel.c",
+      "mode": "default",
+      "growth": 1,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/speedcap.c",
+      "mode": "default",
+      "growth": 77,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/bsearchviz_sim.c",
+      "mode": "xy16",
+      "growth": 41,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "xy16",
+      "growth": 71,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/msquares_sim.c",
+      "mode": "xy16",
+      "growth": 3,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "xy16",
+      "growth": 55,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "xy16",
+      "growth": 93,
+      "ir_far_address_space": false
+    }
+  ],
+  "failure_classes": {
+    "baseline: abort without diagnostic line": 3,
+    "baseline: assertion: isLegalUse(TTI, LU.MinOffset, LU.MaxOffset, LU.Kind, LU.AccessTy, F) && \"Formula": 3,
+    "baseline: error: invalid instruction": 3,
+    "baseline: far address space (p2) not legalizable": 123,
+    "baseline: verifier: Using an undefined physical register (after Post-RA pseudo instruction expansion pass)": 1,
+    "baseline: verifier: Using an undefined physical register (after Virtual Register Rewriter)": 57,
+    "candidate: abort without diagnostic line": 3,
+    "candidate: assertion: isLegalUse(TTI, LU.MinOffset, LU.MaxOffset, LU.Kind, LU.AccessTy, F) && \"Formula": 3,
+    "candidate: error: invalid instruction": 3,
+    "candidate: far address space (p2) not legalizable": 123,
+    "candidate: verifier: Using an undefined physical register (after MOS Insert REP/SEP)": 1,
+    "candidate: verifier: Using an undefined physical register (after Post-RA pseudo instruction expansion pass)": 1,
+    "candidate: verifier: Using an undefined physical register (after Virtual Register Rewriter)": 52
+  },
+  "arm_specific_failures": [
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "default",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/boids.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "verifier: Using an undefined physical register (after MOS Insert REP/SEP)"
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    }
+  ],
+  "configuration": "llc with -disable-spill-hoist (destination driver parity) and -verify-machineinstrs; baseline fbf0a82f llc b8006489; candidate 43e1c4d6 llc c8fb18cb",
+  "identical_to_candidate_2987f4d1_run": "3708 of 3708 arm results (exit status and code hash) match the earlier replay with candidate llc b8329fc5",
+  "totals": {
+    "paired": 1045,
+    "delta": -69616,
+    "smaller": 499,
+    "larger": 39,
+    "growth_bytes": 2453
+  }
+}

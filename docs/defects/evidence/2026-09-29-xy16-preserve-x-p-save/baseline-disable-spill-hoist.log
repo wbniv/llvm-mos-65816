@@ -1,0 +1,9 @@
+2026-09-29T13:24:08Z COMMAND: build/near-proof-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj -disable-spill-hoist docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null
+llc sha256: c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64
+*** Bad machine code: Using an undefined physical register ***
+- function:    main
+- basic block: %bb.25  (0x5761f6209e30)
+- instruction: PH $p
+- operand 0:   $p
+LLVM ERROR: Found 1 machine code errors.
+EXIT: 134

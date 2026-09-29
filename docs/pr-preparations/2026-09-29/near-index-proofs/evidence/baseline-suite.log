@@ -1,0 +1,356 @@
+2026-09-29T13:51:21Z toolset=baseline llc=b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45 source=980fe1f29381a212e585df81e537ed21bcfe4a68
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/0029-cross-target-build/bin
+-- Testing: 146 tests, 8 workers --
+PASS: LLVM :: CodeGen/MOS/shift-rotate.ll (1 of 146)
+PASS: LLVM :: CodeGen/MOS/xy16-near-indir-y.ll (2 of 146)
+FAIL: LLVM :: CodeGen/MOS/near-index-proofs.ll (3 of 146)
+******************** TEST 'LLVM :: CodeGen/MOS/near-index-proofs.ll' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll
+# .---command stderr------------
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll:26:10: error: CHECK: expected string not found in input
+# | ; CHECK: lda (__rc{{[0-9]+}}),y
+# |          ^
+# | <stdin>:37:11: note: scanning from here
+# | near_copy: ; @near_copy
+# |           ^
+# | <stdin>:57:2: note: possible intended match here
+# |  lda (__rc8)
+# |  ^
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll:57:10: error: CHECK: expected string not found in input
+# | ; CHECK: sta buf,x
+# |          ^
+# | <stdin>:71:13: note: scanning from here
+# | global_fill: ; @global_fill
+# |             ^
+# | <stdin>:80:2: note: possible intended match here
+# |  sta __rc4
+# |  ^
+# | 
+# | Input file: <stdin>
+# | Check file: /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs.ll
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |             .
+# |             .
+# |             .
+# |            32:  .zeropage __rc31 
+# |            33:  .file "<stdin>" 
+# |            34:  .text 
+# |            35:  .globl near_copy ; -- Begin function near_copy 
+# |            36:  .type near_copy,@function 
+# |            37: near_copy: ; @near_copy 
+# | check:26'0              {                search range start (exclusive)
+# | check:26'1                               error: no match found in search range
+# |            38: ; %bb.0: ; %entry 
+# |            39:  stz __rc6 
+# |            40: .LBB0_1: ; %loop 
+# |            41:  ; =>This Inner Loop Header: Depth=1 
+# |            42:  lda __rc2 
+# |             .
+# |             .
+# |             .
+# |            52:  adc __rc6 
+# |            53:  sta __rc10 
+# |            54:  lda __rc5 
+# |            55:  adc #0 
+# |            56:  sta __rc11 
+# |            57:  lda (__rc8) 
+# | check:26'2      ?             possible intended match
+# |            58:  sta (__rc10) 
+# |            59:  ldx __rc6 
+# |            60:  inx 
+# |            61:  stx __rc6 
+# |            62:  cpx #64 
+# |            63:  bne .LBB0_1 
+# |            64: ; %bb.2: ; %exit 
+# |            65:  rts 
+# |            66: .Lfunc_end0: 
+# |            67:  .size near_copy, .Lfunc_end0-near_copy 
+# |            68:  ; -- End function 
+# |            69:  .globl global_fill ; -- Begin function global_fill 
+# |            70:  .type global_fill,@function 
+# |            71: global_fill: ; @global_fill 
+# | check:26'3                 }                 search range end (exclusive)
+# | check:57'0                {                  search range start (exclusive)
+# | check:57'1                                   error: no match found in search range
+# |            72: ; %bb.0: ; %entry 
+# |            73:  tay 
+# |            74:  stz __rc2 
+# |            75: .LBB1_1: ; %loop 
+# |            76:  ; =>This Inner Loop Header: Depth=1 
+# |            77:  lda #mos16lo(buf) 
+# |            78:  clc 
+# |            79:  adc __rc2 
+# |            80:  sta __rc4 
+# | check:57'2      ?           possible intended match
+# |            81:  lda #mos16hi(buf) 
+# |            82:  adc #0 
+# |            83:  sta __rc5 
+# |            84:  tya 
+# |            85:  sta (__rc4) 
+# |             .
+# |             .
+# |             .
+# |            93: .Lfunc_end1: 
+# |            94:  .size global_fill, .Lfunc_end1-global_fill 
+# |            95:  ; -- End function 
+# |            96:  .globl wrapping_fill ; -- Begin function wrapping_fill 
+# |            97:  .type wrapping_fill,@function 
+# |            98: wrapping_fill: ; @wrapping_fill 
+# | check:57'3                   }                   search range end (exclusive)
+# |            99: ; %bb.0: ; %entry 
+# |           100:  tay 
+# |           101:  stz __rc4 
+# |           102: .LBB2_1: ; %loop 
+# |           103:  ; =>This Inner Loop Header: Depth=1 
+# |             .
+# |             .
+# |             .
+# | >>>>>>
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/jump-table-limit.ll (4 of 146)
+PASS: LLVM :: CodeGen/MOS/char-stats.ll (5 of 146)
+PASS: LLVM :: CodeGen/MOS/anyext-wide.mir (6 of 146)
+PASS: LLVM :: CodeGen/MOS/scmp-ucmp.ll (7 of 146)
+PASS: LLVM :: CodeGen/MOS/a16-byte-store.ll (8 of 146)
+PASS: LLVM :: CodeGen/MOS/a16-indirect-byte-store.ll (9 of 146)
+PASS: LLVM :: MC/MOS/eflags.s (10 of 146)
+PASS: LLVM :: CodeGen/MOS/add-sub.ll (11 of 146)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-65ce02.mir (12 of 146)
+PASS: LLVM :: CodeGen/MOS/fcmp.ll (13 of 146)
+PASS: LLVM :: CodeGen/MOS/static-stack.ll (14 of 146)
+PASS: LLVM :: MC/MOS/brk-signature.s (15 of 146)
+PASS: LLVM :: CodeGen/MOS/immediate-remat.ll (16 of 146)
+PASS: LLVM :: CodeGen/MOS/char-stats-norecurse.ll (17 of 146)
+PASS: LLVM :: CodeGen/MOS/whole-program-zp.ll (18 of 146)
+PASS: LLVM :: CodeGen/MOS/zp-alloc.ll (19 of 146)
+PASS: LLVM :: CodeGen/MOS/zp-byte-index.ll (20 of 146)
+PASS: LLVM :: CodeGen/MOS/vector-scalarize.ll (21 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector.mir (22 of 146)
+PASS: LLVM :: MC/MOS/branch-range-boundary.s (23 of 146)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65ce02.ll (24 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg.mir (25 of 146)
+PASS: LLVM :: CodeGen/MOS/late-opt-65816.mir (26 of 146)
+PASS: LLVM :: CodeGen/MOS/legalizer.mir (27 of 146)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (28 of 146)
+PASS: LLVM :: CodeGen/MOS/cmp-select.ll (29 of 146)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (30 of 146)
+PASS: LLVM :: MC/MOS/branch-range-matrix-bcc8.s (31 of 146)
+PASS: LLVM :: CodeGen/MOS/hello-world.ll (32 of 146)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (33 of 146)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (34 of 146)
+PASS: LLVM :: CodeGen/MOS/integer-compare.ll (35 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir (36 of 146)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-stack.mir (37 of 146)
+PASS: LLVM :: CodeGen/MOS/print-int.ll (38 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir (39 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-opt-loop.mir (40 of 146)
+PASS: LLVM :: CodeGen/MOS/asm-printer.mir (41 of 146)
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (42 of 146)
+PASS: LLVM :: CodeGen/MOS/combiner.mir (43 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir (44 of 146)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-deterministic.ll (45 of 146)
+PASS: LLVM :: MC/MOS/addressing-modes-65816.s (46 of 146)
+PASS: LLVM :: CodeGen/MOS/anyext-masked-byte.ll (47 of 146)
+PASS: LLVM :: CodeGen/MOS/store-zero.ll (48 of 146)
+PASS: LLVM :: CodeGen/MOS/legalizer-huc6280.mir (49 of 146)
+PASS: LLVM :: CodeGen/MOS/late-opt-65c02.mir (50 of 146)
+PASS: LLVM :: CodeGen/MOS/inc-dec.ll (51 of 146)
+PASS: LLVM :: CodeGen/MOS/legalizer-indexed-offset-observer.mir (52 of 146)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (53 of 146)
+PASS: LLVM :: CodeGen/MOS/callee-saved-regs.ll (54 of 146)
+PASS: LLVM :: CodeGen/MOS/late-opt.mir (55 of 146)
+PASS: LLVM :: CodeGen/MOS/call-lowering.mir (56 of 146)
+PASS: LLVM :: CodeGen/MOS/legalizer-ir.mir (57 of 146)
+PASS: LLVM :: CodeGen/MOS/postrapseudos.mir (58 of 146)
+PASS: LLVM :: CodeGen/MOS/prologepilog.mir (59 of 146)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (60 of 146)
+PASS: LLVM :: CodeGen/MOS/inc-dec-6502x.ll (61 of 146)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-bra.mir (62 of 146)
+PASS: LLVM :: CodeGen/MOS/a16-immediate-width.ll (63 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir (64 of 146)
+PASS: LLVM :: CodeGen/MOS/asm-printer-spc700.mir (65 of 146)
+PASS: LLVM :: MC/MOS/align-nop.s (66 of 146)
+PASS: LLVM :: CodeGen/MOS/asm-printer-huc6280.mir (67 of 146)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65c02.ll (68 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-opt-chain.mir (69 of 146)
+PASS: LLVM :: CodeGen/MOS/regalloc.mir (70 of 146)
+PASS: LLVM :: CodeGen/MOS/nonreentrant.ll (71 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-opt.mir (72 of 146)
+PASS: LLVM :: CodeGen/MOS/scavenger.mir (73 of 146)
+PASS: LLVM :: CodeGen/MOS/light-spill.ll (74 of 146)
+PASS: LLVM :: CodeGen/MOS/asm-printer-ir.mir (75 of 146)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation.mir (76 of 146)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (77 of 146)
+PASS: LLVM :: CodeGen/MOS/commute.mir (78 of 146)
+PASS: LLVM :: CodeGen/MOS/zeropage.ll (79 of 146)
+PASS: LLVM :: CodeGen/MOS/inlineasm-constraint.mir (80 of 146)
+PASS: LLVM :: CodeGen/MOS/ret-global-addr.ll (81 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir (82 of 146)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (83 of 146)
+PASS: LLVM :: MC/MOS/do-copy-data.s (84 of 146)
+PASS: LLVM :: CodeGen/MOS/insert-copies.mir (85 of 146)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (86 of 146)
+FAIL: LLVM :: CodeGen/MOS/near-index-proofs-debug.ll (87 of 146)
+******************** TEST 'LLVM :: CodeGen/MOS/near-index-proofs-debug.ll' FAILED ********************
+Exit Code: 2
+
+Command Output (stdout):
+--
+# RUN: at line 2
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -debug-only=mos-near-nowrap-recovery -o /dev/null < /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll 2>&1 | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -debug-only=mos-near-nowrap-recovery -o /dev/null
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+# .---command stderr------------
+# | FileCheck error: '<stdin>' is empty.
+# | FileCheck command line:  /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/near-index-proofs-debug.ll
+# `-----------------------------
+# error: command failed with exit status: 2
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/coalesce-remat.ll (88 of 146)
+PASS: LLVM :: CodeGen/MOS/scavenger-65c02.mir (89 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir.mir (90 of 146)
+PASS: LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll (91 of 146)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (92 of 146)
+PASS: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (93 of 146)
+PASS: LLVM :: CodeGen/MOS/dp-pointer-arg.ll (94 of 146)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (95 of 146)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (96 of 146)
+PASS: LLVM :: CodeGen/MOS/indexiv.ll (97 of 146)
+PASS: LLVM :: CodeGen/MOS/no-csr.ll (98 of 146)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (99 of 146)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll (100 of 146)
+PASS: LLVM :: MC/MOS/addr-asciz.s (101 of 146)
+PASS: LLVM :: MC/MOS/modifiers.s (102 of 146)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65ce02.s (103 of 146)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir (104 of 146)
+PASS: LLVM :: CodeGen/MOS/finalize-isel.mir (105 of 146)
+PASS: LLVM :: CodeGen/MOS/shift-rotate-chain.mir (106 of 146)
+PASS: LLVM :: MC/MOS/zeropage.s (107 of 146)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (108 of 146)
+PASS: LLVM :: CodeGen/MOS/lower-select.mir (109 of 146)
+PASS: LLVM :: MC/MOS/do-fini-array.s (110 of 146)
+PASS: LLVM :: MC/MOS/bit-branch-target-r65c02.s (111 of 146)
+PASS: LLVM :: CodeGen/MOS/prologepilog-ir.mir (112 of 146)
+PASS: LLVM :: CodeGen/MOS/trivial.ll (113 of 146)
+PASS: LLVM :: CodeGen/MOS/interrupt-width-65816.ll (114 of 146)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (115 of 146)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (116 of 146)
+PASS: LLVM :: CodeGen/MOS/call-lowering-stack.mir (117 of 146)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir (118 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir (119 of 146)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (120 of 146)
+PASS: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (121 of 146)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (122 of 146)
+PASS: LLVM :: MC/MOS/asm-errors.s (123 of 146)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (124 of 146)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-spc700.mir (125 of 146)
+PASS: LLVM :: MC/MOS/inst-lda.s (126 of 146)
+PASS: LLVM :: CodeGen/MOS/legalizer-65c02.mir (127 of 146)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65816.s (128 of 146)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (129 of 146)
+PASS: LLVM :: MC/MOS/zp-regression.s (130 of 146)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-spc700.mir (131 of 146)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (132 of 146)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (133 of 146)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (134 of 146)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (135 of 146)
+UNSUPPORTED: LLVM :: CodeGen/MOS/getchar-regression.ll (136 of 146)
+PASS: LLVM :: CodeGen/MOS/internalize.mir (137 of 146)
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (138 of 146)
+PASS: LLVM :: MC/MOS/do-init-stack.s (139 of 146)
+PASS: LLVM :: MC/MOS/do-init-array.s (140 of 146)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (141 of 146)
+PASS: LLVM :: MC/MOS/trivial.s (142 of 146)
+PASS: LLVM :: CodeGen/MOS/call-lowering-spc700.mir (143 of 146)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir (144 of 146)
+PASS: LLVM :: CodeGen/MOS/leaf-20231021.ll (145 of 146)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (146 of 146)
+********************
+Failed Tests (2):
+  LLVM :: CodeGen/MOS/near-index-proofs-debug.ll
+  LLVM :: CodeGen/MOS/near-index-proofs.ll
+
+
+Testing Time: 2.85s
+
+Total Discovered Tests: 146
+  Unsupported:   1 (0.68%)
+  Passed     : 143 (97.95%)
+  Failed     :   2 (1.37%)

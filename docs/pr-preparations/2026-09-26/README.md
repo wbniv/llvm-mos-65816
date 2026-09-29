@@ -109,7 +109,7 @@ OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning e
 
 **September 27 follow-up:** the [near-Y and bank-wrap simulated PR](../2026-09-27/near-y-pr-simulation.md) records the published downstream repair and full gallery proof. Its #321 extraction and independent-review gates remain in the [feature-held ledger](feature-held-packages.md).
 
-**September 27 near-index follow-up:** [overflow-proof recovery](../../investigations/2026-09-27-near-index-overflow-proofs.md) is implemented locally in `0002`; its own evidence covers the optimization, and #321 extraction and independent review remain pending.
+**September 27 near-index follow-up:** [overflow-proof recovery](../../investigations/2026-09-27-near-index-overflow-proofs.md) is implemented locally in `0002`; its own evidence covers the optimization. The [September 29 packet](../2026-09-29/near-index-proofs/README.md) completes its extraction onto `06bc967d2668`, exact-destination validation and independent review; the PR is unposted under the #321 hold. Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
 
 **September 27 near-store follow-up:** [0065 and the T3 completion record](../../plans/2026-09-27-broader-near-store-profitability.md) add measured local optimizations. Those opening preparation gates were completed in the [September 28 extracted packet](../2026-09-28/0065/README.md), with its own independent 0065 review. The PR is unposted and the native feature posting hold remains; the original 0063 review retains its earlier scope.
 

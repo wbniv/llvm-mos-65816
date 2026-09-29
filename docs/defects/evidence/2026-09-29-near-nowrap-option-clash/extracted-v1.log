@@ -1,0 +1,7 @@
+2026-09-29T12:54:51Z COMMAND: build/near-proof-upstream/candidate-v1/bin/opt -passes=verify -disable-output docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll
+opt sha256: 6eb96b3b76ab115f46a1a9101c9843799dbace7797da781ff16720a16a2d0934
+: CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+LLVM ERROR: inconsistency in registered CommandLine options
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+EXIT: 134

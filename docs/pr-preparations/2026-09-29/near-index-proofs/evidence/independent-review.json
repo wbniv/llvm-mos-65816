@@ -1,0 +1,453 @@
+{
+ "schema": "independent-review/v1",
+ "date": "2026-09-29",
+ "verdict": "approve with changes",
+ "reviewer": {
+  "agent": "Claude Code (CLI), T4 subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96",
+  "agent_version": "Claude Code 2.1.283 (process executable ~/.local/share/claude/versions/2.1.283 for session PID 2382701 and this subagent's parent)",
+  "model": "Claude Opus 5.5 (claude-opus-5-5)",
+  "reasoning_effort": "high per CLAUDE_EFFORT in the session environment; subagent-specific effort not independently verifiable",
+  "independence_note": "runs as a child of the same Claude Code session that performed the upstream extraction, with no inherited conversation context"
+ },
+ "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+ "commits": {
+  "patch1": "fbf0a82fd70a92963cb2dcea10ae93d660e27b64",
+  "patch2": "2987f4d18e971a6fe383589823891ff136e4d1ec"
+ },
+ "patch_sha256": {
+  "0001": "613285e82e683a91fcf2ed2a938ff9c62817655e472e294ae2b938329388f134",
+  "0002": "f7798660ccc72bdf26f27bc7200cfb3ca902364b48b48a47648a54c658e921b2"
+ },
+ "source_sha256": {
+  "MOSRecoverNearNoWrap.cpp": "f9f6db0be4516bdb52aca3d7c4ec94bd6c0c2a719135e8896db4ecbafe1a5d4b",
+  "near-index-proofs.ll": "6b8295b381658b9d672150002f3869fe32da11bf3a027b8278c2e981332d4662"
+ },
+ "tool_sha256": {
+  "baseline/bin/llc": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+  "baseline/bin/opt": "4f7feda2a59c3bf65388327e0100ee90804d1169a70d261b4ca7ce31824a2d11",
+  "baseline/bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+  "candidate/bin/llc": "b8329fc5b147352157a48d481baba9fd2be59744c05f1337460aea6ed20e11b0",
+  "candidate/bin/opt": "e00726e194e9d93b39c58be850339725d7150c48c800455ab69695040c022a29",
+  "candidate/bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+  "candidate-v1/bin/llc": "5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b",
+  "candidate-v1/bin/opt": "6eb96b3b76ab115f46a1a9101c9843799dbace7797da781ff16720a16a2d0934",
+  "candidate-v1/bin/FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38"
+ },
+ "commands": [
+  {
+   "cmd": "bash docs/pr-preparations/2026-09-29/near-index-proofs/regression.sh build/near-proof-upstream/baseline/bin build/near-proof-upstream/source/llvm/test/CodeGen/MOS/near-index-proofs.ll",
+   "exit": 0,
+   "checks": {
+    "default indexed forms": 1,
+    "xy16 indexed forms": 1,
+    "recovery disabled": 2,
+    "recovered IR flags": 2,
+    "6502 exclusion": 2,
+    "opt startup": 0
+   },
+   "log": "build/near-proof-upstream/review/regression-baseline.log"
+  },
+  {
+   "cmd": "regression.sh build/near-proof-upstream/candidate-v1/bin <test>",
+   "exit": 0,
+   "checks": {
+    "default indexed forms": 0,
+    "xy16 indexed forms": 0,
+    "recovery disabled": 0,
+    "recovered IR flags": 2,
+    "6502 exclusion": 2,
+    "opt startup": 134
+   },
+   "log": "build/near-proof-upstream/review/regression-candidate-v1.log"
+  },
+  {
+   "cmd": "regression.sh build/near-proof-upstream/candidate/bin <test>",
+   "exit": 0,
+   "checks": {
+    "default indexed forms": 0,
+    "xy16 indexed forms": 0,
+    "recovery disabled": 0,
+    "recovered IR flags": 0,
+    "6502 exclusion": 0,
+    "opt startup": 0
+   },
+   "log": "build/near-proof-upstream/review/regression-candidate.log"
+  },
+  {
+   "cmd": "baseline/bin/llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < near-index-proofs.ll | baseline/bin/FileCheck near-index-proofs.ll --check-prefix=DISABLED",
+   "exit": 0,
+   "note": "DISABLED expectations equal baseline behaviour"
+  },
+  {
+   "cmd": "build/near-proof-upstream/review/run-probes.sh (12 probe files; candidate llc: -stop-after=mos-near-nowrap-recovery, then codegen default and +mos-a16,+mos-xy16, each with and without -mos-recover-near-nowrap=false, all with -verify-machineinstrs)",
+   "exit": 0,
+   "per_file_codegen_exit": "0 for p01-p09,p11,p12 in all four codegen modes; 134 for p10 in all four modes (baseline also 134)",
+   "log": "build/near-proof-upstream/review/probes.log"
+  },
+  {
+   "cmd": "candidate/bin/opt -mtriple=mos -mcpu=mosw65816 -passes='loop-mssa(loop-reduce),print<scalar-evolution>' -disable-output <file> (near-index-proofs.ll, p06, p07, p11)",
+   "exit": 0,
+   "note": "SCEV of post-LSR GEPs: near_copy {%src,+,1}<nuw>, {%dst,+,1}<nuw>; global_fill {@buf,+,1}<nuw>; wrapping_fill {%dst,+,1}<nw>; pointer_step increment {(1 + %dst),+,1}<nw>"
+  },
+  {
+   "cmd": "diff <downstream MOSRecoverNearNoWrap.cpp extracted from patches/llvm-mos/0002-321-accum16.patch> source/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp",
+   "exit": 1,
+   "note": "differences: header line, file comment, #include of own header, DEBUG_TYPE define, one line wrap, DEBUG_TYPE as pass argument; no logic change",
+   "log": "build/near-proof-upstream/review/fidelity.diff"
+  },
+  {
+   "cmd": "gdb -batch (count createMOSRecoverNearNoWrapPass vs ~MOSRecoverNearNoWrap) candidate/bin/llc -mtriple=mos -mcpu=mosw65816 {-O0,-O2,-disable-lsr} -o /dev/null near-index-proofs.ll",
+   "exit": 0,
+   "result": {
+    "-O0": "created=1 destroyed=0",
+    "-O2": "created=1 destroyed=1",
+    "-disable-lsr": "created=1 destroyed=0"
+   }
+  },
+  {
+   "cmd": "candidate/bin/llc -debug-pass=Structure {-O0,-disable-lsr,-O2}; count of LSR+recovery pass lines",
+   "exit": 0,
+   "result": {
+    "-O0": 0,
+    "-disable-lsr": 0,
+    "-O2": 2
+   }
+  },
+  {
+   "cmd": "candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -start-before=mos-near-nowrap-recovery < post-LSR IR",
+   "exit": 134,
+   "note": "pipeline never starts (inserted passes are only added after their anchor pass); AsmPrinter asserts on functions with no MachineFunction; inherent to insertPass, not specific to this patch"
+  },
+  {
+   "cmd": "dev/container.sh -v source:/src -- clang-format (new files) and clang-format-diff.py -p1 over git diff -U0 of each patch",
+   "exit": 0,
+   "result": "MOSRecoverNearNoWrap.cpp/.h clean; patch-2 changed lines produce one hunk, the misordered patch-1 include MOSInsertREPSEP.h (MOSTargetMachine.cpp:45); patch-1 changed lines produce 2,329 lines of clang-format-diff output across 12 files",
+   "log": "build/near-proof-upstream/review/clang-format.log"
+  },
+  {
+   "cmd": "python3 (dev/check-comment-history.py patch_comments + narratives) on patch 0002",
+   "exit": 0,
+   "result": "0 findings"
+  },
+  {
+   "cmd": "bash build/near-proof-upstream/run-suite.sh candidate",
+   "exit": 0,
+   "result": "145 discovered: 144 passed, 1 unsupported (CodeGen/MOS/getchar-regression.ll), 0 failed; llc b8329fc5...",
+   "log": "build/near-proof-upstream/review/suite-candidate.log",
+   "json": "build/near-proof-upstream/review/suite-candidate.json",
+   "json_sha256": "9392d85c3a1f7df1b81c9c60aa14192576abcf10bda69d76ada57b591c2a47ef",
+   "note": "the runner writes build/near-proof-upstream/candidate-suite.json; the coordinator copy was restored afterwards (sha256 33c7e819...)"
+  },
+  {
+   "cmd": "git -C source diff <commit>~1 <commit> compared with patch bodies",
+   "exit": 0,
+   "result": "0001 body == fbf0a82fd70a; 0002 body == 2987f4d18e97"
+  }
+ ],
+ "probes": {
+  "p01_neg_start.ll": {
+   "sha256": "2b554379e69302a5808f9f5397f31280d841308eb06f30b52b453af14955a18c",
+   "source": "; Negative starting index counting up to 0: p[-10..-1], inbounds.\ndefine void @neg_start(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ -10, %entry ], [ %i1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 0\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p02_unflagged_nuw_iv.ll": {
+   "sha256": "2c5d991809ecd58d2e92f9803b743dd339320fb7911873f8587a30e0b0a69ea8",
+   "source": "; Unflagged GEP with an add-nuw index IV. The address may wrap in a\n; well-defined execution (p = 0xFFF0), so nuw must not be added.\ndefine void @unflagged_nuw_iv(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %loop ]\n  %a = getelementptr i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nuw nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Same with a nuw-flagged i8 IV zero-extended.\ndefine void @unflagged_zext_iv(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]\n  %z = zext i8 %j to i16\n  %a = getelementptr i8, ptr %p, i16 %z\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw i8 %j, 1\n  %c = icmp eq i8 %j1, 200\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p03_decreasing.ll": {
+   "sha256": "ebbc45a5eaa5798bd4c30c405ef3f321a15be3c442a62cf86664488b20005bad",
+   "source": "; Decreasing inbounds index 63..0.\ndefine void @decreasing(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 63, %entry ], [ %i1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nsw i16 %i, -1\n  %c = icmp eq i16 %i, 0\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Decreasing unflagged index: may wrap (p small, i up to 63) -> no nuw.\ndefine void @decreasing_unflagged(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 63, %entry ], [ %i1, %loop ]\n  %a = getelementptr i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nsw i16 %i, -1\n  %c = icmp eq i16 %i, 0\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p04_nested.ll": {
+   "sha256": "11a7307e1123f28b81bf30dd3d84a8f101a1fcf90355d6e4f22819349394535a",
+   "source": "; Outer recurrence used inside the inner loop, plus a row pointer.\ndefine void @nested(ptr %p, i8 %v) {\nentry:\n  br label %outer\nouter:\n  %i = phi i16 [ 0, %entry ], [ %i1, %olatch ]\n  %row = shl nuw nsw i16 %i, 4\n  %rp = getelementptr inbounds i8, ptr %p, i16 %row\n  br label %inner\ninner:\n  %j = phi i16 [ 0, %outer ], [ %j1, %inner ]\n  %a = getelementptr inbounds i8, ptr %rp, i16 %j\n  store volatile i8 %v, ptr %a, align 1\n  %b = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %b, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %jc = icmp eq i16 %j1, 16\n  br i1 %jc, label %olatch, label %inner\nolatch:\n  %i1 = add nuw nsw i16 %i, 1\n  %ic = icmp eq i16 %i1, 8\n  br i1 %ic, label %exit, label %outer\nexit:\n  ret void\n}\n; Outer recurrence unflagged, used inside inner loop: may wrap -> no nuw.\ndefine void @nested_unflagged(ptr %p, i8 %v) {\nentry:\n  br label %outer\nouter:\n  %i = phi i16 [ 0, %entry ], [ %i1, %olatch ]\n  br label %inner\ninner:\n  %j = phi i16 [ 0, %outer ], [ %j1, %inner ]\n  %s = add i16 %i, %j\n  %a = getelementptr i8, ptr %p, i16 %s\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %jc = icmp eq i16 %j1, 16\n  br i1 %jc, label %olatch, label %inner\nolatch:\n  %i1 = add nuw nsw i16 %i, 16\n  %ic = icmp eq i16 %i1, 128\n  br i1 %ic, label %exit, label %outer\nexit:\n  ret void\n}\n"
+  },
+  "p05_conditional.ll": {
+   "sha256": "18bd9bddf640488ca4727ae6428e6bf0844dd77ea03ba8e140ee9fc47f23fdc5",
+   "source": "; Inbounds address used only on a conditional path: SCEV must not treat\n; its poison as UB for every iteration.\ndefine void @conditional(ptr %p, ptr %q, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %latch ]\n  %qa = getelementptr inbounds i8, ptr %q, i16 %i\n  %f = load volatile i8, ptr %qa, align 1\n  %t = icmp ne i8 %f, 0\n  br i1 %t, label %then, label %latch\nthen:\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  br label %latch\nlatch:\n  %i1 = add nuw nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Unflagged address used every iteration, flagged one only conditionally.\ndefine void @conditional_only_flag(ptr %p, i8 %v, i1 %k) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %latch ]\n  %u = getelementptr i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %u, align 1\n  br i1 %k, label %then, label %latch\nthen:\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  %w = load volatile i8, ptr %a, align 1\n  br label %latch\nlatch:\n  %i1 = add nuw nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Early exit before the inbounds access in the latch.\ndefine void @early_exit(ptr %p, ptr %q, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %latch ]\n  %u = getelementptr i8, ptr %p, i16 %i\n  %f = load volatile i8, ptr %q, align 1\n  %t = icmp eq i8 %f, 0\n  br i1 %t, label %exit, label %latch\nlatch:\n  store volatile i8 %v, ptr %u, align 1\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  %w = load volatile i8, ptr %a, align 1\n  %i1 = add nuw nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p06_offset_base.ll": {
+   "sha256": "c17daa965f1e8c7f3c36f95efeb722acad22fb2aa7a1367b0640497742e9158f",
+   "source": "; p[j+5]: LSR may hoist p+5 as the GEP base.\ndefine void @offset_pos(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %k = add nuw nsw i16 %j, 5\n  %a = getelementptr inbounds i8, ptr %p, i16 %k\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; p[j-5], j = 0..63: indices -5..58, inbounds; base may be p-5.\ndefine void @offset_neg(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %k = add nsw i16 %j, -5\n  %a = getelementptr inbounds i8, ptr %p, i16 %k\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Two accesses p[j] (unflagged) and p[j+1] (inbounds).\ndefine void @mixed_pair(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr i8, ptr %p, i16 %j\n  store volatile i8 %v, ptr %a, align 1\n  %k = add nuw nsw i16 %j, 1\n  %b = getelementptr inbounds i8, ptr %p, i16 %k\n  store volatile i8 %v, ptr %b, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p07_elem_types.ll": {
+   "sha256": "9ebc08efc3d95cc5e9a25089f11b92265e2fc4c90949baa04c9b46586298c6e8",
+   "source": "; Non-i8 element types.\ndefine void @elem_i16(ptr %p, i16 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr inbounds i16, ptr %p, i16 %j\n  store volatile i16 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 32\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n%S = type { i8, i8, i8 }\ndefine void @elem_struct(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr inbounds %S, ptr %p, i16 %j, i32 2\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 20\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; A non-IV i16 index into an i16 array survives LSR untouched.\ndefine void @elem_i16_loaded(ptr %p, ptr %idx, i16 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %ia = getelementptr inbounds i8, ptr %idx, i16 %j\n  %x = load volatile i8, ptr %ia, align 1\n  %xz = zext i8 %x to i16\n  %a = getelementptr inbounds i16, ptr %p, i16 %xz\n  store volatile i16 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 32\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p08_i8_index.ll": {
+   "sha256": "bdf7dd652096dcc801c615c328e1cd6e2b3c89a335587565649ff02b0b0beff2",
+   "source": "; i8-typed index surviving LSR (loaded, sign-extended by GEP semantics).\ndefine void @i8_index(ptr %p, ptr %idx, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %ia = getelementptr inbounds i8, ptr %idx, i16 %j\n  %x = load volatile i8, ptr %ia, align 1\n  %a = getelementptr inbounds i8, ptr %p, i8 %x\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 32\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; i8 IV index with nonneg range, zero-extension proven by SCEV.\ndefine void @i8_iv_index(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i8 %j\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i8 %j, 1\n  %c = icmp eq i8 %j1, 100\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p09_addrspace1.ll": {
+   "sha256": "a011a62695a285dd18359c1c980f5e95f0f50d8d0f380695cf77555c36d41db6",
+   "source": "; Zero-page (addrspace(1), 8-bit pointer) addresses are out of scope.\ndefine void @zp(ptr addrspace(1) %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr inbounds i8, ptr addrspace(1) %p, i8 %j\n  store volatile i8 %v, ptr addrspace(1) %a, align 1\n  %j1 = add nuw nsw i8 %j, 1\n  %c = icmp eq i8 %j1, 16\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p10_vector.ll": {
+   "sha256": "973c497019f33544dc6d71a5482f25f5020cbeeedcac6d8bf8032603985d4b6a",
+   "source": "; Vector GEP inside a loop (stop-after only).\ndefine void @vec(<2 x ptr> %p, ptr %out) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %ins = insertelement <2 x i16> poison, i16 %j, i32 0\n  %spl = shufflevector <2 x i16> %ins, <2 x i16> poison, <2 x i32> zeroinitializer\n  %a = getelementptr inbounds i8, <2 x ptr> %p, <2 x i16> %spl\n  %e = extractelement <2 x ptr> %a, i32 0\n  store volatile ptr %e, ptr %out, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 16\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p11_const_base.ll": {
+   "sha256": "c6a7ef5b42caf84b46be98026f22328f61291515fd2d502b9dc24d62107898ca",
+   "source": "; Constant near base 0xFFF0, unflagged: the address wraps at iteration 16\n; in a well-defined execution, so nuw must not be added.\ndefine void @wraps_const(i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr i8, ptr inttoptr (i16 -16 to ptr), i16 %j\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Constant base 0xFF00, 64 iterations: never wraps; a proof is legitimate.\ndefine void @nowrap_const(i8 %v) {\nentry:\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr i8, ptr inttoptr (i16 -256 to ptr), i16 %j\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n; Base with a known range via a zext'd byte, unflagged: base <= 255, j < 64.\ndefine void @range_base(i8 %b, i8 %v) {\nentry:\n  %bz = zext i8 %b to i16\n  %bp = inttoptr i16 %bz to ptr\n  br label %loop\nloop:\n  %j = phi i16 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr i8, ptr %bp, i16 %j\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i16 %j, 1\n  %c = icmp eq i16 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  },
+  "p12_misc.ll": {
+   "sha256": "b2536d4beed91e14c4354c1c7f70bb9081e80e7f987fc8fc1d024ab3142e472a",
+   "source": "; Inbounds address escapes via a pointer compare as well as a store.\ndefine i1 @escape_cmp(ptr %p, ptr %lim, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nuw nsw i16 %i, 1\n  %c = icmp eq i16 %i1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  %last = getelementptr inbounds i8, ptr %p, i16 %i\n  %r = icmp ult ptr %last, %lim\n  ret i1 %r\n}\n; Step 2 inbounds over i8 elements.\ndefine void @step2(ptr %p, i8 %v) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %i1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i16 %i\n  store volatile i8 %v, ptr %a, align 1\n  %i1 = add nuw nsw i16 %i, 2\n  %c = icmp ult i16 %i1, 200\n  br i1 %c, label %loop, label %exit\nexit:\n  ret void\n}\n; optnone function: skipLoop must suppress the pass.\ndefine void @opt_none(ptr %p, i8 %v) noinline optnone {\nentry:\n  br label %loop\nloop:\n  %j = phi i8 [ 0, %entry ], [ %j1, %loop ]\n  %a = getelementptr inbounds i8, ptr %p, i8 %j\n  store volatile i8 %v, ptr %a, align 1\n  %j1 = add nuw nsw i8 %j, 1\n  %c = icmp eq i8 %j1, 64\n  br i1 %c, label %exit, label %loop\nexit:\n  ret void\n}\n"
+  }
+ },
+ "probe_results": {
+  "p01_neg_start.ll": {
+   "nuw_added": [],
+   "verdict": "not flagged; conservative (address {p-10,+,1} does not start at base p)"
+  },
+  "p02_unflagged_nuw_iv.ll": {
+   "nuw_added": [],
+   "verdict": "not flagged; required (well-defined wrap possible without inbounds)"
+  },
+  "p03_decreasing.ll": {
+   "nuw_added": [],
+   "verdict": "not flagged in either function; inbounds case is a conservative miss, unflagged case required"
+  },
+  "p04_nested.ll": {
+   "nuw_added": [
+    "@nested %scevgep2 = gep nuw i8, ptr %lsr.iv1 (outer row pointer), i16 %0"
+   ],
+   "verdict": "justified: {{p,+,16}<outer>,+,1}<nuw><inner> starts at the row-pointer base; unflagged nested variant not flagged"
+  },
+  "p05_conditional.ll": {
+   "nuw_added": [
+    "@conditional %scevgep1 = gep nuw i8, ptr %q (unconditional inbounds load)"
+   ],
+   "verdict": "justified; conditional p store, conditional-only inbounds, and early-exit shapes not flagged"
+  },
+  "p06_offset_base.ll": {
+   "nuw_added": [
+    "@offset_pos %scevgep1 = gep nuw i8, ptr %scevgep(p+5), i16 %0"
+   ],
+   "verdict": "justified: {(5+p)<nuw>,+,1}<nuw> starts at base p+5; the hoisted gep nuw p,5 is emitted by LSR/SCEVExpander itself (present with recovery disabled); offset_neg and mixed_pair not flagged"
+  },
+  "p07_elem_types.ll": {
+   "nuw_added": [
+    "@elem_i16 gep nuw i8 %p, %0 ({p,+,2}<nuw>)",
+    "@elem_struct gep nuw i8 %scevgep(p+2), %0",
+    "@elem_i16_loaded gep nuw i8 %idx, %0"
+   ],
+   "verdict": "justified; LSR rewrites to i8 GEPs; surviving i16-element GEP not flagged (filter)"
+  },
+  "p08_i8_index.ll": {
+   "nuw_added": [
+    "@i8_index gep nuw i8 %idx, %0",
+    "@i8_iv_index gep nuw i8 %p, %0"
+   ],
+   "verdict": "justified; surviving i8-typed index GEP not flagged (filter)"
+  },
+  "p09_addrspace1.ll": {
+   "nuw_added": [],
+   "verdict": "not flagged (address-space filter)"
+  },
+  "p10_vector.ll": {
+   "nuw_added": [],
+   "verdict": "not flagged (vector filter); codegen aborts identically on baseline and candidate (pre-existing MOS vector GEP limitation, MachineIRBuilder assertion)"
+  },
+  "p11_const_base.ll": {
+   "nuw_added": [
+    "@nowrap_const gep nuw i8, ptr inttoptr (i16 -256), i16 %0"
+   ],
+   "verdict": "justified via isKnownPredicate (range-based NUW, 0xFF00+63 < 0x10000); @wraps_const (0xFFF0, wraps at iteration 16) correctly not flagged; @range_base conservative miss; no assembly change because canFoldNearIndex known bits already fold constant bases"
+  },
+  "p12_misc.ll": {
+   "nuw_added": [
+    "@step2 gep nuw i8 %p, %0"
+   ],
+   "verdict": "justified; escape_cmp uses a pointer IV (not flagged); optnone not flagged"
+  }
+ },
+ "rereview": {
+  "date": "2026-09-29",
+  "verdict": "approve with changes (one test-comment nit); findings 1, 2, 5 resolved; finding 3 version resolved, effort unverified",
+  "final_commit": "43e1c4d6d5eae794c9559d2135e5ef2b7daf80e3",
+  "patch_sha256": {
+   "0001": "613285e82e683a91fcf2ed2a938ff9c62817655e472e294ae2b938329388f134",
+   "0002": "51c977e24629f2f2a7f4f024b97d5e274c5a7920cc9120e0526e8f043065aee3"
+  },
+  "tool_sha256": {
+   "candidate/bin/llc": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+   "candidate/bin/opt": "52e181a85a35a38703f37dd93288dccaf6fc862c44c164a55c8c633347b2470d",
+   "candidate-v2/bin/llc": "b8329fc5b147352157a48d481baba9fd2be59744c05f1337460aea6ed20e11b0 (file since removed for disk; hash from removed-for-disk.sha256)",
+   "baseline/bin/llc": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+   "build/llvm-mos/bin/llc (downstream)": "cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7"
+  },
+  "test_sha256": "dd56f39bc6cf3b77fcecfad1633a05afbb6d23d376c009a6afdfc86d1648d2ab",
+  "note": "all llc runs after the coordinator request used ulimit -c 0; exit 134 is SIGABRT from the machine verifier",
+  "commands": [
+   {
+    "cmd": "git -C build/near-proof-upstream/source diff 2987f4d18e97 43e1c4d6d5ea",
+    "exit": 0,
+    "result": "4 files, +49/-9: ID-based insertPass, DataLayout index width, LLVM_DEBUG proof path, two new tests"
+   },
+   {
+    "cmd": "gdb -batch -x review/gdb2-{O0,O2,disable-lsr}.cmd candidate/bin/llc (count callDefaultCtor<MOSRecoverNearNoWrap> vs ~MOSRecoverNearNoWrap) on near-index-proofs.ll",
+    "exit": 0,
+    "result": {
+     "-O0": "created=0 destroyed=0",
+     "-O2": "created=1 destroyed=1",
+     "-disable-lsr": "created=0 destroyed=0"
+    }
+   },
+   {
+    "cmd": "regression.sh build/near-proof-upstream/candidate/bin <test>",
+    "exit": 0,
+    "checks": "6/6 EXIT 0",
+    "log": "build/near-proof-upstream/review/rr-regression-candidate.log"
+   },
+   {
+    "cmd": "regression.sh build/near-proof-upstream/baseline/bin <test>",
+    "exit": 0,
+    "checks": {
+     "default indexed forms": 1,
+     "xy16 indexed forms": 1,
+     "recovery disabled": 2,
+     "recovered IR flags": 2,
+     "6502 exclusion": 2,
+     "opt startup": 0
+    },
+    "log": "build/near-proof-upstream/review/rr-regression-baseline.log"
+   },
+   {
+    "cmd": "candidate-v2/bin/llc -stop-after=mos-near-nowrap-recovery <test> | candidate/bin/FileCheck --check-prefix=IR (run before candidate-v2 llc was removed)",
+    "exit": 0
+   },
+   {
+    "cmd": "candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -debug-only=mos-near-nowrap-recovery -o /dev/null <test>",
+    "exit": 0,
+    "result": "recurrence x3 (near_copy src/dst, global_fill), ordering x1 (ordered_const_base)",
+    "log": "build/near-proof-upstream/review/rr-proof-paths.log"
+   },
+   {
+    "cmd": "TOOLS=candidate/bin OUT=out-final review/run-probes2.sh; diff probes.log probes-final.log; cmp out/* out-final/*",
+    "exit": 0,
+    "result": "identical flag decisions, exit codes and asm-changed flags; all .ir/.s outputs byte-identical (asm scratch deleted afterwards)",
+    "log": "build/near-proof-upstream/review/probes-final.log"
+   },
+   {
+    "cmd": "dev/container.sh -v source:/src -- clang-format; clang-format-diff.py -p1 over git diff -U0 fbf0a82fd70a 43e1c4d6d5ea",
+    "exit": 0,
+    "result": "pass files clean; only hunk is the patch-1 MOSInsertREPSEP.h include order",
+    "log": "build/near-proof-upstream/review/rr-clang-format.log"
+   },
+   {
+    "cmd": "dev/check-comment-history.py logic (patch_comments + narratives) on final 0002",
+    "exit": 0,
+    "result": "0 findings"
+   },
+   {
+    "cmd": "bash build/near-proof-upstream/run-suite.sh candidate",
+    "exit": 0,
+    "result": "145 discovered, 144 passed, 1 unsupported (getchar-regression.ll), 0 failed; llc c8fb18cb, source 43e1c4d6",
+    "log": "build/near-proof-upstream/review/rr-suite-candidate.log",
+    "json_sha256": "5f9685e1611e8c1c5d977b3730b4ba1952e0cdf1cc74a2c56b74588baf5870e2",
+    "note": "coordinator candidate-suite.json restored (sha256 5fd665ee...)"
+   },
+   {
+    "cmd": "candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj boids.xy16.ll -o /dev/null",
+    "exit": 134,
+    "result": "main %bb.25 PH $p Using an undefined physical register (after MOS Insert REP/SEP)",
+    "log": "build/near-proof-upstream/review/preservex/fail.err.head"
+   },
+   {
+    "cmd": "same with -mos-recover-near-nowrap=false",
+    "exit": 0
+   },
+   {
+    "cmd": "candidate llc ... -verify-machineinstrs -stop-before=mos-insert-rep-sep boids.xy16.ll",
+    "exit": 0
+   },
+   {
+    "cmd": "candidate llc -run-pass=mos-insert-rep-sep on that MIR",
+    "exit": 1,
+    "result": "MIR parse error: StackID is not supported by target (stack-id: mos-static)"
+   },
+   {
+    "cmd": "sed 's/stack-id: mos-static/stack-id: default/'; llc -run-pass=machineverifier",
+    "exit": 0,
+    "result": "0 errors"
+   },
+   {
+    "cmd": "llc -run-pass=mos-insert-rep-sep -verify-machineinstrs on the rewritten MIR",
+    "exit": 134,
+    "result": "PH $p Using an undefined physical register",
+    "log": "build/near-proof-upstream/review/preservex/runpass.err.head"
+   },
+   {
+    "cmd": "llc -stop-after=prolog-epilog, -stop-before=mos-copy-opt, -stop-after=mos-copy-opt (recovery on); -stop-after=prolog-epilog, -stop-before=mos-insert-rep-sep (recovery off); python3 review/preservex/analyze2.py",
+    "exit": 0,
+    "result": "only non-undef N/Z/P read in main at PEI and before copy-opt: PH $p in bb.28; N/Z live-in blocks 0 -> 15 across mos-copy-opt (bb.14-29 minus bb.25); recovery off: no PH $p, 0 live-ins",
+    "log": "build/near-proof-upstream/review/preservex/nz-analysis.txt"
+   },
+   {
+    "cmd": "llc -stop-after=mos-near-nowrap-recovery boids (on vs off); diff",
+    "exit": 0,
+    "result": "80 diff lines = 40 GEPs gaining nuw; no other change",
+    "log": "build/near-proof-upstream/review/preservex/onoff.diff"
+   },
+   {
+    "cmd": "candidate llc -mos-recover-near-nowrap=false boids -o off.s; baseline llc boids -o base.s; cmp",
+    "exit": 0,
+    "result": "byte-identical"
+   },
+   {
+    "cmd": "candidate llc boids without -verify-machineinstrs",
+    "exit": 0
+   },
+   {
+    "cmd": "baseline/bin/llc (patch 1 only) -verify-machineinstrs -start-after=loop-reduce -filetype=obj postlsr-on.ll (recovered IR, sha256 faac422f8ca40fb09c19697e5058f2b38f609b0abba2ffaec67126c829f6ec7a)",
+    "exit": 134,
+    "result": "main %bb.25 PH $p Using an undefined physical register",
+    "log": "build/near-proof-upstream/review/preservex/b-on.err.head"
+   },
+   {
+    "cmd": "baseline/bin/llc same on postlsr-off.ll (recovery-off IR)",
+    "exit": 0
+   },
+   {
+    "cmd": "baseline/bin/llc same with -disable-spill-hoist on recovered IR",
+    "exit": 134
+   },
+   {
+    "cmd": "build/llvm-mos/bin/llc (downstream cf5355d3) -verify-machineinstrs -start-after=loop-reduce on recovered IR, with and without -disable-spill-hoist",
+    "exit": [
+     134,
+     134
+    ],
+    "result": "PH $p Using an undefined physical register, %bb.25",
+    "log": [
+     "build/near-proof-upstream/review/preservex/d-on.err.head",
+     "build/near-proof-upstream/review/preservex/d-on2.err.head"
+    ]
+   },
+   {
+    "cmd": "git blame MOSInsertREPSEP.cpp:394-399 and MOSRegisterInfo.cpp:295-330; git show 06bc967d2668:MOSRegisterInfo.cpp",
+    "exit": 0,
+    "result": "SaveAP/PLive and scavenger PUndef P-save both fbf0a82 (patch 1); destination had a bare PH $p; MOSCopyOpt fullyRecomputeLiveIns is destination (26d7c2c1)"
+   },
+   {
+    "cmd": "python3 bucket replay/report.json and replay-driver/report.json; grep failure signature per arm log",
+    "exit": 0,
+    "result": {
+     "replay": "10 baseline-only, 11 candidate-only; 17 Remaining virtual register (all STStk), 3 VirtRegRewriter undefined COPY (baseline), 1 preserveX PH $p (candidate)",
+     "replay-driver": "5 baseline-only VirtRegRewriter undefined COPY, 1 candidate-only boids xy16 preserveX; no Remaining virtual register logs",
+     "disabled_vs_baseline": "equal exit and code hash in 1236/1236 in both runs"
+    }
+   },
+   {
+    "cmd": "grep baseline_only/candidate_only in replay.log and replay-driver.log vs report.json per mode",
+    "exit": 0,
+    "result": "log summaries have the two labels swapped (driver log candidate_only 1/2/2 = report baseline_only 1/2/2); measure.py modified 13:20Z after both runs; evidence/replay-summary-llc-only.json matches report.json"
+   },
+   {
+    "cmd": "git -C source cat-file -p 06bc967d2668:clang/lib/Driver/ToolChains/CommonArgs.cpp | grep -n disable-spill-hoist",
+    "exit": 0,
+    "result": "2742: CmdArgs.push_back(\"-disable-spill-hoist\")"
+   }
+  ]
+ }
+}

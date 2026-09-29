@@ -1,0 +1,99 @@
+{
+  "schema": 1,
+  "id": "mos-near-nowrap-option-clash",
+  "title": "opt aborts at startup: near no-wrap recovery pass and its switch share one option name",
+  "status": "confirmed",
+  "reproducer_origin": "original",
+  "report": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+  "summary": "MOSRecoverNearNoWrap registers its legacy pass argument and its -mos-recover-near-nowrap cl::opt under the same string. opt turns every registered legacy pass into a command-line option, so any opt binary containing the MOS target aborts with \"Option 'mos-recover-near-nowrap' registered more than once\" before reading input. llc and clang are unaffected. Downstream 0002 still carries the collision; the upstream extraction names the pass mos-near-nowrap-recovery and keeps the switch.",
+  "attribution": [
+    "Structured record, preserved baseline and extraction repair: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+    "Earlier sightings are credited in docs/investigations/2026-09-28-farblit-range-integration.md and docs/defects/mos-xy16-stale-x-writer-reload.json."
+  ],
+  "unknowns": [
+    "The exact vendor dirty state linked into the preserved downstream opt was not captured; the diagnostic names the colliding string.",
+    "Downstream 0002 is not yet repaired; the installed toolchain does not ship opt."
+  ],
+  "prior_work": {
+    "disposition": "distinct_from_related",
+    "search_terms": [
+      "registered more than once",
+      "mos-recover-near-nowrap",
+      "MOSRecoverNearNoWrap",
+      "INITIALIZE_PASS"
+    ],
+    "related_records": [
+      "docs/defects/mos-near-index-overflow-proofs.json",
+      "docs/defects/mos-xy16-stale-x-writer-reload.json"
+    ],
+    "related_reports": [
+      "docs/investigations/2026-09-28-farblit-range-integration.md",
+      "docs/investigations/2026-09-28-vlastack-xy16-stale-reload.md"
+    ],
+    "related_changes": [
+      "6c5907b4",
+      "patches/llvm-mos/0002-321-accum16.patch"
+    ],
+    "source_assessment": "vendor/llvm-mos/llvm/lib/Target/MOS/MOSRecoverNearNoWrap.cpp uses \"mos-recover-near-nowrap\" for both the cl::opt and INITIALIZE_PASS_BEGIN/END. Destination 06bc967d2668 has no such pass.",
+    "binary_assessment": "build/llvm-mos/bin/opt (built 2026-09-28) is preserved by hard link as build/near-nowrap-option-clash/baseline/opt and reproduces the abort. The extracted revision 98984efd reproduces it; the final extraction 43e1c4d6 does not.",
+    "decision": "Distinct from mos-near-index-overflow-proofs: that record tracks the missed indexed-addressing optimization, while this one is a pass-registration defect in the same file that aborts opt before any code generation. llc and clang do not build the legacy pass-name option parser, so the optimization evidence is unaffected. Two September 28 audits recorded this collision only as a qualification of suite results; this is its first structured record.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/prior-work.json",
+      "sha256": "a47d09f30a9857d6c9d35dda7ea92baccd1b7647ea8302ecf632e4c0fd368908"
+    }
+  },
+  "baseline": {
+    "command": "build/near-nowrap-option-clash/baseline/opt -passes=verify -disable-output docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "tool": "opt",
+      "pass_pipeline": "verify",
+      "target_initialization": "all targets, including MOS",
+      "expected": "opt starts and verifies the module"
+    },
+    "toolchain_location": "build/near-nowrap-option-clash/baseline/opt (hard link of build/llvm-mos/bin/opt); identity in docs/defects/evidence/2026-09-29-near-nowrap-option-clash/identity.json",
+    "toolchain_sha256": "07fa3ee03c79d9b0c538cdfacd0bde5c7c1684f23651d62ca49c02ec8b7378e6",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/verify.ll",
+      "sha256": "375d7bdbbd7ad3a8382da9edeeb55a76f29f22356bfa1d7a76ed448367f9c539"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/baseline.log",
+      "sha256": "3abc53df1738bccf27814e0f54e332b2c381f6fac33315529285665e7dbf520e"
+    },
+    "exit_code": 134,
+    "failure_signature": "Option 'mos-recover-near-nowrap' registered more than once"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/identity.json",
+      "sha256": "4088de27076cba1d4b6b229685f7f6045d896474e6d78d5c126f1b7634b28a97"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/extracted-v1.log",
+      "sha256": "89aacc6be9c9640aa12cbf58ba6e2e100073c66f6e43de05a3615a7a754e10c6"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/extracted-final.log",
+      "sha256": "7d3c27373a9d55bb0e07d7e8ed2ffa223eed435b5379597943e7d2418941d65a"
+    }
+  ],
+  "additional_runs": [
+    {
+      "kind": "upstream_extraction_repair",
+      "date": "2026-09-29",
+      "source_revision": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+      "failing_revision": "98984efd54651c2a9bb08e8a3022dc21ab29ff0a",
+      "repaired_revision": "43e1c4d6d5eae794c9559d2135e5ef2b7daf80e3",
+      "failing_log": {
+        "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/extracted-v1.log",
+        "sha256": "89aacc6be9c9640aa12cbf58ba6e2e100073c66f6e43de05a3615a7a754e10c6"
+      },
+      "repaired_log": {
+        "path": "docs/defects/evidence/2026-09-29-near-nowrap-option-clash/extracted-final.log",
+        "sha256": "7d3c27373a9d55bb0e07d7e8ed2ffa223eed435b5379597943e7d2418941d65a"
+      },
+      "result": "The same verify.ll command exits 134 with the duplicate-registration signature on the first extraction and 0 on the final extraction, whose pass argument is mos-near-nowrap-recovery. MOS CodeGen+MC suites: first extraction 139 passed, 5 failed (the five opt-based tests), 1 unsupported; repaired extraction 144 passed, 1 unsupported. The extracted regression adds an opt startup RUN line."
+    }
+  ]
+}

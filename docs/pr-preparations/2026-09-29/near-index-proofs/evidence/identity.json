@@ -1,0 +1,84 @@
+{
+  "build": {
+    "host_source": "build/near-proof-upstream/source (sparse worktree of .scratch/carry-clang-upstream/source), mounted as /work/build/register-exhaustion-src",
+    "host_build": "build/near-proof-upstream/build (hard-link copy of the 0065 packet build with in-place-written files un-shared), mounted as /work/build/0029-cross-target-build",
+    "container": "llvm-mos-65816-dev via dev/container.sh",
+    "cmake": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+      "CMAKE_C_COMPILER": "/usr/bin/clang",
+      "LLVM_ENABLE_ASSERTIONS": "ON",
+      "LLVM_TARGETS_TO_BUILD": "X86;ARM;AArch64",
+      "LLVM_EXPERIMENTAL_TARGETS_TO_BUILD": "MOS",
+      "LLVM_USE_LINKER": "lld",
+      "LLVM_MOS_EXPERIMENTAL_REGALLOC_DEFAULT": "OFF",
+      "LLVM_APPEND_VC_REV": "ON"
+    },
+    "logs": [
+      "baseline-build.log (72 steps)",
+      "candidate-build.log (33 steps)",
+      "candidate-final-build.log (5 steps, byte-identical llc after whitespace-only reformat)",
+      "candidate-v2-build.log (4 steps)",
+      "candidate-v3-build.log (review fixes; one ENOSPC failure of the opt link, then a successful relink)"
+    ]
+  },
+  "toolsets": {
+    "baseline": {
+      "source_commit": "fbf0a82fd70a92963cb2dcea10ae93d660e27b64",
+      "description": "patch 1 only",
+      "frozen": "build/near-proof-upstream/baseline/bin",
+      "sha256": {
+        "llc": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+        "opt": "4f7feda2a59c3bf65388327e0100ee90804d1169a70d261b4ca7ce31824a2d11",
+        "llvm-mc": "ab07c8784b9fb6fdf2060404aa56f8defe909b4b5c9036be3850e6c9be32666f",
+        "llvm-objdump": "c68483fa822b29f459424341a8dbfa4721cdcf2aced7ec08c32479fee9b87002",
+        "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+        "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+        "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+        "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+        "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+        "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+        "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+        "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610"
+      }
+    },
+    "candidate_v1": {
+      "source_commit": "98984efd54651c2a9bb08e8a3022dc21ab29ff0a",
+      "description": "first extraction; pass argument collides with its switch",
+      "frozen": "build/near-proof-upstream/candidate-v1/bin",
+      "sha256": {
+        "llc": "5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b (removed after capture)",
+        "opt": "6eb96b3b76ab115f46a1a9101c9843799dbace7797da781ff16720a16a2d0934"
+      }
+    },
+    "candidate": {
+      "source_commit": "980fe1f29381a212e585df81e537ed21bcfe4a68",
+      "description": "patches 1 and 2 (final, after independent-review fixes)",
+      "frozen": "build/near-proof-upstream/candidate/bin",
+      "sha256": {
+        "llc": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+        "opt": "52e181a85a35a38703f37dd93288dccaf6fc862c44c164a55c8c633347b2470d",
+        "llvm-mc": "ab07c8784b9fb6fdf2060404aa56f8defe909b4b5c9036be3850e6c9be32666f",
+        "llvm-objdump": "c68483fa822b29f459424341a8dbfa4721cdcf2aced7ec08c32479fee9b87002",
+        "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+        "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+        "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+        "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+        "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+        "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+        "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+        "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610"
+      },
+      "built_from": "43e1c4d6d5eae794c9559d2135e5ef2b7daf80e3; the final commit differs only in llvm/test/CodeGen/MOS/near-index-proofs-debug.ll, llvm/test/CodeGen/MOS/near-index-proofs.ll"
+    },
+    "candidate_v2": {
+      "source_commit": "2987f4d18e971a6fe383589823891ff136e4d1ec",
+      "description": "pass argument renamed; replay-driver run; superseded by review fixes",
+      "frozen": "build/near-proof-upstream/candidate-v2/bin (llc only)",
+      "sha256": {
+        "llc": "b8329fc5b147352157a48d481baba9fd2be59744c05f1337460aea6ed20e11b0",
+        "opt": "e00726e194e9d93b39c58be850339725d7150c48c800455ab69695040c022a29 (removed after capture)"
+      }
+    }
+  }
+}

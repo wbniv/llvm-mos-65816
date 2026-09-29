@@ -1,0 +1,8 @@
+2026-09-29T12:45:06Z start candidate rebuild at 98984efd54651c2a9bb08e8a3022dc21ab29ff0a (host build/near-proof-upstream/build as /work/build/0029-cross-target-build)
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/5] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSTargetMachine.cpp.o
+[2/5] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSRecoverNearNoWrap.cpp.o
+[3/5] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[4/5] Linking CXX executable bin/llc
+[5/5] Linking CXX executable bin/opt
+2026-09-29T12:45:15Z rc=0

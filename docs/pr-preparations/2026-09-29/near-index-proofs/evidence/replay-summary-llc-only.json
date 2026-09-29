@@ -1,0 +1,366 @@
+{
+  "modes": {
+    "default": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 321,
+      "baseline_bytes": 1521859,
+      "candidate_bytes": 1511950,
+      "delta": -9909,
+      "smaller": 137,
+      "larger": 23,
+      "code_changed": 161,
+      "baseline_only_failures": 2,
+      "candidate_only_failures": 3,
+      "both_arms_failed": 86
+    },
+    "a16": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 306,
+      "baseline_bytes": 1289726,
+      "candidate_bytes": 1265796,
+      "delta": -23930,
+      "smaller": 140,
+      "larger": 4,
+      "code_changed": 145,
+      "baseline_only_failures": 4,
+      "candidate_only_failures": 3,
+      "both_arms_failed": 99
+    },
+    "xy16": {
+      "inputs": 412,
+      "frontend_failures": 0,
+      "paired": 304,
+      "baseline_bytes": 1254772,
+      "candidate_bytes": 1230922,
+      "delta": -23850,
+      "smaller": 140,
+      "larger": 4,
+      "code_changed": 145,
+      "baseline_only_failures": 4,
+      "candidate_only_failures": 5,
+      "both_arms_failed": 99
+    }
+  },
+  "disabled_matches_baseline": 942,
+  "disabled_compared": 942,
+  "disabled_exit_mismatches": 0,
+  "larger": [
+    {
+      "source": "examples/65816/a16cmpaudit.c",
+      "mode": "a16",
+      "growth": 575,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "a16",
+      "growth": 112,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "a16",
+      "growth": 30,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "a16",
+      "growth": 91,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/absdiff.c",
+      "mode": "default",
+      "growth": 2,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/bitcensus.c",
+      "mode": "default",
+      "growth": 6,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/burning-ship.c",
+      "mode": "default",
+      "growth": 12,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/byvaledge_sim.c",
+      "mode": "default",
+      "growth": 16,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/critters_sim.c",
+      "mode": "default",
+      "growth": 9,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "default",
+      "growth": 19,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/fenwick_sim.c",
+      "mode": "default",
+      "growth": 4,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/keycmp64_sim.c",
+      "mode": "default",
+      "growth": 7,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/mandel-double_sim.c",
+      "mode": "default",
+      "growth": 49,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/mandel-float_sim.c",
+      "mode": "default",
+      "growth": 2,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/msquares_sim.c",
+      "mode": "default",
+      "growth": 46,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "default",
+      "growth": 48,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/polyfill_sim.c",
+      "mode": "default",
+      "growth": 9,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/poolfx_sim.c",
+      "mode": "default",
+      "growth": 104,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "default",
+      "growth": 139,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/cpu6502.c",
+      "mode": "default",
+      "growth": 42,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "default",
+      "growth": 21,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/hdr-bloom.c",
+      "mode": "default",
+      "growth": 22,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/newton.c",
+      "mode": "default",
+      "growth": 22,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/poolfx.c",
+      "mode": "default",
+      "growth": 12,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/shift64seam.c",
+      "mode": "default",
+      "growth": 15,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/snes-video-reel.c",
+      "mode": "default",
+      "growth": 1,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/speedcap.c",
+      "mode": "default",
+      "growth": 77,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/bsearchviz_sim.c",
+      "mode": "xy16",
+      "growth": 41,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/dither_sim.c",
+      "mode": "xy16",
+      "growth": 71,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/percol_sim.c",
+      "mode": "xy16",
+      "growth": 55,
+      "ir_far_address_space": false
+    },
+    {
+      "source": "examples/snes/corpus/speedcap_sim.c",
+      "mode": "xy16",
+      "growth": 91,
+      "ir_far_address_space": false
+    }
+  ],
+  "arm_specific_failures": [
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "default",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/corpus/dblbridge_sim.c",
+      "mode": "default",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/corpus/multibase_sim.c",
+      "mode": "default",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/hull.c",
+      "mode": "default",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/msquares.c",
+      "mode": "default",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "a16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/n-body.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/sodo.c",
+      "mode": "a16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/speedcap.c",
+      "mode": "a16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/trimerge.c",
+      "mode": "a16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/bigbyval.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/boids.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "verifier: Using an undefined physical register (after MOS Insert REP/SEP)"
+    },
+    {
+      "source": "examples/snes/dctbloom.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/grid3d.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "verifier: Using an undefined physical register (after Virtual Register Rewriter)"
+    },
+    {
+      "source": "examples/snes/mulov64.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/n-body.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/sodo.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/speedcap.c",
+      "mode": "xy16",
+      "fails_on": "candidate",
+      "signature": "remaining virtual register (STStk scratch)"
+    },
+    {
+      "source": "examples/snes/trimerge.c",
+      "mode": "xy16",
+      "fails_on": "baseline",
+      "signature": "remaining virtual register (STStk scratch)"
+    }
+  ],
+  "configuration": "plain llc, no -disable-spill-hoist; candidate 2987f4d1 (llc b8329fc5); frozen IR identical to the driver-parity runs"
+}

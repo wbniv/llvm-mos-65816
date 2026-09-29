@@ -1,0 +1,23 @@
+{
+  "mechanism": [
+    "prolog-epilog (register scavenging) saves the status register around a scratch use in a loop block with a full-register read, PH killed $p, because C is genuinely live there; the flags N, Z and V are undefined on that path.",
+    "MOSCopyOpt recomputes block live-ins exactly; the whole-register read makes $nz (and $v) live-in to 15 blocks of main, back to a block whose JSR register mask clobbers N and Z.",
+    "MOSInsertREPSEP::preserveX, after that JSR, computes PLive from LivePhysRegs stepped backward from live-outs. $nz is in that set, so it emits PH $p without undef.",
+    "The machine verifier walks forward: no subregister of $p is defined after the call clobber, so it reports Using an undefined physical register at PH $p."
+  ],
+  "stage_observations": {
+    "PH $p in main by pass (candidate)": {
+      "greedy": 0,
+      "virtregrewriter": 0,
+      "prolog-epilog": 1,
+      "branch-folder": 1
+    },
+    "blocks with $nz live-in (candidate)": {
+      "before mos-copy-opt": 0,
+      "after mos-copy-opt": 15,
+      "after second postrapseudos": 19
+    }
+  },
+  "mir": "main-before-rep-sep.mir.xz (function main only, llc -stop-before=mos-insert-rep-sep)",
+  "scope": "The defect lies in preserveX (#321 prerequisite, also carried in 0002) deciding P liveness by backward liveness alone. Near-index proof recovery changes register allocation for this input so that the scavenger saves P before a preserveX point; recovery does not introduce the flag liveness itself."
+}

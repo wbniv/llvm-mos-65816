@@ -1,0 +1,33 @@
+1:  55ef9c1bdc67 ! 1:  fbf0a82fd70a [MOS] Extract opt-in native widths and near-memory prerequisites
+    @@ llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h: public:
+        void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+     
+      ## llvm/lib/Target/MOS/MOS.h ##
+    -@@ llvm/lib/Target/MOS/MOS.h: void initializeMOSCombinerPass(PassRegistry &);
+    - void initializeMOSCopyOptPass(PassRegistry &);
+    +@@ llvm/lib/Target/MOS/MOS.h: void initializeMOSCopyOptPass(PassRegistry &);
+    + void initializeMOSImagRegAllocPass(PassRegistry &);
+      void initializeMOSIndexIVPass(PassRegistry &);
+      void initializeMOSInsertCopiesPass(PassRegistry &);
+     +void initializeMOSInsertREPSEPPass(PassRegistry &);
+    @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp
+      #include "MOSLowerSelect.h"
+      #include "MOSMachineFunctionInfo.h"
+     @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp: extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+    -   initializeMOSCombinerPass(PR);
+        initializeMOSCopyOptPass(PR);
+    +   initializeMOSImagRegAllocPass(PR);
+        initializeMOSInsertCopiesPass(PR);
+     +  initializeMOSInsertREPSEPPass(PR);
+        initializeMOSInternalizePass(PR);
+    @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp: void MOSPassConfig::addPreSched2() {
+     +  addPass(&BranchRelaxationPassID);
+     +}
+      
+    - namespace {
+    - 
+    + void MOSPassConfig::addExperimentalRegAlloc() {
+    +   addPass(&DetectDeadLanesID);
+     
+      ## llvm/test/CodeGen/MOS/a16-byte-store.ll (new) ##
+     @@

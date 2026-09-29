@@ -1,5 +1,5 @@
 {
-  "reviewedAt": "2026-09-28",
+  "reviewedAt": "2026-09-29",
   "defectOverrides": {
     "mos-near-store-profitability": {
       "id": "opt:near-store-broad",
@@ -127,13 +127,15 @@
       "dependsOn": [
         "platform:321"
       ],
-      "nextStep": "Carry verified near-index proof recovery with the native-width feature series; extract and review against the eventual destination.",
+      "nextStep": "Upstream packet extracted onto 06bc967d2668 and independently reviewed; post with the #321 native-width series when requested.",
       "demoUrls": [
         "https://biohack.net/snes/lzss-gallery/"
       ],
       "evidencePaths": [
         "docs/defects/mos-near-index-overflow-proofs.json",
-        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+        "docs/pr-preparations/2026-09-29/near-index-proofs/README.md",
+        "docs/pr-preparations/2026-09-29/near-index-proofs/independent-review.md"
       ]
     },
     "mos-near-index-bank-wrap": {
@@ -199,6 +201,31 @@
       ],
       "nextStep": "Independently review with the extracted native/far compiler series; this repair is validated in the candidate and is not installed downstream.",
       "evidenceNote": "Matching-input assertions red/green evidence is retained. Pristine upstream lacks the native register classes and does not expose this path."
+    },
+    "mos-near-nowrap-option-clash": {
+      "publicationStatus": "not-applicable",
+      "dependsOn": [
+        "defect:mos-near-index-overflow-proofs"
+      ],
+      "nextStep": "The upstream extraction already names the pass separately. Port that rename and ID-based insertion to 0002, rebuild opt, and rerun the full MOS suites.",
+      "evidencePaths": [
+        "docs/defects/mos-near-nowrap-option-clash.json",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+      ]
+    },
+    "mos-xy16-preserve-x-p-save": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:321"
+      ],
+      "nextStep": "Repair preserveX so it saves $p as undefined when no status flag is defined, in 0002 and the #321 prerequisite; red/green on the retained boids.c XY16 IR.",
+      "demoUrls": [
+        "https://biohack.net/snes/boids/"
+      ],
+      "evidencePaths": [
+        "docs/defects/mos-xy16-preserve-x-p-save.json",
+        "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
+      ]
     }
   },
   "items": [

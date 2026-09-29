@@ -1,0 +1,68 @@
+{
+  "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+  "commits": [
+    "fbf0a82fd70a92963cb2dcea10ae93d660e27b64 [MOS] Extract opt-in native widths and near-memory prerequisites",
+    "980fe1f29381a212e585df81e537ed21bcfe4a68 [MOS] Recover near-index no-wrap proofs after loop strength reduction"
+  ],
+  "patches": {
+    "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch": "613285e82e683a91fcf2ed2a938ff9c62817655e472e294ae2b938329388f134",
+    "patches/0002-MOS-Recover-near-index-no-wrap-proofs-after-loop-str.patch": "4930beb64e2625c15335d432dbab4152f583b0a8bbaedd314ae9f74f291eb310"
+  },
+  "roundtrip_tree": "ec89cf0efd5ebeb332fcb31631193a6a92afdb75",
+  "expected_tree": "ec89cf0efd5ebeb332fcb31631193a6a92afdb75",
+  "commands": [
+    {
+      "command": [
+        "read-tree",
+        "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "--check",
+        "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch"
+      ],
+      "exit_code": 0,
+      "output": "patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch:216: new blank line at EOF.\n+\nwarning: 1 line adds whitespace errors.\n"
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "--check",
+        "patches/0002-MOS-Recover-near-index-no-wrap-proofs-after-loop-str.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "apply",
+        "--cached",
+        "patches/0002-MOS-Recover-near-index-no-wrap-proofs-after-loop-str.patch"
+      ],
+      "exit_code": 0,
+      "output": ""
+    },
+    {
+      "command": [
+        "write-tree"
+      ],
+      "exit_code": 0,
+      "output": "ec89cf0efd5ebeb332fcb31631193a6a92afdb75\n"
+    }
+  ]
+}

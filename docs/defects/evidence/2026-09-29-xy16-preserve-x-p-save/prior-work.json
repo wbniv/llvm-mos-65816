@@ -1,0 +1,24 @@
+{
+  "date": "2026-09-29",
+  "searches": [
+    "rg -n 'preserveX|PLive' docs",
+    "rg -n 'undefined physical register' docs/defects docs/investigations",
+    "rg -n 'PH \\$p|PH undef' docs/upstream-contribution-status.md",
+    "git log --oneline -- patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "findings": [
+    {
+      "path": "docs/defects/mos-xy16-stale-x-writer-reload.json",
+      "observation": "Its repair (9a2ece34) introduced MOSInsertREPSEP::preserveX; unknowns list opaque hard-stack operations and stack-relative range, not P-save liveness."
+    },
+    {
+      "path": "patches/llvm-mos/0011-mos-scavenger-live-p-save.patch",
+      "observation": "Scavenger P-save undef handling (hasNoAvailableValue) is present in both 0002 and the extracted prerequisite; here it correctly keeps $p defined because C is live."
+    },
+    {
+      "path": "docs/upstream-contribution-status.md",
+      "observation": "Earlier PH $p verifier failures (strlen-4.c -O0, scavenger live-$p) concern the scavenger save itself, not preserveX."
+    }
+  ],
+  "decision": "Distinct causal defect in preserveX P-save liveness; it is not the stale X reload and not the scavenger save."
+}

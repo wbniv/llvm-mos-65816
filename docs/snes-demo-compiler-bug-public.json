@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "canonical_source": "docs/snes-compiler-contributions.json",
-  "records_sha256": "f7866c56ec66be6bfce960dd948df64ac731d672fe3696b1c487c84a5f39877d",
+  "records_sha256": "b2656b172251208d697249cf8d51f0ab617e0ed06664a02bfd059d52a2e52f2e",
   "records": [
     {
       "slug": "blossom",
@@ -298,7 +298,8 @@
       "evidence": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
       "prs": [],
       "pr_simulations": [
-        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/pr-preparations/2026-09-29/near-index-proofs/pr-body.md"
       ]
     },
     {

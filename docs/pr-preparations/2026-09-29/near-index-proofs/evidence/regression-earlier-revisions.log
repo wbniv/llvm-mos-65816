@@ -1,0 +1,87 @@
+######## toolset baseline (2026-09-29T12:49:37Z)
+llc sha256: b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45
+opt sha256: 4f7feda2a59c3bf65388327e0100ee90804d1169a70d261b4ca7ce31824a2d11
+test sha256: 6b8295b381658b9d672150002f3869fe32da11bf3a027b8278c2e981332d4662
+== default indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -verify-machineinstrs
+source/llvm/test/CodeGen/MOS/near-index-proofs.ll:26:10: error: CHECK: expected string not found in input
+source/llvm/test/CodeGen/MOS/near-index-proofs.ll:57:10: error: CHECK: expected string not found in input
+check:26'1                               error: no match found in search range
+check:57'1                                   error: no match found in search range
+EXIT: 1
+== xy16 indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs
+source/llvm/test/CodeGen/MOS/near-index-proofs.ll:26:10: error: CHECK: expected string not found in input
+source/llvm/test/CodeGen/MOS/near-index-proofs.ll:57:10: error: CHECK: expected string not found in input
+check:26'1                               error: no match found in search range
+check:57'1                                   error: no match found in search range
+EXIT: 1
+== recovery disabled
+COMMAND: llc_to DISABLED -mcpu=mosw65816 -mos-recover-near-nowrap=false -verify-machineinstrs
+llc: Unknown command line argument '-mos-recover-near-nowrap=false'.  Try: 'baseline/bin/llc --help'
+FileCheck error: '<stdin>' is empty.
+EXIT: 2
+== recovered IR flags
+COMMAND: llc_to IR -mcpu=mosw65816 -stop-after=mos-near-nowrap-recovery
+LLVM ERROR: "mos-near-nowrap-recovery" pass is not registered.
+FileCheck error: '<stdin>' is empty.
+EXIT: 2
+== 6502 exclusion
+COMMAND: llc_to PLAIN -mcpu=mos6502 -stop-after=mos-near-nowrap-recovery
+LLVM ERROR: "mos-near-nowrap-recovery" pass is not registered.
+FileCheck error: '<stdin>' is empty.
+EXIT: 2
+== opt startup
+COMMAND: baseline/bin/opt -passes=verify -disable-output source/llvm/test/CodeGen/MOS/near-index-proofs.ll
+EXIT: 0
+######## toolset candidate-v1 (2026-09-29T12:49:38Z)
+llc sha256: 5c51020752f595b862689bcc0c8ac98041256be1192d79e525b21eb96775612b
+opt sha256: 6eb96b3b76ab115f46a1a9101c9843799dbace7797da781ff16720a16a2d0934
+test sha256: 6b8295b381658b9d672150002f3869fe32da11bf3a027b8278c2e981332d4662
+== default indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -verify-machineinstrs
+EXIT: 0
+== xy16 indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs
+EXIT: 0
+== recovery disabled
+COMMAND: llc_to DISABLED -mcpu=mosw65816 -mos-recover-near-nowrap=false -verify-machineinstrs
+EXIT: 0
+== recovered IR flags
+COMMAND: llc_to IR -mcpu=mosw65816 -stop-after=mos-near-nowrap-recovery
+LLVM ERROR: "mos-near-nowrap-recovery" pass is not registered.
+FileCheck error: '<stdin>' is empty.
+EXIT: 2
+== 6502 exclusion
+COMMAND: llc_to PLAIN -mcpu=mos6502 -stop-after=mos-near-nowrap-recovery
+LLVM ERROR: "mos-near-nowrap-recovery" pass is not registered.
+FileCheck error: '<stdin>' is empty.
+EXIT: 2
+== opt startup
+COMMAND: candidate-v1/bin/opt -passes=verify -disable-output source/llvm/test/CodeGen/MOS/near-index-proofs.ll
+: CommandLine Error: Option 'mos-recover-near-nowrap' registered more than once!
+LLVM ERROR: inconsistency in registered CommandLine options
+7  opt       0x0000579213b90e45 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+EXIT: 134
+######## toolset candidate (2026-09-29T12:49:40Z)
+llc sha256: b8329fc5b147352157a48d481baba9fd2be59744c05f1337460aea6ed20e11b0
+opt sha256: e00726e194e9d93b39c58be850339725d7150c48c800455ab69695040c022a29
+test sha256: 6b8295b381658b9d672150002f3869fe32da11bf3a027b8278c2e981332d4662
+== default indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -verify-machineinstrs
+EXIT: 0
+== xy16 indexed forms
+COMMAND: llc_to CHECK -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs
+EXIT: 0
+== recovery disabled
+COMMAND: llc_to DISABLED -mcpu=mosw65816 -mos-recover-near-nowrap=false -verify-machineinstrs
+EXIT: 0
+== recovered IR flags
+COMMAND: llc_to IR -mcpu=mosw65816 -stop-after=mos-near-nowrap-recovery
+EXIT: 0
+== 6502 exclusion
+COMMAND: llc_to PLAIN -mcpu=mos6502 -stop-after=mos-near-nowrap-recovery
+EXIT: 0
+== opt startup
+COMMAND: candidate/bin/opt -passes=verify -disable-output source/llvm/test/CodeGen/MOS/near-index-proofs.ll
+EXIT: 0

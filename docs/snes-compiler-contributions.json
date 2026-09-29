@@ -298,7 +298,8 @@
       "evidence": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
       "prs": [],
       "pr_simulations": [
-        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md"
+        "docs/pr-preparations/2026-09-27/near-y-pr-simulation.md",
+        "docs/pr-preparations/2026-09-29/near-index-proofs/pr-body.md"
       ]
     },
     {

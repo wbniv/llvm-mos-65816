@@ -1,0 +1,143 @@
+{
+  "schema": 1,
+  "id": "mos-xy16-preserve-x-p-save",
+  "title": "XY16 X preservation saves $p as defined after a call clobbered its flags",
+  "status": "confirmed",
+  "reproducer_origin": "original",
+  "report": "docs/investigations/2026-09-27-near-index-overflow-proofs.md",
+  "summary": "MOSInsertREPSEP::preserveX decides whether its PH $p reads a defined status register from backward liveness. A scavenger status-register save elsewhere in the loop makes N/Z look live across blocks, so after a JSR that clobbered them preserveX emits PH $p without undef and the machine verifier rejects it. Found as the one candidate-only failure of the near-index proof replay on the extracted upstream series (boids.c, XY16). Given the IR carrying the recovered nuw flags, the prerequisite alone, the candidate and the downstream compiler all fail identically; the same source compiles on the downstream compiler because its earlier passes produce different IR. Only machine verification rejects it; without -verify-machineinstrs the object is emitted.",
+  "attribution": [
+    "Found and recorded during near-index proof upstream extraction: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96.",
+    "Recovered-IR reproduction first reported by the independent reviewer of the near-index proof packet (docs/pr-preparations/2026-09-29/near-index-proofs/independent-review.md) and replayed by the recorder."
+  ],
+  "unknowns": [
+    "No repair attempted. The fix belongs in preserveX, shared by 0002 and the #321 prerequisite; the scavenger P save that makes N/Z appear live is also patch-1 code.",
+    "No census source input reproduces it on the downstream compiler or on the prerequisite alone; other downstream inputs were not searched."
+  ],
+  "prior_work": {
+    "disposition": "distinct_from_related",
+    "search_terms": [
+      "preserveX",
+      "PLive",
+      "PH $p",
+      "undefined physical register",
+      "MOSInsertREPSEP"
+    ],
+    "related_records": [
+      "docs/defects/mos-xy16-stale-x-writer-reload.json"
+    ],
+    "related_reports": [
+      "docs/investigations/2026-09-28-vlastack-xy16-stale-reload.md"
+    ],
+    "related_changes": [
+      "9a2ece34",
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0011-mos-scavenger-live-p-save.patch"
+    ],
+    "source_assessment": "preserveX SaveAP sets PLive from LivePhysRegs.contains(C|N|Z|V) after stepping backward from block live-outs and emits PH $p with undef only when PLive is false. The extracted prerequisite and 0002 have identical code for it.",
+    "binary_assessment": "Failing extracted candidate llc c8fb18cb is frozen in build/near-proof-upstream/candidate/bin. On the original IR, the same llc with recovery disabled, the patch-1-only llc b8006489 and downstream build/llvm-mos/bin/llc exit 0. On IR produced by the candidate up to and including recovery (boids.xy16.recovered.ll, 40 nuw GEPs), patch-1-only, candidate and downstream llc all exit 134 with the same PH $p diagnostic when started after loop-reduce.",
+    "decision": "The related record repaired stale X reloads by adding preserveX; this record is a separate liveness defect in how preserveX saves P.",
+    "evidence": {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/prior-work.json",
+      "sha256": "9c8113705e7e3b4317612b24403cd9a05cbcee58feaa708ca0a23ecfe30793da"
+    }
+  },
+  "baseline": {
+    "command": "build/near-proof-upstream/candidate/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll -o /dev/null",
+    "working_directory": "/home/will/llvm-mos-65816",
+    "configuration": {
+      "cpu": "mosw65816",
+      "features": [
+        "+mos-a16",
+        "+mos-xy16"
+      ],
+      "optimization": "Os in the frozen IR; llc default -O2",
+      "lto": false,
+      "verifier": true,
+      "expected": "object emitted with machine verification"
+    },
+    "toolchain_location": "build/near-proof-upstream/candidate/bin/llc; identity in docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/identity.json",
+    "toolchain_sha256": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+    "input": {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.ll",
+      "sha256": "2a5fef2fb4a75ae3153ef0b4f8acd3a77c08c7e9e3d294b7ce181ad7f52737d9"
+    },
+    "log": {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/baseline.log",
+      "sha256": "de3872b4fa5500f6e3a8167e6a830c196de0a874b7c9cfc675a67af7fc485791"
+    },
+    "exit_code": 134,
+    "failure_signature": "Using an undefined physical register"
+  },
+  "observations": [
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/identity.json",
+      "sha256": "d3d94a5fd16b1c7c3a2ee9c11b1759a7f37b71edfc0a16bafdeac7a6479b15fd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/analysis.json",
+      "sha256": "227dca9f0351f8ddb8366bcf9e976b43c42b5453e1e35a9c0b5790bc620f0824"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/main-before-rep-sep.mir.xz",
+      "sha256": "8adf569a2a419232b501c46a724c93233f78dde7ce4fd9ce7dc9cb2de70f5e9b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/baseline-disable-spill-hoist.log",
+      "sha256": "02247680a1f8059b09e70968bef791974f94b94ad7790fa132a4d6316b3b2ffd"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/control-recovery-off.log",
+      "sha256": "d5c6e6351c44e95904238c313b2d2af77a31b3271dd36106637b029192fb43f7"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/control-patch1-only.log",
+      "sha256": "a43ef2c3446c8e5d501fd68c24c5df8966dba1bf4473d5174a0723a7cc510b3a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/control-downstream.log",
+      "sha256": "a94e4153ba14ac34601e4a2283a185a657d0be7fcc36ee4ff030fb7dcc4f365f"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.recovered.ll",
+      "sha256": "93c850fa23e158a94fd4166e1673d779732d8b8edfe91830c18e1776c9d8e0b5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-patch1-only.log",
+      "sha256": "833bdde746b17c107a8e1cbd057e3c489d87cee4736f65ac83c0663c0ff79744"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-downstream.log",
+      "sha256": "6e1f0a2f0b3fadd463af55ebcbbd3218f7207b30efccb6f03b955ddf077e0862"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-candidate.log",
+      "sha256": "7664c4afd8dd2cd628fccfefe79975936b854cc6f5d3a6041bb4b1d0a8619374"
+    }
+  ],
+  "additional_runs": [
+    {
+      "kind": "recovered_ir_without_patch_2",
+      "date": "2026-09-29",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/boids.xy16.recovered.ll",
+        "sha256": "93c850fa23e158a94fd4166e1673d779732d8b8edfe91830c18e1776c9d8e0b5"
+      },
+      "runs": {
+        "patch1_only": {
+          "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-patch1-only.log",
+          "sha256": "833bdde746b17c107a8e1cbd057e3c489d87cee4736f65ac83c0663c0ff79744"
+        },
+        "downstream": {
+          "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-downstream.log",
+          "sha256": "6e1f0a2f0b3fadd463af55ebcbbd3218f7207b30efccb6f03b955ddf077e0862"
+        },
+        "candidate": {
+          "path": "docs/defects/evidence/2026-09-29-xy16-preserve-x-p-save/recovered-ir-candidate.log",
+          "sha256": "7664c4afd8dd2cd628fccfefe79975936b854cc6f5d3a6041bb4b1d0a8619374"
+        }
+      },
+      "result": "All three compilers exit 134 with Using an undefined physical register at PH $p in main after MOS Insert REP/SEP. The defect needs only IR carrying the recovered flags, not the recovery pass itself. Independent review reached the same result."
+    }
+  ]
+}

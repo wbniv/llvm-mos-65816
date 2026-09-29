@@ -1,0 +1,30 @@
+{
+  "input": {
+    "source": "examples/snes/boids.c",
+    "source_sha256": "8bd4c37b12ed91af929c277ed9e39ddf389d063b1d7616a600cfe86c9b4e35be",
+    "frontend": "build/llvm-mos-install/bin/clang",
+    "frontend_sha256": "167401dbc007b08f4326904285b59eb837516e4e6a4abbdedcdb4b0b0f880946",
+    "frontend_command": "clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -Os -fno-lto -Xclang -target-feature -Xclang +mos-a16 -Xclang -target-feature -Xclang +mos-xy16 -I examples/65816 -I examples/snes -I build -I build/seamdemo-gen -S -emit-llvm examples/snes/boids.c",
+    "ir": "boids.xy16.ll",
+    "ir_sha256": "2a5fef2fb4a75ae3153ef0b4f8acd3a77c08c7e9e3d294b7ce181ad7f52737d9",
+    "origin": "frozen IR from docs/pr-preparations/2026-09-29/near-index-proofs/measure.py"
+  },
+  "failing_toolchain": {
+    "path": "build/near-proof-upstream/candidate/bin/llc",
+    "sha256": "c8fb18cbdc4f6e40923f530b4c6cc70ba68ca1ae9b2f7a92ecd65b19245d4b64",
+    "source": "llvm-mos/llvm-mos 06bc967d2668 + extracted #321 prerequisite (fbf0a82f) + near-index proof recovery (43e1c4d6)"
+  },
+  "controls": {
+    "recovery_disabled": "same llc with -mos-recover-near-nowrap=false: exit 0",
+    "patch1_only": {
+      "path": "build/near-proof-upstream/baseline/bin/llc",
+      "sha256": "b80064893ccf9fde0213e58037e65b3645de0c64727aa5b0c7d7dabcb8838e45",
+      "result": "exit 0"
+    },
+    "downstream": {
+      "path": "build/llvm-mos/bin/llc",
+      "sha256": "cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7",
+      "result": "exit 0; no PH $p is emitted in main at prolog-epilog"
+    }
+  }
+}
