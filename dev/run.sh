@@ -617,7 +617,7 @@ if [ "$TARGET" = "cross-toolchain" ] || [ "$TARGET" = "cross-selftest" ]; then
   IMAGE="${MOS_DEV_IMAGE:-llvm-mos-65816-dev-cross}"
   DEV_DOCKERFILE="${MOS_DEV_DOCKERFILE:-Dockerfile.cross}"
   # Dockerfile.cross is FROM the base image — make sure it exists locally first.
-  docker build -t llvm-mos-65816-dev -f "$HERE/Dockerfile" "$HERE" >/dev/null
+  docker build --network host -t llvm-mos-65816-dev -f "$HERE/Dockerfile" "$HERE" >/dev/null
 fi
 
 # AWS credentials deliberately stay on the host. For scripts using the shared
@@ -643,7 +643,10 @@ if [ "$TARGET" = determinism-sweep ] && [ -f "$HERE/build-determinism-demo-set.t
   done < "$HERE/build-determinism-demo-set.txt"
 fi
 
-docker build -t "$IMAGE" -f "$HERE/$DEV_DOCKERFILE" "$HERE" >/dev/null
+# Image builds use the host network: with a VPN active, the default bridge
+# network cannot reach the resolvers Docker copies in, so apt steps fail
+# whenever the build cache no longer covers them.
+docker build --network host -t "$IMAGE" -f "$HERE/$DEV_DOCKERFILE" "$HERE" >/dev/null
 mkdir -p "$ROOT/build"
 # Forward the optional knobs into the container when set (name-only -e reads the
 # value from this script's environment — safe under `set -u` via :+).
