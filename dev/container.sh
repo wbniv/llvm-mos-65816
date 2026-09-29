@@ -29,4 +29,7 @@ while [ $# -gt 0 ]; do
   esac
 done
 [ $# -gt 0 ] || { echo "no command given after --" >&2; exit 2; }
-exec docker run --rm "${mounts[@]}" --user "$(id -u):$(id -g)" -e HOME=/work/build -w /work "$IMAGE" "$@"
+# Core dumps are off: batch runs expect compiler aborts, and the host stores
+# every dump in root-owned /var/lib/systemd/coredump.
+exec docker run --rm "${mounts[@]}" --user "$(id -u):$(id -g)" --ulimit core=0 \
+  -e HOME=/work/build -w /work "$IMAGE" "$@"

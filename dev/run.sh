@@ -663,6 +663,7 @@ fi
 docker run --rm \
   -v "$ROOT":/work \
   --user "$(id -u):$(id -g)" \
+  --ulimit core=0 \
   -e HOME=/work/build \
   ${SMOKE_WANT:+-e SMOKE_WANT} \
   ${SMOKE_SETTLE:+-e SMOKE_SETTLE} \
