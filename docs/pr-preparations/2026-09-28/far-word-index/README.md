@@ -1,5 +1,7 @@
 # Native far-word indexing: PR preparation
 
+**September 30 update:** superseded for filing by the [rebased packet](../../2026-09-30/far-word-rebase/README.md) on `06bc967d2668`. Its [independent review](../../2026-09-30/far-word-rebase/independent-review.md) upholds 0069/0070 but blocks the series on defects in the far prerequisite. Update: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+
 **Status: local working draft, September 28, 2026.** The user requested an evolving PR explanation that ties design and development choices to evidence for a demanding compiler audience, with diagrams where useful. Patch 0070 is integrated and installed downstream; this packet prepares its presentation within the native/far compiler series.
 
 - [Extracted upstream series](upstream-series.md): ordered compiler patches on the pinned destination, assertions-build evidence, dependency reconciliation, and separately identified backend replay.

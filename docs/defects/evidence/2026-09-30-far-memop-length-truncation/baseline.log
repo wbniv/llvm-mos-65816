@@ -1,0 +1,14 @@
+$ set -euo pipefail; out=$(build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E "^[[:space:]]*[.;]"); printf "%s\n" "$out"; bad=0; if printf "%s\n" "$out" | grep -A4 "^big_const:" | grep -q "ldy[[:space:]]*#17"; then echo "MISCOMPILE: 70000-byte far memset passes length 4464 (0x1170)"; bad=1; fi; if printf "%s\n" "$out" | grep -A1 "^len64k:" | grep -q "rts"; then echo "MISCOMPILE: 65536-byte far memmove deleted"; bad=1; fi; exit $bad
+big_const:                              ; @big_const
+	lda	#0
+	ldx	#112
+	ldy	#17
+	sty	__rc2
+	jmp	__memset_far
+big_var:                                ; @big_var
+	jmp	__memcpy_far
+len64k:                                 ; @len64k
+	rts
+MISCOMPILE: 70000-byte far memset passes length 4464 (0x1170)
+MISCOMPILE: 65536-byte far memmove deleted
+exit_code=1

@@ -1,0 +1,635 @@
+2026-09-29T23:31:23Z toolset=pre0070 llc=b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b tests-from=77dc044c39bb303d8984ed5d9eb08c3a3455cad8
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find dsymutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find lli-child-target in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llubi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ar in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-addr2line in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bcanalyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-bitcode-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cas in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ctxprof-util in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxdump in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cvtres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfod-find in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-debuginfo-analyzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-diff in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwarfutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dwp in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-dlltool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-exegesis in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-extract-bundle-entry in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ir2vec in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-isel-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ifs in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-install-name-tool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-jitlink in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-opt-fuzzer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-lto in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-mca in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-modextract in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-otool in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-pdbutil in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-profgen in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-ranlib in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rc in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-rtdyld in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-split in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-stress in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strings in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-strip in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-readtapi in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-undname in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-windres in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-c-test in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-cxxfilt in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-xray in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find obj2yaml in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find yaml-bench in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-symbolizer in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sancov in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find sanstats in /work/build/0029-cross-target-build/bin
+llvm-lit: /work/build/register-exhaustion-src/llvm/utils/lit/lit/llvm/subst.py:130: note: Did not find llvm-remarkutil in /work/build/0029-cross-target-build/bin
+-- Testing: 164 tests, 8 workers --
+FAIL: LLVM :: CodeGen/MOS/far-word-policy.mir (1 of 164)
+******************** TEST 'LLVM :: CodeGen/MOS/far-word-policy.mir' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir -o - | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir --check-prefix=SPEED
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir -o -
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir --check-prefix=SPEED
+# .---command stderr------------
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir:29:10: error: SPEED: expected string not found in input
+# | # SPEED: = G_LOAD16_FAR_INDIR_IDX{{ }}
+# |          ^
+# | <stdin>:64:17: note: scanning from here
+# | name: word_speed
+# |                 ^
+# | <stdin>:65:10: note: possible intended match here
+# | alignment: 1
+# |          ^
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir:357:10: error: SPEED: expected string not found in input
+# | # SPEED: = G_LOAD16_FAR_INDIR_IDX{{ }}
+# |          ^
+# | <stdin>:1459:16: note: scanning from here
+# | name: mixed_1_1
+# |                ^
+# | <stdin>:1460:10: note: possible intended match here
+# | alignment: 1
+# |          ^
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir:401:10: error: SPEED: expected string not found in input
+# | # SPEED: = G_LOAD16_FAR_INDIR_IDX{{ }}
+# |          ^
+# | <stdin>:1636:16: note: scanning from here
+# | name: mixed_1_0
+# |                ^
+# | <stdin>:1637:10: note: possible intended match here
+# | alignment: 1
+# |          ^
+# | 
+# | Input file: <stdin>
+# | Check file: /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-policy.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |              .
+# |              .
+# |              .
+# |             59:  attributes #1 = { optsize "target-cpu"="mosw65816" "target-features"="+mos-a16" } 
+# |             60:  attributes #2 = { minsize optsize "target-cpu"="mosw65816" "target-features"="+mos-a16" } 
+# |             61:  attributes #3 = { noinline optnone "target-cpu"="mosw65816" "target-features"="+mos-a16" } 
+# |             62: ... 
+# |             63: --- 
+# |             64: name: word_speed 
+# | check:29'0                     {   search range start (exclusive)
+# | check:29'1                         error: no match found in search range
+# |             65: alignment: 1 
+# | check:29'2               ?     possible intended match
+# |             66: exposesReturnsTwice: false 
+# |             67: legalized: true 
+# |             68: regBankSelected: false 
+# |             69: selected: false 
+# |             70: failedISel: false 
+# |              .
+# |              .
+# |              .
+# |            233:   
+# |            234:  bb.2: 
+# |            235:  RTS 
+# |            236: ... 
+# |            237: --- 
+# |            238: name: word_size 
+# | check:29'3                     }  search range end (exclusive)
+# |            239: alignment: 1 
+# |            240: exposesReturnsTwice: false 
+# |            241: legalized: true 
+# |            242: regBankSelected: false 
+# |            243: selected: false 
+# |              .
+# |              .
+# |              .
+# |           1454:   
+# |           1455:  bb.2: 
+# |           1456:  RTS 
+# |           1457: ... 
+# |           1458: --- 
+# |           1459: name: mixed_1_1 
+# | check:357'0                   {   search range start (exclusive)
+# | check:357'1                       error: no match found in search range
+# |           1460: alignment: 1 
+# | check:357'2              ?     possible intended match
+# |           1461: exposesReturnsTwice: false 
+# |           1462: legalized: true 
+# |           1463: regBankSelected: false 
+# |           1464: selected: false 
+# |           1465: failedISel: false 
+# |              .
+# |              .
+# |              .
+# |           1631:   
+# |           1632:  bb.2: 
+# |           1633:  RTS 
+# |           1634: ... 
+# |           1635: --- 
+# |           1636: name: mixed_1_0 
+# | check:357'3                    }  search range end (exclusive)
+# | check:401'0                   {   search range start (exclusive)
+# | check:401'1                       error: no match found in search range
+# |           1637: alignment: 1 
+# | check:401'2              ?     possible intended match
+# |           1638: exposesReturnsTwice: false 
+# |           1639: legalized: true 
+# |           1640: regBankSelected: false 
+# |           1641: selected: false 
+# |           1642: failedISel: false 
+# |              .
+# |              .
+# |              .
+# |           1808:   
+# |           1809:  bb.2: 
+# |           1810:  RTS 
+# |           1811: ... 
+# |           1812: --- 
+# |           1813: name: mixed_2_1 
+# | check:401'3                    }  search range end (exclusive)
+# |           1814: alignment: 1 
+# |           1815: exposesReturnsTwice: false 
+# |           1816: legalized: true 
+# |           1817: regBankSelected: false 
+# |           1818: selected: false 
+# |              .
+# |              .
+# |              .
+# | >>>>>>
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/inc-dec-65ce02.ll (2 of 164)
+PASS: LLVM :: MC/MOS/eflags.s (3 of 164)
+FAIL: LLVM :: CodeGen/MOS/far-word-index-integration.ll (4 of 164)
+******************** TEST 'LLVM :: CodeGen/MOS/far-word-index-integration.ll' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -stop-after=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll -o - | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll --check-prefix=BYTE
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -stop-after=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll -o -
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll --check-prefix=BYTE
+# RUN: at line 2
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -stop-after=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll -o - | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll --check-prefix=MIR
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -stop-after=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll -o -
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll --check-prefix=MIR
+# .---command stderr------------
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll:16:8: error: MIR: expected string not found in input
+# | ; MIR: = G_LOAD16_FAR_INDIR_IDX{{ }}
+# |        ^
+# | <stdin>:23:19: note: scanning from here
+# | name: bounded_word
+# |                   ^
+# | <stdin>:119:11: note: possible intended match here
+# |  %2:_(s8) = G_CONSTANT i8 -2
+# |           ^
+# | 
+# | Input file: <stdin>
+# | Check file: /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-integration.ll
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |             .
+# |             .
+# |             .
+# |            18:  } 
+# |            19:   
+# |            20:  attributes #0 = { norecurse "nonreentrant" "target-cpu"="mosw65816" "target-features"="+mos-a16" } 
+# |            21: ... 
+# |            22: --- 
+# |            23: name: bounded_word 
+# | check:16'0                      {   search range start (exclusive)
+# | check:16'1                          error: no match found in search range
+# |            24: alignment: 1 
+# |            25: exposesReturnsTwice: false 
+# |            26: legalized: true 
+# |            27: regBankSelected: false 
+# |            28: selected: false 
+# |             .
+# |             .
+# |             .
+# |           114:  bb.1 (%ir-block.0): 
+# |           115:  liveins: $a, $rl1 
+# |           116:   
+# |           117:  %0:_(p2) = COPY $rl1 
+# |           118:  %1:_(s8) = COPY $a 
+# |           119:  %2:_(s8) = G_CONSTANT i8 -2 
+# | check:16'2               ?                    possible intended match
+# |           120:  %29:_(s8) = G_CONSTANT i8 -46 
+# |           121:  %30:_(s8) = G_CONSTANT i8 4 
+# |           122:  %7:_(s16) = G_MERGE_VALUES %29(s8), %30(s8) 
+# |           123:  %3:_(s8) = G_AND %1, %2 
+# |           124:  %31:_(s8) = G_CONSTANT i8 0 
+# |             .
+# |             .
+# |             .
+# |           137:  %5:_(p2) = G_INTTOPTR %11(s32) 
+# |           138:  %6:_(s16) = G_LOAD16_FAR_INDIR %5(p2) :: (volatile load (s16) from %ir.address, align 1, addrspace 2) 
+# |           139:  %8:_(s16) = G_ADD %6, %7 
+# |           140:  G_STORE16_ABS %8(s16), @result :: (volatile store (s16) into @result, align 1) 
+# |           141:  RTS 
+# |           142: ... 
+# | check:16'3         } search range end (exclusive)
+# | >>>>>>
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/shift-rotate.ll (5 of 164)
+PASS: LLVM :: CodeGen/MOS/zp-byte-index.ll (6 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector.mir (7 of 164)
+PASS: LLVM :: CodeGen/MOS/legalizer.mir (8 of 164)
+PASS: LLVM :: CodeGen/MOS/a16-byte-store.ll (9 of 164)
+PASS: LLVM :: CodeGen/MOS/a16-indirect-byte-store.ll (10 of 164)
+PASS: LLVM :: CodeGen/MOS/far-native-word.ll (11 of 164)
+PASS: LLVM :: CodeGen/MOS/integer-compare.ll (12 of 164)
+PASS: LLVM :: CodeGen/MOS/jump-table-limit.ll (13 of 164)
+PASS: LLVM :: CodeGen/MOS/vector-scalarize.ll (14 of 164)
+PASS: LLVM :: MC/MOS/eflags-ir.ll (15 of 164)
+PASS: LLVM :: CodeGen/MOS/far-loop-range.mir (16 of 164)
+PASS: LLVM :: CodeGen/MOS/static-stack.ll (17 of 164)
+PASS: LLVM :: CodeGen/MOS/fcmp.ll (18 of 164)
+PASS: LLVM :: CodeGen/MOS/xy16-near-indir-y.ll (19 of 164)
+PASS: LLVM :: CodeGen/MOS/scmp-ucmp.ll (20 of 164)
+PASS: LLVM :: CodeGen/MOS/far-absolute-extload.mir (21 of 164)
+PASS: LLVM :: CodeGen/MOS/anyext-wide.mir (22 of 164)
+PASS: LLVM :: CodeGen/MOS/far-addressing.ll (23 of 164)
+PASS: LLVM :: CodeGen/MOS/far-loop-range-boundaries.mir (24 of 164)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-65ce02.mir (25 of 164)
+PASS: LLVM :: CodeGen/MOS/anyext-masked-byte.ll (26 of 164)
+PASS: LLVM :: CodeGen/MOS/char-stats-norecurse.ll (27 of 164)
+PASS: LLVM :: CodeGen/MOS/far-global-long-x.ll (28 of 164)
+PASS: LLVM :: CodeGen/MOS/hello-world.ll (29 of 164)
+PASS: LLVM :: CodeGen/MOS/char-stats.ll (30 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-opt-chain.mir (31 of 164)
+PASS: LLVM :: CodeGen/MOS/far-memset.ll (32 of 164)
+PASS: LLVM :: CodeGen/MOS/print-int.ll (33 of 164)
+PASS: LLVM :: CodeGen/MOS/far-phi.ll (34 of 164)
+PASS: LLVM :: CodeGen/MOS/inc-dec-6502x.ll (35 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-opt-loop.mir (36 of 164)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-stack.mir (37 of 164)
+PASS: LLVM :: CodeGen/MOS/add-sub.ll (38 of 164)
+PASS: LLVM :: CodeGen/MOS/store-zero.ll (39 of 164)
+PASS: LLVM :: MC/MOS/long-branches-65ce02.s (40 of 164)
+FAIL: LLVM :: CodeGen/MOS/far-word-index-boundaries.mir (41 of 164)
+******************** TEST 'LLVM :: CodeGen/MOS/far-word-index-boundaries.mir' FAILED ********************
+Exit Code: 1
+
+Command Output (stdout):
+--
+# RUN: at line 1
+/work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir -o - | /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+# executed command: /work/build/0029-cross-target-build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir -o -
+# executed command: /work/build/0029-cross-target-build/bin/FileCheck /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+# .---command stderr------------
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir:22:10: error: CHECK: expected string not found in input
+# | # CHECK: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
+# |          ^
+# | <stdin>:125:22: note: scanning from here
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:125:22: note: with "BASE" equal to "base"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:125:22: note: with "OFFSET" equal to "bound"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:140:16: note: possible intended match here
+# |  %value:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
+# |                ^
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir:127:14: error: CHECK-DAG: expected string not found in input
+# | # CHECK-DAG: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
+# |              ^
+# | <stdin>:666:22: note: scanning from here
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:666:22: note: with "BASE" equal to "base"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:666:22: note: with "OFFSET" equal to "bound"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:681:15: note: possible intended match here
+# |  %word:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
+# |               ^
+# | /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir:151:14: error: CHECK-DAG: expected string not found in input
+# | # CHECK-DAG: = G_LOAD16_FAR_INDIR_IDX{{ }}%[[BASE]](p2), %[[OFFSET]] :: (volatile load (s16), align 1, addrspace 2)
+# |              ^
+# | <stdin>:771:22: note: scanning from here
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:771:22: note: with "BASE" equal to "base"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:771:22: note: with "OFFSET" equal to "bound"
+# |  %bound:_(s8) = G_AND %byte, %mask
+# |                      ^
+# | <stdin>:787:15: note: possible intended match here
+# |  %word:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2)
+# |               ^
+# | 
+# | Input file: <stdin>
+# | Check file: /work/build/register-exhaustion-src/llvm/test/CodeGen/MOS/far-word-index-boundaries.mir
+# | 
+# | -dump-input=help explains the following input dump.
+# | 
+# | Input was:
+# | <<<<<<
+# |             .
+# |             .
+# |             .
+# |           120:  liveins: $rl1, $a 
+# |           121:   
+# |           122:  %base:_(p2) = COPY $rl1 
+# |           123:  %byte:_(s8) = COPY $a 
+# |           124:  %mask:_(s8) = G_CONSTANT i8 -2 
+# |           125:  %bound:_(s8) = G_AND %byte, %mask 
+# | check:22'0                         {                search range start (exclusive)
+# | check:22'1                                          error: no match found in search range
+# | check:22'2                                          with "BASE" equal to "base"
+# | check:22'3                                          with "OFFSET" equal to "bound"
+# |           126:  %26:_(s8) = G_CONSTANT i8 0 
+# |           127:  %7:_(s32) = G_PTRTOINT %base(p2) 
+# |           128:  %27:_(s16), %28:_(s16) = G_UNMERGE_VALUES %7(s32) 
+# |           129:  %9:_(s8), %10:_(s8) = G_UNMERGE_VALUES %27(s16) 
+# |           130:  %11:_(s8), %12:_(s8) = G_UNMERGE_VALUES %28(s16) 
+# |             .
+# |             .
+# |             .
+# |           135:  %23:_(s8), %24:_(s1) = G_UADDE %12, %26, %22 
+# |           136:  %31:_(s16) = G_MERGE_VALUES %17(s8), %19(s8) 
+# |           137:  %32:_(s16) = G_MERGE_VALUES %21(s8), %23(s8) 
+# |           138:  %8:_(s32) = G_MERGE_VALUES %31(s16), %32(s16) 
+# |           139:  %ptr:_(p2) = G_INTTOPTR %8(s32) 
+# |           140:  %value:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2) 
+# | check:22'4                    ?                                                                              possible intended match
+# |           141:  RTS 
+# |           142: ... 
+# |           143: --- 
+# |           144: name: end255 
+# | check:22'5                 }  search range end (exclusive)
+# |           145: alignment: 1 
+# |           146: exposesReturnsTwice: false 
+# |           147: legalized: true 
+# |           148: regBankSelected: false 
+# |           149: selected: false 
+# |             .
+# |             .
+# |             .
+# |           661:  liveins: $rl1, $a 
+# |           662:   
+# |           663:  %base:_(p2) = COPY $rl1 
+# |           664:  %byte:_(s8) = COPY $a 
+# |           665:  %mask:_(s8) = G_CONSTANT i8 -2 
+# |           666:  %bound:_(s8) = G_AND %byte, %mask 
+# | dag:127'0                          {                search range start (exclusive)
+# | dag:127'1                                           error: no match found in search range
+# | dag:127'2                                           with "BASE" equal to "base"
+# | dag:127'3                                           with "OFFSET" equal to "bound"
+# |           667:  %27:_(s8) = G_CONSTANT i8 0 
+# |           668:  %8:_(s32) = G_PTRTOINT %base(p2) 
+# |           669:  %28:_(s16), %29:_(s16) = G_UNMERGE_VALUES %8(s32) 
+# |           670:  %10:_(s8), %11:_(s8) = G_UNMERGE_VALUES %28(s16) 
+# |           671:  %12:_(s8), %13:_(s8) = G_UNMERGE_VALUES %29(s16) 
+# |             .
+# |             .
+# |             .
+# |           676:  %24:_(s8), %25:_(s1) = G_UADDE %13, %27, %23 
+# |           677:  %32:_(s16) = G_MERGE_VALUES %18(s8), %20(s8) 
+# |           678:  %33:_(s16) = G_MERGE_VALUES %22(s8), %24(s8) 
+# |           679:  %9:_(s32) = G_MERGE_VALUES %32(s16), %33(s16) 
+# |           680:  %ptr:_(p2) = G_INTTOPTR %9(s32) 
+# |           681:  %word:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2) 
+# | dag:127'4                    ?                                                                              possible intended match
+# |           682:  %value:_(s8) = G_LOAD_FAR_INDIR %ptr(p2) :: (volatile load (s8), addrspace 2) 
+# |           683:  RTS 
+# |           684: ... 
+# |           685: --- 
+# |           686: name: mixed_byte_first 
+# | dag:127'5                            }  search range end (exclusive)
+# |           687: alignment: 1 
+# |           688: exposesReturnsTwice: false 
+# |           689: legalized: true 
+# |           690: regBankSelected: false 
+# |           691: selected: false 
+# |             .
+# |             .
+# |             .
+# |           766:  liveins: $rl1, $a 
+# |           767:   
+# |           768:  %base:_(p2) = COPY $rl1 
+# |           769:  %byte:_(s8) = COPY $a 
+# |           770:  %mask:_(s8) = G_CONSTANT i8 -2 
+# |           771:  %bound:_(s8) = G_AND %byte, %mask 
+# | dag:151'0                          {                search range start (exclusive)
+# | dag:151'1                                           error: no match found in search range
+# | dag:151'2                                           with "BASE" equal to "base"
+# | dag:151'3                                           with "OFFSET" equal to "bound"
+# |           772:  %27:_(s8) = G_CONSTANT i8 0 
+# |           773:  %8:_(s32) = G_PTRTOINT %base(p2) 
+# |           774:  %28:_(s16), %29:_(s16) = G_UNMERGE_VALUES %8(s32) 
+# |           775:  %10:_(s8), %11:_(s8) = G_UNMERGE_VALUES %28(s16) 
+# |           776:  %12:_(s8), %13:_(s8) = G_UNMERGE_VALUES %29(s16) 
+# |             .
+# |             .
+# |             .
+# |           782:  %32:_(s16) = G_MERGE_VALUES %18(s8), %20(s8) 
+# |           783:  %33:_(s16) = G_MERGE_VALUES %22(s8), %24(s8) 
+# |           784:  %9:_(s32) = G_MERGE_VALUES %32(s16), %33(s16) 
+# |           785:  %ptr:_(p2) = G_INTTOPTR %9(s32) 
+# |           786:  %value:_(s8) = G_LOAD_FAR_INDIR %ptr(p2) :: (volatile load (s8), addrspace 2) 
+# |           787:  %word:_(s16) = G_LOAD16_FAR_INDIR %ptr(p2) :: (volatile load (s16), align 1, addrspace 2) 
+# | dag:151'4                    ?                                                                              possible intended match
+# |           788:  RTS 
+# |           789: ... 
+# | dag:151'5          } search range end (exclusive)
+# | >>>>>>
+# `-----------------------------
+# error: command failed with exit status: 1
+
+--
+
+********************
+PASS: LLVM :: CodeGen/MOS/prologepilog-ir.mir (42 of 164)
+PASS: LLVM :: CodeGen/MOS/ret-global-addr.ll (43 of 164)
+PASS: LLVM :: MC/MOS/addressing-modes-65816.s (44 of 164)
+PASS: LLVM :: CodeGen/MOS/zp-alloc.ll (45 of 164)
+PASS: LLVM :: CodeGen/MOS/inc-dec.ll (46 of 164)
+PASS: LLVM :: CodeGen/MOS/asm-printer.mir (47 of 164)
+PASS: LLVM :: CodeGen/MOS/long-address-symbol-printer.mir (48 of 164)
+PASS: LLVM :: CodeGen/MOS/interrupt-width-65816.ll (49 of 164)
+PASS: LLVM :: CodeGen/MOS/combiner.mir (50 of 164)
+PASS: LLVM :: CodeGen/MOS/legalizer-huc6280.mir (51 of 164)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65816.s (52 of 164)
+PASS: LLVM :: CodeGen/MOS/scavenger-65c02.mir (53 of 164)
+PASS: LLVM :: MC/MOS/long-address-roundtrip-65816.s (54 of 164)
+PASS: LLVM :: MC/MOS/branch-range-matrix-bcc8.s (55 of 164)
+PASS: LLVM :: CodeGen/MOS/a16-immediate-width.ll (56 of 164)
+PASS: LLVM :: CodeGen/MOS/zeropage.ll (57 of 164)
+PASS: LLVM :: MC/MOS/brk-signature.s (58 of 164)
+PASS: LLVM :: CodeGen/MOS/immediate-remat.ll (59 of 164)
+PASS: LLVM :: CodeGen/MOS/whole-program-zp.ll (60 of 164)
+PASS: LLVM :: CodeGen/MOS/inc-dec-65c02.ll (61 of 164)
+PASS: LLVM :: CodeGen/MOS/legalizer-indexed-offset-observer.mir (62 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir.mir (63 of 164)
+PASS: LLVM :: CodeGen/MOS/late-opt.mir (64 of 164)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-deterministic.ll (65 of 164)
+PASS: LLVM :: CodeGen/MOS/shift-rotate-chain.mir (66 of 164)
+PASS: LLVM :: CodeGen/MOS/postrapseudos.mir (67 of 164)
+PASS: LLVM :: CodeGen/MOS/dp-pointer-arg.ll (68 of 164)
+PASS: LLVM :: CodeGen/MOS/light-spill.ll (69 of 164)
+PASS: LLVM :: CodeGen/MOS/late-opt-65816.mir (70 of 164)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-bra.mir (71 of 164)
+PASS: LLVM :: CodeGen/MOS/leaf-20231021.ll (72 of 164)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation.mir (73 of 164)
+PASS: LLVM :: CodeGen/MOS/coalesce-remat.ll (74 of 164)
+PASS: LLVM :: CodeGen/MOS/finalize-isel.mir (75 of 164)
+PASS: LLVM :: CodeGen/MOS/cmp-select.ll (76 of 164)
+PASS: LLVM :: CodeGen/MOS/prologepilog.mir (77 of 164)
+PASS: LLVM :: CodeGen/MOS/indvar-simplify-20230930.ll (78 of 164)
+PASS: LLVM :: CodeGen/MOS/asm-printer-spc700.mir (79 of 164)
+PASS: LLVM :: MC/MOS/zeropage.s (80 of 164)
+PASS: LLVM :: CodeGen/MOS/legalizer-ir.mir (81 of 164)
+PASS: LLVM :: CodeGen/MOS/zp-alloc-preexisting.ll (82 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-spc700.mir (83 of 164)
+PASS: LLVM :: CodeGen/MOS/insert-copies.mir (84 of 164)
+PASS: LLVM :: CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir (85 of 164)
+PASS: LLVM :: CodeGen/MOS/no-csr.ll (86 of 164)
+PASS: LLVM :: MC/MOS/zp-regression.s (87 of 164)
+PASS: LLVM :: MC/MOS/zeropage-huc6280.s (88 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-opt.mir (89 of 164)
+PASS: LLVM :: CodeGen/X86/virtregrewriter-x86-copy-contracts.mir (90 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg.mir (91 of 164)
+PASS: LLVM :: CodeGen/MOS/indexiv.ll (92 of 164)
+PASS: LLVM :: CodeGen/MOS/call-lowering.mir (93 of 164)
+PASS: LLVM :: CodeGen/MOS/callee-saved-regs.ll (94 of 164)
+PASS: LLVM :: CodeGen/MOS/regalloc.mir (95 of 164)
+PASS: LLVM :: CodeGen/MOS/branch-relaxation-inline-asm.mir (96 of 164)
+PASS: LLVM :: CodeGen/MOS/native-index-copy-cost.mir (97 of 164)
+PASS: LLVM :: MC/MOS/modifiers.s (98 of 164)
+PASS: LLVM :: MC/MOS/modifiers-65816.s (99 of 164)
+PASS: LLVM :: CodeGen/MOS/lower-select.mir (100 of 164)
+PASS: LLVM :: CodeGen/MOS/late-opt-65c02.mir (101 of 164)
+PASS: LLVM :: MC/MOS/branch-range-matrix-65ce02.s (102 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-spc700.mir (103 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-spc700.mir (104 of 164)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-spc700.mir (105 of 164)
+PASS: LLVM :: CodeGen/MOS/asm-printer-huc6280.mir (106 of 164)
+PASS: LLVM :: CodeGen/MOS/scavenger.mir (107 of 164)
+PASS: LLVM :: CodeGen/MOS/trivial.ll (108 of 164)
+PASS: LLVM :: MC/MOS/all-65816-opcodes.s (109 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65816.mir (110 of 164)
+PASS: LLVM :: CodeGen/MOS/insert-rep-sep-cloned-kills.mir (111 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-65dtv02.mir (112 of 164)
+PASS: LLVM :: CodeGen/MOS/inlineasm-constraint.mir (113 of 164)
+PASS: LLVM :: CodeGen/MOS/inline-asm-zp-csr.ll (114 of 164)
+PASS: LLVM :: MC/MOS/branch-range-errors.s (115 of 164)
+PASS: LLVM :: CodeGen/MOS/commute.mir (116 of 164)
+PASS: LLVM :: CodeGen/MOS/internalize.mir (117 of 164)
+PASS: LLVM :: CodeGen/MOS/asm-printer-ir.mir (118 of 164)
+PASS: LLVM :: CodeGen/MOS/call-lowering-stack.mir (119 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-65c02.mir (120 of 164)
+PASS: LLVM :: CodeGen/MOS/far-indir-indexed.ll (121 of 164)
+PASS: LLVM :: MC/MOS/branch-range-boundary.s (122 of 164)
+PASS: LLVM :: CodeGen/MOS/legalizer-65c02.mir (123 of 164)
+PASS: LLVM :: CodeGen/MOS/call-lowering-spc700.mir (124 of 164)
+PASS: LLVM :: MC/MOS/modifiers-spc700.s (125 of 164)
+PASS: LLVM :: CodeGen/MOS/postrapseudos-huc6280.mir (126 of 164)
+PASS: LLVM :: MC/MOS/uppercase-registers.s (127 of 164)
+PASS: LLVM :: MC/MOS/long-branches-65816.s (128 of 164)
+PASS: LLVM :: MC/MOS/motorola-integers-default.s (129 of 164)
+PASS: LLVM :: CodeGen/MOS/instruction-selector-ir-65c02.mir (130 of 164)
+PASS: LLVM :: MC/MOS/pc-rel-reloc.s (131 of 164)
+PASS: LLVM :: CodeGen/MOS/nonreentrant.ll (132 of 164)
+PASS: LLVM :: CodeGen/MOS/nonreentrant-nointerrupts.ll (133 of 164)
+PASS: LLVM :: CodeGen/MOS/copy-phys-reg-huc6280.mir (134 of 164)
+PASS: LLVM :: MC/MOS/all-spc700-aliases.s (135 of 164)
+PASS: LLVM :: MC/MOS/all-spc700-opcodes.s (136 of 164)
+PASS: LLVM :: MC/MOS/modifier-width.s (137 of 164)
+PASS: LLVM :: MC/MOS/inst-lda.s (138 of 164)
+PASS: LLVM :: MC/MOS/trivial.s (139 of 164)
+PASS: LLVM :: MC/MOS/all-65ce02-opcodes.s (140 of 164)
+PASS: LLVM :: MC/MOS/do-init-array.s (141 of 164)
+PASS: LLVM :: MC/MOS/addr-asciz.s (142 of 164)
+PASS: LLVM :: MC/MOS/do-copy-data.s (143 of 164)
+PASS: LLVM :: MC/MOS/all-4510-opcodes.s (144 of 164)
+PASS: LLVM :: MC/MOS/all-45gs02-opcodes.s (145 of 164)
+PASS: LLVM :: MC/MOS/asm-errors.s (146 of 164)
+PASS: LLVM :: MC/MOS/all-65816-aliases.s (147 of 164)
+PASS: LLVM :: MC/MOS/all-65c02-opcodes.s (148 of 164)
+PASS: LLVM :: MC/MOS/all-65el02-opcodes.s (149 of 164)
+PASS: LLVM :: MC/MOS/all-65dtv02-opcodes.s (150 of 164)
+PASS: LLVM :: MC/MOS/ophis-hello-world.s (151 of 164)
+UNSUPPORTED: LLVM :: CodeGen/MOS/getchar-regression.ll (152 of 164)
+PASS: LLVM :: MC/MOS/all-6502-opcodes.s (153 of 164)
+PASS: LLVM :: MC/MOS/all-r65c02-opcodes.s (154 of 164)
+PASS: LLVM :: MC/MOS/all-w65c02-opcodes.s (155 of 164)
+PASS: LLVM :: MC/MOS/do-fini-array.s (156 of 164)
+PASS: LLVM :: MC/MOS/modifier-width-65816.s (157 of 164)
+PASS: LLVM :: MC/MOS/modifier-width-errors.s (158 of 164)
+PASS: LLVM :: MC/MOS/do-init-stack.s (159 of 164)
+PASS: LLVM :: MC/MOS/all-huc6280-opcodes.s (160 of 164)
+PASS: LLVM :: MC/MOS/do-zero-bss.s (161 of 164)
+PASS: LLVM :: MC/MOS/all-6502x-opcodes.s (162 of 164)
+PASS: LLVM :: MC/MOS/align-nop.s (163 of 164)
+PASS: LLVM :: MC/MOS/bit-branch-target-r65c02.s (164 of 164)
+********************
+Failed Tests (3):
+  LLVM :: CodeGen/MOS/far-word-index-boundaries.mir
+  LLVM :: CodeGen/MOS/far-word-index-integration.ll
+  LLVM :: CodeGen/MOS/far-word-policy.mir
+
+
+Testing Time: 2.21s
+
+Total Discovered Tests: 164
+  Unsupported:   1 (0.61%)
+  Passed     : 160 (97.56%)
+  Failed     :   3 (1.83%)

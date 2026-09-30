@@ -1,5 +1,7 @@
 # Prepare locally fixed work for posting — 2026-09-26
 
+**September 30 far-word rebase:** 0069/0070 are not ready to post. The [rebased packet](../pr-preparations/2026-09-30/far-word-rebase/README.md) reproduces every September 28 result, but its independent review found four downstream far defects, two extraction gaps and an `Imag32` collision with open #594 in the far prerequisite. Update: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+
 **September 28 near-store preparation:** the [extracted 0065 packet](../pr-preparations/2026-09-28/0065/README.md) completes native-only prerequisite extraction, exact-destination validation and independent review. Publication remains unposted under the #321 hold; #321 and 0063 remain merge prerequisites. Update: OpenAI Codex CLI 0.158.0 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e75a-a9ed-7372-9bac-b19b732a46a2`.
 
 **Dated September 27 near-store follow-up:** [0065](2026-09-27-broader-near-store-profitability.md) completes T3 locally. Its opening gates remain #321 extraction, destination reconciliation and independent review; local validation is not posting readiness. Update: OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e0ee-df60-7d80-8629-5ad167a8c407`.

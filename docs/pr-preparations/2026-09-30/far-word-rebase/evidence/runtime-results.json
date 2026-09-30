@@ -1,0 +1,988 @@
+[
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 1960,
+    "exclusive_master_clocks": 308862,
+    "sample_clocks": [
+      308862
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+    "rom_sha256": "5fdc21056c47c8477e3b02b7beedcc09c5b838a20b5bcca290e387bf2b3ebc1a"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 1960,
+    "exclusive_master_clocks": 308862,
+    "sample_clocks": [
+      308862
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "9c1d801245dd02e21508006a90dc6d05dd02e54e6ca94cf859462eb0c9fb327a",
+    "rom_sha256": "5fdc21056c47c8477e3b02b7beedcc09c5b838a20b5bcca290e387bf2b3ebc1a"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 2024,
+    "exclusive_master_clocks": 289722,
+    "sample_clocks": [
+      289722
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "b9d737bf91b3b8b92f646b3a6c73068b6ce1ed94564640b1b581f32553c3d094",
+    "rom_sha256": "230d263ef592fdc668dd0c13a320bed55c4de518e50652cb71445d2019a43518"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 2153,
+    "exclusive_master_clocks": 387408,
+    "sample_clocks": [
+      387408
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 2153,
+    "exclusive_master_clocks": 387408,
+    "sample_clocks": [
+      387408
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 2153,
+    "exclusive_master_clocks": 387408,
+    "sample_clocks": [
+      387408
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "a8475f792aaa0e543c4d6260f36606078123bb76afd2ad0dd2976fc513592852",
+    "rom_sha256": "50c6aaffde7519cc8a6c75dd2722f675a944289e12692b544e440678b51f44a9"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 3279,
+    "exclusive_master_clocks": 308350,
+    "sample_clocks": [
+      308350
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "6eceea67cde574ec4908e6410c04c871376f156c7fea3d90bcb3e012886fcabc",
+    "rom_sha256": "1f8ae1bdf03f17ceddc1255e6d0f6975c6cf5a2a056a0666ce8de53303944feb"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 3168,
+    "exclusive_master_clocks": 284374,
+    "sample_clocks": [
+      284374
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "3524306160a4ecff8dc932dc0d68600c790c8954b078e3f5be15b8886d8bdb84",
+    "rom_sha256": "2ca6e70707a5eeef4334e088c954119270d35e32b8666d5b279fc704e6a3830d"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 3168,
+    "exclusive_master_clocks": 284374,
+    "sample_clocks": [
+      284374
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "3524306160a4ecff8dc932dc0d68600c790c8954b078e3f5be15b8886d8bdb84",
+    "rom_sha256": "2ca6e70707a5eeef4334e088c954119270d35e32b8666d5b279fc704e6a3830d"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O3",
+    "variant": "baseline",
+    "main_bytes": 15912,
+    "exclusive_master_clocks": 379936,
+    "sample_clocks": [
+      379936
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "dd729b295b0244544b88544c4942c01b7de746d831fc84c66d5c2123c61fef3c",
+    "rom_sha256": "a628cd94c9f4e6060ca5d51464322718a4ec91dc267e6b8d077f48f57db42c7f"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "a16",
+    "opt": "O3",
+    "variant": "default",
+    "main_bytes": 15878,
+    "exclusive_master_clocks": 350972,
+    "sample_clocks": [
+      350972
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "8433a10a33f88bc9cd85e8a50246244be0c1ef147dc7759cea9a429e0fb466bb",
+    "rom_sha256": "b8ff1d0700a6ff182971d1a11199b0b84ad3c667036a3ef4f7c79a74c07d9f27"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 1934,
+    "exclusive_master_clocks": 284878,
+    "sample_clocks": [
+      284878
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+    "rom_sha256": "9b7a5d2da23081e52b61814975defc215ee4f484ffce95672c06bb8eb43ec4fd"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 1934,
+    "exclusive_master_clocks": 284878,
+    "sample_clocks": [
+      284878
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "212146a5988278a32e33de5565da6123d071f431d3a831a22030990b18f3a3cc",
+    "rom_sha256": "9b7a5d2da23081e52b61814975defc215ee4f484ffce95672c06bb8eb43ec4fd"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 1908,
+    "exclusive_master_clocks": 262416,
+    "sample_clocks": [
+      262416
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "2ee4b2e27b36e862ab0c679c994b5d157c70bf277d075bc4a0382e47d162ba73",
+    "rom_sha256": "6c57045813d13fbe05851c0c062bfa025b13f46b1526caee105657fd41d13487"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 1955,
+    "exclusive_master_clocks": 317710,
+    "sample_clocks": [
+      317710
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 1955,
+    "exclusive_master_clocks": 317710,
+    "sample_clocks": [
+      317710
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 1955,
+    "exclusive_master_clocks": 317710,
+    "sample_clocks": [
+      317710
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "df19b9001fdcf06dfa0c69f2e82dacc1ea444157f0a4a9192f192b570886b5a5",
+    "rom_sha256": "8dd727f71e2ddb68596ab0f37665496e5aa669dff6e7251959abde194b57e68d"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 3214,
+    "exclusive_master_clocks": 289654,
+    "sample_clocks": [
+      289654
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "96eab947e18492f1681375f1e86721cefc6799e92b9a3e8b0eba5cf7c50abc06",
+    "rom_sha256": "20cf58f9ef3e3869d2b08ae0e49a6cb8bdc7416eab8aba94ab413c7faf894344"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 3185,
+    "exclusive_master_clocks": 267036,
+    "sample_clocks": [
+      267036
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "dcbaf3f610a61e1c707e60975766122f5d9a18eb7944b4592385d69b5471f0d3",
+    "rom_sha256": "5a60299baa1891716863dd575afc010f7984a56fc1b3f66d515eaaef4acf1a78"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 3185,
+    "exclusive_master_clocks": 267036,
+    "sample_clocks": [
+      267036
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "dcbaf3f610a61e1c707e60975766122f5d9a18eb7944b4592385d69b5471f0d3",
+    "rom_sha256": "5a60299baa1891716863dd575afc010f7984a56fc1b3f66d515eaaef4acf1a78"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O3",
+    "variant": "baseline",
+    "main_bytes": 14360,
+    "exclusive_master_clocks": 356092,
+    "sample_clocks": [
+      356092
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "b61ffb81df1c4c104dea65b4fe44b749176f3b7ee306f235784da8710938e8fd",
+    "rom_sha256": "b556afddb6b00b5d75354620342f0b368aa0302de3ab2b9996f69dd5ce9dfd21"
+  },
+  {
+    "fixture": "farblit",
+    "mode": "xy16",
+    "opt": "O3",
+    "variant": "default",
+    "main_bytes": 14379,
+    "exclusive_master_clocks": 334228,
+    "sample_clocks": [
+      334228
+    ],
+    "expected": 509013605,
+    "bsnes": 509013605,
+    "mame": 509013605,
+    "repeat_equal": true,
+    "object_sha256": "5ddd1e42d7c034fb66b151db3f3f867d991aaa0d046465370c7d565c046525c5",
+    "rom_sha256": "e5e1f5de8c761ed910e1276dc27425b00b27b78edc3504d94505786ddc7b4da1"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786804,
+    "sample_clocks": [
+      8117200
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "4959d0ac069a9817a869ddc435e7157e305a2232b49428f76b5a0baef0756bff",
+    "rom_sha256": "da59f40eb6f0a5421510518b450c359d90cbe67021b339a15e50e3918de99caf"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786804,
+    "sample_clocks": [
+      8117200
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "4959d0ac069a9817a869ddc435e7157e305a2232b49428f76b5a0baef0756bff",
+    "rom_sha256": "da59f40eb6f0a5421510518b450c359d90cbe67021b339a15e50e3918de99caf"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786404,
+    "sample_clocks": [
+      7724578
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "09d7c2492d021eb29fdd01181f08b6ec384169ae47f38f2eaa288a4b96e01f5e",
+    "rom_sha256": "3544ca74742a805f9b756a9000aff955e7cd3f241b2179292b1bf79edadc3345"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 1087,
+    "exclusive_master_clocks": 476666,
+    "sample_clocks": [
+      8848420
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 1087,
+    "exclusive_master_clocks": 476666,
+    "sample_clocks": [
+      8848420
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 1087,
+    "exclusive_master_clocks": 476666,
+    "sample_clocks": [
+      8848420
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "dd19241c4b3ff83e61bee84e6fad0fb086d594141ba1f0a8d6341234b6a80ef4",
+    "rom_sha256": "eaba231dc991f76083719cc182969000d9a3e4cf510d5b41a739782252031e46"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786804,
+    "sample_clocks": [
+      8090820
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "8aea213df956ef3022b6a2f4badfc790cebefc3a8ef494a05213f089e5eb439d",
+    "rom_sha256": "1b8e2c2d50cb6e3cd4cde74180529c72e72f849ad4ca8c36a4c487b571d8a4aa"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786644,
+    "sample_clocks": [
+      7695674
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "0d9393cdb0d7097a21e8194f955488d398db0f6ceb44189d750757ba6ad41212",
+    "rom_sha256": "ba7cff429cc716d6882db627f4cc36505035068c21adaf22bcfc3be7fcc226ca"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786644,
+    "sample_clocks": [
+      7695674
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "0d9393cdb0d7097a21e8194f955488d398db0f6ceb44189d750757ba6ad41212",
+    "rom_sha256": "ba7cff429cc716d6882db627f4cc36505035068c21adaf22bcfc3be7fcc226ca"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786684,
+    "sample_clocks": [
+      7487362
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "11a52b41abfcb98607213b3e1001561446bb64fc5cb08b4a88639d20563c492d",
+    "rom_sha256": "7908b4a56080ad34bcf1058a6f0d80250c4b8d702227c3b66c38cf51e4579a80"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786684,
+    "sample_clocks": [
+      7487362
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "11a52b41abfcb98607213b3e1001561446bb64fc5cb08b4a88639d20563c492d",
+    "rom_sha256": "7908b4a56080ad34bcf1058a6f0d80250c4b8d702227c3b66c38cf51e4579a80"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786644,
+    "sample_clocks": [
+      7094740
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "cb96fe1c8a14e92b5c7cfa3529e2182d8aff679dfedb10a76c9721eda29df2c8",
+    "rom_sha256": "0d272ce2ec634153cf547663902bb119396ccc96adc0c6837cebb4c6cda37041"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 1073,
+    "exclusive_master_clocks": 326402,
+    "sample_clocks": [
+      7484844
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 1073,
+    "exclusive_master_clocks": 326402,
+    "sample_clocks": [
+      7484844
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 1073,
+    "exclusive_master_clocks": 326402,
+    "sample_clocks": [
+      7484844
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "97d048f2f0cc38d20454213bf0cb3095c3db9b6d5b0ca36c69eb886d21b831fa",
+    "rom_sha256": "6d0a713aca6f962e13364fb12c07d4d406c0c4dae6d9c90eee3452db7ad8d326"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786684,
+    "sample_clocks": [
+      7480344
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "a678f17ddc8d1f4930beeb28bd053f9522d6803c82141b7dade330f2954c2b6a",
+    "rom_sha256": "92358b92182d17239be9203233d13f17abfdaf582f18ba159c612c7264cf79d4"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786764,
+    "sample_clocks": [
+      7085158
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "7529cc87a9bec6a3a5f3566dc7962ef88be7666462909d0fa5246f911788d9e7",
+    "rom_sha256": "405792c6e64ee978ea80305d6bc0b797f38b414601acb25a9f5869a44a4e4f43"
+  },
+  {
+    "fixture": "bounds",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 1456,
+    "exclusive_master_clocks": 2786764,
+    "sample_clocks": [
+      7085158
+    ],
+    "expected": 3374804766,
+    "bsnes": 3374804766,
+    "mame": 3374804766,
+    "repeat_equal": true,
+    "object_sha256": "7529cc87a9bec6a3a5f3566dc7962ef88be7666462909d0fa5246f911788d9e7",
+    "rom_sha256": "405792c6e64ee978ea80305d6bc0b797f38b414601acb25a9f5869a44a4e4f43"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41865266
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41865266
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41865266
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "b7080f04702c3854056b8f2a13a020ea23f43db4f7b03acd9bce67bab542b729",
+    "rom_sha256": "47c1aa25a01810a36fbb88d68c091d0493c7ecb6a24df8ab92f43e4e7963eb6f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884088
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884088
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884088
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "e1418cc8e61be1418fc82e38ec5683b735ebc7a7f7d84c36d86b4cab672562b0",
+    "rom_sha256": "13477ffba79eb2aec4be8db0bd778f20e138fd7baff0df3da66f9096f3e46d9c"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884064
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884064
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "a16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1240,
+    "sample_clocks": [
+      41884064
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "d41f169ea57e21f9e2a496b78bb4561c242c7e15fd277a3fc51021a7f9220ce7",
+    "rom_sha256": "d630b5cf4b12a1adadd5b342e14d0e89ff6b7d5c390c5607a7eef3136a0d3b0f"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34086780
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34086780
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Os",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34086780
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "9feaf9917747ff3d4b6bd47b133db82c98ed5da75731e02aef4a3cc07837337c",
+    "rom_sha256": "1a68ddab0216762c6f2a8a6d6615932c3a6be9a3a7a86ade65b4af8a08d226bc"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105602
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105602
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "Oz",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105602
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "a80963dcea550df75076bc972972e3c170a5199675c9bf61326f2db3068ce7b2",
+    "rom_sha256": "8e7c117d3338efcd9a7d668e1dea8bb0d130fa50e03e0998b2e6db051937fd11"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "baseline",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105578
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "default",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105578
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173"
+  },
+  {
+    "fixture": "farblit_press",
+    "mode": "xy16",
+    "opt": "O2",
+    "variant": "all",
+    "main_bytes": 102,
+    "exclusive_master_clocks": 1200,
+    "sample_clocks": [
+      34105578
+    ],
+    "expected": 54933,
+    "bsnes": 54933,
+    "mame": 54933,
+    "repeat_equal": true,
+    "object_sha256": "23a4fb22b0ed790850bdf00337b2e66e000583c94dc41f2d80e1f642b4bf807d",
+    "rom_sha256": "9a143b8de3abe1e8dc526a712f81c046e2890095b69c79e756678337be169173"
+  }
+]

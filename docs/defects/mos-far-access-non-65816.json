@@ -1,0 +1,70 @@
+{
+ "schema": 1,
+ "id": "mos-far-access-non-65816",
+ "title": "Far loads and stores on non-65816 CPUs emit 65816 [dp] opcodes",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
+ "summary": "The p2:32:8 data layout applies to every MOS CPU, and the far runtime-address path does not check hasW65816(); selection does not enforce the HasW65816 predicate on LDIndirLong. A runtime far byte load compiles for mos6502 without error and emits $A7 $00, which the 6502 decodes as an undocumented LAX, the SPC700 as sbc a,[$0+x] and the HuC6280 as smb. Far global loads on those CPUs fail loudly; runtime loads and stores do not. Found by the independent review (finding B3) and reproduced on the downstream toolchain.",
+ "attribution": [
+  "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+ ],
+ "unknowns": [
+  "No repair attempted. Only the byte load was captured downstream; stores and the other CPUs are the reviewer's observations on the extracted candidate."
+ ],
+ "prior_work": {
+  "disposition": "new_defect",
+  "search_terms": [
+   "LDIndirLong",
+   "non-65816",
+   "hasW65816",
+   "tryFarIndirectAddressing"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/320-upstream-far-pointer-note.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0001-320-far-addrspace.patch",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "Downstream MOSLegalizerInfo.cpp routes addrspace(2) runtime accesses to the long-indirect pseudos with no subtarget check; the extracted patch 4 tryFarIndirectAddressing likewise.",
+  "binary_assessment": "Downstream release llc 9031686c exits 0 for mos6502 and llvm-objdump shows a7 <unknown> at offset 0; the extracted candidate d7fde754 emits the same bytes for four CPUs.",
+  "decision": "The far-pointer design notes discuss keeping 6502 pointers 16-bit but no record, test or patch rejects far memory on non-65816 CPUs. New canonical record.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/prior-work.json",
+   "sha256": "abae7aae74a175248c0db40c46eb6ed25edd4526a7c89080adc5e6635e057336"
+  }
+ },
+ "baseline": {
+  "command": "set -euo pipefail; build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll -o build/far-review-defects/rt-6502.o; build/far-review-defects/downstream/llvm-objdump -d --mcpu=mos6502 build/far-review-defects/rt-6502.o | grep -E \"^[[:space:]]+[0-9a-f]+:\"; if build/far-review-defects/downstream/llvm-objdump -d --mcpu=mos6502 build/far-review-defects/rt-6502.o | grep -q -E \"^[[:space:]]+0:[[:space:]]+a7\"; then echo \"MISCOMPILE: mos6502 far byte load emitted 65816 opcode \\$A7\"; exit 1; fi",
+  "working_directory": "/home/will/llvm-mos-65816 (repository root). Captured in the wt/321-far-word-rebase worktree /home/will/llvm-mos-65816-nearproof, where build/far-review-defects/downstream holds hard links to the same frozen binaries.",
+  "configuration": {
+   "cpu": "mos6502",
+   "features": [],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": true,
+   "expected": "a diagnostic: far (addrspace 2) memory needs 65816 long addressing"
+  },
+  "toolchain_location": "build/far-review-defects/downstream/llc; identity in docs/defects/evidence/2026-09-30-far-access-non-65816/identity.json",
+  "toolchain_sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll",
+   "sha256": "8585558e29d144f568e491703c59afe68f52f03274a9f5172318c95bba703eba"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/baseline.log",
+   "sha256": "ef51efda6f7cad7983cf63795fbe650703ccb843937429493249d3ecde874767"
+  },
+  "exit_code": 1,
+  "failure_signature": "MISCOMPILE: mos6502 far byte load emitted 65816 opcode $A7"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-access-non-65816/identity.json",
+   "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  }
+ ]
+}

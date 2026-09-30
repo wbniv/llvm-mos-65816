@@ -1,0 +1,44 @@
+{
+ "purpose": "Maps the container paths in the suite logs and lit JSON to the host directories and binaries they ran on (independent review finding N6).",
+ "mounts": {
+  "/work/build/register-exhaustion-src": "/home/will/llvm-mos-65816/build/far-word-rebase/source, the sparse worktree at the candidate commit for both runs",
+  "/work/build/0029-cross-target-build": "/home/will/llvm-mos-65816/build/far-word-rebase/build, the warm build directory"
+ },
+ "caution": "On the host, build/register-exhaustion-src and build/0029-cross-target-build are unrelated checkouts and builds (the review found 742d554b, dirty, and llc 149af7e3). The suites did not use them; dev/container.sh bind-mounted the directories above over those container paths.",
+ "runs": {
+  "pre0070": {
+   "started": "2026-09-29T23:31:23Z",
+   "toolset_commit": "3d82e37332eccac1d315b7e1c879e780cade7d0e",
+   "tests_commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+   "frozen_tools": "build/far-word-rebase/pre0070",
+   "llc_sha256": "b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b",
+   "FileCheck_sha256": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+   "how": "Before the run, the frozen pre-0070 tools (llc, opt, llvm-mc, llvm-objdump, llvm-readobj, llvm-size, FileCheck, not, count, split-file, llvm-as, llvm-dis) were hard-linked into build/far-word-rebase/build/bin; the tests came from the candidate commit, so the three 0070 tests fail by design.",
+   "lit_json": {
+    "path": "pre0070-suite.json",
+    "sha256": "fec0e06ddc43127c7c585e1c08747b3dd2a4bf0ddc33ab4e41c33fe0cee04ae7"
+   },
+   "log": {
+    "path": "pre0070-suite.log",
+    "sha256": "60c726d6ddc14890c3039d79361cbdee416f04e27b67152b0b304cf024db6d0e"
+   }
+  },
+  "candidate": {
+   "started": "2026-09-29T23:30:53Z",
+   "toolset_commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+   "tests_commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+   "frozen_tools": "build/far-word-rebase/candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "FileCheck_sha256": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+   "how": "Run with the tools built in build/far-word-rebase/build/bin at the candidate commit; build/far-word-rebase/candidate holds the frozen copies.",
+   "lit_json": {
+    "path": "candidate-suite.json",
+    "sha256": "283bac5bba3569767391842823a344aedf0fe7d866d4f8441f84feafcc8d3bef"
+   },
+   "log": {
+    "path": "candidate-suite.log",
+    "sha256": "e771e90804efb5ed3013055add2e70580a5c3f41a1af1ac621317bb736258dc7"
+   }
+  }
+ }
+}

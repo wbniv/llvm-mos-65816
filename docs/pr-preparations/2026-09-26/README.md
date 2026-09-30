@@ -115,6 +115,8 @@ OpenAI Codex CLI 0.157.1 (`codex-tui`), model `gpt-6-astra`, `xhigh` reasoning e
 
 **September 28 far-word follow-up:** the [pinned 14-patch candidate](../2026-09-28/far-word-index/upstream-series.md) supplies the far/native prerequisite extraction and 0069/0070 build, regressions and frozen-IR runtime replay. The complete compiler/ABI series still needs independent review and resolution of its listed scope contracts. This does not change opening readiness for the excluded feature packages. Update: OpenAI Codex CLI 0.157.1 (recorded session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
 
+**September 30 far-word rebase:** the [rebased packet](../2026-09-30/far-word-rebase/README.md) reproduces the September 28 results on `06bc967d2668`. Its [independent review](../2026-09-30/far-word-rebase/independent-review.md) upholds 0069/0070 but blocks filing on four downstream far defects, two extraction gaps and the `Imag32` collision with open #594. The repairs go into the [#320/#321 split series](../../plans/2026-09-30-split-320-321-series.md). Update: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+
 The [feature-held ledger](feature-held-packages.md) covers 0013, 0051, 0052,
 0055, and 0061–0063, plus 0028's explicit presentation hold. Their implementations
 are reviewed, but unresolved #320/#321 compiler/ABI extraction is not merely a

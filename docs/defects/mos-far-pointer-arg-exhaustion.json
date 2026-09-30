@@ -1,0 +1,81 @@
+{
+ "schema": 1,
+ "id": "mos-far-pointer-arg-exhaustion",
+ "title": "A fourth far-pointer argument is assigned a 16-bit RS pair",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
+ "summary": "In the default far-pointer calling convention (Imag32), CC_MOS offers a far (addrspace 2) pointer only RL1..RL3 and has no fallback of its own. A fourth far-pointer argument falls through to the generic CCIfPtr rule and receives a free 16-bit RSn pair. The machine verifier rejects the resulting 32-bit COPY from a 16-bit register; the downstream release build without the verifier crashes with a segmentation fault. The same holds in plain mosw65816 and under +mos-a16. Found by the independent review of the extracted far series (finding B1) and reproduced on the downstream toolchain.",
+ "attribution": [
+  "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+ ],
+ "unknowns": [
+  "No repair attempted. The reviewer suggests CCIfPtrAddrSpace<2, CCAssignToStack<4, 1>> immediately after the RL rule; downstream already has that rule behind the opt-in +mos-farcc-stack feature only.",
+  "Near/far interleavings that exhaust the quads while leaving RS1 free were probed only on the extracted candidate."
+ ],
+ "prior_work": {
+  "disposition": "new_defect",
+  "search_terms": [
+   "CCIfPtrAddrSpace<2",
+   "MOSFarCCStack",
+   "far-pointer ABI",
+   "register exhaustion"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0004-320-far-cc.patch",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "Downstream MOSCallingConv.td gates four far-pointer rules on MOSSubtarget::farPtrCC(). The default Imag32 rule is CCAssignToReg<[RL1, RL2, RL3]> with no stack fallback; only the opt-in Stack variant (+mos-farcc-stack) assigns CCAssignToStack<4, 1>. The extracted patch 4 keeps only the RL rule. Neither falls back when the quads are taken.",
+  "binary_assessment": "Downstream release llc 9031686c exits 134 with the verifier and 139 (SIGSEGV) without it; the extracted assertions candidate d7fde754 fails the same verifier check or asserts in RegisterBankInfo.cpp:569.",
+  "decision": "The September 28 packet listed far-pointer ABI register exhaustion as an open contract to review; no defect record, TODO item or patch covers it. New canonical record.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/prior-work.json",
+   "sha256": "4258ec2e1a4914ce53e7fa846aaac18480b6763500cd7629a3b2e4529c82fb24"
+  }
+ },
+ "baseline": {
+  "command": "build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816 (repository root). Captured in the wt/321-far-word-rebase worktree /home/will/llvm-mos-65816-nearproof, where build/far-review-defects/downstream holds hard links to the same frozen binaries.",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [
+    "+mos-a16"
+   ],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": true,
+   "expected": "the fourth far pointer is passed on the soft stack"
+  },
+  "toolchain_location": "build/far-review-defects/downstream/llc; identity in docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/identity.json",
+  "toolchain_sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll",
+   "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/baseline.log",
+   "sha256": "6987fac97fb2a28400cfdf9d9905aedc6aa5bae2cfa7cccbceb0bfada2f11935"
+  },
+  "exit_code": -6,
+  "failure_signature": "Copy Instruction is illegal with mismatching sizes"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/identity.json",
+   "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/release-no-verifier.log",
+   "sha256": "ae5ddc3410c73cc5d731b4db8841d1d772a458a43422d2514ece5f937597910c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/plain-w65816.log",
+   "sha256": "a6aeb8d0c0c795ff5aa5f077aba588f0eece7dd916cbc733bafa2c05a0bdc1a6"
+  }
+ ]
+}

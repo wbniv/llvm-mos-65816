@@ -1,0 +1,140 @@
+{
+  "destination": "https://github.com/llvm-mos/llvm-mos",
+  "base": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+  "previous_base": "26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6",
+  "previous_series_head": "886adb9c01f3",
+  "pre0070_commit": "3d82e37332eccac1d315b7e1c879e780cade7d0e",
+  "head": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+  "head_tree": "d2d7b62b06a19b362d2b54a210c62e9137c9b5bb",
+  "patch_count": 14,
+  "roundtrip_all_intermediate_trees_match": true,
+  "commits": [
+    {
+      "patch": "patches/0001-Extract-opt-in-native-widths-and-near-memory-prerequ.patch",
+      "sha256": "f89f16457185fa8ca76cdd8839cdb2357343ab5281537eac9b4c3cd2364d1050",
+      "commit": "340c8ee25d5c0d70233287109aa8b208cc241f3b",
+      "subject": "Extract opt-in native widths and near-memory prerequisites",
+      "tree": "7937b8f7c79fff0cf10df5071c2172abbe74654f",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0002-Honor-explicit-address-widths-for-constant-operands.patch",
+      "sha256": "7eb4c3b4cf1c9c63e313584f79169c334809799119aa41bafd96e1bb332e0b1e",
+      "commit": "36f5994b5d4677d89ce7de99e3f7e8ff5f338994",
+      "subject": "Honor explicit address widths for constant operands",
+      "tree": "c74d294acc906493757ee085e0093cef2cdc7f23",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0003-Preserve-long-address-widths-in-printed-assembly.patch",
+      "sha256": "87432d42ed58a45b6f61cc15ed004425bfe882325b968facd97932bdd4b801ea",
+      "commit": "0c77988b2e0b2857efbda416fe5528b838477a03",
+      "subject": "Preserve long address widths in printed assembly",
+      "tree": "4cae5506c4768281fd3239f1f96f42b39f7f1564",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0004-Extract-far-data-addressing-and-bounded-runtime-inde.patch",
+      "sha256": "5fe60f9dd3af39aa9268659950bdaafb4087430ca37f38fd4e3866a627ebe54c",
+      "commit": "11044c53d5fcd784b35cbde5046842e2eb159d41",
+      "subject": "Extract far data addressing and bounded runtime indexing",
+      "tree": "23cc49e78fe40d6e20033381b3590144201ffdb2",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0005-Select-far-absolute-indexed-byte-accesses.patch",
+      "sha256": "436276484e81ab945c84e02f039779488c7b051b37bbca4d1224225fa847e3db",
+      "commit": "2d09f973b33e57caca3ace22bcffbedccee6d487",
+      "subject": "Select far absolute indexed byte accesses",
+      "tree": "1974f71c0a2aea9a5fd40edbd689e06366385890",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0006-Select-native-accumulator-far-word-accesses.patch",
+      "sha256": "9ae514b2bcafcdb350732c5a7e90790f92d46c1da23138033903324433b3c5a4",
+      "commit": "12c692caf02198c5539039c189a22721ba512eed",
+      "subject": "Select native accumulator far word accesses",
+      "tree": "61b140fe7bbc57ae087749078f0d46c52a99fb42",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0007-Select-far-extending-load-addresses-within-the-legal.patch",
+      "sha256": "ae2f708495e372ded84af5d639368bdab7a52266a44070a95343fa8de13becf2",
+      "commit": "f68257d4b23cbb7197d4c976395544d9205e43fb",
+      "subject": "Select far extending-load addresses within the legalizer worklist",
+      "tree": "9d1b4b174169eaf47385753493d5177f377410e5",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0008-Prove-bounded-byte-loop-ranges-for-far-runtime-index.patch",
+      "sha256": "35c640020a5200b97bb86fce56b44d44c9bb9502d7a538cd795d0113523546e0",
+      "commit": "0305b3d91dbd4ea9482adcfa2fbc3285a4a8121f",
+      "subject": "Prove bounded byte-loop ranges for far runtime indexing",
+      "tree": "ca0e3dfac72b7aedd1e1c891128ae1c6d5fea1f1",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0009-Cost-native-index-copies-to-imaginary-register-pairs.patch",
+      "sha256": "361599c2261c93e02fe1e936a236e7e2b437be4103430c99ae5129cbd52bc5fd",
+      "commit": "c140aa349f14973eec625adf71ce69ed89897d3d",
+      "subject": "Cost native index copies to imaginary register pairs",
+      "tree": "bcf6871cb5934f93ed2639f660482cf28444cf0f",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0010-Preserve-all-four-bytes-when-spilling-far-pointer-qu.patch",
+      "sha256": "509617525d77e33b1f6da7565e62ce67f0dd63f4b85cb5f293e10087579e2f8d",
+      "commit": "c9c6fb0c10966bf2975d5e01966bb1d01f3978df",
+      "subject": "Preserve all four bytes when spilling far-pointer quads",
+      "tree": "2c5a5b364af3bbb97215d4634c2cf09866814446",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0011-Preserve-undefined-lane-definitions-in-identity-copi.patch",
+      "sha256": "f4b2b9c9bce5360b2c1dd9c3d571ac52de1c3d7d6558329ee9227edf00cb3d13",
+      "commit": "3d82e37332eccac1d315b7e1c879e780cade7d0e",
+      "subject": "Preserve undefined lane definitions in identity copies",
+      "tree": "3de5afb09dc74e41aa5da9365e96f624860aa598",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0012-Fold-bounded-native-far-word-loads-in-speed-optimize.patch",
+      "sha256": "cbdd17de0664eb400d75a31e5e91bb7155d3411fa974d16cde00b453dcc8d906",
+      "commit": "9bfc1cc5104fcdef6b08c1bac155f160afa0fafb",
+      "subject": "Fold bounded native far word loads in speed-optimized functions",
+      "tree": "968955a7bebf00f5b363c2d440d46ce5bdd1adc5",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0013-Check-far-word-boundaries-operands-and-loop-proof-li.patch",
+      "sha256": "a205c1cf1e313d3e614df0ac7124526f938dc856788f0468d37c65609c27d1b8",
+      "commit": "8ba6eebe365dcc2b51d02b2dd3cdcc3fb0b04f85",
+      "subject": "Check far-word boundaries, operands, and loop-proof limits",
+      "tree": "4024cd67631142151f26ff6187b0ec89d17a35dc",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    },
+    {
+      "patch": "patches/0014-Assert-shared-base-and-index-for-mixed-far-loads.patch",
+      "sha256": "f4ef6fd1e21e6066a3f9cebee4cecff1f670bb47599500bbf46143df32921f50",
+      "commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+      "subject": "Assert shared base and index for mixed far loads",
+      "tree": "d2d7b62b06a19b362d2b54a210c62e9137c9b5bb",
+      "tree_matches_commit": true,
+      "apply_output": ""
+    }
+  ],
+  "rebase": "git am -3 of the 26d7c2c1 packet patches onto the destination; no conflicts; per-commit added/removed lines identical to the previous series (evidence/range-diff.txt shows context-only changes)"
+}

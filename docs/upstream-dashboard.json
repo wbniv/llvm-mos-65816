@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "fa65d20cbb9e37a5cf2a81f697c9e9a8a05bb1939e63ed98b8663317492560f1",
+  "sourceHash": "528d2e521e4258192341b097c0244c837e03c52ab1cfb74f752044c6829461dc",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -108,6 +108,63 @@
       "demoUrls": []
     },
     {
+      "id": "defect:mos-far-access-non-65816",
+      "kind": "defect",
+      "title": "Far loads and stores on non-65816 CPUs emit 65816 [dp] opcodes",
+      "summary": "The p2:32:8 data layout applies to every MOS CPU, and the far runtime-address path does not check hasW65816(); selection does not enforce the HasW65816 predicate on LDIndirLong. A runtime far byte load compiles for mos6502 without error and emits $A7 $00, which the 6502 decodes as an undocumented LAX, the SPC700 as sbc a,[$0+x] and the HuC6280 as smb. Far global loads on those CPUs fail loudly; runtime loads and stores do not. Found by the independent review (finding B3) and reproduced on the downstream toolchain.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Make address-space-2 memory operations fail with a clear diagnostic unless the subtarget has 65816 long addressing; add a mos6502 negative test.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-access-non-65816.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-far-index-fold-dangling-dbg",
+      "kind": "defect",
+      "title": "Far runtime-index fold leaves an undef DBG_VALUE that fails machine verification",
+      "summary": "When tryFarRuntimeIndexFold folds every non-debug use of a far pointer add into a [dp],Y access, salvageDebugInfo cannot express base + zext(offset) and leaves the DBG_VALUE naming the dead vreg. DetectDeadLanes marks it undef and -verify-machineinstrs rejects the function. Without the verifier the location degrades to $noreg and the emitted code is unaffected. The byte fold (0061/patch 4) and the native word fold (0070) both fail downstream. Found by the independent review (finding B4) and reproduced on the downstream toolchain.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Drop or salvage the DBG_VALUE of a far pointer add that the index fold erases, for byte and word folds; add -g verifier regressions.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-index-fold-dangling-dbg.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-far-memop-length-truncation",
+      "kind": "defect",
+      "title": "Far memset/memcpy/memmove lengths above 65535 are truncated or deleted",
+      "summary": "createFarMemLibcall truncates the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check, and the IRTranslator has already truncated the length of a mixed-address-space memmove. A constant 70000-byte far memset calls __memset_far with 4464; a 65536-byte p2<-p0 memmove is deleted and the function returns at once; a runtime i32 memcpy length loses its high 16 bits. The compiler exits 0 and the verifier is clean. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Reject, split or route far memset/memcpy/memmove lengths above 0xFFFF in 0002 and the #320 series; regressions for 65535, 65536, 65537, 70000 and an unbounded runtime length.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-memop-length-truncation.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
       "id": "defect:mos-far-memset-wrong-bank",
       "kind": "defect",
       "title": "Far memset selects the near runtime and loses the destination bank",
@@ -121,6 +178,25 @@
       "nextStep": "Existing a81874d / 0013 repair revalidated; carry far compiler/ABI and runtime integration with the feature series.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-memset-wrong-bank.json"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-far-pointer-arg-exhaustion",
+      "kind": "defect",
+      "title": "A fourth far-pointer argument is assigned a 16-bit RS pair",
+      "summary": "In the default far-pointer calling convention (Imag32), CC_MOS offers a far (addrspace 2) pointer only RL1..RL3 and has no fallback of its own. A fourth far-pointer argument falls through to the generic CCIfPtr rule and receives a free 16-bit RSn pair. The machine verifier rejects the resulting 32-bit COPY from a 16-bit register; the downstream release build without the verifier crashes with a segmentation fault. The same holds in plain mosw65816 and under +mos-a16. Found by the independent review of the extracted far series (finding B1) and reproduced on the downstream toolchain.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Add a far-pointer stack fallback after the RL rule in 0002 and the #320 series; caller and callee regressions for four far pointers and near/far interleavings.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-pointer-arg-exhaustion.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
       ],
       "evidenceNote": "",
       "upstreamUrl": null,
@@ -168,11 +244,12 @@
       "dependsOn": [
         "platform:321"
       ],
-      "nextStep": "Independently review with the extracted native/far compiler series; this repair is validated in the candidate and is not installed downstream.",
+      "nextStep": "Upheld by the September 30 independent review of the rebased series (patch 9); carry it in the split #321 series.",
       "evidenceNote": "",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-native-index-copy-cost.json",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/README.md"
       ],
       "upstreamUrl": null,
       "demoUrls": []
@@ -492,11 +569,13 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing.",
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/320-upstream-far-pointer-note.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],
@@ -510,11 +589,13 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing.",
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/321-upstream-native-width-pr.md",
-        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/pr-preparations/2026-09-30/far-word-rebase/README.md",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "evidenceNote": "",
       "dependsOn": [],

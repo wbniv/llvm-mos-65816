@@ -1,0 +1,172 @@
+ 1:  450823797b44 !  1:  340c8ee25d5c [MOS] Extract opt-in native widths and near-memory prerequisites
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Extract opt-in native widths and near-memory prerequisites
+    +    Extract opt-in native widths and near-memory prerequisites
+     
+         Extract the native compiler support tracked by #321 from the downstream aggregate, excluding far address spaces and platform code. Reconcile current scalarization, byte-mode behavior and native DWARF numbering. Include byte-index, wide-anyext, immediate-width and near atomic guards needed by this compiler subset. Existing implementation credits and dated evidence remain in llvm-mos-65816 records.
+     
+    @@ llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h: public:
+        void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+     
+      ## llvm/lib/Target/MOS/MOS.h ##
+    -@@ llvm/lib/Target/MOS/MOS.h: void initializeMOSCombinerPass(PassRegistry &);
+    - void initializeMOSCopyOptPass(PassRegistry &);
+    +@@ llvm/lib/Target/MOS/MOS.h: void initializeMOSCopyOptPass(PassRegistry &);
+    + void initializeMOSImagRegAllocPass(PassRegistry &);
+      void initializeMOSIndexIVPass(PassRegistry &);
+      void initializeMOSInsertCopiesPass(PassRegistry &);
+     +void initializeMOSInsertREPSEPPass(PassRegistry &);
+    @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp
+      #include "MOSLowerSelect.h"
+      #include "MOSMachineFunctionInfo.h"
+     @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp: extern "C" LLVM_EXTERNAL_VISIBILITY void LLVMInitializeMOSTarget() {
+    -   initializeMOSCombinerPass(PR);
+        initializeMOSCopyOptPass(PR);
+    +   initializeMOSImagRegAllocPass(PR);
+        initializeMOSInsertCopiesPass(PR);
+     +  initializeMOSInsertREPSEPPass(PR);
+        initializeMOSInternalizePass(PR);
+    @@ llvm/lib/Target/MOS/MOSTargetMachine.cpp: void MOSPassConfig::addPreSched2() {
+     +  addPass(&BranchRelaxationPassID);
+     +}
+      
+    - namespace {
+    - 
+    + void MOSPassConfig::addExperimentalRegAlloc() {
+    +   addPass(&DetectDeadLanesID);
+     
+      ## llvm/test/CodeGen/MOS/a16-byte-store.ll (new) ##
+     @@
+ 2:  e4f2374a6dd4 !  2:  36f5994b5d46 [MOS] Honor explicit address widths for constant operands
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Honor explicit address widths for constant operands
+    +    Honor explicit address widths for constant operands
+     
+         Carry downstream 0039 as an independent assembler prerequisite for the
+         far-addressing series. Its implementation is unchanged. Original
+ 3:  0adc1d8bb3ec !  3:  0c77988b2e0b [MOS] Preserve long address widths in printed assembly
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Preserve long address widths in printed assembly
+    +    Preserve long address widths in printed assembly
+     
+         Carry downstream 0044 above the native-width prerequisite and 0039.
+         Preserve symbolic and low-valued long operands through text round trips.
+ 4:  0e97992e1a66 !  4:  11044c53d5fc [MOS] Extract far data addressing and bounded runtime indexing
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Extract far data addressing and bounded runtime indexing
+    +    Extract far data addressing and bounded runtime indexing
+     
+         Extract the p2:32 data-pointer model, Imag32 quads, default register ABI,
+         far data legalization and selection, allocation support, and bounded byte
+ 5:  b6701bb03d0d !  5:  2d09f973b33e [MOS] Select far absolute indexed byte accesses
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Select far absolute indexed byte accesses
+    +    Select far absolute indexed byte accesses
+     
+         Rebase downstream 0061 onto the extracted far-data prerequisite.
+         Retain the existing unsigned index and explicit long-address contracts.
+ 6:  23785eaa2d44 !  6:  12c692caf021 [MOS] Select native accumulator far word accesses
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Select native accumulator far word accesses
+    +    Select native accumulator far word accesses
+     
+         Rebase downstream 0062 onto the pinned native/far compiler series.
+         Original implementation, validation and review credits remain in the
+ 7:  cd0e18359d6e !  7:  f68257d4b23c [MOS] Select far extending-load addresses within the legalizer worklist
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Select far extending-load addresses within the legalizer worklist
+    +    Select far extending-load addresses within the legalizer worklist
+     
+         Rebase downstream 0066 onto the pinned native/far compiler series.
+         Original implementation, validation and review credits remain in the
+ 8:  0b9b52e5d3cd !  8:  0305b3d91dbd [MOS] Prove bounded byte-loop ranges for far runtime indexing
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Prove bounded byte-loop ranges for far runtime indexing
+    +    Prove bounded byte-loop ranges for far runtime indexing
+     
+         Rebase downstream 0069 onto the pinned native/far compiler series.
+         Original implementation, validation and review credits remain in the
+ 9:  5796df8e20f3 !  9:  c140aa349f14 [MOS] Cost native index copies to imaginary register pairs
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Cost native index copies to imaginary register pairs
+    +    Cost native index copies to imaginary register pairs
+     
+         Model the four legal X16/Y16 <-> Imag16 copy edges that physical-copy
+         lowering already supports. Each uses a two-byte direct-page instruction
+10:  eaea9178369d ! 10:  c9c6fb0c1096 [MOS] Preserve all four bytes when spilling far-pointer quads
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Preserve all four bytes when spilling far-pointer quads
+    +    Preserve all four bytes when spilling far-pointer quads
+     
+         Extract the existing 0018 far-pointer spill prerequisite. Expand dynamic
+         stack operations through two Imag16 words and static stack operations
+11:  11baf69da717 ! 11:  3d82e37332ec [CodeGen] Preserve undefined lane definitions in identity copies
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [CodeGen] Preserve undefined lane definitions in identity copies
+    +    Preserve undefined lane definitions in identity copies
+     
+         Reuse the prepared 0028 extraction as a compiler prerequisite. The
+         far-word boundary workload reaches its existing identity-copy lane
+12:  092aa16eb4df ! 12:  9bfc1cc5104f [MOS] Fold bounded native far word loads in speed-optimized functions
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Fold bounded native far word loads in speed-optimized functions
+    +    Fold bounded native far word loads in speed-optimized functions
+     
+         Admit plain two-byte far loads to the all-users indexed-address walk.
+         Require the final byte of every sibling to fit Y8; reject atomic,
+13:  ef0a194ccc0b ! 13:  8ba6eebe365d [MOS] Check far-word boundaries, operands, and loop-proof limits
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Check far-word boundaries, operands, and loop-proof limits
+    +    Check far-word boundaries, operands, and loop-proof limits
+     
+         Add direct 254/255 word endpoint controls, preserved base/index/MMO
+         checks, atomic/escape/call rejection, and a compact live-consumer IR case
+14:  886adb9c01f3 ! 14:  77dc044c39bb [MOS] Assert shared base and index for mixed far loads
+    @@ Metadata
+     Author: Will Norris <will@biohack.net>
+     
+      ## Commit message ##
+    -    [MOS] Assert shared base and index for mixed far loads
+    +    Assert shared base and index for mixed far loads
+     
+         Check both byte-first and word-first traversal orders. Each access must
+         retain the same runtime base and narrowed offset, its volatile memory

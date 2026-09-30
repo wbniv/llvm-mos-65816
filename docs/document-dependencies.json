@@ -77,14 +77,18 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "e95e521f210c239b7cc643fb2b9ec8efeff2b964d6f07b3b90d96132949215e9",
+          "docs/upstream-dashboard-curation.json": "bc777a6ec568702dd38845f1201b1cea8a4e840a3cdf82ce730cb1728b880156",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
           "docs/defects/mos-bank-relax-section-offset.json": "12bd09bd688b5d1453eb10947d4481ba4900482e46133d6f7cca1677cd250353",
           "docs/defects/mos-carry-scheduling-pressure.json": "e0b1ed7f5314f020ea1fc7f1b45f4aad005281fb4c75d8554999197324c594d1",
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
+          "docs/defects/mos-far-access-non-65816.json": "a3e9674ca8602c8e7f9428a36aecdb1d11ef25d46275c0e711243d55e8006b52",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "422389897c6a50a4ea06d617f54b5332e45a52daae40e0dd791ca0ca4dccbfd9",
+          "docs/defects/mos-far-memop-length-truncation.json": "4ee58629cf38dc292dd24cd9b4273adb1d22f18a60135b20fbbbe122a81233f3",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "87913f0f3a26d0d8900b3b79af5a093678461fb1b6d690e9d964e94fc783dc5b",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
@@ -107,7 +111,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "f534e9dfc8c5b4352dbe4b897194c409dd7728873ed8f8c105a65d3144b519f0"
+          "docs/upstream-dashboard.json": "15d252e541f10cf5e4acc2cfa9e7bb9b23f949efd606784cf834458a39c92165"
         }
       }
     },
@@ -128,13 +132,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "359d86bccf680ffec57420edec7686a4b16d0ea93793fcb87ecfc47763dfc751",
+          "docs/upstream-pending-work.md": "c1dd697e376d8577ba2bc25713d9e6985ac0694394f700e9e31bcaa85d498482",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "f534e9dfc8c5b4352dbe4b897194c409dd7728873ed8f8c105a65d3144b519f0",
+          "docs/upstream-dashboard.json": "15d252e541f10cf5e4acc2cfa9e7bb9b23f949efd606784cf834458a39c92165",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "95e4cb3655016923aedbf075763300a18c79fbe2da2eea0f3c0a956b31d55b01"
+          "docs/upstream-dashboard-graph.json": "198aaf95bcf64cfa002acb429396ff706c321df47159dd3c0681b959101f138d"
         }
       }
     },
@@ -300,7 +304,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
+          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -324,7 +332,7 @@
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
+          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
           "docs/plans/2026-09-26-live-upstream-dashboard.md": "d3219df087ecd4c0bb640995f168d5c5d1c0b8e352f765544d228be269c95b5c",
           "docs/plans/2026-07-27-136-lzss-gallery-contiguous-artwork-palette.md": "0513d179f35506c510c9acf01c4aac10a75eaf4db416364ef425a4555651f2dc",
           "docs/plans/2026-07-27-138-lzss-gallery-palette-range-audit.md": "3a3fe88713c6eb1aa41b0a818186c37df84782832c81168c214b9c83ceff053c",
@@ -341,12 +349,12 @@
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/plans/2026-09-28-farblit-range-integration.md": "a82f8e761715ded36c11f3843ede0a9cae6cf49ce9a6bc4c0f2b14d80e42d98a",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T22:46:34.310530+00:00",
-        "note": "Reviewed after the option-collision closure and farblit plan note: TODO has no entry for the collision; no change needed.",
+        "reviewed_at": "2026-09-30T00:21:06.217305+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -388,7 +396,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
+          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -410,7 +422,7 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
+          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
@@ -421,12 +433,12 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T22:36:41.849506+00:00",
-        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
+        "reviewed_at": "2026-09-30T00:21:06.340755+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -468,7 +480,11 @@
           "docs/defects/mos-bank-relax-section-offset.json": "ebd91e6677aa6b8863480fdb1966aa07a532a5692eb1e0ea308185c65f315fea",
           "docs/defects/mos-carry-scheduling-pressure.json": "bbb48823b90da9ab03401eaefcaa11c8f267a5732ff0d34e7e3542d0588a44c9",
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
+          "docs/defects/mos-far-access-non-65816.json": "ef0b35329ee9c6fe2265806a367cd4f10183b6142efa037713b8021e859da218",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "8289ced7672443980d59bc73f86b953c813b6f4daf546fb4a8818c22ae402eda",
+          "docs/defects/mos-far-memop-length-truncation.json": "e7dfc7cdf40b29ee7ff2343a99e557a554109c4ea23e4e4617c8f4c177085a01",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
+          "docs/defects/mos-far-pointer-arg-exhaustion.json": "3d270fa9a0069864daf789dbf3f8949f7328178f65007e928025eefbd23c647d",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
@@ -490,7 +506,7 @@
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
-          "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
+          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/plans/2026-09-27-broader-near-store-profitability.md": "ed6723d16eab9dcf8a784910cb10439457613aeab3d4ebbfd56361586482530a",
@@ -501,12 +517,12 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T22:36:41.845469+00:00",
-        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
+        "reviewed_at": "2026-09-30T00:21:06.348036+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -654,7 +670,7 @@
           "docs/defects/shift64-narrow-count.json": "86c4e724767198afba0cb84e06be3bf5871a83257d8d6f4c3eafeaa3ebb847ac",
           "docs/defects/bitboard-inline-register-pressure.json": "7c389ea5390df59ba99954543e4c3aa5b4432a24ebdfeb81e8e39afe6dcd5f9b",
           "docs/plans/2026-09-25-dpy-indexed-phase2-increment2.md": "962f0ade5b9802f6dc3ee9268520a766849d6aeb41707e59e193bf8f6beeaf4f",
-          "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
+          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/pr-preparations/2026-09-26/0064-submission.json": "792f1896154be513733dd14cae37ea430df5bc49e51fdd407078d9bbf981c34b",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
@@ -666,12 +682,12 @@
           "docs/investigations/2026-09-27-near-index-overflow-proofs.md": "24c0de9286f9ae46e84a4c5829043e3cf37a04635efab532cece5b753117352e",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T22:36:39.645882+00:00",
-        "note": "Updated for the 0002 repair of the opt option collision: statements now say it is fixed, with links to the closed record.",
+        "reviewed_at": "2026-09-30T00:21:06.820926+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -928,7 +944,7 @@
           "docs/pr-preparations/2026-09-26/0064-validation.md": "876d42a60adcd64396b9aa5cb0393db5f8ea02bfeb754e6f2294fe151cefc486",
           "docs/pr-preparations/2026-09-26/mos-validation.md": "a788ff58d21dacd8f73b7410da9cad3155b0211a69f41524905919aa6c7dcf10",
           "docs/pr-preparations/2026-09-26/llvm-validation.md": "a4445c28c09e4bbbb3917c0721950c9d3e692c7cd57f65a52d44366813de428e",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/pr-preparations/2026-09-26/0028-pr-body.md": "f30af1f6fab15e952f894936eb1c78be08b7d6f42d4a75248e3a3ca5250e772f",
           "docs/pr-preparations/2026-09-26/0037-pr-body.md": "dc640b31f51578e6bc5b469d58553dcd67c45f0a21bdb36459fc3fc9d8c1c27e",
           "docs/pr-preparations/2026-09-26/0038-pr-body.md": "4028d7c8b88af655e2be7315c36bb53c111c3cd6bbb95950264126d02abd8f5c",
@@ -955,8 +971,8 @@
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-29T22:37:51.429176+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
+        "reviewed_at": "2026-09-30T00:21:10.088790+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -1462,8 +1478,8 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-26/README.md": "8844ba35f3f50e853440615e0855183b203163dedfd395e1be6055a29dedd845",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
+          "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/investigations/2026-09-26-r2-baseline-backup.md": "640a1f7116b14ce77fdfc6d05027519a84eb73419e11dff679ef5580d411c5ae",
           "docs/plans/2026-09-26-mos-carry-scheduling.md": "439dabb7cac3ddf659add60349bac746e1fc80d94b2f3d71a0411ec50e5a1ff6",
           "docs/investigations/2026-09-27-near-y-decoder.md": "13f5619077a33fff7eb868136b0ab6cc6a4f040a8a9235bd7cbdad5fe3efb853",
@@ -1471,8 +1487,8 @@
           "docs/pr-preparations/2026-09-27/0068-validation.md": "ca72ec1eaa20599dc754224ebd790b4404f10418dd95745ca5c8ac90646f6153",
           "docs/pr-preparations/2026-09-28/0065/README.md": "98be3578fad0194db69473407627efeb79b114d501399bfa548fca661a93b94b"
         },
-        "reviewed_at": "2026-09-29T22:37:46.716041+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
+        "reviewed_at": "2026-09-30T00:21:10.222196+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -2224,12 +2240,12 @@
       "receipt": {
         "sources": {
           "docs/investigations/2026-09-28-far-word-policy.md": "3117627f909b8d81aa79ae996a62f5da75e7c419819da26ae3a87b19ff7b8e5b",
-          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "a394178c88e18f6b66d2bb6ecb7a1c346d942574be522c157e5d7746014745a3",
+          "docs/pr-preparations/2026-09-28/far-word-index/README.md": "c3aed6e0a048b9323333691010720c157d45a7024ef1d1d3479b78c349836d6c",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189"
         },
-        "reviewed_at": "2026-09-28T13:24:21.960948+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-30T00:21:10.222284+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2271,7 +2287,7 @@
           "docs/investigations/2026-09-28-farblit-payoff.md": "8ab011b998c47e6e1ce67e91300c0c006d1c9ae7427345b89c9aee5e5c7b20ab",
           "docs/investigations/2026-09-28-farblit-range-integration.md": "0c355a214254495f60e8478499f9a2f874c13d01840afd940a45a0e72c513b27",
           "docs/pr-preparations/2026-09-26/native-optimization-review.md": "818f9cd79adc29f4d55cd662d892ac43919f66a2c7e2e654b910325205a1f849",
-          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "3b581b79e09fa9dc80a145d4f708c653520e8c00e1c1bef0dce58a41f27f22fd",
+          "docs/pr-preparations/2026-09-26/feature-held-packages.md": "767af59e98fc66ef1941e3098d074f7ce0a3d7259593bb2ec8ae1458bf442c27",
           "docs/defects/evidence/2026-09-28-far-word-policy/results.json": "82609acaabda77b78ac710a418801a0be47ea70bd86d88b16be7d5770a0b0157",
           "docs/defects/evidence/2026-09-28-far-word-policy/trace.json": "ef5faa521845e918a467e762a86dc1fe08a63928cdfc479b07f394ad6f247734",
           "docs/defects/evidence/2026-09-28-far-word-policy/identity.json": "7782dd8ee661d14ed63b44ca5b0931c79ba40f46059ee910c9c17ee23480f215",
@@ -2293,8 +2309,8 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-29T22:37:53.190327+00:00",
-        "note": "Reviewed against the closed option-collision record: no statement here describes that collision as open; no change needed.",
+        "reviewed_at": "2026-09-30T00:21:12.780232+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
@@ -2307,13 +2323,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "e94a59a7a487fafeda90762a2612856098010174efb9647f10946ca2f64edc99",
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "560cb2c96e2a9b811db35b84224e0bace60596fa1f248512006df5be4cd04dc6",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e"
         },
-        "reviewed_at": "2026-09-28T13:24:23.207246+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-30T00:22:42.352539+00:00",
+        "note": "Reviewed, no change. pr-body.md is the September 28 draft PR text; the September 30 packet supersedes it for filing and records the blocking review, and the body will be rewritten against the split series. The publication runbook is unaffected.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2330,16 +2346,16 @@
       "receipt": {
         "sources": {
           "docs/pr-preparations/2026-09-28/far-word-index/pr-body.md": "940c761d1ca365d8b50df096bdf662d0362cce361521bfe8958b9f3e5d1ae848",
-          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "e94a59a7a487fafeda90762a2612856098010174efb9647f10946ca2f64edc99",
+          "docs/pr-preparations/2026-09-28/far-word-index/review.md": "560cb2c96e2a9b811db35b84224e0bace60596fa1f248512006df5be4cd04dc6",
           "docs/pr-preparations/2026-09-28/far-word-index/destination.json": "5ca65d663e18df843053f2eb36ad3f1e34faaaafeff53d1c74ae6ad741ed4adc",
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md": "abc42e11ad2e44e6578912ede327279f5cd7bfa0afdc4345ac003cc35d49e50e",
           "docs/pr-preparations/2026-09-28/far-word-index/0069-pr-body.md": "f3f54a14aaf4aff017c3d0d983d006a4e0378c19d933623e2348ad1a70b1ee22",
           "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/REPRODUCE.md": "979aa213fe3f43ef8f279beacc53d712a3bd11528cf6c2422fd453538d590214"
         },
-        "reviewed_at": "2026-09-28T13:24:23.481226+00:00",
-        "note": "Reviewed against the new canonical native-index copy-cost record and the pinned candidate evidence. Confirmed whether this summary or plan claims copy-cost behavior, upstream readiness, or independent-review status; retained accurate scope and current prerequisites, with the candidate correction and validation linked where relevant.",
-        "attribution": "OpenAI Codex CLI 0.157.1 (vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84"
+        "reviewed_at": "2026-09-30T00:21:13.355674+00:00",
+        "note": "Added the September 30 far-word rebase outcome: suites, sensitivity and 58-configuration replay reproduce September 28; the independent review upholds 0069/0070 and blocks filing on four downstream far defects (new canonical records), two extraction gaps and the #594 Imag32 collision.",
+        "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     },
     {
@@ -2591,10 +2607,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "ec3a9d6e39ebf98d168dbb8c28fbb607fa1f5016c6d3ec6123363646a275d4e4"
+          "TODO.md": "6810a9aabfaaef932c61b6ba760d8f0fc8aa883e3bef7e3035fe8afbedfd5c61"
         },
-        "reviewed_at": "2026-09-29T14:13:47.509797+00:00",
-        "note": "Reviewed against the new defect records and packet: no statement here concerns near-index recovery, the opt option collision or preserveX; no change needed.",
+        "reviewed_at": "2026-09-30T00:30:11.582887+00:00",
+        "note": "Reviewed, no change: the TODO Inbox triage and the far-word status updates do not affect the publication runbook.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     }

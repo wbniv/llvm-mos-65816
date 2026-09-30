@@ -1,0 +1,6 @@
+$ set -euo pipefail; build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj docs/defects/evidence/2026-09-30-far-access-non-65816/rt.ll -o build/far-review-defects/rt-6502.o; build/far-review-defects/downstream/llvm-objdump -d --mcpu=mos6502 build/far-review-defects/rt-6502.o | grep -E "^[[:space:]]+[0-9a-f]+:"; if build/far-review-defects/downstream/llvm-objdump -d --mcpu=mos6502 build/far-review-defects/rt-6502.o | grep -q -E "^[[:space:]]+0:[[:space:]]+a7"; then echo "MISCOMPILE: mos6502 far byte load emitted 65816 opcode \$A7"; exit 1; fi
+       0: a7           	<unknown>
+       1: 00           	brk
+       2: 60           	rts
+MISCOMPILE: mos6502 far byte load emitted 65816 opcode $A7
+exit_code=1

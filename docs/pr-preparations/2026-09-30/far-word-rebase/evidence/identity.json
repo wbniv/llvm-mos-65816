@@ -1,0 +1,58 @@
+{
+  "build": {
+    "host_source": "build/far-word-rebase/source (sparse worktree of .scratch/carry-clang-upstream/source), mounted as /work/build/register-exhaustion-src",
+    "host_build": "build/far-word-rebase/build (hard-link copy of build/far-word-upstream/build with in-place-written files un-shared), mounted as /work/build/0029-cross-target-build",
+    "container": "llvm-mos-65816-dev via dev/container.sh; system clang/lld 21.1.8",
+    "cmake": {
+      "CMAKE_BUILD_TYPE": "Release",
+      "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+      "LLVM_ENABLE_ASSERTIONS": "ON",
+      "LLVM_TARGETS_TO_BUILD": "X86;ARM;AArch64",
+      "LLVM_EXPERIMENTAL_TARGETS_TO_BUILD": "MOS",
+      "LLVM_USE_LINKER": "lld",
+      "LLVM_MOS_EXPERIMENTAL_REGALLOC_DEFAULT": "OFF"
+    }
+  },
+  "toolsets": {
+    "pre0070": {
+      "commit": "3d82e37332eccac1d315b7e1c879e780cade7d0e",
+      "frozen": "build/far-word-rebase/pre0070",
+      "sha256": {
+        "llc": "b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b",
+        "opt": "fff0dccf0bc7af60c3ace28653339a4cf9a85187c6920c5a68c6ced951d7edd1",
+        "llvm-mc": "95a27555b15e93fbe62c10cf263e5a5ad34b6d823ace524a6ba4172ac987a4dc",
+        "llvm-objdump": "7e63b83e0905391734be87db3d0b617d21f934de10c14d8d621ebc7f5e47e8e0",
+        "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+        "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+        "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+        "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+        "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+        "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+        "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+        "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610"
+      }
+    },
+    "candidate": {
+      "commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+      "frozen": "build/far-word-rebase/candidate",
+      "sha256": {
+        "llc": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+        "opt": "60a25c112cd59539f0de67fd69708831e4ffc9fc0c91edd9ab959b8893a0e055",
+        "llvm-mc": "95a27555b15e93fbe62c10cf263e5a5ad34b6d823ace524a6ba4172ac987a4dc",
+        "llvm-objdump": "7e63b83e0905391734be87db3d0b617d21f934de10c14d8d621ebc7f5e47e8e0",
+        "llvm-readobj": "db7d562154aa9c5ef0df77e88598fbcd8a365a5118c65cd4f6fa1efb44c4feff",
+        "llvm-size": "8c9376085559ce88020e5864547cdd730f61d7a49210eb3f122cd4d6d07f8c4b",
+        "FileCheck": "7ea5a1f9bbcc785cb14fd8d6a45d5daa3c94d62faa1e9ffc301661423b367e38",
+        "not": "56f39be234c821bb525118acd83a5e8f89c93d3f838a46c802c25fb8a5ef1d4b",
+        "count": "4616ee320820232d0c57bb519f49ba46a58f0441a0bf005ca7d5f34b53972b6e",
+        "split-file": "5c346b54a4cf10a15c94e70931cd22e19d1eb4af4c0536c35380b8ab99a1ce28",
+        "llvm-as": "3b8df086aaaae1922561b48eac70808cba59c7491f5d268ded5d76a8b2a1ff69",
+        "llvm-dis": "48e0a8b77a8043dc89aa5f28b860e74dd18fa99d39862056bed4d2ea3789f610"
+      }
+    }
+  },
+  "previous_series_tools": {
+    "pre0070_llc": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f",
+    "candidate_llc": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe"
+  }
+}

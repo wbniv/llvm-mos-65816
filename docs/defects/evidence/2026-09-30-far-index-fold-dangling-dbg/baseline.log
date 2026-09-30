@@ -1,0 +1,76 @@
+$ build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null
+
+# After Detect Dead Lanes
+# Machine code for function walk: IsSSA, TracksLiveness, Legalized, RegBankSelected, Selected
+
+bb.1.entry:
+  successors: %bb.2(0x80000000); %bb.2(100.00%)
+  liveins: $a, $rl1
+  %0:imag32 = COPY $rl1
+  DBG_VALUE %0:imag32, $noreg, !"base", !DIExpression(), debug-location !10; dbg.c:2 line no:1
+  %15:anyi8 = LDZ
+  %40:cc = LDImm1 0
+
+bb.2.loop:
+; predecessors: %bb.1, %bb.2
+  successors: %bb.3(0x04000000), %bb.2(0x7c000000); %bb.3(3.12%), %bb.2(96.88%)
+
+  %2:yc = PHI %15:anyi8, %bb.1, %11:gpr, %bb.2
+  %33:anyi8 = PHI %15:anyi8, %bb.1, %31:anyi8, %bb.2
+  %34:anyi8 = PHI %15:anyi8, %bb.1, %32:anyi8, %bb.2
+  %3:imag16 = REG_SEQUENCE %33:anyi8, %subreg.sublo, %34:anyi8, %subreg.subhi
+  DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+  %27:ac = LDIndirLongIdx %0:imag32, %2:yc, debug-location !10 :: (load (s8) from %ir.p, addrspace 2); dbg.c:2
+  %8:imag16 = REG_SEQUENCE %27:ac, %subreg.sublo, %15:anyi8, %subreg.subhi, debug-location !10; dbg.c:2
+  %39:ac16 = LDAImag16 %3:imag16, debug-location !10; dbg.c:2
+  %41:ac16, dead %42:cc, dead %43:vc = ADCImag16 %39:ac16(tied-def 0), %8:imag16, %40:cc, debug-location !10; dbg.c:2
+  %9:imag16 = STAImag16 %41:ac16, debug-location !10; dbg.c:2
+  %44:anyi8 = COPY %2:yc
+  %45:anyi8 = INC %44:anyi8(tied-def 0)
+  %11:gpr = COPY %45:anyi8
+  %31:anyi8 = COPY %9.sublo:imag16
+  %32:anyi8 = COPY %9.subhi:imag16
+  CmpBrImm %bb.2, undef $z, 0, %11:gpr, 100, implicit-def $c
+  BRA %bb.3
+
+bb.3.exit:
+; predecessors: %bb.2
+
+  %38:ac16 = LDAImag16 %9:imag16, debug-location !10; dbg.c:2
+  STAbs16 %38:ac16, @sink, debug-location !10 :: (volatile store (s16) into @sink, align 1); dbg.c:2
+  RTS debug-location !10; dbg.c:2
+
+# End machine code for function walk.
+
+*** Bad machine code: Generic virtual register use cannot be undef ***
+- function:    walk
+- basic block: %bb.2 loop (0x5e33f6bb8848)
+- instruction: DBG_VALUE undef %5:any, $noreg, !"p", !DIExpression(), debug-location !10; dbg.c:2 line no:2
+- operand 0:   undef %5:any
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll'.
+2.	Running pass 'Verify generated machine code' on function '@walk'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x00005e33ba08e178 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x00005e33ba08b455 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x00005e33ba08eef1
+3  libc.so.6 0x0000758743e45cb0
+4  libc.so.6 0x0000758743ea61ac pthread_kill + 284
+5  libc.so.6 0x0000758743e45b7e gsignal + 30
+6  libc.so.6 0x0000758743e288ec abort + 39
+7  llc       0x00005e33b9ffba95 llvm::report_fatal_error(llvm::Twine const&, bool) + 437
+8  llc       0x00005e33b91633b7
+9  llc       0x00005e33b9164691
+10 llc       0x00005e33b9086d73 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) + 723
+11 llc       0x00005e33b94dd2da llvm::FPPassManager::runOnFunction(llvm::Function&) + 618
+12 llc       0x00005e33b94e397c llvm::FPPassManager::runOnModule(llvm::Module&) + 44
+13 llc       0x00005e33b94de009 llvm::legacy::PassManagerImpl::run(llvm::Module&) + 2601
+14 llc       0x00005e33b8b2c21d
+15 llc       0x00005e33b8b29bb3 main + 1331
+16 libc.so.6 0x0000758743e2a601
+17 libc.so.6 0x0000758743e2a718 __libc_start_main + 136
+18 llc       0x00005e33b8b25f25 _start + 37
+exit_code=-6

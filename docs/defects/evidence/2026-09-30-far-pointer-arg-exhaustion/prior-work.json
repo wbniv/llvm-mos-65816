@@ -1,0 +1,47 @@
+{
+  "searched_ref": "origin/main 5dc63f4d",
+  "scope": "docs, TODO.md, patches (not transcripts)",
+  "hits": {
+    "CCIfPtrAddrSpace<2": [
+      "docs/defects/evidence/2026-09-26-far-memset/capture-build.log",
+      "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0004-MOS-Extract-far-data-addressing-and-bounded-runtime-.patch",
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0004-320-far-cc.patch"
+    ],
+    "MOSFarCCStack": [
+      "docs/defects/evidence/2026-09-26-far-memset/capture-build.log",
+      "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt",
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0004-320-far-cc.patch"
+    ],
+    "far-pointer ABI": [
+      "docs/pr-preparations/2026-09-26/snes-blossom-pr-simulation.md",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0004-MOS-Extract-far-data-addressing-and-bounded-runtime-.patch"
+    ],
+    "register exhaustion": [
+      "docs/pr-preparations/2026-09-22/0029-pr-preview.html",
+      "docs/pr-preparations/2026-09-22/0029-simulated-review.md",
+      "docs/pr-preparations/2026-09-22/mixed-width-call-issue-preview.html",
+      "docs/pr-preparations/2026-09-26/inline-asm-review.md",
+      "docs/pr-preparations/2026-09-27/0068-pr-preview.html",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+      "docs/upstream-contribution-status.md",
+      "docs/upstream-dashboard-curation.json",
+      "docs/upstream-dashboard-graph-map.json",
+      "docs/upstream-dashboard-graph.json",
+      "docs/upstream-dashboard.json",
+      "docs/upstream-pending-work.md",
+      "docs/upstream-twoaddr-physreg-reschedule-pr.md"
+    ]
+  },
+  "downstream_binary_checked": {
+    "path": "build/far-review-defects/downstream/llc",
+    "sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+    "hard_link_of": "build/llvm-mos/bin/llc",
+    "built": "2026-09-30T05:29:36+07:00",
+    "source": "vendor/llvm-mos with the fork patch stack as committed at 5dc63f4d (0002 includes the near no-wrap option-collision fix)",
+    "assertions": false
+  }
+}

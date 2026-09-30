@@ -197,9 +197,10 @@
       ],
       "evidencePaths": [
         "docs/defects/mos-native-index-copy-cost.json",
-        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/README.md"
       ],
-      "nextStep": "Independently review with the extracted native/far compiler series; this repair is validated in the candidate and is not installed downstream.",
+      "nextStep": "Upheld by the September 30 independent review of the rebased series (patch 9); carry it in the split #321 series.",
       "evidenceNote": "Matching-input assertions red/green evidence is retained. Pristine upstream lacks the native register classes and does not expose this path."
     },
     "mos-near-nowrap-option-clash": {
@@ -226,6 +227,50 @@
         "docs/defects/mos-xy16-preserve-x-p-save.json",
         "docs/investigations/2026-09-27-near-index-overflow-proofs.md"
       ]
+    },
+    "mos-far-pointer-arg-exhaustion": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Add a far-pointer stack fallback after the RL rule in 0002 and the #320 series; caller and callee regressions for four far pointers and near/far interleavings.",
+      "evidencePaths": [
+        "docs/defects/mos-far-pointer-arg-exhaustion.json",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ]
+    },
+    "mos-far-memop-length-truncation": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Reject, split or route far memset/memcpy/memmove lengths above 0xFFFF in 0002 and the #320 series; regressions for 65535, 65536, 65537, 70000 and an unbounded runtime length.",
+      "evidencePaths": [
+        "docs/defects/mos-far-memop-length-truncation.json",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ]
+    },
+    "mos-far-access-non-65816": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Make address-space-2 memory operations fail with a clear diagnostic unless the subtarget has 65816 long addressing; add a mos6502 negative test.",
+      "evidencePaths": [
+        "docs/defects/mos-far-access-non-65816.json",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ]
+    },
+    "mos-far-index-fold-dangling-dbg": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:320"
+      ],
+      "nextStep": "Drop or salvage the DBG_VALUE of a far pointer add that the index fold erases, for byte and word folds; add -g verifier regressions.",
+      "evidencePaths": [
+        "docs/defects/mos-far-index-fold-dangling-dbg.json",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md"
+      ]
     }
   },
   "items": [
@@ -239,10 +284,12 @@
       "evidencePaths": [
         "docs/upstream-pending-work.md",
         "docs/320-upstream-far-pointer-note.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/README.md",
+        "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing."
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review."
     },
     {
       "id": "platform:321",
@@ -254,10 +301,12 @@
       "evidencePaths": [
         "docs/upstream-pending-work.md",
         "docs/321-upstream-native-width-pr.md",
-        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+        "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+        "docs/pr-preparations/2026-09-30/far-word-rebase/README.md",
+        "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Independently review the pinned 14-patch native/far compiler candidate and resolve the remaining ABI and feature-scope contracts before filing."
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review."
     },
     {
       "id": "platform:snes415",

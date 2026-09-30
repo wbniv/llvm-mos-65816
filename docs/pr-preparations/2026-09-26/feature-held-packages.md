@@ -8,6 +8,8 @@ publication hold, not merely waiting for another PR to merge.
 
 **September 28 far-word preparation:** the [14-patch candidate](../2026-09-28/far-word-index/upstream-series.md) extracts the native/far prerequisites, 0061/0062/0066/0069/0070, and required allocation/spill repairs onto exact upstream. Its assertions build, expanded regressions and frozen-IR backend/runtime replay are complete. Independent review of the entire compiler/ABI series and the explicitly listed scope contracts remain opening gates; this does not certify the excluded feature packages.
 
+**September 30 far-word rebase:** the [rebased packet](../2026-09-30/far-word-rebase/README.md) reproduces every September 28 result on `06bc967d2668`. Its [independent review](../2026-09-30/far-word-rebase/independent-review.md) upholds 0069/0070 but finds four downstream far defects, two extraction gaps and an `Imag32` collision with open #594. These remain opening gates until they are repaired in the [split #320/#321 series](../../plans/2026-09-30-split-320-321-series.md) and reviewed again.
+
 | Existing change | Reviewed contract and evidence | Remaining opening gate |
 |---|---|---|
 | 0013 far-memory intrinsic routing | Same retained 4096-byte memset input fails without the routing and passes with it; fresh archived runtime replay confirmed. Far-pointer routing uses the far runtime symbols. | A coherent #320/#321 compiler/ABI and far-runtime package. The unconditional i16 length truncation is only justified in the recorded ≤65535 domain; no unrestricted wider-length memcpy/memmove claim. |

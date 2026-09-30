@@ -1,0 +1,13 @@
+$ build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-09-30-far-pointer-arg-exhaustion/abi4.ll'.
+2.	Running pass 'Unnamed pass: implement Pass::getPassName()' on function '@callee4'
+Stack dump without symbol names (ensure you have llvm-symbolizer in your PATH or set the environment var `LLVM_SYMBOLIZER_PATH` to point to it):
+0  llc       0x000057315ec83178 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) + 40
+1  llc       0x000057315ec80455 llvm::sys::RunSignalHandlers() + 293
+2  llc       0x000057315ec83ef1
+3  libc.so.6 0x0000769f70e45cb0
+4  llc       0x000057315d19b434
+exit_code=-11

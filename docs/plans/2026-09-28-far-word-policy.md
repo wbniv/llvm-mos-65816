@@ -25,3 +25,5 @@ Independent-review coordination and summary update: OpenAI Codex CLI 0.157.1 (se
 The [extracted candidate](../pr-preparations/2026-09-28/far-word-index/upstream-series.md) now records concrete ordered patches on exact upstream, an assertions build, expanded checks, prerequisite reconciliation, and a separate frozen-IR backend replay. The earlier completed downstream experiment remains dated evidence. Independent review of the complete compiler/ABI candidate and its listed scope limits remains necessary.
 
 Preparation update: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`.
+
+**September 30:** the independent review happened on the [rebased series](../pr-preparations/2026-09-30/far-word-rebase/README.md). It upholds this policy (0070) and 0069, and blocks filing on defects in the far prerequisite; see [the review](../pr-preparations/2026-09-30/far-word-rebase/independent-review.md). Update: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.

@@ -1,0 +1,35 @@
+{
+  "searched_ref": "origin/main 5dc63f4d",
+  "scope": "docs, TODO.md, patches (not transcripts)",
+  "hits": {
+    "tryFarRuntimeIndexFold": [
+      "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt",
+      "docs/defects/evidence/2026-09-28-far-word-policy/candidate.patch",
+      "docs/defects/evidence/2026-09-28-far-word-policy/package.py",
+      "docs/defects/evidence/2026-09-28-far-word-policy/prior-work.json",
+      "docs/defects/evidence/2026-09-28-farblit-payoff/prior-work.json",
+      "docs/defects/evidence/2026-09-28-farblit-shapes/prior-work.json",
+      "docs/investigations/2026-09-27-farblit-byte-load.md",
+      "docs/pr-preparations/2026-09-28/far-word-index/destination.json",
+      "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0069-initial.md",
+      "docs/pr-preparations/2026-09-28/far-word-index/independent-review/0070.md",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0004-MOS-Extract-far-data-addressing-and-bounded-runtime-.patch",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0008-MOS-Prove-bounded-byte-loop-ranges-for-far-runtime-i.patch",
+      "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0012-MOS-Fold-bounded-native-far-word-loads-in-speed-opti.patch",
+      "patches/llvm-mos/0002-321-accum16.patch",
+      "patches/llvm-mos/0070-mos-far-word-index-policy.patch"
+    ],
+    "salvageDebugInfo": [
+      "docs/pr-preparations/2026-09-26/upstream-source/llvm/lib/CodeGen/SelectionDAG/SelectionDAGBuilder.cpp.txt"
+    ],
+    "cannot be undef": []
+  },
+  "downstream_binary_checked": {
+    "path": "build/far-review-defects/downstream/llc",
+    "sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+    "hard_link_of": "build/llvm-mos/bin/llc",
+    "built": "2026-09-30T05:29:36+07:00",
+    "source": "vendor/llvm-mos with the fork patch stack as committed at 5dc63f4d (0002 includes the near no-wrap option-collision fix)",
+    "assertions": false
+  }
+}

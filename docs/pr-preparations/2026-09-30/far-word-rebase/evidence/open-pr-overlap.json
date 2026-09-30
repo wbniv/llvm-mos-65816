@@ -1,0 +1,173 @@
+{
+  "checked_at": "2026-09-29T23:33:26Z",
+  "series_files": 67,
+  "open_prs": [
+    {
+      "number": 610,
+      "title": "Bump pyjwt to 2.14.0 in llvm/utils/git lockfile",
+      "author": "katsugtgz",
+      "updated": "2026-09-27",
+      "overlapping_files": []
+    },
+    {
+      "number": 606,
+      "title": "Implement the MOSConventionalSSA pass",
+      "author": "mysterymath",
+      "updated": "2026-09-29",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSInstrPseudos.td"
+      ]
+    },
+    {
+      "number": 604,
+      "title": "[MOS] Encode MVN/MVP bank operands in destination-source byte order",
+      "author": "wbniv",
+      "updated": "2026-09-20",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSInstrFormats.td"
+      ]
+    },
+    {
+      "number": 603,
+      "title": "[MOS] Use zero page,X addressing for indexed stores into the zero page",
+      "author": "Roxxik",
+      "updated": "2026-09-15",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSMCInstLower.cpp"
+      ]
+    },
+    {
+      "number": 601,
+      "title": "feat(MOS): DWARF register numbering and CFI support for source-level debugging",
+      "author": "johnwbyrd",
+      "updated": "2026-09-26",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSFrameLowering.cpp",
+        "llvm/test/CodeGen/MOS/prologepilog.mir"
+      ]
+    },
+    {
+      "number": 594,
+      "title": "[MOS] Add 32-bit imaginary register foundation",
+      "author": "mlund",
+      "updated": "2026-08-19",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSAsmPrinter.cpp",
+        "llvm/lib/Target/MOS/MOSInstrInfo.cpp",
+        "llvm/lib/Target/MOS/MOSMCInstLower.cpp",
+        "llvm/lib/Target/MOS/MOSRegisterInfo.cpp",
+        "llvm/lib/Target/MOS/MOSRegisterInfo.td",
+        "llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp"
+      ]
+    },
+    {
+      "number": 593,
+      "title": "[65CE02] Keep late `INW`/`DEW` out of split ZP-stack register pairs",
+      "author": "mlund",
+      "updated": "2026-08-30",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSISelLowering.cpp",
+        "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+        "llvm/lib/Target/MOS/MOSMCInstLower.cpp",
+        "llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp"
+      ]
+    },
+    {
+      "number": 589,
+      "title": "[MOS] Mark CmpZero as a terminator",
+      "author": "wbniv",
+      "updated": "2026-09-13",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSInstrPseudos.td",
+        "llvm/lib/Target/MOS/MOSLateOptimization.cpp"
+      ]
+    },
+    {
+      "number": 588,
+      "title": "[MOS] Add the COP mnemonic with a mandatory signature operand",
+      "author": "wbniv",
+      "updated": "2026-09-15",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSInstrInfo.td"
+      ]
+    },
+    {
+      "number": 585,
+      "title": "[65CE02] Legalize arithmetic right shifts",
+      "author": "mlund",
+      "updated": "2026-08-30",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSInstrGISel.td",
+        "llvm/lib/Target/MOS/MOSInstrLogical.td",
+        "llvm/lib/Target/MOS/MOSInstructionSelector.cpp",
+        "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+        "llvm/lib/Target/MOS/MOSMCInstLower.cpp",
+        "llvm/lib/Target/MOS/MOSRegisterInfo.cpp",
+        "llvm/lib/Target/MOS/MOSTargetMachine.cpp",
+        "llvm/test/CodeGen/MOS/legalizer.mir"
+      ]
+    },
+    {
+      "number": 584,
+      "title": "[MOS] Fix non-GPR immediate loads in mos-late-opt",
+      "author": "wbniv",
+      "updated": "2026-09-13",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSLateOptimization.cpp"
+      ]
+    },
+    {
+      "number": 553,
+      "title": "[MOS] Add TRI hook to allow remat past register class restrictions",
+      "author": "koalabuttz",
+      "updated": "2026-04-19",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSRegisterInfo.h"
+      ]
+    },
+    {
+      "number": 537,
+      "title": "test: add MOS lit test features and mark unsupported tests",
+      "author": "johnwbyrd",
+      "updated": "2026-07-13",
+      "overlapping_files": []
+    },
+    {
+      "number": 478,
+      "title": "[WIP] Initial PreserveMost Calling Convention implementation",
+      "author": "jroweboy",
+      "updated": "2026-07-06",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSCallLowering.cpp",
+        "llvm/lib/Target/MOS/MOSCallingConv.td",
+        "llvm/lib/Target/MOS/MOSFrameLowering.cpp",
+        "llvm/lib/Target/MOS/MOSISelLowering.cpp",
+        "llvm/lib/Target/MOS/MOSRegisterInfo.cpp"
+      ]
+    },
+    {
+      "number": 472,
+      "title": "Legalize signed comparisons with constants to unsigned comparisons",
+      "author": "Domkeykong",
+      "updated": "2026-01-04",
+      "overlapping_files": [
+        "llvm/lib/Target/MOS/MOSLegalizerInfo.cpp",
+        "llvm/test/CodeGen/MOS/legalizer.mir"
+      ]
+    },
+    {
+      "number": 464,
+      "title": "Use Apple Silicon for CI/CD",
+      "author": "pr1metine",
+      "updated": "2026-01-04",
+      "overlapping_files": []
+    },
+    {
+      "number": 310,
+      "title": "Initial support for building libcxx/libcxxabi on MOS.",
+      "author": "asiekierka",
+      "updated": "2026-01-04",
+      "overlapping_files": []
+    }
+  ]
+}

@@ -1,5 +1,7 @@
 # Native far-word indexing: author review and evidence guide
 
+**September 30 update:** the series was [rebased onto `06bc967d2668`](../../2026-09-30/far-word-rebase/README.md) with unchanged patch bodies and independently reviewed again. That [review](../../2026-09-30/far-word-rebase/independent-review.md) upholds the 0069/0070 claims audited here, but blocks filing on defects in the far prerequisite. Update: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+
 **September 28, 2026 — local PR preparation.** The implementation and measurements are retained in the [0070 investigation](../../../investigations/2026-09-28-far-word-policy.md). This document audits their use in the [working PR body](pr-body.md), adds a pinned upstream source inspection, and records unresolved questions. The [separate independent AI review](independent-review.md) now records three source assessments and the resolved P2 weakness in the 0069 opcode assertions, with matching-input sensitivity evidence. A concrete [upstream extraction and execution record](upstream-series.md) is now available; independent review of that complete series remains pending.
 
 Author preparation: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The original range-proof and payoff investigations retain their own verified credits.

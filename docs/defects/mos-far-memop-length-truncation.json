@@ -1,0 +1,76 @@
+{
+ "schema": 1,
+ "id": "mos-far-memop-length-truncation",
+ "title": "Far memset/memcpy/memmove lengths above 65535 are truncated or deleted",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
+ "summary": "createFarMemLibcall truncates the length of an address-space-2 G_MEMSET, G_MEMCPY or G_MEMMOVE to 16 bits without a range check, and the IRTranslator has already truncated the length of a mixed-address-space memmove. A constant 70000-byte far memset calls __memset_far with 4464; a 65536-byte p2<-p0 memmove is deleted and the function returns at once; a runtime i32 memcpy length loses its high 16 bits. The compiler exits 0 and the verifier is clean. Found by the independent review (finding B2) and reproduced on the downstream toolchain.",
+ "attribution": [
+  "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+ ],
+ "unknowns": [
+  "No repair attempted. The far runtime entry points take a 16-bit length; whether to split, reject or add 32-bit-length entries is undecided.",
+  "No emulator run: the wrong length is read from the emitted immediate operands."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "createFarMemLibcall",
+   "__memset_far",
+   "length domain",
+   "lengths above 65535"
+  ],
+  "related_records": [
+   "docs/defects/mos-far-memset-wrong-bank.json"
+  ],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md",
+   "docs/320-far-memset-miscompile.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0013-320-far-memops.patch",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "Downstream MOSLegalizerInfo.cpp createFarMemLibcall builds buildTrunc(LLT::scalar(16), Len) for any wider length (0002 and 0013 carry the same hunk); the extracted patch 4 matches.",
+  "binary_assessment": "Downstream release llc 9031686c emits ldx #112 / ldy #17 (4464) for the 70000-byte fill and a bare rts for the 65536-byte memmove; the extracted candidate d7fde754 emits the same.",
+  "decision": "mos-far-memset-wrong-bank fixed near/far runtime routing and explicitly excluded lengths above 65535 from its closure. This is the length-domain defect in the same function, a separate mechanism.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/prior-work.json",
+   "sha256": "a2fe96840b92849171a0d799d8d1df271483895e4ebee6aa10db59cf303b78f8"
+  }
+ },
+ "baseline": {
+  "command": "set -euo pipefail; out=$(build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll -o - | grep -v -E \"^[[:space:]]*[.;]\"); printf \"%s\\n\" \"$out\"; bad=0; if printf \"%s\\n\" \"$out\" | grep -A4 \"^big_const:\" | grep -q \"ldy[[:space:]]*#17\"; then echo \"MISCOMPILE: 70000-byte far memset passes length 4464 (0x1170)\"; bad=1; fi; if printf \"%s\\n\" \"$out\" | grep -A1 \"^len64k:\" | grep -q \"rts\"; then echo \"MISCOMPILE: 65536-byte far memmove deleted\"; bad=1; fi; exit $bad",
+  "working_directory": "/home/will/llvm-mos-65816 (repository root). Captured in the wt/321-far-word-rebase worktree /home/will/llvm-mos-65816-nearproof, where build/far-review-defects/downstream holds hard links to the same frozen binaries.",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [
+    "+mos-a16"
+   ],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": true,
+   "expected": "lengths above 0xFFFF are rejected, split or passed to a 32-bit-length entry"
+  },
+  "toolchain_location": "build/far-review-defects/downstream/llc; identity in docs/defects/evidence/2026-09-30-far-memop-length-truncation/identity.json",
+  "toolchain_sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/farmemlen.ll",
+   "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/baseline.log",
+   "sha256": "7b305d29f276077947196d064f72f8bd884f647e2682d920ddd81c7fa3516fad"
+  },
+  "exit_code": 1,
+  "failure_signature": "MISCOMPILE: 70000-byte far memset passes length 4464 (0x1170)"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-memop-length-truncation/identity.json",
+   "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  }
+ ]
+}

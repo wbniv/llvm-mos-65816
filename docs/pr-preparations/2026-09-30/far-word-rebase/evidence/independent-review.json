@@ -1,0 +1,1077 @@
+{
+ "reviewer": "Claude Code 2.1.285 subagent (T4 design-and-build tier), model claude-opus-5-5 (Opus 5.5); reasoning effort not exposed to the agent (unknown)",
+ "source": {
+  "repo": "build/far-word-rebase/source",
+  "base": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+  "candidate_commit": "77dc044c39bb303d8984ed5d9eb08c3a3455cad8",
+  "candidate_tree": "d2d7b62b06a19b362d2b54a210c62e9137c9b5bb",
+  "patch11_commit": "3d82e37332eccac1d315b7e1c879e780cade7d0e"
+ },
+ "tools": {
+  "candidate": {
+   "dir": "build/far-word-rebase/candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf"
+  },
+  "pre0070": {
+   "dir": "build/far-word-rebase/pre0070",
+   "llc_sha256": "b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b"
+  },
+  "without0028": {
+   "dir": "build/far-word-upstream/candidate-without0028",
+   "llc_sha256": "b2bdf8352d141d816d04415d83c028aff7373a57719391d4a0fbcc95b90cd5cf"
+  },
+  "copycost-baseline": {
+   "dir": "build/far-word-upstream/allocation-baseline",
+   "llc_sha256": "35a1afd96ad2af273aabbcbc98b3be2beb028babcdb86ff959a679f8c535659e"
+  },
+  "old-pre0070": {
+   "dir": "build/far-word-upstream/pre0070",
+   "llc_sha256": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f"
+  },
+  "old-candidate": {
+   "dir": "build/far-word-upstream/candidate",
+   "llc_sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe"
+  }
+ },
+ "probe_inputs": {
+  "abi1near.ll": {
+   "sha256": "433553dceed71ca0109a2e32de8a904c4a5fd072615ca081191e355b272e0b79",
+   "text": "; One near pointer then three far pointers: RS1 then RL1..RL3?\ndefine i8 @c1(ptr %n, ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c) {\n  %va = load volatile i8, ptr addrspace(2) %c\n  %vn = load volatile i8, ptr %n\n  %s = add i8 %va, %vn\n  ret i8 %s\n}\n; Near pointer after far ones: RS2..RS7 taken, so near gets RS1.\ndefine i8 @c2(ptr addrspace(2) %a, ptr %n, ptr %m) {\n  %va = load volatile i8, ptr addrspace(2) %a\n  %vn = load volatile i8, ptr %m\n  %s = add i8 %va, %vn\n  ret i8 %s\n}\n"
+  },
+  "abi4.ll": {
+   "sha256": "c7764c04c7f17421acfed72e036e74382f2b3dceda4157caf43802f66a27a326",
+   "text": "; Four far pointers: the fourth exceeds RL1..RL3.\ndefine i8 @callee4(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c, ptr addrspace(2) %d) {\n  %va = load volatile i8, ptr addrspace(2) %a\n  %vd = load volatile i8, ptr addrspace(2) %d\n  %s = add i8 %va, %vd\n  ret i8 %s\n}\ndefine i8 @caller4(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c, ptr addrspace(2) %d) {\n  %r = call i8 @callee4(ptr addrspace(2) %d, ptr addrspace(2) %c, ptr addrspace(2) %b, ptr addrspace(2) %a)\n  ret i8 %r\n}\n"
+  },
+  "abimix.ll": {
+   "sha256": "a82572bed597c4daf0a022b5795d0944fc441fe857783239cd2d28c4f5d88440",
+   "text": "; Seven near pointers occupy RS1..RS7 before a far pointer is assigned.\ndefine i8 @calleemix(ptr %p1, ptr %p2, ptr %p3, ptr %p4, ptr %p5, ptr %p6, ptr %p7, ptr addrspace(2) %f) {\n  %v = load volatile i8, ptr addrspace(2) %f\n  %w = load volatile i8, ptr %p7\n  %s = add i8 %v, %w\n  ret i8 %s\n}\ndefine i8 @callermix(ptr addrspace(2) %f) {\n  %r = call i8 @calleemix(ptr null, ptr null, ptr null, ptr null, ptr null, ptr null, ptr inttoptr (i16 7 to ptr), ptr addrspace(2) %f)\n  ret i8 %r\n}\n"
+  },
+  "abiret.ll": {
+   "sha256": "048e2f35296949d71dd8328c60d5bf994abfda7657cc28e991225cb305de39f7",
+   "text": "define ptr addrspace(2) @retfar(ptr addrspace(2) %a, i32 %i) {\n  %p = getelementptr i8, ptr addrspace(2) %a, i32 %i\n  ret ptr addrspace(2) %p\n}\n"
+  },
+  "dbg.ll": {
+   "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445",
+   "text": "@sink = external global i16\n\ndefine void @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {\nentry:\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %base, metadata !15, metadata !DIExpression()), !dbg !20\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %acc = phi i16 [ 0, %entry ], [ %sum, %loop ]\n  %off = zext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %base, i32 %off\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !16, metadata !DIExpression()), !dbg !20\n  %w = load i16, ptr addrspace(2) %p, align 1, !dbg !20\n  %sum = add i16 %acc, %w, !dbg !20\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i16 %sum, ptr @sink, !dbg !20\n  ret void, !dbg !20\n}\n\ndefine i32 @mkfar(i16 %lo, i8 %bank) !dbg !30 {\n  %l = zext i16 %lo to i32\n  %b = zext i8 %bank to i32\n  %h = shl i32 %b, 16\n  %a = or i32 %l, %h\n  %p = inttoptr i32 %a to ptr addrspace(2)\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !31, metadata !DIExpression()), !dbg !32\n  %v = load volatile i8, ptr addrspace(2) %p, !dbg !32\n  %r = zext i8 %v to i32\n  ret i32 %r\n}\n\ndeclare void @llvm.dbg.value(metadata, metadata, metadata)\n\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walk\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)\n!15 = !DILocalVariable(name: \"base\", arg: 1, scope: !10, file: !1, line: 1, type: !14)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n!30 = distinct !DISubprogram(name: \"mkfar\", scope: !1, file: !1, line: 10, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!31 = !DILocalVariable(name: \"q\", scope: !30, file: !1, line: 11, type: !14)\n!32 = !DILocation(line: 11, scope: !30)\n"
+  },
+  "dbgabs.ll": {
+   "sha256": "7c57063714dbdda25f449f2adf4cb7aa895f1db2ef11671d0f049ab7cd92157f",
+   "text": "@sink = external global i8\n@tbl = external global [200 x i8]\ndefine void @walkn(i8 %n) !dbg !10 {\nentry:\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %acc = phi i8 [ 0, %entry ], [ %sum, %loop ]\n  %off = zext i8 %i to i16\n  %p = getelementptr i8, ptr @tbl, i16 %off\n  call void @llvm.dbg.value(metadata ptr %p, metadata !16, metadata !DIExpression()), !dbg !20\n  %w = load i8, ptr %p, !dbg !20\n  %sum = add i8 %acc, %w, !dbg !20\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i8 %sum, ptr @sink, !dbg !20\n  ret void, !dbg !20\n}\ndeclare void @llvm.dbg.value(metadata, metadata, metadata)\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walkn\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 16)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n"
+  },
+  "dbgbyte.ll": {
+   "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e",
+   "text": "@sink = external global i16\n\ndefine void @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {\nentry:\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %base, metadata !15, metadata !DIExpression()), !dbg !20\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %acc = phi i16 [ 0, %entry ], [ %sum, %loop ]\n  %off = zext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %base, i32 %off\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !16, metadata !DIExpression()), !dbg !20\n  %wb = load i8, ptr addrspace(2) %p, !dbg !20\n  %w = zext i8 %wb to i16\n  %sum = add i16 %acc, %w, !dbg !20\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i16 %sum, ptr @sink, !dbg !20\n  ret void, !dbg !20\n}\n\ndefine i32 @mkfar(i16 %lo, i8 %bank) !dbg !30 {\n  %l = zext i16 %lo to i32\n  %b = zext i8 %bank to i32\n  %h = shl i32 %b, 16\n  %a = or i32 %l, %h\n  %p = inttoptr i32 %a to ptr addrspace(2)\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !31, metadata !DIExpression()), !dbg !32\n  %v = load volatile i8, ptr addrspace(2) %p, !dbg !32\n  %r = zext i8 %v to i32\n  ret i32 %r\n}\n\ndeclare void @llvm.dbg.value(metadata, metadata, metadata)\n\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walk\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)\n!15 = !DILocalVariable(name: \"base\", arg: 1, scope: !10, file: !1, line: 1, type: !14)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n!30 = distinct !DISubprogram(name: \"mkfar\", scope: !1, file: !1, line: 10, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!31 = !DILocalVariable(name: \"q\", scope: !30, file: !1, line: 11, type: !14)\n!32 = !DILocation(line: 11, scope: !30)\n"
+  },
+  "dbgmerge.ll": {
+   "sha256": "aaec86eebd62d1d8d3e5ed9e3591f2bd853e987e8ddf5bf4de0332ba66626dba",
+   "text": "define i32 @mkfar(i16 %lo, i8 %bank) !dbg !30 {\n  %l = zext i16 %lo to i32\n  %b = zext i8 %bank to i32\n  %h = shl i32 %b, 16\n  %a = or i32 %l, %h\n  %p = inttoptr i32 %a to ptr addrspace(2)\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !31, metadata !DIExpression()), !dbg !32\n  %v = load volatile i8, ptr addrspace(2) %p, !dbg !32\n  %r = zext i8 %v to i32\n  ret i32 %r\n}\n\n\ndefine ptr addrspace(2) @mkfar2(i8 %lo, i8 %hi, i8 %bank) !dbg !30 {\n  %a = zext i8 %lo to i32\n  %b = zext i8 %hi to i32\n  %c = zext i8 %bank to i32\n  %b8 = shl i32 %b, 8\n  %c16 = shl i32 %c, 16\n  %ab = or i32 %a, %b8\n  %abc = or i32 %ab, %c16\n  %p = inttoptr i32 %abc to ptr addrspace(2)\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %p, metadata !31, metadata !DIExpression()), !dbg !32\n  %q = getelementptr i8, ptr addrspace(2) %p, i32 1\n  call void @llvm.dbg.value(metadata ptr addrspace(2) %q, metadata !31, metadata !DIExpression()), !dbg !32\n  ret ptr addrspace(2) %q\n}\ndefine i16 @asint(ptr addrspace(2) %p) !dbg !30 {\n  %i = ptrtoint ptr addrspace(2) %p to i32\n  call void @llvm.dbg.value(metadata i32 %i, metadata !31, metadata !DIExpression()), !dbg !32\n  %t = trunc i32 %i to i16\n  ret i16 %t\n}\ndeclare void @llvm.dbg.value(metadata, metadata, metadata)\n\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walk\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)\n!15 = !DILocalVariable(name: \"base\", arg: 1, scope: !10, file: !1, line: 1, type: !14)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n!30 = distinct !DISubprogram(name: \"mkfar\", scope: !1, file: !1, line: 10, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!31 = !DILocalVariable(name: \"q\", scope: !30, file: !1, line: 11, type: !14)\n!32 = !DILocation(line: 11, scope: !30)\n"
+  },
+  "dbgnear.ll": {
+   "sha256": "1e412bcb47787053752f4c99d68af2f5772341993449e27b4e30e7eee1ec2130",
+   "text": "@sink = external global i8\ndefine void @walkn(ptr %base, i8 %n) !dbg !10 {\nentry:\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %acc = phi i8 [ 0, %entry ], [ %sum, %loop ]\n  %off = zext i8 %i to i16\n  %p = getelementptr i8, ptr %base, i16 %off\n  call void @llvm.dbg.value(metadata ptr %p, metadata !16, metadata !DIExpression()), !dbg !20\n  %w = load i8, ptr %p, !dbg !20\n  %sum = add i8 %acc, %w, !dbg !20\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i8 %sum, ptr @sink, !dbg !20\n  ret void, !dbg !20\n}\ndeclare void @llvm.dbg.value(metadata, metadata, metadata)\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walkn\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 16)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n"
+  },
+  "far6502.ll": {
+   "sha256": "c8efc0f79c3fb094e555d6bd2901b40961b02e1906d5ae1764f354a10f1fc714",
+   "text": "@g = external addrspace(2) global [16 x i8]\ndefine i8 @ld_global(i8 %i) {\n  %p = getelementptr i8, ptr addrspace(2) @g, i8 %i\n  %v = load i8, ptr addrspace(2) %p\n  ret i8 %v\n}\ndefine i8 @ld_rt(ptr addrspace(2) %p) {\n  %v = load i8, ptr addrspace(2) %p\n  ret i8 %v\n}\ndefine void @st_rt(ptr addrspace(2) %p, i8 %v) {\n  store i8 %v, ptr addrspace(2) %p\n  ret void\n}\ndefine i16 @ld16_rt(ptr addrspace(2) %p) {\n  %v = load i16, ptr addrspace(2) %p\n  ret i16 %v\n}\n"
+  },
+  "farmemlen.ll": {
+   "sha256": "c5c669c56d04a420914dc88d55c52ce0d42d5ed62e99039e49f08652c277269f",
+   "text": "; Constant 70000-byte fill: 70000 = 0x11170 exceeds the 16-bit runtime length.\ndefine void @big_const(ptr addrspace(2) %d) {\n  call void @llvm.memset.p2.i32(ptr addrspace(2) %d, i8 0, i32 70000, i1 false)\n  ret void\n}\n; Runtime i32 length with no proven bound.\ndefine void @big_var(ptr addrspace(2) %d, ptr addrspace(2) %s, i32 %n) {\n  call void @llvm.memcpy.p2.p2.i32(ptr addrspace(2) %d, ptr addrspace(2) %s, i32 %n, i1 false)\n  ret void\n}\n; Exactly 65536 truncates to zero.\ndefine void @len64k(ptr addrspace(2) %d, ptr %s) {\n  call void @llvm.memmove.p2.p0.i32(ptr addrspace(2) %d, ptr %s, i32 65536, i1 false)\n  ret void\n}\ndeclare void @llvm.memset.p2.i32(ptr addrspace(2), i8, i32, i1 immarg)\ndeclare void @llvm.memcpy.p2.p2.i32(ptr addrspace(2), ptr addrspace(2), i32, i1 immarg)\ndeclare void @llvm.memmove.p2.p0.i32(ptr addrspace(2), ptr, i32, i1 immarg)\n"
+  },
+  "nodbg.ll": {
+   "sha256": "5367efcfdedb2e562a7f517261f979aa49919a82e6d24a9f8e74f67218fefa14",
+   "text": "@sink = external global i16\n\ndefine void @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {\nentry:\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %acc = phi i16 [ 0, %entry ], [ %sum, %loop ]\n  %off = zext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %base, i32 %off\n  %w = load i16, ptr addrspace(2) %p, align 1\n  %sum = add i16 %acc, %w\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i16 %sum, ptr @sink\n  ret void\n}\n\ndefine i32 @mkfar(i16 %lo, i8 %bank) !dbg !30 {\n  %l = zext i16 %lo to i32\n  %b = zext i8 %bank to i32\n  %h = shl i32 %b, 16\n  %a = or i32 %l, %h\n  %p = inttoptr i32 %a to ptr addrspace(2)\n  %v = load volatile i8, ptr addrspace(2) %p\n  %r = zext i8 %v to i32\n  ret i32 %r\n}\n\n\n!llvm.dbg.cu = !{!0}\n!llvm.module.flags = !{!2, !3}\n!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: \"probe\", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)\n!1 = !DIFile(filename: \"dbg.c\", directory: \"/tmp\")\n!2 = !{i32 2, !\"Dwarf Version\", i32 4}\n!3 = !{i32 2, !\"Debug Info Version\", i32 3}\n!10 = distinct !DISubprogram(name: \"walk\", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!11 = !DISubroutineType(types: !12)\n!12 = !{null}\n!13 = !DIBasicType(name: \"char\", size: 8, encoding: DW_ATE_unsigned_char)\n!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)\n!15 = !DILocalVariable(name: \"base\", arg: 1, scope: !10, file: !1, line: 1, type: !14)\n!16 = !DILocalVariable(name: \"p\", scope: !10, file: !1, line: 2, type: !14)\n!20 = !DILocation(line: 2, scope: !10)\n!30 = distinct !DISubprogram(name: \"mkfar\", scope: !1, file: !1, line: 10, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)\n!31 = !DILocalVariable(name: \"q\", scope: !30, file: !1, line: 11, type: !14)\n!32 = !DILocation(line: 11, scope: !30)\n"
+  },
+  "plain.ll": {
+   "sha256": "39a282824f3411bdd7c0f9eaaa86ab4c5521bb1c2eede606dc4eb570804229a3",
+   "text": "define i8 @f(i8 %a){\n %b = add i8 %a, 1\n ret i8 %b\n}\n"
+  },
+  "ptrtoint.ll": {
+   "sha256": "3649bf87859f4b7fcd7080878abe223a1fe09c8b2c98249571e71a38731f11cb",
+   "text": "define i16 @asint(ptr addrspace(2) %p) {\n  %i = ptrtoint ptr addrspace(2) %p to i32\n  %t = trunc i32 %i to i16\n  ret i16 %t\n}\ndefine i8 @bankof(ptr addrspace(2) %p) {\n  %i = ptrtoint ptr addrspace(2) %p to i32\n  %s = lshr i32 %i, 16\n  %t = trunc i32 %s to i8\n  ret i8 %t\n}\ndefine i1 @isnull(ptr addrspace(2) %p) {\n  %c = icmp eq ptr addrspace(2) %p, null\n  ret i1 %c\n}\ndefine ptr addrspace(2) @fromnear(ptr %p) {\n  %f = addrspacecast ptr %p to ptr addrspace(2)\n  ret ptr addrspace(2) %f\n}\ndefine ptr @tonear(ptr addrspace(2) %p) {\n  %f = addrspacecast ptr addrspace(2) %p to ptr\n  ret ptr %f\n}\ndefine ptr addrspace(2) @sel(i1 %c, ptr addrspace(2) %a, ptr addrspace(2) %b) {\n  %r = select i1 %c, ptr addrspace(2) %a, ptr addrspace(2) %b\n  ret ptr addrspace(2) %r\n}\ndefine i1 @cmpult(ptr addrspace(2) %a, ptr addrspace(2) %b) {\n  %c = icmp ult ptr addrspace(2) %a, %b\n  ret i1 %c\n}\n"
+  },
+  "rt.ll": {
+   "sha256": "8585558e29d144f568e491703c59afe68f52f03274a9f5172318c95bba703eba",
+   "text": "define i8 @ld_rt(ptr addrspace(2) %p) {\n  %v = load i8, ptr addrspace(2) %p\n  ret i8 %v\n}\n"
+  },
+  "spill.ll": {
+   "sha256": "a5947e9c4be7704b69c84a715698a728c585682ca4a15e8e4a59958f5df6144e",
+   "text": "declare void @ext(i8)\n@sink = external global i8\n\ndefine void @keep(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c) {\n  call void @ext(i8 1)\n  %va = load volatile i8, ptr addrspace(2) %a\n  call void @ext(i8 %va)\n  %vb = load volatile i8, ptr addrspace(2) %b\n  call void @ext(i8 %vb)\n  %vc = load volatile i8, ptr addrspace(2) %c\n  store volatile i8 %vc, ptr addrspace(2) %a\n  store volatile i8 %vb, ptr addrspace(2) %c\n  ret void\n}\n\ndefine void @rec(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c, i8 %n) {\n  %z = icmp eq i8 %n, 0\n  br i1 %z, label %done, label %go\ngo:\n  %m = sub i8 %n, 1\n  call void @rec(ptr addrspace(2) %c, ptr addrspace(2) %a, ptr addrspace(2) %b, i8 %m)\n  %va = load volatile i8, ptr addrspace(2) %a\n  %vb = load volatile i8, ptr addrspace(2) %b\n  %s = add i8 %va, %vb\n  store volatile i8 %s, ptr addrspace(2) %c\n  br label %done\ndone:\n  ret void\n}\n"
+  },
+  "spillos.ll": {
+   "sha256": "6d1fbe9f652f26e696f076d17dbc8922f93793ef0c44c61e533e38e9a3914852",
+   "text": "declare void @ext(i8)\n@sink = external global i8\n\ndefine void @keep(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c) {\n  call void @ext(i8 1)\n  %va = load volatile i8, ptr addrspace(2) %a\n  call void @ext(i8 %va)\n  %vb = load volatile i8, ptr addrspace(2) %b\n  call void @ext(i8 %vb)\n  %vc = load volatile i8, ptr addrspace(2) %c\n  store volatile i8 %vc, ptr addrspace(2) %a\n  store volatile i8 %vb, ptr addrspace(2) %c\n  ret void\n}\n\ndefine void @rec(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c, i8 %n) optsize {\n  %z = icmp eq i8 %n, 0\n  br i1 %z, label %done, label %go\ngo:\n  %m = sub i8 %n, 1\n  call void @rec(ptr addrspace(2) %c, ptr addrspace(2) %a, ptr addrspace(2) %b, i8 %m)\n  %va = load volatile i8, ptr addrspace(2) %a\n  %vb = load volatile i8, ptr addrspace(2) %b\n  %s = add i8 %va, %vb\n  store volatile i8 %s, ptr addrspace(2) %c\n  br label %done\ndone:\n  ret void\n}\n"
+  },
+  "w.ll": {
+   "sha256": "00522e7bf000d765f5fcfab80dc1e4fc97d6bd05f17cd81572ce892ef6cf99e4",
+   "text": "@sink = external global i16\n@sink8 = external global i8\ndeclare void @ext()\n\n; M = 254 (and -2 would give 254), word end 255: admitted\ndefine void @w254(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 254\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; M = 255: word final byte 256, must be rejected\ndefine void @w255(ptr addrspace(2) %b, i8 %i) {\n  %o = zext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; atomic word: rejected\ndefine void @watomic(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load atomic i16, ptr addrspace(2) %p monotonic, align 2\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; volatile word: admitted (single access preserved)\ndefine void @wvolatile(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load volatile i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; escape: address stored\ndefine void @wescape(ptr addrspace(2) %b, i8 %i, ptr %slot) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  store ptr addrspace(2) %p, ptr %slot\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; call between address formation and access\ndefine void @wcall(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  call void @ext()\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; word store sibling: whole group rejected\ndefine void @wstoresib(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  %s = add i16 %v, 1\n  store i16 %s, ptr addrspace(2) %p, align 1\n  ret void\n}\n; mixed: byte at +2 and word at 0; M=252 -> E=2 -> 254 ok\ndefine void @wmixed(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 252\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %q = getelementptr i8, ptr addrspace(2) %p, i32 2\n  %c = load i8, ptr addrspace(2) %q\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i8 %c, ptr @sink8\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; mixed: byte at +3 and word at +2; M=252 -> E = max(3, 3) = 255 ok ; word at +3 would be 256\ndefine void @wmixed2(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 252\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %q = getelementptr i8, ptr addrspace(2) %p, i32 3\n  %v = load i16, ptr addrspace(2) %q, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; optsize\ndefine void @wos(ptr addrspace(2) %b, i8 %i) optsize {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; minsize\ndefine void @wminsize(ptr addrspace(2) %b, i8 %i) minsize optsize {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; optnone\ndefine void @woptnone(ptr addrspace(2) %b, i8 %i) optnone noinline {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; i16 index offset (wider offset domain): bounded by and 0xFE\ndefine void @widx16(ptr addrspace(2) %b, i16 %i) {\n  %m = and i16 %i, 254\n  %o = zext i16 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; scaled word array index: i in [0,127] * 2 = 254 max\ndefine void @wscaled(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i16, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; sign-extended index: negative offsets possible, must reject\ndefine void @wsext(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = sext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %v = load i16, ptr addrspace(2) %p, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; negative constant displacement after runtime index\ndefine void @wnegdisp(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %q = getelementptr i8, ptr addrspace(2) %p, i32 -1\n  %v = load i16, ptr addrspace(2) %q, align 1\n  store volatile i16 %v, ptr @sink\n  ret void\n}\n; extending byte loads beside word\ndefine void @wzext(ptr addrspace(2) %b, i8 %i) {\n  %m = and i8 %i, 127\n  %o = zext i8 %m to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %c = load i8, ptr addrspace(2) %p\n  %z = zext i8 %c to i16\n  %q = getelementptr i8, ptr addrspace(2) %p, i32 1\n  %v = load i16, ptr addrspace(2) %q, align 1\n  %s = add i16 %z, %v\n  store volatile i16 %s, ptr @sink\n  ret void\n}\n"
+  },
+  "xmix.ll": {
+   "sha256": "eb4edc57c852a010d1cd8b5e50beb15f878190d799b2c34a8342b3fbe58ff1bb",
+   "text": "@big = external global [1000 x i8]\n@sink = external global i16\ndefine void @mix(ptr addrspace(2) %b, i16 %k0) {\nentry:\n  br label %loop\nloop:\n  %i = phi i8 [ 0, %entry ], [ %next, %loop ]\n  %k = phi i16 [ %k0, %entry ], [ %k1, %loop ]\n  %acc = phi i16 [ 0, %entry ], [ %sum, %loop ]\n  %pk = getelementptr i8, ptr @big, i16 %k\n  %bv = load volatile i8, ptr %pk\n  %o = zext i8 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  %w = load i16, ptr addrspace(2) %p, align 1\n  %bz = zext i8 %bv to i16\n  %s1 = add i16 %acc, %w\n  %sum = add i16 %s1, %bz\n  %k1 = add i16 %k, 3\n  %next = add i8 %i, 1\n  %done = icmp eq i8 %next, 100\n  br i1 %done, label %exit, label %loop\nexit:\n  store volatile i16 %sum, ptr @sink\n  ret void\n}\n"
+  },
+  "xyphi.ll": {
+   "sha256": "7f60530cd2a08eb47a65508afb5a660925474e0de6646b21daebe08a7730ca4f",
+   "text": "@n = external global i16\n@m = external global i16\n@arr = external global [300 x i8]\n@warr = external global [300 x i16]\n@out = external global i16\ndefine void @loop1() {\nentry:\n  %s = load i16, ptr @n\n  br label %loop\nloop:\n  %i = phi i16 [ %s, %entry ], [ %inc, %loop ]\n  %p = getelementptr i8, ptr @arr, i16 %i\n  store i8 0, ptr %p\n  %inc = add i16 %i, 1\n  %e = load i16, ptr @m\n  %c = icmp ne i16 %inc, %e\n  br i1 %c, label %loop, label %exit\nexit:\n  store i16 %inc, ptr @out\n  ret void\n}\ndefine void @sel(i1 %c) {\n  %a = load i16, ptr @n\n  %b = load i16, ptr @m\n  br i1 %c, label %t, label %f\nt:\n  %a1 = add i16 %a, 1\n  br label %j\nf:\n  %b1 = sub i16 %b, 1\n  br label %j\nj:\n  %x = phi i16 [ %a1, %t ], [ %b1, %f ]\n  %y = phi i16 [ %a, %t ], [ %b, %f ]\n  %p = getelementptr i16, ptr @warr, i16 %x\n  %v = load i16, ptr %p\n  %q = getelementptr i8, ptr @arr, i16 %x\n  store i8 1, ptr %q\n  store i16 %v, ptr @out\n  store i16 %y, ptr @m\n  ret void\n}\ndefine void @swap(i16 %k) {\nentry:\n  %a0 = load i16, ptr @n\n  %b0 = load i16, ptr @m\n  br label %loop\nloop:\n  %a = phi i16 [ %a0, %entry ], [ %b, %loop ]\n  %b = phi i16 [ %b0, %entry ], [ %a2, %loop ]\n  %a2 = add i16 %a, 1\n  %pa = getelementptr i8, ptr @arr, i16 %a\n  %pb = getelementptr i16, ptr @warr, i16 %b\n  %va = load i8, ptr %pa\n  %vb = load i16, ptr %pb\n  %z = zext i8 %va to i16\n  %s = add i16 %z, %vb\n  store i16 %s, ptr @out\n  %c = icmp ult i16 %a2, %k\n  br i1 %c, label %loop, label %exit\nexit:\n  ret void\n}\ndefine void @farx(ptr addrspace(2) %b, i16 %n) {\nentry:\n  br label %loop\nloop:\n  %i = phi i16 [ 0, %entry ], [ %inc, %loop ]\n  %o = zext i16 %i to i32\n  %p = getelementptr i8, ptr addrspace(2) %b, i32 %o\n  store i8 0, ptr addrspace(2) %p\n  %inc = add i16 %i, 1\n  %c = icmp ult i16 %inc, %n\n  br i1 %c, label %loop, label %exit\nexit:\n  ret void\n}\n"
+  }
+ },
+ "checks": [
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/abi4.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***",
+   "finding": "F1",
+   "check": "four far-pointer arguments"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/abi4.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***",
+   "finding": "F1",
+   "check": "four far-pointer arguments"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/abi4.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***",
+   "finding": "F1",
+   "check": "four far-pointer arguments"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 build/far-word-rebase/review/probes/abi4.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "Assertion `(MeaningfulBitWidth.isScalable() || OrigValueBitWidth >= MeaningfulBitWidth) && \"Meaningful bits not covered by the mapping\"' failed",
+   "finding": "F1",
+   "check": "four far-pointer arguments, no verifier"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/abimix.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "stdout_matches": [
+    "sta\t(__rc0)",
+    "sta\t(__rc0),y",
+    "sta\t(__rc0),y",
+    "sta\t(__rc0),y",
+    "jsr\tcalleemix"
+   ],
+   "finding": "F1-control",
+   "check": "seven near + one far pointer passes on the stack"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/farmemlen.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "stdout_matches": [
+    "big_const:                              ; @big_const",
+    "ldx\t#112",
+    "ldy\t#17",
+    "sty\t__rc2",
+    "jmp\t__memset_far",
+    "big_var:                                ; @big_var",
+    "jmp\t__memcpy_far",
+    "len64k:                                 ; @len64k",
+    "rts"
+   ],
+   "finding": "F2",
+   "check": "far memset/memcpy/memmove lengths above 65535"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -filetype=obj build/far-word-rebase/review/probes/rt.ll -o build/far-word-rebase/review/probes/.rt-tmp.o",
+   "exit_code": 0,
+   "diagnostic": "",
+   "objdump": [
+    "0: a7           \t<unknown>",
+    "1: 00           \tbrk",
+    "2: 60           \trts"
+   ],
+   "finding": "F3",
+   "check": "runtime far byte load on mos6502"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mos65c02 -O2 -verify-machineinstrs -filetype=obj build/far-word-rebase/review/probes/rt.ll -o build/far-word-rebase/review/probes/.rt-tmp.o",
+   "exit_code": 0,
+   "diagnostic": "",
+   "objdump": [
+    "0: a7           \t<unknown>",
+    "1: 00           \tbrk",
+    "2: 60           \trts"
+   ],
+   "finding": "F3",
+   "check": "runtime far byte load on mos65c02"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs -filetype=obj build/far-word-rebase/review/probes/rt.ll -o build/far-word-rebase/review/probes/.rt-tmp.o",
+   "exit_code": 0,
+   "diagnostic": "",
+   "objdump": [
+    "0: a7 00        \tsbc\ta,[$0+x]                ; 0x0 <ld_rt>",
+    "2: 6f           \tret"
+   ],
+   "finding": "F3",
+   "check": "runtime far byte load on mosspc700"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=moshuc6280 -O2 -verify-machineinstrs -filetype=obj build/far-word-rebase/review/probes/rt.ll -o build/far-word-rebase/review/probes/.rt-tmp.o",
+   "exit_code": 0,
+   "diagnostic": "",
+   "objdump": [
+    "0: a7 00        \tsmb\t$2,$2000                ; 0x2000 <ld_rt+0x2000>",
+    "2: 60           \trts"
+   ],
+   "finding": "F3",
+   "check": "runtime far byte load on moshuc6280"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbgbyte.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbgbyte.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbg.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbg.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "pre0070",
+   "llc_sha256": "b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b",
+   "command": "build/far-word-rebase/pre0070/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbgbyte.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbgbyte.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "pre0070",
+   "llc_sha256": "b86894b7802be95f07c017c5e1766a92bdfb7b25e8c6ae59617cc05c4bb61b9b",
+   "command": "build/far-word-rebase/pre0070/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbg.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "F4",
+   "check": "dbg.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "old-pre0070",
+   "llc_sha256": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f",
+   "command": "build/far-word-upstream/pre0070/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbgbyte.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbgbyte.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "old-pre0070",
+   "llc_sha256": "a2fb79789e8cd6e3c21db4ac952d99a51df4c7ea1771c7d95d03cbb001b45e5f",
+   "command": "build/far-word-upstream/pre0070/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbg.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "F4",
+   "check": "dbg.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "old-candidate",
+   "llc_sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe",
+   "command": "build/far-word-upstream/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbgbyte.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbgbyte.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "old-candidate",
+   "llc_sha256": "9b024b51ae3dfbcef8d5aee9d74aaed4d99887e4bec920bb4edf3b342afa6bbe",
+   "command": "build/far-word-upstream/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/dbg.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***",
+   "finding": "F4",
+   "check": "dbg.ll at O2 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -mos-far-word-index=off -verify-machineinstrs build/far-word-rebase/review/probes/dbg.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "F4-control",
+   "check": "dbg.ll with -mos-far-word-index=off"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -mos-far-word-index=off build/far-word-rebase/review/probes/dbg.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "stdout_matches": [
+    ";DEBUG_VALUE: walk:base <- $rl1",
+    ";DEBUG_VALUE: walk:base <- $rl1",
+    ";DEBUG_VALUE: walk:p <- $rl3",
+    ";DEBUG_VALUE: walk:p <- $rl3",
+    ";DEBUG_VALUE: walk:base <- $rl1",
+    ";DEBUG_VALUE: mkfar:q <- $rl1",
+    ".byte\t2                               ; DW_AT_location",
+    ".byte\t2                               ; DW_AT_location",
+    ".byte\t18                              ; DW_AT_location",
+    ".ascii\t\"\\202\\200\\f\"",
+    ".ascii\t\"\\203\\200\\f\"",
+    ".byte\t18                              ; DW_AT_location"
+   ],
+   "finding": "F5",
+   "check": "DW_AT_location bytes for far pointer in $rl1"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "F6",
+   "check": "asint -O0 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed",
+   "finding": "F6",
+   "check": "asint -O2 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed",
+   "finding": "F6",
+   "check": "tonear -O0 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": -6,
+   "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed",
+   "finding": "F6",
+   "check": "tonear -O2 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)",
+   "finding": "F6",
+   "check": "isnull -O0 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)",
+   "finding": "F6",
+   "check": "isnull -O2 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: unable to legalize instruction: %4:_(p2) = G_SELECT %0:_(s1), %1:_, %2:_ (in function: sel)",
+   "finding": "F6",
+   "check": "sel -O0 +mos-a16"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/.one.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "F6",
+   "check": "sel -O2 +mos-a16"
+  },
+  {
+   "tool": "copycost-baseline",
+   "llc_sha256": "35a1afd96ad2af273aabbcbc98b3be2beb028babcdb86ff959a679f8c535659e",
+   "command": "build/far-word-upstream/allocation-baseline/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/MOS/native-index-copy-cost.mir -o -",
+   "exit_code": -6,
+   "diagnostic": "Unexpected physical register copy",
+   "finding": "P9",
+   "check": "native-index-copy-cost.mir on preserved failing compiler"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/MOS/native-index-copy-cost.mir -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "filecheck_exit_code": 0,
+   "finding": "P9",
+   "check": "native-index-copy-cost.mir on candidate"
+  },
+  {
+   "tool": "without0028",
+   "llc_sha256": "b2bdf8352d141d816d04415d83c028aff7373a57719391d4a0fbcc95b90cd5cf",
+   "command": "build/far-word-upstream/candidate-without0028/llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "filecheck_exit_code": 0,
+   "finding": "P11",
+   "check": "virtregrewriter-x86-copy-contracts.mir"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/X86/virtregrewriter-x86-copy-contracts.mir -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "filecheck_exit_code": 0,
+   "finding": "P11",
+   "check": "virtregrewriter-x86-copy-contracts.mir"
+  },
+  {
+   "tool": "without0028",
+   "llc_sha256": "b2bdf8352d141d816d04415d83c028aff7373a57719391d4a0fbcc95b90cd5cf",
+   "command": "build/far-word-upstream/candidate-without0028/llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir -o -",
+   "exit_code": -6,
+   "diagnostic": "*** Bad machine code: Using an undefined physical register ***",
+   "filecheck_exit_code": 2,
+   "finding": "P11",
+   "check": "virtregrewriter-x86-undef-high-byte-result.mir"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=x86_64 -enable-subreg-liveness -run-pass=greedy,virtregrewriter -verify-machineinstrs build/far-word-rebase/source/llvm/test/CodeGen/X86/virtregrewriter-x86-undef-high-byte-result.mir -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "filecheck_exit_code": 0,
+   "finding": "P11",
+   "check": "virtregrewriter-x86-undef-high-byte-result.mir"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "none",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "none",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "byte",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "none",
+    "wscaled": "none",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16 -O0"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O1 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "none",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "none",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "byte",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "none",
+    "wscaled": "none",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16 -O1"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "word",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "word",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "word",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "word",
+    "wscaled": "word",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16 -O2"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O3 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "word",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "word",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "word",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "word",
+    "wscaled": "word",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16 -O3"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "none",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "none",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "byte",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "none",
+    "wscaled": "none",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16,+mos-xy16 -O0"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O1 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "none",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "none",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "byte",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "none",
+    "wscaled": "none",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16,+mos-xy16 -O1"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "word",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "word",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "word",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "word",
+    "wscaled": "word",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16,+mos-xy16 -O2"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O3 -verify-machineinstrs -stop-after=legalizer build/far-word-rebase/review/probes/w.ll -o -",
+   "exit_code": 0,
+   "diagnostic": "",
+   "folds": {
+    "w254": "word",
+    "w255": "none",
+    "watomic": "none",
+    "wvolatile": "word",
+    "wescape": "none",
+    "wcall": "none",
+    "wstoresib": "none",
+    "wmixed": "word",
+    "wmixed2": "word",
+    "wos": "none",
+    "wminsize": "none",
+    "woptnone": "none",
+    "widx16": "word",
+    "wscaled": "word",
+    "wsext": "none",
+    "wnegdisp": "none",
+    "wzext": "word"
+   },
+   "finding": "0070",
+   "check": "admission matrix -mattr=+mos-a16,+mos-xy16 -O3"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -mos-experimental-regalloc build/far-word-rebase/review/probes/w.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: MOSConventionalSSA is not implemented",
+   "finding": "R1",
+   "check": "w.ll -mos-experimental-regalloc"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -mos-experimental-regalloc build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: MOSConventionalSSA is not implemented",
+   "finding": "R1",
+   "check": "spill.ll -mos-experimental-regalloc"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -mos-experimental-regalloc build/far-word-rebase/review/probes/plain.ll -o /dev/null",
+   "exit_code": 1,
+   "diagnostic": "LLVM ERROR: MOSConventionalSSA is not implemented",
+   "finding": "R1",
+   "check": "plain.ll -mos-experimental-regalloc"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16 -O0"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16 -O2"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O3 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16 -O3"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16,+mos-xy16 -O0"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16,+mos-xy16 -O2"
+  },
+  {
+   "tool": "candidate",
+   "llc_sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+   "command": "build/far-word-rebase/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O3 -verify-machineinstrs build/far-word-rebase/review/probes/spill.ll -o /dev/null",
+   "exit_code": 0,
+   "diagnostic": "",
+   "finding": "P10",
+   "check": "spill.ll -mattr=+mos-a16,+mos-xy16 -O3"
+  }
+ ],
+ "suites": {
+  "suite-candidate.json": {
+   "tooldir": "build/far-word-rebase/candidate",
+   "summary": {
+    "PASS": 162,
+    "UNSUPPORTED": 1
+   },
+   "non_pass": [
+    "CodeGen/MOS/getchar-regression.ll"
+   ]
+  },
+  "suite-pre0070.json": {
+   "tooldir": "build/far-word-rebase/pre0070",
+   "summary": {
+    "PASS": 159,
+    "FAIL": 3,
+    "UNSUPPORTED": 1
+   },
+   "non_pass": [
+    "CodeGen/MOS/far-word-index-boundaries.mir",
+    "CodeGen/MOS/far-word-index-integration.ll",
+    "CodeGen/MOS/far-word-policy.mir",
+    "CodeGen/MOS/getchar-regression.ll"
+   ]
+  },
+  "suite-candidate-extra.json": {
+   "tooldir": "build/far-word-rebase/candidate",
+   "summary": {
+    "PASS": 1
+   },
+   "non_pass": []
+  },
+  "suite-pre0070-extra.json": {
+   "tooldir": "build/far-word-rebase/pre0070",
+   "summary": {
+    "PASS": 1
+   },
+   "non_pass": []
+  }
+ },
+ "sensitivity": {
+  "positive_passes": 6,
+  "mutations": 228,
+  "rejected": 228
+ },
+ "sweep": {
+  "invocations": 426,
+  "nonzero": [
+   {
+    "file": "inline-asm-zp-csr.ll",
+    "mattr": "+mos-a16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "LLVM ERROR: Operand type not implemented."
+   },
+   {
+    "file": "inline-asm-zp-csr.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "LLVM ERROR: Operand type not implemented."
+   },
+   {
+    "file": "vector-scalarize.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: instruction is not legal: %57:_(s16) = G_IMPLICIT_DEF (in function: insert_var_undef)"
+   },
+   {
+    "file": "vector-scalarize.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: instruction is not legal: %57:_(s16) = G_IMPLICIT_DEF (in function: insert_var_undef)"
+   },
+   {
+    "file": "vector-scalarize.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: instruction is not legal: %55:_(s16) = G_IMPLICIT_DEF (in function: insert_var_undef)"
+   },
+   {
+    "file": "vector-scalarize.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: instruction is not legal: %55:_(s16) = G_IMPLICIT_DEF (in function: insert_var_undef)"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "abi4.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Copy Instruction is illegal with mismatching sizes ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O0",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgbyte.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbg.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbg.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbg.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbg.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "*** Bad machine code: Generic virtual register use cannot be undef ***"
+   },
+   {
+    "file": "dbgmerge.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed"
+   },
+   {
+    "file": "dbgmerge.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed"
+   },
+   {
+    "file": "dbgmerge.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "134",
+    "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed"
+   },
+   {
+    "file": "dbgmerge.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "134",
+    "diagnostic": "Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16",
+    "opt": "O0",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16",
+    "opt": "O2",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16",
+    "opt": "O3",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O0",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O2",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   },
+   {
+    "file": "ptrtoint.ll",
+    "mattr": "+mos-a16,+mos-xy16",
+    "opt": "O3",
+    "exit_code": "1",
+    "diagnostic": "LLVM ERROR: unable to legalize instruction: %1:_(p2) = G_CONSTANT i32 0 (in function: isnull)"
+   }
+  ]
+ },
+ "clang_format": {
+  "command": "dev/container.sh -v build/far-word-rebase/source:/src -- clang-format-diff.py -p1 -binary /opt/llvm-mos/bin/clang-format < git diff -U0 06bc967d2668 HEAD -- *.cpp *.h",
+  "output_sha256": "8955a59b9358b7a0ef4b441bab6571abff70c0016aef98352978029a21f079b6",
+  "removed_lines": 613
+ },
+ "dwarfdump": {
+  "command": "llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -mos-far-word-index=off -filetype=obj probes/dbg.ll -o dbg0.o; dev/container.sh -- /opt/llvm-mos/bin/llvm-dwarfdump --debug-info dbg0.o",
+  "dbg0_o_sha256": "bea57e1f56b828a79f4f49acc82955592ef366c1258a7873548a02ef9eaa2df3",
+  "locations": [
+   "LLVM version 24.0.0git",
+   "0x00000000: Compile Unit: length = 0x000000b3, format = DWARF32, version = 0x0004, abbr_offset = 0x0000, addr_size = 0x04 (next unit at 0x000000b7)",
+   "DW_AT_location\t(DW_OP_regx RS2, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0, DW_OP_regx RS3, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0)",
+   "DW_AT_location\t(DW_OP_regx RS6, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0, DW_OP_regx RS7, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0)",
+   "DW_AT_location\t(DW_OP_regx RS2, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0, DW_OP_regx RS3, DW_OP_piece 0x2, DW_OP_bit_piece 0x7 0x0)"
+  ]
+ },
+ "reviewer_attribution_correction": "Coordinator correction from the subagent transcript metadata: Claude Code 2.1.283 (not 2.1.285), agent type t4-opus-high, model claude-opus-5-5, high reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+}

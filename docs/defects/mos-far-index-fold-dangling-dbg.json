@@ -1,0 +1,80 @@
+{
+ "schema": 1,
+ "id": "mos-far-index-fold-dangling-dbg",
+ "title": "Far runtime-index fold leaves an undef DBG_VALUE that fails machine verification",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md",
+ "summary": "When tryFarRuntimeIndexFold folds every non-debug use of a far pointer add into a [dp],Y access, salvageDebugInfo cannot express base + zext(offset) and leaves the DBG_VALUE naming the dead vreg. DetectDeadLanes marks it undef and -verify-machineinstrs rejects the function. Without the verifier the location degrades to $noreg and the emitted code is unaffected. The byte fold (0061/patch 4) and the native word fold (0070) both fail downstream. Found by the independent review (finding B4) and reproduced on the downstream toolchain.",
+ "attribution": [
+  "Found by the independent reviewer of the rebased far-word series on the extracted candidate: Claude Code 2.1.283, model claude-opus-5-5 (Opus 5.5), high reasoning effort (t4-opus-high subagent of session f79adc39-72b4-4dc5-abc1-849c14c5ce96; verified from its transcript metadata).",
+  "Downstream reproduction, prior-work audit and this record: Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96."
+ ],
+ "unknowns": [
+  "No repair attempted. Setting the leftover operands to $noreg is the minimal repair; salvaging with DBG_VALUE_LIST would keep the location."
+ ],
+ "prior_work": {
+  "disposition": "new_defect",
+  "search_terms": [
+   "tryFarRuntimeIndexFold",
+   "salvageDebugInfo",
+   "cannot be undef"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0061-mos-far-global-long-x.patch",
+   "patches/llvm-mos/0070-mos-far-word-index-policy.patch",
+   "patches/llvm-mos/0002-321-accum16.patch"
+  ],
+  "source_assessment": "Downstream tryFarRuntimeIndexFold erases the folded G_PTR_ADD after salvageDebugInfo with no fallback for an unsalvageable DBG_VALUE; the extracted patches 4 and 12 match.",
+  "binary_assessment": "Downstream release llc 9031686c exits 134 for both the byte and word probes; the extracted pre-0070 llc fails only the byte probe and the candidate both, matching the review.",
+  "decision": "No defect record, TODO item or lit test covers debug values across the far index fold; the existing far tests have no -g input. New canonical record.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/prior-work.json",
+   "sha256": "0ad7e82d5ca7bc59d78233edccf4a53a8efd5c218ba66b531fe41e9882a5fff8"
+  }
+ },
+ "baseline": {
+  "command": "build/far-review-defects/downstream/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816 (repository root). Captured in the wt/321-far-word-rebase worktree /home/will/llvm-mos-65816-nearproof, where build/far-review-defects/downstream holds hard links to the same frozen binaries.",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [
+    "+mos-a16"
+   ],
+   "optimization": "O2 with -g metadata",
+   "lto": false,
+   "verifier": true,
+   "expected": "verifier-clean, location dropped or salvaged"
+  },
+  "toolchain_location": "build/far-review-defects/downstream/llc; identity in docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/identity.json",
+  "toolchain_sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+  "input": {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+   "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/baseline.log",
+   "sha256": "c5f0f1d92fd1e896d287dcfa4776bc5cd133f2d4b23a16ffc529a4479fb0c882"
+  },
+  "exit_code": -6,
+  "failure_signature": "Generic virtual register use cannot be undef"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/identity.json",
+   "sha256": "5289a59b2b5c5bb11ec1be2ad19383dde9cd1f49d86499fa4f95be558e0295c6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/word-fold.log",
+   "sha256": "6085384e836dbf12964b5a8ce8577cff471f2cc537c7492530fec0d1f20e456a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll",
+   "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445"
+  }
+ ]
+}

@@ -1,0 +1,7 @@
+2026-09-29T23:30:17Z start candidate build at 77dc044c39bb303d8984ed5d9eb08c3a3455cad8
+ninja: Entering directory `/work/build/0029-cross-target-build'
+[1/4] Building CXX object lib/Target/MOS/CMakeFiles/LLVMMOSCodeGen.dir/MOSLegalizerInfo.cpp.o
+[2/4] Linking CXX static library lib/libLLVMMOSCodeGen.a
+[3/4] Linking CXX executable bin/llc
+[4/4] Linking CXX executable bin/opt
+2026-09-29T23:30:36Z rc=0

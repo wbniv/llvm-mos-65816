@@ -1,0 +1,22 @@
+{
+  "downstream_llc": {
+    "path": "build/far-review-defects/downstream/llc",
+    "sha256": "9031686cc961f98d5d6011ae072c0c135a128fb1751fba8753a5b111a2e97ca2",
+    "hard_link_of": "build/llvm-mos/bin/llc",
+    "built": "2026-09-30T05:29:36+07:00",
+    "source": "vendor/llvm-mos with the fork patch stack as committed at 5dc63f4d (0002 includes the near no-wrap option-collision fix)",
+    "assertions": false
+  },
+  "downstream_llvm_objdump": {
+    "path": "build/far-review-defects/downstream/llvm-objdump",
+    "sha256": "fba3e55229c58c9c2e0e7c730a47d6827d311d514c13ee5142b4afe367bc632a"
+  },
+  "extracted_candidate_llc": {
+    "path": "build/far-word-rebase/candidate/llc",
+    "sha256": "d7fde754bb0222b40b514c97e7baa2eb98ca18d626ae8fea49d12f6add17f9cf",
+    "series": "77dc044c39bb, 14 commits on llvm-mos 06bc967d2668",
+    "assertions": true
+  },
+  "core_dumps": "disabled (RLIMIT_CORE=0) for every run",
+  "probe_origin": "Copied verbatim from build/far-word-rebase/review/probes/ of the main checkout; the same inputs are embedded in docs/pr-preparations/2026-09-30/far-word-rebase/evidence/independent-review.json."
+}
