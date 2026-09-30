@@ -70,6 +70,8 @@ Because the executed programs are byte-identical, the September 28 [size and mas
 
 ## Independent review
 
+**Second review (2026‑10‑01), after the far-prerequisite carry:** [independent-review-2.md](independent-review-2.md). B1, B2, B3 and B6 are fixed and B4 is fixed at its site, but two new blockers remain: B8 (the same dangling `DBG_VALUE` at three other far fold sites) and B9 (#320 asserts on Imag32 spills until far-word patch 10). Filing still waits on those as well as B5/B7.
+
 [Verdict](independent-review.md): **do not file this series yet.** The reviewer confirmed every coordinator result above with its own runner on the frozen tools. It found the rebase faithful and upheld the optimizations:
 - **0069:** the Z-flag loop bound holds at every use.
 - **0070:** admission matches the description across 17 probe functions, both modes and O0–O3, and the word load always runs with an 8-bit Y.
