@@ -1,0 +1,16 @@
+[MOS] Legalize and select native 16-bit loads and stores
+
+Under +mos-a16, s16 G_LOAD and G_STORE are legalized before byte narrowing. An absolute address becomes G_LOAD16_ABS/G_STORE16_ABS. An absolute or runtime base with an 8-bit variable index, or a runtime pointer with a constant offset of 1-255, becomes an abs,X or (zp),Y word access. Any other runtime pointer on a 65C02-class CPU becomes G_LOAD16_INDIR/G_STORE16_INDIR. The selector lowers these to the word pseudos and moves the value between A16 and its Imag16 pair; a single-use word load feeding a store is folded straight into the store's accumulator load.
+
+Accesses stay on the byte path where the native form costs more: constant-valued stores, loads whose every use splits the value into bytes, stores of values built from bytes in the same block with no call or inline assembly in between, and indirect stores of an A:X argument. Atomic accesses remain a single operation.
+
+Default-mode effect: none (fixed input set identical).
+
+Tests: a16-load-store.ll checks one rep/sep-bracketed word load and store for absolute, (zp) and (zp),y (runtime and constant index) addresses, and a constant store kept as two byte stores. a16-byte-store.ll and a16-indirect-byte-store.ll, which pin the byte-versus-native store decisions, need native arithmetic results next to the stores and land with it.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-load-store.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

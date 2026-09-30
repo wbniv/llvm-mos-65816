@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "6021667ce20e98a76a598695130d3ec5a1dfe74a964be19e0ab539c3f0b4c007",
+  "sourceHash": "30e5aa11c21c4758982fd004e7742dd996094b61f3d640e21026dff285ef457b",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -585,7 +585,7 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review.",
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/320-upstream-far-pointer-note.md",
@@ -605,7 +605,7 @@
       "localStatus": "in-progress",
       "publicationStatus": "unposted",
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review.",
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review.",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/upstream-pending-work.md",
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/321-upstream-native-width-pr.md",

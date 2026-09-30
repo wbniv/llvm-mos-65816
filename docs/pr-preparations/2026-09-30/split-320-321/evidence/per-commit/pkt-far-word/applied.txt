@@ -1,0 +1,10 @@
+7e3e727e54daa30409dd2629de68fecddaa23a70 Assert shared base and index for mixed far loads
+833ddf288b1798e76d3b1cdba9e7cfcbca0bae51 Check far-word boundaries, operands, and loop-proof limits
+ce5d354c08aed69c0ee8dcea17eff1168c264a37 Fold bounded native far word loads in speed-optimized functions
+66269164b70409d87fb01b5fe3e3971d63d5c5ac Preserve undefined lane definitions in identity copies
+f268cfee53ef38454cf16b80bd6d923fe2d2e351 Preserve all four bytes when spilling far-pointer quads
+5cf1fcf9792e2a7e71254c765134fd59ac544e1b Cost native index copies to imaginary register pairs
+ec331788a077e45d7faf60f49cd9a7b194596146 Prove bounded byte-loop ranges for far runtime indexing
+e91ab45bfa9ac4c0488de646578e3eb2236bfde2 Select far extending-load addresses within the legalizer worklist
+76015eb1589894316805e94657d92f330520f7d2 Select native accumulator far word accesses
+70792a0fd7b4ba961676820079e1126f89084e99 Select far absolute indexed byte accesses

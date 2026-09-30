@@ -1,0 +1,16 @@
+[MOS] Keep call-clobbered imaginary copies out of Imag16 pairs
+
+Refuse to coalesce a sub-register copy into an Imag16 pair when one side is a virtual register whose only definition is `COPY $rcN` and that register is live across a call whose regmask clobbers $rcN. The pair would inherit the $rcN allocation hint and could be re-bound to $rcN across the clobbering call, leaving a use with no reaching definition that the machine verifier rejects. Keeping the COPY gives the value its own spillable register.
+
+The guard needs all three conditions, so ordinary coalescing is unaffected. Native s32 values are built from s16 lanes, which makes Imag16 pairs assembled from call results common under +mos-a16.
+
+Default-mode effect: none in the fixed input set. The hook runs for every CPU.
+
+Tests: coalesce-call-clobbered-imag.mir runs the register coalescer on byte COPYs of $rc2/$rc3 that build an Imag16 pair: across a second call they stay separate registers, and without that call they coalesce into the pair. The parent commit folds $rc2/$rc3 into the pair across the call.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

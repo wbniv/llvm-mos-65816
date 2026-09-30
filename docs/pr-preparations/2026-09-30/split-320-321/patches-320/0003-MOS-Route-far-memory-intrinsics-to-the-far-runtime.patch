@@ -1,0 +1,187 @@
+From a70ade048618f74a86fa1daf27b5e8efd702917e Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 3/4] [MOS] Route far memory intrinsics to the far runtime
+
+A G_MEMSET, G_MEMCPY or G_MEMMOVE with any address-space-2 pointer operand that is not expanded inline now calls __memset_far, __memcpy_far or __memmove_far. Near and direct-page pointer arguments are cast to far (bank $00 under the DBR=0 contract), so both pointers use the far-pointer ABI. The length argument is 16 bits: wider lengths are truncated and narrower ones zero-extended. The supported length domain is therefore 0-65535; longer lengths are not diagnosed.
+
+The generic memory libcall would pass the far pointer to the near runtime and drop the bank byte, silently accessing the wrong bank.
+
+Default-mode effect: none; only calls with far pointer operands change.
+
+Tests: far-memset.ll checks a far constant fill over the inline limit and a variable-length far fill calling __memset_far, and a near variable fill still calling __memset.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/far-memset.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp | 96 ++++++++++++++++++++++++
+ llvm/test/CodeGen/MOS/far-memset.ll      | 32 ++++++++
+ 2 files changed, 128 insertions(+)
+ create mode 100644 llvm/test/CodeGen/MOS/far-memset.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 6bfdd5839a84..ba1d2bafc534 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -48,6 +48,7 @@
+ #include "llvm/CodeGen/TargetInstrInfo.h"
+ #include "llvm/CodeGen/TargetOpcodes.h"
+ #include "llvm/CodeGen/TargetRegisterInfo.h"
++#include "llvm/IR/CallingConv.h"
+ #include "llvm/IR/InstrTypes.h"
+ #include "llvm/IR/Instructions.h"
+ #include "llvm/IR/Intrinsics.h"
+@@ -2886,6 +2887,93 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+   return true;
+ }
+ 
++// Memory-intrinsic operands are destination, value/source, length, and the
++// tail-call immediate. Inspect pointer operands for the far address space.
++static bool anyFarPointerOperand(const MachineRegisterInfo &MRI,
++                                 const MachineInstr &MI) {
++  for (unsigned I = 0, E = MI.getNumOperands() - 1; I < E; ++I) {
++    const MachineOperand &MO = MI.getOperand(I);
++    if (!MO.isReg())
++      continue;
++    LLT Ty = MRI.getType(MO.getReg());
++    if (Ty.isPointer() && Ty.getAddressSpace() == MOS::AS_Far)
++      return true;
++  }
++  return false;
++}
++
++// Far memory intrinsics require far runtime entry points. Convert any near
++// or direct-page pointer argument to address space 2 so both pointers use
++// the same ABI. Near addresses are in bank zero under the DBR=0 contract.
++static bool createFarMemLibcall(LegalizerHelper &Helper,
++                                MachineRegisterInfo &MRI, MachineInstr &MI) {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  auto &Ctx = Builder.getMF().getFunction().getContext();
++  const LLT PF = LLT::pointer(MOS::AS_Far, 32);
++
++  unsigned Opc = MI.getOpcode();
++  const char *Callee;
++  switch (Opc) {
++  case MOS::G_MEMSET:
++    Callee = "__memset_far";
++    break;
++  case MOS::G_MEMCPY:
++    Callee = "__memcpy_far";
++    break;
++  case MOS::G_MEMMOVE:
++    Callee = "__memmove_far";
++    break;
++  default:
++    return false;
++  }
++  const bool IsSet = Opc == MOS::G_MEMSET;
++
++  // Operands are destination, value/source, length, and the tail-call immediate.
++  // Widen near and direct-page pointers to the runtime's far-pointer ABI.
++  auto asFar = [&](Register Reg) {
++    if (MRI.getType(Reg).getAddressSpace() != MOS::AS_Far)
++      Reg = Builder.buildAddrSpaceCast(PF, Reg).getReg(0);
++    return Reg;
++  };
++  Type *FarPtrTy = PointerType::get(Ctx, MOS::AS_Far);
++
++  SmallVector<CallLowering::ArgInfo, 3> Args;
++  // arg 0: destination pointer.
++  Args.push_back({asFar(MI.getOperand(0).getReg()), FarPtrTy, 0});
++  if (IsSet) {
++    // arg 1: fill byte (i8, matching __memset's `char` value).
++    Register Val = MI.getOperand(1).getReg();
++    Args.push_back(
++        {Val, IntegerType::get(Ctx, MRI.getType(Val).getSizeInBits()), 1});
++  } else {
++    // arg 1: source pointer.
++    Args.push_back({asFar(MI.getOperand(1).getReg()), FarPtrTy, 1});
++  }
++  // The far runtime's size_t parameter is 16 bits. This lowering's supported
++  // runtime domain is lengths representable by that parameter.
++  Register Len = MI.getOperand(2).getReg();
++  unsigned LenBits = MRI.getType(Len).getSizeInBits();
++  if (LenBits > 16)
++    Len = Builder.buildTrunc(LLT::scalar(16), Len).getReg(0);
++  else if (LenBits < 16)
++    Len = Builder.buildZExt(LLT::scalar(16), Len).getReg(0);
++  Args.push_back({Len, IntegerType::get(Ctx, 16), 2});
++
++  auto &CLI = *Builder.getMF().getSubtarget().getCallLowering();
++  CallLowering::CallLoweringInfo Info;
++  Info.CallConv = CallingConv::C; // CC_MOS; the addrspace-2 args select Imag32.
++  Info.Callee = MachineOperand::CreateES(Callee);
++  Info.OrigRet = CallLowering::ArgInfo({0}, Type::getVoidTy(Ctx), 0);
++  // The far runtime returns void; nothing consumes a return, so there is no tail
++  // call and no "returned" arg coupling (unlike the near createMemLibcall).
++  Info.IsTailCall = false;
++  llvm::append_range(Info.OrigArgs, Args);
++  if (!CLI.lowerCall(Builder, Info))
++    return false;
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+                                      MachineRegisterInfo &MRI, MachineInstr &MI,
+                                      LostDebugLocObserver &LocObserver) const {
+@@ -2931,6 +3019,14 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+     return true;
+   }
+ 
++  // the inline path above already lowers a far memop correctly (per-byte
++  // far G_STOREs) for a constant size <= SizeLimit. When it bails (variable size,
++  // or constant size over the limit) we must NOT fall into the generic
++  // createMemLibcall: it calls the NEAR runtime with the far pointer, dropping the
++  // bank byte -> silent wrong-bank access. Route far memops to the far runtime.
++  if (anyFarPointerOperand(MRI, MI))
++    return createFarMemLibcall(Helper, MRI, MI);
++
+   // Try emitting a libcall.
+   Result = Helper.createMemLibcall(MRI, MI, LocObserver);
+   if (Result == LegalizerHelper::Legalized) {
+diff --git a/llvm/test/CodeGen/MOS/far-memset.ll b/llvm/test/CodeGen/MOS/far-memset.ll
+new file mode 100644
+index 000000000000..b6c6ecf3f9f1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-memset.ll
+@@ -0,0 +1,32 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++
++; A far fill exceeding the inline limit requires a runtime whose destination
++; parameter retains the bank byte. The i32 length is the loop-idiom form for
++; a 4096-byte fill at $7E2000. A near fill uses the near runtime ABI.
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define void @far_constant_fill() {
++; CHECK-LABEL: far_constant_fill:
++; CHECK: {{jsr|jmp}} __memset_far{{$}}
++  call void @llvm.memset.p2.i32(ptr addrspace(2) inttoptr (i32 8265728 to ptr addrspace(2)), i8 66, i32 4096, i1 false)
++  ret void
++}
++
++define void @far_variable_fill(ptr addrspace(2) %dst, i8 %value, i16 %size) {
++; CHECK-LABEL: far_variable_fill:
++; CHECK: {{jsr|jmp}} __memset_far{{$}}
++  call void @llvm.memset.p2.i16(ptr addrspace(2) %dst, i8 %value, i16 %size, i1 false)
++  ret void
++}
++
++define void @near_variable_fill(ptr %dst, i8 %value, i16 %size) {
++; CHECK-LABEL: near_variable_fill:
++; CHECK: {{jsr|jmp}} __memset{{$}}
++  call void @llvm.memset.p0.i16(ptr %dst, i8 %value, i16 %size, i1 false)
++  ret void
++}
++
++declare void @llvm.memset.p2.i32(ptr addrspace(2), i8, i32, i1 immarg)
++declare void @llvm.memset.p2.i16(ptr addrspace(2), i8, i16, i1 immarg)
++declare void @llvm.memset.p0.i16(ptr, i8, i16, i1 immarg)
+-- 
+2.53.0
+

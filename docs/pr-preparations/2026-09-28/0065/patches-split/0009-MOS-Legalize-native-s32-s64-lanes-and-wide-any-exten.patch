@@ -1,0 +1,360 @@
+From 3cec9891c6cf3a20877b0e67148ad6780eea223f Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 09/18] [MOS] Legalize native s32/s64 lanes and wide
+ any-extensions
+
+Under +mos-a16, an s32 value is represented as two s16 lanes and an s64 value as two s32 halves: G_ANYEXT to s32 from s8/s16 and G_TRUNC from s32 to s16 are legal, G_MERGE_VALUES/G_UNMERGE_VALUES between s32 and 2 x s16 and between s64 and 2 x s32 are legal, and the four-piece forms (4 x s8 <-> s32, 4 x s16 <-> s64) are split into those two-level forms, because the selector handles only two-part merges. Extensions to s64 are custom.
+
+In every mode, G_ANYEXT from a source that is not 1, 8, 16 or 32 bits wide now lowers through G_ZEXT instead of being unsupported; an any-extension may zero-fill its high bits.
+
+Default-mode effect: none in the fixed input set. The any-extension rule applies to every CPU, but only to source widths that were previously rejected.
+
+Tests: anyext-wide.mir checks wide extensions at legalization in default, +mos-a16 and +mos-a16,+mos-xy16 modes, including a shift libcall consuming the low bytes. anyext-masked-byte.ll checks that a masked byte store's s8 to s64 extension lowers in all three modes. Both also pass before this commit; they guard the new rules, This commit precedes native arithmetic because, without these rules, native s16 arithmetic leaves an s64 to 4 x s16 G_UNMERGE_VALUES that cannot be legalized (anyext-masked-byte.ll fails under +mos-a16).
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/anyext-wide.mir llvm/test/CodeGen/MOS/anyext-masked-byte.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp    | 169 ++++++++++++++++++--
+ llvm/lib/Target/MOS/MOSLegalizerInfo.h      |  12 ++
+ llvm/test/CodeGen/MOS/anyext-masked-byte.ll |  13 ++
+ llvm/test/CodeGen/MOS/anyext-wide.mir       |  79 +++++++++
+ 4 files changed, 258 insertions(+), 15 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/anyext-masked-byte.ll
+ create mode 100644 llvm/test/CodeGen/MOS/anyext-wide.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index eb56ca2608ad..522d5cea6bbb 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -95,15 +95,27 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   // Integer Extension and Truncation
+ 
+-  getActionDefinitionsBuilder(G_ANYEXT)
+-      .legalFor({{S16, S8}})
+-      .customIf(typeIs(1, S1))
+-      .scalarize(0)
+-      .unsupported();
+-  getActionDefinitionsBuilder(G_TRUNC)
+-      .legalFor({{S1, S8}, {S1, S16}, {S8, S16}})
+-      .scalarize(0)
+-      .unsupported();
++  // Native s32 values use two s16 lanes. Keep the extension and merge rules
++  // consistent with that representation; zero extensions lower through bytes.
++  {
++    auto &B = getActionDefinitionsBuilder(G_ANYEXT).scalarize(0).legalFor({{S16, S8}});
++    if (STI.hasAccum16())
++      B.legalFor({{S32, S16}, {S32, S8}})
++          .customFor({{S64, S8}, {S64, S16}, {S64, S32}});
++    // Native-width s64 extensions and sources without a native lane
++    // decomposition lower through ZEXT. ANYEXT permits zero-filled high bits.
++    B.customIf([](const LegalityQuery &Q) {
++       unsigned SrcBits = Q.Types[1].getSizeInBits();
++       return SrcBits == 1 || (SrcBits != 8 && SrcBits != 16 && SrcBits != 32);
++     }).unsupported();
++  }
++  {
++    auto &B = getActionDefinitionsBuilder(G_TRUNC)
++                  .legalFor({{S1, S8}, {S1, S16}, {S8, S16}});
++    if (STI.hasAccum16())
++      B.legalFor({{S16, S32}});
++    B.scalarize(0).unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_SEXT).scalarize(0).custom();
+ 
+@@ -151,12 +163,36 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   // inserts with constant indices, which the rule above then lowers further.
+   getActionDefinitionsBuilder(G_SHUFFLE_VECTOR).lower();
+ 
+-  getActionDefinitionsBuilder(G_MERGE_VALUES)
+-      .legalForCartesianProduct({S16, P}, {S8, PZ})
+-      .unsupported();
+-  getActionDefinitionsBuilder(G_UNMERGE_VALUES)
+-      .legalForCartesianProduct({S8, PZ}, {S16, P})
+-      .unsupported();
++  // Native accumulator: s32<->2x s16 (un)merge is the glue for the 2x s16 representation of s32
++  // (see the ext/trunc note above), mirroring the default s16<->s8 (un)merge.
++  {
++    auto &B = getActionDefinitionsBuilder(G_MERGE_VALUES)
++                  .legalForCartesianProduct({S16, P}, {S8, PZ});
++    if (STI.hasAccum16())
++      // {S32,S16} 2x s16->s32 is the direct legal form; {S32,S8} is a 4x s8->s32
++      // merge (e.g. an i8->i32 sext the artifact combiner couldn't fold) that the
++      // 2-source selectMergeValues can't take — custom-rewrite it into the legal
++      // 2-level form (see legalizeMergeS32FromBytes).
++      // {S64,S32} 2x s32->s64 is the direct legal form; {S64,S16} is a 4x s16->s64
++      // merge that the 2-source selector can't take — custom-rewrite to the 2-level
++      // form (see legalizeMergeS64FromWords). Mirror of the s32 case, one level up.
++      B.legalFor({{S32, S16}, {S64, S32}}).customFor({{S32, S8}, {S64, S16}});
++    B.unsupported();
++  }
++  {
++    auto &B = getActionDefinitionsBuilder(G_UNMERGE_VALUES)
++                  .legalForCartesianProduct({S8, PZ}, {S16, P});
++    if (STI.hasAccum16())
++      // {S16,S32} 2x s16<-s32 is the direct legal form; {S8,S32} is a 4x s8<-s32
++      // unmerge (e.g. the byte split inside an s32 ±1 add or an s32 shift>=8) that
++      // the 2-dest selectUnmergeValues can't take — custom-rewrite it into the legal
++      // 2-level form (see legalizeUnmergeS32ToBytes). Mirror of the G_MERGE_VALUES rule.
++      // {S32,S64} 2x s32<-s64 is the direct legal form; {S16,S64} is a 4x s16<-s64
++      // unmerge (e.g. splitting a 64-bit value into 16-bit lanes) — custom-rewrite to
++      // the 2-level form (see legalizeUnmergeS64ToWords). Mirror of the s32 case.
++      B.legalFor({{S16, S32}, {S32, S64}}).customFor({{S8, S32}, {S16, S64}});
++    B.unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_BSWAP)
+       .customFor({S8})
+@@ -542,6 +578,18 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+   case G_FREEZE:
+     return legalizeToCopy(Helper, MRI, MI);
+ 
++  case G_MERGE_VALUES:
++    // customFor {S32,S8} (4x s8->s32) and {S64,S16} (4x s16->s64); pick by dest width.
++    if (MRI.getType(MI.getOperand(0).getReg()).getSizeInBits() == 64)
++      return legalizeMergeS64FromWords(Helper, MRI, MI);
++    return legalizeMergeS32FromBytes(Helper, MRI, MI);
++  case G_UNMERGE_VALUES:
++    // customFor {S8,S32} (4x s8<-s32) and {S16,S64} (4x s16<-s64); pick by source width.
++    if (MRI.getType(MI.getOperand(MI.getNumOperands() - 1).getReg())
++            .getSizeInBits() == 64)
++      return legalizeUnmergeS64ToWords(Helper, MRI, MI);
++    return legalizeUnmergeS32ToBytes(Helper, MRI, MI);
++
+   // Integer Operations
+   case G_ADD:
+   case G_SUB:
+@@ -638,6 +686,97 @@ static auto unmergeDefsSplitHigh(MachineInstr *MI) {
+                      MI->getOperand(MI->getNumOperands() - 2)};
+ }
+ 
++// Native accumulator: a direct 4x s8 -> s32 G_MERGE_VALUES (only reached via customFor({S32,S8})
++// under +mos-a16) — rewrite into the legal 2-level form so it routes through the
++// s32-as-2x-s16 representation: merge(a,b)->s16, merge(c,d)->s16, then those ->s32.
++// Both halves are legal (legalForCartesianProduct {S16,S8}; legalFor {S32,S16}) and the
++// artifact combiner folds them against feeding unmerges. selectMergeValues only takes a
++// 2-source merge, so the 4-source form must be split here, not selected.
++bool MOSLegalizerInfo::legalizeMergeS32FromBytes(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S16 = LLT::scalar(16);
++  Register Dst = MI.getOperand(0).getReg();
++  Register B0 = MI.getOperand(1).getReg();
++  Register B1 = MI.getOperand(2).getReg();
++  Register B2 = MI.getOperand(3).getReg();
++  Register B3 = MI.getOperand(4).getReg();
++  auto Lo = Builder.buildMergeValues(S16, {B0, B1});
++  auto Hi = Builder.buildMergeValues(S16, {B2, B3});
++  Builder.buildMergeValues(Dst, {Lo.getReg(0), Hi.getReg(0)});
++  MI.eraseFromParent();
++  return true;
++}
++
++// Native accumulator: a direct 4x s8 <- s32 G_UNMERGE_VALUES (only reached via customFor({S8,S32})
++// under +mos-a16) — the symmetric inverse of legalizeMergeS32FromBytes. Rewrite it into
++// the legal 2-level form so it routes through the s32-as-2x-s16 representation: unmerge
++// the s32 into two s16 words (legal {S16,S32}), then unmerge each word into two s8 bytes
++// (legal {S8,S16}), reusing the four original byte def regs. selectUnmergeValues only
++// takes a 2-dest unmerge, so the 4-dest form must be split here, not selected. Building
++// only unmerges (no new merge) cannot create a merge<->unmerge artifact-combine loop.
++bool MOSLegalizerInfo::legalizeUnmergeS32ToBytes(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S16 = LLT::scalar(16);
++  Register D0 = MI.getOperand(0).getReg();
++  Register D1 = MI.getOperand(1).getReg();
++  Register D2 = MI.getOperand(2).getReg();
++  Register D3 = MI.getOperand(3).getReg();
++  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  auto Words = Builder.buildUnmerge(S16, Src);     // s32 -> Lo:s16, Hi:s16
++  Builder.buildUnmerge({D0, D1}, Words.getReg(0)); // Lo -> D0, D1
++  Builder.buildUnmerge({D2, D3}, Words.getReg(1)); // Hi -> D2, D3
++  MI.eraseFromParent();
++  return true;
++}
++
++// Native accumulator: a direct 4x s16 -> s64 G_MERGE_VALUES (only reached via customFor({S64,S16})
++// under +mos-a16) — the s64 analogue of legalizeMergeS32FromBytes, one level up: merge each
++// pair of s16 words into an s32 (legal {S32,S16}), then merge the two s32 halves into the s64
++// (legal {S64,S32}). selectMergeValues only takes a 2-source merge, so the 4-source form must be
++// split here, not selected.
++bool MOSLegalizerInfo::legalizeMergeS64FromWords(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S32 = LLT::scalar(32);
++  Register Dst = MI.getOperand(0).getReg();
++  Register W0 = MI.getOperand(1).getReg();
++  Register W1 = MI.getOperand(2).getReg();
++  Register W2 = MI.getOperand(3).getReg();
++  Register W3 = MI.getOperand(4).getReg();
++  auto Lo = Builder.buildMergeValues(S32, {W0, W1});
++  auto Hi = Builder.buildMergeValues(S32, {W2, W3});
++  Builder.buildMergeValues(Dst, {Lo.getReg(0), Hi.getReg(0)});
++  MI.eraseFromParent();
++  return true;
++}
++
++// Native accumulator: a direct 4x s16 <- s64 G_UNMERGE_VALUES (only reached via customFor({S16,S64})
++// under +mos-a16) — the symmetric inverse of legalizeMergeS64FromWords, and the s64 analogue of
++// legalizeUnmergeS32ToBytes: unmerge the s64 into two s32 halves (legal {S32,S64}), then unmerge
++// each half into two s16 words (legal {S16,S32}), reusing the four original word def regs.
++// selectUnmergeValues only takes a 2-dest unmerge, so the 4-dest form must be split here.
++bool MOSLegalizerInfo::legalizeUnmergeS64ToWords(LegalizerHelper &Helper,
++                                                 MachineRegisterInfo &MRI,
++                                                 MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++  const LLT S32 = LLT::scalar(32);
++  Register D0 = MI.getOperand(0).getReg();
++  Register D1 = MI.getOperand(1).getReg();
++  Register D2 = MI.getOperand(2).getReg();
++  Register D3 = MI.getOperand(3).getReg();
++  Register Src = MI.getOperand(4).getReg(); // G_UNMERGE: defs first, source last
++  auto Halves = Builder.buildUnmerge(S32, Src);     // s64 -> Lo:s32, Hi:s32
++  Builder.buildUnmerge({D0, D1}, Halves.getReg(0)); // Lo -> D0, D1
++  Builder.buildUnmerge({D2, D3}, Halves.getReg(1)); // Hi -> D2, D3
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizeAnyExt(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index b979eea6c2b4..9c308482a1e2 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -38,6 +38,18 @@ public:
+                          MachineInstr &MI) const;
+ 
+ private:
++  // Native accumulator: 4x s8 -> s32 G_MERGE_VALUES -> legal 2-level (2x s16) form.
++  bool legalizeMergeS32FromBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
++  // Native accumulator: 4x s8 <- s32 G_UNMERGE_VALUES -> legal 2-level (2x s16) form (mirror).
++  bool legalizeUnmergeS32ToBytes(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
++  // Native accumulator: 4x s16 -> s64 G_MERGE_VALUES -> legal 2-level (2x s32) form (one level up).
++  bool legalizeMergeS64FromWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
++  // Native accumulator: 4x s16 <- s64 G_UNMERGE_VALUES -> legal 2-level (2x s32) form (mirror).
++  bool legalizeUnmergeS64ToWords(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                                 MachineInstr &MI) const;
+   // Integer Extension and Truncation
+   bool legalizeAnyExt(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                       MachineInstr &MI) const;
+diff --git a/llvm/test/CodeGen/MOS/anyext-masked-byte.ll b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
+new file mode 100644
+index 000000000000..e3ba456f0fd6
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/anyext-masked-byte.ll
+@@ -0,0 +1,13 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs %s -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %s -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %s -o /dev/null
++
++; Legalizing the masked byte store can introduce G_ANYEXT s8 -> s64. The
++; extension must lower even when native-width lanes are enabled.
++define void @extend_masked(ptr %out, i8 %value) {
++  %scaled = mul i8 %value, 7
++  %masked = and i8 %scaled, 63
++  %extended = zext i8 %masked to i64
++  store volatile i64 %extended, ptr %out, align 1
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/anyext-wide.mir b/llvm/test/CodeGen/MOS/anyext-wide.mir
+new file mode 100644
+index 000000000000..2e99fc2d4029
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/anyext-wide.mir
+@@ -0,0 +1,79 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=legalizer -verify-machineinstrs %s -o - | FileCheck %s --implicit-check-not=G_ANYEXT
++
++# Wide extensions preserve the source bytes. A shift libcall consumes the low
++# count byte, while a store consumes all bytes of the extended value.
++---
++name: anyext_shift
++body: |
++  bb.0:
++    liveins: $a
++    ; CHECK-LABEL: name: anyext_shift
++    ; CHECK: [[COUNT:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: $rc8 = COPY [[COUNT]](s8)
++    ; CHECK-NEXT: JSR &__ashldi3
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s64) = G_ANYEXT %0
++    %2:_(s64) = G_CONSTANT i64 1
++    %3:_(s64) = G_SHL %2, %1
++    %4:_(p0) = G_CONSTANT i16 512
++    G_STORE %3, %4 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s8_s64_store
++body: |
++  bb.0:
++    liveins: $a
++    ; CHECK-LABEL: name: anyext_s8_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s64) = G_ANYEXT %0
++    %2:_(p0) = G_CONSTANT i16 512
++    G_STORE %1, %2 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s16_s64_store
++body: |
++  bb.0:
++    liveins: $a, $x
++    ; CHECK-LABEL: name: anyext_s16_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: [[HI:%[0-9]+]]:_(s8) = COPY $x
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS [[HI]](s8), 513
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s8) = COPY $x
++    %2:_(s16) = G_MERGE_VALUES %0, %1
++    %3:_(s64) = G_ANYEXT %2
++    %4:_(p0) = G_CONSTANT i16 512
++    G_STORE %3, %4 :: (volatile store (s64))
++    RTS
++...
++---
++name: anyext_s32_s64_store
++body: |
++  bb.0:
++    liveins: $a, $x, $rc2, $rc3
++    ; CHECK-LABEL: name: anyext_s32_s64_store
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = COPY $a
++    ; CHECK: [[HI:%[0-9]+]]:_(s8) = COPY $rc3
++    ; CHECK: G_STORE_ABS [[LO]](s8), 512
++    ; CHECK: G_STORE_ABS [[HI]](s8), 515
++    ; CHECK: G_STORE_ABS {{.*}}, 519
++    %0:_(s8) = COPY $a
++    %1:_(s8) = COPY $x
++    %2:_(s8) = COPY $rc2
++    %3:_(s8) = COPY $rc3
++    %4:_(s32) = G_MERGE_VALUES %0, %1, %2, %3
++    %5:_(s64) = G_ANYEXT %4
++    %6:_(p0) = G_CONSTANT i16 512
++    G_STORE %5, %6 :: (volatile store (s64))
++    RTS
++...
+-- 
+2.53.0
+

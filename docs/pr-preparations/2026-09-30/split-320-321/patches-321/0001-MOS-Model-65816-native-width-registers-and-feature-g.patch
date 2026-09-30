@@ -1,0 +1,179 @@
+From c38fa4cc5a602b3af84e4bdad085b4fcf751566a Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 01/16] [MOS] Model 65816 native-width registers and feature
+ gates
+
+Add two opt-in subtarget features for the WDC 65816: mos-a16 selects 16-bit accumulator codegen, and mos-xy16 selects 16-bit index registers and implies mos-a16. No CPU implies either feature.
+
+The 65816 widens A to 16 bits when the M status bit is clear and X/Y when the X bit is clear. The high accumulator byte B, and the high index bytes, alias the 8-bit registers the backend already models. Add A16 (A:B), X16 (X:XH) and Y16 (Y:YH) as registers covered by their byte halves, so liveness and allocation see a 16-bit value in A16 as clobbering $a and the reverse. The full registers carry the MOS native-mode DWARF numbers 0x01000000-0x01000002; the internal high bytes have no DWARF number. Single-member classes Ac16, Xc16 and Yc16 give later commits allocation targets, and Ac16 joins the register bank. Nothing selects these registers yet.
+
+Default-mode effect: the new classes change the generated register pressure sets (MOSAsmParamRegClass stops being a separate set; Ac16, Xc16 and Yc16 sets appear). MachineLICM, MachineSink and the machine scheduler read pressure sets, so default mos6502 and mosw65816 code changes: 18 of 54 compiling mos6502 inputs and 33 of 78 mosw65816 inputs in the fixed input set produce different assembly. With -disable-machine-licm -disable-machine-sink -enable-misched=false -enable-post-misched=false the outputs are identical. Total default code size over the set grows by 3,478 bytes (mos6502) and 3,202 bytes (mosw65816).
+
+Tests: native-width-registers.mir checks that both features are recognized and that the Ac16, Xc16 and Yc16 classes and the A16, X16 and Y16 registers parse and verify, with sublo naming the existing byte register.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-width-registers.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSFeatures.td            | 16 ++++++++++
+ llvm/lib/Target/MOS/MOSRegisterBanks.td       |  5 ++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.td        | 32 +++++++++++++++++++
+ llvm/lib/Target/MOS/MOSSubtarget.h            |  8 +++++
+ .../CodeGen/MOS/native-width-registers.mir    | 28 ++++++++++++++++
+ 5 files changed, 88 insertions(+), 1 deletion(-)
+ create mode 100644 llvm/test/CodeGen/MOS/native-width-registers.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSFeatures.td b/llvm/lib/Target/MOS/MOSFeatures.td
+index 76d7409c1f1b..180dbaf85a09 100644
+--- a/llvm/lib/Target/MOS/MOSFeatures.td
++++ b/llvm/lib/Target/MOS/MOSFeatures.td
+@@ -19,3 +19,19 @@ def FeatureStaticStack :
+   SubtargetFeature<
+     "static-stack", "StaticStack", "true",
+     "Whether to use statically-allocated stack frames if possible.">;
++
++// Native widths: opt-in 16-bit accumulator mode for the WDC 65816 (REP/SEP-bracketed
++// 16-bit-A codegen). Enable with -mattr=+mos-a16; NOT implied by FamilyW65816,
++// so default mosw65816 codegen is unaffected.
++def FeatureAccum16 :
++  SubtargetFeature<
++    "mos-a16", "HasAccum16", "true",
++    "16-bit accumulator mode (insert REP/SEP) on the WDC 65816.">;
++
++// Native indices: opt-in 16-bit index register mode for the WDC 65816.
++// Implies +mos-a16: soft-stack spill uses TXA→A16→STA (needs M=0 bracket).
++def FeatureIndex16 :
++  SubtargetFeature<
++    "mos-xy16", "HasIndex16", "true",
++    "16-bit index register mode (insert REP/SEP X) on the WDC 65816.",
++    [FeatureAccum16]>;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterBanks.td b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+index 868f6c71270a..d7e981ef61dc 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterBanks.td
++++ b/llvm/lib/Target/MOS/MOSRegisterBanks.td
+@@ -11,4 +11,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ // Register banks are unused, so place everything in one big bank.
+-def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Fakei32, Fakei64]>;
++// Native widths: Ac16 (the 16-bit accumulator A16) joins the bank so 16-bit
++// accumulator ops can be allocated. Allocation to A16 is forced by the Ac16
++// register class on the selected ops, not by the bank (banks are unused here).
++def AnyRegBank : RegisterBank<"Any", [Anyi1, Anyi8, Imag16, Ac16, Fakei32, Fakei64]>;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index 5d4b239d1f3d..e64c0860e596 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -111,6 +111,28 @@ def P : MOSReg<3, "P"> {
+   let SubRegIndices = [subcarry, subnz, subv];
+ }
+ 
++// Native registers alias their byte halves for allocation and liveness. The
++// full registers use the MOS DWARF native-mode numbers. Internal high-byte
++// pieces have no standalone DWARF location.
++def B : MOSReg<0, "b"> { let DwarfNumbers = [-1]; }
++def A16 : MOSReg<0x01000000, "a16"> {
++  let SubRegs = [A, B];
++  let SubRegIndices = [sublo, subhi];
++  let CoveredBySubRegs = 1;
++}
++def XH : MOSReg<0, "xh"> { let DwarfNumbers = [-1]; }
++def YH : MOSReg<0, "yh"> { let DwarfNumbers = [-1]; }
++def X16 : MOSReg<0x01000001, "x16"> {
++  let SubRegs = [X, XH];
++  let SubRegIndices = [sublo, subhi];
++  let CoveredBySubRegs = 1;
++}
++def Y16 : MOSReg<0x01000002, "y16"> {
++  let SubRegs = [Y, YH];
++  let SubRegIndices = [sublo, subhi];
++  let CoveredBySubRegs = 1;
++}
++
+ //===----------------------------------------------------------------------===//
+ //  Imaginary registers
+ //===----------------------------------------------------------------------===//
+@@ -212,6 +234,16 @@ let isPressureFineGrained = true in {
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+ 
++// Native widths: the 16-bit accumulator as a register class (single member,
++// A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
++// under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
++def Ac16 : MOSReg16Class<(add A16)>;
++
++// Native indices: 16-bit index register classes, one member each. Used only under
++// +mos-xy16; inert otherwise. Mirror Ac16.
++def Xc16 : MOSReg16Class<(add X16)>;
++def Yc16 : MOSReg16Class<(add Y16)>;
++
+ // Instruction-specific register classes.
+ def AImag8 : MOSReg8Class<(add Imag8, A)>;
+ let isPressureFineGrained = true in {
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+index 6d303255c67f..5cb39f7dfefe 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.h
++++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+@@ -115,6 +115,12 @@ public:
+   bool hasJMPIdxIndir() const { return has65C02() || hasSPC700(); }
+   bool staticStack() const { return StaticStack; }
+ 
++  // Native widths: opt-in 16-bit accumulator mode (REP/SEP-bracketed 16-bit-A codegen).
++  bool hasAccum16() const { return HasAccum16; }
++
++  // Native indices: opt-in 16-bit index register mode (REP/SEP-bracketed 16-bit-X/Y).
++  bool hasIndex16() const { return HasIndex16; }
++
+   bool hasW65816Or65EL02() const { return HasW65816Insns || Has65EL02Insns; }
+ 
+ private:
+@@ -140,6 +146,8 @@ private:
+ 
+   bool LongRegisterNames = false;
+   bool StaticStack = false;
++  bool HasAccum16 = false;
++  bool HasIndex16 = false;
+ 
+   // Dummy member, used by FeatureSet's. We cannot have a SubtargetFeature with
+   // no variable, so we instead bind pseudo features to this variable.
+diff --git a/llvm/test/CodeGen/MOS/native-width-registers.mir b/llvm/test/CodeGen/MOS/native-width-registers.mir
+new file mode 100644
+index 000000000000..4f5f668dde7d
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-width-registers.mir
+@@ -0,0 +1,28 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=none -verify-machineinstrs %s -o - 2>&1 | FileCheck %s
++
++# The native-width features are recognized, and the 16-bit registers and
++# classes they add parse and verify. A16, X16 and Y16 are covered by their
++# byte halves: sublo of each is the 8-bit register the backend already uses.
++
++# CHECK-NOT: not a recognized feature
++# CHECK-LABEL: name: native_registers
++# CHECK: %0:ac16 = COPY $a16
++# CHECK-NEXT: %1:xc16 = COPY $x16
++# CHECK-NEXT: %2:yc16 = COPY $y16
++# CHECK-NEXT: $a = COPY %0.sublo
++# CHECK-NEXT: $x = COPY %1.sublo
++# CHECK-NEXT: $y = COPY %2.sublo
++---
++name: native_registers
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a16, $x16, $y16
++    %0:ac16 = COPY $a16
++    %1:xc16 = COPY $x16
++    %2:yc16 = COPY $y16
++    $a = COPY %0.sublo
++    $x = COPY %1.sublo
++    $y = COPY %2.sublo
++    RTS implicit $a, implicit $x, implicit $y
++...
+-- 
+2.53.0
+

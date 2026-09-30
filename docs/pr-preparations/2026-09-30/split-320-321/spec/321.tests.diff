@@ -1,0 +1,892 @@
+diff --git a/llvm/test/MC/MOS/index-width-mapping-65816.s b/llvm/test/MC/MOS/index-width-mapping-65816.s
+new file mode 100644
+index 0000000..b0a5ff0
+--- /dev/null
++++ b/llvm/test/MC/MOS/index-width-mapping-65816.s
+@@ -0,0 +1,54 @@
++# RUN: llvm-mc -triple=mos -mcpu=mosw65816 -filetype=obj %s -o %t.o
++# RUN: llvm-objdump -t %t.o | FileCheck %s
++
++# The 8-bit index-register memory forms require 8-bit index registers, so on
++# the 65816 each of them opens an $xh mapping region after a 16-bit index
++# instruction. Every probe below follows a 16-bit `ldx` ($xl), so each one
++# must start its own $xh region at its own offset.
++
++# CHECK-DAG: 00000003 l .text 00000000 $xh.1
++# CHECK-DAG: 00000008 l .text 00000000 $xh.3
++# CHECK-DAG: 0000000d l .text 00000000 $xh.5
++# CHECK-DAG: 00000013 l .text 00000000 $xh.7
++# CHECK-DAG: 00000018 l .text 00000000 $xh.9
++# CHECK-DAG: 0000001e l .text 00000000 $xh.11
++# CHECK-DAG: 00000023 l .text 00000000 $xh.13
++# CHECK-DAG: 00000029 l .text 00000000 $xh.15
++# CHECK-DAG: 0000002e l .text 00000000 $xh.17
++# CHECK-DAG: 00000034 l .text 00000000 $xh.19
++# CHECK-DAG: 00000039 l .text 00000000 $xh.21
++# CHECK-DAG: 0000003e l .text 00000000 $xh.23
++# CHECK-DAG: 00000044 l .text 00000000 $xh.25
++# CHECK-DAG: 00000049 l .text 00000000 $xh.27
++# CHECK-DAG: 0000004f l .text 00000000 $xh.29
++
++ldx #mos16($1234)
++stx $12
++ldx #mos16($1234)
++stx $12,y
++ldx #mos16($1234)
++stx $1234
++ldx #mos16($1234)
++ldx $12
++ldx #mos16($1234)
++ldx $1234
++ldx #mos16($1234)
++ldx $12,y
++ldx #mos16($1234)
++ldx $1234,y
++ldx #mos16($1234)
++sty $12
++ldx #mos16($1234)
++sty $1234
++ldx #mos16($1234)
++sty $12,x
++ldx #mos16($1234)
++ldy $12,x
++ldx #mos16($1234)
++ldy $1234,x
++ldx #mos16($1234)
++ldy $12
++ldx #mos16($1234)
++cpy $1234
++ldx #mos16($1234)
++cpx $12
+diff --git a/llvm/test/CodeGen/MOS/native-width-registers.mir b/llvm/test/CodeGen/MOS/native-width-registers.mir
+new file mode 100644
+index 0000000..4f5f668
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-width-registers.mir
+@@ -0,0 +1,28 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=none -verify-machineinstrs %s -o - 2>&1 | FileCheck %s
++
++# The native-width features are recognized, and the 16-bit registers and
++# classes they add parse and verify. A16, X16 and Y16 are covered by their
++# byte halves: sublo of each is the 8-bit register the backend already uses.
++
++# CHECK-NOT: not a recognized feature
++# CHECK-LABEL: name: native_registers
++# CHECK: %0:ac16 = COPY $a16
++# CHECK-NEXT: %1:xc16 = COPY $x16
++# CHECK-NEXT: %2:yc16 = COPY $y16
++# CHECK-NEXT: $a = COPY %0.sublo
++# CHECK-NEXT: $x = COPY %1.sublo
++# CHECK-NEXT: $y = COPY %2.sublo
++---
++name: native_registers
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $a16, $x16, $y16
++    %0:ac16 = COPY $a16
++    %1:xc16 = COPY $x16
++    %2:yc16 = COPY $y16
++    $a = COPY %0.sublo
++    $x = COPY %1.sublo
++    $y = COPY %2.sublo
++    RTS implicit $a, implicit $x, implicit $y
++...
+diff --git a/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir b/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+new file mode 100644
+index 0000000..0f0a6e8
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+@@ -0,0 +1,66 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=branch-relaxation -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=branch-relaxation -verify-machineinstrs -filetype=obj %s -o %t.o
++# RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++
++# Each 16-bit accumulator pseudo emits the width-agnostic opcode of its
++# addressing mode. A 16-bit immediate that would fit an 8-bit field prints as
++# mos16(value), so the text reassembles to the three-byte form; a value above
++# 255 already states its width and prints bare. The object carries the
++# three-byte immediate encodings.
++
++# CHECK-LABEL: accumulator_forms:
++# CHECK:      lda __rc2
++# CHECK-NEXT: clc
++# CHECK-NEXT: adc #mos16(66)
++# CHECK-NEXT: adc #43981
++# CHECK-NEXT: and #mos16(255)
++# CHECK-NEXT: ora {{.*}}g
++# CHECK-NEXT: eor __rc4
++# CHECK-NEXT: cmp #mos16(5)
++# CHECK-NEXT: asl
++# CHECK-NEXT: lsr
++# CHECK-NEXT: inc
++# CHECK-NEXT: dec
++# CHECK-NEXT: sta __rc2
++# CHECK-NEXT: sta {{.*}}g
++# CHECK-NEXT: rts
++
++# OBJ-LABEL: <accumulator_forms>:
++# OBJ:      a5 00 {{.*}}lda
++# OBJ-NEXT: 18 {{.*}}clc
++# OBJ-NEXT: 69 42 00 {{.*}}adc
++# OBJ-NEXT: 69 cd ab {{.*}}adc
++# OBJ-NEXT: 29 ff 00 {{.*}}and
++# OBJ:      45 00 {{.*}}eor
++# OBJ-NEXT: c9 05 00 {{.*}}cmp
++# OBJ-NEXT: 0a {{.*}}asl
++# OBJ-NEXT: 4a {{.*}}lsr
++# OBJ-NEXT: 1a {{.*}}inc
++# OBJ-NEXT: 3a {{.*}}dec
++# OBJ-NEXT: 85 00 {{.*}}sta
++--- |
++  @g = global i16 0
++  define void @accumulator_forms() { ret void }
++...
++---
++name: accumulator_forms
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1, $rs2
++    $a16 = LDAImag16 $rs1
++    $c = LDCImm 0
++    $a16, $c, $v = ADCImm16 $a16, 66, $c
++    $a16, $c, $v = ADCImm16 $a16, 43981, $c
++    $a16 = ANDImm16 $a16, 255
++    $a16 = ORAAbs16 $a16, @g
++    $a16 = EORImag16 $a16, $rs2
++    $c = CMPImm16 $a16, 5, implicit-def $nz
++    $a16 = ASLAcc16 $a16, implicit-def $c
++    $a16 = LSRAcc16 $a16, implicit-def $c
++    $a16 = INCAcc16 $a16
++    $a16 = DECAcc16 $a16
++    $rs1 = STAImag16 $a16
++    STAbs16 killed $a16, @g
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/xy16-index-forms.mir b/llvm/test/CodeGen/MOS/xy16-index-forms.mir
+new file mode 100644
+index 0000000..403784f
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/xy16-index-forms.mir
+@@ -0,0 +1,53 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -start-before=branch-relaxation -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -start-before=branch-relaxation -verify-machineinstrs -filetype=obj %s -o %t.o
++# RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++
++# Each 16-bit index pseudo emits the width-agnostic opcode of its addressing
++# mode; the object carries the three-byte index immediates.
++
++# CHECK-LABEL: index_forms:
++# CHECK:      ldx #511
++# CHECK-NEXT: inx
++# CHECK-NEXT: cpx #4660
++# CHECK-NEXT: ldy __rc2
++# CHECK-NEXT: dey
++# CHECK-NEXT: sty __rc4
++# CHECK-NEXT: lda {{.*}}t,x
++# CHECK-NEXT: pha
++# CHECK-NEXT: txa
++# CHECK-NEXT: tax
++# CHECK-NEXT: pla
++# CHECK-NEXT: sta {{.*}}t,x
++# CHECK-NEXT: rts
++
++# OBJ-LABEL: <index_forms>:
++# OBJ:      a2 ff 01 {{.*}}ldx
++# OBJ-NEXT: e8 {{.*}}inx
++# OBJ-NEXT: e0 34 12 {{.*}}cpx
++# OBJ-NEXT: a4 00 {{.*}}ldy
++# OBJ-NEXT: 88 {{.*}}dey
++# OBJ-NEXT: 84 00 {{.*}}sty
++--- |
++  @t = global [4 x i16] zeroinitializer
++  define void @index_forms() { ret void }
++...
++---
++name: index_forms
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1, $rs2
++    $x16 = LDXImm16 511
++    $x16 = INX16 $x16
++    $c = CPXImm16 $x16, 4660
++    $y16 = LDYImag16 $rs1
++    $y16 = DEY16 $y16
++    $rs2 = STYImag16 $y16
++    $a16 = LDAbsXIdx16 @t, $x16
++    PHA16 $a16
++    $a16 = TXA16 $x16
++    $x16 = TAX16 $a16
++    $a16 = PLA16
++    STAbsXIdx16 killed $a16, @t, $x16
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
+new file mode 100644
+index 0000000..e04a407
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
+@@ -0,0 +1,314 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O0 -stop-after=prolog-epilog -verify-machineinstrs < %s | FileCheck %s
++
++; Stock 6502 at -O0 (reduced with llvm-reduce from gcc.c-torture/execute/strlen-4.c).
++; The frame is larger than 255 bytes, so a frame-index expansion is an
++; AddrLostk/AddrHistk carry chain whose carry the register scavenger must place
++; in $c. The fast register allocator reloads a spilled pointer between the `sec`
++; that seeds a 16-bit subtraction and the `sbc` that consumes it, so $c is live
++; across that reload and the scavenger must preserve $p around it.
++;
++; Both directions of the save are pinned:
++;   * where nothing of $p holds a value (the preceding ADC dead-flagged $c and
++;     $v), the PHP must read an undef $p, or the verifier rejects it;
++;   * where $c is live, the PHP must stay a plain `PH $p`; an over-eager undef
++;     would let that flag definition move or die.
++; Without the undef flag the verifier rejects the first push after Prologue/
++; Epilogue Insertion ("Using an undefined physical register" on PH $p).
++
++; CHECK-LABEL: name: test_array_ptr
++; CHECK: PH undef $p
++; CHECK: $p = PL
++; CHECK: PH $p
++; CHECK-NOT: PH undef $p
++; CHECK: $p = PL
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++target triple = "mos"
++
++; Function Attrs: noinline optnone
++define ptr @test_array_ptr(ptr %0, i16 %1, ptr %2, ptr %3, i16 %4, i16 %5, i16 %6, i16 %7) #0 {
++  %9 = alloca i16, align 1
++  %10 = alloca i16, align 1
++  %11 = alloca i16, align 1
++  br i1 false, label %13, label %12
++
++12:                                               ; preds = %8
++  unreachable
++
++13:                                               ; preds = %8
++  br i1 false, label %15, label %14
++
++14:                                               ; preds = %13
++  unreachable
++
++15:                                               ; preds = %13
++  br i1 false, label %17, label %16
++
++16:                                               ; preds = %15
++  unreachable
++
++17:                                               ; preds = %15
++  br i1 false, label %19, label %18
++
++18:                                               ; preds = %17
++  unreachable
++
++19:                                               ; preds = %17
++  %20 = load i16, ptr null, align 1
++  %21 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %20
++  %22 = load i16, ptr %9, align 1
++  %23 = getelementptr [3 x [28 x i8]], ptr %21, i16 0, i16 %22
++  %24 = load i16, ptr %9, align 1
++  %25 = getelementptr [28 x i8], ptr %23, i16 %24
++  %26 = load volatile i16, ptr %25, align 1
++  br i1 false, label %28, label %27
++
++27:                                               ; preds = %19
++  unreachable
++
++28:                                               ; preds = %19
++  %29 = load i16, ptr %9, align 1
++  %30 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %29
++  %31 = load i16, ptr %9, align 1
++  %32 = getelementptr [3 x [28 x i8]], ptr %30, i16 0, i16 %31
++  %33 = load i16, ptr null, align 1
++  %34 = getelementptr [28 x i8], ptr %32, i16 %33
++  %35 = load volatile i16, ptr %34, align 1
++  br i1 false, label %37, label %36
++
++36:                                               ; preds = %28
++  unreachable
++
++37:                                               ; preds = %28
++  %38 = load i16, ptr %3, align 1
++  %39 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %38
++  %40 = load i16, ptr %0, align 1
++  %41 = getelementptr [3 x [28 x i8]], ptr %39, i16 0, i16 %40
++  %42 = load i16, ptr null, align 1
++  %43 = getelementptr [28 x i8], ptr %41, i16 %42
++  %44 = load volatile i16, ptr %43, align 1
++  %45 = load i16, ptr null, align 1
++  %46 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %45
++  %47 = load i16, ptr null, align 1
++  %48 = getelementptr [3 x [28 x i8]], ptr %46, i16 0, i16 %47
++  %49 = load i16, ptr null, align 1
++  %50 = getelementptr [28 x i8], ptr %48, i16 %49
++  %51 = load volatile i16, ptr %50, align 1
++  br label %52
++
++52:                                               ; preds = %37
++  %53 = load volatile i16, ptr %2, align 1
++  br i1 false, label %55, label %54
++
++54:                                               ; preds = %52
++  unreachable
++
++55:                                               ; preds = %52
++  %56 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %4
++  %57 = load i16, ptr %10, align 1
++  %58 = getelementptr [3 x [28 x i8]], ptr %56, i16 0, i16 %57
++  %59 = load i16, ptr %10, align 1
++  %60 = getelementptr [28 x i8], ptr %58, i16 %59
++  %61 = load volatile i16, ptr %60, align 1
++  br i1 false, label %63, label %62
++
++62:                                               ; preds = %55
++  unreachable
++
++63:                                               ; preds = %55
++  %64 = load i16, ptr null, align 1
++  %65 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %64
++  %66 = load i16, ptr %11, align 1
++  %67 = getelementptr [3 x [28 x i8]], ptr %65, i16 0, i16 %66
++  %68 = load i16, ptr %11, align 1
++  %69 = getelementptr [28 x i8], ptr %67, i16 %68
++  %70 = load volatile i16, ptr %69, align 1
++  %71 = load i16, ptr null, align 1
++  %72 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %71
++  %73 = load i16, ptr null, align 1
++  %74 = getelementptr [3 x [28 x i8]], ptr %72, i16 0, i16 %73
++  %75 = load i16, ptr null, align 1
++  %76 = getelementptr [28 x i8], ptr %74, i16 %75
++  %77 = load volatile i16, ptr %76, align 1
++  %78 = load i16, ptr null, align 1
++  %79 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %78
++  %80 = load i16, ptr null, align 1
++  %81 = getelementptr [3 x [28 x i8]], ptr %79, i16 0, i16 %80
++  %82 = load i16, ptr null, align 1
++  %83 = getelementptr [28 x i8], ptr %81, i16 %82
++  %84 = load volatile i16, ptr %83, align 1
++  %85 = load i16, ptr null, align 1
++  %86 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %85
++  %87 = load i16, ptr %9, align 1
++  %88 = getelementptr [3 x [28 x i8]], ptr %86, i16 0, i16 %87
++  %89 = load i16, ptr %9, align 1
++  %90 = getelementptr [28 x i8], ptr %88, i16 %89
++  %91 = load volatile i16, ptr %90, align 1
++  %92 = load i16, ptr null, align 1
++  %93 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %92
++  %94 = load i16, ptr null, align 1
++  %95 = getelementptr [3 x [28 x i8]], ptr %93, i16 0, i16 %94
++  %96 = load i16, ptr null, align 1
++  %97 = getelementptr [28 x i8], ptr %95, i16 %96
++  %98 = load volatile i16, ptr %97, align 1
++  %99 = load i16, ptr null, align 1
++  %100 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %99
++  %101 = load i16, ptr null, align 1
++  %102 = getelementptr [3 x [28 x i8]], ptr %100, i16 0, i16 %101
++  %103 = load i16, ptr null, align 1
++  %104 = getelementptr [28 x i8], ptr %102, i16 %103
++  %105 = load volatile i16, ptr %104, align 1
++  %106 = load i16, ptr %10, align 1
++  %107 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %106
++  %108 = load i16, ptr %10, align 1
++  %109 = getelementptr [3 x [28 x i8]], ptr %107, i16 0, i16 %108
++  %110 = load i16, ptr null, align 1
++  %111 = getelementptr [28 x i8], ptr %109, i16 %110
++  %112 = load volatile i16, ptr %111, align 1
++  br label %113
++
++113:                                              ; preds = %63
++  %114 = load i16, ptr %10, align 1
++  %115 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %114
++  %116 = load i16, ptr %10, align 1
++  %117 = getelementptr [3 x [28 x i8]], ptr %115, i16 0, i16 %116
++  %118 = load i16, ptr null, align 1
++  %119 = getelementptr [28 x i8], ptr %117, i16 %118
++  %120 = load volatile i16, ptr %119, align 1
++  br i1 false, label %122, label %121
++
++121:                                              ; preds = %113
++  unreachable
++
++122:                                              ; preds = %113
++  %123 = load i16, ptr %10, align 1
++  %124 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %123
++  %125 = load i16, ptr %10, align 1
++  %126 = getelementptr [3 x [28 x i8]], ptr %124, i16 0, i16 %125
++  %127 = load i16, ptr null, align 1
++  %128 = getelementptr [28 x i8], ptr %126, i16 %127
++  %129 = load volatile i16, ptr %128, align 1
++  br i1 false, label %131, label %130
++
++130:                                              ; preds = %122
++  unreachable
++
++131:                                              ; preds = %122
++  %132 = load i16, ptr null, align 1
++  %133 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %132
++  %134 = load i16, ptr %11, align 1
++  %135 = getelementptr [3 x [28 x i8]], ptr %133, i16 0, i16 %134
++  %136 = load i16, ptr %11, align 1
++  %137 = getelementptr [28 x i8], ptr %135, i16 %136
++  %138 = load volatile i16, ptr %137, align 1
++  %139 = load i16, ptr null, align 1
++  %140 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %139
++  %141 = load i16, ptr null, align 1
++  %142 = getelementptr [3 x [28 x i8]], ptr %140, i16 0, i16 %141
++  %143 = load i16, ptr null, align 1
++  %144 = getelementptr [28 x i8], ptr %142, i16 %143
++  %145 = load volatile i16, ptr %144, align 1
++  br label %146
++
++146:                                              ; preds = %131
++  %147 = load i16, ptr null, align 1
++  %148 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %147
++  %149 = load i16, ptr null, align 1
++  %150 = getelementptr [3 x [28 x i8]], ptr %148, i16 0, i16 %149
++  %151 = load i16, ptr %9, align 1
++  %152 = getelementptr [28 x i8], ptr %150, i16 %151
++  %153 = load volatile i16, ptr %152, align 1
++  %154 = load i16, ptr %9, align 1
++  %155 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %154
++  %156 = load i16, ptr null, align 1
++  %157 = getelementptr [3 x [28 x i8]], ptr %155, i16 0, i16 %156
++  %158 = load i16, ptr null, align 1
++  %159 = getelementptr [28 x i8], ptr %157, i16 %158
++  %160 = load volatile i16, ptr %159, align 1
++  br i1 false, label %162, label %161
++
++161:                                              ; preds = %146
++  unreachable
++
++162:                                              ; preds = %146
++  %163 = load i16, ptr %9, align 1
++  %164 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %163
++  %165 = load i16, ptr %9, align 1
++  %166 = getelementptr [3 x [28 x i8]], ptr %164, i16 0, i16 %165
++  %167 = load i16, ptr null, align 1
++  %168 = getelementptr [28 x i8], ptr %166, i16 %167
++  %169 = load volatile i16, ptr %168, align 1
++  br i1 false, label %171, label %170
++
++170:                                              ; preds = %162
++  unreachable
++
++171:                                              ; preds = %162
++  %172 = load i16, ptr %9, align 1
++  %173 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %172
++  %174 = load i16, ptr %9, align 1
++  %175 = getelementptr [3 x [28 x i8]], ptr %173, i16 0, i16 %174
++  %176 = load i16, ptr null, align 1
++  %177 = getelementptr [28 x i8], ptr %175, i16 %176
++  %178 = load volatile i16, ptr %177, align 1
++  br i1 false, label %180, label %179
++
++179:                                              ; preds = %171
++  unreachable
++
++180:                                              ; preds = %171
++  %181 = load i16, ptr null, align 1
++  %182 = getelementptr [3 x [28 x i8]], ptr null, i16 0, i16 %181
++  %183 = sub i16 0, %1
++  %184 = getelementptr [28 x i8], ptr %182, i16 %183
++  %185 = call i16 null(ptr %184)
++  %186 = icmp eq i16 %4, 1
++  br i1 %186, label %188, label %187
++
++187:                                              ; preds = %180
++  unreachable
++
++188:                                              ; preds = %180
++  %189 = load i16, ptr null, align 1
++  %190 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %189
++  %191 = load i16, ptr null, align 1
++  %192 = getelementptr [3 x [28 x i8]], ptr %190, i16 0, i16 %191
++  %193 = load i16, ptr null, align 1
++  %194 = getelementptr [28 x i8], ptr %192, i16 %193
++  %195 = load volatile i16, ptr %194, align 1
++  %196 = load i16, ptr null, align 1
++  %197 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %196
++  %198 = load i16, ptr null, align 1
++  %199 = getelementptr [3 x [28 x i8]], ptr %197, i16 0, i16 %198
++  %200 = load i16, ptr null, align 1
++  %201 = getelementptr [28 x i8], ptr %199, i16 %200
++  %202 = load volatile i16, ptr %201, align 1
++  %203 = load i16, ptr null, align 1
++  %204 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %203
++  %205 = load i16, ptr null, align 1
++  %206 = getelementptr [3 x [28 x i8]], ptr %204, i16 0, i16 %205
++  %207 = load i16, ptr null, align 1
++  %208 = getelementptr [28 x i8], ptr %206, i16 %207
++  %209 = load volatile i16, ptr %208, align 1
++  %210 = load i16, ptr null, align 1
++  %211 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %210
++  %212 = load i16, ptr null, align 1
++  %213 = getelementptr [3 x [28 x i8]], ptr %211, i16 0, i16 %212
++  %214 = load i16, ptr null, align 1
++  %215 = getelementptr [28 x i8], ptr %213, i16 %214
++  %216 = load volatile i16, ptr %215, align 1
++  %217 = load i16, ptr null, align 1
++  %218 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %217
++  %219 = getelementptr [3 x [28 x i8]], ptr %218, i16 0, i16 %5
++  %220 = load i16, ptr null, align 1
++  %221 = getelementptr [28 x i8], ptr %219, i16 %220
++  %222 = load volatile i16, ptr %221, align 1
++  %223 = load i16, ptr null, align 1
++  %224 = getelementptr [2 x [3 x [28 x i8]]], ptr null, i16 0, i16 %223
++  %225 = getelementptr [3 x [28 x i8]], ptr %224, i16 0, i16 %6
++  %226 = getelementptr [28 x i8], ptr %225, i16 %7
++  %227 = load volatile i16, ptr %226, align 1
++  ret ptr %2
++}
++
++attributes #0 = { noinline optnone }
+diff --git a/llvm/test/CodeGen/MOS/native-spill-copy.mir b/llvm/test/CodeGen/MOS/native-spill-copy.mir
+new file mode 100644
+index 0000000..00f10db
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-spill-copy.mir
+@@ -0,0 +1,69 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=prolog-epilog -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=postrapseudos -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=COPY
++
++# A soft-stack spill of A16 is one word store or load through the exact slot
++# pointer; a slot at a nonzero offset first forms that pointer, because (zp)
++# addressing has no index.
++
++# CHECK-LABEL: name: spill_a16
++# CHECK:     $rc6 = COPY killed $a
++# CHECK:     $rc7 = COPY killed $a
++# CHECK:     STAIndir16 $a16, $rs3
++# CHECK-NEXT: STAIndir16 $a16, $rs0
++# CHECK:     $a16 = LDAIndir16 $rs4
++---
++name: spill_a16
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++  - { id: 1, type: spill-slot, size: 2, alignment: 1 }
++body: |
++  bb.0:
++    liveins: $a16
++    dead early-clobber renamable $rs3 = STStk renamable $a16, %stack.0, 0
++    dead early-clobber renamable $rs3 = STStk renamable $a16, %stack.1, 0
++    renamable $a16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    RTS implicit $a16
++...
++
++# X16 has no (zp) store of its own, so its spill is staged through A16. A16
++# is live across the spill here, so the expansion saves it with PHA16/PLA16.
++
++# CHECK-LABEL: name: spill_x16_a_live
++# CHECK:      PHA16 $a16
++# CHECK-NEXT: $a16 = TXA16 $x16
++# CHECK-NEXT: STAIndir16 killed $a16, $rs0
++# CHECK-NEXT: $a16 = PLA16
++# CHECK-NEXT: PHA16 $a16
++# CHECK-NEXT: $a16 = LDAIndir16 $rs0
++# CHECK-NEXT: $x16 = TAX16 killed $a16
++# CHECK-NEXT: $a16 = PLA16
++---
++name: spill_x16_a_live
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++body: |
++  bb.0:
++    liveins: $a16, $x16
++    dead early-clobber renamable $rs3 = STStk killed renamable $x16, %stack.0, 0
++    renamable $x16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    RTS implicit $a16, implicit $x16
++...
++
++# Copies between a 16-bit index register and an Imag16 pair are one index
++# load or store of the pair.
++
++# COPY-LABEL: name: copy_index
++# COPY:      $x16 = LDXImag16 $rs1
++# COPY-NEXT: $rs2 = STYImag16 $y16
++---
++name: copy_index
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1, $y16
++    $x16 = COPY killed $rs1
++    $rs2 = COPY killed $y16
++    RTS implicit $x16, implicit $rs2
++...
+diff --git a/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir b/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+new file mode 100644
+index 0000000..ca86aea
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+@@ -0,0 +1,57 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=register-coalescer -verify-machineinstrs %s -o - | FileCheck %s
++
++# A value read straight out of a call-clobbered imaginary register ($rcN)
++# must not be folded into an Imag16 pair when it stays live across a call
++# that clobbers $rcN: the pair would inherit the $rcN hint and could be
++# assigned $rcN across the clobber. The COPYs are kept, so each byte gets its
++# own register.
++
++# CHECK-LABEL: name: live_across_call
++# CHECK:      JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++# CHECK-NEXT: [[LO:%[0-9]+]]:imag8 = COPY $rc2
++# CHECK-NEXT: [[HI:%[0-9]+]]:imag8 = COPY $rc3
++# CHECK-NEXT: JSR @g, mos_csr
++# CHECK-NEXT: undef [[PAIR:%[0-9]+]].sublo:imag16 = COPY [[LO]]
++# CHECK-NEXT: [[PAIR]].subhi:imag16 = COPY [[HI]]
++# CHECK-NEXT: $rs1 = COPY [[PAIR]]
++
++# Without an intervening call the guard does not apply, and the bytes are
++# coalesced into the pair as usual.
++
++# CHECK-LABEL: name: no_call_between
++# CHECK:      JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++# CHECK-NEXT: undef [[PAIR2:%[0-9]+]].sublo:imag16 = COPY $rc2
++# CHECK-NEXT: [[PAIR2]].subhi:imag16 = COPY $rc3
++# CHECK-NEXT: $rs1 = COPY [[PAIR2]]
++--- |
++  declare void @g()
++  define i16 @live_across_call() { ret i16 0 }
++  define i16 @no_call_between() { ret i16 0 }
++...
++---
++name: live_across_call
++tracksRegLiveness: true
++body: |
++  bb.0:
++    JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++    %0:imag8 = COPY $rc2
++    %1:imag8 = COPY $rc3
++    JSR @g, mos_csr
++    undef %2.sublo:imag16 = COPY %0
++    %2.subhi:imag16 = COPY %1
++    $rs1 = COPY %2
++    RTS implicit $rs1
++...
++---
++name: no_call_between
++tracksRegLiveness: true
++body: |
++  bb.0:
++    JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++    %0:imag8 = COPY $rc2
++    %1:imag8 = COPY $rc3
++    undef %2.sublo:imag16 = COPY %0
++    %2.subhi:imag16 = COPY %1
++    $rs1 = COPY %2
++    RTS implicit $rs1
++...
+diff --git a/llvm/test/CodeGen/MOS/a16-load-store.ll b/llvm/test/CodeGen/MOS/a16-load-store.ll
+new file mode 100644
+index 0000000..92d804c
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-load-store.ll
+@@ -0,0 +1,89 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++
++; Under +mos-a16, a 16-bit value moves through memory with one word load and
++; one word store in a single rep/sep bracket, whether the address is absolute,
++; a runtime pointer, or a runtime pointer with a Y index. A loaded value may
++; pass through its Imag16 home between the two accesses, still in M=0.
++
++@g = global i16 0, align 1
++@h = global i16 0, align 1
++
++define void @copy_indirect_to_global(ptr %p) {
++; CHECK-LABEL: copy_indirect_to_global:
++; CHECK:      rep #32
++; CHECK-NEXT: lda (__rc2)
++; CHECK-NEXT: sta g
++; CHECK-NEXT: sep #32
++; CHECK-NEXT: rts
++  %v = load i16, ptr %p, align 1
++  store i16 %v, ptr @g, align 1
++  ret void
++}
++
++define void @copy_global_to_global() {
++; CHECK-LABEL: copy_global_to_global:
++; CHECK:      rep #32
++; CHECK-NEXT: lda g
++; CHECK-NOT:  sep
++; CHECK:      sta h
++; CHECK-NEXT: sep #32
++; CHECK-NEXT: rts
++  %v = load volatile i16, ptr @g, align 1
++  store volatile i16 %v, ptr @h, align 1
++  ret void
++}
++
++define void @copy_global_to_indirect(ptr %p) {
++; CHECK-LABEL: copy_global_to_indirect:
++; CHECK:      rep #32
++; CHECK-NEXT: lda g
++; CHECK-NEXT: sta (__rc2)
++; CHECK-NEXT: sep #32
++; CHECK-NEXT: rts
++  %v = load i16, ptr @g, align 1
++  store i16 %v, ptr %p, align 1
++  ret void
++}
++
++define void @load_runtime_index(ptr %p, i8 %i) {
++; CHECK-LABEL: load_runtime_index:
++; CHECK:      tay
++; CHECK-NEXT: rep #32
++; CHECK-NEXT: lda (__rc2),y
++; CHECK-NOT:  sep
++; CHECK:      sta g
++; CHECK-NEXT: sep #32
++; CHECK-NEXT: rts
++  %x = zext i8 %i to i16
++  %s = getelementptr inbounds nuw i8, ptr %p, i16 %x
++  %v = load volatile i16, ptr %s, align 1
++  store volatile i16 %v, ptr @g, align 1
++  ret void
++}
++
++define void @load_constant_offset(ptr %p) {
++; CHECK-LABEL: load_constant_offset:
++; CHECK:      ldy #6
++; CHECK-NEXT: rep #32
++; CHECK-NEXT: lda (__rc2),y
++; CHECK-NOT:  sep
++; CHECK:      sta g
++; CHECK-NEXT: sep #32
++; CHECK-NEXT: rts
++  %s = getelementptr inbounds nuw i8, ptr %p, i16 6
++  %v = load volatile i16, ptr %s, align 1
++  store volatile i16 %v, ptr @g, align 1
++  ret void
++}
++
++; A constant is cheaper as two byte immediate stores than materialized into
++; an Imag16 pair for a word store.
++define void @store_constant() {
++; CHECK-LABEL: store_constant:
++; CHECK-NOT:  rep
++; CHECK:      stx g
++; CHECK:      stx g+1
++; CHECK-NEXT: rts
++  store i16 4660, ptr @g, align 1
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/near-index-nowrap.ll b/llvm/test/CodeGen/MOS/near-index-nowrap.ll
+new file mode 100644
+index 0000000..fc9293d
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-nowrap.ll
+@@ -0,0 +1,63 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,M6502
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,W65816
++
++; On the 65816, an indexed access adds the index to the 16-bit base with a
++; carry into the bank, while a near pointer add wraps at 16 bits. The add is
++; folded into (zp),y or abs,x only when it cannot wrap: it is nuw, it is
++; inbounds with a non-negative offset, or known bits bound the sum below
++; 0x10000. Other CPUs wrap either way and always fold.
++
++define i8 @plain(ptr %p, i8 %i) {
++; CHECK-LABEL: plain:
++; M6502:      lda (__rc2),y
++; W65816-NOT: (__rc2),y
++; W65816:     adc __rc2
++; W65816:     lda (__rc2)
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @nuw(ptr %p, i8 %i) {
++; CHECK-LABEL: nuw:
++; CHECK:      tay
++; CHECK-NEXT: lda (__rc2),y
++  %x = zext i8 %i to i16
++  %q = getelementptr nuw i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @inbounds_nonnegative(ptr %p, i8 %i) {
++; CHECK-LABEL: inbounds_nonnegative:
++; CHECK:      tay
++; CHECK-NEXT: lda (__rc2),y
++  %x = zext i8 %i to i16
++  %q = getelementptr inbounds i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++@t = global [16 x i8] zeroinitializer
++
++define i8 @global_base(i8 %i) {
++; CHECK-LABEL: global_base:
++; M6502:      lda t,x
++; W65816-NOT: t,x
++; W65816:     lda (__rc2)
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr @t, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @bounded_constant_base(i8 %i) {
++; CHECK-LABEL: bounded_constant_base:
++; CHECK:      tax
++; CHECK-NEXT: lda 4096,x
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr inttoptr (i16 4096 to ptr), i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
+diff --git a/llvm/test/CodeGen/MOS/a16-small-add.ll b/llvm/test/CodeGen/MOS/a16-small-add.ll
+new file mode 100644
+index 0000000..3c2ede8
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-small-add.ll
+@@ -0,0 +1,39 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefix=DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefix=NATIVE
++
++; Under +mos-a16, adding or subtracting 2 on a byte uses two increments or
++; decrements that any 8-bit register can hold, instead of an adc pinned to A.
++; Larger steps, and the default mode, keep the adc.
++
++define i8 @add2(i8 %a, i8 %b) {
++; DEFAULT-LABEL: add2:
++; DEFAULT:      adc #2
++; NATIVE-LABEL: add2:
++; NATIVE:       inx
++; NATIVE-NEXT:  inx
++; NATIVE-NEXT:  txa
++; NATIVE-NEXT:  rts
++  %r = add i8 %b, 2
++  ret i8 %r
++}
++
++define i8 @sub2(i8 %a, i8 %b) {
++; DEFAULT-LABEL: sub2:
++; DEFAULT:      adc #254
++; NATIVE-LABEL: sub2:
++; NATIVE:       dex
++; NATIVE-NEXT:  dex
++; NATIVE-NEXT:  txa
++; NATIVE-NEXT:  rts
++  %r = sub i8 %b, 2
++  ret i8 %r
++}
++
++define i8 @add3(i8 %a, i8 %b) {
++; DEFAULT-LABEL: add3:
++; DEFAULT:      adc #3
++; NATIVE-LABEL: add3:
++; NATIVE:       adc #3
++  %r = add i8 %b, 3
++  ret i8 %r
++}

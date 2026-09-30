@@ -1,0 +1,182 @@
+{
+ "destination": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+ "head": "9f7e8a2968c55acea53ba88a78af2bc5a039c02a",
+ "final_tree": "c580f57d90406a6d0651e6b6225de1b75ad6fbd6",
+ "all_intermediate_trees_match": true,
+ "original_candidate": "75926742e3e13e26a17ef6e7837efb869caec0dc",
+ "tree_delta_vs_original_candidate": [
+  "M\tllvm/lib/CodeGen/CodeGenCommonISel.cpp",
+  "M\tllvm/lib/CodeGen/GlobalISel/Utils.cpp",
+  "M\tllvm/lib/Target/MOS/CMakeLists.txt",
+  "M\tllvm/lib/Target/MOS/MOS.h",
+  "A\tllvm/lib/Target/MOS/MOSConventionalSSA.cpp",
+  "A\tllvm/lib/Target/MOS/MOSConventionalSSA.h",
+  "M\tllvm/lib/Target/MOS/MOSFeatures.td",
+  "A\tllvm/lib/Target/MOS/MOSImagRegAlloc.cpp",
+  "A\tllvm/lib/Target/MOS/MOSImagRegAlloc.h",
+  "M\tllvm/lib/Target/MOS/MOSInstrInfo.td",
+  "A\tllvm/lib/Target/MOS/MOSRegAlloc.cpp",
+  "A\tllvm/lib/Target/MOS/MOSRegAlloc.h",
+  "M\tllvm/lib/Target/MOS/MOSTargetMachine.cpp",
+  "A\tllvm/test/CodeGen/MOS/a16-accumulator-forms.mir",
+  "A\tllvm/test/CodeGen/MOS/a16-load-store.ll",
+  "A\tllvm/test/CodeGen/MOS/a16-small-add.ll",
+  "A\tllvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir",
+  "A\tllvm/test/CodeGen/MOS/native-spill-copy.mir",
+  "A\tllvm/test/CodeGen/MOS/native-width-registers.mir",
+  "A\tllvm/test/CodeGen/MOS/near-index-nowrap.ll",
+  "A\tllvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll",
+  "A\tllvm/test/CodeGen/MOS/xy16-index-forms.mir",
+  "M\tllvm/test/CodeGen/X86/GlobalISel/x86-calllowering-dbg-trunc.ll",
+  "A\tllvm/test/MC/MOS/brk-signature.s",
+  "A\tllvm/test/MC/MOS/index-width-mapping-65816.s"
+ ],
+ "mos_suites": "PASS=156 UNSUPPORTED=1",
+ "llc_sha256": "288617e727643dcea855b804975972f2bcf2c03bb3f2aebe7805b1801b853085",
+ "series": [
+  {
+   "patch": "patches-split/0001-MOS-Model-65816-native-width-registers-and-feature-g.patch",
+   "commit": "c38fa4cc5a602b3af84e4bdad085b4fcf751566a",
+   "subject": "[MOS] Model 65816 native-width registers and feature gates",
+   "tree": "348a94e4c91972a3271990a79219af028a6c102f",
+   "matches_commit_tree": true,
+   "sha256": "7a7eca48c371028f19b54bca7b543798f2153bc514f1fc14cde985fce824f2fd"
+  },
+  {
+   "patch": "patches-split/0002-MOS-Define-16-bit-accumulator-instruction-forms.patch",
+   "commit": "1b52f2ece5ba9ec2a81bc77184a29b9a8001896d",
+   "subject": "[MOS] Define 16-bit accumulator instruction forms",
+   "tree": "7b9d26eecd38963342387be1e3c133bb9464edb6",
+   "matches_commit_tree": true,
+   "sha256": "a6bd087d898b18c79683c8814cbe6e578682e8232ea61682559ebb9b29dbfc82"
+  },
+  {
+   "patch": "patches-split/0003-MOS-Define-16-bit-index-instruction-forms-and-X-widt.patch",
+   "commit": "420e010ad26bf20502a24f776274d3f48b3d7fc0",
+   "subject": "[MOS] Define 16-bit index instruction forms and X-width requirements",
+   "tree": "d1b5cfc64a93fb08b0d0e142d4221adcead8f8c7",
+   "matches_commit_tree": true,
+   "sha256": "eaeba27f788f6fd5ab03931ad292e124a9d6a7d52d39e5cb828a71cfab402b84"
+  },
+  {
+   "patch": "patches-split/0004-MOS-Insert-REP-SEP-from-M-X-width-requirements.patch",
+   "commit": "bc5f120a58084f85e370267244d6f92ea98e2173",
+   "subject": "[MOS] Insert REP/SEP from M/X width requirements",
+   "tree": "d78c572f68d5648b203ed929b00a9b7023ad59e7",
+   "matches_commit_tree": true,
+   "sha256": "30017716b4738a03f271b329de59dd94030f670829135405a5b27e0cd7057226"
+  },
+  {
+   "patch": "patches-split/0005-MOS-Preserve-status-flags-across-register-scavenging.patch",
+   "commit": "dbd065b5e351a03afd3e7eb1878a49c716114844",
+   "subject": "[MOS] Preserve status flags across register scavenging",
+   "tree": "5a90dcafd24b8d27a94579d7add216d9655db805",
+   "matches_commit_tree": true,
+   "sha256": "faf6ab83fec19b2b82676f3f0441dde12bfb3a29de197bb5eddaa6367cad0af0"
+  },
+  {
+   "patch": "patches-split/0006-MOS-Spill-and-copy-native-width-registers.patch",
+   "commit": "aba628a4d70d60c521bde1d8bab69689bb9f2516",
+   "subject": "[MOS] Spill and copy native-width registers",
+   "tree": "1b594a411fc8d3fe1350c1181b7f1982a208b024",
+   "matches_commit_tree": true,
+   "sha256": "2edfc6f894838fb038c20b68f6e6e9b3958a627eb319ab66165d107feb4a7b41"
+  },
+  {
+   "patch": "patches-split/0007-MOS-Keep-call-clobbered-imaginary-copies-out-of-Imag.patch",
+   "commit": "09506482de2f121caca79d269651913b1a2602c3",
+   "subject": "[MOS] Keep call-clobbered imaginary copies out of Imag16 pairs",
+   "tree": "a51e7c150c58d21c29a4d4557f07db6e12d12027",
+   "matches_commit_tree": true,
+   "sha256": "a7e848432bc12a67d8d4edc3fe7098cb5a9c7686e6ea4a25536df4af28b3922c"
+  },
+  {
+   "patch": "patches-split/0008-MOS-Legalize-and-select-native-16-bit-loads-and-stor.patch",
+   "commit": "e43bae5fa46fcafabf716960a6d4f706d6508b51",
+   "subject": "[MOS] Legalize and select native 16-bit loads and stores",
+   "tree": "b52b2aaa267bd7ad71de01f77b0b3689d5506e05",
+   "matches_commit_tree": true,
+   "sha256": "6a4eb31b9f2d7f73095c9d3fb28ac074cc69e473d40414ad91682f52e6632e62"
+  },
+  {
+   "patch": "patches-split/0009-MOS-Legalize-native-s32-s64-lanes-and-wide-any-exten.patch",
+   "commit": "3cec9891c6cf3a20877b0e67148ad6780eea223f",
+   "subject": "[MOS] Legalize native s32/s64 lanes and wide any-extensions",
+   "tree": "e0b92cd107186f8e1aeda670ffb2f7cf2a09f05a",
+   "matches_commit_tree": true,
+   "sha256": "a78d1b1fd5521650b94e1d8906e274cb849a62e96c53d003ab646ce008412487"
+  },
+  {
+   "patch": "patches-split/0010-MOS-Select-native-16-bit-arithmetic-logic-and-consta.patch",
+   "commit": "460ed3e89eedf5926ce285779f885fe525c216a4",
+   "subject": "[MOS] Select native 16-bit arithmetic, logic and constant shifts",
+   "tree": "2181a8a796df5472634d927914b43ad5fe1c3a27",
+   "matches_commit_tree": true,
+   "sha256": "3cf920752d7e1e275bd6b13e886712aafebb8943df85685dd074454b9c2f4f1b"
+  },
+  {
+   "patch": "patches-split/0011-MOS-Select-native-16-bit-compares-and-fused-branches.patch",
+   "commit": "ebdd0900230fc715c11c76d691f6b0e5f3cbeff5",
+   "subject": "[MOS] Select native 16-bit compares and fused branches",
+   "tree": "374c9967aabe4ae91ffbe899246fbc398577f7d8",
+   "matches_commit_tree": true,
+   "sha256": "10b3f6b36de243140445ef77b634b330c02581af806e4831b44cceca71a60c75"
+  },
+  {
+   "patch": "patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch",
+   "commit": "77326e4aaff3f6faae77f4d21f663dc10a73a9ae",
+   "subject": "[MOS] Keep byte indexes byte-wide in absolute indexed addressing",
+   "tree": "a0872a7424fdaf736ff31973cdeaa2e01fe5ed1f",
+   "matches_commit_tree": true,
+   "sha256": "39095063dc3d3fae72f97ad2ca681174af8eac09f1588d867e2605b295fdaf12"
+  },
+  {
+   "patch": "patches-split/0013-MOS-Require-a-no-wrap-proof-before-folding-near-inde.patch",
+   "commit": "0284f9f318a41a2c19773c66ae05a05a3ab8af45",
+   "subject": "[MOS] Require a no-wrap proof before folding near indexes on the 65816",
+   "tree": "230f899f5be0317aa96a8aaf4328b5119c2f9ff4",
+   "matches_commit_tree": true,
+   "sha256": "e626c8f006833a62a8e773720fa7befe80d8c520df2da3352012293ffc630cbb"
+  },
+  {
+   "patch": "patches-split/0014-MOS-Select-16-bit-index-registers-under-mos-xy16.patch",
+   "commit": "e8c51cc3b8cf542718e8270c7777e5638c7e20f3",
+   "subject": "[MOS] Select 16-bit index registers under +mos-xy16",
+   "tree": "55b27b17b9f2892bbbac5e36d0fef774dc8369f3",
+   "matches_commit_tree": true,
+   "sha256": "a6bff2a2a6f11960dcba1d5f1ebd7db74a442131e01a62c207b779fcebcaad23"
+  },
+  {
+   "patch": "patches-split/0015-MOS-Keep-small-8-bit-adds-relocatable-under-mos-a16.patch",
+   "commit": "50db44329f1d1f6b57bd419bcd013fbf98ccd9cc",
+   "subject": "[MOS] Keep small 8-bit adds relocatable under +mos-a16",
+   "tree": "4962c0b9b4475e8c59d867751791556c1a0d6ef9",
+   "matches_commit_tree": true,
+   "sha256": "1d53f2f1ebe72a07f11195540dae52fbd387963005c17e22053823dd9d022234"
+  },
+  {
+   "patch": "patches-split/0016-MOS-Preserve-interrupted-M-X-state-in-65816-interrup.patch",
+   "commit": "780d9e028c04ebbad1cc1821125110552490c982",
+   "subject": "[MOS] Preserve interrupted M/X state in 65816 interrupt handlers",
+   "tree": "6bb9b089ba566c4a1116fbe7a136a4edfaff7c90",
+   "matches_commit_tree": true,
+   "sha256": "d0588f2d50fbeb64c77d1a49a3afcf61e007cec5f2b5ec23924f38b2211f88b5"
+  },
+  {
+   "patch": "patches-split/0017-Share-near-byte-stores-with-an-ABI-unit-increment.patch",
+   "commit": "17358c983170c04b852ba5c936b4afc15028541e",
+   "subject": "Share near byte stores with an ABI unit increment",
+   "tree": "08aaaab928628a4a1856456bcd1298ab3292103a",
+   "matches_commit_tree": true,
+   "sha256": "4da7396a48ce21661c2de913c9cb3adf2669ea84df94e8fcdcf2948058cf2a67"
+  },
+  {
+   "patch": "patches-split/0018-Keep-profitable-near-stores-in-byte-registers.patch",
+   "commit": "9f7e8a2968c55acea53ba88a78af2bc5a039c02a",
+   "subject": "Keep profitable near stores in byte registers",
+   "tree": "c580f57d90406a6d0651e6b6225de1b75ad6fbd6",
+   "matches_commit_tree": true,
+   "sha256": "c620af34caf58a9ee6c71a4e9e9c8473b26193285ac187e971a2d61bc8ed13ab"
+  }
+ ]
+}

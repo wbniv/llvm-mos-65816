@@ -1,0 +1,11 @@
+A	llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+A	llvm/test/CodeGen/MOS/a16-load-store.ll
+A	llvm/test/CodeGen/MOS/a16-small-add.ll
+A	llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+A	llvm/test/CodeGen/MOS/imag32-copy.mir
+A	llvm/test/CodeGen/MOS/native-spill-copy.mir
+A	llvm/test/CodeGen/MOS/native-width-registers.mir
+A	llvm/test/CodeGen/MOS/near-index-nowrap.ll
+A	llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll
+A	llvm/test/CodeGen/MOS/xy16-index-forms.mir
+A	llvm/test/MC/MOS/index-width-mapping-65816.s

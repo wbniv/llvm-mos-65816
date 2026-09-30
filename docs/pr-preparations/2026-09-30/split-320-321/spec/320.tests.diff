@@ -1,0 +1,31 @@
+diff --git a/llvm/test/CodeGen/MOS/imag32-copy.mir b/llvm/test/CodeGen/MOS/imag32-copy.mir
+new file mode 100644
+index 0000000..19511de
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-copy.mir
+@@ -0,0 +1,25 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-before=postrapseudos -verify-machineinstrs %s -o - | FileCheck %s
++
++# RLk is the quad of Imag16 pairs RS(2k) and RS(2k+1): four consecutive
++# zero-page bytes. A quad copy is four byte copies in address order, and each
++# byte is named by its own __rc symbol.
++
++# CHECK-LABEL: copy_quad:
++# CHECK:      ldx __rc8
++# CHECK-NEXT: stx __rc4
++# CHECK-NEXT: ldx __rc9
++# CHECK-NEXT: stx __rc5
++# CHECK-NEXT: ldx __rc10
++# CHECK-NEXT: stx __rc6
++# CHECK-NEXT: ldx __rc11
++# CHECK-NEXT: stx __rc7
++# CHECK-NEXT: rts
++---
++name: copy_quad
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rl2
++    $rl1 = COPY killed $rl2
++    RTS implicit $rl1
++...

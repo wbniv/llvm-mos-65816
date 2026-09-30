@@ -35,6 +35,8 @@ Avoid “first stage.” The current patch implements both accumulator and index
 5. Preserve unknown incoming M/X state across interrupt handlers.
 6. Add focused LLVM coverage and native-width correctness tests.
 
+As of September 30 this series exists: the extracted #321 patch is split into 16 commits on `06bc967d2668`, each with its own tests and a one-line validation command ([split packet](pr-preparations/2026-09-30/split-320-321/README.md), [reviewer map](pr-preparations/2026-09-30/split-320-321/REVIEWER-MAP-321.md)).
+
 The commits may be reviewed independently, but the intended upstream vehicle is one draft PR with one complete feature narrative. Do not present the ISR fix as an unrelated standalone correction: upstream main does not yet contain the native-width machinery that exposes it.
 
 ## Extraction audit: `0002` is not the PR diff

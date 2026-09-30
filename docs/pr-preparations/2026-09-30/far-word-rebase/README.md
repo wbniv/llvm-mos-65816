@@ -2,6 +2,21 @@
 
 Prepared September 30, 2026. This packet rebases the [September 28 extracted series](../../2026-09-28/far-word-index/upstream-series.md) from `26d7c2c1eebf` onto current `llvm-mos/llvm-mos` main `06bc967d2668c7c11c4d6eb43a6aed1f99ad258b`. It repeats that packet's checks on the rebased trees and adds an independent review of the complete compiler/ABI series. It covers both TODO items: the bounded Farblit range proof (0069, patch 8) and the native-word speed policy (0070, patches 12–14). The [plan](../../../plans/2026-09-30-far-word-rebase.md) records the contract. Nothing is posted; the #320/#321 holds and the SNES platform track stay unchanged.
 
+## Split series (current)
+
+The #321 and #320 prerequisites are no longer submitted as one patch each (patches 1 and 4 below). They are now the [split series](../split-320-321/README.md): #321 in 16 commits, the two unchanged MC commits, and #320 in 4 commits, followed by this packet's patches 5–14 applied unchanged with `git am -3`. [`patches-split/`](patches-split/) holds all 32 patches in that order. The #321 commits come before the MC commits, as patch 1 did before patches 2–3; the split evidence was built in that order.
+
+| Check | Result |
+| --- | --- |
+| Patches 5–14 on the split | Applied with `git am -3`, no conflicts |
+| Final tree | `cf6262110789`: the previous candidate `77dc044c39bb` plus the 11 test files the split adds under `llvm/test/`; no other path differs |
+| Round trip | Each of the 32 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
+| MOS CodeGen + MC | 172 passed, 1 unsupported (163 before, less the 2 X86 tests counted there, plus the 11 added tests) |
+| X86 0028 regressions | Both pass |
+| `llc` | sha256 `d7fde754bb02…`, identical to the previous candidate's `llc` |
+
+Everything below this section describes the monolithic-prerequisite series and remains its dated record.
+
 ## Series and rebase
 
 The same 14 patches were applied with `git am -3`, with no conflicts. For every commit, the added and removed lines equal the September 28 series; the [range-diff](evidence/range-diff.txt) differs only in context. The [round-trip](evidence/series.json) applies each [rebased patch](patches/) to the destination in order and matches every intermediate tree, with no whitespace warnings.

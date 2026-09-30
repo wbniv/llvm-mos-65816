@@ -1,0 +1,16 @@
+[MOS] Select 16-bit index registers under +mos-xy16
+
+Under +mos-xy16, s16 index values use 16-bit X and Y. The legalizer keeps an s16 offset as a 16-bit index in the word and byte abs,X and (zp),Y folds (G_LOAD_ABS_IDX16 and related opcodes), and constrains an absolute s16 load to Xc16 when every use can consume X directly: word stores, +/-1, compares, and PHI/COPY chains of those. selectXY16 selects direct LDX/STX/LDY/STY, INX/DEX/INY/DEY, CPX/CPY and the 16-bit-index accesses. A loaded index whose only users are copies is not a genuine index: it is reclassed to Imag16 and loaded through A16, because an unrelated 8-bit-index instruction's `sep #$10` would clear a live X/Y high byte.
+
+A (zp),Y access whose index sits in an Imag16 pair uses a fused pseudo that the assembly printer emits as `ldy zp` immediately followed by the access. Keeping the pair in one instruction until emission prevents spill code from placing a `sep #$10` between them.
+
+Default-mode effect: none (fixed input set identical).
+
+Tests: xy16-near-indir-y.ll checks the fused byte and word (zp),Y loads and stores after instruction selection and in the emitted assembly.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/xy16-near-indir-y.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

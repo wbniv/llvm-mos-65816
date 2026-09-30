@@ -1,0 +1,47 @@
+Root cause of stage-1 default-mode asm differences (base 06bc967d2668 -> stage 1).
+Generated register pressure sets (llvm-tblgen -gen-register-info, MOSGenRegisterInfoTargetDesc.inc):
+--- PressureNameTable
+2c2
+<     "MOSAsmParamRegClass",
+---
+>     "Ac16",
+3a4,5
+>     "Xc16",
+>     "Yc16",
+4a7,9
+>     "GPR_LSB_with_Ac16",
+>     "GPR_LSB_with_Xc16",
+>     "GPR_LSB_with_Yc16",
+6a12,14
+>     "Anyi1_with_Ac16",
+>     "Anyi1_with_Xc16",
+>     "Anyi1_with_Yc16",
+--- PressureLimitTable
+2c2
+<     3,  	// 0: MOSAsmParamRegClass
+---
+>     2,  	// 0: Ac16
+4,7c4,15
+<     6,  	// 2: GPR_LSB
+<     7,  	// 3: GPR_LSB_with_Pc
+<     262,  	// 4: Anyi1
+<     263,  	// 5: Anyi1_with_Pc
+---
+>     4,  	// 2: Xc16
+>     4,  	// 3: Yc16
+>     6,  	// 4: GPR_LSB
+>     6,  	// 5: GPR_LSB_with_Ac16
+>     6,  	// 6: GPR_LSB_with_Xc16
+>     6,  	// 7: GPR_LSB_with_Yc16
+>     7,  	// 8: GPR_LSB_with_Pc
+>     262,  	// 9: Anyi1
+>     262,  	// 10: Anyi1_with_Ac16
+>     262,  	// 11: Anyi1_with_Xc16
+>     262,  	// 12: Anyi1_with_Yc16
+>     263,  	// 13: Anyi1_with_Pc
+
+Isolation (8 differing corpus inputs, mos6502, llc 321-00 vs 321-01):
+  -enable-misched=false -enable-post-misched=false: 30/132 inputs still differ (whole set)
+  -disable-machine-licm: 8/8 differ; -disable-machine-sink: 8/8 differ
+  licm+sink: 8/8; licm+misched: 8/8; sink+misched: 8/8
+  -disable-machine-licm -disable-machine-sink -enable-misched=false -enable-post-misched=false: 0/8 differ

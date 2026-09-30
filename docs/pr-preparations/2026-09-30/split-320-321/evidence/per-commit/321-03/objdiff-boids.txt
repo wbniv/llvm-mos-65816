@@ -1,0 +1,5 @@
+a mapping symbols:  604 $mh  667 $xh 
+b mapping symbols:  604 $mh  1121 $xh 
+sections: 7 vs 7
+section bytes: identical
+relocations (symbol index column ignored): identical

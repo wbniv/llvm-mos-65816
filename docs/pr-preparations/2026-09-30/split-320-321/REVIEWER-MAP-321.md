@@ -1,0 +1,215 @@
+# Reviewer map: #321 native widths as a 16‑commit series
+
+This series replaces the monolithic patch `340c8ee25d5c` ("Extract opt-in native widths and near-memory prerequisites", 38 files, +5,391). It starts at llvm-mos `06bc967d2668` and ends at the tree of `340c8ee25d5c` (`7937b8f7c79f`) plus ten test files the split adds under `llvm/test/` (no other file differs). Patches: [`patches-321/`](patches-321/). Series branch: `split-320-321` in `build/split-320-321/source` (commits `c38fa4cc5a60`..`780d9e028c04`).
+
+Attribution: split by Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort. The extraction credit of the monolithic patch (OpenAI Codex CLI 0.158.0, model gpt-6-astra, xhigh reasoning effort, session `01a0e75a-a9ed-7372-9bac-b19b732a46a2`) is kept in every commit message.
+
+## How to read and validate
+
+- Every commit builds with assertions and passes `llvm/test/CodeGen/MOS` and `llvm/test/MC/MOS` on its own (per-commit logs: `build/split-320-321/evidence/t-321-NN/`; summaries in [`evidence/`](evidence/)).
+- Every commit except 4, 9, 10, 11, 12, 14 and 16, whose tests come from the monolithic patch, carries a test the split adds. Each added test fails on the parent commit and passes on its own commit and every later one ([red/green table](evidence/red-green.tsv)).
+- Each commit message gives one **Validate** command. Paths are relative to an llvm-mos checkout; `build/bin` is an assertions build of that commit.
+- **Default-mode effect** compares the commit with its parent on a fixed input set, in `-mcpu=mos6502` and plain `-mcpu=mosw65816` (no `+mos-a16`/`+mos-xy16`). The set is the 38 MOS CodeGen `.ll` tests at `06bc967d2668` plus 52 frozen corpus IRs (every 8th `*.default.ll` of the near-proof replay driver, target attributes stripped). Assembly and object hashes are recorded per commit, not full outputs.
+
+## Dependency diagram
+
+Solid arrows are code dependencies; dotted arrows are test-only dependencies. Commits 5, 7 and 16 use nothing the series adds (they touch only existing registers and instructions), so they could be reviewed or merged ahead of it; they were built only in series order.
+
+```mermaid
+flowchart TD
+  C1["1 registers + feature gates"] --> C2["2 accumulator forms"]
+  C1 --> C3["3 index forms, X-width flags"]
+  C2 --> C4["4 REP/SEP insertion"]
+  C3 --> C4
+  C2 --> C6["6 native spills + copies"]
+  C3 --> C6
+  C4 --> C8["8 native loads/stores"]
+  C6 --> C8
+  C1 --> C9["9 s32/s64 lanes, wide anyext"]
+  C8 --> C10["10 native ALU/shifts + A16 residency"]
+  C9 -.->|anyext-masked-byte.ll| C10
+  C10 --> C11["11 native compares, fused branches"]
+  C10 -.->|observer test checks an s16 G_ADD kept by commit 10 (reasoned, not built)| C12["12 byte index stays byte-wide"]
+  C8 --> C13["13 near-index no-wrap proof"]
+  C11 --> C14["14 +mos-xy16 index selection"]
+  C13 --> C14
+  C10 --> C15["15 relocatable small 8-bit adds"]
+  C5["5 status flags across scavenging"]
+  C7["7 coalescing guard"]
+  C16["16 interrupt M/X/D/DBR protocol"]
+```
+
+## Summary
+
+Line counts are added/removed lines from `git diff --numstat`, split into code and tests. "(added)" marks a test the split adds; the others come from the monolithic patch.
+
+| # | Commit | Subject | Code | Tests | Focused tests | Default-mode effect |
+|---|---|---|---|---|---|---|
+| 1 | `c38fa4cc5a60` | Model 65816 native-width registers and feature gates | +60/‑1 | +28 | native-width-registers.mir (added) | **asm changes** (register pressure sets) |
+| 2 | `1b52f2ece5ba` | Define 16-bit accumulator instruction forms | +344/‑1 | +66 | a16-accumulator-forms.mir (added) | none |
+| 3 | `420e010ad26b` | Define 16-bit index instruction forms and X-width requirements | +258/‑14 | +107 | index-width-mapping-65816.s, xy16-index-forms.mir (added) | **objects**: `$xh` mapping symbols |
+| 4 | `bc5f120a5808` | Insert REP/SEP from M/X width requirements | +847/‑1 | +290 | insert-rep-sep-stack.mir, insert-rep-sep-cloned-kills.mir | none |
+| 5 | `dbd065b5e351` | Preserve status flags across register scavenging | +155/‑33 | +314 | scavenger-p-undef-6502.ll (added) | none in the set; fixes a mos6502 -O0 assertion |
+| 6 | `aba628a4d70d` | Spill and copy native-width registers | +202/‑5 | +69 | native-spill-copy.mir (added) | none |
+| 7 | `09506482de2f` | Keep call-clobbered imaginary copies out of Imag16 pairs | +51 | +57 | coalesce-call-clobbered-imag.mir (added) | none observed |
+| 8 | `e43bae5fa46f` | Legalize and select native 16-bit loads and stores | +575/‑13 | +89 | a16-load-store.ll (added) | none |
+| 9 | `3cec9891c6cf` | Legalize native s32/s64 lanes and wide any-extensions | +166/‑15 | +92 | anyext-wide.mir, anyext-masked-byte.ll | none observed |
+| 10 | `460ed3e89eed` | Select native 16-bit arithmetic, logic and constant shifts | +467/‑13 | +348 | a16-byte-store.ll, a16-indirect-byte-store.ll | none |
+| 11 | `ebdd0900230f` | Select native 16-bit compares and fused branches | +543/‑15 | +65 | a16-immediate-width.ll | none |
+| 12 | `77326e4aaff3` | Keep byte indexes byte-wide in absolute indexed addressing | +41/‑1 | +52/‑3 | zp-byte-index.ll, legalizer-indexed-offset-observer.mir, legalizer.mir | **asm changes** (both modes) |
+| 13 | `0284f9f318a4` | Require a no-wrap proof before folding near indexes on the 65816 | +24/‑1 | +63 | near-index-nowrap.ll (added) | **asm changes** (mosw65816) |
+| 14 | `e8c51cc3b8cf` | Select 16-bit index registers under +mos-xy16 | +578/‑7 | +120 | xy16-near-indir-y.ll | none |
+| 15 | `50db44329f1d` | Keep small 8-bit adds relocatable under +mos-a16 | +42 | +39 | a16-small-add.ll (added) | none |
+| 16 | `780d9e028c04` | Preserve interrupted M/X state in 65816 interrupt handlers | +44 | +34 | interrupt-width-65816.ll | **asm changes** for mosw65816 interrupt handlers |
+
+## Default-mode evidence
+
+Counts are inputs whose assembly (or only object) differs from the parent commit. Of the 90 inputs per mode, 54 compile in mos6502 and 78 in mosw65816 at the base (79 from commit 13 on); failures are compared by normalized first error line.
+
+| # | mos6502 | mosw65816 | Size (bytes, inputs compiling on both sides) | Explanation |
+|---|---|---|---|---|
+| 1 | 18 asm | 33 asm | +3,478 / +3,202 | New register classes change the generated register pressure sets (`MOSAsmParamRegClass` stops being its own set). MachineLICM, MachineSink and the machine scheduler read them. With all three disabled the outputs match (0/8 sample inputs differ). Evidence: `evidence/321-01/pressure-sets.txt`, `size-vs-base.txt`. |
+| 3 | 0 | 68 object-only | 0 | `XHigh` on LDX/STX/LDY/STY/CPX/CPY makes the W65816 ELF streamer emit `$xh` mapping symbols. Section bytes and relocations are identical (`evidence/321-03/objdiff-boids.txt`: 667 → 1,121 `$xh`). |
+| 12 | 16 asm | 17 asm | +280 / ‑83 | An s8 index is used directly, and a shared s16 offset gets an explicit zero high byte. mos6502: 12 larger, 3 smaller; mosw65816: 1 larger, 14 smaller. |
+| 13 | 0 | 28 (27 asm, 1 newly compiling) | 0 / +4,626 | Byte indexes into runtime pointers need a 16-bit add unless the add is proven not to wrap. `examples_snes_sodo` fails on the base with "Remaining virtual register" in frame lowering and compiles after this commit; the shape is avoided, not repaired. |
+| 16 | 0 | 3 asm | 0 / +110 | Exactly the three tests with `"interrupt"` functions (nonreentrant.ll, static-stack.ll, zp-alloc.ll). |
+| all others | 0 | 0 | 0 | Assembly and objects identical. |
+| **base → 16** | | | **+3,758 (1.3%) / +7,855 (2.7%)** | Sum of commits 1, 12, 13 and 16. |
+
+## Commits
+
+Each entry lists the purpose, the key hunks, the tests and what a reviewer should check. The review findings column maps the independent review's N3 (clang-format lines this commit would reformat, `clang-format-diff.py` on the commit's C++ hunks) and N4 (added lib lines carrying history tags such as `#321`, "Increment", "Phase") to commits, so follow-ups can land in the right place.
+
+### 1. Model 65816 native-width registers and feature gates (`c38fa4cc5a60`)
+
+- **Purpose.** Opt-in features `mos-a16` and `mos-xy16` (implies `mos-a16`); registers A16=A:B, X16=X:XH, Y16=Y:YH covered by their byte halves, with native DWARF numbers 0x01000000‑0x01000002; single-member classes Ac16/Xc16/Yc16; Ac16 joins the register bank.
+- **Key hunks.** `MOSFeatures.td` (FeatureAccum16, FeatureIndex16); `MOSSubtarget.h` (hasAccum16/hasIndex16); `MOSRegisterInfo.td` (B, A16, XH, YH, X16, Y16; Ac16, Xc16, Yc16); `MOSRegisterBanks.td`.
+- **Check.** No CPU implies the features; byte registers alias the wide ones through `CoveredBySubRegs`.
+- **Default effect.** Asm changes through pressure sets (table above). This is the one opt-in commit that changes default codegen without a code path gated on the feature.
+- **Tests.** native-width-registers.mir (added): both features are recognized; the Ac16/Xc16/Yc16 classes and A16/X16/Y16 registers parse and verify, and `sublo` names the existing byte register. Red on the parent: unknown register class.
+- **Findings.** N3: 4 lines. N4: 0.
+
+### 2. Define 16-bit accumulator instruction forms (`1b52f2ece5ba`)
+
+- **Purpose.** HasAccum16 predicate; MLow TSFlag on logical pseudos; word pseudos for load/store (abs, abs,X, (zp), (zp),Y, Imag16), ADC/SBC/AND/ORA/EOR, CMP, ASL/LSR/ROR/INC/DEC; `mos16()` printing of small 16-bit immediates.
+- **Key hunks.** `MOSInstrFormats.td` (HasAccum16, `imm16` PrintMethod); `MOSInstrLogical.td` (MOSLogicalInstr MLow; LDAbs16 … RORAcc16); `MOSInstPrinter.cpp` (printImm16Operand).
+- **Check.** Every pseudo expands to the width-agnostic MC opcode; no Ac16↔byte COPY exists.
+- **Tests.** a16-accumulator-forms.mir (added): a sequence of accumulator pseudos emitted from MIR (starting at branch relaxation, so no REP/SEP) checks each expanded instruction, `mos16()` for 66 and 255, bare 43981, and the three-byte immediate encodings in the object. a16-immediate-width.ll (commit 11) checks the printing on selected code.
+- **Findings.** N3: 0. N4: 4.
+
+### 3. Define 16-bit index instruction forms and X-width requirements (`420e010ad26b`)
+
+- **Purpose.** HasIndex16; XLow/XHigh TSFlags; X/Y 16-bit loads, stores, compares, inc/dec, abs,X16 and (zp),Y16 accesses, TXA16/TAX16/TYA16/TAY16, PHA16/PLA16; `XHigh` on the existing 8-bit index-register memory forms.
+- **Key hunks.** `MOSInstrFormats.td` (HasIndex16; CC0_Regular `XHigh`); `MOSInstrInfo.td` (`XHigh` on STX/LDX/STY/LDY forms); `MOSInstrLogical.td` (XLow/XHigh bits; LDAbsXIdx … STIndirYIdx16; LDXAbs16 … PLA16).
+- **Default effect.** `$xh` mapping symbols in mosw65816 objects only.
+- **Tests.** index-width-mapping-65816.s (added): each of the 15 XHigh forms, assembled after a 16-bit `ldx`, opens its own `$xh` mapping region (red on the parent: no `$xh` symbols). xy16-index-forms.mir (added): the index pseudos expand to the expected instructions and three-byte index immediates.
+- **Findings.** N3: 0. N4: 0.
+
+### 4. Insert REP/SEP from M/X width requirements (`bc5f120a5808`)
+
+- **Purpose.** Late pass placing REP/SEP from TSFlags: forward M/X dataflow, 8-bit ABI at entry/calls/returns, width-agnostic carry init, combined `#$30`, critical-edge placement, live X16 preservation across narrowing, STZ pair fusion. No-op without `+mos-a16`.
+- **Key hunks.** `MOSInsertREPSEP.cpp` (new, 811 lines: `requiredWidth`/`requiredXWidth`, `runOnMachineFunction`, `placeIntraBlock`, `placeLegacy`, `preserveX`, `getStackDepths`); `MOSTargetMachine.cpp` (`addPreEmitPass` before branch relaxation).
+- **Tests.** insert-rep-sep-stack.mir, insert-rep-sep-cloned-kills.mir.
+- **Size note.** 847 non-test lines, above the ~600 target; the pass is one algorithm in one new file and is not split further.
+- **Findings.** N3: 11. N4: 4 (for example "The original Increment-1a behavior").
+
+### 5. Preserve status flags across register scavenging (`dbd065b5e351`)
+
+- **Purpose.** Scavenger can save a live P: PHP/PLP on balanced ranges, a dead-index-register courier through RC17 on unbalanced ones, `undef` PHP when no sub-register of P is defined; removes the N/Z-dead assertion.
+- **Key hunks.** `MOSRegisterInfo.cpp`: `computeLiveBefore`, `findDeadIndexReg`, `hasNoAvailableValue`, `saveScavengerRegister` (case P), `canSaveScavengerRegister`.
+- **Upstream note.** Target-generic MOS change; it can be reviewed ahead of the feature.
+- **Tests.** scavenger-p-undef-6502.ll (added; reduced from gcc.c-torture strlen-4.c, taken from the downstream tree's tests): mos6502 at -O0 with a frame over 255 bytes, through prologue/epilogue insertion with the verifier on. It checks `PH undef $p` where no status bit holds a value and a plain `PH $p` where carry is live. The parent fails it on the N/Z-dead assertion, so this commit also fixes a default-mode (stock 6502) assertion.
+- **Findings.** N3: 3. N4: 0.
+
+### 6. Spill and copy native-width registers (`aba628a4d70d`)
+
+- **Purpose.** Copies Xc16/Yc16↔Imag16; static-stack spills of Ac16/Xc16/Yc16; soft-stack spills through `(zp)` with an exact slot pointer, X16/Y16 staged through A16 and bracketed by PHA16/PLA16 when A is live.
+- **Key hunks.** `MOSInstrInfo.cpp` (`copyPhysRegImpl`, `loadStoreRegStackSlot`); `MOSRegisterInfo.cpp` (`pushPullBalanced`, `accumulatorLiveAcross`, `expandLDSTStk` → `expandLDSTStkImpl`); `MOSRegisterInfo.h`.
+- **Ordering.** Placed before any native selection so no selection commit can meet an unlowerable spill.
+- **Tests.** native-spill-copy.mir (added): A16 soft-stack spills at offset zero and through a formed nonzero-offset pointer, an X16 spill and reload staged through A16 inside PHA16/PLA16 while A16 is live, and X16/Y16 copies with Imag16 pairs. Red on the parent: the byte spill path asserts on A16.
+- **Findings.** N3: 48. N4: 1.
+
+### 7. Keep call-clobbered imaginary copies out of Imag16 pairs (`09506482de2f`)
+
+- **Purpose.** `shouldCoalesce` declines folding `vreg = COPY $rcN` into an Imag16 pair when the vreg lives across a call clobbering `$rcN`.
+- **Key hunks.** `MOSRegisterInfo.cpp` (`copiedFromClobberedPhysImag`, `shouldCoalesce`).
+- **Upstream note.** Target-generic; a standalone candidate.
+- **Tests.** coalesce-call-clobbered-imag.mir (added): after the register coalescer, byte COPYs of `$rc2`/`$rc3` that build an Imag16 pair stay separate when a second call intervenes, and coalesce into the pair when it does not. Red on the parent: the pair absorbs `$rc2`/`$rc3` across the call.
+- **Findings.** N3: 26. N4: 0.
+
+### 8. Legalize and select native 16-bit loads and stores (`e43bae5fa46f`)
+
+- **Purpose.** s16 G_LOAD/G_STORE → `G_LOAD16_ABS`/`_INDIR`/`_ABS_IDX`/`_INDIR_IDX` under `+mos-a16`, with byte-path exceptions (constants, byte-only loads, byte-built stores, A:X indirect stores, atomics); selector word forms.
+- **Key hunks.** `MOSInstrGISel.td` (G_LOAD16_* / G_STORE16_*); `MOSLegalizerInfo.cpp` (`legalizeLoadStore16`, `tryIndexedAddressing16`, `legalizeLoad`/`legalizeStore` dispatch, load/store rule); `MOSInstructionSelector.cpp` (`selectMem16Indir`, `selectMem16Abs`, `selectMem16AbsIdx`, `selectMem16IndirIdx`, `loadStoreValueIntoA16`).
+- **Interim text.** Until commit 14, `tryIndexedAddressing16` uses 8-bit-index opcode lambdas and the plain `ConstOffset <= 255` condition; commit 14 generalizes both.
+- **Tests.** a16-load-store.ll (added): absolute, (zp) and (zp),y (runtime and constant index) word copies in one rep/sep bracket, and a constant store kept as two byte stores. Its checks allow the Imag16 home between load and store that commit 10's residency peephole later removes. a16-byte-store.ll and a16-indirect-byte-store.ll land in commit 10: they need native producers and that peephole.
+- **Findings.** N3: 110. N4: 13, including the broken comment "(Native widths: )" in `legalizeLoadStore16`.
+
+### 9. Legalize native s32/s64 lanes and wide any-extensions (`3cec9891c6cf`)
+
+- **Purpose.** Under `+mos-a16`, s32 = 2 × s16 and s64 = 2 × s32 (ext/trunc/merge/unmerge rules, four-piece split helpers). In every mode, G_ANYEXT from unusual widths lowers through G_ZEXT.
+- **Key hunks.** `MOSLegalizerInfo.cpp` (G_ANYEXT/G_TRUNC, G_MERGE_VALUES/G_UNMERGE_VALUES rules, `legalizeMergeS32FromBytes` … `legalizeUnmergeS64ToWords`, `legalizeCustom`); `MOSLegalizerInfo.h`.
+- **Ordering.** Precedes native arithmetic: without it anyext-masked-byte.ll fails under `+mos-a16` ("unable to legalize … G_UNMERGE_VALUES s64") once commit 10 lands (seen in the first ordering, `evidence/v1-order/321-09`).
+- **Tests.** anyext-wide.mir, anyext-masked-byte.ll.
+- **Findings.** N3: 76. N4: 0.
+
+### 10. Select native 16-bit arithmetic, logic and constant shifts (`460ed3e89eed`)
+
+- **Purpose.** s16 add/sub/and/or/xor and constant shifts 1‑7 stay native; `selectAlu16Native` (immediate, absolute-operand folds, inc/dec), `selectShift16Native` (asl/lsr; `cmp #$8000; ror` for ASHR); post-RA `threadAccum16` keeps A16 resident across `sta rsN; lda rsN`.
+- **Key hunks.** `MOSLegalizerInfo.cpp` (bitwise rules, `legalizeAddSub`, `legalizeShiftRotate` passthrough); `MOSInstructionSelector.cpp` (`select` dispatch, `getI16Const`, `getImm16Operand`, `noClobberBetween`, `foldableAbsLoad16`, `selectAlu16Native`, `selectShift16Native`); `MOSLateOptimization.cpp` (`threadAccum16`).
+- **Interim text.** `foldableAbsLoad16` has no Xc16 guard until commit 14.
+- **Tests.** a16-byte-store.ll, a16-indirect-byte-store.ll (store policy of commit 8 with native producers present).
+- **Findings.** N3: 188. N4: 8.
+
+### 11. Select native 16-bit compares and fused branches (`ebdd0900230f`)
+
+- **Purpose.** Native UGE/ULT via one 16-bit G_SBC; SLT via sign flip; profitable native EQ; fused CmpBr16 pseudos and their expansion; opcode-keyed frame-index displacement; byte sign fill for 16-bit ASHR by bytes.
+- **Key hunks.** `MOSInstrPseudos.td` (CmpBrImag16 … CmpBrImagAbs16); `MOSInstrInfo.cpp` (`getBranchDestBlock`, `analyzeBranch`, `expandPostRAPseudo`, `expandCmpBr16`); `MOSRegisterInfo.cpp` (`eliminateFrameIndex`); `MOSLegalizerInfo.cpp` (`legalizeICmp`, G_ASHR fill); `MOSInstructionSelector.cpp` (CmpNZ16 matchers, `selectBrCondImm`, `foldableIndirLoad16`, `selectSbc16`).
+- **Tests.** a16-immediate-width.ll (also covers commit 2's printing).
+- **Findings.** N3: 125. N4: 14.
+
+### 12. Keep byte indexes byte-wide in absolute indexed addressing (`77326e4aaff3`)
+
+- **Purpose.** s8 index used directly; a byte-sized s16 index is truncated and its other users get an explicit `merge(lo, 0)`, with observer notification for CSE.
+- **Key hunks.** `MOSLegalizerInfo.cpp` (`tryAbsoluteIndexedAddressing`).
+- **Default effect.** Asm changes in both modes (table above); legalizer.mir updated.
+- **Upstream note.** Changes default output, so it needs its own justification in review.
+- **Tests.** zp-byte-index.ll, legalizer-indexed-offset-observer.mir; legalizer.mir updated.
+- **Findings.** N3: 4. N4: 0.
+
+### 13. Require a no-wrap proof before folding near indexes on the 65816 (`0284f9f318a4`)
+
+- **Purpose.** `canFoldNearIndex`: on the 65816 an indexed access carries into DBR, so a near G_PTR_ADD folds only with nuw, nusw with a non-negative offset, or a known-bits bound.
+- **Key hunks.** `MOSLegalizerInfo.cpp` (`canFoldNearIndex`; calls in `tryIndexedAddressing16`, `tryAbsoluteIndexedAddressing`, `selectIndirectAddressing`).
+- **Default effect.** mosw65816 asm changes, +4,626 bytes on the fixed set. The later near-index recovery patches add no-wrap proofs for common shapes; their effect on this set was not measured here.
+- **Tests.** near-index-nowrap.ll (added): on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base bounded by known bits (folded on both).
+- **Findings.** N3: 0. N4: 0.
+
+### 14. Select 16-bit index registers under +mos-xy16 (`e8c51cc3b8cf`)
+
+- **Purpose.** s16 offsets as 16-bit X/Y indexes (B2), Xc16 classification of loads whose users can take X (B1), `selectXY16`, fused `ldy zp; lda/sta (zp),y` pseudos emitted by the assembly printer.
+- **Key hunks.** `MOSInstrGISel.td` (G_*_IDX16); `MOSInstrLogical.td` (LDIndirYIdxFused …); `MOSAsmPrinter.cpp` (`emitInstruction`); `MOSLegalizerInfo.cpp` (`allUsesAreXY16Compatible`, B1/B2 hunks); `MOSInstructionSelector.cpp` (`isXc16Reg`, `isYc16Reg`, `selectXY16`, dispatch).
+- **Tests.** xy16-near-indir-y.ll.
+- **Findings.** N3: 134. N4: 7.
+
+### 15. Keep small 8-bit adds relocatable under +mos-a16 (`50db44329f1d`)
+
+- **Purpose.** ±2 on an s8 under `+mos-a16` becomes two INC/DEC on Anyi8, avoiding an A-pinned counter that deadlocks allocation around Ac16 transits.
+- **Key hunks.** `MOSInstructionSelector.cpp` (`selectAddSub`).
+- **Tests.** a16-small-add.ll (added): +2 and -2 become `inx; inx` and `dex; dex` under +mos-a16, +3 keeps `adc`, and the default mode keeps `adc` for all three. The allocation failure that motivates the change needs a larger function and is not reproduced by this test.
+- **Findings.** N3: 22. N4: 1.
+
+### 16. Preserve interrupted M/X state in 65816 interrupt handlers (`780d9e028c04`)
+
+- **Purpose.** 65816 interrupt prologue/epilogue saves A/X/Y at 16 bits plus DBR and D, establishes M8/X8, D=0, DBR=0; RTI restores P.
+- **Key hunks.** `MOSFrameLowering.cpp` (`emitPrologue`, `emitEpilogue`).
+- **Default effect.** Applies to plain mosw65816 interrupt handlers.
+- **Upstream note.** Depends on nothing else in the series; the blueprint asks to present it with the feature narrative rather than as an unrelated fix.
+- **Tests.** interrupt-width-65816.ll.
+- **Findings.** N3: 2. N4: 0.
+
+## Gaps a reviewer will notice
+
+- **Tests the split adds:** commits 1, 2, 3, 5, 6, 7, 8, 13 and 15 carry tests that the monolithic patch did not have; the series ends at the monolithic tree plus these ten files. They have not yet been copied into the downstream patch `0002` or `vendor/`.
+- **Default code size:** commits 1, 12 and 13 grow default code on the fixed set (+1.3% mos6502, +2.7% mosw65816 end to end).
+- **#320 residue:** none in code. One test (xy16-near-indir-y.ll) carries a data layout string with `p2:32:8-p3:24:8`.

@@ -1,0 +1,60 @@
+321-02: +// #321 native s16 indirect memory: LDA (zp) / STA (zp) in 16-bit-accumulator mode —
+321-02: +// #321 native 16-bit compares: A16 - operand, discard the result, keep the flags
+321-02: +// #321 native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
+321-02: +// #321 native s16 arithmetic right shift (signed `>>`): the 65816 has no native
+321-04: +  // XLow=1: our new 16-bit X/Y pseudos (INX16, LDXAbs16, TXA16, TAX16, …).
+321-04: +    // in an X16 ambient `iny` would increment the full 16-bit Y (the 16-bit
+321-04: +  // The original Increment-1a behavior: each block begins and ends 8-bit.
+321-04: +// This file declares the MOS REP/SEP insertion pass (#321 — 16-bit register
+321-06: +      // #321 SPILL CONTRACT (static-stack mirror of MOSRegisterInfo::expandLDSTStk):
+321-08: +// #321 native s16: a 16-bit indirect load `lda (zp)` in 16-bit-accumulator mode —
+321-08: +// #321 native s16: a 16-bit indirect store `sta (zp)` in 16-bit-accumulator mode —
+321-08: +// #321 native s16: 16-bit abs,x load/store `lda abs,x` / `sta abs,x` in M=0 mode.
+321-08: +// #321 native s16: 16-bit (zp),y load/store in M=0 mode. Mirrors G_LOAD_INDIR_IDX /
+321-08: +  // #321 native s16 indirect load/store (G_LOAD16_INDIR / G_STORE16_INDIR):
+321-08: +  // #321 native s16 absolute load/store (G_LOAD16_ABS / G_STORE16_ABS):
+321-08: +  // #321 native s16: bring a 16-bit store's value into A16, folding a single-use
+321-08: +// #321 native s16 indirect load/store: a 16-bit value through a runtime pointer.
+321-08: +// #321 native s16 absolute load/store: a 16-bit value at an absolute (global/static)
+321-08: +      // abs,x or (zp),y indexed 16-bit load/store (Native widths: ).
+321-08: +    // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer ->
+321-08: +  // #321 native s16: a 16-bit value through a non-absolute 16-bit pointer -> one
+321-08: +  // #321 native s16 indirect load/store (one 16-bit op vs two 8-bit).
+321-10: +  // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
+321-10: +    // #321 native s16 constant shift: the legalizer leaves a small s16 left /
+321-10: +// #321 native s16: recover a 16-bit constant whether it survived as a G_CONSTANT or was
+321-10: +// #321 native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
+321-10: +// #321 native s16: extract a 16-bit compile-time constant from an operand, if it
+321-10: +  // #321 native 16-bit inc/dec: a 16-bit ±1 is one `inc a`/`dec a` on A16 (1 byte, no
+321-10: +// #321 native s16 constant shift: `dst = src << k` / `dst = src >> k` (unsigned),
+321-10: +  // #321 native 16-bit constant shifts: under +mos-a16 a small s16 shift is one
+321-11: +// #321 native s16 equality: expand a fused 16-bit compare-branch to
+321-11: +  // #321 native s16 equality (== / !=): a fused 16-bit compare-and-branch. The LHS
+321-11: +  // #321 native 16-bit compares: select an s16 G_SBC (compare form) to one
+321-11: +    // #321 native s16: a 16-bit G_SBC is the native equality form (handled by the
+321-11: +// #321 native s16 equality: match a 16-bit G_SBC whose live flag is Z (the ==/!=
+321-11: +  // #321 native s16 equality: a 16-bit G_SBC (Z) feeding this branch -> a fused
+321-11: +    // #321 `g == 0x1234`: fold a single-use near-abs GLOBAL LHS into `lda abs`
+321-11: +// #321 RHS-indexed compare fold: a single-use, same-BB 16-bit *indirect* load
+321-11: +// #321 native 16-bit compares: select an s16 G_SBC that the legalizer left
+321-11: +  // #321 native 16-bit compare: an s16-result G_SBC is the unsigned-ordering
+321-11: +  // #321 native s16 signed ordering: signed order equals unsigned order after
+321-11: +  // #321 canonicalization: EQ's Z is symmetric (a-b==0 iff b-a==0); swaps below are safe.
+321-11: +    // #321 native s16 equality (branch-fused): one 16-bit G_SBC -> selectBrCondImm
+321-11: +  // (#321), whose operand after the frame-index address is the COMPARE immediate
+321-14: +    // #321 seed 247/445: a 16-bit value classed Xc16/Yc16 whose only consumers are
+321-14: +// #321 xy16 B1 gate: return true if every use of Vreg (an s16 vreg produced by
+321-14: +        // B1: under +mos-xy16, constrain the load result to Xc16 when ALL uses
+321-14: +  // B2: set when a direct s16 offset (16-bit index) is found; switches the
+321-14: +      // B2: under +mos-xy16, a direct s16 offset uses the widened index form.
+321-14: +      // B2: under +mos-xy16, a direct s16 offset uses the widened form.
+321-14: +      // B2: direct s16 offset → (zp),Y16 indirect indexed (16-bit Y).
+321-15: +    // #321 a16 register-pressure relief: under +mos-a16, lower a SMALL-constant 8-bit
+320-01: +// #321 Increment 1b: the 16-bit accumulator as a register class (single member,
+320-04: +  // #321 Phase 2 inc 2: indirect-long indexed with a 16-bit Y.
+320-04: +  // #321 Phase 2 inc 1: the indexed indirect-long forms (`lda [dp],y` /
+320-04: +  // #321 Phase 2 inc 1: the indexed forms carry the far pointer in operand 1
+320-04: +  case MOS::G_LOAD_FAR_INDIR_IDX: // #321 Ph2: far load -> LDA [dp],y (b7).
+320-04: +  case MOS::G_STORE_FAR_INDIR_IDX: // #321 Ph2: far store -> STA [dp],y (97).
+320-04: +    // #321 Phase 2 inc 1: a small constant displacement off that runtime
+320-04: +  // #321 Phase 2 inc 1: 65816 indirect-long INDEXED (`lda [dp],y`) addressing

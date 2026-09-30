@@ -289,7 +289,7 @@
         "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/320",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review."
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review."
     },
     {
       "id": "platform:321",
@@ -306,7 +306,7 @@
         "docs/plans/2026-09-30-split-320-321-series.md"
       ],
       "upstreamUrl": "https://github.com/llvm-mos/llvm-mos/issues/321",
-      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. Split #320/#321 into reviewable commit series, repair those findings in it, then re-review."
+      "nextStep": "Rebased onto 06bc967d2668 and independently reviewed: 0069/0070 hold, but the far prerequisite has four downstream defects, two extraction gaps and a register collision with open #594. #320/#321 are now split into reviewable commit series (docs/pr-preparations/2026-09-30/split-320-321); repair those findings on that series, then re-review."
     },
     {
       "id": "platform:snes415",

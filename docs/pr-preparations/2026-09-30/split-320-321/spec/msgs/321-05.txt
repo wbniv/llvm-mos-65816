@@ -1,0 +1,16 @@
+[MOS] Preserve status flags across register scavenging
+
+Let the register scavenger preserve a live processor status register. On a balanced hard-stack range it saves P with PHP and restores it with PLP. On an unbalanced range, when the target has PHX/PHY and a dead index register exists at both ends, it moves P through that register into the reserved RC17 slot (`php; plx; stx rc17` and `ldx rc17; phx; plp`), each half stack-neutral. The PHP operand is marked undef when no part of P holds a defined value, matching the verifier's rule that any defined sub-register makes the composite defined. Any other case stops with a fatal error.
+
+The scavenger borrows $c, a sub-register of $p, for frame-index carries. Native 16-bit compare and ALU chains keep N, Z or C live across such a materialization, so N and Z cannot be assumed dead at a scavenge point, and the scavenger does not assert it. A and Y keep their existing save paths; P no longer shares them.
+
+Default-mode effect: none in the fixed input set. The P paths apply to every CPU: on mos6502 at -O0, a frame over 255 bytes with carry live across a spill reload no longer stops on the N/Z assertion.
+
+Tests: scavenger-p-undef-6502.ll (reduced from gcc.c-torture strlen-4.c, from the downstream tree's tests) compiles at -O0 on mos6502 through prologue/epilogue insertion with the verifier on, and checks both a `PH undef $p` where no status bit holds a value and a plain `PH $p` where carry is live. The parent commit fails it with the N/Z assertion.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

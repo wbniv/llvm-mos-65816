@@ -1,0 +1,20 @@
+[MOS] Legalize and select far pointer values and memory accesses
+
+Pass, legalize and select address-space-2 pointers and the byte loads and stores through them.
+
+Calls: a far pointer argument is assigned to RL1-RL3 and its calling-convention type is i32; incoming 32-bit values are accepted. Legalization: p2 is legal for G_GLOBAL_VALUE, G_FRAME_INDEX and G_BLOCK_ADDR, converts to and from s32 with G_PTRTOINT/G_INTTOPTR, and takes s32 offsets in G_PTR_ADD, which always use the integer carry chain so the add carries into the bank byte. A p2 G_PHI becomes an s32 PHI, with casts placed before each predecessor's terminator and after the block's PHIs. Casting a near pointer to far zero-extends it (bank $00) without the zero-page bias used for direct-page pointers. A byte load or store through a constant or global far address becomes G_LOAD_FAR_ABS/G_STORE_FAR_ABS (absolute long, `lda $xxxxxx`); through a runtime far pointer it becomes G_LOAD_FAR_INDIR/G_STORE_FAR_INDIR (`lda [dp]`).
+
+Selection: s32 register values use Imag32; a 2 x s16 merge composes an Imag32 with REG_SEQUENCE and an s32 unmerge splits it by word; the far address of a symbol (by address space, including aliases, not by section name) is built from MO_ADDR24_SEG_LO/_SEG_HI/_BANK immediates, which lower to the ADDR24 relocation modifiers; the far access pseudos pin their pointer operand to Imag32 so the cast chain coalesces into the quad `[dp]` reads. Allocation hints skip candidates whose width differs from the copy's other side. MOSLateOptimization's LDImm combining tracks only immediate loads into A, X or Y, and LDCImm treats any nonzero immediate as a set carry.
+
+The 65816 reaches data outside bank DBR only through long addressing; a 16-bit pointer cannot name it.
+
+Default-mode effect: none for code that compiled before: assembly and objects are identical in mos6502 and mosw65816. Five corpus inputs that use address space 2 fail in both default modes before and after this commit, with a different legalization error: without +mos-a16, the s32 merges and unmerges that far pointers need are not legal.
+
+Tests: far-addressing.ll checks absolute-long and `[dp]` loads and stores in assembly and object bytes ($af/$8f/$a7/$87), and that a near symbol placed in a far section stays near. far-phi.ll checks the p2 PHI legalization and a `[dp]` load in the emitted loop.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/far-addressing.ll llvm/test/CodeGen/MOS/far-phi.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

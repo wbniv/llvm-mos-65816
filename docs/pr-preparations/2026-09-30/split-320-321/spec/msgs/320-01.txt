@@ -1,0 +1,18 @@
+[MOS] Add the far address space and 32-bit imaginary pointer quads
+
+Add address space 2 for far data pointers: `p2:32:8` in the MOS data layout (TargetDataLayout and MOSTargetMachine) and AS_Far in MOS::AddressSpace. A far pointer is a 32-bit value whose low three bytes are the 65816 long address; 32 bits keep it a simple MVT, since there is no MVT::i24.
+
+A runtime far pointer lives in an imaginary quad: RLk covers the Imag16 pairs RS(2k) and RS(2k+1), four consecutive zero-page bytes, through the new sublo16/subhi16 indices. The Imag32 class joins the register bank. A quad is named by its lowest __rc byte, which is where `[dp]` reads the address; it is reserved whenever either of its pairs is reserved (stack pointer, scavenger slot, frame pointer, or pairs outside the imaginary window); it copies as two Imag16 copies and costs four byte copies; and zero-page CSR allocation places all four bytes as one consecutive unit and records offsets for the quad, both pairs and all four bytes, so a relocated `[dp]` operand stays consistent with its byte definitions. Quads have no DWARF number; their byte and pair subregisters keep the existing mappings.
+
+This commit defines the same register family (sublo16/subhi16, MOSImagReg32, RL#K, MOSReg32Class, Imag32) as open upstream PR #594 with a different register-number offset (0x600 here) and allocation policy (#594 keeps RL non-allocatable). It must be reconciled with #594 before submission; a #594-based rebase replaces this commit.
+
+Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code for the fixed input set is identical in mos6502 and mosw65816 (assembly and objects).
+
+Tests: imag32-copy.mir checks that a quad copy lowers to four byte copies in address order, with RL1 and RL2 naming __rc4-__rc7 and __rc8-__rc11. Nothing produces address space 2 values until the next commit.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/imag32-copy.mir`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

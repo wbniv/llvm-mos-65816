@@ -2,6 +2,20 @@
 
 Prepared September 28, 2026. This packet extracts the completed downstream optimization onto `llvm-mos/llvm-mos` revision `26d7c2c1eebf98ca194b92609ba4e7540bfc6ef6`. The [local completion record](../../../plans/2026-09-27-broader-near-store-profitability.md), [canonical missed-optimization record](../../../defects/mos-near-store-profitability.json), original patches, and preserved baseline remain the authoritative September 27 evidence.
 
+## Split series (current)
+
+This packet's destination was `26d7c2c1eebf`, with its own #321 extraction as patch 1. Its later patches (0063 and 0065, patches 2 and 3 below) now apply with `git am -3`, without conflicts, on the 16-commit [#321 split series](../../2026-09-30/split-320-321/README.md) at `06bc967d2668`. [`patches-split/`](patches-split/) holds the 16 split commits followed by those two patches.
+
+| Check | Result |
+| --- | --- |
+| 0063 and 0065 on the split | Applied with `git am -3`, no conflicts |
+| Final tree | `c580f57d9040` |
+| Round trip | Each of the 18 patches applied in order to `06bc967d2668` reproduces its commit's tree ([record](evidence/split-series.json)) |
+| MOS CodeGen + MC | 156 passed, 1 unsupported: the split's 153 plus 0065's three tests |
+| `llc` | sha256 `288617e72764…`; it differs from the previous candidate because the destination and the #321 extraction differ |
+
+The replay, runtime and loaded-pointer measurements below were taken on the `26d7c2c1eebf` series and have not been repeated on the split. Everything below this section is that dated record.
+
 ## Scope and publication
 
 The ordered series contains the #321 native compiler prerequisites, 0063's absolute increment rule, and 0065's broader near-store profitability rule with additional boundary tests. Apply all three patches to the exact destination before reviewing or building 0065. Upstream main has no native-width entry point, so the final patch cannot be applied or evaluated alone.

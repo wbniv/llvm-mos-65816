@@ -1,0 +1,972 @@
+From 460ed3e89eedf5926ce285779f885fe525c216a4 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 10/32] [MOS] Select native 16-bit arithmetic, logic and
+ constant shifts
+
+Under +mos-a16, s16 G_ADD, G_SUB, G_AND, G_OR and G_XOR stay legal, and s16 shifts by a constant 1-7 are left un-narrowed. The selector emits `lda; [clc|sec]; op; sta` on the Imag16 operands. A second operand that is a constant (recovered from a byte-split G_MERGE_VALUES if needed) uses the immediate form. A single-use absolute load in the same block, with no call, unmodeled side effect, ordered store or possibly aliasing store in between, is read directly by `lda abs` or `op abs`. Adding or subtracting one becomes `inc a`/`dec a`. Shifts emit one `asl a` or `lsr a` per bit; arithmetic right shift emits `cmp #$8000; ror a` per bit, because the 65816 has no arithmetic shift right and the compare copies the sign into carry. Shifts by 8 or more keep the byte path, which relabels bytes at no cost.
+
+Each selected operation stores its result to an Imag16 home. After register allocation, MOSLateOptimization removes a `lda rsN` that reloads the home just written by `sta rsN` from A16, when nothing in between writes A16 or the home and no call or inline assembly intervenes; the store goes too when the reload killed the home and nothing else read it, and A16 kill flags in the extended range are cleared. Without this, a chain of word operations stores and reloads every intermediate result. Running after allocation keeps byte values from coalescing into A16.
+
+Default-mode effect: none (fixed input set identical).
+
+Tests: a16-byte-store.ll and a16-indirect-byte-store.ll check the store policy from the load/store commit with native producers present: argument, returned, volatile, byte-built and A:X values keep byte stores in default, +mos-a16 and +mos-a16,+mos-xy16 modes, while a native sum is stored by the word store directly after its `adc`, which needs the residency peephole. The immediate forms are checked by a16-immediate-width.ll in the next commit.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-byte-store.ll llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ .../lib/Target/MOS/MOSInstructionSelector.cpp | 332 ++++++++++++++++++
+ llvm/lib/Target/MOS/MOSLateOptimization.cpp   |  95 +++++
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      |  53 ++-
+ llvm/test/CodeGen/MOS/a16-byte-store.ll       | 161 +++++++++
+ .../CodeGen/MOS/a16-indirect-byte-store.ll    | 187 ++++++++++
+ 5 files changed, 815 insertions(+), 13 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/a16-byte-store.ll
+ create mode 100644 llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index ec801ddb0c93..a78146b542a4 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -96,6 +96,13 @@ private:
+   bool selectIncDecMB(MachineInstr &MI);
+   bool selectUnMergeValues(MachineInstr &MI);
+   bool selectBrIndirect(MachineInstr &MI);
++  // Native widths: select a native s16 ALU op (G_ADD/G_SUB/G_AND/G_OR/
++  // G_XOR) whose value lives in an Imag16 zero-page pair (locals/multi-use, not
++  // just the all-global peephole).
++  bool selectAlu16Native(MachineInstr &MI);
++  // #321 native s16 constant shift (G_SHL / unsigned G_LSHR, amount in [1,7]):
++  // `lda; (asl|lsr)*k; sta` on the Imag16 value, bracketed by one rep/sep.
++  bool selectShift16Native(MachineInstr &MI);
+   // #321 native s16 indirect load/store (G_LOAD16_INDIR / G_STORE16_INDIR):
+   // lda (zp)/sta (zp) in M=0 through a runtime pointer, one rep/sep.
+   bool selectMem16Indir(MachineInstr &MI);
+@@ -216,15 +223,46 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   switch (MI.getOpcode()) {
+   case MOS::G_ADD:
+   case MOS::G_SUB:
++    // Native widths: a native s16 add/sub (left un-narrowed by the
++    // legalizer under +mos-a16) carries its value in an Imag16 pair.
++    if (STI.hasAccum16() &&
++        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
++            LLT::scalar(16)) {
++      if (selectAlu16Native(MI))
++        return true;
++      break;
++    }
+     if (selectAddSub(MI))
+       return true;
+     break;
+   case MOS::G_AND:
+   case MOS::G_OR:
+   case MOS::G_XOR:
++    // Native widths: native s16 bitwise lives in an Imag16 pair too.
++    if (STI.hasAccum16() &&
++        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
++            LLT::scalar(16)) {
++      if (selectAlu16Native(MI))
++        return true;
++      break;
++    }
+     if (selectLogical(MI))
+       return true;
+     break;
++  case MOS::G_SHL:
++  case MOS::G_LSHR:
++  case MOS::G_ASHR:
++    // #321 native s16 constant shift: the legalizer leaves a small s16 left /
++    // unsigned-right / signed-right shift un-narrowed under +mos-a16; select it to
++    // one `lda; <shift>*k; sta` run on the Imag16 value (asl / lsr / cmp+ror).
++    if (STI.hasAccum16() &&
++        MI.getMF()->getRegInfo().getType(MI.getOperand(0).getReg()) ==
++            LLT::scalar(16)) {
++      if (selectShift16Native(MI))
++        return true;
++      break;
++    }
++    break;
+   }
+ 
+   if (selectImpl(MI, *CoverageInfo))
+@@ -795,6 +833,28 @@ static Register getSbcFlagForRegister(const MachineInstr &Sbc, Register Reg) {
+   llvm_unreachable("Could not find register in G_SBC outputs.");
+ }
+ 
++// #321 native s16: recover a 16-bit constant whether it survived as a G_CONSTANT or was
++// byte-split into G_MERGE_VALUES(i8 lo, i8 hi) during legalization — how a 16-bit
++// constant operand of a native EQ/ALU op reaches selection under +mos-a16 (a
++// G_CONSTANT i16 is illegal and is narrowed to bytes). Two non-constant byte loads
++// merged together yield nullopt, so a `g == h` (both variables) is not mistaken for an
++// immediate compare. Shared by the EQ matcher (CmpNZImm16_match) and getImm16Operand.
++static std::optional<int64_t> getI16Const(Register R,
++                                          const MachineRegisterInfo &MRI) {
++  if (auto C = getIConstantVRegValWithLookThrough(R, MRI))
++    return C->Value.getZExtValue() & 0xFFFF;
++  MachineInstr *Def = getDefIgnoringCopies(R, MRI);
++  if (Def && Def->getOpcode() == TargetOpcode::G_MERGE_VALUES &&
++      Def->getNumOperands() == 3) {
++    auto Lo = getIConstantVRegValWithLookThrough(Def->getOperand(1).getReg(), MRI);
++    auto Hi = getIConstantVRegValWithLookThrough(Def->getOperand(2).getReg(), MRI);
++    if (Lo && Hi)
++      return ((Hi->Value.getZExtValue() & 0xFF) << 8) |
++             (Lo->Value.getZExtValue() & 0xFF);
++  }
++  return std::nullopt;
++}
++
+ // Match criteria common to all Cmp where N or Z are used.
+ struct CmpNZ_match {
+   Register &LHS;
+@@ -1124,6 +1184,47 @@ bool MOSInstructionSelector::selectBrCondImm(MachineInstr &MI) {
+   return true;
+ }
+ 
++// #321 native s16 compare-operand fold: returns the defining G_LOAD16_ABS iff `R`
++// is a single-use 16-bit near-abs global load in `User`'s block — the operand the
++// absolute compare/load forms (cmp abs / lda abs) can read directly instead of
++// round-tripping the global through an Imag16 pair. Volatile-safe: the load has
++// exactly this one use, so folding preserves the single memory access in program
++// order (single-use check, same as selectAlu16Native's abs operand fold). Same-BB
++// only (mirrors shouldFoldMemAccess's no-cross-block rule).
++
++// Folding moves a load to its single user in the same block. Calls, unmodeled
++// side effects, and potentially aliasing stores invalidate the loaded value.
++// Ordered stores are barriers regardless of aliasing so volatile accesses keep
++// their order. Alias analysis can admit intervening non-aliasing stores.
++static bool noClobberBetween(const MachineInstr *Def, const MachineInstr &User,
++                             AAResults *AA) {
++  bool afterDef = false;
++  for (const MachineInstr &MI : *Def->getParent()) {
++    if (&MI == Def) { afterDef = true; continue; }
++    if (&MI == &User)
++      break;
++    if (!afterDef)
++      continue;
++    if (MI.isCall() || MI.hasUnmodeledSideEffects())
++      return false;
++    if (MI.mayStore() &&
++        (MI.hasOrderedMemoryRef() || MI.mayAlias(AA, *Def, /*UseTBAA=*/true)))
++      return false;
++  }
++  return true;
++}
++
++static MachineInstr *foldableAbsLoad16(Register R, const MachineInstr &User,
++                                       const MachineRegisterInfo &MRI,
++                                       AAResults *AA) {
++  MachineInstr *Def = MRI.getVRegDef(R);
++  if (Def && Def->getOpcode() == MOS::G_LOAD16_ABS &&
++      MRI.hasOneNonDBGUse(R) && Def->getParent() == User.getParent() &&
++      noClobberBetween(Def, User, AA))
++    return Def;
++  return nullptr;
++}
++
+ // Although some G_SBC instructions can be folded in to their (branch) uses,
+ // others need to be selected directly.
+ bool MOSInstructionSelector::selectSbc(MachineInstr &MI) {
+@@ -1960,6 +2061,237 @@ bool MOSInstructionSelector::selectBrIndirect(MachineInstr &MI) {
+   }
+   return selectGeneric(MI);
+ }
++// #321 native s16: extract a 16-bit compile-time constant from an operand, if it
++// is one. Handles both forms a 16-bit literal takes by the time it reaches the
++// selector: a direct (look-through) constant, and — the common case — a
++// G_MERGE_VALUES of two byte constants (a 16-bit immediate is split into lo/hi
++// bytes before selection; getIConstantVRegValWithLookThrough does NOT look
++// through the merge, so reconstruct it here). Enables folding `var OP const` into
++// the *Imm16 forms instead of materializing the constant into an Imag16 pair.
++static std::optional<int64_t> getImm16Operand(Register R,
++                                              MachineRegisterInfo &MRI) {
++  // Shared with the EQ matcher (CmpNZImm16_match): direct G_CONSTANT or a byte-split
++  // G_MERGE_VALUES(i8 lo, i8 hi). See getI16Const.
++  return getI16Const(R, MRI);
++}
++
++// Native s16 values reside in Imag16 pairs. The selector loads A16 for
++// computation and stores it back afterward. Ac16-to-byte COPY instructions
++// would allow coalescing of incompatible widths, so use word loads/stores.
++bool MOSInstructionSelector::selectAlu16Native(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  Register Dst = MI.getOperand(0).getReg();
++  Register A = MI.getOperand(1).getReg();
++  Register B = MI.getOperand(2).getReg();
++
++  // Map the generic opcode to (zp ALU opcode, abs ALU opcode, imm ALU opcode
++  // [0 = none], carry-init: 0 clc / -1 sec (the sign-extended i1 'true' the .td
++  // LDImm1 pattern already produces elsewhere, matching the byte ADD/SUB
++  // CarryInVal convention below — irrelevant/unused for the non-arith ops),
++  // is-arithmetic, commutative). AbsOpc reads a near-abs global operand
++  // directly (the mixed-operand fold below).
++  unsigned AluOpc, AbsOpc, ImmOpc;
++  int CarryInit;
++  bool IsArith, Commutative;
++  switch (MI.getOpcode()) {
++  case MOS::G_ADD: AluOpc = MOS::ADCImag16; AbsOpc = MOS::ADCAbs16; ImmOpc = MOS::ADCImm16; CarryInit = 0;  IsArith = true;  Commutative = true;  break;
++  case MOS::G_SUB: AluOpc = MOS::SBCImag16; AbsOpc = MOS::SBCAbs16; ImmOpc = 0;             CarryInit = -1; IsArith = true;  Commutative = false; break;
++  case MOS::G_AND: AluOpc = MOS::ANDImag16; AbsOpc = MOS::ANDAbs16; ImmOpc = MOS::ANDImm16; CarryInit = -1; IsArith = false; Commutative = true;  break;
++  case MOS::G_OR:  AluOpc = MOS::ORAImag16; AbsOpc = MOS::ORAAbs16; ImmOpc = MOS::ORAImm16; CarryInit = -1; IsArith = false; Commutative = true;  break;
++  default:         AluOpc = MOS::EORImag16; AbsOpc = MOS::EORAbs16; ImmOpc = MOS::EORImm16; CarryInit = -1; IsArith = false; Commutative = true;  break; // G_XOR
++  }
++
++  // #321 native 16-bit inc/dec: a 16-bit ±1 is one `inc a`/`dec a` on A16 (1 byte, no
++  // carry-init), not `(clc;) adc #$0001`. Compute the signed step from a constant
++  // operand: ADD by +1 / SUB by -1 -> inc; ADD by -1 (0xFFFF) / SUB by +1 -> dec. For
++  // ADD (commutative) the constant may be either operand; for SUB it must be the
++  // subtrahend B (`1 - x` is not a decrement). The value loads via the LHS abs-fold
++  // (lda abs near-abs global, else lda zp); inc/dec a sets N/Z (carry-out unused). All
++  // MLow=1 -> one rep/sep bracket, value enters/leaves A16 only via the load/store.
++  if (MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB) {
++    auto stepOf = [](int64_t C) -> int { return C == 1 ? 1 : (C == 0xFFFF ? -1 : 0); };
++    int Step = 0;
++    Register Val;
++    if (MI.getOpcode() == MOS::G_ADD) {
++      if (auto C = getImm16Operand(B, MRI)) { Step = stepOf(*C); Val = A; }
++      if (!Step)
++        if (auto C = getImm16Operand(A, MRI)) { Step = stepOf(*C); Val = B; }
++    } else { // G_SUB: only the subtrahend (B) as a constant is an inc/dec
++      if (auto C = getImm16Operand(B, MRI)) { Step = -stepOf(*C); Val = A; }
++    }
++    if (Step) {
++      SmallVector<MachineInstrBuilder, 3> New;
++      MachineInstr *LdV = foldableAbsLoad16(Val, MI, MRI, AA);
++      Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      if (LdV)
++        New.push_back(Builder.buildInstr(MOS::LDAbs16).addDef(Lo)
++                          .add(LdV->getOperand(1)).cloneMemRefs(*LdV));
++      else
++        New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(Val));
++      Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++      New.push_back(Builder.buildInstr(Step > 0 ? MOS::INCAcc16 : MOS::DECAcc16)
++                        .addDef(Res).addUse(Lo));
++      New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
++      for (MachineInstrBuilder &Bld : New)
++        constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++      if (LdV)
++        LdV->eraseFromParent();
++      MI.eraseFromParent();
++      return true;
++    }
++  }
++
++  // Fold a constant operand into the immediate form (not for SUB: no SBCImm16).
++  // After the (optional) swap, A is the register loaded into A16 and Imm (if set)
++  // is the second operand; otherwise B is the register second operand.
++  std::optional<int64_t> Imm;
++  if (ImmOpc) {
++    if ((Imm = getImm16Operand(B, MRI))) {
++      // B is the immediate; A stays the loaded register.
++    } else if (Commutative && (Imm = getImm16Operand(A, MRI))) {
++      std::swap(A, B); // load the old-B register; the old-A constant is the imm.
++    }
++  }
++
++  // Mixed-operand fold sites: a single-use near-abs global A folds into `lda abs`;
++  // a single-use near-abs global B (no immediate) folds into the `OP abs` form.
++  SmallVector<MachineInstr *, 2> Folded;
++  MachineInstr *LdA = foldableAbsLoad16(A, MI, MRI, AA);
++  MachineInstr *LdB = Imm ? nullptr : foldableAbsLoad16(B, MI, MRI, AA);
++
++  SmallVector<MachineInstrBuilder, 4> New;
++
++  // lda a (16-bit) -> A16. Fold a near-abs global LHS straight into `lda abs`.
++  Register Lo = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  if (LdA) {
++    New.push_back(Builder.buildInstr(MOS::LDAbs16)
++                      .addDef(Lo)
++                      .add(LdA->getOperand(1))
++                      .cloneMemRefs(*LdA));
++    Folded.push_back(LdA);
++  } else {
++    New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Lo).addUse(A));
++  }
++
++  Register Carry;
++  if (IsArith) {
++    // clc (add) / sec (sub) — outside the 16-bit run (carry-init is M-agnostic).
++    Carry = MRI.createVirtualRegister(&MOS::CcRegClass);
++    New.push_back(Builder.buildInstr(MOS::LDImm1).addDef(Carry).addImm(CarryInit));
++  }
++
++  // the ALU op (16-bit): A16 = a OP (b | [b:abs] | #imm) (+carry for add/sub). The
++  // second operand is an immediate, a near-abs global (abs form), or an Imag16 reg.
++  Register Res = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  unsigned EffAluOpc = Imm ? ImmOpc : (LdB ? AbsOpc : AluOpc);
++  auto Alu = Builder.buildInstr(EffAluOpc).addDef(Res);
++  if (IsArith) {
++    Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++    Register VOut = MRI.createVirtualRegister(&MOS::VcRegClass);
++    Alu.addDef(CarryOut).addDef(VOut).addUse(Lo);
++    if (Imm)
++      Alu.addImm(*Imm);
++    else if (LdB)
++      Alu.add(LdB->getOperand(1));
++    else
++      Alu.addUse(B);
++    Alu.addUse(Carry);
++  } else {
++    Alu.addUse(Lo);
++    if (Imm)
++      Alu.addImm(*Imm);
++    else if (LdB)
++      Alu.add(LdB->getOperand(1));
++    else
++      Alu.addUse(B);
++  }
++  if (LdB) {
++    Alu.cloneMemRefs(*LdB);
++    Folded.push_back(LdB);
++  }
++  New.push_back(Alu);
++
++  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Res));
++
++  for (MachineInstrBuilder &Bld : New)
++    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  // Erase the folded loads (single-use; this op was their only consumer, and
++  // selection is bottom-up so they are not yet selected).
++  for (MachineInstr *F : Folded)
++    F->eraseFromParent();
++
++  MI.eraseFromParent();
++  return true;
++}
++
++// #321 native s16 constant shift: `dst = src << k` / `dst = src >> k` (unsigned),
++// k a compile-time constant in [1,7] left un-narrowed by the legalizer under
++// +mos-a16. In 16-bit-accumulator mode one `asl a` / `lsr a` shifts all 16 bits,
++// so emit `lda src; (asl|lsr)*k; sta dst` — all MLow=1, so MOSInsertREPSEP wraps
++// the run in one rep/sep. The value enters A16 only via LDAImag16 and leaves only
++// via STAImag16 (no Ac16<->8-bit COPY). No carry-init: each shift self-fills 0.
++bool MOSInstructionSelector::selectShift16Native(MachineInstr &MI) {
++  MachineIRBuilder Builder(MI);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  Register Dst = MI.getOperand(0).getReg();
++  Register Src = MI.getOperand(1).getReg();
++  Register AmtReg = MI.getOperand(2).getReg();
++
++  auto AmtVal = getIConstantVRegValWithLookThrough(AmtReg, MRI);
++  if (!AmtVal)
++    return false; // legalizer only leaves constant amounts native; be defensive
++  uint64_t Amt = AmtVal->Value.getZExtValue();
++
++  const unsigned Opc = MI.getOpcode();
++  const bool IsAshr = Opc == MOS::G_ASHR;
++
++  SmallVector<MachineInstrBuilder, 16> New;
++
++  // lda src (16-bit) -> A16
++  Register Cur = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++  New.push_back(Builder.buildInstr(MOS::LDAImag16).addDef(Cur).addUse(Src));
++
++  // Amt iterations on A16, each threading a fresh Ac16 from the previous (the tied
++  // $dst=$src collapses the chain onto A16 in regalloc).
++  //  - G_SHL  -> asl a  (fill 0 at bit 0)
++  //  - G_LSHR -> lsr a  (fill 0 at bit 15)
++  //  - G_ASHR -> cmp #$8000; ror a  (cmp sets C = sign bit; ror rotates it into
++  //              bit 15, replicating the sign; the ror's carry-out is dead).
++  for (uint64_t I = 0; I < Amt; ++I) {
++    Register Next = MRI.createVirtualRegister(&MOS::Ac16RegClass);
++    if (IsAshr) {
++      Register Sign = MRI.createVirtualRegister(&MOS::CcRegClass);
++      New.push_back(Builder.buildInstr(MOS::CMPImm16)
++                        .addDef(Sign)
++                        .addUse(Cur)
++                        .addImm(0x8000));
++      Register CarryOut = MRI.createVirtualRegister(&MOS::CcRegClass);
++      New.push_back(Builder.buildInstr(MOS::RORAcc16)
++                        .addDef(Next)
++                        .addDef(CarryOut)
++                        .addUse(Cur)
++                        .addUse(Sign));
++    } else {
++      const unsigned ShOpc = Opc == MOS::G_SHL ? MOS::ASLAcc16 : MOS::LSRAcc16;
++      New.push_back(Builder.buildInstr(ShOpc).addDef(Next).addUse(Cur));
++    }
++    Cur = Next;
++  }
++
++  // sta dst (16-bit): the Imag16 dst is DEF'd by the store (imaginary-reg write).
++  New.push_back(Builder.buildInstr(MOS::STAImag16).addDef(Dst).addUse(Cur));
++
++  for (MachineInstrBuilder &Bld : New)
++    constrainSelectedInstRegOperands(*Bld.getInstr(), TII, TRI, RBI);
++
++  MI.eraseFromParent();
++  return true;
++}
+ 
+ Register MOSInstructionSelector::loadStoreValueIntoA16(
+     MachineIRBuilder &Builder, MachineInstr &StoreMI, Register Value,
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index fbedd8d46b95..3b17de9b4b1e 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -48,6 +48,7 @@ public:
+   bool lowerCmpZeros(MachineBasicBlock &MBB) const;
+   void lowerCmpZero(MachineInstr &MI) const;
+   bool combineLdImm(MachineBasicBlock &MBB) const;
++  bool threadAccum16(MachineBasicBlock &MBB) const;
+   bool tailJMP(MachineBasicBlock &MBB) const;
+ };
+ 
+@@ -56,6 +57,7 @@ bool MOSLateOptimization::runOnMachineFunction(MachineFunction &MF) {
+   for (MachineBasicBlock &MBB : MF) {
+     Changed |= lowerCmpZeros(MBB);
+     Changed |= combineLdImm(MBB);
++    Changed |= threadAccum16(MBB);
+     Changed |= tailJMP(MBB);
+   }
+   return Changed;
+@@ -398,6 +400,99 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+   return Changed;
+ }
+ 
++// Native operations keep values in Imag16 homes between instructions. A store
++// followed by a reload of the same home can retain its value in A16 instead.
++// Remove the store too when that reload is the home's only remaining reader.
++//
++// Run after register allocation so byte values cannot coalesce into A16.
++// LDAImag16 and STAImag16 do not define flags. Intervening instructions may
++// read A16, but writes to A16 or the home, calls, and inline assembly end the
++// residency proof. Clear intervening A16 kills when extending its lifetime.
++bool MOSLateOptimization::threadAccum16(MachineBasicBlock &MBB) const {
++  const auto *TRI = MBB.getParent()->getSubtarget().getRegisterInfo();
++  bool Changed = false;
++
++  // Stores whose value still provably resides in $a16, awaiting a redundant reload.
++  struct Pend { Register Home; MachineInstr *Sta; bool HomeRead; };
++  SmallVector<Pend, 4> Pending;
++  auto indexOf = [&](Register H) -> int {
++    for (unsigned I = 0, E = Pending.size(); I != E; ++I)
++      if (Pending[I].Home == H)
++        return (int)I;
++    return -1;
++  };
++
++  for (MachineInstr &MI : make_early_inc_range(MBB)) {
++    if (MI.isDebugInstr())
++      continue;
++
++    if (MI.getOpcode() == MOS::LDAImag16) {
++      Register Home = MI.getOperand(1).getReg();           // Imag16 use ($rsN)
++      int Idx = indexOf(Home);
++      if (Idx >= 0 &&
++          MI.getOperand(0).getReg() == Pending[Idx].Sta->getOperand(1).getReg()) {
++        // Redundant reload: $a16 already holds Home's value.
++        MachineInstr *Sta = Pending[Idx].Sta;
++        Register Acc = MI.getOperand(0).getReg();          // $a16
++        bool EraseStore = MI.getOperand(1).isKill() && !Pending[Idx].HomeRead;
++        // $a16 now stays live from the store across the gap to the next op — clear
++        // any stale kills on it so the verifier/later passes see it live throughout.
++        for (auto J = MachineBasicBlock::iterator(Sta),
++                  E = MachineBasicBlock::iterator(MI);
++             J != E; ++J)
++          J->clearRegisterKills(Acc, TRI);
++        MI.eraseFromParent();
++        Changed = true;
++        if (EraseStore) {
++          Sta->eraseFromParent();
++          Pending.erase(Pending.begin() + Idx); // store gone -> stop tracking
++        }
++        // Else keep BOTH the store and the pending entry: the value still resides
++        // in $a16 *and* the home, so a later reload of the same home is also
++        // redundant (this is the multi-reload case, e.g. `sta h; <store h>; lda h;
++        // … ; lda h`). $a16 is unchanged, so other pendings stay valid too.
++        continue;
++      }
++      // Genuine reload: it rewrites $a16, so no resident value survives.
++      Pending.clear();
++      continue;
++    }
++
++    if (MI.getOpcode() == MOS::STAImag16) {
++      // A store of the current $a16 value. STA reads $a16 (doesn't write it), so
++      // prior pendings keep holding the same resident value.
++      Register Home = MI.getOperand(0).getReg();           // Imag16 def ($rsN)
++      if (int Old = indexOf(Home); Old >= 0)
++        Pending.erase(Pending.begin() + Old);
++      Pending.push_back({Home, &MI, /*HomeRead=*/false});
++      continue;
++    }
++
++    // Any other instruction. Bail the whole resident set if $a16 is rewritten
++    // (incl. 8-bit sub-A / xba via aliasing -> modifiesRegister), clobbered by a
++    // call (regmask), or touched opaquely by inline asm. A volatile *store* only
++    // READS $a16, so it's fine to thread across (the store stays put; only the
++    // non-volatile reload of the Imag16 temp is dropped) — a volatile *load* would
++    // write $a16 and is caught by modifiesRegister above.
++    if (MI.modifiesRegister(MOS::A16, TRI) || MI.isCall() || MI.isInlineAsm()) {
++      Pending.clear();
++      continue;
++    }
++    // $a16 untouched: drop any home this instruction overwrites; note reads (a read
++    // means the store is still needed and may not be erased).
++    for (unsigned I = 0; I != Pending.size();) {
++      if (MI.modifiesRegister(Pending[I].Home, TRI)) {
++        Pending.erase(Pending.begin() + I);
++      } else {
++        if (MI.readsRegister(Pending[I].Home, TRI))
++          Pending[I].HomeRead = true;
++        ++I;
++      }
++    }
++  }
++  return Changed;
++}
++
+ bool MOSLateOptimization::tailJMP(MachineBasicBlock &MBB) const {
+   if (MBB.size() < 2)
+     return false;
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 522d5cea6bbb..e963285fe981 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -212,20 +212,24 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+       .widenScalarToNextMultipleOf(0, 8)
+       .custom();
+ 
+-  getActionDefinitionsBuilder({G_AND, G_OR})
+-      .legalFor({S8})
+-      .scalarize(0)
+-      .widenScalarToNextMultipleOf(0, 8)
+-      .maxScalar(0, S8)
+-      .unsupported();
++  // Native widths: under +mos-a16, s16 bitwise stays native (legal,
++  // selected by selectAlu16Native into an Imag16 pair) instead of narrowing to
++  // S8; larger scalars clamp to S16. Gated on hasAccum16 so default codegen is
++  // untouched. The 1b combiner still fast-paths all-global `g = a & b` shapes.
++  const LLT MaxBitwise = STI.hasAccum16() ? S16 : S8;
++  {
++    auto &B = getActionDefinitionsBuilder({G_AND, G_OR}).legalFor({S8});
++    if (STI.hasAccum16())
++      B.legalFor({S16});
++    B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++  }
+ 
+-  getActionDefinitionsBuilder(G_XOR)
+-      .legalFor({S8})
+-      .customFor({S1})
+-      .scalarize(0)
+-      .widenScalarToNextMultipleOf(0, 8)
+-      .maxScalar(0, S8)
+-      .unsupported();
++  {
++    auto &B = getActionDefinitionsBuilder(G_XOR).legalFor({S8}).customFor({S1});
++    if (STI.hasAccum16())
++      B.legalFor({S16});
++    B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, MaxBitwise).unsupported();
++  }
+ 
+   getActionDefinitionsBuilder(G_MUL)
+       .libcallFor({S8, S16, S32, S64})
+@@ -860,6 +864,11 @@ bool MOSLegalizerInfo::legalizeAddSub(LegalizerHelper &Helper,
+   assert(MRI.getType(Dst).isByteSized());
+ 
+   assert(MI.getOpcode() == MOS::G_ADD || MI.getOpcode() == MOS::G_SUB);
++  const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++  const LLT Ty = MRI.getType(Dst);
++  if (STI.hasAccum16() && Ty == LLT::scalar(16))
++    return true; // legal as-is; selected natively (selectAlu16Native)
++
+   auto RHSConst =
+       getIConstantVRegValWithLookThrough(MI.getOperand(2).getReg(), MRI);
+   // Constants too wide for int64_t cannot be +/-1, and would assert in
+@@ -1055,6 +1064,24 @@ bool MOSLegalizerInfo::legalizeShiftRotate(
+     return true;
+   }
+ 
++  // #321 native 16-bit constant shifts: under +mos-a16 a small s16 shift is one
++  // `lda; <shift>*Amt; sta` run in 16-bit-A mode, far cheaper than the 8-bit
++  // byte-pair decomposition below. Leave the s16 G_SHL/G_LSHR/G_ASHR un-narrowed
++  // (mirrors legalizeAddSub's native passthrough) for selectShift16Native: left and
++  // unsigned-right shift to one `asl`/`lsr` per bit; signed-right (ASHR) to
++  // `cmp #$8000; ror` per bit (the cmp sets carry from the sign, ror replicates it).
++  // Gated to Amt in [1,7]: Amt>=8 keeps the byte path (it relabels bytes with a
++  // sign/zero fill — free for byte-aligned shifts). After the Amt==0 copy, before
++  // the byte/over-correct paths.
++  {
++    const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
++    if (STI.hasAccum16() && Ty == LLT::scalar(16) &&
++        (MI.getOpcode() == MOS::G_SHL || MI.getOpcode() == MOS::G_LSHR ||
++         MI.getOpcode() == MOS::G_ASHR) &&
++        Amt >= 1 && Amt <= 7)
++      return true; // native; selected by selectShift16Native
++  }
++
+   Register Partial;
+   Register NewAmt;
+   // Shift by one multiples of one byte.
+diff --git a/llvm/test/CodeGen/MOS/a16-byte-store.ll b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+new file mode 100644
+index 000000000000..d9c2a64528c6
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-byte-store.ll
+@@ -0,0 +1,161 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++
++@g = global i16 0, align 1
++@h = global i16 0, align 1
++
++declare i16 @produce()
++
++; The ABI supplies an i16 argument in A:X. Absolute byte stores can consume
++; those registers directly when no native-width consumer needs the value.
++define void @store_arg(i16 %value) {
++; BYTE-LABEL: store_arg:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  store i16 %value, ptr @g, align 1
++  ret void
++}
++
++define i16 @store_return(i16 %value) {
++; BYTE-LABEL: store_return:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr @g, align 1
++  ret i16 %value
++}
++
++define void @store_twice(i16 %value) {
++; BYTE-LABEL: store_twice:
++; BYTE-NOT: rep
++; BYTE-NOT: __rc
++; BYTE-DAG: sta g
++; BYTE-DAG: stx g+1
++; BYTE-DAG: sta h
++; BYTE-DAG: stx h+1
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr @g, align 1
++  store volatile i16 %value, ptr @h, align 1
++  ret void
++}
++
++; Call results use the same byte-register ABI as arguments.
++define void @store_call() {
++; BYTE-LABEL: store_call:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: jsr produce
++; BYTE-NEXT: sta g
++; BYTE-NEXT: stx g+1
++; BYTE-NEXT: rts
++  %value = call i16 @produce()
++  store i16 %value, ptr @g, align 1
++  ret void
++}
++
++; Native producers retain a native store so the value stays in the wide path.
++define void @store_add(i16 %value) {
++; NATIVE-LABEL: store_add:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE-NEXT: rts
++; DEFAULT-LABEL: store_add:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %sum = add i16 %value, 42
++  store i16 %sum, ptr @g, align 1
++  ret void
++}
++
++define void @store_copy() {
++; NATIVE-LABEL: store_copy:
++; NATIVE: rep #[[WIDTH:(16|32)]]
++; NATIVE-NEXT: ld{{[axy]}} h
++; NATIVE-NEXT: st{{[axy]}} g
++; NATIVE-NEXT: sep #[[WIDTH]]
++; NATIVE-NEXT: rts
++; DEFAULT-LABEL: store_copy:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %value = load volatile i16, ptr @h, align 1
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; A byte-built argument with a native arithmetic use already needs Imag16.
++define i16 @store_mixed(i16 %value) {
++; NATIVE-LABEL: store_mixed:
++; NATIVE: rep #32
++; NATIVE: sta g
++; NATIVE: inc
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_mixed:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr @g, align 1
++  %sum = add i16 %value, 1
++  ret i16 %sum
++}
++
++; A value live across a call needs preserved storage. One native reload and store
++; can consume that pair without two separate byte reloads.
++declare void @opaque()
++define void @store_across_call(i16 %value) {
++; NATIVE-LABEL: store_across_call:
++; NATIVE: jsr opaque
++; NATIVE-NEXT: rep #32
++; NATIVE-NEXT: lda __rc20
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_across_call:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void @opaque()
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; The argument can cross a call along one predecessor of the store block.
++define void @store_cross_block(i16 %value, i1 %condition) {
++; NATIVE-LABEL: store_cross_block:
++; NATIVE: jsr opaque
++; NATIVE: rep #32
++; NATIVE-NEXT: lda __rc20
++; NATIVE-NEXT: sta g
++; NATIVE-NEXT: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_cross_block:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  br i1 %condition, label %call, label %store
++call:
++  call void @opaque()
++  br label %store
++store:
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; Clobbering inline assembly can require the same preservation as a call.
++define void @store_across_asm(i16 %value) {
++; NATIVE-LABEL: store_across_asm:
++; NATIVE: ;APP
++; NATIVE: ;NO_APP
++; NATIVE: rep #32
++; NATIVE: sta g
++; NATIVE: sep #32
++; NATIVE: rts
++; DEFAULT-LABEL: store_across_asm:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void asm sideeffect "", "~{a},~{x},~{y}"()
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
+diff --git a/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
+new file mode 100644
+index 000000000000..91b7adc661cd
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll
+@@ -0,0 +1,187 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,DEFAULT
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=BYTE,NATIVE
++
++@g = global i16 0, align 2
++@h = global i16 0, align 1
++declare void @opaque()
++
++; The pointer already occupies an imaginary pair, while the value arrives in A:X.
++; A single indirect store can use those bytes directly in the ambient M8/X8 mode.
++define void @store_indirect(ptr %p, i16 %value) {
++; BYTE-LABEL: store_indirect:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: txa
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; Volatile stores preserve both bytes and their low-to-high order.
++define void @store_volatile(ptr %p, i16 %value) {
++; BYTE-LABEL: store_volatile:
++; BYTE-NEXT: ; %bb.0:
++; BYTE-NEXT: sta (__rc2)
++; BYTE-NEXT: ldy #1
++; BYTE-NEXT: txa
++; BYTE-NEXT: sta (__rc2),y
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr %p, align 1
++  ret void
++}
++
++; The byte-valued return also consumes the original low byte after the stores.
++define i16 @store_and_return(ptr %p, i16 %value) {
++; BYTE-LABEL: store_and_return:
++; BYTE-NOT: rep
++; BYTE: sta (__rc2)
++; BYTE: sta (__rc2),y
++; BYTE: lda __rc4
++; BYTE-NEXT: rts
++  store volatile i16 %value, ptr %p, align 1
++  ret i16 %value
++}
++
++; Sharing the value across stores changes its register and reload costs.
++define void @store_twice(ptr %p, ptr %q, i16 %value) {
++; NATIVE-LABEL: store_twice:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sta (__rc4)
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_twice:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store volatile i16 %value, ptr %p, align 1
++  store volatile i16 %value, ptr %q, align 1
++  ret void
++}
++
++define void @store_absolute_and_indirect(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_absolute_and_indirect:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sta g
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_absolute_and_indirect:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr %p, align 1
++  store volatile i16 %value, ptr @g, align 1
++  ret void
++}
++
++; A non-wrapping offset retains its indexed native-width store.
++define void @store_offset(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_offset:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2),y
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_offset:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %q = getelementptr nuw i16, ptr %p, i16 1
++  store i16 %value, ptr %q, align 1
++  ret void
++}
++
++; A native producer can feed the wide store without splitting its result.
++define void @store_computed(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_computed:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE-NEXT: sta (__rc2)
++; NATIVE-NEXT: sep #32
++; DEFAULT-LABEL: store_computed:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %sum = add i16 %value, 42
++  store i16 %sum, ptr %p, align 1
++  ret void
++}
++
++; Intervening arithmetic changes both A:X residency and the current width.
++define void @store_native_context(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_native_context:
++; NATIVE: rep #32
++; NATIVE: adc #mos16(42)
++; NATIVE: sta (__rc2)
++; NATIVE-NEXT: sep #32
++; DEFAULT-LABEL: store_native_context:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  %old = load volatile i16, ptr @h, align 1
++  %sum = add i16 %old, 42
++  store volatile i16 %sum, ptr @h, align 1
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; A call requires the argument to survive in preserved storage.
++define void @store_across_call(ptr %p, i16 %value) {
++; NATIVE-LABEL: store_across_call:
++; NATIVE: jsr opaque
++; NATIVE: rep #32
++; NATIVE: sta (__rc{{[0-9]+}})
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_across_call:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  call void @opaque()
++  store i16 %value, ptr %p, align 1
++  ret void
++}
++
++; Later arguments already reside in imaginary registers and favor a wide load.
++define void @store_later_argument(ptr %p, i16 %first, i16 %value) {
++; NATIVE-LABEL: store_later_argument:
++; NATIVE: rep #32
++; NATIVE: sta (__rc2)
++; NATIVE: sep #32
++; DEFAULT-LABEL: store_later_argument:
++; DEFAULT-NOT: rep
++; DEFAULT: rts
++  store i16 %value, ptr %p, align 1
++  store volatile i16 %first, ptr @g, align 1
++  ret void
++}
++
++; Atomic word stores require the native single-instruction memory access. The
++; function attribute enables that path even in the default-feature RUN above.
++define void @store_atomic(ptr %p, i16 %value) #0 {
++; BYTE-LABEL: store_atomic:
++; BYTE: rep #32
++; BYTE: sta (__rc2)
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr %p unordered, align 2
++  ret void
++}
++
++; The same atomic contract applies to absolute stores and shared values.
++define void @store_atomic_absolute(i16 %value) #0 {
++; BYTE-LABEL: store_atomic_absolute:
++; BYTE: rep #32
++; BYTE: sta g
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr @g unordered, align 2
++  ret void
++}
++
++define void @store_atomic_shared(i16 %value) #0 {
++; BYTE-LABEL: store_atomic_shared:
++; BYTE: rep #32
++; BYTE: sta g
++; BYTE: sta h
++; BYTE-NEXT: sep #32
++; BYTE-NEXT: rts
++  store atomic i16 %value, ptr @g unordered, align 2
++  store volatile i16 %value, ptr @h, align 1
++  ret void
++}
++
++attributes #0 = { "target-features"="+mos-a16" }
+-- 
+2.53.0
+

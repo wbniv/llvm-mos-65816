@@ -1,0 +1,160 @@
+From 0284f9f318a41a2c19773c66ae05a05a3ab8af45 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 13/17] [MOS] Require a no-wrap proof before folding near
+ indexes on the 65816
+
+On the 65816, indexed addressing adds the index to the 16-bit base with carry into the bank (DBR), while a near G_PTR_ADD wraps at 16 bits. Folding the add into abs,X, abs,Y or (zp),Y is correct only if the unsigned sum cannot wrap. canFoldNearIndex allows the fold when the add is nuw, when it is nusw with a known non-negative offset, or when known bits bound base + offset below 0x10000. Other CPUs are unaffected. The check applies to the native word forms and to the existing byte abs-indexed (except zero page) and indirect-indexed folds.
+
+Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (25 larger, 2 smaller, +4,626 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
+
+Tests: near-index-nowrap.ll checks, on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base whose known bits bound the sum (folded on both).
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/near-index-nowrap.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp   | 25 ++++++++-
+ llvm/test/CodeGen/MOS/near-index-nowrap.ll | 63 ++++++++++++++++++++++
+ 2 files changed, 87 insertions(+), 1 deletion(-)
+ create mode 100644 llvm/test/CodeGen/MOS/near-index-nowrap.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 1080b80e0b38..6819d49cec5f 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -27,6 +27,7 @@
+ #include "llvm/ADT/STLExtras.h"
+ #include "llvm/ADT/STLFunctionalExtras.h"
+ #include "llvm/ADT/SmallVector.h"
++#include "llvm/CodeGen/GlobalISel/GISelValueTracking.h"
+ #include "llvm/CodeGen/GlobalISel/LegalizerHelper.h"
+ #include "llvm/CodeGen/GlobalISel/LegalizerInfo.h"
+ #include "llvm/CodeGen/GlobalISel/LostDebugLocObserver.h"
+@@ -2202,6 +2203,23 @@ static bool willBeStaticallyAllocated(const MachineOperand &MO) {
+   return !MF.getFrameInfo().isFixedObjectIndex(MO.getIndex());
+ }
+ 
++// Native 65816 indexed addressing carries out of the 16-bit address into
++// DBR. A near G_PTR_ADD wraps at 16 bits, so folding it into an index requires
++// proof that its unsigned sum cannot wrap. Inbounds alone permits subtraction.
++static bool canFoldNearIndex(const GPtrAdd &PtrAdd, LegalizerHelper &Helper) {
++  const auto &STI = Helper.MIRBuilder.getMF().getSubtarget<MOSSubtarget>();
++  if (!STI.hasW65816() || PtrAdd.getFlag(MachineInstr::NoUWrap))
++    return true;
++  auto *VT = Helper.getValueTracking();
++  KnownBits Offset = VT->getKnownBits(PtrAdd.getOffsetReg());
++  if (PtrAdd.getFlag(MachineInstr::NoUSWrap) && Offset.isNonNegative())
++    return true;
++  KnownBits Base = VT->getKnownBits(PtrAdd.getBaseReg());
++  bool Overflow;
++  (void)Base.getMaxValue().uadd_ov(Offset.getMaxValue(), Overflow);
++  return !Overflow;
++}
++
+ bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
+                                               MachineRegisterInfo &MRI,
+                                               GLoadStore &MI) const {
+@@ -2268,6 +2286,8 @@ bool MOSLegalizerInfo::tryIndexedAddressing16(LegalizerHelper &Helper,
+     // becomes VarIndex (first one wins; a second means we can't fold both).
+     if (const auto *PtrAdd =
+             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++      if (!canFoldNearIndex(*PtrAdd, Helper))
++        return false;
+       Addr = PtrAdd->getBaseReg();
+       Register Off = PtrAdd->getOffsetReg();
+       if (auto C = getIConstantVRegValWithLookThrough(Off, MRI)) {
+@@ -2475,6 +2495,8 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+     }
+     if (const auto *PtrAddAddr =
+             cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++      if (!ZP && !canFoldNearIndex(*PtrAddAddr, Helper))
++        return false;
+       Addr = PtrAddAddr->getBaseReg();
+       Register NewOffset = PtrAddAddr->getOffsetReg();
+       if (auto ConstOffset =
+@@ -2600,7 +2622,8 @@ bool MOSLegalizerInfo::selectIndirectAddressing(LegalizerHelper &Helper,
+       isa<GLoad>(MI) ? MOS::G_LOAD_INDIR_IDX : MOS::G_STORE_INDIR_IDX;
+ 
+   if (const auto *PtrAddAddr =
+-          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI))) {
++          cast_if_present<GPtrAdd>(getOpcodeDef(G_PTR_ADD, Addr, MRI));
++      PtrAddAddr && canFoldNearIndex(*PtrAddAddr, Helper)) {
+     Register Base = PtrAddAddr->getBaseReg();
+     Register Offset = PtrAddAddr->getOffsetReg();
+     if (auto ConstOffset = getIConstantVRegValWithLookThrough(Offset, MRI)) {
+diff --git a/llvm/test/CodeGen/MOS/near-index-nowrap.ll b/llvm/test/CodeGen/MOS/near-index-nowrap.ll
+new file mode 100644
+index 000000000000..fc9293d016b9
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/near-index-nowrap.ll
+@@ -0,0 +1,63 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,M6502
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -verify-machineinstrs < %s | FileCheck %s --check-prefixes=CHECK,W65816
++
++; On the 65816, an indexed access adds the index to the 16-bit base with a
++; carry into the bank, while a near pointer add wraps at 16 bits. The add is
++; folded into (zp),y or abs,x only when it cannot wrap: it is nuw, it is
++; inbounds with a non-negative offset, or known bits bound the sum below
++; 0x10000. Other CPUs wrap either way and always fold.
++
++define i8 @plain(ptr %p, i8 %i) {
++; CHECK-LABEL: plain:
++; M6502:      lda (__rc2),y
++; W65816-NOT: (__rc2),y
++; W65816:     adc __rc2
++; W65816:     lda (__rc2)
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @nuw(ptr %p, i8 %i) {
++; CHECK-LABEL: nuw:
++; CHECK:      tay
++; CHECK-NEXT: lda (__rc2),y
++  %x = zext i8 %i to i16
++  %q = getelementptr nuw i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @inbounds_nonnegative(ptr %p, i8 %i) {
++; CHECK-LABEL: inbounds_nonnegative:
++; CHECK:      tay
++; CHECK-NEXT: lda (__rc2),y
++  %x = zext i8 %i to i16
++  %q = getelementptr inbounds i8, ptr %p, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++@t = global [16 x i8] zeroinitializer
++
++define i8 @global_base(i8 %i) {
++; CHECK-LABEL: global_base:
++; M6502:      lda t,x
++; W65816-NOT: t,x
++; W65816:     lda (__rc2)
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr @t, i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
++
++define i8 @bounded_constant_base(i8 %i) {
++; CHECK-LABEL: bounded_constant_base:
++; CHECK:      tax
++; CHECK-NEXT: lda 4096,x
++  %x = zext i8 %i to i16
++  %q = getelementptr i8, ptr inttoptr (i16 4096 to ptr), i16 %x
++  %v = load i8, ptr %q
++  ret i8 %v
++}
+-- 
+2.53.0
+

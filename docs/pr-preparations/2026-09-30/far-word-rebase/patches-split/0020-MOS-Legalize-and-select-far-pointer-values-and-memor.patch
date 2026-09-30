@@ -1,0 +1,933 @@
+From 83802bc03edc5995df1e2b36c676a8881d2ff742 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 20/32] [MOS] Legalize and select far pointer values and memory
+ accesses
+
+Pass, legalize and select address-space-2 pointers and the byte loads and stores through them.
+
+Calls: a far pointer argument is assigned to RL1-RL3 and its calling-convention type is i32; incoming 32-bit values are accepted. Legalization: p2 is legal for G_GLOBAL_VALUE, G_FRAME_INDEX and G_BLOCK_ADDR, converts to and from s32 with G_PTRTOINT/G_INTTOPTR, and takes s32 offsets in G_PTR_ADD, which always use the integer carry chain so the add carries into the bank byte. A p2 G_PHI becomes an s32 PHI, with casts placed before each predecessor's terminator and after the block's PHIs. Casting a near pointer to far zero-extends it (bank $00) without the zero-page bias used for direct-page pointers. A byte load or store through a constant or global far address becomes G_LOAD_FAR_ABS/G_STORE_FAR_ABS (absolute long, `lda $xxxxxx`); through a runtime far pointer it becomes G_LOAD_FAR_INDIR/G_STORE_FAR_INDIR (`lda [dp]`).
+
+Selection: s32 register values use Imag32; a 2 x s16 merge composes an Imag32 with REG_SEQUENCE and an s32 unmerge splits it by word; the far address of a symbol (by address space, including aliases, not by section name) is built from MO_ADDR24_SEG_LO/_SEG_HI/_BANK immediates, which lower to the ADDR24 relocation modifiers; the far access pseudos pin their pointer operand to Imag32 so the cast chain coalesces into the quad `[dp]` reads. Allocation hints skip candidates whose width differs from the copy's other side. MOSLateOptimization's LDImm combining tracks only immediate loads into A, X or Y, and LDCImm treats any nonzero immediate as a set carry.
+
+The 65816 reaches data outside bank DBR only through long addressing; a 16-bit pointer cannot name it.
+
+Default-mode effect: none for code that compiled before: assembly and objects are identical in mos6502 and mosw65816. Five corpus inputs that use address space 2 fail in both default modes before and after this commit, with a different legalization error: without +mos-a16, the s32 merges and unmerges that far pointers need are not legal.
+
+Tests: far-addressing.ll checks absolute-long and `[dp]` loads and stores in assembly and object bytes ($af/$8f/$a7/$87), and that a near symbol placed in a far section stays near. far-phi.ll checks the p2 PHI legalization and a `[dp]` load in the emitted loop.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/far-addressing.ll llvm/test/CodeGen/MOS/far-phi.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSCallLowering.cpp       |   1 +
+ llvm/lib/Target/MOS/MOSCallingConv.td         |   4 +
+ llvm/lib/Target/MOS/MOSISelLowering.cpp       |   5 +-
+ llvm/lib/Target/MOS/MOSInstrGISel.td          |  38 +++++
+ llvm/lib/Target/MOS/MOSInstrInfo.h            |   7 +
+ llvm/lib/Target/MOS/MOSInstrLogical.td        |  22 +++
+ .../lib/Target/MOS/MOSInstructionSelector.cpp | 140 +++++++++++++++++-
+ llvm/lib/Target/MOS/MOSLateOptimization.cpp   |   3 +-
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 128 ++++++++++++++--
+ llvm/lib/Target/MOS/MOSLegalizerInfo.h        |   9 ++
+ llvm/lib/Target/MOS/MOSMCInstLower.cpp        |  30 ++--
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       |  13 ++
+ llvm/test/CodeGen/MOS/far-addressing.ll       |  90 +++++++++++
+ llvm/test/CodeGen/MOS/far-phi.ll              |  60 ++++++++
+ 14 files changed, 524 insertions(+), 26 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/far-addressing.ll
+ create mode 100644 llvm/test/CodeGen/MOS/far-phi.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSCallLowering.cpp b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+index bfa9303e3fc9..bde875dcfe1a 100644
+--- a/llvm/lib/Target/MOS/MOSCallLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSCallLowering.cpp
+@@ -161,6 +161,7 @@ struct MOSIncomingValueHandler : CallLowering::IncomingValueHandler {
+       report_fatal_error("Not yet implemented.");
+     case 8:
+     case 16:
++    case 32:
+       break;
+     }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
+index b03bcd284365..f701183d0906 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.td
++++ b/llvm/lib/Target/MOS/MOSCallingConv.td
+@@ -58,6 +58,10 @@ let Entry = 1 in {
+ def CC_MOS : CallingConv<[
+   CCIfType<[i1], CCPromoteToType<i8>>,
+ 
++  // Far data pointers occupy one caller-saved imaginary quad. Register units
++  // alias the near-pointer pairs, so argument assignments cannot overlap.
++  CCIfPtrAddrSpace<2, CCAssignToReg<[RL1, RL2, RL3]>>,
++
+   // An 8-bit direct-page (addrspace 1) pointer is only 8 bits wide, so it must take
+   // an 8-bit slot like an i8 value -- NOT the 16-bit RS pair the generic CCIfPtr rule
+   // below would assign, which yields an illegal size-mismatched COPY ((p1) = COPY
+diff --git a/llvm/lib/Target/MOS/MOSISelLowering.cpp b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+index 1727ef1ddccc..a113a8e824a1 100644
+--- a/llvm/lib/Target/MOS/MOSISelLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSISelLowering.cpp
+@@ -85,8 +85,11 @@ unsigned MOSTargetLowering::getCachedNumRegisters(MVT VT) const {
+ MVT MOSTargetLowering::getRegisterTypeForCallingConv(
+     LLVMContext &Context, CallingConv::ID CC, EVT VT,
+     const ISD::ArgFlagsTy &Flags) const {
+-  if (Flags.isPointer())
++  if (Flags.isPointer()) {
++    if (Flags.getPointerAddrSpace() == MOS::AS_Far)
++      return MVT::i32;
+     return Flags.getPointerAddrSpace() == MOS::AS_ZeroPage ? MVT::i8 : MVT::i16;
++  }
+   return TargetLowering::getRegisterTypeForCallingConv(Context, CC, VT, Flags);
+ }
+ 
+diff --git a/llvm/lib/Target/MOS/MOSInstrGISel.td b/llvm/lib/Target/MOS/MOSInstrGISel.td
+index b37b32c5d9c4..950e2cd9a838 100644
+--- a/llvm/lib/Target/MOS/MOSInstrGISel.td
++++ b/llvm/lib/Target/MOS/MOSInstrGISel.td
+@@ -68,6 +68,17 @@ def G_LOAD_ABS : MOSGenericInstruction {
+   let mayLoad = true;
+ }
+ 
++// Generalized 8-bit load using 65816 absolute-long (24-bit) addressing,
++// for far (addrspace 2) pointers. The address argument is a global value or a
++// 24-bit immediate. Selects to LDA AbsoluteLong (accumulator only). Additionally
++// expects a MachineMemOperand.
++def G_LOAD_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins unknown:$addr);
++  let mayLoad = true;
++}
++
+ // Generalized 8-bit load using the absolute indexed addressing mode. The base
+ // argument isn't a pointer; it's either a global value or a 16-bit immediate.
+ // The index argument is an 8-bit scalar. Additionally expects a
+@@ -132,7 +143,34 @@ def G_STORE_ABS : MOSGenericInstruction {
+   let mayStore = true;
+ }
+ 
++// Generalized 8-bit store using 65816 absolute-long (24-bit) addressing,
++// for far (addrspace 2) pointers. The address argument is a global value or a
++// 24-bit immediate. Selects to STA AbsoluteLong (accumulator only). Additionally
++// expects a MachineMemOperand.
++def G_STORE_FAR_ABS : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, unknown:$addr);
++  let mayStore = true;
++}
+ 
++// 8-bit load/store through a RUNTIME far (addrspace 2) pointer
++// via 65816 indirect-long (`lda [dp]`/`sta [dp]`). The address operand is the
++// far pointer itself (a 32-bit value that lands in a contiguous Imag32 ZP quad);
++// the selector lowers these to LDIndirLong/STIndirLong. Mirror of
++// G_LOAD_FAR_ABS/G_STORE_FAR_ABS for the non-constant (indirect) far case.
++def G_LOAD_FAR_INDIR : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs type0:$dst);
++  let InOperandList = (ins ptype1:$addr);
++  let mayLoad = true;
++}
++def G_STORE_FAR_INDIR : MOSGenericInstruction {
++  let Predicates = [HasW65816];
++  let OutOperandList = (outs);
++  let InOperandList = (ins type0:$src, ptype1:$addr);
++  let mayStore = true;
++}
+ 
+ 
+ // Generalized 8-bit store using the absolute indexed addressing mode. The base
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.h b/llvm/lib/Target/MOS/MOSInstrInfo.h
+index 39dc4abee67e..d4439c2f065b 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.h
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.h
+@@ -169,6 +169,13 @@ enum TOF {
+   MO_HI,
+   MO_HI_JT,
+   MO_ZEROPAGE,
++  // the three bytes of a 24-bit far (addrspace 2) address,
++  // materialized as immediate loads when taking the address of a far symbol.
++  // SEG_LO/SEG_HI are the low 16 bits (segment); BANK is bits 16-23 (the 65816
++  // program bank). They lower to VK_ADDR24_SEGMENT_LO/_HI and VK_ADDR24_BANK.
++  MO_ADDR24_SEG_LO,
++  MO_ADDR24_SEG_HI,
++  MO_ADDR24_BANK,
+ };
+ 
+ } // namespace MOS
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+index 202adbfaafb8..8e5e4a180e27 100644
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -643,6 +643,28 @@ let Predicates = [HasHUC6280] in {
+ // Addition/Subtraction Patterns
+ //===---------------------------------------------------------------------===//
+ 
++def LDAbsLong : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteLong addr24:$src)> {
++  let Predicates = [HasW65816];
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList = (ins addr24:$src);
++}
++
++def STAbsLong : MOSStore, PseudoInstExpansion<(STA_AbsoluteLong addr24:$dst)> {
++  let Predicates = [HasW65816];
++  dag InOperandList = (ins Ac:$src, addr24:$dst);
++}
++
++def LDIndirLong : MOSLoad, PseudoInstExpansion<(LDA_IndirectLong addr8:$addr)> {
++  let Predicates = [HasW65816];
++  dag OutOperandList = (outs Ac:$dst);
++  dag InOperandList  = (ins Imag32:$addr);
++}
++
++def STIndirLong : MOSStore, PseudoInstExpansion<(STA_IndirectLong addr8:$addr)> {
++  let Predicates = [HasW65816];
++  dag InOperandList = (ins Ac:$src, Imag32:$addr);
++}
++
+ //===---------------------------------------------------------------------===//
+ // Native widths: 16-bit-accumulator load/add/store (native M=0 mode)
+ //===---------------------------------------------------------------------===//
+diff --git a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+index a548870466cc..21a6222fa65d 100644
+--- a/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
++++ b/llvm/lib/Target/MOS/MOSInstructionSelector.cpp
+@@ -90,6 +90,12 @@ private:
+   std::pair<Register, Register> selectFrameIndexLoHi(MachineInstr &MI);
+   bool selectAddr(MachineInstr &MI);
+   std::pair<Register, Register> selectAddrLoHi(MachineInstr &MI);
++  // materialize a far (addrspace 2) symbol's 24-bit address as
++  // two Imag16 words — the low word is the segment (bits 0-15), the high word is
++  // (bank, 0) (bits 16-23 in its low byte). Used by selectAddr (→ Imag32) and
++  // selectAddrLoHi (the s32→2×s16 unmerge fold).
++  std::pair<Register, Register> buildFarAddrWords(MachineIRBuilder &Builder,
++                                                  const MachineOperand &GO);
+   bool selectStore(MachineInstr &MI);
+   bool selectRMW(MachineInstr &MI);
+   bool selectLshrShlE(MachineInstr &MI);
+@@ -215,6 +221,10 @@ static const TargetRegisterClass &getRegClassForType(LLT Ty) {
+     return MOS::Anyi8RegClass;
+   case 16:
+     return MOS::Imag16RegClass;
++  case 32:
++    // the only 32-bit register-resident value is a runtime far
++    // (addrspace 2) pointer, whose 4 bytes live in a contiguous Imag32 ZP quad.
++    return MOS::Imag32RegClass;
+   }
+ }
+ 
+@@ -347,6 +357,13 @@ bool MOSInstructionSelector::select(MachineInstr &MI) {
+   case MOS::G_LOAD_ABS_IDX:
+   case MOS::G_LOAD_INDIR:
+   case MOS::G_LOAD_INDIR_IDX:
++  // far load/store go straight to selectGeneric (LDA/STA AbsoluteLong, or
++  // LDA/STA [dp] for the runtime-pointer indirect-long forms); the far store
++  // must bypass selectStore's 16-bit RMW/STZ folds.
++  case MOS::G_LOAD_FAR_ABS:
++  case MOS::G_STORE_FAR_ABS:
++  case MOS::G_LOAD_FAR_INDIR:
++  case MOS::G_STORE_FAR_INDIR:
+   case MOS::G_PHI:
+   case MOS::G_STORE_INDIR:
+   case MOS::G_STORE_INDIR_IDX:
+@@ -1760,12 +1777,73 @@ MOSInstructionSelector::selectFrameIndexLoHi(MachineInstr &MI) {
+   return {LoAddr.getReg(0), HiAddr.getReg(0)};
+ }
+ 
++// Far data symbols and their aliases have address space 2. Section names
++// alone do not change a data symbol's pointer width.
++static bool isFarSymbol(const MachineOperand &Op) {
++  if (!Op.isGlobal())
++    return false;
++  const GlobalValue *GV = Op.getGlobal();
++  if (GV->getAddressSpace() == MOS::AS_Far)
++    return true;
++  if (const auto *GO = dyn_cast<GlobalObject>(GV->getAliaseeObject())) {
++    if (GO->getAddressSpace() == MOS::AS_Far)
++      return true;
++  }
++  return false;
++}
++
++std::pair<Register, Register>
++MOSInstructionSelector::buildFarAddrWords(MachineIRBuilder &Builder,
++                                          const MachineOperand &GO) {
++  LLT S8 = LLT::scalar(8);
++  LLT S16 = LLT::scalar(16);
++  MachineRegisterInfo &MRI = *Builder.getMRI();
++
++  const auto &BuildByte = [&](unsigned Flag) -> Register {
++    auto I = buildLdImm(Builder, S8).add(GO);
++    I->getOperand(1).setTargetFlags(Flag);
++    constrainSelectedInstRegOperands(*I, TII, TRI, RBI);
++    return I.getReg(0);
++  };
++
++  // Low word = segment (address bits 0-15).
++  Register SegLo = BuildByte(MOS::MO_ADDR24_SEG_LO);
++  Register SegHi = BuildByte(MOS::MO_ADDR24_SEG_HI);
++  Register SegW = MRI.createGenericVirtualRegister(S16);
++  composePtr(Builder, SegW, SegLo, SegHi);
++
++  // High word = (bank, 0): the program bank (bits 16-23) in the low byte, the
++  // p2's unused top byte zero.
++  Register Bank = BuildByte(MOS::MO_ADDR24_BANK);
++  auto Zero = buildLdImm(Builder, S8).addImm(0);
++  constrainSelectedInstRegOperands(*Zero, TII, TRI, RBI);
++  Register BankW = MRI.createGenericVirtualRegister(S16);
++  composePtr(Builder, BankW, Bank, Zero.getReg(0));
++
++  return {SegW, BankW};
++}
++
+ bool MOSInstructionSelector::selectAddr(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
+   MachineOperand Op = MI.getOperand(1);
+   if (Op.isCImm())
+     Op.ChangeToImmediate(Op.getCImm()->getSExtValue());
+ 
++  // the address of a far symbol is a 24-bit value held in an
++  // Imag32 (p2). Compose it from the segment word + (bank, 0) word.
++  if (isFarSymbol(Op)) {
++    auto [SegW, BankW] = buildFarAddrWords(Builder, Op);
++    auto RegSeq = Builder.buildInstr(MOS::REG_SEQUENCE)
++                      .addDef(MI.getOperand(0).getReg())
++                      .addUse(SegW)
++                      .addImm(MOS::sublo16)
++                      .addUse(BankW)
++                      .addImm(MOS::subhi16);
++    constrainGenericOp(*RegSeq);
++    MI.eraseFromParent();
++    return true;
++  }
++
+   MachineInstrBuilder Instr = buildLdImm(Builder, MI.getOperand(0))
+                                   .add(Op);
+   constrainSelectedInstRegOperands(*Instr, TII, TRI, RBI);
+@@ -1776,6 +1854,10 @@ bool MOSInstructionSelector::selectAddr(MachineInstr &MI) {
+ std::pair<Register, Register>
+ MOSInstructionSelector::selectAddrLoHi(MachineInstr &MI) {
+   MachineIRBuilder Builder(MI);
++  // a far symbol's address decomposes into two 16-bit words
++  // (segment, bank:0) — matching the s32→2×s16 unmerge that reaches this fold.
++  if (isFarSymbol(MI.getOperand(1)))
++    return buildFarAddrWords(Builder, MI.getOperand(1));
+   LLT S8 = LLT::scalar(8);
+   auto LoImm = buildLdImm(Builder, S8).add(MI.getOperand(1));
+   LoImm->getOperand(1).setTargetFlags(MOS::MO_LO);
+@@ -2149,6 +2231,27 @@ bool MOSInstructionSelector::selectMergeValues(MachineInstr &MI) {
+     return true;
+   }
+ 
++  // a 2x s16 -> 32-bit merge composes the two 16-bit halves of
++  // a runtime far pointer into a contiguous Imag32 ZP quad (16-bit subreg word
++  // indices). Only far pointers reach selection as a unified 32-bit value, so
++  // this path is exclusive to them; everything narrower uses the byte compose.
++  // Pin the result to Imag32 in place (vs letting constrainGenericOp insert a
++  // class-less bridge COPY): the merge is selected mid-chain, between its
++  // inttoptr use and its s16-half defs, so an in-place class lets the whole
++  // inttoptr/COPY chain coalesce to the one Imag32 the `[dp]` load reads.
++  if (MRI.getType(Lo) == LLT::scalar(16)) {
++    MI.getMF()->getRegInfo().setRegClass(Dst, &MOS::Imag32RegClass);
++    auto RegSeq = Builder.buildInstr(MOS::REG_SEQUENCE)
++                      .addDef(Dst)
++                      .addUse(Lo)
++                      .addImm(MOS::sublo16)
++                      .addUse(Hi)
++                      .addImm(MOS::subhi16);
++    constrainGenericOp(*RegSeq);
++    MI.eraseFromParent();
++    return true;
++  }
++
+   composePtr(Builder, Dst, Lo, Hi);
+   MI.eraseFromParent();
+   return true;
+@@ -2370,10 +2473,19 @@ bool MOSInstructionSelector::selectUnMergeValues(MachineInstr &MI) {
+     LoCopy = Builder.buildCopy(Lo, LoHi->first);
+     HiCopy = Builder.buildCopy(Hi, LoHi->second);
+   } else {
++    // a 32-bit far pointer (Imag32) unmerges into two 16-bit
++    // word halves, addressed by the word subreg indices (sublo16/subhi16);
++    // everything narrower splits into byte halves (sublo/subhi). Pick the
++    // indices by the destination width — mirrors the size gate in
++    // selectMergeValues. A 16-bit unmerge result only arises from the a16
++    // s32->2xs16 legalization, so this cannot perturb the 8-bit path.
++    const bool Wide = Builder.getMRI()->getType(Lo) == LLT::scalar(16);
++    const unsigned LoSub = Wide ? MOS::sublo16 : MOS::sublo;
++    const unsigned HiSub = Wide ? MOS::subhi16 : MOS::subhi;
+     LoCopy = Builder.buildCopy(Lo, Src);
+-    LoCopy->getOperand(1).setSubReg(MOS::sublo);
++    LoCopy->getOperand(1).setSubReg(LoSub);
+     HiCopy = Builder.buildCopy(Hi, Src);
+-    HiCopy->getOperand(1).setSubReg(MOS::subhi);
++    HiCopy->getOperand(1).setSubReg(HiSub);
+   }
+   constrainGenericOp(*LoCopy);
+   constrainGenericOp(*HiCopy);
+@@ -3144,6 +3256,18 @@ bool MOSInstructionSelector::selectMem16IndirIdx(MachineInstr &MI) {
+ 
+ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   unsigned Opcode;
++  // pin the runtime far pointer operand of the indirect-long
++  // load/store to Imag32 in place before the generic operand constraints run, so
++  // its upstream inttoptr/merge COPY chain coalesces to the single Imag32 quad
++  // that `lda [dp]`/`sta [dp]` reads — otherwise a class-less bridge COPY is left
++  // behind (the operand constraint inserts a bridge it never re-constrains).
++  if (MI.getOpcode() == MOS::G_LOAD_FAR_INDIR ||
++      MI.getOpcode() == MOS::G_STORE_FAR_INDIR) {
++    MachineRegisterInfo &MRI = MI.getMF()->getRegInfo();
++    Register Ptr = MI.getOperand(1).getReg();
++    if (Ptr.isVirtual() && !MRI.getRegClassOrNull(Ptr))
++      MRI.setRegClass(Ptr, &MOS::Imag32RegClass);
++  }
+   switch (MI.getOpcode()) {
+   default:
+     llvm_unreachable("Unexpected opcode.");
+@@ -3162,6 +3286,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   case MOS::G_LOAD_ABS:
+     Opcode = MOS::LDAbs;
+     break;
++  case MOS::G_LOAD_FAR_ABS: // 65816 far load -> LDA AbsoluteLong.
++    Opcode = MOS::LDAbsLong;
++    break;
++  case MOS::G_LOAD_FAR_INDIR: // runtime far load -> LDA [dp].
++    Opcode = MOS::LDIndirLong;
++    break;
+   case MOS::G_LOAD_ABS_IDX:
+     Opcode = MOS::LDAbsIdx;
+     break;
+@@ -3180,6 +3310,12 @@ bool MOSInstructionSelector::selectGeneric(MachineInstr &MI) {
+   case MOS::G_STORE_ABS:
+     Opcode = MOS::STAbs;
+     break;
++  case MOS::G_STORE_FAR_ABS: // 65816 far store -> STA AbsoluteLong.
++    Opcode = MOS::STAbsLong;
++    break;
++  case MOS::G_STORE_FAR_INDIR: // runtime far store -> STA [dp].
++    Opcode = MOS::STIndirLong;
++    break;
+   case MOS::G_STORE_ABS_IDX:
+     Opcode = MOS::STAbsIdx;
+     break;
+diff --git a/llvm/lib/Target/MOS/MOSLateOptimization.cpp b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+index 3b17de9b4b1e..2b72179eff35 100644
+--- a/llvm/lib/Target/MOS/MOSLateOptimization.cpp
++++ b/llvm/lib/Target/MOS/MOSLateOptimization.cpp
+@@ -287,7 +287,8 @@ bool MOSLateOptimization::combineLdImm(MachineBasicBlock &MBB) const {
+       continue;
+     }
+ 
+-    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm()) {
++    if (MI.getOpcode() != MOS::LDImm || !MI.getOperand(1).isImm() ||
++        !MOS::GPRRegClass.contains(MI.getOperand(0).getReg())) {
+       // If a register is overwritten with an instruction other than
+       // an immediate load, mark register value as unknown.
+       if (MI.modifiesRegister(MOS::A, TRI))
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 877e6a91147b..6bfdd5839a84 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -70,6 +70,9 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   LLT S64 = LLT::scalar(64);
+   LLT P = LLT::pointer(0, 16);
+   LLT PZ = LLT::pointer(1, 8);
++  // Far data pointers use a simple 32-bit register and calling-convention
++  // type. The low 24 bits form the 65816 long address.
++  LLT PF = LLT::pointer(2, 32);
+ 
+   // There are no vector registers, but the optimizer freely forms vector
+   // operations over the vector types SROA invents for aggregates. Any
+@@ -92,7 +95,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+       .unsupported();
+ 
+   getActionDefinitionsBuilder({G_GLOBAL_VALUE, G_FRAME_INDEX, G_BLOCK_ADDR})
+-      .legalFor({P, PZ})
++      .legalFor({P, PZ, PF})
+       .unsupported();
+ 
+   // Integer Extension and Truncation
+@@ -131,16 +134,21 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+ 
+   // Type Conversions
+ 
++  // a 32-bit far pointer (PF) round-trips to/from an s32
++  // (the cast that creates a runtime far pointer, and the integer view used by
++  // far-pointer arithmetic). Selected as a COPY, same as the near forms.
+   getActionDefinitionsBuilder(G_INTTOPTR)
+-      .legalFor({{P, S16}, {PZ, S8}})
++      .legalFor({{P, S16}, {PZ, S8}, {PF, S32}})
+       .scalarSameSizeAs(1, 0)
+       .unsupported();
+   getActionDefinitionsBuilder(G_PTRTOINT)
+-      .legalFor({{S16, P}, {S8, PZ}})
++      .legalFor({{S16, P}, {S8, PZ}, {S32, PF}})
+       .scalarSameSizeAs(0, 1)
+       .unsupported();
++  // near->far (AS0->AS2) zero-extends the 16-bit near pointer
++  // to the 32-bit far pointer (bank byte $00); handled in legalizeAddrSpaceCast.
+   getActionDefinitionsBuilder(G_ADDRSPACE_CAST)
+-      .customForCartesianProduct({P, PZ})
++      .customForCartesianProduct({P, PZ, PF})
+       .unsupported();
+ 
+   // Bitcasts only appear once vector types are involved; a scalar-to-scalar
+@@ -288,8 +296,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+       .maxScalar(0, S8)
+       .unsupported();
+ 
++  // {PF,S32} adds an integer offset to a 32-bit far pointer;
++  // the 32-bit add carries through the bank byte across a 64 KB boundary.
+   getActionDefinitionsBuilder(G_PTR_ADD)
+-      .customFor({{P, S16}, {PZ, S8}})
++      .customFor({{P, S16}, {PZ, S8}, {PF, S32}})
+       .scalarSameSizeAs(1, 0)
+       .unsupported();
+   getActionDefinitionsBuilder(G_PTRMASK)
+@@ -415,9 +425,9 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+     // Native s16 accesses select a word addressing mode before byte narrowing.
+     auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
+     if (STI.hasAccum16())
+-      B.customForCartesianProduct({S8, S16, PZ, P}, {PZ, P});
++      B.customForCartesianProduct({S8, S16, PZ, P, PF}, {PZ, P, PF});
+     else
+-      B.customForCartesianProduct({S8, PZ, P}, {PZ, P});
++      B.customForCartesianProduct({S8, PZ, P, PF}, {PZ, P, PF});
+     B.scalarize(0).widenScalarToNextMultipleOf(0, 8).maxScalar(0, S8).unsupported();
+   }
+ 
+@@ -431,6 +441,7 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   getActionDefinitionsBuilder(G_PHI)
+       .legalFor({S1, S8, P, PZ})
+       .scalarize(0)
++      .customFor({PF})
+       .widenScalarToNextMultipleOf(0, 8)
+       .maxScalar(0, S8)
+       .unsupported();
+@@ -646,6 +657,8 @@ bool MOSLegalizerInfo::legalizeCustom(LegalizerHelper &Helper, MachineInstr &MI,
+     return legalizeMemOp(Helper, MRI, MI, LocObserver);
+ 
+   // Control Flow
++  case G_PHI:
++    return legalizePhi(Helper, MRI, MI);
+   case G_BRCOND:
+     return legalizeBrCond(Helper, MRI, MI);
+   case G_BRJT:
+@@ -1815,6 +1828,40 @@ bool MOSLegalizerInfo::legalizeAbs(LegalizerHelper &Helper,
+   return true;
+ }
+ 
++// Convert a far-pointer PHI to an s32 PHI. Incoming casts belong before
++// each predecessor's terminator, and the result cast belongs after all PHIs.
++// The integer PHI then uses the ordinary scalar narrowing rules.
++bool MOSLegalizerInfo::legalizePhi(LegalizerHelper &Helper,
++                                   MachineRegisterInfo &MRI,
++                                   MachineInstr &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++
++  Register Dst = MI.getOperand(0).getReg();
++  LLT IntTy = LLT::scalar(MRI.getType(Dst).getSizeInBits()); // s32 for p2
++
++  Helper.Observer.changingInstr(MI);
++
++  // ptrtoint each incoming far-pointer value at the end of its predecessor
++  // block (operands come in (value, block) pairs).
++  for (unsigned I = 1, E = MI.getNumOperands(); I < E; I += 2) {
++    MachineBasicBlock &Pred = *MI.getOperand(I + 1).getMBB();
++    Builder.setInsertPt(Pred, Pred.getFirstTerminatorForward());
++    auto Int = Builder.buildPtrToInt(IntTy, MI.getOperand(I).getReg());
++    MI.getOperand(I).setReg(Int.getReg(0));
++  }
++
++  // Retype the phi def to the integer, then inttoptr it back to the far pointer
++  // immediately after the block's phis.
++  Register NewDst = MRI.createGenericVirtualRegister(IntTy);
++  MI.getOperand(0).setReg(NewDst);
++  MachineBasicBlock &MBB = *MI.getParent();
++  Builder.setInsertPt(MBB, MBB.getFirstNonPHI());
++  Builder.buildIntToPtr(Dst, NewDst);
++
++  Helper.Observer.changedInstr(MI);
++  return true;
++}
++
+ bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
+                                       MachineRegisterInfo &MRI,
+                                       MachineInstr &MI) const {
+@@ -1843,7 +1890,9 @@ bool MOSLegalizerInfo::legalizePtrAdd(LegalizerHelper &Helper,
+   // this to 4 cost 3% in a tile-conversion loop.
+   const MOSSubtarget &STI = Builder.getMF().getSubtarget<MOSSubtarget>();
+   unsigned MaxIncDec = STI.has65CE02() ? 2 : 1;
+-  if (ConstOffset && !ConstOffset->Value.isZero() &&
++  // Far pointers use the integer carry chain through the bank byte.
++  if (MRI.getType(Base).getScalarSizeInBits() != 32 &&
++      ConstOffset && !ConstOffset->Value.isZero() &&
+       ConstOffset->Value.abs().ule(MaxIncDec)) {
+     int64_t N = ConstOffset->Value.getSExtValue();
+     unsigned Opc = N > 0 ? MOS::G_INC : MOS::G_DEC;
+@@ -1899,11 +1948,14 @@ bool MOSLegalizerInfo::legalizeAddrSpaceCast(LegalizerHelper &Helper,
+     // larger -> smaller address space: truncate
+     Tmp = Builder.buildTrunc(DestTypeS, Tmp);
+   } else if (DestTypeS.getSizeInBits() > SrcTypeS.getSizeInBits()) {
+-    // smaller -> larger address space: extend
+-    assert(SrcTypeP.getAddressSpace() == MOS::AS_ZeroPage);
+-    assert(DestTypeP.getAddressSpace() == MOS::AS_Memory);
++    // smaller -> larger address space: zero-extend the address.
+     Tmp = Builder.buildZExt(DestTypeS, Tmp);
+-    if (STI.getZeroPageOffset() != 0) {
++    // ZeroPage (AS1) -> Memory (AS0): the direct page lives at ZeroPageOffset, so
++    // bias the widened address into it. Memory (AS0) -> Far
++    // (AS2) needs no bias — the near 16-bit address is already the far address's
++    // low word and the bank byte is $00.
++    if (SrcTypeP.getAddressSpace() == MOS::AS_ZeroPage &&
++        STI.getZeroPageOffset() != 0) {
+       // Dest = (Src | ZeroPageOffset)
+       Tmp = Builder.buildOr(
+           DestTypeS, Tmp,
+@@ -2466,6 +2518,14 @@ bool MOSLegalizerInfo::selectAddressingMode(LegalizerHelper &Helper,
+       return true;
+     return selectIndirectAddressing(Helper, MRI, MI);
+   }
++  case 32: {
++    // 32-bit far pointer. A compile-time-constant/global far address uses
++    // 65816 absolute-long (`lda $xxxxxx`); a RUNTIME far pointer uses indirect-
++    // long (`lda [dp]`) through a ZP Imag32 quad.
++    if (tryFarAbsoluteAddressing(Helper, MRI, MI))
++      return true;
++    return tryFarIndirectAddressing(Helper, MRI, MI);
++  }
+   default:
+     llvm_unreachable("unknown pointer size");
+   }
+@@ -2531,6 +2591,50 @@ bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
+   return false;
+ }
+ 
++// Select an absolute-long byte access for a constant or global far address.
++// Retain the memory operand and return false for a runtime base so indirect
++// address selection can handle it.
++bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
++                                                MachineRegisterInfo &MRI,
++                                                GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++
++  unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS : MOS::G_STORE_FAR_ABS;
++  auto Operand = matchAbsoluteAddressing(MRI, MI.getPointerReg());
++
++  if (!Operand.has_value())
++    return false;
++
++  Helper.Observer.changingInstr(MI);
++  MI.setDesc(Builder.getTII().get(Opcode));
++  MI.removeOperand(1);
++  MI.addOperand(*Operand);
++  Helper.Observer.changedInstr(MI);
++  return true;
++}
++
++// select 65816 indirect-long addressing for a RUNTIME far
++// pointer — one not matchable as a constant/global, so absolute-long can't be
++// used. Replaces the generic G_LOAD/G_STORE with G_LOAD_FAR_INDIR/
++// G_STORE_FAR_INDIR carrying the far pointer itself; the selector + the Imag32
++// operand class place its 32 bits into a contiguous ZP quad that `lda [dp]` /
++// `sta [dp]` dereferences (reading the low 3 bytes as the 24-bit address).
++// Mirrors how the 16-bit indirect path hands its pointer to G_LOAD_INDIR.
++bool MOSLegalizerInfo::tryFarIndirectAddressing(LegalizerHelper &Helper,
++                                                MachineRegisterInfo &MRI,
++                                                GLoadStore &MI) const {
++  MachineIRBuilder &Builder = Helper.MIRBuilder;
++
++  unsigned Opcode =
++      isa<GLoad>(MI) ? MOS::G_LOAD_FAR_INDIR : MOS::G_STORE_FAR_INDIR;
++  Builder.buildInstr(Opcode)
++      .add(MI.getOperand(0))      // dst (load) / value (store)
++      .addUse(MI.getPointerReg()) // far pointer -> Imag32 ZP quad
++      .addMemOperand(*MI.memoperands_begin());
++  MI.eraseFromParent();
++  return true;
++}
++
+ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+                                                     MachineRegisterInfo &MRI,
+                                                     GLoadStore &MI,
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.h b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+index 9c308482a1e2..2c05fc55db33 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.h
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.h
+@@ -75,6 +75,8 @@ private:
+                       MachineInstr &MI) const;
+   bool legalizeAbs(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                    MachineInstr &MI) const;
++  bool legalizePhi(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
++                   MachineInstr &MI) const;
+   bool legalizePtrAdd(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                       MachineInstr &MI) const;
+   bool legalizePtrMask(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+@@ -102,6 +104,13 @@ private:
+   matchAbsoluteAddressing(MachineRegisterInfo &MRI, Register Addr) const;
+   bool tryAbsoluteAddressing(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+                              GLoadStore &MI, bool ZP) const;
++  // 65816 far (24-bit) absolute-long addressing for 32-bit far pointers.
++  bool tryFarAbsoluteAddressing(LegalizerHelper &Helper,
++                                MachineRegisterInfo &MRI, GLoadStore &MI) const;
++  // 65816 indirect-long (`lda [dp]`) addressing for a runtime
++  // (non-constant) 32-bit far pointer.
++  bool tryFarIndirectAddressing(LegalizerHelper &Helper,
++                                MachineRegisterInfo &MRI, GLoadStore &MI) const;
+   bool tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+                                     MachineRegisterInfo &MRI, GLoadStore &MI,
+                                     bool ZP) const;
+diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+index 91259dc48d72..87faaebe35dc 100644
+--- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
++++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+@@ -497,16 +497,11 @@ void MOSMCInstLower::lower(const MachineInstr *MI, MCInst &OutMI) {
+     return;
+   }
+   case MOS::LDCImm: {
+-    switch (MI->getOperand(1).getImm()) {
+-    default:
+-      llvm_unreachable("Unexpected LDCImm immediate.");
+-    case 0:
+-      OutMI.setOpcode(MOS::CLC_Implied);
+-      return;
+-    case -1:
+-      OutMI.setOpcode(MOS::SEC_Implied);
+-      return;
+-    }
++    // A set i1 carry may be represented as either -1 or 1. Both select SEC;
++    // zero selects CLC.
++    OutMI.setOpcode(MI->getOperand(1).getImm() == 0 ? MOS::CLC_Implied
++                                                    : MOS::SEC_Implied);
++    return;
+   }
+   case MOS::INWImag:
+   case MOS::DEWImag: {
+@@ -914,6 +909,21 @@ MCOperand MOSMCInstLower::lowerSymbolOperand(const MachineOperand &MO,
+                                /*isNegated=*/false, Ctx);
+     }
+     break;
++  // the three bytes of a 24-bit far-symbol address. The
++  // segment (low 16 bits) is the same value a near R_MOS_ADDR16 would give, but
++  // the ADDR24 family makes the bank-aware intent explicit to the linker.
++  case MOS::MO_ADDR24_SEG_LO:
++    Expr = MOSMCExpr::create(MOSMCExpr::VK_ADDR24_SEGMENT_LO, Expr,
++                             /*isNegated=*/false, Ctx);
++    break;
++  case MOS::MO_ADDR24_SEG_HI:
++    Expr = MOSMCExpr::create(MOSMCExpr::VK_ADDR24_SEGMENT_HI, Expr,
++                             /*isNegated=*/false, Ctx);
++    break;
++  case MOS::MO_ADDR24_BANK:
++    Expr = MOSMCExpr::create(MOSMCExpr::VK_ADDR24_BANK, Expr,
++                             /*isNegated=*/false, Ctx);
++    break;
+   case MOS::MO_HI_JT: {
+     // Jump tables are partitioned in two arrays: first all the low bytes,
+     // then all the high bytes. This index referes to the high byte array, so
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index a1a345177981..c8ad24ce8697 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -1089,11 +1089,22 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+       }
+       if (Other.getSubReg())
+         OtherReg = TRI.getSubReg(OtherReg, Other.getSubReg());
++      // Subregister copies of a far-pointer quad can present hint candidates
++      // with a different width from the other operand. Only non-null physical
++      // registers of equal width represent copy edges with defined costs.
++      // Ignore other candidates in both passes so they cannot gain preference.
++      const auto &SizeMismatch = [&](Register SelfReg) {
++        return !SelfReg || !OtherReg ||
++               TRI.getRegSizeInBits(*TRI.getMinimalPhysRegClass(SelfReg)) !=
++                   TRI.getRegSizeInBits(*TRI.getMinimalPhysRegClass(OtherReg));
++      };
+       MOSInstrCost WorstCost;
+       for (Register R : Order) {
+         Register SelfReg = R;
+         if (Self.getSubReg())
+           SelfReg = TRI.getSubReg(SelfReg, Self.getSubReg());
++        if (SizeMismatch(SelfReg))
++          continue;
+         MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
+         if (Cost.value(CostMode) > WorstCost.value(CostMode))
+           WorstCost = Cost;
+@@ -1102,6 +1113,8 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+         Register SelfReg = R;
+         if (Self.getSubReg())
+           SelfReg = TRI.getSubReg(SelfReg, Self.getSubReg());
++        if (SizeMismatch(SelfReg))
++          continue;
+         MOSInstrCost Cost = copyCost(SelfReg, OtherReg, STI);
+         if (Cost.value(CostMode) < WorstCost.value(CostMode))
+           RegScores[R] += (WorstCost - Cost);
+diff --git a/llvm/test/CodeGen/MOS/far-addressing.ll b/llvm/test/CodeGen/MOS/far-addressing.ll
+new file mode 100644
+index 000000000000..ae7aa512e195
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-addressing.ll
+@@ -0,0 +1,90 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
++; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++
++; #320 far addressing — the four data opcodes of the AS_Far (addrspace 2) model.
++; The emulator ROM gates (dev/run.sh far_indir / far_store / far-bank1 ...) cover
++; the runtime behaviour; this test pins the SELECTED OPCODE, which they cannot.
++; These are the shapes MOSInstructionSelector::selectAddr / selectGeneric produce:
++;
++;   * a LINK-TIME far address (an addrspace(2) global -- isFarSymbol) is an
++;     absolute-long operand:         lda long / sta long  ($af / $8f)
++;   * a RUNTIME far address (inttoptr of a 32-bit value, held in an Imag32 zero-page
++;     quad) is direct-indirect-long: lda [dp] / sta [dp]  ($a7 / $87)
++;
++; The second RUN line disassembles the object so the opcode BYTE is pinned, not
++; just the mnemonic -- `lda mos24(x)` and `lda x` print similarly but are $af vs $ad.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@fardata = addrspace(2) global i8 0
++@farbuf = addrspace(2) global i8 0
++
++; A far global's address is a link-time 24-bit constant: absolute long, $af.
++define i8 @far_load_abs() {
++; CHECK-LABEL: far_load_abs:
++; CHECK: lda mos24(fardata)
++; CHECK: rts
++; OBJ-LABEL: <far_load_abs>:
++; OBJ: af {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}lda
++  %v = load i8, ptr addrspace(2) @fardata
++  ret i8 %v
++}
++
++; ... and the store half, $8f.
++define void @far_store_abs(i8 %v) {
++; CHECK-LABEL: far_store_abs:
++; CHECK: sta mos24(farbuf)
++; CHECK: rts
++; OBJ-LABEL: <far_store_abs>:
++; OBJ: 8f {{[0-9a-f]+ [0-9a-f]+ [0-9a-f]+}} {{.*}}sta
++  store i8 %v, ptr addrspace(2) @farbuf
++  ret void
++}
++
++; A runtime far pointer (inttoptr i32) lands in an Imag32 zero-page quad and is
++; dereferenced with direct-indirect-long, $a7. This is the far_indir.c shape.
++define i8 @far_load_indir(i32 %a) {
++; CHECK-LABEL: far_load_indir:
++; CHECK: lda [__rc{{[0-9]+}}]
++; CHECK: rts
++; OBJ-LABEL: <far_load_indir>:
++; OBJ: a7 {{[0-9a-f]+}} {{.*}}lda [
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  %v = load i8, ptr addrspace(2) %p
++  ret i8 %v
++}
++
++; ... and the store half, $87. This is the far_store.c shape.
++define void @far_store_indir(i32 %a, i8 %v) {
++; CHECK-LABEL: far_store_indir:
++; CHECK: sta [__rc{{[0-9]+}}]
++; CHECK: rts
++; OBJ-LABEL: <far_store_indir>:
++; OBJ: 87 {{[0-9a-f]+}} {{.*}}sta [
++  %p = inttoptr i32 %a to ptr addrspace(2)
++  store i8 %v, ptr addrspace(2) %p
++  ret void
++}
++
++; A plain (AS0) global merely PLACED in a .far_* section keeps its NEAR 16-bit
++; address -- isFarSymbol restricts the section test to FUNCTIONS on purpose, so
++; taking &it must not over-trigger 24-bit materialization into a 16-bit context
++; (selectAddrLoHi/buildFarAddrWords require a 24-bit destination). Codegen must
++; emit a BARE symbol operand here, not mos24(...); dev/run.sh far_indir is the
++; matching runtime gate.
++;
++; Asm-only: what the ASSEMBLER then does with a bare unresolved symbol operand on
++; W65816 is a separate, already-tracked MC-layer question (the failing `addr24`
++; bare-symbol line in MC/MOS/addressing-modes-65816.s), so this case deliberately
++; carries no OBJ check -- it pins the codegen decision, not the encoding choice.
++@near_in_far_section = global i8 -87, section ".far_data"
++
++define i8 @near_symbol_in_far_section() {
++; CHECK-LABEL: near_symbol_in_far_section:
++; CHECK: lda near_in_far_section
++; CHECK-NOT: mos24(near_in_far_section)
++; CHECK: rts
++  %v = load volatile i8, ptr @near_in_far_section
++  ret i8 %v
++}
+diff --git a/llvm/test/CodeGen/MOS/far-phi.ll b/llvm/test/CodeGen/MOS/far-phi.ll
+new file mode 100644
+index 000000000000..d476ce22ce22
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-phi.ll
+@@ -0,0 +1,60 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -stop-after=legalizer -o - < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s --check-prefix=ASM
++
++; A far-pointer PHI crosses the p2/s32 bridge before scalar narrowing.
++; Incoming values are converted in their predecessor blocks; the result is
++; converted back after all PHIs. A volatile stride keeps the far pointer on
++; the back-edge so both conversion directions and the final dereference remain.
++
++target datalayout = "e-m:e-p:16:8-p1:8:8-p2:32:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++@stride = global i32 0
++
++define i8 @far_ptr_induction(i32 %a, i16 %n) {
++; CHECK-LABEL: name: far_ptr_induction
++;
++; Preheader: the incoming far pointer is ptrtoint'd and unmerged to the four
++; bytes that feed the phis.
++; CHECK: bb.{{[0-9]+}}.entry:
++; CHECK: %[[P0:[0-9]+]]:_(p2) = G_INTTOPTR
++; CHECK: %[[I0:[0-9]+]]:_(s32) = G_PTRTOINT %[[P0]](p2)
++; CHECK: %[[W0:[0-9]+]]:_(s16), %[[W1:[0-9]+]]:_(s16) = G_UNMERGE_VALUES %[[I0]](s32)
++; CHECK: %[[A0:[0-9]+]]:_(s8), %[[A1:[0-9]+]]:_(s8) = G_UNMERGE_VALUES %[[W0]](s16)
++; CHECK: %[[A2:[0-9]+]]:_(s8), %[[A3:[0-9]+]]:_(s8) = G_UNMERGE_VALUES %[[W1]](s16)
++;
++; Loop header: four s8 phis -- NOT a p2 phi -- re-merged and inttoptr'd back to
++; p2 for the dereference.
++; CHECK: bb.{{[0-9]+}}.loop:
++; CHECK-NOT: (p2) = G_PHI
++; CHECK: %[[Q0:[0-9]+]]:_(s8) = G_PHI %[[A0]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q1:[0-9]+]]:_(s8) = G_PHI %[[A1]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q2:[0-9]+]]:_(s8) = G_PHI %[[A2]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[Q3:[0-9]+]]:_(s8) = G_PHI %[[A3]](s8), %bb.{{[0-9]+}},
++; CHECK: %[[V0:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[Q0]](s8), %[[Q1]](s8)
++; CHECK: %[[V1:[0-9]+]]:_(s16) = G_MERGE_VALUES %[[Q2]](s8), %[[Q3]](s8)
++; CHECK: %[[J:[0-9]+]]:_(s32) = G_MERGE_VALUES %[[V0]](s16), %[[V1]](s16)
++; CHECK: %[[P:[0-9]+]]:_(p2) = G_INTTOPTR %[[J]](s32)
++; CHECK: G_LOAD_FAR_INDIR %[[P]](p2)
++;
++; And it reaches a real indirect-long dereference in the emitted loop.
++; ASM-LABEL: far_ptr_induction:
++; ASM: lda [__rc{{[0-9]+}}]
++entry:
++  %p0 = inttoptr i32 %a to ptr addrspace(2)
++  br label %loop
++
++loop:
++  %p = phi ptr addrspace(2) [ %p0, %entry ], [ %pn, %loop ]
++  %i = phi i16 [ 0, %entry ], [ %in, %loop ]
++  %acc = phi i8 [ 0, %entry ], [ %accn, %loop ]
++  %v = load i8, ptr addrspace(2) %p
++  %accn = add i8 %acc, %v
++  %s = load volatile i32, ptr @stride
++  %pn = getelementptr inbounds i8, ptr addrspace(2) %p, i32 %s
++  %in = add i16 %i, 1
++  %c = icmp ult i16 %in, %n
++  br i1 %c, label %loop, label %exit
++
++exit:
++  ret i8 %accn
++}
+-- 
+2.53.0
+

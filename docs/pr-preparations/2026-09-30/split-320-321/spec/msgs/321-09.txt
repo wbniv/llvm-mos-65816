@@ -1,0 +1,16 @@
+[MOS] Legalize native s32/s64 lanes and wide any-extensions
+
+Under +mos-a16, an s32 value is represented as two s16 lanes and an s64 value as two s32 halves: G_ANYEXT to s32 from s8/s16 and G_TRUNC from s32 to s16 are legal, G_MERGE_VALUES/G_UNMERGE_VALUES between s32 and 2 x s16 and between s64 and 2 x s32 are legal, and the four-piece forms (4 x s8 <-> s32, 4 x s16 <-> s64) are split into those two-level forms, because the selector handles only two-part merges. Extensions to s64 are custom.
+
+In every mode, G_ANYEXT from a source that is not 1, 8, 16 or 32 bits wide now lowers through G_ZEXT instead of being unsupported; an any-extension may zero-fill its high bits.
+
+Default-mode effect: none in the fixed input set. The any-extension rule applies to every CPU, but only to source widths that were previously rejected.
+
+Tests: anyext-wide.mir checks wide extensions at legalization in default, +mos-a16 and +mos-a16,+mos-xy16 modes, including a shift libcall consuming the low bytes. anyext-masked-byte.ll checks that a masked byte store's s8 to s64 extension lowers in all three modes. Both also pass before this commit; they guard the new rules, This commit precedes native arithmetic because, without these rules, native s16 arithmetic leaves an s64 to 4 x s16 G_UNMERGE_VALUES that cannot be legalized (anyext-masked-byte.ll fails under +mos-a16).
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/anyext-wide.mir llvm/test/CodeGen/MOS/anyext-masked-byte.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

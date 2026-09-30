@@ -1,0 +1,169 @@
+From 09506482de2f121caca79d269651913b1a2602c3 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 07/16] [MOS] Keep call-clobbered imaginary copies out of
+ Imag16 pairs
+
+Refuse to coalesce a sub-register copy into an Imag16 pair when one side is a virtual register whose only definition is `COPY $rcN` and that register is live across a call whose regmask clobbers $rcN. The pair would inherit the $rcN allocation hint and could be re-bound to $rcN across the clobbering call, leaving a use with no reaching definition that the machine verifier rejects. Keeping the COPY gives the value its own spillable register.
+
+The guard needs all three conditions, so ordinary coalescing is unaffected. Native s32 values are built from s16 lanes, which makes Imag16 pairs assembled from call results common under +mos-a16.
+
+Default-mode effect: none in the fixed input set. The hook runs for every CPU.
+
+Tests: coalesce-call-clobbered-imag.mir runs the register coalescer on byte COPYs of $rc2/$rc3 that build an Imag16 pair: across a second call they stay separate registers, and without that call they coalesce into the pair. The parent commit folds $rc2/$rc3 into the pair across the call.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp       | 51 +++++++++++++++++
+ .../MOS/coalesce-call-clobbered-imag.mir      | 57 +++++++++++++++++++
+ 2 files changed, 108 insertions(+)
+ create mode 100644 llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 8abc01658afa..d02c88c15874 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -20,8 +20,10 @@
+ #include "MOSInstrInfo.h"
+ #include "MOSMachineFunctionInfo.h"
+ #include "MOSSubtarget.h"
++#include "llvm/ADT/BitVector.h"
+ #include "llvm/ADT/SmallSet.h"
+ #include "llvm/ADT/SmallVector.h"
++#include "llvm/CodeGen/LiveIntervals.h"
+ #include "llvm/CodeGen/LivePhysRegs.h"
+ #include "llvm/CodeGen/MachineBasicBlock.h"
+ #include "llvm/CodeGen/MachineFrameInfo.h"
+@@ -906,12 +908,61 @@ bool isRmwPattern(Register Reg, const MachineRegisterInfo &MRI) {
+   return true;
+ }
+ 
++// True if the virtual register Reg's unique definition is a COPY *directly* out of a
++// physical imaginary register ($rcN) — `Reg = COPY $rcN` — and Reg is live across a
++// call that clobbers that same $rcN.
++//
++// $rcN are the calling convention's imaginary (zero-page) argument/return scratch: a
++// libcall passes and returns values in them and clobbers them (via the call's
++// regmask). A `Reg = COPY $rcN` reading such a return value hints Reg back to $rcN.
++// If Reg is then folded into an imaginary-register *pair* (a sub-register copy
++// building an Imag16) that outlives a libcall re-clobbering $rcN, the pair inherits
++// the $rcN hint and the allocator re-binds it to $rcN across the clobber — leaving a
++// use of $rcN with no reaching definition on that path. The value survives in $rcN at
++// runtime so the code is correct, but the IR is ill-formed and the MachineVerifier
++// rejects it ("Using an undefined physical register") — a latent miscompile hazard.
++static bool copiedFromClobberedPhysImag(Register Reg,
++                                        const MachineRegisterInfo &MRI,
++                                        LiveIntervals &LIS) {
++  if (!Reg.isVirtual() || !LIS.hasInterval(Reg))
++    return false;
++  const MachineInstr *Def = MRI.getUniqueVRegDef(Reg);
++  if (!Def || !Def->isCopy())
++    return false;
++  Register Src = Def->getOperand(1).getReg();
++  if (!Src.isPhysical() || !MOS::Imag8RegClass.contains(Src))
++    return false;
++  BitVector Usable;
++  return LIS.checkRegMaskInterference(LIS.getInterval(Reg), Usable) &&
++         !Usable.test(Src.id());
++}
++
+ bool MOSRegisterInfo::shouldCoalesce(
+     MachineInstr *MI, const TargetRegisterClass *SrcRC, unsigned SubReg,
+     const TargetRegisterClass *DstRC, unsigned DstSubReg,
+     const TargetRegisterClass *NewRC, LiveIntervals &LIS) const {
+   const auto &MRI = MI->getMF()->getRegInfo();
+ 
++  // Don't fold a value read straight out of a call-clobbered imaginary register
++  // ($rcN, via `vreg = COPY $rcN`) into an imaginary-register *pair* (a sub-register
++  // copy that builds an Imag16) when that value outlives the clobbering call. The
++  // pair inherits the physical-$rcN allocation hint and the allocator re-binds it to
++  // $rcN across the clobber, producing a disconnected def->use the MachineVerifier
++  // rejects ("Using an undefined physical register") — a latent miscompile hazard.
++  // Refusing keeps the COPY so the value gets its own spillable vreg.
++  //
++  // Narrowly gated to stay inert on the common case: it requires (1) a *direct*
++  // `vreg = COPY $rcN` read (unique def), (2) that vreg genuinely live across a call
++  // clobbering $rcN, and (3) a sub-register copy into an Imag16 pair — the exact shape
++  // that re-creates the re-bindable hint. It only ever keeps an extra COPY, never
++  // changing correctness. Pure virtual values without a physical-register COPY
++  // do not satisfy this guard; their call-clobber constraints belong to allocation.
++  if (NewRC == &MOS::Imag16RegClass && (DstSubReg || SubReg)) {
++    if (copiedFromClobberedPhysImag(MI->getOperand(0).getReg(), MRI, LIS) ||
++        copiedFromClobberedPhysImag(MI->getOperand(1).getReg(), MRI, LIS))
++      return false;
++  }
++
+   // Don't coalesce Imag8 and AImag8 registers together when used by shifts or
+   // rotates.  This may cause expensive ASL zp's to be used when ASL A would
+   // have sufficed. It's better to do arithmetic in A and then copy it out.
+diff --git a/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir b/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+new file mode 100644
+index 000000000000..ca86aea42a5a
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir
+@@ -0,0 +1,57 @@
++# RUN: llc -mtriple=mos -mcpu=mos6502 -run-pass=register-coalescer -verify-machineinstrs %s -o - | FileCheck %s
++
++# A value read straight out of a call-clobbered imaginary register ($rcN)
++# must not be folded into an Imag16 pair when it stays live across a call
++# that clobbers $rcN: the pair would inherit the $rcN hint and could be
++# assigned $rcN across the clobber. The COPYs are kept, so each byte gets its
++# own register.
++
++# CHECK-LABEL: name: live_across_call
++# CHECK:      JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++# CHECK-NEXT: [[LO:%[0-9]+]]:imag8 = COPY $rc2
++# CHECK-NEXT: [[HI:%[0-9]+]]:imag8 = COPY $rc3
++# CHECK-NEXT: JSR @g, mos_csr
++# CHECK-NEXT: undef [[PAIR:%[0-9]+]].sublo:imag16 = COPY [[LO]]
++# CHECK-NEXT: [[PAIR]].subhi:imag16 = COPY [[HI]]
++# CHECK-NEXT: $rs1 = COPY [[PAIR]]
++
++# Without an intervening call the guard does not apply, and the bytes are
++# coalesced into the pair as usual.
++
++# CHECK-LABEL: name: no_call_between
++# CHECK:      JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++# CHECK-NEXT: undef [[PAIR2:%[0-9]+]].sublo:imag16 = COPY $rc2
++# CHECK-NEXT: [[PAIR2]].subhi:imag16 = COPY $rc3
++# CHECK-NEXT: $rs1 = COPY [[PAIR2]]
++--- |
++  declare void @g()
++  define i16 @live_across_call() { ret i16 0 }
++  define i16 @no_call_between() { ret i16 0 }
++...
++---
++name: live_across_call
++tracksRegLiveness: true
++body: |
++  bb.0:
++    JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++    %0:imag8 = COPY $rc2
++    %1:imag8 = COPY $rc3
++    JSR @g, mos_csr
++    undef %2.sublo:imag16 = COPY %0
++    %2.subhi:imag16 = COPY %1
++    $rs1 = COPY %2
++    RTS implicit $rs1
++...
++---
++name: no_call_between
++tracksRegLiveness: true
++body: |
++  bb.0:
++    JSR @g, mos_csr, implicit-def $rc2, implicit-def $rc3
++    %0:imag8 = COPY $rc2
++    %1:imag8 = COPY $rc3
++    undef %2.sublo:imag16 = COPY %0
++    %2.subhi:imag16 = COPY %1
++    $rs1 = COPY %2
++    RTS implicit $rs1
++...
+-- 
+2.53.0
+

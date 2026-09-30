@@ -1,0 +1,16 @@
+[MOS] Spill and copy native-width registers
+
+Give each native-width register class explicit copy and spill lowering. Copies between Xc16/Yc16 and an Imag16 pair use `ldx/ldy zp` and `stx/sty zp`. Static-stack spills of Ac16, Xc16 and Yc16 use one word absolute load or store. Soft-stack spills of Ac16 use one word `lda/sta (zp)` through the exact slot pointer; a nonzero offset first forms that pointer in the reserved scratch pair, because (zp) addressing has no index. X16 and Y16 are staged through A16 (`txa; sta (zp)` and `lda (zp); tax`), and the expansion is bracketed by PHA16/PLA16 when the accumulator is live across it. pushPullBalanced counts PHA16/PLA16 as one matched push and pull.
+
+The byte fall-through in both spill paths can represent only 8-bit classes: the high byte of A16, X16 or Y16 has no byte register of its own. Without these cases a spilled 16-bit register would lose its high byte.
+
+Default-mode effect: none (fixed input set identical); the new paths apply only to the native classes.
+
+Tests: native-spill-copy.mir checks A16 soft-stack spills at offset zero and at a formed nonzero-offset pointer, an X16 spill and reload staged through A16 inside PHA16/PLA16 while A16 is live, and X16/Y16 copies to and from Imag16 pairs.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-spill-copy.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

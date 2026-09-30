@@ -1,0 +1,18 @@
+[MOS] Insert REP/SEP from M/X width requirements
+
+Add MOSInsertREPSEP, which runs in addPreEmitPass before branch relaxation, so relaxation accounts for the inserted instructions. It is a no-op without +mos-a16.
+
+Each instruction's required accumulator and index widths come from the MLow/MHigh/XLow/XHigh TSFlags. A forward dataflow over the CFG propagates M and X state; function entry, calls and returns require the 8-bit ABI state. Width changes are placed at transitions, so a loop body can stay in 16-bit mode, and a combined `rep/sep #$30` is used when both flags change together. Carry initialization is width-agnostic and does not split a bracket. A switch needed on a critical edge is placed at the target block's entry. When narrowing X would destroy a live 16-bit index value, the pass saves X16 on the hardware stack below the bytes the region consumes and restores it after, preserving A and P with an A16 courier. The pass also fuses two adjacent `stz g`/`stz g+1` into one 16-bit `stz g`.
+
+The 65816 executes these instructions correctly only in the width they were emitted for, and the assembler cannot track M/X state, so the compiler must place every REP and SEP.
+
+Default-mode effect: none (the pass returns immediately without +mos-a16; fixed input set identical).
+
+Tests: insert-rep-sep-cloned-kills.mir checks that narrowing X preserves the 16-bit X value itself, without re-executing its writer, when the source was killed or overwritten, the writer is an increment, Y widens before an X reader, a byte definition ends the value, and N/Z are live. insert-rep-sep-stack.mir checks that the saved X word sits below the bytes a region pushes or pulls, for byte and word stack operations and live N/Z, and emits an object.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/insert-rep-sep-stack.mir llvm/test/CodeGen/MOS/insert-rep-sep-cloned-kills.mir`; `build/bin/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -o - <<< '@g = global i16 1 define void @f() { store i16 0, ptr @g ret void }'` prints `rep #32; stz g; sep #32`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

@@ -1,0 +1,510 @@
+From 1b52f2ece5ba9ec2a81bc77184a29b9a8001896d Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 02/17] [MOS] Define 16-bit accumulator instruction forms
+
+Define the pseudo instructions that carry a 16-bit value through the accumulator, gated on HasAccum16. The 65816 uses the same opcode bytes for 8- and 16-bit accumulator operations; the width is processor state. Codegen therefore needs distinct pseudos, so that allocation, liveness and a later REP/SEP pass know which width an operation requires. Each pseudo expands to the existing width-agnostic MC instruction.
+
+The forms are word loads and stores (absolute, abs,X, (zp), (zp),Y and Imag16), ADC/SBC/AND/ORA/EOR with absolute, Imag16 and immediate operands, CMP against Imag16, absolute, (zp) and immediate operands, and ASL/LSR/ROR/INC/DEC on the accumulator. Values enter A16 only through word loads and leave only through word stores; there is no COPY between Ac16 and a byte class, which could otherwise coalesce registers of different widths.
+
+MOSLogicalInstr gains the MLow TSFlag at the bit position the MC instruction formats already use, so a pass that runs before MC lowering can read the required accumulator width from a pseudo.
+
+A 16-bit immediate now prints as mos16(value) when the value would fit an 8-bit immediate. The assembler has no M-flag state, so a bare `adc #66` reassembles to the two-byte form; with M clear the processor would then take the next opcode as the immediate's high byte. Values above 255 print unchanged.
+
+Default-mode effect: none in the fixed input set (assembly and objects identical in mos6502 and mosw65816). Default codegen emits no 16-bit immediates.
+
+Tests: a16-accumulator-forms.mir emits a sequence of these pseudos from MIR and checks the expanded instructions, the mos16() printing of small immediates (and bare printing above 255), and the three-byte immediate encodings in the object. a16-immediate-width.ll (in the compare commit) checks the printing on selected code.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-accumulator-forms.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ .../MOS/MCTargetDesc/MOSInstPrinter.cpp       |  42 +++
+ .../Target/MOS/MCTargetDesc/MOSInstPrinter.h  |   1 +
+ llvm/lib/Target/MOS/MOSInstrFormats.td        |  19 +-
+ llvm/lib/Target/MOS/MOSInstrLogical.td        | 283 ++++++++++++++++++
+ .../CodeGen/MOS/a16-accumulator-forms.mir     |  66 ++++
+ 5 files changed, 410 insertions(+), 1 deletion(-)
+ create mode 100644 llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+index 5b530be1d134..52307132776f 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.cpp
+@@ -78,6 +78,48 @@ void MOSInstPrinter::printOperand(const MCInst *MI, unsigned OpNo,
+   }
+ }
+ 
++// A 16-bit immediate prints its width explicitly whenever the bare text could
++// be re-parsed as an 8-bit one. The assembler has no notion of the M/X flags,
++// so `adc #66` always matches the narrowest candidate and reassembles to two
++// bytes; with M=0 the processor then consumes the following opcode as the
++// immediate's high byte and the whole instruction stream desynchronises.
++// Values above 255 are unambiguous already, which is why only small constants
++// need an explicit width.
++//
++// This is the same rule MOSDisassembler::getInstruction applies when it
++// re-wraps a decoded 16-bit immediate, one layer over: here it covers every
++// MCInst that reaches the printer, including the ones built by codegen, which
++// is the only producer of a plain (unwrapped) small 16-bit immediate.
++void MOSInstPrinter::printImm16Operand(const MCInst *MI, unsigned OpNo,
++                                       raw_ostream &OS) {
++  const MCOperand &Op = MI->getOperand(OpNo);
++
++  // An expression that already carries a MOS modifier prints that modifier
++  // itself; wrapping it again would yield mos16(mos16(x)).
++  if (Op.isExpr())
++    if (const auto *MME = dyn_cast<MOSMCExpr>(Op.getExpr()))
++      if (MME->getKind() != MOSMCExpr::VK_NONE)
++        return printOperand(MI, OpNo, OS);
++
++  // A constant that cannot fit an 8-bit immediate already states its own
++  // width, so ordinary disassembly does not grow a wrapper. Anything else --
++  // a small constant, an out-of-range one (whose bare text matches no operand
++  // at all), or a symbolic expression (which always matches the narrowest
++  // candidate) -- has to say how wide it is.
++  int64_t Value;
++  bool IsConstant = Op.isImm();
++  if (IsConstant)
++    Value = Op.getImm();
++  else if (Op.isExpr())
++    IsConstant = Op.getExpr()->evaluateAsAbsolute(Value);
++  if (IsConstant && Value > 0xFF && Value <= 0xFFFF)
++    return printOperand(MI, OpNo, OS);
++
++  OS << "mos16(";
++  printOperand(MI, OpNo, OS);
++  OS << ')';
++}
++
+ void MOSInstPrinter::printBranchOperand(const MCInst *MI, uint64_t Address,
+                                         unsigned OpNo, raw_ostream &OS) {
+   const MCOperand &Op = MI->getOperand(OpNo);
+diff --git a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+index e450fadb6296..50b49bd88126 100644
+--- a/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
++++ b/llvm/lib/Target/MOS/MCTargetDesc/MOSInstPrinter.h
+@@ -38,6 +38,7 @@ public:
+   // generated by TableGen
+   void printInstruction(const MCInst *MI, uint64_t Address, raw_ostream &OS);
+   void printOperand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
++  void printImm16Operand(const MCInst *MI, unsigned OpNo, raw_ostream &OS);
+   void printBranchOperand(const MCInst *MI, uint64_t Address, unsigned OpNo,
+                           raw_ostream &OS);
+   void printCustomAliasOperand(const MCInst *MI, uint64_t Address,
+diff --git a/llvm/lib/Target/MOS/MOSInstrFormats.td b/llvm/lib/Target/MOS/MOSInstrFormats.td
+index ca75d5524124..2716e7a36359 100644
+--- a/llvm/lib/Target/MOS/MOSInstrFormats.td
++++ b/llvm/lib/Target/MOS/MOSInstrFormats.td
+@@ -57,6 +57,15 @@ def HasW65816 : Predicate<"Subtarget->hasW65816()">,
+   let PredicateName = "FeatureW65816";
+ }
+ 
++// Native widths: opt-in 16-bit-accumulator codegen (FeatureAccum16 / +mos-a16).
++// The SubtargetFeature defines the hasAccum16() accessor; this Predicate exposes it
++// to tablegen `let Predicates = [HasAccum16]` so the 16-bit logical ops / pseudos
++// are only available when the feature is on.
++def HasAccum16 : Predicate<"Subtarget->hasAccum16()">,
++                AssemblerPredicate<(all_of FeatureAccum16), "Accum16"> {
++  let PredicateName = "FeatureAccum16";
++}
++
+ def Has65EL02 : Predicate<"Subtarget->has65EL02()">,
+                 AssemblerPredicate<(all_of Feature65EL02), "65EL02"> {
+   let PredicateName = "Feature65EL02";
+@@ -212,7 +221,15 @@ class imm16at<int offset> : Operand<i32> {
+   let OperandNamespace = "MOSOp";
+   let Type = i16;
+ }
+-def imm16 : imm16at<1>;
++// The 16-bit immediate of an Immediate16 instruction must be printed with an
++// explicit mos16() width whenever it would fit an 8-bit one, or the assembly
++// does not round-trip: the assembler has no M/X state, so a bare `adc #66`
++// re-parses as the two-byte form and, with M=0, desynchronises the instruction
++// stream from that point on. imm16at5 (the HuC6280 tii/tdd block length) does
++// not share this: its operand slot has no narrower sibling to collapse into.
++def imm16 : imm16at<1> {
++  let PrintMethod = "printImm16Operand";
++}
+ def imm16at5 : imm16at<5>;
+ 
+ /// An 8-bit pc-relative reference, for branch instructions.
+diff --git a/llvm/lib/Target/MOS/MOSInstrLogical.td b/llvm/lib/Target/MOS/MOSInstrLogical.td
+index 6b8158ca0cac..a4c1528978f9 100644
+--- a/llvm/lib/Target/MOS/MOSInstrLogical.td
++++ b/llvm/lib/Target/MOS/MOSInstrLogical.td
+@@ -65,6 +65,14 @@ class MOSLogicalInstr : Instruction {
+   let isPseudo = true;
+   let isCodeGenOnly = true;
+   let isReMaterializable = true;
++
++  // Native widths: the M (accumulator width) TSFlag, mirroring the MC `Inst`
++  // base (MOSInstrFormats.td) at the same bit position (TSFlagMLow = bit 0). The
++  // MOSInsertREPSEP pass runs at addPreEmitPass — before MCInst expansion — so it
++  // reads this flag off the *logical* instruction to bracket 16-bit-accumulator
++  // ops with REP/SEP. Defaults to 0 (8-bit); set to 1 on the 16-bit forms.
++  bit MLow = 0;
++  let TSFlags{0} = MLow;
+ }
+ 
+ //===---------------------------------------------------------------------===//
+@@ -598,6 +606,281 @@ let Predicates = [HasHUC6280] in {
+ // Addition/Subtraction Patterns
+ //===---------------------------------------------------------------------===//
+ 
++//===---------------------------------------------------------------------===//
++// Native widths: 16-bit-accumulator load/add/store (native M=0 mode)
++//===---------------------------------------------------------------------===//
++//
++// These three logical ops carry a 16-bit value through the A16 accumulator
++// (class Ac16, which holds only A16 = B:A). The MC opcodes are width-agnostic —
++// the same LDA/ADC/STA absolute bytes the M flag governs at runtime — so they
++// PseudoInstExpand to the plain _Absolute forms. MLow=1 tags them so the
++// MOSInsertREPSEP pass wraps the run in one `rep #$20 … sep #$20`. Gated on
++// HasAccum16 (+mos-a16); only ever produced by selectAlu16Native, so the
++// default 8-bit codegen never sees them.
++
++// LDA abs (16-bit) — load a 16-bit absolute global into A16.
++def LDAbs16 : MOSLoad, PseudoInstExpansion<(LDA_Absolute addr16:$src)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr16:$src);
++}
++
++// ADC abs (16-bit) — A16 = A16 + [abs] + carry. Mirrors the 8-bit MOSAddSub
++// shape (carry in/out + overflow), but on Ac16 and reading absolute memory.
++def ADCAbs16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_Absolute addr16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let isAdd = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, addr16:$r, Cc:$carryin);
++}
++
++// SBC abs (16-bit) — A16 = A16 - [abs] - !carry. Mirrors ADCAbs16; carry-in is
++// SET (sec) for a plain subtract. Non-commutative: $l is the minuend.
++def SBCAbs16 : MOSLogicalInstr, PseudoInstExpansion<(SBC_Absolute addr16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, addr16:$r, Cc:$carryin);
++}
++
++// Bitwise abs (16-bit): A16 = A16 {& | ^} [abs]. No carry/overflow — simpler than
++// the ADC/SBC shape. MLow=1 so the run is REP/SEP-bracketed.
++class MOSBitAbs16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real addr16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$l, addr16:$r);
++}
++def ANDAbs16 : MOSBitAbs16<AND_Absolute>;
++def ORAAbs16 : MOSBitAbs16<ORA_Absolute>;
++def EORAbs16 : MOSBitAbs16<EOR_Absolute>;
++
++// Immediate-operand 16-bit forms: A16 = A16 OP #imm16. Same accumulator shape as
++// the *Abs16 ops but the second operand is a 16-bit immediate (no memory). Used
++// for `g = a OP constant` (the combiner routes one constant operand here).
++def ADCImm16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_Immediate16 imm16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let isAdd = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, imm16:$r, Cc:$carryin);
++}
++class MOSBitImm16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real imm16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$l, imm16:$r);
++}
++def ANDImm16 : MOSBitImm16<AND_Immediate16>;
++def ORAImm16 : MOSBitImm16<ORA_Immediate16>;
++def EORImm16 : MOSBitImm16<EOR_Immediate16>;
++
++// STA abs (16-bit) — store A16 to a 16-bit absolute global.
++def STAbs16 : MOSStore, PseudoInstExpansion<(STA_Absolute addr16:$dst)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr16:$dst);
++}
++
++// Native widths: abs,x and (zp),y indexed 16-bit load/store (M=0).
++// Mirrors the 8-bit LDAAbsIdx/STAbsIdx and LDIndirIdx/STIndirIdx, but on Ac16
++// with MLow=1 so MOSInsertREPSEP wraps the op in one rep #$20 … sep #$20.
++
++// LDA abs,x (16-bit) — load 16-bit from absolute_base + X into A16.
++def LDAbsIdx16 : MOSLoad, PseudoInstExpansion<(LDA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins addr16:$addr, Xc:$idx);
++}
++
++// STA abs,x (16-bit) — store A16 to absolute_base + X.
++def STAbsIdx16 : MOSStore, PseudoInstExpansion<(STA_AbsoluteX addr16:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, addr16:$addr, Xc:$idx);
++}
++
++// LDA (zp),y (16-bit) — load 16-bit via ZP-resident pointer + Y offset into A16.
++// Follows the same pattern as 8-bit LDIndirIdx: $addr maps to the Imag16 pair;
++// Yc:$offset is an extra constraint operand not referenced in the expansion (LLVM
++// preserves it as an extra use for RA).
++def LDIndirIdx16 : MOSLoad, PseudoInstExpansion<(LDA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$addr, Yc:$offset);
++}
++
++// STA (zp),y (16-bit) — store A16 via ZP-resident pointer + Y offset.
++def STIndirIdx16 : MOSStore, PseudoInstExpansion<(STA_IndirectIndexed addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr, Yc:$offset);
++}
++
++// Imag16 values enter A16 through word loads and leave through word stores.
++// Avoid Ac16-to-byte COPY instructions, which could coalesce different widths.
++
++// LDA zp (16-bit) — load a 16-bit Imag16 pair into A16.
++def LDAImag16 : MOSLoad, PseudoInstExpansion<(LDA_ZeroPage addr8:$src)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$src);
++}
++
++// ADC zp (16-bit) — A16 = A16 + [Imag16] + carry. Mirrors ADCAbs16.
++def ADCImag16 : MOSLogicalInstr, PseudoInstExpansion<(ADC_ZeroPage addr8:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let isAdd = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, Imag16:$r, Cc:$carryin);
++}
++
++// SBC zp (16-bit) — A16 = A16 - [Imag16] - !carry. Mirrors SBCAbs16.
++def SBCImag16 : MOSLogicalInstr, PseudoInstExpansion<(SBC_ZeroPage addr8:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout, Vc:$vout);
++  dag InOperandList = (ins Ac16:$l, Imag16:$r, Cc:$carryin);
++}
++
++// Bitwise zp (16-bit): A16 = A16 {& | ^} [Imag16]. Mirrors MOSBitAbs16.
++class MOSBitImag16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real addr8:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++  let Constraints = "$dst = $l";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$l, Imag16:$r);
++}
++def ANDImag16 : MOSBitImag16<AND_ZeroPage>;
++def ORAImag16 : MOSBitImag16<ORA_ZeroPage>;
++def EORImag16 : MOSBitImag16<EOR_ZeroPage>;
++
++// Writing an Imag16 register pair defines it. The s16 result enters A16
++// through LDAImag16 and leaves through STAImag16, without a byte-class COPY.
++def STAImag16 : MOSLogicalInstr, PseudoInstExpansion<(STA_ZeroPage addr8:$dst)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Imag16:$dst);
++  dag InOperandList = (ins Ac16:$src);
++}
++
++// #321 native s16 indirect memory: LDA (zp) / STA (zp) in 16-bit-accumulator mode —
++// load/store a 16-bit value through a runtime pointer held in a zero-page Imag16
++// pair. Mirror the 8-bit LDIndir/STIndir (LDA_Indirect=$B2 / STA_Indirect=$92,
++// 65C02+; the w65816 has them) with MLow=1 so MOSInsertREPSEP brackets the access.
++// The value enters/leaves A16 only via these / the Imag16 load-store — no Ac16<->
++// 8-bit COPY. Used by selectMem16Indir for *p, a[i], a[i]=v, p[i].
++def LDAIndir16 : MOSLoad, PseudoInstExpansion<(LDA_Indirect addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Imag16:$addr);
++}
++def STAIndir16 : MOSStore, PseudoInstExpansion<(STA_Indirect addr8:$addr)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$src, Imag16:$addr);
++}
++
++// #321 native 16-bit compares: A16 - operand, discard the result, keep the flags
++// (Cc = carry; N/Z set implicitly). MLow=1 so MOSInsertREPSEP brackets `lda; cmp`
++// in one rep/sep run; SEP doesn't touch C/Z/N, so a following branch reads them.
++// Used by selectSbc16 for the unsigned-ordering (C-flag) s16 comparisons. There is
++// no CMP_Immediate16 opcode, so a constant RHS is materialized into Imag16 and
++// compared via CMPImag16 (correct, just not folded).
++class MOSCMP16 : MOSCMP {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let mayLoad = true;
++}
++def CMPImag16 : MOSCMP16, PseudoInstExpansion<(CMP_ZeroPage addr8:$r)> {
++  dag InOperandList = (ins Ac16:$l, Imag16:$r);
++}
++def CMPAbs16 : MOSCMP16, PseudoInstExpansion<(CMP_Absolute addr16:$r)> {
++  dag InOperandList = (ins Ac16:$l, addr16:$r);
++}
++// cmp (zp) — compare A16 against a 16-bit value read through a zero-page POINTER
++// pair (M=0). The RHS-indexed compare fold: `arr[i]`/`p[i]` legalize to a computed
++// pointer + G_LOAD16_INDIR (lda (zp)); when that load is a single-use compare RHS,
++// selectSbc16 folds it here (cmp (zp)) instead of staging the value through an
++// Imag16 temp. Mirrors LDAIndir16 + the 8-bit CMPIndir; no index reg (so no X-flag
++// bracketing) and no abs base (so no frame-index / ZP-confusable concern).
++def CMPIndir16 : MOSCMP16, PseudoInstExpansion<(CMP_Indirect addr8:$addr)> {
++  dag InOperandList = (ins Ac16:$l, Imag16:$addr);
++}
++// cmp #imm16 — CMP_Immediate16 is generated by the CC1_All multiclass (like
++// ADC_Immediate16), so a constant RHS folds to `cmp #$1234` (common loop bounds)
++// instead of materializing the constant into an Imag16 pair. No mayLoad.
++def CMPImm16 : MOSCMP, PseudoInstExpansion<(CMP_Immediate16 imm16:$r)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  dag InOperandList = (ins Ac16:$l, imm16:$r);
++}
++
++// Constant s16 shifts use A16 with MLow set. Values enter and leave
++// through word loads/stores; zero-filling shifts do not consume carry.
++class MOSShiftAcc16<Instruction real> : MOSLogicalInstr,
++    PseudoInstExpansion<(real)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $src";
++  dag OutOperandList = (outs Ac16:$dst);
++  dag InOperandList = (ins Ac16:$src);
++}
++// Shifts define carry so liveness preserves a carry value used across
++// the shift. Arithmetic unit steps use the corresponding accumulator op.
++def ASLAcc16 : MOSShiftAcc16<ASL_Accumulator> { let Defs = [C]; }
++def LSRAcc16 : MOSShiftAcc16<LSR_Accumulator> { let Defs = [C]; }
++
++// #321 native s16 inc/dec: in 16-bit-accumulator mode one `inc a` / `dec a` steps all
++// 16 bits, so a 16-bit `x + 1` / `x - 1` selects to a single accumulator inc/dec
++// (1 byte, no carry-init) instead of `(clc;) adc #$0001` — and far better than the
++// 8-bit byte inc/dec-with-carry chain the default path emits. Same accumulator-RMW
++// shape as ASLAcc16 (MLow=1, $dst=$src, no extra operands); inc a / dec a set N/Z but
++// not C/V, which is correct for a plain ±1 (G_ADD/G_SUB carry out is unused here). The
++// value enters A16 only via LDAImag16/LDAbs16 and leaves only via STAImag16 (no Ac16<->
++// 8-bit COPY). Used by selectAlu16Native (register ±1 and global ±1 via lda/inc-a/sta).
++def INCAcc16 : MOSShiftAcc16<INC_Accumulator>;
++def DECAcc16 : MOSShiftAcc16<DEC_Accumulator>;
++// Native unit arithmetic uses accumulator INC/DEC between the selected
++// load and store, preserving the addressing mode and memory operands.
++
++// #321 native s16 arithmetic right shift (signed `>>`): the 65816 has no native
++// ASR, but in 16-bit mode `cmp #$8000` sets carry = the sign bit (A >= 0x8000) and
++// `ror a` rotates that carry back into bit 15 while shifting right — so the sign
++// replicates. selectShift16Native emits `cmp #$8000; ror a` per bit. Unlike ASL/LSR
++// this rotate has a real carry-in (the sign from the cmp); its carry-out (old bit 0)
++// is dead (the next bit's cmp recomputes C). MLow=1 so the whole run stays bracketed.
++def RORAcc16 : MOSLogicalInstr, PseudoInstExpansion<(ROR_Accumulator)> {
++  let Predicates = [HasAccum16];
++  let MLow = 1;
++  let Constraints = "$dst = $src";
++  dag OutOperandList = (outs Ac16:$dst, Cc:$carryout);
++  dag InOperandList = (ins Ac16:$src, Cc:$carryin);
++}
++
+ def : Pat<(add Ac:$l, (i8 imm:$imm)), (ADCImm Ac:$l, imm:$imm, (LDCImm 0))>;
+ def : Pat<(add Ac:$l, Imag8:$r), (ADCImag8 Ac:$l, Imag8:$r, (LDCImm 0))>;
+ def : Pat<(sub Ac:$l, (i8 imm:$imm)), (SBCImm Ac:$l, imm:$imm, (LDCImm -1))>;
+diff --git a/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir b/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+new file mode 100644
+index 000000000000..0f0a6e82cb86
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/a16-accumulator-forms.mir
+@@ -0,0 +1,66 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=branch-relaxation -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -start-before=branch-relaxation -verify-machineinstrs -filetype=obj %s -o %t.o
++# RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
++
++# Each 16-bit accumulator pseudo emits the width-agnostic opcode of its
++# addressing mode. A 16-bit immediate that would fit an 8-bit field prints as
++# mos16(value), so the text reassembles to the three-byte form; a value above
++# 255 already states its width and prints bare. The object carries the
++# three-byte immediate encodings.
++
++# CHECK-LABEL: accumulator_forms:
++# CHECK:      lda __rc2
++# CHECK-NEXT: clc
++# CHECK-NEXT: adc #mos16(66)
++# CHECK-NEXT: adc #43981
++# CHECK-NEXT: and #mos16(255)
++# CHECK-NEXT: ora {{.*}}g
++# CHECK-NEXT: eor __rc4
++# CHECK-NEXT: cmp #mos16(5)
++# CHECK-NEXT: asl
++# CHECK-NEXT: lsr
++# CHECK-NEXT: inc
++# CHECK-NEXT: dec
++# CHECK-NEXT: sta __rc2
++# CHECK-NEXT: sta {{.*}}g
++# CHECK-NEXT: rts
++
++# OBJ-LABEL: <accumulator_forms>:
++# OBJ:      a5 00 {{.*}}lda
++# OBJ-NEXT: 18 {{.*}}clc
++# OBJ-NEXT: 69 42 00 {{.*}}adc
++# OBJ-NEXT: 69 cd ab {{.*}}adc
++# OBJ-NEXT: 29 ff 00 {{.*}}and
++# OBJ:      45 00 {{.*}}eor
++# OBJ-NEXT: c9 05 00 {{.*}}cmp
++# OBJ-NEXT: 0a {{.*}}asl
++# OBJ-NEXT: 4a {{.*}}lsr
++# OBJ-NEXT: 1a {{.*}}inc
++# OBJ-NEXT: 3a {{.*}}dec
++# OBJ-NEXT: 85 00 {{.*}}sta
++--- |
++  @g = global i16 0
++  define void @accumulator_forms() { ret void }
++...
++---
++name: accumulator_forms
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1, $rs2
++    $a16 = LDAImag16 $rs1
++    $c = LDCImm 0
++    $a16, $c, $v = ADCImm16 $a16, 66, $c
++    $a16, $c, $v = ADCImm16 $a16, 43981, $c
++    $a16 = ANDImm16 $a16, 255
++    $a16 = ORAAbs16 $a16, @g
++    $a16 = EORImag16 $a16, $rs2
++    $c = CMPImm16 $a16, 5, implicit-def $nz
++    $a16 = ASLAcc16 $a16, implicit-def $c
++    $a16 = LSRAcc16 $a16, implicit-def $c
++    $a16 = INCAcc16 $a16
++    $a16 = DECAcc16 $a16
++    $rs1 = STAImag16 $a16
++    STAbs16 killed $a16, @g
++    RTS
++...
+-- 
+2.53.0
+

@@ -1,0 +1,20 @@
+[MOS] Define 16-bit accumulator instruction forms
+
+Define the pseudo instructions that carry a 16-bit value through the accumulator, gated on HasAccum16. The 65816 uses the same opcode bytes for 8- and 16-bit accumulator operations; the width is processor state. Codegen therefore needs distinct pseudos, so that allocation, liveness and a later REP/SEP pass know which width an operation requires. Each pseudo expands to the existing width-agnostic MC instruction.
+
+The forms are word loads and stores (absolute, abs,X, (zp), (zp),Y and Imag16), ADC/SBC/AND/ORA/EOR with absolute, Imag16 and immediate operands, CMP against Imag16, absolute, (zp) and immediate operands, and ASL/LSR/ROR/INC/DEC on the accumulator. Values enter A16 only through word loads and leave only through word stores; there is no COPY between Ac16 and a byte class, which could otherwise coalesce registers of different widths.
+
+MOSLogicalInstr gains the MLow TSFlag at the bit position the MC instruction formats already use, so a pass that runs before MC lowering can read the required accumulator width from a pseudo.
+
+A 16-bit immediate now prints as mos16(value) when the value would fit an 8-bit immediate. The assembler has no M-flag state, so a bare `adc #66` reassembles to the two-byte form; with M clear the processor would then take the next opcode as the immediate's high byte. Values above 255 print unchanged.
+
+Default-mode effect: none in the fixed input set (assembly and objects identical in mos6502 and mosw65816). Default codegen emits no 16-bit immediates.
+
+Tests: a16-accumulator-forms.mir emits a sequence of these pseudos from MIR and checks the expanded instructions, the mos16() printing of small immediates (and bare printing above 255), and the three-byte immediate encodings in the object. a16-immediate-width.ll (in the compare commit) checks the printing on selected code.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-accumulator-forms.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

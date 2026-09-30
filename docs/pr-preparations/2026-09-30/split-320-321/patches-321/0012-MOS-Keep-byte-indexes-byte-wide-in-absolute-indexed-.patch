@@ -1,0 +1,170 @@
+From 77326e4aaff3f6faae77f4d21f663dc10a73a9ae Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 12/16] [MOS] Keep byte indexes byte-wide in absolute indexed
+ addressing
+
+In absolute indexed addressing, an index that is already s8 (a zero-page pointer offset) is used directly. An s16 index known to fit in 8 bits is truncated for the access, and its other users are rewritten to an explicit G_MERGE_VALUES of the low byte and a zero byte, inserted after the definition (after the PHIs for a PHI), with the legalizer observer notified around each rewrite so GISel CSE stays consistent.
+
+Both lanes of the shared s16 offset stay explicitly defined: under native widths that value can reach a word spill or a word consumer, which reads both bytes.
+
+Default-mode effect: yes, in every mode. legalizer.mir drops a COPY of the s8 index in two zero-page tests, and the high byte of a shared offset becomes a known zero. In the fixed input set 16 of 54 compiling mos6502 inputs and 17 of 78 mosw65816 inputs produce different assembly; code size changes by +280 bytes on mos6502 (12 inputs larger, 3 smaller) and -83 bytes on mosw65816 (1 larger, 14 smaller).
+
+Tests: zp-byte-index.ll checks zero-page indexed loads and stores in mos6502, +mos-a16 and +mos-a16,+mos-xy16 modes; legalizer-indexed-offset-observer.mir checks the rewritten operands and the CSE observer contract (assertions builds); legalizer.mir is updated.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/zp-byte-index.ll llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir llvm/test/CodeGen/MOS/legalizer.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSLegalizerInfo.cpp      | 42 ++++++++++++++++++-
+ .../MOS/legalizer-indexed-offset-observer.mir | 28 +++++++++++++
+ llvm/test/CodeGen/MOS/legalizer.mir           |  4 +-
+ llvm/test/CodeGen/MOS/zp-byte-index.ll        | 23 ++++++++++
+ 4 files changed, 93 insertions(+), 4 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+ create mode 100644 llvm/test/CodeGen/MOS/zp-byte-index.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index eda3c1950fa1..1080b80e0b38 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -2501,7 +2501,47 @@ bool MOSLegalizerInfo::tryAbsoluteIndexedAddressing(LegalizerHelper &Helper,
+               .countMaxActiveBits() <= 8) {
+         if (Index)
+           return false;
+-        Index = Builder.buildZExtOrTrunc(S8, NewOffset).getReg(0);
++
++        // A zero-page offset is already a byte and needs no decomposition.
++        if (MRI.getType(NewOffset) == S8) {
++          Index = NewOffset;
++          continue;
++        }
++
++        // Use a byte index and reconstruct an explicit zero high byte for other
++        // consumers of the s16 offset. This keeps both lanes defined for spills.
++        LLT S16 = LLT::scalar(16);
++        auto &SavedMBB = Builder.getMBB();
++        auto SavedInsertPt = Builder.getInsertPt();
++
++        // Insert after the offset definition, or after all PHIs when the
++        // definition is a PHI, so the replacement dominates every original use.
++        MachineInstr *OffDef = MRI.getVRegDef(NewOffset);
++        MachineBasicBlock &OffMBB = *OffDef->getParent();
++        Builder.setInsertPt(OffMBB, OffDef->isPHI()
++                                        ? OffMBB.getFirstNonPHI()
++                                        : std::next(OffDef->getIterator()));
++
++        Register Lo = Builder.buildTrunc(S8, NewOffset).getReg(0);
++        Register ZeroHi = Builder.buildConstant(S8, 0).getReg(0);
++        Register Explicit16 =
++            Builder.buildMergeLikeInstr(S16, {Lo, ZeroHi}).getReg(0);
++
++        // Notify the legalizer observer around every use rewrite. GISel CSE
++        // keys depend on operands, so the index must track each new operand profile.
++        MachineInstr *TruncMI = MRI.getVRegDef(Lo);
++        for (MachineOperand &MO :
++             llvm::make_early_inc_range(MRI.use_operands(NewOffset))) {
++          MachineInstr &UseMI = *MO.getParent();
++          if (&UseMI == TruncMI)
++            continue;
++          Helper.Observer.changingInstr(UseMI);
++          MO.setReg(Explicit16);
++          Helper.Observer.changedInstr(UseMI);
++        }
++
++        Builder.setInsertPt(SavedMBB, SavedInsertPt);
++        Index = Lo;
+         continue;
+       }
+     }
+diff --git a/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+new file mode 100644
+index 000000000000..02e6a058a8f6
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/legalizer-indexed-offset-observer.mir
+@@ -0,0 +1,28 @@
++# REQUIRES: asserts
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -run-pass=legalizer,mos-combiner -verify-machineinstrs -o - %s | FileCheck %s
++#
++# The no-wrap pointer add permits native indexing. Rewriting the masked s16
++# offset must notify GISel CSE for the shared G_ADD consumer. The legalizer and
++# combiner verify that the cached operand profiles match the rewritten uses.
++---
++name: indexed_offset_rewrite_notifies_observer
++body: |
++  bb.0:
++    liveins: $rs0, $rs2, $rs4, $rc0
++    ; CHECK-LABEL: name: indexed_offset_rewrite_notifies_observer
++    ; CHECK: [[LO:%[0-9]+]]:_(s8) = G_TRUNC {{%[0-9]+}}(s16)
++    ; CHECK-NEXT: [[MERGE:%[0-9]+]]:_(s16) = G_MERGE_VALUES [[LO]](s8), {{%[0-9]+}}(s8)
++    ; CHECK-NEXT: G_STORE_INDIR_IDX {{%[0-9]+}}(s8), {{%[0-9]+}}(p0), [[LO]] :: (store (s8))
++    ; CHECK-NEXT: G_ADD [[MERGE]], {{%[0-9]+}}
++    %0:_(p0) = COPY $rs0
++    %1:_(s16) = COPY $rs2
++    %2:_(s16) = COPY $rs4
++    %3:_(s8) = COPY $rc0
++    %4:_(s16) = G_CONSTANT i16 255
++    %5:_(s16) = G_AND %1, %4
++    %6:_(p0) = nuw G_PTR_ADD %0, %5
++    G_STORE %3(s8), %6(p0) :: (store (s8))
++    %7:_(s16) = G_ADD %5, %2
++    $rs0 = COPY %7(s16)
++    RTS implicit $rs0
++...
+diff --git a/llvm/test/CodeGen/MOS/legalizer.mir b/llvm/test/CodeGen/MOS/legalizer.mir
+index d892e484d20d..f566385dd9b4 100644
+--- a/llvm/test/CodeGen/MOS/legalizer.mir
++++ b/llvm/test/CodeGen/MOS/legalizer.mir
+@@ -2444,8 +2444,7 @@ body: |
+   bb.0.entry:
+     ; CHECK-LABEL: name: load_zp_constant_ptradd_8
+     ; CHECK: [[COPY:%[0-9]+]]:_(s8) = COPY $a
+-    ; CHECK-NEXT: [[COPY1:%[0-9]+]]:_(s8) = COPY [[COPY]](s8)
+-    ; CHECK-NEXT: [[LOAD_ZP_IDX:%[0-9]+]]:_(s8) = G_LOAD_ZP_IDX target-flags(zeropage) 123, [[COPY1]](s8) :: (load (s8))
++    ; CHECK-NEXT: [[LOAD_ZP_IDX:%[0-9]+]]:_(s8) = G_LOAD_ZP_IDX target-flags(zeropage) 123, [[COPY]](s8) :: (load (s8))
+     ; CHECK-NEXT: RTS implicit [[LOAD_ZP_IDX]](s8)
+     %0:_(p1) = G_CONSTANT i8 123
+     %1:_(s8) = COPY $a
+@@ -2531,7 +2530,6 @@ body: |
+     ; CHECK-NEXT: [[PTRTOINT:%[0-9]+]]:_(s8) = G_PTRTOINT [[COPY]](p1)
+     ; CHECK-NEXT: [[ADD:%[0-9]+]]:_(s8) = G_ADD [[PTRTOINT]], [[COPY1]]
+     ; CHECK-NEXT: [[INTTOPTR:%[0-9]+]]:_(p1) = G_INTTOPTR [[ADD]](s8)
+-    ; CHECK-NEXT: [[COPY2:%[0-9]+]]:_(s8) = COPY [[COPY1]](s8)
+     ; CHECK-NEXT: [[PTRTOINT1:%[0-9]+]]:_(s8) = G_PTRTOINT [[INTTOPTR]](p1)
+     ; CHECK-NEXT: G_STORE_ZP_IDX [[COPY1]](s8), target-flags(zeropage) 0, [[PTRTOINT1]](s8) :: (store (s8))
+     ; CHECK-NEXT: RTS
+diff --git a/llvm/test/CodeGen/MOS/zp-byte-index.ll b/llvm/test/CodeGen/MOS/zp-byte-index.ll
+new file mode 100644
+index 000000000000..453149541971
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zp-byte-index.ll
+@@ -0,0 +1,23 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -verify-machineinstrs < %s | FileCheck %s
++
++; Zero-page pointer arithmetic has an eight-bit offset. The byte index must
++; remain eight bits when selecting indexed loads and stores.
++target datalayout = "e-m:e-p:16:8-p1:8:8-i16:8-i32:8-i64:8-f32:8-f64:8-a:8-Fi8-n8"
++
++define i8 @load_zp(i8 %index) {
++; CHECK-LABEL: load_zp:
++; CHECK: lda {{.*}}17,{{[xy]}}
++  %p = getelementptr i8, ptr addrspace(1) inttoptr (i8 17 to ptr addrspace(1)), i8 %index
++  %v = load i8, ptr addrspace(1) %p, align 1
++  ret i8 %v
++}
++
++define void @store_zp(i8 %index, i8 %value) {
++; CHECK-LABEL: store_zp:
++; CHECK: sta {{.*}}17,{{[xy]}}
++  %p = getelementptr i8, ptr addrspace(1) inttoptr (i8 17 to ptr addrspace(1)), i8 %index
++  store i8 %value, ptr addrspace(1) %p, align 1
++  ret void
++}
+-- 
+2.53.0
+

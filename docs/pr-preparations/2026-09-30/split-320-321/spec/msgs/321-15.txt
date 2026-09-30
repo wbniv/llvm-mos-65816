@@ -1,0 +1,16 @@
+[MOS] Keep small 8-bit adds relocatable under +mos-a16
+
+Under +mos-a16, an 8-bit add or subtract of 2 selects as two G_INC/G_DEC steps constrained to Anyi8 instead of `clc; adc #2`, whose operand is pinned to A.
+
+A counter pinned to A that stays live across a 16-bit indexed-load transit (Ac16, which covers A) can deadlock greedy allocation: the counter cannot be recolored off its single register, and the single-instruction Ac16 transit cannot be spilled. An Anyi8 counter can live in X, Y or zero page. The step limit keeps the chain no larger than `clc; adc`. The result is the same modular value.
+
+Default-mode effect: none (gated on +mos-a16; fixed input set identical).
+
+Tests: a16-small-add.ll checks that +2 and -2 become two `inx`/`dex` under +mos-a16, that +3 keeps `adc`, and that the default mode keeps `adc` for all three. It checks the selection, not the allocation failure itself, which needs a larger function.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-small-add.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

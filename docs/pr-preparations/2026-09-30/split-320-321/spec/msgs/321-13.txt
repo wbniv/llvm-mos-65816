@@ -1,0 +1,14 @@
+[MOS] Require a no-wrap proof before folding near indexes on the 65816
+
+On the 65816, indexed addressing adds the index to the 16-bit base with carry into the bank (DBR), while a near G_PTR_ADD wraps at 16 bits. Folding the add into abs,X, abs,Y or (zp),Y is correct only if the unsigned sum cannot wrap. canFoldNearIndex allows the fold when the add is nuw, when it is nusw with a known non-negative offset, or when known bits bound base + offset below 0x10000. Other CPUs are unaffected. The check applies to the native word forms and to the existing byte abs-indexed (except zero page) and indirect-indexed folds.
+
+Default-mode effect: yes, on plain mosw65816 when an index cannot be proven not to wrap; mos6502 is unchanged. In the fixed input set 27 of the 78 mosw65816 inputs that compile before change (25 larger, 2 smaller, +4,626 bytes, 1.6%), because a byte index into a runtime pointer now needs a 16-bit add. One corpus input (examples_snes_sodo) that already fails on the base commit with "Remaining virtual register" during frame lowering compiles after this change; the change avoids that shape rather than repairing it.
+
+Tests: near-index-nowrap.ll checks, on mos6502 and mosw65816, a plain add (folded only on mos6502), nuw and inbounds non-negative adds (folded on both), a global base (folded only on mos6502) and a constant base whose known bits bound the sum (folded on both).
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/near-index-nowrap.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

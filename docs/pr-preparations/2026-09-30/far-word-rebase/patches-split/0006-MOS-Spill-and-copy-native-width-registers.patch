@@ -1,0 +1,393 @@
+From aba628a4d70d60c521bde1d8bab69689bb9f2516 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 06/32] [MOS] Spill and copy native-width registers
+
+Give each native-width register class explicit copy and spill lowering. Copies between Xc16/Yc16 and an Imag16 pair use `ldx/ldy zp` and `stx/sty zp`. Static-stack spills of Ac16, Xc16 and Yc16 use one word absolute load or store. Soft-stack spills of Ac16 use one word `lda/sta (zp)` through the exact slot pointer; a nonzero offset first forms that pointer in the reserved scratch pair, because (zp) addressing has no index. X16 and Y16 are staged through A16 (`txa; sta (zp)` and `lda (zp); tax`), and the expansion is bracketed by PHA16/PLA16 when the accumulator is live across it. pushPullBalanced counts PHA16/PLA16 as one matched push and pull.
+
+The byte fall-through in both spill paths can represent only 8-bit classes: the high byte of A16, X16 or Y16 has no byte register of its own. Without these cases a spilled 16-bit register would lose its high byte.
+
+Default-mode effect: none (fixed input set identical); the new paths apply only to the native classes.
+
+Tests: native-spill-copy.mir checks A16 soft-stack spills at offset zero and at a formed nonzero-offset pointer, an X16 spill and reload staged through A16 inside PHA16/PLA16 while A16 is live, and X16/Y16 copies to and from Imag16 pairs.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/native-spill-copy.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp        |  47 +++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp     | 151 +++++++++++++++++++-
+ llvm/lib/Target/MOS/MOSRegisterInfo.h       |   9 ++
+ llvm/test/CodeGen/MOS/native-spill-copy.mir |  69 +++++++++
+ 4 files changed, 271 insertions(+), 5 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/native-spill-copy.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index a7eacc0d6b0e..336e016b6aad 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -675,6 +675,18 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+                     TRI.getSubReg(SrcReg, MOS::sublo));
+     copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi),
+                     TRI.getSubReg(SrcReg, MOS::subhi));
++  } else if (AreClasses(MOS::Xc16RegClass, MOS::Imag16RegClass)) {
++    // Native indices: X16 ← Imag16 ZP pair: ldx zp
++    Builder.buildInstr(MOS::LDXImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag16RegClass, MOS::Xc16RegClass)) {
++    // Native indices: Imag16 ZP pair ← X16: stx zp
++    Builder.buildInstr(MOS::STXImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Yc16RegClass, MOS::Imag16RegClass)) {
++    // Native indices: Y16 ← Imag16 ZP pair: ldy zp
++    Builder.buildInstr(MOS::LDYImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
++    // Native indices: Imag16 ZP pair ← Y16: sty zp
++    Builder.buildInstr(MOS::STYImag16).addDef(DestReg).addUse(SrcReg);
+   } else if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+     assert(SrcReg.isPhysical() && DestReg.isPhysical());
+     Register SrcReg8 =
+@@ -933,7 +945,17 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+       Instr.addDef(Ptr, RegState::EarlyClobber);
+     Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
+   } else {
+-    if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
++    if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++        (Reg.isVirtual() &&
++         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
++      // Spill the accumulator with a word load/store. Byte GPR copies cannot
++      // represent A16. Ac16 is available only under HasAccum16, and the mode
++      // insertion pass supplies the M=0 state required by these instructions.
++      Builder.buildInstr(IsLoad ? MOS::LDAbs16 : MOS::STAbs16)
++          .addReg(Reg, getDefRegState(IsLoad) | getKillRegState(IsKill))
++          .addFrameIndex(FrameIndex)
++          .addMemOperand(MMO);
++    } else if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
+         (Reg.isVirtual() &&
+          MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
+       MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
+@@ -965,7 +987,30 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+                                    MF.getMachineMemOperand(MMO, 1, 1));
+       if (IsLoad && Tmp != Reg)
+         Builder.buildCopy(Reg, Tmp);
++    } else if ((Reg.isPhysical() && MOS::Xc16RegClass.contains(Reg)) ||
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Xc16RegClass))) {
++      // Native indices: spill/reload X16 with a single 16-bit abs load/store
++      // (LDXAbs16/STXAbs16), like Ac16 with LDAbs16/STAbs16. InsertREPSEP
++      // wraps the XLow=1 op in its own rep/sep #$10.
++      Builder.buildInstr(IsLoad ? MOS::LDXAbs16 : MOS::STXAbs16)
++          .addReg(Reg, getDefRegState(IsLoad) | getKillRegState(IsKill))
++          .addFrameIndex(FrameIndex)
++          .addMemOperand(MMO);
++    } else if ((Reg.isPhysical() && MOS::Yc16RegClass.contains(Reg)) ||
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Yc16RegClass))) {
++      // Native indices: spill/reload Y16 with a single 16-bit abs load/store.
++      Builder.buildInstr(IsLoad ? MOS::LDYAbs16 : MOS::STYAbs16)
++          .addReg(Reg, getDefRegState(IsLoad) | getKillRegState(IsKill))
++          .addFrameIndex(FrameIndex)
++          .addMemOperand(MMO);
+     } else {
++      // #321 SPILL CONTRACT (static-stack mirror of MOSRegisterInfo::expandLDSTStk):
++      // this single-byte fall-through is correct ONLY for 8-bit classes. Every
++      // spillable >=16-bit register class needs its OWN case above. Handled:
++      //   Ac16  -> LDAbs16/STAbs16; Imag16 -> two byte spills;
++      //   Xc16  -> LDXAbs16/STXAbs16; Yc16 -> LDYAbs16/STYAbs16.
+       loadStoreByteStaticStackSlot(
+           Builder, MachineOperand::CreateReg(Reg, IsLoad), FrameIndex, 0, MMO);
+     }
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 91fc9e132cc3..8abc01658afa 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -129,9 +129,16 @@ static bool pushPullBalanced(MachineBasicBlock::iterator Begin,
+   for (const MachineInstr &MI : make_range(Begin, End)) {
+     switch (MI.getOpcode()) {
+     case MOS::PH:
++    // PHA16/PLA16 (the A16 save/restore bracket expandLDSTStk puts around an
++    // X16/Y16 soft-stack spill) move two bytes rather than one, but they are
++    // always emitted as a matched pair inside a single frame-index expansion, so
++    // counting them ±1 like PH/PL keeps this predicate exact: a range containing
++    // both is balanced, a range containing exactly one is not.
++    case MOS::PHA16:
+       ++PushCount;
+       break;
+     case MOS::PL:
++    case MOS::PLA16:
+       if (!PushCount)
+         return false;
+       --PushCount;
+@@ -537,7 +544,59 @@ void MOSRegisterInfo::expandAddrHistk(MachineBasicBlock::iterator MI) const {
+   MI->eraseFromParent();
+ }
+ 
++// Native indices: does A16 (or either of its bytes, $a / $b) carry a value that is
++// live across Pos? Pos is an LDStk/STStk, which never names A16 in an operand,
++// so liveness immediately before it equals liveness immediately after it —
++// exactly the "is something depending on the accumulator across this spill"
++// question expandLDSTStk needs to answer.
++//
++// LivePhysRegs::available() is alias-aware, so a live 8-bit $a answers yes too.
++// That is deliberate, not over-approximation: the staging sequence below is
++// `lda (zp)` / `tax` (or `txa` / `sta (zp)`), which destroys $a just as
++// thoroughly as it destroys $a16.
++//
++// Erring is one-sided by construction. A spurious "live" costs one `pha`/`pla`
++// pair (2 bytes, 7 cycles) and is always semantically harmless; a missed "live"
++// is a miscompile. The estimate can only err toward "live": the scan runs during
++// PEI's forward walk over the block, so any LDStk/STStk *below* Pos is still an
++// unexpanded pseudo that names no accumulator — it can therefore only fail to
++// report a kill of A16, never invent a use of it.
++static bool accumulatorLiveAcross(MachineBasicBlock::iterator Pos) {
++  const MachineFunction &MF = *Pos->getParent()->getParent();
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
++  const MachineRegisterInfo &MRI = MF.getRegInfo();
++  LivePhysRegs LPR(TRI);
++  computeLiveBefore(Pos, LPR);
++  return !LPR.available(MRI, Register(MOS::A16).asMCReg());
++}
++
++// The spill wrapper saves live A16 around index-register spills. Recursive
++// Imag16 byte splits use the same wrapper so every operation observes the
++// accumulator preservation contract.
+ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
++  const bool IsLoad = MI->getOpcode() == MOS::LDStk;
++  Register Loc =
++      IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
++  const bool StagesThroughA16 =
++      MOS::Xc16RegClass.contains(Loc) || MOS::Yc16RegClass.contains(Loc);
++
++  if (!StagesThroughA16 || !accumulatorLiveAcross(MI)) {
++    expandLDSTStkImpl(MI);
++    return;
++  }
++
++  MachineBasicBlock &MBB = *MI->getParent();
++  // Captured before the expansion, which inserts ahead of MI and then erases it;
++  // Next therefore still marks the point just past everything it emitted.
++  MachineBasicBlock::iterator Next = std::next(MI);
++  MachineIRBuilder Builder(MBB, MI);
++  Builder.buildInstr(MOS::PHA16).addUse(MOS::A16);
++  expandLDSTStkImpl(MI);
++  Builder.setInsertPt(MBB, Next);
++  Builder.buildInstr(MOS::PLA16).addDef(MOS::A16);
++}
++
++void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
+   MachineFunction &MF = *MI->getMF();
+   MachineIRBuilder Builder(*MI);
+   MachineRegisterInfo &MRI = *Builder.getMRI();
+@@ -549,10 +608,23 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+       IsLoad ? MI->getOperand(0).getReg() : MI->getOperand(1).getReg();
+   int64_t Offset = MI->getOperand(3).getImm();
+ 
+-  if (Offset >= 256) {
++  // Spill Ac16 with a word access. Imag16 values split into two byte
++  // registers, but the hidden high accumulator byte has no byte GPR copy.
++  const bool IsAc16 = MOS::Ac16RegClass.contains(Loc);
++  // Native indices: X16/Y16 spilled via TXA16/STAIndir16 or LDAIndir16/TAX16 (same
++  // indirect-only constraint as Ac16 — the (zp)-indirect ops have no index).
++  const bool IsXc16 = MOS::Xc16RegClass.contains(Loc);
++  const bool IsYc16 = MOS::Yc16RegClass.contains(Loc);
++
++  // Form an exact slot pointer in the reserved scratch when the access can't use a
++  // base+index addressing mode: a far offset (>= 256), OR a 16-bit spill at a nonzero
++  // offset (STAIndir16/LDAIndir16 and their X/Y variants are (zp)-indirect with no
++  // index). After this the pointer is in operand 2 and the offset is 0, so re-entry
++  // lands in the offset-0 paths below.
++  if (Offset >= 256 || ((IsAc16 || IsXc16 || IsYc16) && Offset != 0)) {
+     Register P = MRI.createVirtualRegister(&MOS::PcRegClass);
+-    // Far stack accesses need a virtual base register, so materialize one
+-    // here using the pointer provided.
++    // These accesses need a concrete base pointer, so materialize one here using
++    // the pointer provided (the earlyclobber scratch operand).
+     Register NewBase =
+         IsLoad ? MI->getOperand(1).getReg() : MI->getOperand(0).getReg();
+     // We can't scavenge a 16-bit register, so this can't be virtual here
+@@ -579,7 +651,76 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+ 
+     expandAddrLostk(Lo);
+     expandAddrHistk(Hi);
+-    expandLDSTStk(MI);
++    // Straight to the impl: the wrapper already decided (and, if needed,
++    // emitted) the A16 bracket for this very instruction, above the AddrLostk
++    // chain we just emitted.
++    expandLDSTStkImpl(MI);
++    return;
++  }
++
++  // Native widths: Ac16 spill/reload at offset 0 — operand 2 is now the exact slot pointer
++  // (the frame register for a near offset-0 access, or the scratch pointer the block
++  // above formed). One 16-bit indirect store/load of A16 through it; the MLow=1 op is
++  // rep/sep-bracketed by the later MOSInsertREPSEP pass.
++  if (IsAc16) {
++    assert(Offset == 0 && "Ac16 nonzero offset should have formed a pointer above");
++    Builder.buildInstr(IsLoad ? MOS::LDAIndir16 : MOS::STAIndir16)
++        .addReg(Loc, getDefRegState(IsLoad))
++        .add(MI->getOperand(2))
++        .addMemOperand(*MI->memoperands_begin());
++    MI->eraseFromParent();
++    return;
++  }
++
++  // Native indices: X16/Y16 spill/reload at offset 0, via A16 as a staging register.
++  // Store: TXA16 (X16→A16) → STAIndir16 [ptr].
++  // Load:  LDAIndir16 [ptr] → TAX16 (A16→X16).
++  // Both the XLow=1 and MLow=1 brackets are inserted by MOSInsertREPSEP.
++  // A16 is CLOBBERED here and no operand says so, which is why expandLDSTStk (the
++  // wrapper) brackets this whole expansion with PHA16/PLA16 whenever the
++  // accumulator is live across the spill — see the comment on it.
++  if (IsXc16) {
++    assert(Offset == 0 && "Xc16 nonzero offset should have formed a pointer above");
++    if (!IsLoad) {
++      Builder.buildInstr(MOS::TXA16)
++          .addReg(MOS::A16, RegState::Define)
++          .addReg(MOS::X16);
++      Builder.buildInstr(MOS::STAIndir16)
++          .addReg(MOS::A16, RegState::Kill)
++          .add(MI->getOperand(2))
++          .addMemOperand(*MI->memoperands_begin());
++    } else {
++      Builder.buildInstr(MOS::LDAIndir16)
++          .addReg(MOS::A16, RegState::Define)
++          .add(MI->getOperand(2))
++          .addMemOperand(*MI->memoperands_begin());
++      Builder.buildInstr(MOS::TAX16)
++          .addReg(MOS::X16, RegState::Define)
++          .addReg(MOS::A16, RegState::Kill);
++    }
++    MI->eraseFromParent();
++    return;
++  }
++  if (IsYc16) {
++    assert(Offset == 0 && "Yc16 nonzero offset should have formed a pointer above");
++    if (!IsLoad) {
++      Builder.buildInstr(MOS::TYA16)
++          .addReg(MOS::A16, RegState::Define)
++          .addReg(MOS::Y16);
++      Builder.buildInstr(MOS::STAIndir16)
++          .addReg(MOS::A16, RegState::Kill)
++          .add(MI->getOperand(2))
++          .addMemOperand(*MI->memoperands_begin());
++    } else {
++      Builder.buildInstr(MOS::LDAIndir16)
++          .addReg(MOS::A16, RegState::Define)
++          .add(MI->getOperand(2))
++          .addMemOperand(*MI->memoperands_begin());
++      Builder.buildInstr(MOS::TAY16)
++          .addReg(MOS::Y16, RegState::Define)
++          .addReg(MOS::A16, RegState::Kill);
++    }
++    MI->eraseFromParent();
+     return;
+   }
+ 
+@@ -622,6 +763,8 @@ void MOSRegisterInfo::expandLDSTStk(MachineBasicBlock::iterator MI) const {
+   if (Loc8)
+     Loc = Loc8;
+ 
++  // Every spillable register class wider than eight bits has an explicit
++  // word-width path above. Only flags and byte registers reach this tail.
+   assert(Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc));
+ 
+   Register A = Loc;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+index 1d2f8027e01c..4374d26d8f55 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+@@ -77,6 +77,15 @@ public:
+   void expandAddrHistk(MachineBasicBlock::iterator MI) const;
+   void expandLDSTStk(MachineBasicBlock::iterator MI) const;
+ 
++private:
++  // The body of expandLDSTStk. expandLDSTStk itself is a thin wrapper that
++  // brackets this with an A16 save/restore when the expansion would clobber a
++  // live accumulator (see its comment); the recursive splits below re-enter
++  // through the wrapper so each split gets the same treatment.
++  void expandLDSTStkImpl(MachineBasicBlock::iterator MI) const;
++
++public:
++
+   Register getFrameRegister(const MachineFunction &MF) const override;
+ 
+   bool shouldCoalesce(MachineInstr *MI, const TargetRegisterClass *SrcRC,
+diff --git a/llvm/test/CodeGen/MOS/native-spill-copy.mir b/llvm/test/CodeGen/MOS/native-spill-copy.mir
+new file mode 100644
+index 000000000000..00f10db721bb
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/native-spill-copy.mir
+@@ -0,0 +1,69 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=prolog-epilog -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -run-pass=postrapseudos -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=COPY
++
++# A soft-stack spill of A16 is one word store or load through the exact slot
++# pointer; a slot at a nonzero offset first forms that pointer, because (zp)
++# addressing has no index.
++
++# CHECK-LABEL: name: spill_a16
++# CHECK:     $rc6 = COPY killed $a
++# CHECK:     $rc7 = COPY killed $a
++# CHECK:     STAIndir16 $a16, $rs3
++# CHECK-NEXT: STAIndir16 $a16, $rs0
++# CHECK:     $a16 = LDAIndir16 $rs4
++---
++name: spill_a16
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++  - { id: 1, type: spill-slot, size: 2, alignment: 1 }
++body: |
++  bb.0:
++    liveins: $a16
++    dead early-clobber renamable $rs3 = STStk renamable $a16, %stack.0, 0
++    dead early-clobber renamable $rs3 = STStk renamable $a16, %stack.1, 0
++    renamable $a16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    RTS implicit $a16
++...
++
++# X16 has no (zp) store of its own, so its spill is staged through A16. A16
++# is live across the spill here, so the expansion saves it with PHA16/PLA16.
++
++# CHECK-LABEL: name: spill_x16_a_live
++# CHECK:      PHA16 $a16
++# CHECK-NEXT: $a16 = TXA16 $x16
++# CHECK-NEXT: STAIndir16 killed $a16, $rs0
++# CHECK-NEXT: $a16 = PLA16
++# CHECK-NEXT: PHA16 $a16
++# CHECK-NEXT: $a16 = LDAIndir16 $rs0
++# CHECK-NEXT: $x16 = TAX16 killed $a16
++# CHECK-NEXT: $a16 = PLA16
++---
++name: spill_x16_a_live
++tracksRegLiveness: true
++stack:
++  - { id: 0, type: spill-slot, size: 2, alignment: 1 }
++body: |
++  bb.0:
++    liveins: $a16, $x16
++    dead early-clobber renamable $rs3 = STStk killed renamable $x16, %stack.0, 0
++    renamable $x16, dead early-clobber renamable $rs4 = LDStk %stack.0, 0
++    RTS implicit $a16, implicit $x16
++...
++
++# Copies between a 16-bit index register and an Imag16 pair are one index
++# load or store of the pair.
++
++# COPY-LABEL: name: copy_index
++# COPY:      $x16 = LDXImag16 $rs1
++# COPY-NEXT: $rs2 = STYImag16 $y16
++---
++name: copy_index
++tracksRegLiveness: true
++body: |
++  bb.0:
++    liveins: $rs1, $y16
++    $x16 = COPY killed $rs1
++    $rs2 = COPY killed $y16
++    RTS implicit $x16, implicit $rs2
++...
+-- 
+2.53.0
+

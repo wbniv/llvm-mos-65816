@@ -1,0 +1,4 @@
+PASS: LLVM :: CodeGen/MOS/zz-probe/far-phi.ll (1 of 4)
+PASS: LLVM :: CodeGen/MOS/zz-probe/far-addressing.ll (2 of 4)
+FAIL: LLVM :: CodeGen/MOS/zz-probe/far-memset.ll (3 of 4)
+FAIL: LLVM :: CodeGen/MOS/zz-probe/far-indir-indexed.ll (4 of 4)

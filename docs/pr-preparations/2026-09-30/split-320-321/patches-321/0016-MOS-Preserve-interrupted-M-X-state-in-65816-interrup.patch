@@ -1,0 +1,129 @@
+From 780d9e028c04ebbad1cc1821125110552490c982 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Wed, 30 Sep 2026 00:00:00 +0000
+Subject: [PATCH 16/16] [MOS] Preserve interrupted M/X state in 65816 interrupt
+ handlers
+
+A native-mode 65816 interrupt inherits M, X, D and DBR from the interrupted code, and user code may have changed D or DBR with inline assembly. Interrupt handlers on the 65816 now save A, X and Y at a fixed 16-bit width, save DBR and D, and establish the C ABI state before any compiled code runs: `rep #$30; pha; phx; phy; phb; phd; pea 0; pld; phk; plb; sep #$30`. The epilogue restores D, DBR, Y, X and A at 16-bit width in reverse order, and RTI restores the stacked P with the interrupted M/X state. `phk; plb` sets DBR to 0 from PBR, which interrupt entry forces to 0.
+
+Default-mode effect: yes, for functions with the "interrupt" attribute on mosw65816, with or without +mos-a16; other functions and other CPUs are unchanged. In the fixed input set exactly the three tests with interrupt handlers (nonreentrant.ll, static-stack.ll, zp-alloc.ll) change on mosw65816 (+110 bytes in total; each handler gains a 15-byte prologue and a 7-byte epilogue sequence).
+
+Tests: interrupt-width-65816.ll checks the prologue and epilogue on plain mosw65816.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/interrupt-width-65816.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+---
+ llvm/lib/Target/MOS/MOSFrameLowering.cpp      | 44 +++++++++++++++++++
+ .../test/CodeGen/MOS/interrupt-width-65816.ll | 34 ++++++++++++++
+ 2 files changed, 78 insertions(+)
+ create mode 100644 llvm/test/CodeGen/MOS/interrupt-width-65816.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSFrameLowering.cpp b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
+index cd0d8fae27c1..204cb37d5623 100644
+--- a/llvm/lib/Target/MOS/MOSFrameLowering.cpp
++++ b/llvm/lib/Target/MOS/MOSFrameLowering.cpp
+@@ -285,6 +285,38 @@ void MOSFrameLowering::emitPrologue(MachineFunction &MF,
+   const TargetRegisterInfo &TRI = *MF.getRegInfo().getTargetRegisterInfo();
+   MachineIRBuilder Builder(MBB, MBB.begin());
+ 
++  // A native-mode 65816 interrupt inherits M/X from the interrupted
++  // instruction; unlike a normal C call, entry is not guaranteed M8/X8.
++  // Save the complete physical registers at deterministic 16-bit widths, then
++  // establish the ordinary C ABI state. RTI will restore the hardware-stacked
++  // P (and therefore the interrupted M/X state) after the matching epilogue.
++  //
++  // Interrupt entry also inherits D and DBR unchanged, and user code (inline
++  // asm) may legally have moved either. Compiled code is D-relative on every
++  // imaginary-register access (including the soft-stack pointer) and
++  // DBR-relative on every absolute access, so both are saved and the C ABI
++  // state (D=0, DBR=0) re-established before any of that runs. All six added
++  // instructions are M/X-width-independent. `pea 0; pld` zeroes D without
++  // touching a register; `phk; plb` derives DBR=0 from PBR, which the
++  // interrupt entry hardware forces to 0.
++  if (isISR(MF) && MF.getSubtarget<MOSSubtarget>().hasW65816()) {
++    const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
++    auto Entry = MBB.begin();
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::REP_Immediate))
++        .addImm(0x30);
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHA_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHX_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHY_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHB_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHD_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PEA_Absolute)).addImm(0);
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLD_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PHK_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::PLB_Implied));
++    BuildMI(MBB, Entry, DebugLoc(), TII.get(MOS::SEP_Immediate))
++        .addImm(0x30);
++  }
++
+   // Stack pointer adjustments need to occur after the CLD in an interrupt
+   // handler or the sum might be incorrect.
+   for (MachineInstr &MI : MBB)
+@@ -346,6 +378,18 @@ void MOSFrameLowering::emitEpilogue(MachineFunction &MF,
+   // If soft stack is used, increase the soft stack pointer SP.
+   if (StackSize)
+     offsetSP(Builder, StackSize);
++
++  if (isISR(MF) && MF.getSubtarget<MOSSubtarget>().hasW65816()) {
++    const TargetInstrInfo &TII = *MF.getSubtarget().getInstrInfo();
++    auto Ret = MBB.getFirstTerminator();
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::REP_Immediate)).addImm(0x30);
++    // Reverse of the prologue's push order: D and DBR were pushed last.
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLD_Implied));
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLB_Implied));
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLY_Implied));
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLX_Implied));
++    BuildMI(MBB, Ret, DebugLoc(), TII.get(MOS::PLA_Implied));
++  }
+ }
+ 
+ uint64_t MOSFrameLowering::staticSize(const MachineFrameInfo &MFI) const {
+diff --git a/llvm/test/CodeGen/MOS/interrupt-width-65816.ll b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
+new file mode 100644
+index 000000000000..17a137a5e255
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/interrupt-width-65816.ll
+@@ -0,0 +1,34 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 < %s | FileCheck %s
++
++; A 65816 interrupt inherits M/X from the interrupted instruction, and D and
++; DBR from the interrupted code (which may legally have moved them via inline
++; asm). Save full A/X/Y in a known 16-bit mode, save D and DBR, and establish
++; the complete C ABI state (M8/X8, D=0, DBR=0 — the latter derived from the
++; hardware-forced PBR=0 via phk/plb) before any compiled code runs; restore
++; everything in reverse before RTI, which restores the stacked P.
++; Runnable end-to-end reproducers and explanation:
++; https://biohack.net/snes/nmitally/ (M/X) and the #141 dpbank demo (D/DBR).
++
++define void @isr() "interrupt" {
++; CHECK-LABEL: isr:
++; CHECK:       rep #48
++; CHECK-NEXT:  pha
++; CHECK-NEXT:  phx
++; CHECK-NEXT:  phy
++; CHECK-NEXT:  phb
++; CHECK-NEXT:  phd
++; CHECK-NEXT:  pea 0
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  phk
++; CHECK-NEXT:  plb
++; CHECK-NEXT:  sep #48
++; CHECK:       cld
++; CHECK:       rep #48
++; CHECK-NEXT:  pld
++; CHECK-NEXT:  plb
++; CHECK-NEXT:  ply
++; CHECK-NEXT:  plx
++; CHECK-NEXT:  pla
++; CHECK-NEXT:  rti
++  ret void
++}
+-- 
+2.53.0
+

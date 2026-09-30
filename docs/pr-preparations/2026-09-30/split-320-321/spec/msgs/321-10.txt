@@ -1,0 +1,16 @@
+[MOS] Select native 16-bit arithmetic, logic and constant shifts
+
+Under +mos-a16, s16 G_ADD, G_SUB, G_AND, G_OR and G_XOR stay legal, and s16 shifts by a constant 1-7 are left un-narrowed. The selector emits `lda; [clc|sec]; op; sta` on the Imag16 operands. A second operand that is a constant (recovered from a byte-split G_MERGE_VALUES if needed) uses the immediate form. A single-use absolute load in the same block, with no call, unmodeled side effect, ordered store or possibly aliasing store in between, is read directly by `lda abs` or `op abs`. Adding or subtracting one becomes `inc a`/`dec a`. Shifts emit one `asl a` or `lsr a` per bit; arithmetic right shift emits `cmp #$8000; ror a` per bit, because the 65816 has no arithmetic shift right and the compare copies the sign into carry. Shifts by 8 or more keep the byte path, which relabels bytes at no cost.
+
+Each selected operation stores its result to an Imag16 home. After register allocation, MOSLateOptimization removes a `lda rsN` that reloads the home just written by `sta rsN` from A16, when nothing in between writes A16 or the home and no call or inline assembly intervenes; the store goes too when the reload killed the home and nothing else read it, and A16 kill flags in the extended range are cleared. Without this, a chain of word operations stores and reloads every intermediate result. Running after allocation keeps byte values from coalescing into A16.
+
+Default-mode effect: none (fixed input set identical).
+
+Tests: a16-byte-store.ll and a16-indirect-byte-store.ll check the store policy from the load/store commit with native producers present: argument, returned, volatile, byte-built and A:X values keep byte stores in default, +mos-a16 and +mos-a16,+mos-xy16 modes, while a native sum is stored by the word store directly after its `adc`, which needs the residency peephole. The immediate forms are checked by a16-immediate-width.ll in the next commit.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/a16-byte-store.ll llvm/test/CodeGen/MOS/a16-indirect-byte-store.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

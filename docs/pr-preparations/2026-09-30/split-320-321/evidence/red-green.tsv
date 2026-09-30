@@ -1,0 +1,12 @@
+test	commit	red(parent probe)	green(own..end)	result	red reason
+llvm/test/CodeGen/MOS/native-width-registers.mir	321-01	FAIL	PASS x21	OK	unknown register name 'a16'
+llvm/test/CodeGen/MOS/a16-accumulator-forms.mir	321-02	FAIL	PASS x20	OK	unknown machine instruction name 'LDAImag16'
+llvm/test/MC/MOS/index-width-mapping-65816.s	321-03	FAIL	PASS x19	OK	error: CHECK-DAG: expected string not found in input
+llvm/test/CodeGen/MOS/xy16-index-forms.mir	321-03	FAIL	PASS x19	OK	unknown machine instruction name 'LDXImm16'
+llvm/test/CodeGen/MOS/scavenger-p-undef-6502.ll	321-05	FAIL	PASS x17	OK	Assertion `!LiveRegs.contains(MOS::N) && "expected N to be free when saving scavenger register"' failed.
+llvm/test/CodeGen/MOS/native-spill-copy.mir	321-06	FAIL	PASS x16	OK	Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+llvm/test/CodeGen/MOS/coalesce-call-clobbered-imag.mir	321-07	FAIL	PASS x15	OK	error: CHECK-NEXT: expected string not found in input
+llvm/test/CodeGen/MOS/a16-load-store.ll	321-08	FAIL	PASS x14	OK	error: CHECK: expected string not found in input
+llvm/test/CodeGen/MOS/near-index-nowrap.ll	321-13	FAIL	PASS x9	OK	error: W65816: expected string not found in input
+llvm/test/CodeGen/MOS/a16-small-add.ll	321-15	FAIL	PASS x7	OK	error: NATIVE: expected string not found in input
+llvm/test/CodeGen/MOS/imag32-copy.mir	320-01	FAIL	PASS x4	OK	unknown register name 'rl2'

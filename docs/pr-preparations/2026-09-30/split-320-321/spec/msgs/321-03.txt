@@ -1,0 +1,16 @@
+[MOS] Define 16-bit index instruction forms and X-width requirements
+
+Define the index-width pseudos, gated on HasIndex16: A loads and stores through abs,X and (zp),Y with a 16-bit index (8- and 16-bit data), LDX/LDY/STX/STY/CPX/CPY with absolute, Imag16 and immediate operands, INX/DEX/INY/DEY, the TXA/TAX/TYA/TAY transfers used to stage an index register through A16, and PHA16/PLA16 for preserving A16 around such staging. MOSLogicalInstr gains the XLow and XHigh TSFlags at the MC bit positions.
+
+The existing 8-bit LDX, STX, LDY, STY, CPX and CPY zero-page and absolute forms are marked XHigh: they require 8-bit index registers. A REP/SEP pass needs this to narrow X before them, because with X clear they would read or write two bytes.
+
+Default-mode effect: assembly is unchanged. MOSMCELFStreamer emits $xh mapping symbols from the XHigh flag on W65816 objects, so mosw65816 objects gain $xh symbols before these instructions: 68 of 90 mosw65816 objects in the fixed input set differ, with identical section bytes and relocations (for example 667 to 1,121 $xh symbols in examples_snes_boids). mos6502 objects are identical.
+
+Tests: index-width-mapping-65816.s assembles each XHigh form after a 16-bit `ldx` and checks that each opens its own $xh mapping region. xy16-index-forms.mir emits the index pseudos from MIR and checks the expanded instructions and the three-byte index immediates in the object.
+
+Validate: `build/bin/llvm-lit -v llvm/test/MC/MOS/index-width-mapping-65816.s llvm/test/CodeGen/MOS/xy16-index-forms.mir`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk

@@ -1,0 +1,14 @@
+[MOS] Preserve interrupted M/X state in 65816 interrupt handlers
+
+A native-mode 65816 interrupt inherits M, X, D and DBR from the interrupted code, and user code may have changed D or DBR with inline assembly. Interrupt handlers on the 65816 now save A, X and Y at a fixed 16-bit width, save DBR and D, and establish the C ABI state before any compiled code runs: `rep #$30; pha; phx; phy; phb; phd; pea 0; pld; phk; plb; sep #$30`. The epilogue restores D, DBR, Y, X and A at 16-bit width in reverse order, and RTI restores the stacked P with the interrupted M/X state. `phk; plb` sets DBR to 0 from PBR, which interrupt entry forces to 0.
+
+Default-mode effect: yes, for functions with the "interrupt" attribute on mosw65816, with or without +mos-a16; other functions and other CPUs are unchanged. In the fixed input set exactly the three tests with interrupt handlers (nonreentrant.ll, static-stack.ll, zp-alloc.ll) change on mosw65816 (+110 bytes in total; each handler gains a 15-byte prologue and a 7-byte epilogue sequence).
+
+Tests: interrupt-width-65816.ll checks the prologue and epilogue on plain mosw65816.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/interrupt-width-65816.ll`.
+
+Extraction of the monolithic native-width patch: OpenAI Codex CLI 0.158.0 (codex-tui), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e75a-a9ed-7372-9bac-b19b732a46a2. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
