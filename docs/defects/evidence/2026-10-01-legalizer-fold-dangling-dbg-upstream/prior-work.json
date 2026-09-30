@@ -1,0 +1,108 @@
+{
+ "searched_ref": "origin/main 590f96167daf",
+ "scope": "docs, TODO.md, patches, dev (not transcripts); git log --all; upstream llvm-mos issues and PRs (public search API, 2026-10-01)",
+ "hits": {
+  "cannot be undef": [
+   "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/baseline.log",
+   "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/prior-work.json",
+   "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/word-fold.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/baseline.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/downstream-field.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/downstream-gidx.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field-O0.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field-plain-O2.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield-O0.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx-fw14.log",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/prior-work.json",
+   "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/store1.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/baseline.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nearfield-O2.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngfield-O0.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngidx-O2.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx-O0.log",
+   "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx-w65816.log",
+   "docs/defects/evidence/2026-10-01-split-carry/b4-unrepaired-320-04.log",
+   "docs/defects/evidence/2026-10-01-split-carry/b4-word-unrepaired-fw-old.log",
+   "docs/defects/mos-far-index-fold-dangling-dbg.json",
+   "docs/plans/2026-09-30-far-prerequisite-defects.md",
+   "docs/plans/2026-09-30-far-word-rebase.md",
+   "docs/pr-preparations/2026-09-30/far-word-rebase/evidence/independent-review.json",
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md"
+  ],
+  "tryAbsoluteIndexedAddressing": [
+   "dev/legalindexdom.sh",
+   "dev/xy16ops.sh",
+   "docs/defects/evidence/2026-09-26-far-memset/capture-build.log",
+   "docs/defects/evidence/2026-09-26-far-memset/legalizer-with-0013.cpp.txt",
+   "docs/defects/evidence/2026-09-26-far-memset/legalizer-without-0013.cpp.txt",
+   "docs/defects/evidence/2026-09-26-mos-carry-scheduling/baseline-source.diff.txt",
+   "docs/defects/mos-near-index-bank-wrap.json",
+   "docs/defects/mos-zp-index-same-width-trunc.json",
+   "docs/investigations/2026-06-29-xy16-inplace-memmove-16bit-index-miscompile.md",
+   "docs/investigations/2026-09-25-longx-global-measurement.md",
+   "docs/plans/2026-06-18-321-abs-x-indiry-16bit-indexed-load-store.md",
+   "docs/plans/2026-06-18-321-xy16-legalizer-integration.md",
+   "docs/plans/2026-09-14-eliminate-build-nondeterminism.md",
+   "docs/plans/2026-09-14-maze-refold.md",
+   "docs/plans/spikes/2026-06-29-fork-legalizer-const-domination-repro.c",
+   "docs/pr-preparations/2026-09-26/mos-review.md",
+   "docs/pr-preparations/2026-09-28/0065/evidence/upstream-MOSLegalizerInfo.cpp.txt",
+   "docs/pr-preparations/2026-09-28/0065/patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch",
+   "docs/pr-preparations/2026-09-28/0065/patches-split/0013-MOS-Require-a-no-wrap-proof-before-folding-near-inde.patch",
+   "docs/pr-preparations/2026-09-28/0065/patches-split/0014-MOS-Select-16-bit-index-registers-under-mos-xy16.patch",
+   "docs/pr-preparations/2026-09-28/0065/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch",
+   "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0001-MOS-Extract-opt-in-native-widths-and-near-memory-pre.patch",
+   "docs/pr-preparations/2026-09-28/far-word-index/upstream-series/patches/0004-MOS-Extract-far-data-addressing-and-bounded-runtime-.patch",
+   "docs/pr-preparations/2026-09-29/near-index-proofs/evidence/destination-reconciliation.json",
+   "docs/pr-preparations/2026-09-29/near-index-proofs/patches-split/0012-MOS-Keep-byte-indexes-byte-wide-in-absolute-indexed-.patch"
+  ],
+  "salvageDebugInfoForDbgValue": [
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md"
+  ],
+  "computeSalvageReplacements": []
+ },
+ "git_log": {
+  "DBG_VALUE": [
+   "590f9616 Record the second independent review of the carried #320 split",
+   "664b877a Repair far-prerequisite defects B1-B4 downstream",
+   "6dc0b153 Rebase and review the far-word series; record four far defects"
+  ],
+  "salvage": [
+   "91ba9598 #321 a16 Phase-3 investigation: record B2 + post-RA-extension probe (both NO-GO)"
+  ]
+ },
+ "upstream_search": {
+  "DBG_VALUE": {
+   "total_count": 1,
+   "items": [
+    {
+     "number": 570,
+     "title": "feat(GlobalISel): implement debug info salvaging for G_MERGE_VALUES",
+     "state": "closed"
+    }
+   ]
+  },
+  "cannot+be+undef": {
+   "total_count": 1,
+   "items": [
+    {
+     "number": 43,
+     "title": "SEV replacement will not work as expected",
+     "state": "closed"
+    }
+   ]
+  },
+  "salvageDebugInfo": {
+   "total_count": 1,
+   "items": [
+    {
+     "number": 570,
+     "title": "feat(GlobalISel): implement debug info salvaging for G_MERGE_VALUES",
+     "state": "closed"
+    }
+   ]
+  }
+ },
+ "upstream_source": "llvm-mos 06bc967d2668: llvm/lib/CodeGen/CodeGenCommonISel.cpp salvageDebugInfoForDbgValue (lines 356-405) skips a DBG_VALUE when computeSalvageReplacements returns nothing (line 379-380), leaving it on the register the caller erases; computeSalvageReplacements handles COPY, G_TRUNC and (since #570) G_MERGE_VALUES, not G_PTR_ADD.",
+ "findings": "No upstream issue or PR reports the near shapes; the local far records cover only address-space-2 fold sites. The near instances are reached through upstream MOS legalizer folds (selectAddressingMode: absolute, absolute indexed, indirect indexed), with the generic salvage gap as the mechanism."
+}

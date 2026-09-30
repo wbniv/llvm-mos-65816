@@ -1,0 +1,330 @@
+{
+ "schema": 1,
+ "id": "mos-imag32-reserved-pair-units",
+ "title": "Unreserved Imag32 quads over reserved pairs make calls with stack arguments abort",
+ "status": "fixed",
+ "reproducer_origin": "reduced",
+ "report": "docs/plans/2026-10-01-far-prerequisite-split-carry.md",
+ "summary": "llvm-mos#594 (mlund, draft, head 7b80f7e18768) adds RL quads as super-registers of the RS pairs but does not reserve a quad whose pair is reserved. LLVM counts a register unit as reserved only when its root and all of its super-registers are reserved, so the stack pointer RS0 (covered by RL0) stops being reserved at the unit level. Any function that makes a call with stack arguments, such as a variadic call, then aborts in the register coalescer with \"LLVM ERROR: Invalid global physical register\" (a use of $rs0 without a def during live-range computation), in every MOS CPU mode including default mos6502 code. Reproduced with #594 applied to upstream 06bc967d2668 alone and in the #320 split. Fixed in the split by the commit after #594, which reserves a quad whenever either of its RS pairs is reserved.",
+ "attribution": [
+  "Found while carrying llvm-mos#594 into the #320 series; reduction, repair, evidence and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+ ],
+ "unknowns": [
+  "#594 was not built on its own base 07baad39bea5; the defect is shown on 06bc967d2668, which differs from that base by #570, #571, #586, #605 and the #321 series (the upstream-only build u594 excludes #321).",
+  "#594 as posted still carries the defect; the fix is a separate commit in the #320 series, not part of #594."
+ ],
+ "prior_work": {
+  "disposition": "new_defect",
+  "search_terms": [
+   "Invalid global physical register",
+   "Reserve the QUAD itself only",
+   "isReservedRegUnit",
+   "Imag32"
+  ],
+  "related_records": [],
+  "related_reports": [
+   "docs/pr-preparations/2026-10-01/594-comment.md"
+  ],
+  "related_changes": [
+   "aa5d0544 (downstream quad reservation rule)",
+   "llvm-mos#594 7b80f7e18768"
+  ],
+  "source_assessment": "#594's getReservedRegs is unchanged from upstream (precomputed reserved set plus the frame pointer), so no RL quad is reserved; downstream and the reviewed split reserve a quad over a reserved pair (rule from aa5d0544).",
+  "binary_assessment": "Upstream base llc p-321-00 compiles variadic-call.ll; base + #594 (u594) and the series #594 commit abort with the signature; adding only the reservation rule (u594-resv) and the series fix commit compile it.",
+  "decision": "New canonical record: the abort appears only when RL is defined without the downstream reservation rule, which no earlier record or report covers.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/prior-work.json",
+   "sha256": "cc9fc504b67a84690a271662e1ecba21a0eacac1cb10f5a1a11969df04d593f0"
+  }
+ },
+ "baseline": {
+  "command": "build/split-320-321/llc/r2-320-1a3 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [],
+   "optimization": "O2",
+   "lto": false,
+   "verifier": true,
+   "expected": "compiles; a call with stack arguments"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1a3 (split series #320-1a-iii: llvm-mos#594 7b80f7e18768 carried onto the #321 series and MC commits (MOSImagReg32 bits<32>)); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+  "toolchain_sha256": "9f8b456100f1b90336b1bf4d19fec2740d5d200c1b658c8e30ddbabcc33de5ce",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+   "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/baseline.log",
+   "sha256": "cb8d007f77eb47eabf09ec7f57375fe0f5df37b83f33d5aace4238b767a1efb4"
+  },
+  "exit_code": 134,
+  "failure_signature": "Invalid global physical register"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/base-plus-594-fix.log",
+   "sha256": "601ea00db0d967f6513e73b43190fa3b743fd90b63fdb6d6131b48a257688152"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/base-plus-594.log",
+   "sha256": "ea36501d34664fce3582f2a329991b998a593fc3a36ff7a734f889e253bc9846"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/baseline-mos6502.log",
+   "sha256": "0b91a35f3bf1af470c72a31599feea38b421aded7793676a22e3fb0a907ce081"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/baseline.log",
+   "sha256": "cb8d007f77eb47eabf09ec7f57375fe0f5df37b83f33d5aace4238b767a1efb4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/candidate-mos6502.log",
+   "sha256": "e7962cc5dd4978c23b42838558c64337ca8f6f9f612835107dfc031e62daeb1c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/candidate.log",
+   "sha256": "1bf734ba97be6e4f0868975b641f55b4c91a1ed6b722dc3fb300f2322cd582e1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "sha256": "117fd6d99703c376ebf05ef09085a8fd917ece20c2bd539e9f7d25c5d7182b43"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/interesting.sh",
+   "sha256": "b92fc11d4834fb94734cebf6610a3ea7301d28f8f4d0b649101f6902f8329f8c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/prior-work.json",
+   "sha256": "cc9fc504b67a84690a271662e1ecba21a0eacac1cb10f5a1a11969df04d593f0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/upstream-base.log",
+   "sha256": "d4a679293b637d445e4a9ff1f94c087efd38335a9bfbd933d22257c89a756631"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf-baseline.log",
+   "sha256": "6a8e25f3ebeb2b71f8872d7af2bc4a9d167ad1357d8f0c71235f189110e51078"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf-candidate.log",
+   "sha256": "ba57ed97de8d723436348138f837d09f57a9753cd5a5a66ae4c81883c60e8c91"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll",
+   "sha256": "08d3b180070b5a405bf9c3c9d42407186254541c229a91f8518b1679498d9b80"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+   "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+  }
+ ],
+ "resolution": {
+  "change": "Split series commit \"[MOS] Reserve Imag32 quads that overlap reserved pairs\" (733b59e025ee; gated as b880f5dd2105, same tree f4ea09e9146e): MOSRegisterInfo::getReservedRegs reserves every Imag32 quad whose sublo16 or subhi16 pair is reserved.",
+  "causal_explanation": "With the quad over RS0 unreserved, RS0's register units were not reserved, so live-range computation for those units met a use of $rs0 without a def. Reserving the quad restores unit-level reservation of the stack pointer, scavenger slot and frame pointer bytes.",
+  "trigger_check": "The unchanged variadic-call.ll runs through the fix commit's llc with the baseline configuration and exits 0; the same holds for the original vaprintf IR and for mos6502, and the upstream-only pair (u594 fails, u594-resv passes) isolates the rule as the cause.",
+  "regression": {
+   "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+   "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+  },
+  "regression_tests": [
+   "llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll (split series): the variadic call in mos6502 and mosw65816 with -verify-machineinstrs"
+  ],
+  "candidate": {
+   "command": "build/split-320-321/llc/r2-320-1b -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1b (split series #320-1b: quad reservation fix); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "e4e2c1e171cabffd668a62c9fdf10bb6c97b4bf883d85f0f0985904e8fdec0de",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/candidate.log",
+    "sha256": "1bf734ba97be6e4f0868975b641f55b4c91a1ed6b722dc3fb300f2322cd582e1"
+   },
+   "exit_code": 0
+  }
+ },
+ "additional_runs": [
+  {
+   "command": "build/split-320-321/llc/r2-320-1a3 -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1a3 (series #594 commit); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "9f8b456100f1b90336b1bf4d19fec2740d5d200c1b658c8e30ddbabcc33de5ce",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/baseline-mos6502.log",
+    "sha256": "0b91a35f3bf1af470c72a31599feea38b421aded7793676a22e3fb0a907ce081"
+   },
+   "exit_code": 134,
+   "failure_signature": "Invalid global physical register",
+   "label": "mos6502, series #594 commit"
+  },
+  {
+   "command": "build/split-320-321/llc/r2-320-1b -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1b (series fix commit); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "e4e2c1e171cabffd668a62c9fdf10bb6c97b4bf883d85f0f0985904e8fdec0de",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/candidate-mos6502.log",
+    "sha256": "e7962cc5dd4978c23b42838558c64337ca8f6f9f612835107dfc031e62daeb1c"
+   },
+   "exit_code": 0,
+   "label": "mos6502, series fix commit"
+  },
+  {
+   "command": "build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (upstream base); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/upstream-base.log",
+    "sha256": "d4a679293b637d445e4a9ff1f94c087efd38335a9bfbd933d22257c89a756631"
+   },
+   "exit_code": 0,
+   "label": "upstream 06bc967d2668 without #594: compiles"
+  },
+  {
+   "command": "build/split-320-321/llc/u594 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/u594 (base + #594 only); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "184095f9338a0de9046f86a97f98a85104bd1e933095eaa739224e4c6fd2b7c4",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/base-plus-594.log",
+    "sha256": "ea36501d34664fce3582f2a329991b998a593fc3a36ff7a734f889e253bc9846"
+   },
+   "exit_code": 134,
+   "failure_signature": "Invalid global physical register",
+   "label": "upstream base + #594 only (no #321/#320 code): aborts"
+  },
+  {
+   "command": "build/split-320-321/llc/u594-resv -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/u594-resv (base + #594 + reservation rule only); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "7f7562c7b43dad2921288eb1f34f10ac1d26615e1210662e0b050c366ce546ec",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll",
+    "sha256": "147b96b2181d5a5043c8ed8a41c8fd2e248ec5d7c6dcab36815954e234707d85"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/base-plus-594-fix.log",
+    "sha256": "601ea00db0d967f6513e73b43190fa3b743fd90b63fdb6d6131b48a257688152"
+   },
+   "exit_code": 0,
+   "label": "upstream base + #594 + only the reservation rule: compiles"
+  },
+  {
+   "command": "build/split-320-321/llc/r2-320-1a3 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1a3 (series #594 commit); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "9f8b456100f1b90336b1bf4d19fec2740d5d200c1b658c8e30ddbabcc33de5ce",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll",
+    "sha256": "08d3b180070b5a405bf9c3c9d42407186254541c229a91f8518b1679498d9b80"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf-baseline.log",
+    "sha256": "6a8e25f3ebeb2b71f8872d7af2bc4a9d167ad1357d8f0c71235f189110e51078"
+   },
+   "exit_code": 134,
+   "failure_signature": "Invalid global physical register",
+   "label": "original input (SNES vaprintf demo IR), series #594 commit"
+  },
+  {
+   "command": "build/split-320-321/llc/r2-320-1b -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": false,
+    "verifier": true,
+    "expected": "compiles; a call with stack arguments"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-1b (series fix commit); identity in docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/identity.json",
+   "toolchain_sha256": "e4e2c1e171cabffd668a62c9fdf10bb6c97b4bf883d85f0f0985904e8fdec0de",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll",
+    "sha256": "08d3b180070b5a405bf9c3c9d42407186254541c229a91f8518b1679498d9b80"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf-candidate.log",
+    "sha256": "ba57ed97de8d723436348138f837d09f57a9753cd5a5a66ae4c81883c60e8c91"
+   },
+   "exit_code": 0,
+   "label": "original input, series fix commit"
+  }
+ ]
+}

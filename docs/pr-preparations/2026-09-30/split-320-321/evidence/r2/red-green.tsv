@@ -1,0 +1,171 @@
+test	version	role	llc	llc_sha256_16	result	first_diagnostic
+imag32-reserved-pairs.ll	320-1b	red-parent	r2-320-1a3	9f8b456100f1b903	FAIL	RUN 1: LLVM ERROR: Use not jointly dominated by defs.
+imag32-reserved-pairs.ll	320-1b	green	r2-320-1b	e4e2c1e171cabffd	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-320-1c	f4c0da84e614deba	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-320-1d	a5a166005f75950e	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-320-2	9f52795b3f2eb45c	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-320-3	d3a90acf52ac427e	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-320-4	70d96dbc4e78218c	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-9	cda3200958d98920	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-5	72341912b4cdd210	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-8	4875761591998a53	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-11	e34098a6f568ba54	PASS	
+imag32-reserved-pairs.ll	320-1b	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+imag32-allocation-gate.mir	320-1c	red-parent	r2-320-1b	e4e2c1e171cabffd	FAIL	RUN 1: error: /work/build/split-320-321/probe-r2/320-1c__imag32-allocation-gate.mir: Cannot use non-allocatable class 'Imag32' for virtual register 0 in function 'imag32_vreg'
+imag32-allocation-gate.mir	320-1c	green	r2-320-1c	f4c0da84e614deba	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-320-1d	a5a166005f75950e	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-320-2	9f52795b3f2eb45c	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-320-3	d3a90acf52ac427e	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-320-4	70d96dbc4e78218c	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-9	cda3200958d98920	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-5	72341912b4cdd210	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-8	4875761591998a53	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-11	e34098a6f568ba54	PASS	
+imag32-allocation-gate.mir	320-1c	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	red-parent	r2-320-1b	e4e2c1e171cabffd	FAIL	RUN 1: error: CHECK-NEXT: expected string not found in input
+far-ptr-arg-exhaustion.ll	320-1c	red-unrepaired	c-320-01	d5022893511ee122	FAIL	RUN 1: Assertion `TmpVec.size() > 1' failed.
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-320-1c	f4c0da84e614deba	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-320-1d	a5a166005f75950e	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-9	cda3200958d98920	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-5	72341912b4cdd210	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-8	4875761591998a53	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-ptr-arg-exhaustion.ll	320-1c	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+prologepilog.mir	320-1d	red-parent	r2-320-1c	f4c0da84e614deba	FAIL	RUN 1: Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+prologepilog.mir	320-1d	green	r2-320-1d	a5a166005f75950e	PASS	
+prologepilog.mir	320-1d	green	r2-320-2	9f52795b3f2eb45c	PASS	
+prologepilog.mir	320-1d	green	r2-320-3	d3a90acf52ac427e	PASS	
+prologepilog.mir	320-1d	green	r2-320-4	70d96dbc4e78218c	PASS	
+prologepilog.mir	320-1d	green	r2-fw-9	cda3200958d98920	PASS	
+prologepilog.mir	320-1d	green	r2-fw-5	72341912b4cdd210	PASS	
+prologepilog.mir	320-1d	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+prologepilog.mir	320-1d	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+prologepilog.mir	320-1d	green	r2-fw-8	4875761591998a53	PASS	
+prologepilog.mir	320-1d	green	r2-fw-11	e34098a6f568ba54	PASS	
+prologepilog.mir	320-1d	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-ptr-arg-exhaustion.ll	320-2	red-parent	r2-320-1d	a5a166005f75950e	FAIL	RUN 4: LLVM ERROR: unable to legalize instruction: %6:_(s8) = G_LOAD %3:_(p2) :: (volatile load (s8) from %ir.d, addrspace 2) (in function: callee4)
+far-ptr-arg-exhaustion.ll	320-2	red-unrepaired	c-320-02	58540bdeab7b6ef5	FAIL	RUN 6: error: STACK: expected string not found in input
+far-ptr-arg-exhaustion.ll	320-2	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-9	cda3200958d98920	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-5	72341912b4cdd210	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-8	4875761591998a53	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-ptr-arg-exhaustion.ll	320-2	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-quad-spill-call.ll	320-2	red-parent	r2-320-1d	a5a166005f75950e	FAIL	RUN 1: LLVM ERROR: unable to legalize instruction: %8:_(s8) = G_LOAD %3:_(p2) :: (volatile load (s8) from %ir.p3, addrspace 2) (in function: f)
+far-quad-spill-call.ll	320-2	red-unrepaired	c-320-02	58540bdeab7b6ef5	FAIL	RUN 1: Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+far-quad-spill-call.ll	320-2	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-quad-spill-call.ll	320-2	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-quad-spill-call.ll	320-2	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-9	cda3200958d98920	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-5	72341912b4cdd210	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-8	4875761591998a53	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-quad-spill-call.ll	320-2	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-access-non-65816.ll	320-2	red-parent	r2-320-1d	a5a166005f75950e	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: %2:_(s8) = G_LOAD %0:_(p2) :: (load (s8) from %ir.p, addrspace 2) (in function: ld_rt)
+far-access-non-65816.ll	320-2	red-unrepaired	c-320-02	58540bdeab7b6ef5	FAIL	RUN 2: error: ERR: expected string not found in input
+far-access-non-65816.ll	320-2	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-access-non-65816.ll	320-2	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-access-non-65816.ll	320-2	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-9	cda3200958d98920	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-5	72341912b4cdd210	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-8	4875761591998a53	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-access-non-65816.ll	320-2	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-fold-debug.ll	320-2	red-parent	r2-320-1d	a5a166005f75950e	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: %3:_(s8) = G_LOAD %2:_(p2) :: (load (s8) from %ir.q, addrspace 2) (in function: walk)
+far-fold-debug.ll	320-2	red-unrepaired	c-320-02	58540bdeab7b6ef5	FAIL	RUN 2: error: DROP: expected string not found in input
+far-fold-debug.ll	320-2	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-fold-debug.ll	320-2	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-fold-debug.ll	320-2	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-9	cda3200958d98920	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-5	72341912b4cdd210	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-8	4875761591998a53	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-fold-debug.ll	320-2	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-ptr-trunc.ll	320-2	red-parent	r2-320-1d	a5a166005f75950e	FAIL	RUN 1: LLVM ERROR: unable to legalize instruction: %1:_(p0) = G_ADDRSPACE_CAST %0:_(p2) (in function: far_to_near)
+far-ptr-trunc.ll	320-2	red-unrepaired	p-320-02	053193836fc67412	FAIL	RUN 1: Assertion `Builder.getMRI()->getType(From) == LLT::scalar(16)' failed.
+far-ptr-trunc.ll	320-2	green	r2-320-2	9f52795b3f2eb45c	PASS	
+far-ptr-trunc.ll	320-2	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-ptr-trunc.ll	320-2	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-9	cda3200958d98920	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-5	72341912b4cdd210	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-8	4875761591998a53	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-ptr-trunc.ll	320-2	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-memop-length.ll	320-3	red-parent	r2-320-2	9f52795b3f2eb45c	FAIL	RUN 2: LLVM ERROR: unable to legalize instruction: G_MEMSET %0:_(p2), %1:_(s8), %2:_(s32), 0 :: (store (s8) into %ir.d, addrspace 2) (in function: set_65535)
+far-memop-length.ll	320-3	red-unrepaired	p-320-03	9176eb386b7a6627	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-memop-length.ll	320-3	green	r2-320-3	d3a90acf52ac427e	PASS	
+far-memop-length.ll	320-3	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-memop-length.ll	320-3	green	r2-fw-9	cda3200958d98920	PASS	
+far-memop-length.ll	320-3	green	r2-fw-5	72341912b4cdd210	PASS	
+far-memop-length.ll	320-3	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-memop-length.ll	320-3	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-memop-length.ll	320-3	green	r2-fw-8	4875761591998a53	PASS	
+far-memop-length.ll	320-3	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-memop-length.ll	320-3	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-fold-debug.ll	320-4	red-parent	r2-320-3	d3a90acf52ac427e	FAIL	RUN 9: error: DROP: expected string not found in input
+far-fold-debug.ll	320-4	red-unrepaired	c-320-04	bbc982dd14d476d3	FAIL	RUN 2: error: DROP: expected string not found in input
+far-fold-debug.ll	320-4	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-9	cda3200958d98920	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-5	72341912b4cdd210	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-8	4875761591998a53	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-fold-debug.ll	320-4	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-index-fold-debug.ll	320-4	red-parent	r2-320-3	d3a90acf52ac427e	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	320-4	red-unrepaired	p-320-04	5b7d45e7da478195	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	320-4	green	r2-320-4	70d96dbc4e78218c	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-9	cda3200958d98920	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-5	72341912b4cdd210	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-8	4875761591998a53	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-index-fold-debug.ll	320-4	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+native-index-copy-cost.mir	fw-9	red-parent	r2-320-4	70d96dbc4e78218c	FAIL	RUN 1: error: '<stdin>' is empty.
+native-index-copy-cost.mir	fw-9	green	r2-fw-9	cda3200958d98920	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-5	72341912b4cdd210	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-8	4875761591998a53	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-11	e34098a6f568ba54	PASS	
+native-index-copy-cost.mir	fw-9	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-global-long-x.ll	fw-5	red-parent	r2-fw-9	cda3200958d98920	FAIL	RUN 1: error: CHECK: expected string not found in input
+far-global-long-x.ll	fw-5	green	r2-fw-5	72341912b4cdd210	PASS	
+far-global-long-x.ll	fw-5	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-global-long-x.ll	fw-5	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-global-long-x.ll	fw-5	green	r2-fw-8	4875761591998a53	PASS	
+far-global-long-x.ll	fw-5	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-global-long-x.ll	fw-5	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-fold-debug.ll	fw-5	red-parent	r2-fw-9	cda3200958d98920	FAIL	RUN 28: error: DROP: expected string not found in input
+far-fold-debug.ll	fw-5	red-unrepaired	c-fw-14	cce5eb24ccd61411	FAIL	RUN 2: error: DROP: expected string not found in input
+far-fold-debug.ll	fw-5	green	r2-fw-5	72341912b4cdd210	PASS	
+far-fold-debug.ll	fw-5	green	r2-fw-6	4eb8e7e98dc14a2c	PASS	
+far-fold-debug.ll	fw-5	green	r2-fw-7	bb3a66be8ea667fd	PASS	
+far-fold-debug.ll	fw-5	green	r2-fw-8	4875761591998a53	PASS	
+far-fold-debug.ll	fw-5	green	r2-fw-11	e34098a6f568ba54	PASS	
+far-fold-debug.ll	fw-5	green	r2-fw-14	c90f96487d2fe6d3	PASS	
+far-index-fold-debug.ll	fw-12	red-parent	r2-fw-11	e34098a6f568ba54	FAIL	RUN 3: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	fw-12	red-unrepaired	fw-old	d7fde754bb0222b4	FAIL	RUN 2: error: CHECK: expected string not found in input
+far-index-fold-debug.ll	fw-12	green	r2-fw-14	c90f96487d2fe6d3	PASS	

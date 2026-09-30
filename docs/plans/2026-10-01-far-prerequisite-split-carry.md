@@ -1,6 +1,6 @@
 # Carry the far-prerequisite repairs into the #320 split commits
 
-Status: implemented (2026‑10‑01); all six verification steps pass, and the #594/B5 decision is escalated. Verification output is recorded below. This plan carries the downstream B1–B4 repairs ([far-prerequisite plan](2026-09-30-far-prerequisite-defects.md), commit `664b877a`), the B6 extraction gap, and the independent review's N3/N4 cleanups into the #320 commits of the [#320/#321 split](2026-09-30-split-320-321-series.md). It then re-verifies the split and the far-word 0069/0070 packet for a second independent review. It belongs to the two TODO items "Prepare native-word speed policy 0070 for upstream review" and "Prepare the bounded Farblit range proof for upstream review", whose shared blocker is these defects. The user approved the work on 2026‑09‑30 ("go ahead on 0069 and 0070 when it doesn't conflict with work in-flight"); the conflicting pressure-set change landed on origin as `b145a581`.
+Status: first carry implemented (2026‑10‑01; verification below). Second round implemented 2026‑10‑01 (verification below): #594 option 1, B8, B9 and N10–N16 from the [second independent review](../pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md); see [Second round](#second-round-594-option-1-b8-b9-n10n16). This plan carries the downstream B1–B4 repairs ([far-prerequisite plan](2026-09-30-far-prerequisite-defects.md), commit `664b877a`), the B6 extraction gap, and the independent review's N3/N4 cleanups into the #320 commits of the [#320/#321 split](2026-09-30-split-320-321-series.md). It then re-verifies the split and the far-word 0069/0070 packet for a second independent review. It belongs to the two TODO items "Prepare native-word speed policy 0070 for upstream review" and "Prepare the bounded Farblit range proof for upstream review", whose shared blocker is these defects. The user approved the work on 2026‑09‑30 ("go ahead on 0069 and 0070 when it doesn't conflict with work in-flight"); the conflicting pressure-set change landed on origin as `b145a581`.
 
 Attribution: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).
 
@@ -158,3 +158,154 @@ B2 is the only repair that changes code for inputs that compiled before. `carry-
 | O1, O2, O3, Os, Oz | the same eight | 92 → 141 bytes | unchanged |
 
 The eight are the constant lengths 65536, 65537 and 70000, the unbounded runtime lengths and the loop idiom's scaled length. `set_65535`, `set_zext`, `mov_masked` and `set_i16` keep the 16-bit entries at every level, so known-bits proves the bound even at O0. The decision does not depend on the level, and a length truncation must not be traded for size, so B2 is not level-gated. The far-word 58-configuration replay shows 0070's own gate unchanged: Os and Oz identical, O2 and O3 faster.
+
+## Second round: #594 option 1, B8, B9, N10–N16
+
+Added 2026‑10‑01 after the [second independent review](../pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md) (origin `590f9616`) and the user's #594 decision (origin `9125c46d`). The reviewed series stays on branch `split-320-321-carry` as the reference. The new series is on branch `split-320-321-r2` (`ad7b2f4239a2`..`d19b7155d3c6`), and the far-word packet on `pkt-r2-far-word` (top `c275e191de52`).
+
+### New #320 layout
+
+| Commit | Content | Tests |
+|---|---|---|
+| #320‑1a (3 commits) | #594 as posted by mlund: "Avoid newlines in inline asm operands", "Accumulate composite zero-page CSR benefit", "Add nonallocatable 32-bit imaginary registers". Authorship and messages kept. | #594's own |
+| #320‑1b | The far address space (`p2:32:8`, `AS_Far`), Imag32 bank membership and reservation, and RL allocation behind one predicate, `MOSSubtarget::hasAllocatableImag32()`, which is the 65816 until an SDK contiguity contract exists. Also the RL calling convention with B1's stack fallback, the `i32` calling-convention type for far pointers, and incoming 32-bit values. Whatever old #320‑1 adds beyond #594. | allocation-gate test (replaces #594's `imag32-nonalloc.mir` expectation on the 65816); the call-lowering half of `far-ptr-arg-exhaustion.ll` |
+| #320‑1c | Imag32 quad spills: far-word patch 10 moved here (B9) | patch 10's `prologepilog.mir` cases |
+| #320‑2 | As before, plus the B8 helper at the absolute-long fold, the N12 fix, N13, N14 and N15 | the full-compile half of `far-ptr-arg-exhaustion.ll`; the B9 reproducer (four far pointers live across a call); `-g` absolute-long test |
+| #320‑3 | As before, plus N10 | mixed-space cases in `far-memop-length.ll` |
+| #320‑4 | As before; the B4 walk is replaced by the shared B8 helper at both fold paths | `-g` displacement-window test and store case |
+| far-word 5 | plus the B8 helper at the absolute-indexed fold | `-g` absolute-indexed test |
+| far-word 6–9, 11–14 | unchanged except context; patch 10 is gone | — |
+
+### #594 carry: one mechanical adaptation, one escalation
+
+#594 does not apply unchanged to the split. Upstream #571 (`26d7c2c1eebf`, in `06bc967d2668`) renumbered the imaginary registers after #594 was written: RC is at `0x20000`, RS at `0x30000`, and `MOSReg` takes a 32-bit number. The two unrelated #594 commits apply with identical changed lines. The register commit needs two things:
+
+- a context-only conflict resolution, because both sides add a branch at the same place in `copyPhysRegImpl`, and #594's hunk context holds the old numbering `defvar`s;
+- one token: `class MOSImagReg32<bits<16> num …>` becomes `bits<32>`. `0x30080` does not fit 16 bits, which is the same widening #571 applied to `MOSReg`.
+
+Each changed line is otherwise identical to `7b80f7e18768`, and a rebase note records the adaptation below mlund's message.
+
+**ESCALATE (numbering).** On the current base, #594's formula `Imag16RegsOffset + MaxImag16Regs` gives RL numbers `0x30080 + K`. The comments in `MOSRegisterInfo.td` (from #571) read the MOS DWARF specification as a type byte: `0x02` RC and `0x03` RS. So `0x30080` sits in the RS type range, as RS index 128, which does not exist. The lldb MOS plugin (`MOSImaginaryRegisters`) recognizes only the RC and RS banks. A far pointer's location is therefore a well-formed single `DW_OP_regx`, and B5's malformed composite is gone, but no current consumer can resolve it. The alternative, a new type such as `0x04` at `0x40000`, needs the specification's maintainers, and the specification page itself returns HTTP 403. The series implements the user's literal choice, the formula (one `defvar`), and the numbering question goes back to the user and the #594 comment.
+
+### B8 design
+
+Chosen: one static helper in `MOSLegalizerInfo.cpp`, `dropDeadFarAddressDebugUses(MRI, Register Ptr)`. It is called after a far fold erases an access, with that access's pointer. It climbs from the pointer through `G_PTR_ADD` bases while the whole tree of adds on a register is dead. A tree is dead when every non-debug user is a `G_PTR_ADD` based on that register whose own tree is dead. The helper then sets every `DBG_VALUE` of the dead tree to `$noreg`. It stops at the first register with a live user (the base the new pseudo reads), so it never drops a live location. It replaces B4's walk, which is the case where the climb starts from a constant add on the runtime add.
+
+Rejected: a generic salvage change in `CodeGenCommonISel.cpp`, which would drop unsalvageable operands and salvage `G_PTR_ADD` as `DW_OP_plus_uconst`. It would also repair the near shapes, but it is an llvm-project change and must not ride inside #320. It is proposed in the upstream record instead.
+
+Sites: #320‑2 `tryFarAbsoluteAddressing`, #320‑4 both paths of `tryFarIndirectIndexedAddressing` (runtime fold and window), and far-word patch 5 `tryFarAbsoluteIndexedAddressing`. Records: the four new far sites share B4's mechanism, but B4's closure was for the runtime-index site only, so they are a distinct defect instance under the evidence rules. They go in a new record, `mos-far-fold-dangling-dbg-sites`, related to `mos-far-index-fold-dangling-dbg`. The near shapes on upstream `06bc967d2668` get their own record, `mos-legalizer-fold-dangling-dbg-upstream`, which is not fixed here.
+
+### Nonblocking items
+
+- **N10:** state the LangRef argument in #320‑3's message and pin the IRTranslator narrowing: `memcpy.p2.p0` with 40000 keeps its length, and 70000 is narrowed.
+- **N12:** at #320‑2 a far memop that is not inlined fails to legalize, loudly, instead of calling the near runtime; #320‑3 replaces that with the far runtime call.
+- **N13:** on CPUs without long addressing, far loads and stores are made custom for every type, so the diagnostic fires once per access, before any narrowing.
+- **N14:** fix the message and the comment. With the allocation gate, far pointer values on other CPUs cannot be allocated, so the text states the actual contract, which is measured.
+- **N15:** remove the history tags from #320's tests, and the trailing blank line.
+- **N16:** list far `atomicrmw`/`cmpxchg` with the loud unsupported far shapes in the #320 reviewer map.
+- **N11:** add an llvm-mos-sdk companion entry for the six far runtime entries to `docs/upstream-contribution-status.md`, as future/blocked.
+
+### What changed while implementing (deviations from the layout above)
+
+1. **#594 has a defect as posted.** With #594 applied, any function with a call that passes stack arguments (a variadic call is enough) aborts in the register coalescer with "Invalid global physical register", in every MOS mode, including default mos6502 code. The cause: RL over a reserved RS pair is not reserved, and LLVM counts a register unit as reserved only when all its super-registers are.
+    - It reproduces with #594 alone on upstream `06bc967d2668` (`u594`), and adding only the reservation rule fixes it (`u594-resv`).
+    - #594 stays unchanged, and a separate commit (#320‑1b) carries the fix, with a test reduced by llvm-reduce.
+    - [Record](../defects/mos-imag32-reserved-pair-units.json); suggested additions to the #594 comment are in [594-comment.md](../pr-preparations/2026-10-01/594-comment.md).
+    - The layout is therefore 1a (#594 ×3), 1b (reservation fix), 1c (far address space, allocation gate, calling convention), 1d (spills).
+2. **The allocation gate is an empty allocation order, not reservation.** Reserving every quad on other CPUs moved call arguments on mos6502, because `MOSValueAssigner` marks every reserved register and its aliases as used. Twelve MOS tests failed. `Imag32` now has an alternative order that is empty unless `hasAllocatableImag32()`. A strong copy hint outside the order is filtered, because the allocator asserts on it.
+3. **Far pointer values need the 65816.** With quads unallocatable elsewhere, a far pointer argument on mos6502 goes to the stack and fails to legalize loudly (the A8 limit). The B3 test no longer claims that passing a far pointer stays legal there.
+4. **Far-word patch 9 now precedes patch 5.** Patch 5's own XY16 test asserts in `copyCost` without patch 9's copy costs. This predates the carry; patch 5 had never been built on its own.
+5. **B8 sections that need +mos-a16:** the runtime-offset sections of `far-fold-debug.ll` skip plain mosw65816, where the zero-extended s32 offset fails to legalize (A8).
+
+### Second-round verification
+
+1. #320‑1a's changed lines equal #594's except the recorded `bits<32>`; #320‑1b..#320‑4 and the far-word packet round-trip from `06bc967d2668`.
+
+    ```text
+    diff of changed lines, 7b80f7e18768 vs the carried commit:
+    < +class MOSImagReg32<bits<16> num, string name, list<Register> subregs>
+    > +class MOSImagReg32<bits<32> num, string name, list<Register> subregs>
+    (a1e2fa5ce11a and d3d346169104: identical changed lines)
+    27 patches applied in order to 06bc967d2668; every intermediate tree matches: True; final tree 11f4fcadc11a
+    r2-far-word: 36 patches, trees match: True, final 3ca03f1da90c, delta vs original: 48 paths, PASS=187 UNSUPPORTED=1
+    ```
+
+    PASS.
+
+2. Every commit builds with assertions, passes MOS CodeGen+MC and adds no MOS warnings.
+
+    ```text
+    label       lit                     mos_warnings
+    r2-320-1a1  PASS=160 UNSUPPORTED=1  0
+    r2-320-1a2  PASS=161 UNSUPPORTED=1  0
+    r2-320-1a3  PASS=166 UNSUPPORTED=1  0
+    r2-320-1b   PASS=167 UNSUPPORTED=1  0
+    r2-320-1c   PASS=168 UNSUPPORTED=1  0
+    r2-320-1d   PASS=168 UNSUPPORTED=1  0
+    r2-320-2    PASS=174 UNSUPPORTED=1  0
+    r2-320-3    PASS=176 UNSUPPORTED=1  0
+    r2-320-4    PASS=178 UNSUPPORTED=1  0
+    r2-fw-9     PASS=179 UNSUPPORTED=1  0
+    r2-fw-5     PASS=180 UNSUPPORTED=1  0     (first order: FAIL far-global-long-x.ll; fixed by moving patch 9)
+    r2-fw-6..8  PASS=181, 182, 183          0
+    r2-fw-11    PASS=183 UNSUPPORTED=1  0
+    r2-fw-14    PASS=187 UNSUPPORTED=1  0
+    ```
+
+    PASS.
+
+3. Every added or extended test is red on its parent (and on the reviewed commit where one exists) and green after, including B8's probes and B9's reproducer.
+
+    ```text
+    $ bash spec/r2-red-green.sh evidence/r2-red-green.tsv        (170 probes)
+        143 green PASS
+         27 red FAIL
+    $ bash spec/r2-b8-sweep.sh ... c-320-04 c-fw-14 r2-320-4 r2-fw-14
+    field, store1, gfield, gidx, argoff, chain, word, qonly: no "cannot be undef" on r2-320-4 or r2-fw-14
+    spill (B9): assert=4 on c-320-04 -> none on r2; remaining failures on r2 are plain-mosw65816
+      "unable to legalize G_MERGE_VALUES s32" (A8)
+    nidx, ngfield, ngidx, nearfield (upstream near shapes): still fail everywhere, as recorded
+    ```
+
+    PASS.
+
+4. Default-mode identity per commit versus its parent, with #594's own default-mode effects listed.
+
+    ```text
+    r2-320-1a1 vs MC top, 1a2 vs 1a1, 1c vs 1b, 1d vs 1c, 3 vs 2, 4 vs 3, fw-9 vs 4: identical
+      (each lists only the trapguard harness artifact: same assertion, hashed stderr line starts with the llc file name)
+    r2-320-1a3 vs 1a2: 4 inputs change (vaprintf compiled, now aborts; cgrade_sim, sodo_sim, sodo abort) -- #594's defect
+    r2-320-1b vs 1a2: identical (trapguard artifact only)
+    r2-320-2 vs 1d: the five far inputs fail with a different error, as in the first round
+    ```
+
+    PASS.
+
+5. The far-word packet suites pass; the 58 replay objects are compared with the reviewed packet, and the emulators rerun if any object differs.
+
+    ```text
+    second round vs reviewed carried packet: 58 identical, 0 different []
+    ```
+
+    PASS: no object changed, so the reviewed packet's MAME/bsnes results stand and the emulators were not rerun.
+
+6. `check-defect-evidence.py` passes with the new records.
+
+    ```text
+    $ python3 dev/check-defect-evidence.py --worktree
+    Defect evidence: PASS (35 records, worktree)
+    ```
+
+    PASS. New records: mos-imag32-reserved-pair-units (fixed in the series), mos-far-fold-dangling-dbg-sites (confirmed; split repair recorded as additional runs; downstream 0002 not repaired), mos-legalizer-fold-dangling-dbg-upstream (confirmed; not fixed; generic salvage fallback proposed). mos-far-index-fold-dangling-dbg gains the second-round runs.
+
+### Second-round measurements by optimization level (lesson 4)
+
+`default-hashes-levels.sh` compiled the fixed default-mode input set (90 inputs, mos6502 and plain mosw65816) with the MC top's `llc` (`p-320-00`) and the new #320‑4 (`r2-320-4`). Levels were O0, O1, O2 and O3, plus O2 with every function forced to `optsize` (Os) or `optsize minsize` (Oz). Errors are hashed from their message, not the `llc` file name.
+
+```text
+O0..Oz, mos6502 and mosw65816: 85 of 90 inputs identical (assembly and object) at every level;
+the 5 that differ are the far corpus inputs, which fail at the MC top and after #320 (rc 1 -> 1),
+with a different error message.
+```
+
+The whole #320 group, #594 included, changes no default-mode code at any level. For far code, the second-round changes are debug-location drops (B8) and error paths (N12, N13, the allocation gate). The 58 far-word replay objects (Os, Oz, O2, O3) are byte-identical to the reviewed packet's. No repair in this round changes code for an input that compiled before, so no level gate is needed. [Levels](../pr-preparations/2026-09-30/split-320-321/evidence/r2/levels.txt).

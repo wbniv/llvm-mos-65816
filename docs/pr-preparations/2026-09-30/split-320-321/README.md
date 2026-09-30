@@ -1,6 +1,6 @@
 # #320/#321 split into reviewable commit series
 
-Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md).
+Status: split landed on branch `split-320-321` in `build/split-320-321/source` (a worktree of `.scratch/carry-clang-upstream/source`), head `1a616f08ea67`. Nothing is posted. On 2026‑09‑30 the series was regenerated with the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application): `GeneratePressureSet = 0` in #321‑1 and the pressure hooks with the `-O3` gate in #321‑8. Every commit hash changed, and every gate below was rerun on the new commits. On 2026‑10‑01 the far-prerequisite repairs (B1–B4, the B6 trunc pattern) and the N3/N4 cleanups were carried into the four #320 commits ([carry](#far-prerequisite-carry-2026-10-01)); the #321 and MC commits are unchanged. Contract: [the split plan](../../../plans/2026-09-30-split-320-321-series.md) and [the carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md). **Current #320 (2026‑10‑01, second round):** branch `split-320-321-r2`, nine commits on #594; see [Second round](#second-round-2026-10-01).
 
 Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. Far-prerequisite carry: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Pressure-set regeneration: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F).
 
@@ -16,7 +16,7 @@ Attribution: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`c
 
 ## Chain
 
-`06bc967d2668` → #321 1–16 (`45bc97d89c6a`..`aa868b952570`) → MC `3721ab9a5c0e` "Honor explicit address widths for constant operands" → MC `25c40909b44a` "Preserve long address widths in printed assembly" → #320 1–4 (`abfb29168fca`..`59d98c37ab77`, branch `split-320-321-carry`; before the carry `42785c3bef21`..`1a616f08ea67`, branch `split-320-321`).
+`06bc967d2668` → #321 1–16 (`45bc97d89c6a`..`aa868b952570`) → MC `3721ab9a5c0e` "Honor explicit address widths for constant operands" → MC `25c40909b44a` "Preserve long address widths in printed assembly" → #320 1–4 (`abfb29168fca`..`59d98c37ab77`, branch `split-320-321-carry`; before the carry `42785c3bef21`..`1a616f08ea67`, branch `split-320-321`). Current #320: #594 ×3 (`ad7b2f4239a2`..`fcb88211d861`) → `733b59e025ee`..`d19b7155d3c6` (branch `split-320-321-r2`); the reviewed carry `abfb29168fca`..`59d98c37ab77` stays on `split-320-321-carry`.
 
 The MC commits keep their diffs, messages, authors and dates.
 
@@ -28,7 +28,9 @@ The split must reproduce the monolithic patches plus the pressure-set change (`s
 |---|---|
 | #321 end tree vs `340c8ee25d5c` + pressure change (reference `0a9dad44a2d9`, tree `778746df6e90`) | **Equal plus 12 added `llvm/test/` files, no other path** ([list](evidence/321.invariant.txt)); checked by `build-series.sh` and again by applying `patches-321/` to `06bc967d2668` (tree `d6b87f6d2aa6`) |
 | #320 end tree vs `11044c53d5fc` + pressure change (reference `fa1928c8b9ca`, tree `deb630c2d43f`) | **Equal plus 18 added `llvm/test/` files and the carried repairs in 11 library files ([`spec/carry-320.diff`](spec/carry-320.diff)), no other path** ([list](evidence/carry/320.invariant.txt)); applying `patches-321/`, `patches-mc/` and `patches-320/` to `06bc967d2668` reproduces every commit tree and ends at tree `c80a2ee108f3` |
+| #320 end tree, second round | The pressure-set reference plus #594, the carried repairs and the second-round fixes in 16 library files and 26 added `llvm/test/` files ([list](evidence/r2/320.invariant.txt)); `patches-321/`, `patches-mc/` and the nine `patches-320/` round-trip from `06bc967d2668` to tree `11f4fcadc11a` |
 | Every commit builds with assertions and passes MOS CodeGen + MC | **Yes** for all 20 split commits and the MC top (table below); no new warnings in `lib/Target/MOS` |
+| Second round: every commit builds, passes MOS CodeGen + MC, no new MOS warnings | **Yes** for all nine #320 commits and far-word patches 5–9, 11 and 14 ([stages](evidence/r2/stages.tsv)) |
 | Every added test fails on its parent and passes on its own and every later commit | **Yes** for the carried tests, which also fail on the unrepaired commit ([carry red/green](evidence/carry/red-green.tsv)), and for 12 of the 13 earlier ones ([red/green](evidence/red-green.tsv)). The exception is `native-width-default-pressure.ll`: it checks that #321‑1 keeps upstream's default code, so it passes on its upstream parent by design; it fails on the unchanged #321‑1 and #321‑16 `llc` ([log](../../../defects/evidence/2026-09-30-native-width-pressure-sets/final/test-red-green.log)) |
 | Later packet patches apply unchanged | **Yes**: far-word 5–14, the near-index recovery patch, and 0065's 0063/0065 patches (below) |
 | No #320 content in the #321 commits (`AS_Far`, `AS_FarPacked`, `FarCC`, `p2`, `Imag32`, `addrspace(2)`) | **None in code.** One test, `xy16-near-indir-y.ll`, carries a data layout string containing `p2:32:8-p3:24:8` |
@@ -47,6 +49,27 @@ Each fix is in the commit whose code it corrects, with its test ([plan](../../..
 | B1–B4 record commands | unrepaired split commit fails with the record's signature; carried commit passes ([records](../../../defects/)) |
 
 Opt-level gating (lesson 4): the only repair that changes code for inputs that compiled before is B2, and only for a far memory intrinsic whose length is not provably 16 bits. Its decision is identical at O0, O1, O2, O3, Os and Oz in A16 and XY16: the eight unprovable or oversized lengths in `far-memop-length.ll` move to the `…_far32` entries (+49 bytes of `.text` over the eight calls), and the four provable lengths and both `far-memset.ll` functions are unchanged ([callees](evidence/carry/b2-levels-callees.tsv), [sizes](evidence/carry/b2-levels-size.tsv)). It is a correctness repair and is not level-gated. No SNES corpus frontend IR (831 files) contains a far memory intrinsic, and the far-word packet's 58 replay objects are byte-identical with and without the carry.
+
+## Second round (2026-10-01)
+
+After the [second independent review](../far-word-rebase/independent-review-2.md) and the user's #594 decision, #320 was rebuilt ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#second-round-594-option-1-b8-b9-n10n16), [map](REVIEWER-MAP-320.md)):
+
+- **#594 carried unchanged** as three commits with mlund's authorship. The register commit needs one token (`bits<16>` → `bits<32>`, after upstream #571).
+- **A defect in #594 as posted:** every function with a call that passes stack arguments aborts in the register coalescer, because RL over a reserved pair is not reserved. The next commit fixes it ([record](../../../defects/mos-imag32-reserved-pair-units.json)). It reproduces with #594 alone on upstream `06bc967d2668`.
+- **RL allocation on the 65816 only**, behind `MOSSubtarget::hasAllocatableImag32()`, through an empty alternative allocation order elsewhere. Reserving the quads was tried first and moved call arguments on mos6502; twelve MOS tests caught it.
+- **B9:** far-word patch 10 (quad spills) is now #320‑1d.
+- **B8:** one helper, `dropDeadFarAddressDebugUses`, is called by every far fold that erases an access: #320‑2, #320‑4 and far-word patch 5.
+- **N10, N12–N16** applied; N11 queued in the tracker.
+
+| Gate | Result |
+|---|---|
+| Per commit: build, MOS CodeGen+MC, warnings | 1a: 160, 161, 166; 1b 167; 1c 168; 1d 168; 2: 174; 3: 176; 4: 178; far-word 9: 179, 5: 180, 6: 181, 7: 182, 8: 183, 11: 183, 14: 187 pass (1 unsupported each); 0 MOS warnings ([stages](evidence/r2/stages.tsv)) |
+| Red/green | 27 red runs fail and 143 green runs pass ([table](evidence/r2/red-green.tsv)) |
+| Default mode vs parent (O2) | identical except #594's 1a‑iii (4 aborts, removed by 1b) and #320‑2's changed errors on far inputs; the only other row is the `trapguard` harness artifact |
+| Default mode by level | MC top against #320‑4 at O0, O1, O2, O3, Os and Oz: identical for every input that compiles; only the five far inputs, which fail before and after, change their error ([levels](evidence/r2/levels.txt)) |
+| B8/B9 probes (second review) | no far probe fails the verifier on the new #320‑4 or packet; the spill assertion is gone; the near upstream shapes still fail, as recorded ([sweep](evidence/r2/b8-sweep.tsv)) |
+| Replay | the 58 far-word configurations give objects identical to the reviewed packet's ([comparison](../far-word-rebase/evidence/split-r2-replay.json)) |
+| N3/N4 | 0 clang-format lines in each of our commits; #594's register commit (unchanged) has 5; no history tags |
 
 ## Tests the split adds
 
@@ -103,6 +126,7 @@ Each packet's later patches were applied unchanged with `git am -3` on the split
 | Packet | Series | Conflicts | Final tree vs previous candidate | Suites | `llc` vs previous candidate |
 |---|---|---|---|---|---|
 | [far-word](../far-word-rebase/README.md) | #321 1–16, MC ×2, #320 1–4, far-word 5–14 (32) | patches 5 and 12: context from the carried #320 comments and formatting, resolved by hand | `77dc044c39bb` + pressure-set change + the carry + 18 added tests (final `f3aba3593673`) | 179 pass | differs (pressure sets and the carry) |
+| far-word, second round | #321 1–16, MC ×2, #320 (9), far-word 9, 5–8, 11–14 (36) | patch 9 moved before patch 5, whose own XY16 test needs its copy costs | final `3ca03f1da90c` | 187 pass | objects of all 58 replay configurations identical to the reviewed packet |
 | [near-index](../../2026-09-29/near-index-proofs/README.md) | #321 1–16, recovery patch (17); unchanged by the carry | none | `980fe1f29381` + pressure-set change + 12 added tests + one `MOSFeatures.td` blank line (final `6bd824516c06`) | 157 pass | differs (pressure sets) |
 | [0065](../../2026-09-28/0065/README.md) | #321 1–16, 0063, 0065 (18); unchanged by the carry | none | different destination (`26d7c2c1eebf` before; final `cde019345d24`) | 158 pass | differs (destination) |
 
@@ -132,7 +156,7 @@ Each was needed for a build or test gate, or to keep one concept per commit.
 
 - **Resolved: #321‑1 no longer changes default codegen** (pressure-set change, deviation 13; record [`mos-native-width-pressure-sets`](../../../defects/mos-native-width-pressure-sets.json)).
 - **Downstream `0002` does not carry the pressure-set change yet.** Applied downstream, the change grows default-mode code by 13,427 B (+0.58%) and native code by about 3 KB over 262 SNES sources at `-Os`, because the downstream carry scheduling (0064/0067, not in this series) relies on the Ac16/Xc16/Yc16-derived pressure sets. With carry scheduling off, the same change shrinks default code by 25,290 B. That is escalated for a user decision ([plan](../../../plans/2026-09-30-native-register-pressure-sets.md#application)).
-- **#594 (B7) and far-quad DWARF (B5): escalated.** #320‑1 defines the Imag32 family that open PR #594 also defines, with a different register-number offset and allocation policy. #594 was unchanged on 2026‑10‑01 (draft, head `7b80f7e18768`). Aligning with it is a choice between incompatible options, recorded in the [carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#594-reconciliation-b7); #320‑1 is the commit an alignment replaces ([details](REVIEWER-MAP-320.md#1-add-the-far-address-space-and-32-bit-imaginary-pointer-quads-abfb29168fca)).
+- **#594 (B7): decided and implemented** (option 1, second round). **B5: the RL numbering is escalated** again: the chosen formula gives `0x30080 + K`, inside the RS type range of the DWARF specification ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#594-carry-one-mechanical-adaptation-one-escalation)). The #594 coordination draft has suggested additions ([594-comment.md](../../2026-10-01/594-comment.md)).
 - **Review findings:** B1–B4, B6 and the #320 parts of N3 and N4 are fixed in the #320 commits ([status](REVIEWER-MAP-320.md#where-the-independent-reviews-findings-land)). N3 and N4 in the #321 commits (including the broken "(Native widths: )" in #321‑8) are not changed, so the near-index and 0065 packets keep their commits.
 - **0065 measurements** (replay, runtime, loaded pointer) were taken on its `26d7c2c1eebf` series and were not repeated on the split.
 - **Commits 5, 7 and 16 independence** from the rest of the series is by code inspection; they were built only in series order.

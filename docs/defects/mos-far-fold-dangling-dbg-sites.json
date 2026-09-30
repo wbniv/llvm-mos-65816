@@ -1,0 +1,286 @@
+{
+ "schema": 1,
+ "id": "mos-far-fold-dangling-dbg-sites",
+ "title": "Far addressing folds other than the runtime-index fold leave dangling DBG_VALUEs",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md",
+ "summary": "Three far addressing-mode folds erase or rewrite an access and leave the G_PTR_ADDs that computed its pointer with only debug uses: the absolute-long fold (tryFarAbsoluteAddressing, #320-2), the [dp],Y displacement window in tryFarIndirectIndexedAddressing (#320-4), and the absolute-long indexed fold (tryFarAbsoluteIndexedAddressing, far-word patch 5 / downstream 0061). The legalizer erases the dead adds; salvageDebugInfoForDbgValue cannot express a G_PTR_ADD and leaves the DBG_VALUE on the erased register, which DetectDeadLanes marks undef, so -g with -verify-machineinstrs fails (\"Generic virtual register use cannot be undef\"). The simplest -g far field access (base + 1) fails at O0 and O2 on the reviewed split and on the downstream release toolchain. Emitted code is unaffected. This is the mechanism of mos-far-index-fold-dangling-dbg (B4) at the fold sites its repair did not cover.",
+ "attribution": [
+  "Found by the second independent review (finding B8): Claude Code 2.1.285, t4-opus-high agent a86560004d12c0518, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort (read from that subagent's transcript metadata); session 310aee67-a99e-4b78-ba48-c560322fe80d.",
+  "Evidence capture, prior-work audit and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+ ],
+ "unknowns": [
+  "Downstream 0002 is not repaired: vendor/ and 0002 were held by another agent on 2026-10-01. The repair (dropDeadFarAddressDebugUses, called by every far fold) exists only in the #320 split series, branch split-320-321-r2 and pkt-r2-far-word, and is recorded below as additional runs; the status stays confirmed until the downstream toolchain carries it.",
+  "Release builds without -verify-machineinstrs were not examined for the resulting location; for B4 the location degraded to $noreg without the verifier."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "cannot be undef",
+   "dangling",
+   "setDebugValueUndef",
+   "tryFarAbsoluteAddressing",
+   "tryFarIndirectIndexedAddressing",
+   "tryFarAbsoluteIndexedAddressing"
+  ],
+  "related_records": [
+   "docs/defects/mos-far-index-fold-dangling-dbg.json"
+  ],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md"
+  ],
+  "related_changes": [
+   "patches/llvm-mos/0002-321-accum16.patch",
+   "patches/llvm-mos/0061-mos-far-global-long-x.patch"
+  ],
+  "source_assessment": "The reviewed split (#320-2, #320-4, far-word patch 5) and downstream 0002/0061 drop dead-address debug locations only in tryFarRuntimeIndexFold (the B4 repair). The absolute-long, displacement-window and absolute-indexed folds erase or rewrite the access without touching the debug users of the adds that become dead.",
+  "binary_assessment": "Reviewed split llc c-320-04 and far-word candidate c-fw-14 (assertions) exit 134 with the signature for field.ll, store1.ll and gfield.ll (O0), and c-fw-14 for gidx.ll; the downstream release candidate llc f1fa50a2 fails field.ll and gidx.ll the same way.",
+  "decision": "mos-far-index-fold-dangling-dbg is correctly closed for its own site: its same-input regression passes and its causal change covers only tryFarRuntimeIndexFold. These inputs pass on #320-3 and fail through different fold functions whose code the B4 repair never touched, so they are a distinct defect instance with their own baseline rather than a reopening of B4.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/prior-work.json",
+   "sha256": "ffc9407a5ea87b89a80ad463ad90cc97e4d24baabb0826a1488c3fccfefad27b"
+  }
+ },
+ "baseline": {
+  "command": "build/split-320-321/llc/c-320-04 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-review-defects mounted at /work/build/...)",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [
+    "+mos-a16"
+   ],
+   "optimization": "O2 with -g metadata",
+   "lto": false,
+   "verifier": true,
+   "expected": "verifier-clean, dead address locations dropped or salvaged"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-04 (reviewed split #320-4 59d98c37ab77, assertions build); identity in docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/identity.json",
+  "toolchain_sha256": "bbc982dd14d476d37e192518830ec67cf80b02c14da6e94527a5af97dcb2912e",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll",
+   "sha256": "8092c7b1d06541dc8b77e349f5cb12654a339acb100b9aa3daa22bfc6b7d44e6"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/baseline.log",
+   "sha256": "f2b0c308d122a645b849c80fc057016d5e0e691fc5df872b6d5c9dfcdd1047b8"
+  },
+  "exit_code": 134,
+  "failure_signature": "Generic virtual register use cannot be undef"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/baseline.log",
+   "sha256": "f2b0c308d122a645b849c80fc057016d5e0e691fc5df872b6d5c9dfcdd1047b8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/downstream-field.log",
+   "sha256": "1ac5faa67bd3db2255a50d05d60d90df27703bc95541353bf777fd8020bcdb98"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/downstream-gidx.log",
+   "sha256": "907b4aeaef30ed67d80f8d8f2861ad6d8e060c6556dd8b3e8f655670779272f0"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field-O0.log",
+   "sha256": "4c119d16c5d30f97a70485d0f92b887094f87fb10b555fd5f00ff5604658b1bf"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field-plain-O2.log",
+   "sha256": "cf7cea7ffd20f91582b635c3a9fa13e5f8d35c36f164cde51810bef874e9179b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll",
+   "sha256": "8092c7b1d06541dc8b77e349f5cb12654a339acb100b9aa3daa22bfc6b7d44e6"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield-O0.log",
+   "sha256": "da9e58817ce06b491dff291f3e55cb8008d4e314d3158539ee560c4ddca2a21c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield.ll",
+   "sha256": "d1dec0746960d86b44d55beb324062f4d3530c67ddd178003c0809ba178b3c34"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx-fw14.log",
+   "sha256": "6095b01d3d28c980e1f25ec3fdfc064c599350b517edbab6bb150262be91079c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll",
+   "sha256": "844be3b0597284a1f28fffde5b33bf21d79a61decab8d27702d481ee656b9b4f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/identity.json",
+   "sha256": "ec2e7290cc25391060af4137d5270ffa6ddb8ff858eba4e3e82d5e9721956aa5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/prior-work.json",
+   "sha256": "ffc9407a5ea87b89a80ad463ad90cc97e4d24baabb0826a1488c3fccfefad27b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/store1.ll",
+   "sha256": "1291664437258363d9679ac75beb3d42fdb1d97f1c37efd6fc17f14133fcbea1"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/store1.log",
+   "sha256": "eb30fad9333c13014941e32a4fd45dbb1778cb20d7ec90d77bce3d8d0521e09d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate.log",
+   "sha256": "bcbd96d809af0a607588a7af055fdf3cd299ef2e033bb16616318448dac87701"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-field-O0.log",
+   "sha256": "7dfb58e6f6db86a57f79d90475e8d2a02dc5d5b7a0834f869e9733f6849051f8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-store1.log",
+   "sha256": "577a1f6f2d1bc0d50a08e43d606a3231dd25e882daa8b97435bbeb416e51154d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-gfield-O0.log",
+   "sha256": "f887643c5ef2a4d880a1accf9de997172e7c23d197303d4a5b54a109fff1cbce"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-gidx-fw14.log",
+   "sha256": "c0423a786311dc75503e5d3b11a6eacf7082b60db20bda7fcebc602a292abe01"
+  }
+ ],
+ "additional_runs": [
+  {
+   "label": "Second-round split #320-4: field.ll, same input and configuration as the baseline",
+   "command": "build/split-320-321/llc/r2-320-4 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-4 (second-round split #320-4 d19b7155d3c6 (gated as 2e2d91dd1534, same tree))",
+   "toolchain_sha256": "70d96dbc4e78218c77cf687ce5383a1bcad72561bbf77986b97b1881d15af1b5",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll",
+    "sha256": "8092c7b1d06541dc8b77e349f5cb12654a339acb100b9aa3daa22bfc6b7d44e6"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate.log",
+    "sha256": "bcbd96d809af0a607588a7af055fdf3cd299ef2e033bb16616318448dac87701"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round split #320-4: field.ll at O0",
+   "command": "build/split-320-321/llc/r2-320-4 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O0 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-4 (second-round split #320-4)",
+   "toolchain_sha256": "70d96dbc4e78218c77cf687ce5383a1bcad72561bbf77986b97b1881d15af1b5",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll",
+    "sha256": "8092c7b1d06541dc8b77e349f5cb12654a339acb100b9aa3daa22bfc6b7d44e6"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-field-O0.log",
+    "sha256": "7dfb58e6f6db86a57f79d90475e8d2a02dc5d5b7a0834f869e9733f6849051f8"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round split #320-4: store1.ll",
+   "command": "build/split-320-321/llc/r2-320-4 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/store1.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-4 (second-round split #320-4)",
+   "toolchain_sha256": "70d96dbc4e78218c77cf687ce5383a1bcad72561bbf77986b97b1881d15af1b5",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/store1.ll",
+    "sha256": "1291664437258363d9679ac75beb3d42fdb1d97f1c37efd6fc17f14133fcbea1"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-store1.log",
+    "sha256": "577a1f6f2d1bc0d50a08e43d606a3231dd25e882daa8b97435bbeb416e51154d"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round split #320-2: gfield.ll at O0 (absolute-long site)",
+   "command": "build/split-320-321/llc/r2-320-2 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O0 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-2 (second-round split #320-2 3046c5754503 (gated as 3ddbe6912fe1, same tree))",
+   "toolchain_sha256": "9f52795b3f2eb45c986213fc0e613872d51929e0cea0d07ef98ad1d06a17d22c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gfield.ll",
+    "sha256": "d1dec0746960d86b44d55beb324062f4d3530c67ddd178003c0809ba178b3c34"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-gfield-O0.log",
+    "sha256": "f887643c5ef2a4d880a1accf9de997172e7c23d197303d4a5b54a109fff1cbce"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round far-word candidate: gidx.ll (absolute-indexed site)",
+   "command": "build/split-320-321/llc/r2-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-fw-14 (second-round far-word candidate c275e191de52 (gated as 6306e48b493b, same tree))",
+   "toolchain_sha256": "c90f96487d2fe6d3fa49a8cfc01f9485affdbd4857e4594ee8b87f7bfefcbbcb",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll",
+    "sha256": "844be3b0597284a1f28fffde5b33bf21d79a61decab8d27702d481ee656b9b4f"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/candidate-gidx-fw14.log",
+    "sha256": "c0423a786311dc75503e5d3b11a6eacf7082b60db20bda7fcebc602a292abe01"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  }
+ ]
+}

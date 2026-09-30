@@ -1,0 +1,17 @@
+{
+ "llc": {
+  "c-320-04 (reviewed carried #320-4 59d98c37ab77)": {
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-320-04",
+   "sha256": "bbc982dd14d476d37e192518830ec67cf80b02c14da6e94527a5af97dcb2912e"
+  },
+  "c-fw-14 (reviewed far-word candidate a5515aab9219)": {
+   "host_path": "/home/will/llvm-mos-65816/build/split-320-321/llc/c-fw-14",
+   "sha256": "cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7"
+  },
+  "downstream release candidate after B1-B4 (0002 at 664b877a)": {
+   "host_path": "/home/will/llvm-mos-65816/build/far-review-defects/candidate/llc",
+   "sha256": "f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1"
+  }
+ },
+ "build": "split: build/split-320-321/build, assertions Release, dev container; downstream: build/far-review-defects/candidate (release)"
+}

@@ -1,7 +1,7 @@
 From 793da9041cd3366b7b55a40af04144847c868f97 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 02/32] [MOS] Define 16-bit accumulator instruction forms
+Subject: [PATCH 02/36] [MOS] Define 16-bit accumulator instruction forms
 
 Define the pseudo instructions that carry a 16-bit value through the accumulator, gated on HasAccum16. The 65816 uses the same opcode bytes for 8- and 16-bit accumulator operations; the width is processor state. Codegen therefore needs distinct pseudos, so that allocation, liveness and a later REP/SEP pass know which width an operation requires. Each pseudo expands to the existing width-agnostic MC instruction.
 

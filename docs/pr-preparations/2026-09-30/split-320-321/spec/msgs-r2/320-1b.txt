@@ -1,0 +1,19 @@
+[MOS] Add the far address space and allocate Imag32 quads on the 65816
+
+Add address space 2 for far data pointers: `p2:32:8` in the MOS data layout (TargetDataLayout and MOSTargetMachine) and AS_Far in MOS::AddressSpace. A far pointer is a 32-bit value whose low three bytes are the 65816 long address; 32 bits keep it a simple MVT, since there is no MVT::i24.
+
+A runtime far pointer lives in an Imag32 quad, the RL register family of the previous commit (llvm-mos#594). This commit adds Imag32 to the register bank and makes the class allocatable where MOSSubtarget::hasAllocatableImag32() holds. A quad is usable only if the linker keeps its four RS bytes contiguous, which no platform contract states yet. The 65816 needs quads for far data, so the predicate is the 65816 for now; every other CPU reserves every quad, and the predicate is the one place to switch to a platform contiguity contract. A quad is also reserved whenever either of its RS pairs is reserved (stack pointer, scavenger slot, frame pointer, or pairs outside the imaginary window). A strong copy hint that is not in the allocation order, such as a reserved quad, is no longer offered to the allocator.
+
+Calls: where quads are allocatable, a far pointer argument is assigned to RL1-RL3; a far pointer that finds no free quad, and every far pointer on other CPUs, goes to a 4-byte stack slot. It never falls through to the generic pointer rule, whose 16-bit RS pair cannot hold it. The calling-convention type of a far pointer is i32, and incoming 32-bit values are accepted.
+
+Default-mode effect: the data layout string gains p2:32:8 for every MOS CPU. Generated code for the fixed input set is identical in mos6502 and mosw65816 (assembly and objects).
+
+Tests: imag32-allocation-gate.mir checks that the 65816 allocates a quad and that mos6502 reports that no register is available; it replaces #594's imag32-nonalloc.mir, whose non-allocatable class this commit changes. far-ptr-arg-exhaustion.ll checks call lowering for a fourth far pointer and for near/far interleavings in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16, and that mos6502 passes every far pointer on the stack. Nothing produces address space 2 values until the next commits.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/imag32-allocation-gate.mir llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll`.
+
+Rebase preparation of the monolithic far-data patch: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Implementation provenance remains in the source patches and investigations at wbniv/llvm-mos-65816 c3a53aecbc48. Split into this series: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort. Repairs, review follow-ups and the #594 rebase: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

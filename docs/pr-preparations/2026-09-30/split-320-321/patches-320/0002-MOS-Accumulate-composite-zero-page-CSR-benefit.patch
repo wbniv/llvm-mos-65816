@@ -1,0 +1,66 @@
+From f8a569b204c1d76325343436ab6958cbe5e710b6 Mon Sep 17 00:00:00 2001
+From: mlund <mlund@localhost>
+Date: Mon, 10 Aug 2026 16:43:17 +0200
+Subject: [PATCH 2/9] [MOS] Accumulate composite zero-page CSR benefit
+
+Account for every byte before averaging a composite CSR candidate's
+benefit. Previously only the final byte contributed, underweighting
+Imag16 candidates.
+---
+ llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp      |  4 +--
+ .../MOS/zp-alloc-composite-benefit.mir        | 26 +++++++++++++++++++
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+ create mode 100644 llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir
+
+diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+index d5908928d20d..5dcca9e38612 100644
+--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
++++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+@@ -599,10 +599,10 @@ void MOSZeroPageAlloc::collectCandidates(
+ 
+       // Account for the second byte.
+       if (Idx++ < 4) {
+-        Benefit = 9 * SaveFreq;      // LDA ZP,PHA
++        Benefit += 9 * SaveFreq;     // LDA ZP,PHA
+         Benefit += 10 * RestoreFreq; // PLA,STA ZP
+       } else {
+-        Benefit = 12 * SaveFreq;     // LDA ZP,STA ABS
++        Benefit += 12 * SaveFreq;    // LDA ZP,STA ABS
+         Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
+       }
+       ++Size;
+diff --git a/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir b/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir
+new file mode 100644
+index 000000000000..ba492ff86e7e
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir
+@@ -0,0 +1,26 @@
++# REQUIRES: asserts
++# RUN: llc -mtriple=mos -O2 -zp-avail=224 \
++# RUN:   -start-before=mos-zero-page-alloc \
++# RUN:   -debug-only=mos-zero-page-alloc -o /dev/null %s 2>&1 \
++# RUN:   | FileCheck %s
++
++# CHECK: CSR $rs10, Size 2, Benefit 1.900000e+01
++
++--- |
++  target triple = "mos"
++
++  define void @imag16_zp_benefit() #0 {
++  entry:
++    ret void
++  }
++
++  attributes #0 = { "nonreentrant" }
++...
++---
++name: imag16_zp_benefit
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    $rs10 = IMPLICIT_DEF
++    RTS
++...
+-- 
+2.53.0
+

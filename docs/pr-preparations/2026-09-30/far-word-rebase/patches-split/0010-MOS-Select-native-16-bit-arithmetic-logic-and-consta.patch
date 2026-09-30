@@ -1,7 +1,7 @@
 From a520448a2c7f3193f7d523c1e8dba53eae888011 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 10/32] [MOS] Select native 16-bit arithmetic, logic and
+Subject: [PATCH 10/36] [MOS] Select native 16-bit arithmetic, logic and
  constant shifts
 
 Under +mos-a16, s16 G_ADD, G_SUB, G_AND, G_OR and G_XOR stay legal, and s16 shifts by a constant 1-7 are left un-narrowed. The selector emits `lda; [clc|sec]; op; sta` on the Imag16 operands. A second operand that is a constant (recovered from a byte-split G_MERGE_VALUES if needed) uses the immediate form. A single-use absolute load in the same block, with no call, unmodeled side effect, ordered store or possibly aliasing store in between, is read directly by `lda abs` or `op abs`. Adding or subtracting one becomes `inc a`/`dec a`. Shifts emit one `asl a` or `lsr a` per bit; arithmetic right shift emits `cmp #$8000; ror a` per bit, because the 65816 has no arithmetic shift right and the compare copies the sign into carry. Shifts by 8 or more keep the byte path, which relabels bytes at no cost.

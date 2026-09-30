@@ -1,0 +1,149 @@
+{
+ "schema": 1,
+ "id": "mos-legalizer-fold-dangling-dbg-upstream",
+ "title": "Near addressing folds in upstream llvm-mos leave dangling DBG_VALUEs",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md",
+ "summary": "On upstream llvm-mos 06bc967d2668, a -g near access whose address the MOS legalizer folds into an addressing mode fails -verify-machineinstrs with \"Generic virtual register use cannot be undef\": a pointer plus a zero-extended byte index (absolute indexed or indirect indexed) at O0 and O2 on mos6502 and mosw65816, and a near global plus a constant at O0. Mechanism: MOSLegalizerInfo::selectAddressingMode (tryAbsoluteAddressing, tryAbsoluteIndexedAddressing, indirect indexed) replaces the access, the G_PTR_ADD that computed its pointer is left with only a debug use, the legalizer erases it, and the generic salvageDebugInfoForDbgValue (llvm/lib/CodeGen/CodeGenCommonISel.cpp) skips a DBG_VALUE it cannot salvage instead of dropping its location, so the DBG_VALUE names an erased register. It is not fixed here. Classification: the trigger is MOS-specific (the MOS legalizer performs addressing-mode folds that erase address arithmetic; other GlobalISel targets fold addresses during selection), and the missing fallback is in generic GlobalISel code. Proposed upstream fix: in llvm-mos, make salvageDebugInfoForDbgValue set an unsalvageable DBG_VALUE to $noreg (setDebugValueUndef), as the IR salvage does, and salvage a G_PTR_ADD with a constant offset as DW_OP_plus_uconst; that generic change also repairs the far sites. A MOS-local alternative is a helper after each fold, like the far-series dropDeadFarAddressDebugUses.",
+ "attribution": [
+  "Found by the second independent review (finding B8, near shapes on the upstream base): Claude Code 2.1.285, t4-opus-high agent a86560004d12c0518, model claude-opus-5-5 (Claude Opus 5.5), high reasoning effort (read from that subagent's transcript metadata); session 310aee67-a99e-4b78-ba48-c560322fe80d.",
+  "Evidence capture, prior-work audit and this record: Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); dispatched from session 310aee67-a99e-4b78-ba48-c560322fe80d (https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F)."
+ ],
+ "unknowns": [
+  "Whether another GlobalISel target reaches the generic gap was not tested; the MOS legalizer is the only known path that erases address arithmetic with debug users before selection.",
+  "Not reported upstream; posting is user-triggered."
+ ],
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "cannot be undef",
+   "tryAbsoluteIndexedAddressing",
+   "salvageDebugInfoForDbgValue",
+   "computeSalvageReplacements",
+   "DBG_VALUE"
+  ],
+  "related_records": [
+   "docs/defects/mos-far-index-fold-dangling-dbg.json",
+   "docs/defects/mos-far-fold-dangling-dbg-sites.json"
+  ],
+  "related_reports": [
+   "docs/pr-preparations/2026-09-30/far-word-rebase/independent-review-2.md"
+  ],
+  "related_changes": [
+   "llvm-mos#570 (G_MERGE_VALUES debug-info salvage, merged 2026-09-29)"
+  ],
+  "source_assessment": "Upstream 06bc967d2668 salvageDebugInfoForDbgValue continues past a DBG_VALUE when computeSalvageReplacements returns nothing, which covers every G_PTR_ADD; the MOS near fold helpers do not drop the debug users of addresses they make dead.",
+  "binary_assessment": "The upstream-base llc p-321-00 (assertions) exits 134 with the signature for nidx.ll (mos6502 O0/O2, mosw65816 O2), ngidx.ll and nearfield.ll (O2) and ngfield.ll (O0).",
+  "decision": "The far records cover address-space-2 fold sites in the far series and are repaired there by a far-only helper; these near sites exist in upstream llvm-mos without any far code, so they are a separate canonical record for an upstream report. No upstream issue or PR reports them (search of 2026-10-01).",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/prior-work.json",
+   "sha256": "0d105c5ae924a0a7edbaf9ab94a6d7b4d6cb014c234375f92237594975a01b5a"
+  }
+ },
+ "baseline": {
+  "command": "build/split-320-321/llc/p-321-00 -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx.ll -o /dev/null",
+  "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 and build/far-review-defects mounted at /work/build/...)",
+  "configuration": {
+   "cpu": "mos6502",
+   "features": [],
+   "optimization": "O2 with -g metadata",
+   "lto": false,
+   "verifier": true,
+   "expected": "verifier-clean, dead address locations dropped or salvaged"
+  },
+  "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/p-321-00 (upstream llvm-mos 06bc967d2668, assertions build); identity in docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/identity.json",
+  "toolchain_sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx.ll",
+   "sha256": "b1e3c87a2dbd69682b354ecca783b67536306799d7217542c8cbfc09457007c5"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/baseline.log",
+   "sha256": "3693f7a9edaaf5df99f106c4391cb33840602bc327152c383230e40873587191"
+  },
+  "exit_code": 134,
+  "failure_signature": "Generic virtual register use cannot be undef"
+ },
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/baseline.log",
+   "sha256": "3693f7a9edaaf5df99f106c4391cb33840602bc327152c383230e40873587191"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/identity.json",
+   "sha256": "7be4cb05c3af44b400b5ab2459152854afcaf7861762849b3c0d7487339bcd6d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nearfield-O2.log",
+   "sha256": "517e41717b0a22d5a1d71e296db3f84368c5f0f37f6355aca88c6255f643e44f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nearfield.ll",
+   "sha256": "577a9981ef87d1a3c62eccd9d685c7f047ded33f943bdfa37102ea05fd788e92"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngfield-O0.log",
+   "sha256": "acbd0a21d96453e214f3b3a85cebcebbedcfbd141bc0724164494d55ac520980"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngfield.ll",
+   "sha256": "5ff4e827af4ff982bb756a8873bc50c3bbef36aa8cea5691f4d5b3808be32ccf"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngidx-O2.log",
+   "sha256": "a95f4e75083520252a8f87bad575fc0b63adb1b5c69d67293039433d630c68da"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/ngidx.ll",
+   "sha256": "98e58a977594009a3392e9386dcf526498b76670d6a3f6ef9c901d9e439407ac"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx-O0.log",
+   "sha256": "85b5ac152f42e261e757c798a238914e5d0f65afc56232e01712464861a8b136"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx-w65816.log",
+   "sha256": "c690193e04c70a883321e11dbd18b671b9037b91c25d1d24a93604663aac9829"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx.ll",
+   "sha256": "b1e3c87a2dbd69682b354ecca783b67536306799d7217542c8cbfc09457007c5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/prior-work.json",
+   "sha256": "0d105c5ae924a0a7edbaf9ab94a6d7b4d6cb014c234375f92237594975a01b5a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/r2-320-4-nidx.log",
+   "sha256": "23f78502046b842a7bd0d7ac9eb10437a729a473c4f9c2ecca8b96326088bedb"
+  }
+ ],
+ "additional_runs": [
+  {
+   "label": "Second-round split #320-4: the near shape still fails, as intended (not fixed in the series)",
+   "command": "build/split-320-321/llc/r2-320-4 -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mos6502",
+    "features": [],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, dead address locations dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-4 (second-round split #320-4, which repairs only far fold sites)",
+   "toolchain_sha256": "70d96dbc4e78218c77cf687ce5383a1bcad72561bbf77986b97b1881d15af1b5",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/nidx.ll",
+    "sha256": "b1e3c87a2dbd69682b354ecca783b67536306799d7217542c8cbfc09457007c5"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-legalizer-fold-dangling-dbg-upstream/r2-320-4-nidx.log",
+    "sha256": "23f78502046b842a7bd0d7ac9eb10437a729a473c4f9c2ecca8b96326088bedb"
+   },
+   "exit_code": 134,
+   "observed": "fails"
+  }
+ ]
+}

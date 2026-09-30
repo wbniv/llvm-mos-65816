@@ -1,0 +1,42 @@
+From ad7b2f4239a23d5fa4d399fad41ebd3866920fb4 Mon Sep 17 00:00:00 2001
+From: mlund <mlund@localhost>
+Date: Mon, 10 Aug 2026 16:42:13 +0200
+Subject: [PATCH 1/9] [MOS] Avoid newlines in inline asm operands
+
+PrintAsmOperand must emit only operand text. An embedded newline corrupts
+templates that add syntax after a zero-page CSR operand.
+---
+ llvm/lib/Target/MOS/MOSAsmPrinter.cpp      | 2 +-
+ llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll | 2 --
+ 2 files changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+index 27d01f28cc4d..79dcbf042fcf 100644
+--- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
++++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+@@ -202,7 +202,7 @@ bool MOSAsmPrinter::PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
+       size_t Offset = It->second;
+       if (Offset)
+         OS << '+' << Offset;
+-      OS << ")\n";
++      OS << ')';
+       break;
+     }
+ 
+diff --git a/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll b/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
+index 3a4374841844..27460500165d 100644
+--- a/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
++++ b/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
+@@ -16,9 +16,7 @@ define void @inline_asm_zp_csr(i8 %c) "nonreentrant" {
+ ; CHECK-NEXT:    sta mos8(.Linline_asm_zp_csr_zp_stk+1)
+ ; CHECK-NEXT:    ;APP
+ ; CHECK-NEXT:    lda mos8(.Linline_asm_zp_csr_zp_stk)
+-; CHECK-EMPTY:
+ ; CHECK-NEXT:    lda mos8(.Linline_asm_zp_csr_zp_stk+1)
+-; CHECK-EMPTY:
+ ; CHECK-NEXT:    ;NO_APP
+ ; CHECK-NEXT:    rts
+ entry:
+-- 
+2.53.0
+

@@ -1,0 +1,305 @@
+probe	llc	mode	level	rc	signature
+arglist	c-320-04	mosw65816	O0	0	
+arglist	c-320-04	mosw65816	O2	0	
+arglist	c-320-04	mosw65816:+mos-a16	O0	0	
+arglist	c-320-04	mosw65816:+mos-a16	O2	0	
+arglist	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	0	
+arglist	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	0	
+argoff	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+argoff	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+argoff	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	0	
+argoff	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	0	
+chain	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %50:_(s32) = G_MERGE_VALUES %59:_(s8), %61:_(s
+chain	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %56:_(s32) = G_MERGE_VALUES %65:_(s8), %67:_(s
+chain	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+chain	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+chain	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	0	
+chain	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816	O0	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816	O2	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+field	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+gfield	c-320-04	mosw65816	O0	134	Generic virtual register use cannot be undef
+gfield	c-320-04	mosw65816	O2	0	
+gfield	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+gfield	c-320-04	mosw65816:+mos-a16	O2	0	
+gfield	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+gfield	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gidx	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %15:_(s8), %17:_(s8
+gidx	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %15:_(s8), %17:_(s8
+gidx	c-320-04	mosw65816:+mos-a16	O0	0	
+gidx	c-320-04	mosw65816:+mos-a16	O2	0	
+gidx	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	0	
+gidx	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	0	
+nearfield	c-320-04	mos6502	O0	134	Generic virtual register use cannot be undef
+nearfield	c-320-04	mos6502	O2	134	Generic virtual register use cannot be undef
+nearfield	c-320-04	mosw65816	O0	0	
+nearfield	c-320-04	mosw65816	O2	0	
+ngfield	c-320-04	mos6502	O0	134	Generic virtual register use cannot be undef
+ngfield	c-320-04	mos6502	O2	0	
+ngfield	c-320-04	mosw65816	O0	134	Generic virtual register use cannot be undef
+ngfield	c-320-04	mosw65816	O2	0	
+ngidx	c-320-04	mos6502	O0	134	Generic virtual register use cannot be undef
+ngidx	c-320-04	mos6502	O2	134	Generic virtual register use cannot be undef
+ngidx	c-320-04	mosw65816	O0	0	
+ngidx	c-320-04	mosw65816	O2	0	
+nidx	c-320-04	mos6502	O0	134	Generic virtual register use cannot be undef
+nidx	c-320-04	mos6502	O2	134	Generic virtual register use cannot be undef
+nidx	c-320-04	mosw65816	O0	0	
+nidx	c-320-04	mosw65816	O2	0	
+qonly	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %39:_(s32) = G_MERGE_VALUES %48:_(s8), %50:_(s
+qonly	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %44:_(s32) = G_MERGE_VALUES %53:_(s8), %55:_(s
+qonly	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+qonly	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+qonly	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	0	
+qonly	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	0	
+spill	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	c-320-04	mosw65816:+mos-a16	O0	134	Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+spill	c-320-04	mosw65816:+mos-a16	O2	134	Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+spill	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	134	Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+spill	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	134	Assertion `Loc == MOS::C || Loc == MOS::V || MOS::Anyi8RegClass.contains(Loc)' failed.
+store1	c-320-04	mosw65816	O0	134	Generic virtual register use cannot be undef
+store1	c-320-04	mosw65816	O2	134	Generic virtual register use cannot be undef
+store1	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+store1	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+store1	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+store1	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+word	c-320-04	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %54:_(s32) = G_MERGE_VALUES %63:_(s8), %65:_(s
+word	c-320-04	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %59:_(s32) = G_MERGE_VALUES %68:_(s8), %70:_(s
+word	c-320-04	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+word	c-320-04	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+word	c-320-04	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+word	c-320-04	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+arglist	c-fw-14	mosw65816	O0	0	
+arglist	c-fw-14	mosw65816	O2	0	
+arglist	c-fw-14	mosw65816:+mos-a16	O0	0	
+arglist	c-fw-14	mosw65816:+mos-a16	O2	0	
+arglist	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+arglist	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+argoff	c-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	c-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+argoff	c-fw-14	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+argoff	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+argoff	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+chain	c-fw-14	mosw65816	O0	0	
+chain	c-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %56:_(s32) = G_MERGE_VALUES %65:_(s8), %67:_(s
+chain	c-fw-14	mosw65816:+mos-a16	O0	0	
+chain	c-fw-14	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+chain	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+chain	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816	O2	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+field	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+gfield	c-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+gfield	c-fw-14	mosw65816	O2	0	
+gfield	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+gfield	c-fw-14	mosw65816:+mos-a16	O2	0	
+gfield	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+gfield	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gidx	c-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+gidx	c-fw-14	mosw65816	O2	134	Generic virtual register use cannot be undef
+gidx	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+gidx	c-fw-14	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+gidx	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+gidx	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+nearfield	c-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+nearfield	c-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+nearfield	c-fw-14	mosw65816	O0	0	
+nearfield	c-fw-14	mosw65816	O2	0	
+ngfield	c-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+ngfield	c-fw-14	mos6502	O2	0	
+ngfield	c-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+ngfield	c-fw-14	mosw65816	O2	0	
+ngidx	c-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+ngidx	c-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+ngidx	c-fw-14	mosw65816	O0	0	
+ngidx	c-fw-14	mosw65816	O2	0	
+nidx	c-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+nidx	c-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+nidx	c-fw-14	mosw65816	O0	0	
+nidx	c-fw-14	mosw65816	O2	0	
+qonly	c-fw-14	mosw65816	O0	0	
+qonly	c-fw-14	mosw65816	O2	0	
+qonly	c-fw-14	mosw65816:+mos-a16	O0	0	
+qonly	c-fw-14	mosw65816:+mos-a16	O2	0	
+qonly	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+qonly	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+spill	c-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	c-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	c-fw-14	mosw65816:+mos-a16	O0	0	
+spill	c-fw-14	mosw65816:+mos-a16	O2	0	
+spill	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+spill	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+store1	c-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+store1	c-fw-14	mosw65816	O2	134	Generic virtual register use cannot be undef
+store1	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+store1	c-fw-14	mosw65816:+mos-a16	O2	134	Generic virtual register use cannot be undef
+store1	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+store1	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	134	Generic virtual register use cannot be undef
+word	c-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %54:_(s32) = G_MERGE_VALUES %63:_(s8), %65:_(s
+word	c-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %59:_(s32) = G_MERGE_VALUES %68:_(s8), %70:_(s
+word	c-fw-14	mosw65816:+mos-a16	O0	134	Generic virtual register use cannot be undef
+word	c-fw-14	mosw65816:+mos-a16	O2	0	
+word	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	134	Generic virtual register use cannot be undef
+word	c-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+arglist	r2-320-4	mosw65816	O0	0	
+arglist	r2-320-4	mosw65816	O2	0	
+arglist	r2-320-4	mosw65816:+mos-a16	O0	0	
+arglist	r2-320-4	mosw65816:+mos-a16	O2	0	
+arglist	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+arglist	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+argoff	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	r2-320-4	mosw65816:+mos-a16	O0	0	
+argoff	r2-320-4	mosw65816:+mos-a16	O2	0	
+argoff	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+argoff	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+chain	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %50:_(s32) = G_MERGE_VALUES %59:_(s8), %61:_(s
+chain	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %56:_(s32) = G_MERGE_VALUES %65:_(s8), %67:_(s
+chain	r2-320-4	mosw65816:+mos-a16	O0	0	
+chain	r2-320-4	mosw65816:+mos-a16	O2	0	
+chain	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+chain	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+field	r2-320-4	mosw65816	O0	0	
+field	r2-320-4	mosw65816	O2	0	
+field	r2-320-4	mosw65816:+mos-a16	O0	0	
+field	r2-320-4	mosw65816:+mos-a16	O2	0	
+field	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+field	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gfield	r2-320-4	mosw65816	O0	0	
+gfield	r2-320-4	mosw65816	O2	0	
+gfield	r2-320-4	mosw65816:+mos-a16	O0	0	
+gfield	r2-320-4	mosw65816:+mos-a16	O2	0	
+gfield	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+gfield	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gidx	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %15:_(s8), %17:_(s8
+gidx	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %6:_(s32) = G_MERGE_VALUES %15:_(s8), %17:_(s8
+gidx	r2-320-4	mosw65816:+mos-a16	O0	0	
+gidx	r2-320-4	mosw65816:+mos-a16	O2	0	
+gidx	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+gidx	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+nearfield	r2-320-4	mos6502	O0	134	Generic virtual register use cannot be undef
+nearfield	r2-320-4	mos6502	O2	134	Generic virtual register use cannot be undef
+nearfield	r2-320-4	mosw65816	O0	0	
+nearfield	r2-320-4	mosw65816	O2	0	
+ngfield	r2-320-4	mos6502	O0	134	Generic virtual register use cannot be undef
+ngfield	r2-320-4	mos6502	O2	0	
+ngfield	r2-320-4	mosw65816	O0	134	Generic virtual register use cannot be undef
+ngfield	r2-320-4	mosw65816	O2	0	
+ngidx	r2-320-4	mos6502	O0	134	Generic virtual register use cannot be undef
+ngidx	r2-320-4	mos6502	O2	134	Generic virtual register use cannot be undef
+ngidx	r2-320-4	mosw65816	O0	0	
+ngidx	r2-320-4	mosw65816	O2	0	
+nidx	r2-320-4	mos6502	O0	134	Generic virtual register use cannot be undef
+nidx	r2-320-4	mos6502	O2	134	Generic virtual register use cannot be undef
+nidx	r2-320-4	mosw65816	O0	0	
+nidx	r2-320-4	mosw65816	O2	0	
+qonly	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %39:_(s32) = G_MERGE_VALUES %48:_(s8), %50:_(s
+qonly	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %44:_(s32) = G_MERGE_VALUES %53:_(s8), %55:_(s
+qonly	r2-320-4	mosw65816:+mos-a16	O0	0	
+qonly	r2-320-4	mosw65816:+mos-a16	O2	0	
+qonly	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+qonly	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+spill	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	r2-320-4	mosw65816:+mos-a16	O0	0	
+spill	r2-320-4	mosw65816:+mos-a16	O2	0	
+spill	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+spill	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+store1	r2-320-4	mosw65816	O0	0	
+store1	r2-320-4	mosw65816	O2	0	
+store1	r2-320-4	mosw65816:+mos-a16	O0	0	
+store1	r2-320-4	mosw65816:+mos-a16	O2	0	
+store1	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+store1	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+word	r2-320-4	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %54:_(s32) = G_MERGE_VALUES %63:_(s8), %65:_(s
+word	r2-320-4	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %59:_(s32) = G_MERGE_VALUES %68:_(s8), %70:_(s
+word	r2-320-4	mosw65816:+mos-a16	O0	0	
+word	r2-320-4	mosw65816:+mos-a16	O2	0	
+word	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O0	0	
+word	r2-320-4	mosw65816:+mos-a16,+mos-xy16	O2	0	
+arglist	r2-fw-14	mosw65816	O0	0	
+arglist	r2-fw-14	mosw65816	O2	0	
+arglist	r2-fw-14	mosw65816:+mos-a16	O0	0	
+arglist	r2-fw-14	mosw65816:+mos-a16	O2	0	
+arglist	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+arglist	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+argoff	r2-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	r2-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %9:_(s32) = G_MERGE_VALUES %18:_(s8), %20:_(s8
+argoff	r2-fw-14	mosw65816:+mos-a16	O0	0	
+argoff	r2-fw-14	mosw65816:+mos-a16	O2	0	
+argoff	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+argoff	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+chain	r2-fw-14	mosw65816	O0	0	
+chain	r2-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %56:_(s32) = G_MERGE_VALUES %65:_(s8), %67:_(s
+chain	r2-fw-14	mosw65816:+mos-a16	O0	0	
+chain	r2-fw-14	mosw65816:+mos-a16	O2	0	
+chain	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+chain	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+field	r2-fw-14	mosw65816	O0	0	
+field	r2-fw-14	mosw65816	O2	0	
+field	r2-fw-14	mosw65816:+mos-a16	O0	0	
+field	r2-fw-14	mosw65816:+mos-a16	O2	0	
+field	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+field	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gfield	r2-fw-14	mosw65816	O0	0	
+gfield	r2-fw-14	mosw65816	O2	0	
+gfield	r2-fw-14	mosw65816:+mos-a16	O0	0	
+gfield	r2-fw-14	mosw65816:+mos-a16	O2	0	
+gfield	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+gfield	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+gidx	r2-fw-14	mosw65816	O0	0	
+gidx	r2-fw-14	mosw65816	O2	0	
+gidx	r2-fw-14	mosw65816:+mos-a16	O0	0	
+gidx	r2-fw-14	mosw65816:+mos-a16	O2	0	
+gidx	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+gidx	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+nearfield	r2-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+nearfield	r2-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+nearfield	r2-fw-14	mosw65816	O0	0	
+nearfield	r2-fw-14	mosw65816	O2	0	
+ngfield	r2-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+ngfield	r2-fw-14	mos6502	O2	0	
+ngfield	r2-fw-14	mosw65816	O0	134	Generic virtual register use cannot be undef
+ngfield	r2-fw-14	mosw65816	O2	0	
+ngidx	r2-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+ngidx	r2-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+ngidx	r2-fw-14	mosw65816	O0	0	
+ngidx	r2-fw-14	mosw65816	O2	0	
+nidx	r2-fw-14	mos6502	O0	134	Generic virtual register use cannot be undef
+nidx	r2-fw-14	mos6502	O2	134	Generic virtual register use cannot be undef
+nidx	r2-fw-14	mosw65816	O0	0	
+nidx	r2-fw-14	mosw65816	O2	0	
+qonly	r2-fw-14	mosw65816	O0	0	
+qonly	r2-fw-14	mosw65816	O2	0	
+qonly	r2-fw-14	mosw65816:+mos-a16	O0	0	
+qonly	r2-fw-14	mosw65816:+mos-a16	O2	0	
+qonly	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+qonly	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+spill	r2-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	r2-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %16:_(s32) = G_MERGE_VALUES %17:_(s8), %20:_(s
+spill	r2-fw-14	mosw65816:+mos-a16	O0	0	
+spill	r2-fw-14	mosw65816:+mos-a16	O2	0	
+spill	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+spill	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+store1	r2-fw-14	mosw65816	O0	0	
+store1	r2-fw-14	mosw65816	O2	0	
+store1	r2-fw-14	mosw65816:+mos-a16	O0	0	
+store1	r2-fw-14	mosw65816:+mos-a16	O2	0	
+store1	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+store1	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	
+word	r2-fw-14	mosw65816	O0	1	LLVM ERROR: unable to legalize instruction: %54:_(s32) = G_MERGE_VALUES %63:_(s8), %65:_(s
+word	r2-fw-14	mosw65816	O2	1	LLVM ERROR: unable to legalize instruction: %59:_(s32) = G_MERGE_VALUES %68:_(s8), %70:_(s
+word	r2-fw-14	mosw65816:+mos-a16	O0	0	
+word	r2-fw-14	mosw65816:+mos-a16	O2	0	
+word	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O0	0	
+word	r2-fw-14	mosw65816:+mos-a16,+mos-xy16	O2	0	

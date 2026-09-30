@@ -113,6 +113,18 @@
   {
    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-carried-fw-14.log",
    "sha256": "febd8c8adbbd514321cda64d05758c7b62f88fd0ce8e7b601479d25a53880c5d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+   "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-r2-320-4.log",
+   "sha256": "b469f77c7f192c0f6833967357f8c43f0c405a8c0b687cdd1134cfd22a819dc8"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-r2-fw-14.log",
+   "sha256": "114068ddccc5e0f57b493a73f2e318736e7ebf35ce18f384e2e1b08a7e7cc71f"
   }
  ],
  "resolution": {
@@ -285,6 +297,60 @@
    "log": {
     "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-carried-fw-14.log",
     "sha256": "febd8c8adbbd514321cda64d05758c7b62f88fd0ce8e7b601479d25a53880c5d"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round split #320-4: byte fold with the shared helper",
+   "command": "build/split-320-321/llc/r2-320-4 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-320-4 (second-round split #320-4, where dropDeadFarAddressDebugUses replaces the dedicated walk)",
+   "toolchain_sha256": "70d96dbc4e78218c77cf687ce5383a1bcad72561bbf77986b97b1881d15af1b5",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbgbyte.ll",
+    "sha256": "335d0ce1aac9c054d781270bbcff4d3bb31f3d59bd1b0883958a32b2e306506e"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-r2-320-4.log",
+    "sha256": "b469f77c7f192c0f6833967357f8c43f0c405a8c0b687cdd1134cfd22a819dc8"
+   },
+   "exit_code": 0,
+   "observed": "passes"
+  },
+  {
+   "label": "Second-round far-word candidate: word fold",
+   "command": "build/split-320-321/llc/r2-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll -o /dev/null",
+   "working_directory": "/home/will/llvm-mos-65816-splitcarry (repository root, in the dev container as /work, with /home/will/llvm-mos-65816/build/split-320-321 mounted at /work/build/split-320-321)",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2 with -g metadata",
+    "lto": false,
+    "verifier": true,
+    "expected": "verifier-clean, location dropped or salvaged"
+   },
+   "toolchain_location": "/home/will/llvm-mos-65816/build/split-320-321/llc/r2-fw-14 (second-round far-word candidate)",
+   "toolchain_sha256": "c90f96487d2fe6d3fa49a8cfc01f9485affdbd4857e4594ee8b87f7bfefcbbcb",
+   "input": {
+    "path": "docs/defects/evidence/2026-09-30-far-index-fold-dangling-dbg/dbg.ll",
+    "sha256": "4cb6dd64863871aad13b2b6480eae7cb2b5b34353917e6e76038247b6874d445"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-split-carry/b4-word-r2-fw-14.log",
+    "sha256": "114068ddccc5e0f57b493a73f2e318736e7ebf35ce18f384e2e1b08a7e7cc71f"
    },
    "exit_code": 0,
    "observed": "passes"

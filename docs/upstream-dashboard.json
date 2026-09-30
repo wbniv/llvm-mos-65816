@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "3659201c3f5f71c100423e904b22f675f6f0b315f87fc7d72160cdab03771eac",
+  "sourceHash": "319044cdf3e8ebdfdc6cae20276958f2b1daf38af8c3cf667db189a95ce79965",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -145,6 +145,22 @@
       "demoUrls": []
     },
     {
+      "id": "defect:mos-far-fold-dangling-dbg-sites",
+      "kind": "defect",
+      "title": "Far addressing folds other than the runtime-index fold leave dangling DBG_VALUEs",
+      "summary": "Three far addressing-mode folds erase or rewrite an access and leave the G_PTR_ADDs that computed its pointer with only debug uses: the absolute-long fold (tryFarAbsoluteAddressing, #320-2), the [dp],Y displacement window in tryFarIndirectIndexedAddressing (#320-4), and the absolute-long indexed fold (tryFarAbsoluteIndexedAddressing, far-word patch 5 / downstream 0061). The legalizer erases the dead adds; salvageDebugInfoForDbgValue cannot express a G_PTR_ADD and leaves the DBG_VALUE on the erased register, which DetectDeadLanes marks undef, so -g with -verify-machineinstrs fails (\"Generic virtual register use cannot be undef\"). The simplest -g far field access (base + 1) fails at O0 and O2 on the reviewed split and on the downstream release toolchain. Emitted code is unaffected. This is the mechanism of mos-far-index-fold-dangling-dbg (B4) at the fold sites its repair did not cover.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-far-fold-dangling-dbg-sites.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
       "id": "defect:mos-far-index-fold-dangling-dbg",
       "kind": "defect",
       "title": "Far runtime-index fold leaves an undef DBG_VALUE that fails machine verification",
@@ -250,6 +266,38 @@
       "evidenceNote": "",
       "dependsOn": [],
       "upstreamUrl": null,
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-imag32-reserved-pair-units",
+      "kind": "defect",
+      "title": "Unreserved Imag32 quads over reserved pairs make calls with stack arguments abort",
+      "summary": "llvm-mos#594 (mlund, draft, head 7b80f7e18768) adds RL quads as super-registers of the RS pairs but does not reserve a quad whose pair is reserved. LLVM counts a register unit as reserved only when its root and all of its super-registers are reserved, so the stack pointer RS0 (covered by RL0) stops being reserved at the unit level. Any function that makes a call with stack arguments, such as a variadic call, then aborts in the register coalescer with \"LLVM ERROR: Invalid global physical register\" (a use of $rs0 without a def during live-range computation), in every MOS CPU mode including default mos6502 code. Reproduced with #594 applied to upstream 06bc967d2668 alone and in the #320 split. Fixed in the split by the commit after #594, which reserves a quad whenever either of its RS pairs is reserved.",
+      "localStatus": "fixed",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-imag32-reserved-pair-units.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
+      "demoUrls": []
+    },
+    {
+      "id": "defect:mos-legalizer-fold-dangling-dbg-upstream",
+      "kind": "defect",
+      "title": "Near addressing folds in upstream llvm-mos leave dangling DBG_VALUEs",
+      "summary": "On upstream llvm-mos 06bc967d2668, a -g near access whose address the MOS legalizer folds into an addressing mode fails -verify-machineinstrs with \"Generic virtual register use cannot be undef\": a pointer plus a zero-extended byte index (absolute indexed or indirect indexed) at O0 and O2 on mos6502 and mosw65816, and a near global plus a constant at O0. Mechanism: MOSLegalizerInfo::selectAddressingMode (tryAbsoluteAddressing, tryAbsoluteIndexedAddressing, indirect indexed) replaces the access, the G_PTR_ADD that computed its pointer is left with only a debug use, the legalizer erases it, and the generic salvageDebugInfoForDbgValue (llvm/lib/CodeGen/CodeGenCommonISel.cpp) skips a DBG_VALUE it cannot salvage instead of dropping its location, so the DBG_VALUE names an erased register. It is not fixed here. Classification: the trigger is MOS-specific (the MOS legalizer performs addressing-mode folds that erase address arithmetic; other GlobalISel targets fold addresses during selection), and the missing fallback is in generic GlobalISel code. Proposed upstream fix: in llvm-mos, make salvageDebugInfoForDbgValue set an unsalvageable DBG_VALUE to $noreg (setDebugValueUndef), as the IR salvage does, and salvage a G_PTR_ADD with a constant offset as DW_OP_plus_uconst; that generic change also repairs the far sites. A MOS-local alternative is a helper after each fold, like the far-series dropDeadFarAddressDebugUses.",
+      "localStatus": "qualified",
+      "publicationStatus": "unknown",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json"
+      ],
+      "evidenceNote": "",
+      "dependsOn": [],
+      "upstreamUrl": null,
+      "nextStep": "",
       "demoUrls": []
     },
     {

@@ -1,7 +1,7 @@
 From 2d64d3c841ff42ebf814f78f86da767aaec279b1 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 03/32] [MOS] Define 16-bit index instruction forms and X-width
+Subject: [PATCH 03/36] [MOS] Define 16-bit index instruction forms and X-width
  requirements
 
 Define the index-width pseudos, gated on HasIndex16: A loads and stores through abs,X and (zp),Y with a 16-bit index (8- and 16-bit data), LDX/LDY/STX/STY/CPX/CPY with absolute, Imag16 and immediate operands, INX/DEX/INY/DEY, the TXA/TAX/TYA/TAY transfers used to stage an index register through A16, and PHA16/PLA16 for preserving A16 around such staging. MOSLogicalInstr gains the XLow and XHigh TSFlags at the MC bit positions.

@@ -1,0 +1,36 @@
+$ build/split-320-321/llc/r2-320-1a3 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll -o /dev/null
+# llc sha256 9f8b456100f1b90336b1bf4d19fec2740d5d200c1b658c8e30ddbabcc33de5ce
+The register $rs0 needs to be live in to %bb.18, but is missing from the live-in list.
+LLVM ERROR: Invalid global physical register
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/r2-320-1a3 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/vaprintf.c.default.ll'.
+2.	Running pass 'Register Coalescer' on function '@main'
+ #0 0x0000578729d1613b llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/r2-320-1a3+0x454b13b)
+ #1 0x0000578729d12fc1 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/r2-320-1a3+0x4547fc1)
+ #2 0x0000578729d16f4b SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007370f8232cb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007370f82931ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007370f8232b7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007370f82158ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x0000578729c714a5 llvm::report_fatal_error(llvm::Twine const&, bool) (build/split-320-321/llc/r2-320-1a3+0x44a64a5)
+ #8 0x0000578729c712e6 (build/split-320-321/llc/r2-320-1a3+0x44a62e6)
+ #9 0x00005787289034a2 llvm::LiveRangeCalc::findReachingDefs(llvm::LiveRange&, llvm::MachineBasicBlock&, llvm::SlotIndex, llvm::Register, llvm::ArrayRef<llvm::SlotIndex>) (build/split-320-321/llc/r2-320-1a3+0x31384a2)
+#10 0x0000578728902722 llvm::LiveRangeCalc::extend(llvm::LiveRange&, llvm::SlotIndex, llvm::Register, llvm::ArrayRef<llvm::SlotIndex>) (build/split-320-321/llc/r2-320-1a3+0x3137722)
+#11 0x00005787289060fd llvm::LiveIntervalCalc::extendToUses(llvm::LiveRange&, llvm::Register, llvm::LaneBitmask, llvm::LiveInterval*) (build/split-320-321/llc/r2-320-1a3+0x313b0fd)
+#12 0x00005787288edc43 llvm::LiveIntervals::computeRegUnitRange(llvm::LiveRange&, llvm::MCRegUnit) (build/split-320-321/llc/r2-320-1a3+0x3122c43)
+#13 0x0000578728c245a7 (anonymous namespace)::RegisterCoalescer::joinCopy(llvm::MachineInstr*, llvm::SmallPtrSetImpl<llvm::MachineInstr*>&) RegisterCoalescer.cpp:0:0
+#14 0x0000578728c2205e (anonymous namespace)::RegisterCoalescer::copyCoalesceWorkList(llvm::MutableArrayRef<llvm::MachineInstr*>) RegisterCoalescer.cpp:0:0
+#15 0x0000578728c1e321 (anonymous namespace)::RegisterCoalescer::run(llvm::MachineFunction&) RegisterCoalescer.cpp:0:0
+#16 0x0000578728c1f9bd (anonymous namespace)::RegisterCoalescerLegacy::runOnMachineFunction(llvm::MachineFunction&) RegisterCoalescer.cpp:0:0
+#17 0x00005787289b0c29 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/r2-320-1a3+0x31e5c29)
+#18 0x0000578728f42f60 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/r2-320-1a3+0x3777f60)
+#19 0x0000578728f4b062 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/r2-320-1a3+0x3780062)
+#20 0x0000578728f43d24 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/r2-320-1a3+0x3778d24)
+#21 0x00005787278fde4b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#22 0x00005787278fb113 main (build/split-320-321/llc/r2-320-1a3+0x2130113)
+#23 0x00007370f8217601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#24 0x00007370f8217718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#25 0x00005787278fa325 _start (build/split-320-321/llc/r2-320-1a3+0x212f325)
+exit_code=134

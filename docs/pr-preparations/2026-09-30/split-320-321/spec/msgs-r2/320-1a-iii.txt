@@ -1,0 +1,9 @@
+[MOS] Add nonallocatable 32-bit imaginary registers
+
+Model each RL as two RS subregisters and support physical copies and
+symbol lowering. Group RL aliases during zero-page CSR allocation.
+
+Keep Imag32 nonallocatable because linker scripts may place adjacent RS
+registers apart.
+
+[Rebased onto llvm-mos 06bc967d2668 for the #320 series: from llvm-mos/llvm-mos#594 head 7b80f7e18768. MOSImagReg32 takes a bits<32> number, matching the 32-bit MOSReg numbering introduced by #571; every other changed line is as posted.]

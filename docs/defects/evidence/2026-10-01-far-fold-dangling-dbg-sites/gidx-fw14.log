@@ -1,0 +1,47 @@
+$ build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll -o /dev/null
+# llc sha256 cce5eb24ccd6141172138b662e83cc4beefd7d1aa1f6c6ff71f409ae229bb5c7
+
+# After Detect Dead Lanes
+# Machine code for function walk: IsSSA, TracksLiveness, Legalized, RegBankSelected, Selected
+
+bb.1 (%ir-block.0):
+  liveins: $a
+  %0:xc = COPY $a
+  DBG_VALUE undef %3:any, $noreg, !"q", !DIExpression(), debug-location !10; dbg.c:2 line no:3
+  %4:ac = LDAbsLongIdx @g, %0:xc, debug-location !10 :: (load (s8) from %ir.q, addrspace 2); dbg.c:2
+  $a = COPY %4:ac, debug-location !10; dbg.c:2
+  RTS implicit $a, debug-location !10; dbg.c:2
+
+# End machine code for function walk.
+
+*** Bad machine code: Generic virtual register use cannot be undef ***
+- function:    walk
+- basic block: %bb.1  (0x6011aa646310)
+- instruction: DBG_VALUE undef %3:any, $noreg, !"q", !DIExpression(), debug-location !10; dbg.c:2 line no:3
+- operand 0:   undef %3:any
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/c-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll'.
+2.	Running pass 'Verify generated machine code' on function '@walk'
+ #0 0x00006011a56101db llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/c-fw-14+0x45541db)
+ #1 0x00006011a560d061 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/c-fw-14+0x4551061)
+ #2 0x00006011a5610feb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x0000786b371abcb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x0000786b3720c1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x0000786b371abb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x0000786b3718e8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00006011a556b545 llvm::report_fatal_error(llvm::Twine const&, bool) (build/split-320-321/llc/c-fw-14+0x44af545)
+ #8 0x00006011a43c64f2 (anonymous namespace)::MachineVerifier::~MachineVerifier() MachineVerifier.cpp:0:0
+ #9 0x00006011a43c7b0a (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x00006011a42aafd9 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/c-fw-14+0x31eefd9)
+#11 0x00006011a483d000 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/c-fw-14+0x3781000)
+#12 0x00006011a4845102 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/c-fw-14+0x3789102)
+#13 0x00006011a483ddc4 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/c-fw-14+0x3781dc4)
+#14 0x00006011a31f04cb compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x00006011a31ed793 main (build/split-320-321/llc/c-fw-14+0x2131793)
+#16 0x0000786b37190601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x0000786b37190718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x00006011a31ec9a5 _start (build/split-320-321/llc/c-fw-14+0x21309a5)
+exit_code=134

@@ -1,0 +1,185 @@
+From cbbe9c70f520c9437520387688bd882cd5afca65 Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Mon, 28 Sep 2026 19:12:12 +0700
+Subject: [PATCH 24/36] [MOS] Spill and reload Imag32 quads as four bytes
+
+An allocatable Imag32 quad must be spillable. Spill and reload a quad through its two Imag16 words: a static stack slot takes four byte accesses, and a dynamic stack operation (LDStk/STStk) expands into two Imag16 operations at offsets 0 and 2. Each piece carries a precise memory operand. When subregister operands are introduced after live intervals exist, fresh virtual registers carry them, and a reload defines the low word with an undef first lane. Without this, a quad spill fell into the byte fallback, which copies one byte through a GPR, or asserted in expandLDSTStkImpl.
+
+Default-mode effect: none; only quad spills change, and quads are allocated only on the 65816.
+
+Tests: prologepilog.mir checks that a static quad reload and store move all four bytes (__rc4-__rc7) in order. The next commit adds the end-to-end case: four far pointers live across a call.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/prologepilog.mir`.
+
+Original implementation attribution: agent/tool, version, model and reasoning effort unknown in this extracted patch's metadata; existing repository history remains authoritative. Extraction: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Moved from the far-word packet (patch 10) into the #320 series: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ llvm/lib/Target/MOS/MOSInstrInfo.cpp    | 60 +++++++++++++++++++++++--
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp | 32 +++++++++++++
+ llvm/test/CodeGen/MOS/prologepilog.mir  | 26 +++++++++++
+ 3 files changed, 114 insertions(+), 4 deletions(-)
+
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index 3c43dd923b09..daf2187bad16 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -958,9 +958,61 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+       Instr.addDef(Ptr, RegState::EarlyClobber);
+     Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
+   } else {
+-    if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++    if ((Reg.isPhysical() && MOS::Imag32RegClass.contains(Reg)) ||
+         (Reg.isVirtual() &&
+-         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
++         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag32RegClass))) {
++      // A far pointer is a four-byte Imag32 quad. Splitting it here is
++      // essential: the generic byte fallback would copy only one byte through
++      // a GPR, leaving an illegal GPR-to-Imag32 COPY after register allocation.
++      Register Quad = Reg;
++      Register LoWord;
++      Register HiWord;
++      if (Reg.isPhysical()) {
++        LoWord = TRI->getSubReg(Reg, MOS::sublo16);
++        HiWord = TRI->getSubReg(Reg, MOS::subhi16);
++      } else {
++        // As with Imag16 below, use fresh temporaries when introducing
++        // subregister operands after live intervals have been computed.
++        Quad = MRI.createVirtualRegister(&MOS::Imag32RegClass);
++        LoWord = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++        HiWord = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++        if (!IsLoad) {
++          Builder.buildCopy(Quad, Reg);
++          Builder.buildInstr(MOS::COPY).addDef(LoWord).addUse(Quad, RegState{},
++                                                              MOS::sublo16);
++          Builder.buildInstr(MOS::COPY).addDef(HiWord).addUse(Quad, RegState{},
++                                                              MOS::subhi16);
++        }
++      }
++      auto Byte = [&](Register Word, unsigned SubReg) {
++        MachineOperand MO = MachineOperand::CreateReg(Word, IsLoad);
++        if (Word.isPhysical())
++          MO.setReg(TRI->getSubReg(Word, SubReg));
++        else {
++          MO.setSubReg(SubReg);
++          if (IsLoad && SubReg == MOS::sublo)
++            MO.setIsUndef();
++        }
++        return MO;
++      };
++      MachineOperand Bytes[] = {
++          Byte(LoWord, MOS::sublo), Byte(LoWord, MOS::subhi),
++          Byte(HiWord, MOS::sublo), Byte(HiWord, MOS::subhi)};
++      for (unsigned I = 0; I != 4; ++I)
++        loadStoreByteStaticStackSlot(Builder, Bytes[I], FrameIndex, I,
++                                     MF.getMachineMemOperand(MMO, I, 1));
++      if (Reg.isVirtual() && IsLoad) {
++        Builder.buildInstr(MOS::COPY)
++            .addDef(Quad, RegState::Undef, MOS::sublo16)
++            .addUse(LoWord);
++        Builder.buildInstr(MOS::COPY)
++            .addDef(Quad, RegState{}, MOS::subhi16)
++            .addUse(HiWord);
++        Builder.buildCopy(Reg, Quad);
++      }
++    } else if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
+       // Spill the accumulator with a word load/store. Byte GPR copies cannot
+       // represent A16. Ac16 is available only under HasAccum16, and the mode
+       // insertion pass supplies the M=0 state required by these instructions.
+@@ -969,8 +1021,8 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+           .addFrameIndex(FrameIndex)
+           .addMemOperand(MMO);
+     } else if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
+-        (Reg.isVirtual() &&
+-         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
+       MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
+       MachineOperand Hi = Lo;
+       Register Tmp = Reg;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index 74ae5cbbc53c..46057c8e4ba5 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -883,6 +883,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
+     return;
+   }
+ 
++  if (MOS::Imag32RegClass.contains(Loc)) {
++    if (!IsLoad) {
++      // As for Imag16 below, make every covered byte live before splitting the
++      // store. A far pointer occupies the complete four-byte Imag32 register.
++      Builder.buildInstr(MOS::KILL, {Loc}, {Loc});
++    }
++    Register Lo = TRI.getSubReg(Loc, MOS::sublo16);
++    Register Hi = TRI.getSubReg(Loc, MOS::subhi16);
++    auto LoInstr = Builder.buildInstr(MI->getOpcode());
++    if (!IsLoad)
++      LoInstr.add(MI->getOperand(0));
++    LoInstr.addReg(Lo, getDefRegState(IsLoad));
++    if (IsLoad)
++      LoInstr.add(MI->getOperand(1));
++    LoInstr.add(MI->getOperand(2))
++        .add(MI->getOperand(3))
++        .addMemOperand(MF.getMachineMemOperand(*MI->memoperands_begin(), 0, 2));
++    auto HiInstr = Builder.buildInstr(MI->getOpcode());
++    if (!IsLoad)
++      HiInstr.add(MI->getOperand(0));
++    HiInstr.addReg(Hi, getDefRegState(IsLoad));
++    if (IsLoad)
++      HiInstr.add(MI->getOperand(1));
++    HiInstr.add(MI->getOperand(2))
++        .addImm(MI->getOperand(3).getImm() + 2)
++        .addMemOperand(MF.getMachineMemOperand(*MI->memoperands_begin(), 2, 2));
++    MI->eraseFromParent();
++    expandLDSTStk(LoInstr);
++    expandLDSTStk(HiInstr);
++    return;
++  }
++
+   if (MOS::Imag16RegClass.contains(Loc)) {
+     if (!IsLoad) {
+       // Loc may not be fully alive at this point, which would create uses of
+diff --git a/llvm/test/CodeGen/MOS/prologepilog.mir b/llvm/test/CodeGen/MOS/prologepilog.mir
+index 4fa2e3acd73f..f8dad8ad3d86 100644
+--- a/llvm/test/CodeGen/MOS/prologepilog.mir
++++ b/llvm/test/CodeGen/MOS/prologepilog.mir
+@@ -253,6 +253,32 @@ body: |
+ 
+ ...
+ ---
++name: ld_far_ptr
++stack:
++  - { id: 0, size: 4 }
++body: |
++  bb.0.entry:
++    ; CHECK-LABEL: name: ld_far_ptr
++    ; CHECK: $rc4 = COPY killed $a
++    ; CHECK: $rc5 = COPY killed $a
++    ; CHECK: $rc6 = COPY killed $a
++    ; CHECK: $rc7 = COPY killed $a
++    $rl1, early-clobber $rs1 = LDStk %stack.0, 0 :: (load 4 from %stack.0)
++...
++---
++name: st_far_ptr
++stack:
++  - { id: 0, size: 4 }
++body: |
++  bb.0.entry:
++    ; CHECK-LABEL: name: st_far_ptr
++    ; CHECK: $a = COPY $rc4
++    ; CHECK: $a = COPY $rc5
++    ; CHECK: $a = COPY $rc6
++    ; CHECK: $a = COPY $rc7
++    early-clobber $rs1 = STStk $rl1, %stack.0, 0 :: (store 4 into %stack.0)
++...
++---
+ name: st_byte
+ stack:
+   - { id: 0, size: 1 }
+-- 
+2.53.0
+

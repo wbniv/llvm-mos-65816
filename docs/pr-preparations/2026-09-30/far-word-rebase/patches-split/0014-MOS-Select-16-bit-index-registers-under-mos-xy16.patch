@@ -1,7 +1,7 @@
 From a6718b6f6560a7070d518015443e188a5a65530a Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 14/32] [MOS] Select 16-bit index registers under +mos-xy16
+Subject: [PATCH 14/36] [MOS] Select 16-bit index registers under +mos-xy16
 
 Under +mos-xy16, s16 index values use 16-bit X and Y. The legalizer keeps an s16 offset as a 16-bit index in the word and byte abs,X and (zp),Y folds (G_LOAD_ABS_IDX16 and related opcodes), and constrains an absolute s16 load to Xc16 when every use can consume X directly: word stores, +/-1, compares, and PHI/COPY chains of those. selectXY16 selects direct LDX/STX/LDY/STY, INX/DEX/INY/DEY, CPX/CPY and the 16-bit-index accesses. A loaded index whose only users are copies is not a genuine index: it is reclassed to Imag16 and loaded through A16, because an unrelated 8-bit-index instruction's `sep #$10` would clear a live X/Y high byte.
 

@@ -1,0 +1,36 @@
+$ build/split-320-321/llc/u594 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null
+# llc sha256 184095f9338a0de9046f86a97f98a85104bd1e933095eaa739224e4c6fd2b7c4
+The register $rs0 needs to be live in to %bb.1, but is missing from the live-in list.
+LLVM ERROR: Invalid global physical register
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/split-320-321/llc/u594 -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-imag32-reserved-pair-units/variadic-call.ll'.
+2.	Running pass 'Register Coalescer' on function '@main'
+ #0 0x00005e4d2d20a3ab llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/split-320-321/llc/u594+0x45313ab)
+ #1 0x00005e4d2d207231 llvm::sys::RunSignalHandlers() (build/split-320-321/llc/u594+0x452e231)
+ #2 0x00005e4d2d20b1bb SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x00007d96822bccb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x00007d968231d1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x00007d96822bcb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x00007d968229f8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x00005e4d2d165715 llvm::report_fatal_error(llvm::Twine const&, bool) (build/split-320-321/llc/u594+0x448c715)
+ #8 0x00005e4d2d165556 (build/split-320-321/llc/u594+0x448c556)
+ #9 0x00005e4d2bdf7612 llvm::LiveRangeCalc::findReachingDefs(llvm::LiveRange&, llvm::MachineBasicBlock&, llvm::SlotIndex, llvm::Register, llvm::ArrayRef<llvm::SlotIndex>) (build/split-320-321/llc/u594+0x311e612)
+#10 0x00005e4d2bdf6892 llvm::LiveRangeCalc::extend(llvm::LiveRange&, llvm::SlotIndex, llvm::Register, llvm::ArrayRef<llvm::SlotIndex>) (build/split-320-321/llc/u594+0x311d892)
+#11 0x00005e4d2bdfa26d llvm::LiveIntervalCalc::extendToUses(llvm::LiveRange&, llvm::Register, llvm::LaneBitmask, llvm::LiveInterval*) (build/split-320-321/llc/u594+0x312126d)
+#12 0x00005e4d2bde1db3 llvm::LiveIntervals::computeRegUnitRange(llvm::LiveRange&, llvm::MCRegUnit) (build/split-320-321/llc/u594+0x3108db3)
+#13 0x00005e4d2c1187b7 (anonymous namespace)::RegisterCoalescer::joinCopy(llvm::MachineInstr*, llvm::SmallPtrSetImpl<llvm::MachineInstr*>&) RegisterCoalescer.cpp:0:0
+#14 0x00005e4d2c11626e (anonymous namespace)::RegisterCoalescer::copyCoalesceWorkList(llvm::MutableArrayRef<llvm::MachineInstr*>) RegisterCoalescer.cpp:0:0
+#15 0x00005e4d2c112531 (anonymous namespace)::RegisterCoalescer::run(llvm::MachineFunction&) RegisterCoalescer.cpp:0:0
+#16 0x00005e4d2c113bcd (anonymous namespace)::RegisterCoalescerLegacy::runOnMachineFunction(llvm::MachineFunction&) RegisterCoalescer.cpp:0:0
+#17 0x00005e4d2bea4d99 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/split-320-321/llc/u594+0x31cbd99)
+#18 0x00005e4d2c437170 llvm::FPPassManager::runOnFunction(llvm::Function&) (build/split-320-321/llc/u594+0x375e170)
+#19 0x00005e4d2c43f272 llvm::FPPassManager::runOnModule(llvm::Module&) (build/split-320-321/llc/u594+0x3766272)
+#20 0x00005e4d2c437f34 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/split-320-321/llc/u594+0x375ef34)
+#21 0x00005e4d2ae07a8b compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#22 0x00005e4d2ae04d53 main (build/split-320-321/llc/u594+0x212bd53)
+#23 0x00007d96822a1601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#24 0x00007d96822a1718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#25 0x00005e4d2ae03f65 _start (build/split-320-321/llc/u594+0x212af65)
+exit_code=134

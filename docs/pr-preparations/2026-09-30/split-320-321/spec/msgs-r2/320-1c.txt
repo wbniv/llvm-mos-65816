@@ -1,0 +1,14 @@
+[MOS] Spill and reload Imag32 quads as four bytes
+
+An allocatable Imag32 quad must be spillable. Spill and reload a quad through its two Imag16 words: a static stack slot takes four byte accesses, and a dynamic stack operation (LDStk/STStk) expands into two Imag16 operations at offsets 0 and 2. Each piece carries a precise memory operand. When subregister operands are introduced after live intervals exist, fresh virtual registers carry them, and a reload defines the low word with an undef first lane. Without this, a quad spill fell into the byte fallback, which copies one byte through a GPR, or asserted in expandLDSTStkImpl.
+
+Default-mode effect: none; only quad spills change, and quads are allocated only on the 65816.
+
+Tests: prologepilog.mir checks that a static quad reload and store move all four bytes (__rc4-__rc7) in order. The next commit adds the end-to-end case: four far pointers live across a call.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/prologepilog.mir`.
+
+Original implementation attribution: agent/tool, version, model and reasoning effort unknown in this extracted patch's metadata; existing repository history remains authoritative. Extraction: OpenAI Codex CLI 0.157.1 (session source vscode), model gpt-6-astra, xhigh reasoning effort; verified session 01a0e67f-298f-7a21-80af-06f867085f84. Moved from the far-word packet (patch 10) into the #320 series: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F

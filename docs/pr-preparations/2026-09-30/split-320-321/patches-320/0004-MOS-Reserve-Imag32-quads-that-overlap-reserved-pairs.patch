@@ -1,0 +1,71 @@
+From 733b59e025ee80a1742f5c3258da6b70b14b39cc Mon Sep 17 00:00:00 2001
+From: Will Norris <will@biohack.net>
+Date: Thu, 1 Oct 2026 12:00:00 +0000
+Subject: [PATCH 4/9] [MOS] Reserve Imag32 quads that overlap reserved pairs
+
+Reserve an RL quad whenever either of its RS pairs is reserved: the stack pointer (RS0), the scavenger slot, the frame pointer, or pairs outside the imaginary window.
+
+LLVM counts a register unit as reserved only when its root register and all of its super-registers are reserved. The RL quads of the previous commit are new super-registers of the RS pairs, so without this the stack pointer's byte units were no longer reserved. A function that makes a call with stack arguments, such as any variadic call, then aborted in the register coalescer: live-range computation found a use of $rs0 without a def ("Invalid global physical register"). This happened in every MOS CPU mode, including default mos6502 code.
+
+Default-mode effect: the fixed input set gives the same results as before the RL registers were added (mos6502 and mosw65816), including the four inputs that the previous commit changed: one that compiled again compiles, and three return to their earlier results.
+
+Tests: imag32-reserved-pairs.ll, reduced from a SNES demo with llvm-reduce, compiles a variadic call in mos6502 and mosw65816 with the verifier on.
+
+Validate: `build/bin/llvm-lit -v llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll`.
+
+Found while carrying llvm-mos#594 into the #320 series, and fixed: Claude Code 2.1.285 (t4-opus-high agent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F
+---
+ llvm/lib/Target/MOS/MOSRegisterInfo.cpp        | 10 ++++++++++
+ llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll | 16 ++++++++++++++++
+ 2 files changed, 26 insertions(+)
+ create mode 100644 llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll
+
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index a78a81c23e34..09d3c79821df 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -225,6 +225,16 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+   BitVector Reserved = this->Reserved;
+   if (TFI->hasFP(MF))
+     reserveAllSubregs(&Reserved, getFrameRegister(MF));
++  // Reserve an Imag32 quad whenever either of its RS pairs is reserved: the
++  // stack pointer (RS0), the scavenger slot, the frame pointer, or pairs
++  // outside the imaginary window. A register unit counts as reserved only if
++  // its root and all of its super-registers are reserved, so an unreserved
++  // quad over RS0 would make the stack pointer's units allocatable, and a use
++  // of $rs0 without a def would fail live-range computation.
++  for (MCPhysReg Q : MOS::Imag32RegClass)
++    if (Reserved.test(getSubReg(Q, MOS::sublo16)) ||
++        Reserved.test(getSubReg(Q, MOS::subhi16)))
++      Reserved.set(Q);
+   return Reserved;
+ }
+ 
+diff --git a/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll b/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll
+new file mode 100644
+index 000000000000..fc8f243cc2d0
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll
+@@ -0,0 +1,16 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; An Imag32 quad that overlaps a reserved pair is reserved too. Otherwise the
++; stack pointer's register units are no longer reserved (RL0 covers RS0), and a
++; call with stack arguments aborts live-range computation in the register
++; coalescer with "Invalid global physical register".
++
++; CHECK-LABEL: main:
++; CHECK: jsr mini_sprintf
++define i16 @main() {
++  call void (ptr, ptr, ...) @mini_sprintf(ptr null, ptr null, i16 0, i16 0)
++  ret i16 0
++}
++
++declare void @mini_sprintf(ptr, ptr, ...)
+-- 
+2.53.0
+

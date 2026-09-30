@@ -1,0 +1,31 @@
+{
+ "llc": {
+  "r2-320-1a3": {
+   "desc": "split series #320-1a-iii: llvm-mos#594 7b80f7e18768 carried onto the #321 series and MC commits (MOSImagReg32 bits<32>)",
+   "commit": "7331fa31f3cccec5c735559710500d4b22c17aff",
+   "sha256": "9f8b456100f1b90336b1bf4d19fec2740d5d200c1b658c8e30ddbabcc33de5ce"
+  },
+  "r2-320-1b": {
+   "desc": "split series #320-1b: quad reservation fix",
+   "commit": "b880f5dd2105b0da44059012d45267a3d19bdcf2",
+   "sha256": "e4e2c1e171cabffd668a62c9fdf10bb6c97b4bf883d85f0f0985904e8fdec0de"
+  },
+  "p-321-00": {
+   "desc": "upstream llvm-mos 06bc967d2668",
+   "commit": "06bc967d2668c7c11c4d6eb43a6aed1f99ad258b",
+   "sha256": "2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7"
+  },
+  "u594": {
+   "desc": "upstream 06bc967d2668 + the three #594 commits only (scratch-594-base, same bits<32> adaptation)",
+   "commit": "bfb930d465a0ea1b03b1463ca801187b7132aacf",
+   "sha256": "184095f9338a0de9046f86a97f98a85104bd1e933095eaa739224e4c6fd2b7c4"
+  },
+  "u594-resv": {
+   "desc": "u594 + only the quad reservation rule",
+   "commit": "0cfe815224a0a7af63e6296e52520a8dcb7dac84",
+   "sha256": "7f7562c7b43dad2921288eb1f34f10ac1d26615e1210662e0b050c366ce546ec"
+  }
+ },
+ "build": "build/split-320-321/build (assertions Release, dev container, ninja -j3 under build/.heavy-build.lock); frozen hard links in build/split-320-321/llc/",
+ "reduction": "llvm-reduce -j 3 --test interesting.sh vaprintf.c.default.ll -> variadic-call.ll (interesting: u594 aborts with the signature and u594-resv compiles)"
+}

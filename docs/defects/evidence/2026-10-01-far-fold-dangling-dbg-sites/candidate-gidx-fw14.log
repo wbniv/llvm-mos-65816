@@ -1,0 +1,3 @@
+$ build/split-320-321/llc/r2-fw-14 -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/gidx.ll -o /dev/null
+# llc sha256 c90f96487d2fe6d3fa49a8cfc01f9485affdbd4857e4594ee8b87f7bfefcbbcb
+exit_code=0

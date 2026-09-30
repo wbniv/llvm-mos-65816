@@ -1,0 +1,9 @@
+{
+ "searched_ref": "origin/main 590f96167daf",
+ "searches": {
+  "Invalid global physical register (docs, TODO, patches, git log)": "no hits",
+  "Reserve the QUAD itself only (git log -S in patches/)": "aa5d0544 2026-06-20 \"#320 Inc 3: runtime far-pointer deref (lda [dp]) + near->far cast\" introduced the same reservation rule downstream, to keep the allocator off the stack pointer",
+  "llvm-mos#594 comments and reviews (public API, 2026-10-01)": "none"
+ },
+ "findings": "The downstream far work and the reviewed split already reserve a quad whenever either pair is reserved, so they never showed this abort. #594 as posted defines RL without that rule. No record, issue or report covers the abort."
+}

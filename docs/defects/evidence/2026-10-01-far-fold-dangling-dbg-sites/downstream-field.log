@@ -1,0 +1,48 @@
+$ build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll -o /dev/null
+# llc sha256 f1fa50a225c3660715b16c44dd2dc65b98984549923e4a6bb994ed2867cedda1
+
+# After Detect Dead Lanes
+# Machine code for function walk: IsSSA, TracksLiveness, Legalized, RegBankSelected, Selected
+
+bb.1 (%ir-block.0):
+  liveins: $rl1
+  %0:imag32 = COPY $rl1
+  DBG_VALUE undef %2:any, $noreg, !"q", !DIExpression(), debug-location !10; dbg.c:2 line no:3
+  %4:yc = LDImm 1, debug-location !10; dbg.c:2
+  %3:ac = LDIndirLongIdx %0:imag32, %4:yc, debug-location !10 :: (load (s8) from %ir.q, addrspace 2); dbg.c:2
+  $a = COPY %3:ac, debug-location !10; dbg.c:2
+  RTS implicit $a, debug-location !10; dbg.c:2
+
+# End machine code for function walk.
+
+*** Bad machine code: Generic virtual register use cannot be undef ***
+- function:    walk
+- basic block: %bb.1  (0x615022a460e0)
+- instruction: DBG_VALUE undef %2:any, $noreg, !"q", !DIExpression(), debug-location !10; dbg.c:2 line no:3
+- operand 0:   undef %2:any
+LLVM ERROR: Found 1 machine code errors.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace and instructions to reproduce the bug.
+Stack dump:
+0.	Program arguments: build/far-review-defects/candidate/llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll -o /dev/null
+1.	Running pass 'Function Pass Manager' on module 'docs/defects/evidence/2026-10-01-far-fold-dangling-dbg-sites/field.ll'.
+2.	Running pass 'Verify generated machine code' on function '@walk'
+ #0 0x0000614ffa6c0928 llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (build/far-review-defects/candidate/llc+0x202a928)
+ #1 0x0000614ffa6bdc05 llvm::sys::RunSignalHandlers() (build/far-review-defects/candidate/llc+0x2027c05)
+ #2 0x0000614ffa6c16a1 SignalHandler(int, siginfo_t*, void*) Signals.cpp:0:0
+ #3 0x000075dfe08dccb0 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45cb0)
+ #4 0x000075dfe093d1ac pthread_kill (/usr/lib/x86_64-linux-gnu/libc.so.6+0xa61ac)
+ #5 0x000075dfe08dcb7e raise (/usr/lib/x86_64-linux-gnu/libc.so.6+0x45b7e)
+ #6 0x000075dfe08bf8ec abort (/usr/lib/x86_64-linux-gnu/libc.so.6+0x288ec)
+ #7 0x0000614ffa62e245 llvm::report_fatal_error(llvm::Twine const&, bool) (build/far-review-defects/candidate/llc+0x1f98245)
+ #8 0x0000614ff9795b67 (build/far-review-defects/candidate/llc+0x10ffb67)
+ #9 0x0000614ff9796e41 (anonymous namespace)::MachineVerifierLegacyPass::runOnMachineFunction(llvm::MachineFunction&) MachineVerifier.cpp:0:0
+#10 0x0000614ff96b9523 llvm::MachineFunctionPass::runOnFunction(llvm::Function&) (build/far-review-defects/candidate/llc+0x1023523)
+#11 0x0000614ff9b0fa8a llvm::FPPassManager::runOnFunction(llvm::Function&) (build/far-review-defects/candidate/llc+0x1479a8a)
+#12 0x0000614ff9b1612c llvm::FPPassManager::runOnModule(llvm::Module&) (build/far-review-defects/candidate/llc+0x148012c)
+#13 0x0000614ff9b107b9 llvm::legacy::PassManagerImpl::run(llvm::Module&) (build/far-review-defects/candidate/llc+0x147a7b9)
+#14 0x0000614ff915e2dd compileModule(char**, llvm::SmallVectorImpl<llvm::PassPlugin>&, llvm::LLVMContext&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>&) llc.cpp:0:0
+#15 0x0000614ff915bc73 main (build/far-review-defects/candidate/llc+0xac5c73)
+#16 0x000075dfe08c1601 (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a601)
+#17 0x000075dfe08c1718 __libc_start_main (/usr/lib/x86_64-linux-gnu/libc.so.6+0x2a718)
+#18 0x0000614ff9157fe5 _start (build/far-review-defects/candidate/llc+0xac1fe5)
+exit_code=134

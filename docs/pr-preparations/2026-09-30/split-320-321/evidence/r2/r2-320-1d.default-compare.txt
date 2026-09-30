@@ -1,0 +1,4 @@
+mos6502: 90 inputs (54 compile before), 89 identical, 1 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 89 identical, 1 asm differ, 0 object-only differ
+  asm mos6502 corpus/examples_snes_trapguard.c.default.ll: ['134', 'err:4d0aa881fcaf', '134', '-'] -> ['134', 'err:03773c91ae1a', '134', '-']
+  asm mosw65816 corpus/examples_snes_trapguard.c.default.ll: ['134', 'err:4d0aa881fcaf', '134', '-'] -> ['134', 'err:03773c91ae1a', '134', '-']

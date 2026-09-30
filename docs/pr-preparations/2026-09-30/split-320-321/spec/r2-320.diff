@@ -1,0 +1,1388 @@
+diff --git a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+index 48ae1c70fbbf..d8e97f075d4f 100644
+--- a/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
++++ b/llvm/lib/Target/MOS/MOSAsmPrinter.cpp
+@@ -208,11 +208,12 @@ bool MOSAsmPrinter::PrintAsmOperand(const MachineInstr *MI, unsigned OpNo,
+       size_t Offset = It->second;
+       if (Offset)
+         OS << '+' << Offset;
+-      OS << ")\n";
++      OS << ')';
+       break;
+     }
+ 
+-    if (MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg))
++    if (MOS::Imag32RegClass.contains(Reg) ||
++        MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg))
+       OS << TRI.getImag8SymbolName(Reg);
+     else
+       OS << TRI.getRegAsmName(Reg);
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.cpp b/llvm/lib/Target/MOS/MOSCallingConv.cpp
+index 9b5546351485..d3f9c7616577 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.cpp
++++ b/llvm/lib/Target/MOS/MOSCallingConv.cpp
+@@ -11,6 +11,7 @@
+ //===----------------------------------------------------------------------===//
+ 
+ #include "MOSCallingConv.h"
++#include "MOSSubtarget.h"
+ 
+ #include "llvm/CodeGen/MachineFunction.h"
+ #include "llvm/IR/DataLayout.h"
+diff --git a/llvm/lib/Target/MOS/MOSCallingConv.td b/llvm/lib/Target/MOS/MOSCallingConv.td
+index a37da830892d..636d95c5a39a 100644
+--- a/llvm/lib/Target/MOS/MOSCallingConv.td
++++ b/llvm/lib/Target/MOS/MOSCallingConv.td
+@@ -58,9 +58,12 @@ let Entry = 1 in {
+ def CC_MOS : CallingConv<[
+   CCIfType<[i1], CCPromoteToType<i8>>,
+ 
+-  // Far data pointers occupy one caller-saved imaginary quad. Register units
+-  // alias the near-pointer pairs, so argument assignments cannot overlap.
+-  CCIfPtrAddrSpace<2, CCAssignToReg<[RL1, RL2, RL3]>>,
++  // Far data pointers occupy one caller-saved imaginary quad where quads are
++  // allocatable. Register units alias the near-pointer pairs, so argument
++  // assignments cannot overlap.
++  CCIf<"State.getMachineFunction().getSubtarget<MOSSubtarget>()"
++       ".hasAllocatableImag32()",
++       CCIfPtrAddrSpace<2, CCAssignToReg<[RL1, RL2, RL3]>>>,
+   // A far pointer that finds no free quad goes to a 4-byte stack slot. Without
+   // this it would reach the generic CCIfPtr rule below and take a 16-bit RS
+   // pair, which cannot hold the 32-bit value.
+diff --git a/llvm/lib/Target/MOS/MOSCopyOpt.cpp b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+index 50432465870e..ca1700b448fb 100644
+--- a/llvm/lib/Target/MOS/MOSCopyOpt.cpp
++++ b/llvm/lib/Target/MOS/MOSCopyOpt.cpp
+@@ -229,7 +229,8 @@ bool MOSCopyOpt::runOnMachineFunction(MachineFunction &MF) {
+       auto [Dst, Src] = MI.getFirst2Regs();
+       auto LdImmCostVal = MOSInstrCost(2, 2).value(CostMode);
+ 
+-      if (!MOS::Imag16RegClass.contains(Dst) && Dst != MOS::C &&
++      if (!MOS::Imag32RegClass.contains(Dst) &&
++          !MOS::Imag16RegClass.contains(Dst) && Dst != MOS::C &&
+           Dst != MOS::V &&
+           TRI.copyCost(Dst, Src, STI).value(CostMode) <= LdImmCostVal)
+         continue;
+diff --git a/llvm/lib/Target/MOS/MOSInstrInfo.cpp b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+index c8352d789198..daf2187bad16 100644
+--- a/llvm/lib/Target/MOS/MOSInstrInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSInstrInfo.cpp
+@@ -676,13 +676,6 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+       copyPhysRegImpl(Builder, DestReg,
+                       getRegWithVal(Builder, SrcReg, MOS::GPRRegClass));
+     }
+-  } else if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+-    // copy a 32-bit far pointer as two 16-bit word copies
+-    // (each recurses to the Imag16 byte-pair copy below).
+-    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo16),
+-                    TRI.getSubReg(SrcReg, MOS::sublo16));
+-    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi16),
+-                    TRI.getSubReg(SrcReg, MOS::subhi16));
+   } else if (AreClasses(MOS::Imag16RegClass, MOS::Imag16RegClass)) {
+     assert(SrcReg.isPhysical() && DestReg.isPhysical());
+     copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo),
+@@ -701,6 +694,12 @@ void MOSInstrInfo::copyPhysRegImpl(MachineIRBuilder &Builder, Register DestReg,
+   } else if (AreClasses(MOS::Imag16RegClass, MOS::Yc16RegClass)) {
+     // Native indices: Imag16 ZP pair ← Y16: sty zp
+     Builder.buildInstr(MOS::STYImag16).addDef(DestReg).addUse(SrcReg);
++  } else if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
++    assert(SrcReg.isPhysical() && DestReg.isPhysical());
++    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::sublo16),
++                    TRI.getSubReg(SrcReg, MOS::sublo16));
++    copyPhysRegImpl(Builder, TRI.getSubReg(DestReg, MOS::subhi16),
++                    TRI.getSubReg(SrcReg, MOS::subhi16));
+   } else if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+     assert(SrcReg.isPhysical() && DestReg.isPhysical());
+     Register SrcReg8 =
+@@ -959,9 +958,61 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+       Instr.addDef(Ptr, RegState::EarlyClobber);
+     Instr.addFrameIndex(FrameIndex).addImm(0).addMemOperand(MMO);
+   } else {
+-    if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++    if ((Reg.isPhysical() && MOS::Imag32RegClass.contains(Reg)) ||
+         (Reg.isVirtual() &&
+-         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
++         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag32RegClass))) {
++      // A far pointer is a four-byte Imag32 quad. Splitting it here is
++      // essential: the generic byte fallback would copy only one byte through
++      // a GPR, leaving an illegal GPR-to-Imag32 COPY after register allocation.
++      Register Quad = Reg;
++      Register LoWord;
++      Register HiWord;
++      if (Reg.isPhysical()) {
++        LoWord = TRI->getSubReg(Reg, MOS::sublo16);
++        HiWord = TRI->getSubReg(Reg, MOS::subhi16);
++      } else {
++        // As with Imag16 below, use fresh temporaries when introducing
++        // subregister operands after live intervals have been computed.
++        Quad = MRI.createVirtualRegister(&MOS::Imag32RegClass);
++        LoWord = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++        HiWord = MRI.createVirtualRegister(&MOS::Imag16RegClass);
++        if (!IsLoad) {
++          Builder.buildCopy(Quad, Reg);
++          Builder.buildInstr(MOS::COPY).addDef(LoWord).addUse(Quad, RegState{},
++                                                              MOS::sublo16);
++          Builder.buildInstr(MOS::COPY).addDef(HiWord).addUse(Quad, RegState{},
++                                                              MOS::subhi16);
++        }
++      }
++      auto Byte = [&](Register Word, unsigned SubReg) {
++        MachineOperand MO = MachineOperand::CreateReg(Word, IsLoad);
++        if (Word.isPhysical())
++          MO.setReg(TRI->getSubReg(Word, SubReg));
++        else {
++          MO.setSubReg(SubReg);
++          if (IsLoad && SubReg == MOS::sublo)
++            MO.setIsUndef();
++        }
++        return MO;
++      };
++      MachineOperand Bytes[] = {
++          Byte(LoWord, MOS::sublo), Byte(LoWord, MOS::subhi),
++          Byte(HiWord, MOS::sublo), Byte(HiWord, MOS::subhi)};
++      for (unsigned I = 0; I != 4; ++I)
++        loadStoreByteStaticStackSlot(Builder, Bytes[I], FrameIndex, I,
++                                     MF.getMachineMemOperand(MMO, I, 1));
++      if (Reg.isVirtual() && IsLoad) {
++        Builder.buildInstr(MOS::COPY)
++            .addDef(Quad, RegState::Undef, MOS::sublo16)
++            .addUse(LoWord);
++        Builder.buildInstr(MOS::COPY)
++            .addDef(Quad, RegState{}, MOS::subhi16)
++            .addUse(HiWord);
++        Builder.buildCopy(Reg, Quad);
++      }
++    } else if ((Reg.isPhysical() && MOS::Ac16RegClass.contains(Reg)) ||
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Ac16RegClass))) {
+       // Spill the accumulator with a word load/store. Byte GPR copies cannot
+       // represent A16. Ac16 is available only under HasAccum16, and the mode
+       // insertion pass supplies the M=0 state required by these instructions.
+@@ -970,8 +1021,8 @@ void MOSInstrInfo::loadStoreRegStackSlot(
+           .addFrameIndex(FrameIndex)
+           .addMemOperand(MMO);
+     } else if ((Reg.isPhysical() && MOS::Imag16RegClass.contains(Reg)) ||
+-        (Reg.isVirtual() &&
+-         MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
++               (Reg.isVirtual() &&
++                MRI.getRegClass(Reg)->hasSuperClassEq(&MOS::Imag16RegClass))) {
+       MachineOperand Lo = MachineOperand::CreateReg(Reg, IsLoad);
+       MachineOperand Hi = Lo;
+       Register Tmp = Reg;
+diff --git a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+index 3f8f7366c04b..71fc9b90774a 100644
+--- a/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSLegalizerInfo.cpp
+@@ -427,6 +427,10 @@ MOSLegalizerInfo::MOSLegalizerInfo(const MOSSubtarget &STI) {
+   {
+     // Native s16 accesses select a word addressing mode before byte narrowing.
+     auto &B = getActionDefinitionsBuilder({G_LOAD, G_STORE});
++    // Without 65816 long addressing, a far access of any type is diagnosed
++    // whole in legalizeCustom, before it could be narrowed into pieces.
++    if (!STI.hasW65816())
++      B.customIf(typeIs(1, PF));
+     if (STI.hasAccum16())
+       B.customForCartesianProduct({S8, S16, PZ, P, PF}, {PZ, P, PF});
+     else
+@@ -583,7 +587,8 @@ bool MOSLegalizerInfo::legalizeIntrinsic(LegalizerHelper &Helper,
+ // same bytes decode as unrelated instructions there. Diagnose a far access on
+ // those CPUs instead of selecting it, and replace it (a load by an undefined
+ // value) so that legalization finishes and the diagnostic is what is reported.
+-// Passing or storing a far pointer as a value stays legal on every CPU.
++// Far pointer values are not accesses; they live in Imag32 quads, which only
++// CPUs with MOSSubtarget::hasAllocatableImag32() allocate.
+ static bool rejectFarAccessWithoutLong(LegalizerHelper &Helper,
+                                        MachineInstr &MI, bool IsFar) {
+   MachineFunction &MF = Helper.MIRBuilder.getMF();
+@@ -2630,6 +2635,53 @@ bool MOSLegalizerInfo::tryAbsoluteAddressing(LegalizerHelper &Helper,
+   return false;
+ }
+ 
++// Whether every non-debug user of R is a G_PTR_ADD based on R whose own
++// result is equally dead, so R dies once its accesses have been folded away.
++static bool isDeadFarAddressTree(const MachineRegisterInfo &MRI, Register R) {
++  for (const MachineInstr &U : MRI.use_nodbg_instructions(R)) {
++    const auto *PA = dyn_cast<GPtrAdd>(&U);
++    if (!PA || PA->getBaseReg() != R ||
++        !isDeadFarAddressTree(MRI, PA->getReg(0)))
++      return false;
++  }
++  return true;
++}
++
++// A far addressing-mode fold replaces an access's pointer with the base and
++// an offset the new instruction encodes. The G_PTR_ADDs that computed the old
++// pointer can then be left with only debug uses. The legalizer erases them,
++// and salvageDebugInfo cannot express a G_PTR_ADD, so a DBG_VALUE would name
++// an erased register, which the machine verifier rejects once DetectDeadLanes
++// marks it undef. Called with the folded access's former pointer, this finds
++// the largest tree of such dead adds (climbing through dead bases) and sets
++// the locations of their DBG_VALUEs to $noreg. A register with a live user
++// stops the walk, so no live location is dropped.
++static void dropDeadFarAddressDebugUses(MachineRegisterInfo &MRI,
++                                        Register Ptr) {
++  if (!Ptr.isVirtual() || !isDeadFarAddressTree(MRI, Ptr))
++    return;
++  Register Top = Ptr;
++  while (const auto *PA = dyn_cast_or_null<GPtrAdd>(MRI.getVRegDef(Top))) {
++    Register Base = PA->getBaseReg();
++    if (!Base.isVirtual() || !isDeadFarAddressTree(MRI, Base))
++      break;
++    Top = Base;
++  }
++  SmallVector<Register, 8> Worklist = {Top};
++  SmallPtrSet<MachineInstr *, 8> DbgUses;
++  while (!Worklist.empty()) {
++    Register R = Worklist.pop_back_val();
++    for (MachineInstr &U : MRI.use_instructions(R)) {
++      if (U.isDebugValue())
++        DbgUses.insert(&U);
++      else if (const auto *PA = dyn_cast<GPtrAdd>(&U))
++        Worklist.push_back(PA->getReg(0));
++    }
++  }
++  for (MachineInstr *U : DbgUses)
++    U->setDebugValueUndef();
++}
++
+ // Select an absolute-long byte access for a constant or global far address.
+ // Retain the memory operand and return false for a runtime base so indirect
+ // address selection can handle it.
+@@ -2639,7 +2691,8 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+ 
+   unsigned Opcode = isa<GLoad>(MI) ? MOS::G_LOAD_FAR_ABS : MOS::G_STORE_FAR_ABS;
+-  auto Operand = matchAbsoluteAddressing(MRI, MI.getPointerReg());
++  Register Ptr = MI.getPointerReg();
++  auto Operand = matchAbsoluteAddressing(MRI, Ptr);
+ 
+   if (!Operand.has_value())
+     return false;
+@@ -2649,6 +2702,7 @@ bool MOSLegalizerInfo::tryFarAbsoluteAddressing(LegalizerHelper &Helper,
+   MI.removeOperand(1);
+   MI.addOperand(*Operand);
+   Helper.Observer.changedInstr(MI);
++  dropDeadFarAddressDebugUses(MRI, Ptr);
+   return true;
+ }
+ 
+@@ -2878,26 +2932,11 @@ tryFarRuntimeIndexFold(LegalizerHelper &Helper, MachineRegisterInfo &MRI,
+       .addUse(V->getBaseReg()) // far pointer -> Imag32 ZP quad
+       .addUse(Idx)             // proven-in-range byte offset -> Y
+       .addMemOperand(*MI.memoperands_begin());
++  Register AccessPtr = MI.getPointerReg();
+   MI.eraseFromParent();
+   // Once the last access folds, the pointer add (and any constant-offset adds
+-  // on it) is dead. salvageDebugInfo cannot express base + zext(offset) and
+-  // would leave a DBG_VALUE naming the erased vreg, which the verifier rejects
+-  // once DetectDeadLanes marks it undef. Drop those locations now.
+-  SmallVector<Register, 4> DeadAddrs = {Addr};
+-  for (unsigned I = 0; I < DeadAddrs.size(); ++I)
+-    for (const MachineInstr &U : MRI.use_nodbg_instructions(DeadAddrs[I])) {
+-      const auto *PA = dyn_cast<GPtrAdd>(&U);
+-      if (!PA || PA->getBaseReg() != DeadAddrs[I])
+-        return true; // an access has not folded yet
+-      DeadAddrs.push_back(PA->getReg(0));
+-    }
+-  SmallPtrSet<MachineInstr *, 4> DbgUses;
+-  for (Register R : DeadAddrs)
+-    for (MachineInstr &U : MRI.use_instructions(R))
+-      if (U.isDebugValue())
+-        DbgUses.insert(&U);
+-  for (MachineInstr *U : DbgUses)
+-    U->setDebugValueUndef();
++  // on it) is dead.
++  dropDeadFarAddressDebugUses(MRI, AccessPtr);
+   return true;
+ }
+ 
+@@ -2906,7 +2945,8 @@ bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(LegalizerHelper &Helper,
+                                                        GLoadStore &MI) const {
+   MachineIRBuilder &Builder = Helper.MIRBuilder;
+ 
+-  Register Addr = MI.getPointerReg();
++  Register AccessPtr = MI.getPointerReg();
++  Register Addr = AccessPtr;
+   int64_t ConstOffset = 0;
+ 
+   // (a) Peel constant-offset G_PTR_ADDs down to the runtime base pointer.
+@@ -2952,6 +2992,7 @@ bool MOSLegalizerInfo::tryFarIndirectIndexedAddressing(LegalizerHelper &Helper,
+       .addUse(Idx)           // displacement -> Y
+       .addMemOperand(*MI.memoperands_begin());
+   MI.eraseFromParent();
++  dropDeadFarAddressDebugUses(MRI, AccessPtr);
+   return true;
+ }
+ 
+@@ -3366,12 +3407,9 @@ bool MOSLegalizerInfo::legalizeMemOp(LegalizerHelper &Helper,
+     return true;
+   }
+ 
+-  // the inline path above already lowers a far memop correctly (per-byte
+-  // far G_STOREs) for a constant size <= SizeLimit. When it bails (variable
+-  // size, or constant size over the limit) we must NOT fall into the generic
+-  // createMemLibcall: it calls the NEAR runtime with the far pointer, dropping
+-  // the bank byte -> silent wrong-bank access. Route far memops to the far
+-  // runtime.
++  // A far memory intrinsic that is not expanded inline calls the far runtime;
++  // the generic libcall would pass the far pointer to the near runtime and drop
++  // the bank byte.
+   if (anyFarPointerOperand(MRI, MI))
+     return createFarMemLibcall(Helper, MRI, MI);
+ 
+diff --git a/llvm/lib/Target/MOS/MOSMCInstLower.cpp b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+index 274d85e0d99f..470b14fb4720 100644
+--- a/llvm/lib/Target/MOS/MOSMCInstLower.cpp
++++ b/llvm/lib/Target/MOS/MOSMCInstLower.cpp
+@@ -859,8 +859,6 @@ bool MOSMCInstLower::lowerOperand(const MachineOperand &MO, MCOperand &MCOp) {
+ 
+     if (MOS::Imag32RegClass.contains(Reg) ||
+         MOS::Imag16RegClass.contains(Reg) || MOS::Imag8RegClass.contains(Reg)) {
+-      // Imag32 (far-pointer ZP quad) lowers to its low __rc
+-      // symbol, just like the Imag16/Imag8 zero-page forms.
+       const MCExpr *Expr = MCSymbolRefExpr::create(
+           Ctx.getOrCreateSymbol(TRI.getImag8SymbolName(Reg)), Ctx);
+       MCOp = MCOperand::createExpr(Expr);
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index b9a26337cc6e..d9a4c4ed2897 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -69,8 +69,6 @@ MOSRegisterInfo::MOSRegisterInfo(const MOSSubtarget &STI,
+     // Pointers are referred to by their low byte in the addressing modes that
+     // use them.
+     unsigned R = Reg;
+-    // an Imag32 quad is named by its lowest byte's __rc symbol
+-    // (low 16-bit word -> low byte), so `lda [dp]` reads dp..dp+2 from there.
+     if (MOS::Imag32RegClass.contains(R))
+       R = getSubReg(R, MOS::sublo16);
+     if (MOS::Imag16RegClass.contains(R))
+@@ -227,18 +225,16 @@ BitVector MOSRegisterInfo::getReservedRegs(const MachineFunction &MF) const {
+   BitVector Reserved = this->Reserved;
+   if (TFI->hasFP(MF))
+     reserveAllSubregs(&Reserved, getFrameRegister(MF));
+-  // an Imag32 quad (RL = RS:RS pair) is unallocatable whenever
+-  // either of its 16-bit RS words is reserved — the stack pointer (RS0), the
+-  // scavenger slot (RS8), the frame pointer, or any RS beyond the imaginary
+-  // window. Reserve the QUAD itself only; its free RS sibling must stay
+-  // available for ordinary 16-bit allocation (so we can't reserveAllSubregs
+-  // it). Without this the allocator would happily place a far pointer over the
+-  // stack pointer.
+-  for (MCPhysReg Q : MOS::Imag32RegClass) {
++  // Reserve an Imag32 quad whenever either of its RS pairs is reserved: the
++  // stack pointer (RS0), the scavenger slot, the frame pointer, or pairs
++  // outside the imaginary window. A register unit counts as reserved only if
++  // its root and all of its super-registers are reserved, so an unreserved
++  // quad over RS0 would make the stack pointer's units allocatable, and a use
++  // of $rs0 without a def would fail live-range computation.
++  for (MCPhysReg Q : MOS::Imag32RegClass)
+     if (Reserved.test(getSubReg(Q, MOS::sublo16)) ||
+         Reserved.test(getSubReg(Q, MOS::subhi16)))
+       Reserved.set(Q);
+-  }
+   return Reserved;
+ }
+ 
+@@ -887,6 +883,38 @@ void MOSRegisterInfo::expandLDSTStkImpl(MachineBasicBlock::iterator MI) const {
+     return;
+   }
+ 
++  if (MOS::Imag32RegClass.contains(Loc)) {
++    if (!IsLoad) {
++      // As for Imag16 below, make every covered byte live before splitting the
++      // store. A far pointer occupies the complete four-byte Imag32 register.
++      Builder.buildInstr(MOS::KILL, {Loc}, {Loc});
++    }
++    Register Lo = TRI.getSubReg(Loc, MOS::sublo16);
++    Register Hi = TRI.getSubReg(Loc, MOS::subhi16);
++    auto LoInstr = Builder.buildInstr(MI->getOpcode());
++    if (!IsLoad)
++      LoInstr.add(MI->getOperand(0));
++    LoInstr.addReg(Lo, getDefRegState(IsLoad));
++    if (IsLoad)
++      LoInstr.add(MI->getOperand(1));
++    LoInstr.add(MI->getOperand(2))
++        .add(MI->getOperand(3))
++        .addMemOperand(MF.getMachineMemOperand(*MI->memoperands_begin(), 0, 2));
++    auto HiInstr = Builder.buildInstr(MI->getOpcode());
++    if (!IsLoad)
++      HiInstr.add(MI->getOperand(0));
++    HiInstr.addReg(Hi, getDefRegState(IsLoad));
++    if (IsLoad)
++      HiInstr.add(MI->getOperand(1));
++    HiInstr.add(MI->getOperand(2))
++        .addImm(MI->getOperand(3).getImm() + 2)
++        .addMemOperand(MF.getMachineMemOperand(*MI->memoperands_begin(), 2, 2));
++    MI->eraseFromParent();
++    expandLDSTStk(LoInstr);
++    expandLDSTStk(HiInstr);
++    return;
++  }
++
+   if (MOS::Imag16RegClass.contains(Loc)) {
+     if (!IsLoad) {
+       // Loc may not be fully alive at this point, which would create uses of
+@@ -1177,7 +1205,10 @@ bool MOSRegisterInfo::getRegAllocationHints(Register VirtReg,
+ 
+   if (std::optional<Register> StrongHint =
+           getStrongCopyHint(VirtReg, MF, VRM)) {
+-    if (*StrongHint)
++    // A copy may name a register outside this allocation order, such as a
++    // quad on a CPU whose Imag32 order is empty; the allocator accepts only
++    // hints from the order.
++    if (*StrongHint && is_contained(Order, *StrongHint))
+       Hints.push_back(*StrongHint);
+     return true;
+   }
+@@ -1486,8 +1517,6 @@ MOSInstrCost MOSRegisterInfo::copyCost(Register DestReg, Register SrcReg,
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 2;
+   }
+   if (AreClasses(MOS::Imag32RegClass, MOS::Imag32RegClass)) {
+-    // An Imag32 copy costs four byte copies, matching copyPhysRegImpl's
+-    // recursive decomposition into two Imag16 copies.
+     return copyCost(MOS::RC0, MOS::RC1, STI) * 4;
+   }
+   if (AreClasses(MOS::Anyi1RegClass, MOS::Anyi1RegClass)) {
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index 894566f03436..892dcb2f6ff2 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -27,9 +27,7 @@ def sublo : MOSSubRegIndex<8>;
+ // High byte of a 16-bit imaginary pointer register.
+ def subhi : MOSSubRegIndex<8, 8>;
+ 
+-// 16-bit-word subregister indices for the 32-bit imaginary
+-// far-pointer register Imag32 (a quad = pair of 16-bit RS words = 4 contiguous
+-// zero-page __rc bytes). The low word reuses sublo/subhi for its two bytes.
++// Low and high words of a 32-bit imaginary register.
+ def sublo16 : MOSSubRegIndex<16>;
+ def subhi16 : MOSSubRegIndex<16, 16>;
+ 
+@@ -192,14 +190,25 @@ class MOSImagReg16<bits<32> num, string name, list<Register> subregs>
+   let CoveredBySubRegs = 1;
+ }
+ 
++// 32-bit imaginary registers composed of pairs of 16-bit registers.
++class MOSImagReg32<bits<32> num, string name, list<Register> subregs>
++    : MOSReg<num, name> {
++  let SubRegs = subregs;
++  let SubRegIndices = [sublo16, subhi16];
++  let CoveredBySubRegs = 1;
++}
++
++defvar MaxImag32Regs = !sra(MaxImag16Regs, 1);
++defvar Imag32RegsOffset = !add(Imag16RegsOffset, MaxImag16Regs);
++
+ // Now we enumerate the imaginary registers.
+-// Imaginary 8-bit registers, starting with the prefix rc
++// Imaginary 8-bit registers, starting with the prefix rc (c = "char")
+ foreach I = 0...!add(MaxImag8Regs, -1) in {
+   // There exist MaxImag8Regs rcXX registers...
+   defm RC#I: MOSImagReg8<I, "rc"#!cast<string>(I)>;
+ }
+ 
+-// Imaginary 16-bit registers, starting with the prefix rs
++// Imaginary 16-bit registers, starting with the prefix rs (s = "short")
+ foreach I = 0...!add(MaxImag16Regs, -1) in {
+   // There exist MaxImag16Regs rsXX registers...
+   def RS#I: MOSImagReg16<I, "rs"#!cast<string>(I),
+@@ -207,24 +216,12 @@ foreach I = 0...!add(MaxImag16Regs, -1) in {
+        !cast<Register>("RC"#!add(!shl(I,1),1))]>;
+ }
+ 
+-// Far-pointer quads consist of two Imag16 pairs and four consecutive bytes.
+-// Their subregister layout supplies the three bytes read by [dp] addressing.
+-// getReservedRegs reserves a quad whenever either constituent pair is reserved.
+-// Quads have no assigned DWARF number; their byte and word subregisters retain
+-// the existing MOS DWARF mappings.
+-class MOSImagReg32<bits<32> num, string name, list<Register> subregs>
+-    : MOSReg<num, name> {
+-  let DwarfNumbers = [-1];
+-  let SubRegs = subregs;
+-  let SubRegIndices = [sublo16, subhi16];
+-  let CoveredBySubRegs = 1;
+-}
+-defvar MaxImag32Regs = !sra(MaxImag16Regs, 1);
+-defvar Imag32RegsOffset = 0x600;
+-foreach K = 0...!add(MaxImag32Regs, -1) in {
+-  def RL#K: MOSImagReg32<!add(K, Imag32RegsOffset), "rl"#!cast<string>(K),
+-      [!cast<Register>("RS"#!shl(K, 1)),
+-       !cast<Register>("RS"#!add(!shl(K,1),1))]>;
++// Imaginary 32-bit registers, starting with the prefix rl (l = "long")
++foreach I = 0...!add(MaxImag32Regs, -1) in {
++  // There exist MaxImag32Regs rlXX registers...
++  def RL#I: MOSImagReg32<!add(I, Imag32RegsOffset), "rl"#!cast<string>(I),
++      [!cast<Register>("RS"#!shl(I, 1)),
++       !cast<Register>("RS"#!add(!shl(I,1),1))]>;
+ }
+ 
+ //===----------------------------------------------------------------------===//
+@@ -240,7 +237,6 @@ class MOSReg1Class<dag RegList>: MOSRegClass<[i1], 8, RegList> {
+ }
+ class MOSReg8Class<dag RegList>: MOSRegClass<[i8], 8, RegList>;
+ class MOSReg16Class<dag RegList>: MOSRegClass<[i16], 8, RegList>;
+-// 32-bit register class (the far-pointer ZP quad Imag32).
+ class MOSReg32Class<dag RegList>: MOSRegClass<[i32], 8, RegList>;
+ 
+ // Single register classes.
+@@ -261,10 +257,18 @@ let isPressureFineGrained = true in {
+ }
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+-
+-// the 32-bit far-pointer ZP class (4 contiguous __rc bytes).
+-// The runtime far pointer dereferenced by `lda [dp]`/`sta [dp]` lives here.
+-def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))>;
++// RL is allocatable only where its four RS bytes are known to be contiguous:
++// linker scripts may place adjacent RS registers apart. Unless
++// MOSSubtarget::hasAllocatableImag32() holds, Imag32 has an empty allocation
++// order. The registers stay unreserved, so the byte and word registers they
++// overlap keep their calling-convention roles.
++def Imag32 : MOSReg32Class<(sequence "RL%u", 0, !add(MaxImag32Regs, -1))> {
++  let AltOrders = [(sub (sequence "RL%u", 0, !add(MaxImag32Regs, -1)),
++                        (sequence "RL%u", 0, !add(MaxImag32Regs, -1)))];
++  let AltOrderSelect = [{
++    return MF.getSubtarget<MOSSubtarget>().hasAllocatableImag32() ? 0 : 1;
++  }];
++}
+ 
+ // The native-width classes below are opt-in and must not create register
+ // pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
+diff --git a/llvm/lib/Target/MOS/MOSSubtarget.h b/llvm/lib/Target/MOS/MOSSubtarget.h
+index 5cb39f7dfefe..1eff61e60b42 100644
+--- a/llvm/lib/Target/MOS/MOSSubtarget.h
++++ b/llvm/lib/Target/MOS/MOSSubtarget.h
+@@ -102,6 +102,13 @@ public:
+   bool hasR65C02() const { return HasR65C02Insns; }
+   bool hasW65C02() const { return HasW65C02Insns; }
+   bool hasW65816() const { return HasW65816Insns; }
++
++  /// Whether Imag32 (RL) quads may be allocated. A quad is usable only if the
++  /// linker keeps its four RS bytes contiguous, which no platform contract
++  /// states yet. The 65816 needs quads for far (address space 2) data, so it
++  /// allocates them; on every other CPU the Imag32 allocation order is empty.
++  /// This is the one place to switch to a platform contiguity contract.
++  bool hasAllocatableImag32() const { return hasW65816(); }
+   bool has65EL02() const { return Has65EL02Insns; }
+   bool has65CE02() const { return Has65CE02Insns; }
+   bool hasHUC6280() const { return HasHUC6280Insns; }
+diff --git a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+index 14781b292fa5..cab216e32d9b 100644
+--- a/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
++++ b/llvm/lib/Target/MOS/MOSZeroPageAlloc.cpp
+@@ -387,24 +387,20 @@ bool MOSZeroPageAlloc::runOnModule(Module &M) {
+         DenseMap<Register, size_t> &CSRZPOffsets =
+             MF.getInfo<MOSFunctionInfo>()->CSRZPOffsets;
+         const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
++        // Later stages may refer to any alias of an assigned composite CSR.
++        auto AssignImag16 = [&](Register Reg) {
++          CSRZPOffsets[Reg] =
++              CSRZPOffsets[TRI.getSubReg(Reg, MOS::sublo)] = Offset++;
++          CSRZPOffsets[TRI.getSubReg(Reg, MOS::subhi)] = Offset++;
++        };
+         if (MOS::Imag32RegClass.contains(Cand->CSR)) {
+-          // record the quad, BOTH Imag16 sub-pairs and
+-          // all four Imag8 bytes, so every operand form (the [dp] pointer of
+-          // LDA_IndirectLong is the Imag32 itself) is rewritten consistently
+-          // at MC lowering. The four offsets are consecutive by construction,
+-          // which [dp] indirect-long addressing requires.
+-          Register Lo16 = TRI.getSubReg(Cand->CSR, MOS::sublo16);
+-          Register Hi16 = TRI.getSubReg(Cand->CSR, MOS::subhi16);
+-          CSRZPOffsets[Cand->CSR] = CSRZPOffsets[Lo16] =
+-              CSRZPOffsets[TRI.getSubReg(Lo16, MOS::sublo)] = Offset++;
+-          CSRZPOffsets[TRI.getSubReg(Lo16, MOS::subhi)] = Offset++;
+-          CSRZPOffsets[Hi16] = CSRZPOffsets[TRI.getSubReg(Hi16, MOS::sublo)] =
+-              Offset++;
+-          CSRZPOffsets[TRI.getSubReg(Hi16, MOS::subhi)] = Offset++;
++          Register Lo = TRI.getSubReg(Cand->CSR, MOS::sublo16);
++          Register Hi = TRI.getSubReg(Cand->CSR, MOS::subhi16);
++          CSRZPOffsets[Cand->CSR] = Offset;
++          AssignImag16(Lo);
++          AssignImag16(Hi);
+         } else if (MOS::Imag16RegClass.contains(Cand->CSR)) {
+-          CSRZPOffsets[Cand->CSR] =
+-              CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::sublo)] = Offset++;
+-          CSRZPOffsets[TRI.getSubReg(Cand->CSR, MOS::subhi)] = Offset++;
++          AssignImag16(Cand->CSR);
+         } else {
+           CSRZPOffsets[Cand->CSR] = Offset++;
+         }
+@@ -578,6 +574,7 @@ void MOSZeroPageAlloc::collectCandidates(
+   unsigned Idx = 0;
+   DenseSet<Register> Imag16Regs;
+   DenseSet<Register> Imag32Regs;
++  const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
+   for (Register Reg : SavedRegs.set_bits()) {
+     if (!MOS::Imag8RegClass.contains(Reg))
+       continue;
+@@ -598,56 +595,38 @@ void MOSZeroPageAlloc::collectCandidates(
+       Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
+     }
+ 
+-    // if the CSR belongs to an Imag32 quad with live uses
+-    // (a far pointer read via [dp] indirect-long), all FOUR bytes must be
+-    // assigned as one consecutive unit, and the quad super-register itself
+-    // must get a CSRZPOffsets entry so an Imag32 operand (e.g. the pointer of
+-    // LDA_IndirectLong) is rewritten to the ZP-stack location like its byte
+-    // sub-registers are. Without this, the byte defs are silently renamed but
+-    // the [dp] use keeps naming the original __rc quad -> reads garbage.
+-    const TargetRegisterInfo &TRI = *MF.getSubtarget().getRegisterInfo();
+-    Register Imag32 = 0;
+-    for (MCPhysReg Super : TRI.superregs(Reg))
+-      if (MOS::Imag32RegClass.contains(Super)) {
+-        Imag32 = Super;
+-        break;
+-      }
++    // Composite imaginary registers must be assigned as one candidate.
++    // RC has both RS and RL super-registers, so select each layer explicitly.
++    Register Imag16 =
++        TRI.getMatchingSuperReg(Reg, MOS::sublo, &MOS::Imag16RegClass);
++    if (!Imag16)
++      Imag16 =
++          TRI.getMatchingSuperReg(Reg, MOS::subhi, &MOS::Imag16RegClass);
++    assert(MOS::Imag16RegClass.contains(Imag16));
++    Register Imag32 =
++        TRI.getMatchingSuperReg(Imag16, MOS::sublo16, &MOS::Imag32RegClass);
++    if (!Imag32)
++      Imag32 = TRI.getMatchingSuperReg(Imag16, MOS::subhi16,
++                                       &MOS::Imag32RegClass);
+     if (Imag32 && !MF.getRegInfo().reg_nodbg_empty(Imag32)) {
+-      // Don't create the Imag32 candidate more than once (each of the quad's
+-      // four bytes reaches this loop).
+       if (Imag32Regs.contains(Imag32))
+         continue;
+ 
+       Reg = Imag32;
+       Imag32Regs.insert(Reg);
+ 
+-      // Account for the remaining three bytes.
+-      for (int Byte = 0; Byte != 3; ++Byte) {
++      for (unsigned I = 1; I != 4; ++I) {
+         if (Idx++ < 4) {
+-          Benefit += 9 * SaveFreq;     // LDA ZP,PHA
+-          Benefit += 10 * RestoreFreq; // PLA,STA ZP
++          Benefit += 9 * SaveFreq;
++          Benefit += 10 * RestoreFreq;
+         } else {
+-          Benefit += 12 * SaveFreq;    // LDA ZP,STA ABS
+-          Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
++          Benefit += 12 * SaveFreq;
++          Benefit += 12 * RestoreFreq;
+         }
+         ++Size;
+       }
+       Benefit /= Size;
+-
+-      Candidates.push_back(
+-          std::make_unique<Candidate>(Candidate{&MF, Size, /*CSR=*/Reg}));
+-      LocalCandidates.push_back(
+-          LocalCandidate{Candidates.back().get(), Benefit});
+-      continue;
+-    }
+-
+-    // If the CSR is used as a 16-bit pointer, then the two halves cannot be
+-    // assigned independently. Thus, instead of two size-1 candidates, one
+-    // size-2 candidate is used.
+-    Register Imag16 =
+-        *MF.getSubtarget().getRegisterInfo()->superregs(Reg).begin();
+-    assert(MOS::Imag16RegClass.contains(Imag16));
+-    if (!MF.getRegInfo().reg_nodbg_empty(Imag16)) {
++    } else if (!MF.getRegInfo().reg_nodbg_empty(Imag16)) {
+       // Don't create the Imag16 candidate twice.
+       if (Imag16Regs.contains(Imag16))
+         continue;
+@@ -657,10 +636,10 @@ void MOSZeroPageAlloc::collectCandidates(
+ 
+       // Account for the second byte.
+       if (Idx++ < 4) {
+-        Benefit = 9 * SaveFreq;      // LDA ZP,PHA
++        Benefit += 9 * SaveFreq;     // LDA ZP,PHA
+         Benefit += 10 * RestoreFreq; // PLA,STA ZP
+       } else {
+-        Benefit = 12 * SaveFreq;     // LDA ZP,STA ABS
++        Benefit += 12 * SaveFreq;    // LDA ZP,STA ABS
+         Benefit += 12 * RestoreFreq; // LDA ABS,STA ZP
+       }
+       ++Size;
+diff --git a/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir b/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir
+new file mode 100644
+index 000000000000..eae9fb4285ed
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/asm-printer-45gs02.mir
+@@ -0,0 +1,16 @@
++# RUN: llc -mtriple=mos -mcpu=mos45gs02 -start-after=machine-opt-remark-emitter \
++# RUN:   -verify-machineinstrs -o - %s | FileCheck %s
++
++# Physical RL operands are currently reachable only from MIR.
++
++---
++name: imag32_memory_operand
++body: |
++  bb.0.entry:
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl1
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl7
++    ; CHECK-LABEL: imag32_memory_operand
++    ; CHECK: lda [__rc4],z
++    ; CHECK: lda [__rc28],z
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/copy-phys-reg.mir b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+index 9de851df125c..b3621e6dd8e2 100644
+--- a/llvm/test/CodeGen/MOS/copy-phys-reg.mir
++++ b/llvm/test/CodeGen/MOS/copy-phys-reg.mir
+@@ -192,6 +192,25 @@ body: |
+     $rs1 = COPY $rs0
+ ...
+ ---
++name: imag32_to_imag32
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_to_imag32
++    ; CHECK: liveins: $rl1
++    ; CHECK-NEXT: {{  $}}
++    ; CHECK-NEXT: [[LD0:%[0-9]+]]:gpr = LDImag8 $rc4
++    ; CHECK-NEXT: $rc8 = STImag8 [[LD0]]
++    ; CHECK-NEXT: [[LD1:%[0-9]+]]:gpr = LDImag8 $rc5
++    ; CHECK-NEXT: $rc9 = STImag8 [[LD1]]
++    ; CHECK-NEXT: [[LD2:%[0-9]+]]:gpr = LDImag8 $rc6
++    ; CHECK-NEXT: $rc10 = STImag8 [[LD2]]
++    ; CHECK-NEXT: [[LD3:%[0-9]+]]:gpr = LDImag8 $rc7
++    ; CHECK-NEXT: $rc11 = STImag8 [[LD3]]
++    $rl2 = COPY $rl1
++...
++---
+ name: lsb_to_lsb
+ tracksRegLiveness: true
+ body: |
+diff --git a/llvm/test/CodeGen/MOS/far-access-non-65816.ll b/llvm/test/CodeGen/MOS/far-access-non-65816.ll
+index e452a289ee30..35c7f44d0ce8 100644
+--- a/llvm/test/CodeGen/MOS/far-access-non-65816.ll
++++ b/llvm/test/CodeGen/MOS/far-access-non-65816.ll
+@@ -1,19 +1,21 @@
+ ; RUN: split-file %s %t
+-; RUN: not llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR
+-; RUN: not llc -mtriple=mos -mcpu=mos65c02 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR
+-; RUN: not llc -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR
+-; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs %t/value.ll -o - | FileCheck %s --check-prefix=VALUE
+-; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs -o /dev/null %t/access.ll
++; RUN: not llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR --implicit-check-not="error:"
++; RUN: not llc -mtriple=mos -mcpu=mos65c02 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR --implicit-check-not="error:"
++; RUN: not llc -mtriple=mos -mcpu=mosspc700 -O2 -verify-machineinstrs -o /dev/null %t/access.ll 2>&1 | FileCheck %s --check-prefix=ERR --implicit-check-not="error:"
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs -o /dev/null %t/access-w65816.ll
+ 
+ ; Far (addrspace 2) memory is reached only with 65816 long addressing. On any
+ ; other MOS CPU a far load, store, extending load or memory intrinsic is
+ ; diagnosed instead of being selected as a 65816 [dp] opcode, which those CPUs
+ ; decode as unrelated instructions ($A7 is an undocumented LAX on the 6502).
+-; Passing a far pointer as a value stays legal.
++; Each access is diagnosed once, before a wide access is split into bytes. Far
++; pointer values themselves need Imag32 quads, which only the 65816 allocates
++; (MOSSubtarget::hasAllocatableImag32), so they are not supported elsewhere.
+ 
+ ; ERR: error: {{.*}}in function ld_rt i8 (ptr addrspace(2)): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+ ; ERR: error: {{.*}}in function st_rt void (ptr addrspace(2), i8): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+ ; ERR: error: {{.*}}in function ld_zext i16 (ptr addrspace(2)): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
++; ERR: error: {{.*}}in function ld_i32 i32 (ptr addrspace(2)): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+ ; ERR: error: {{.*}}in function set_far void (ptr addrspace(2), i16): far (address space 2) memory access requires 65816 long addressing; the target CPU has none
+ 
+ ;--- access.ll
+@@ -33,6 +35,11 @@ define i16 @ld_zext(ptr addrspace(2) %p) {
+   ret i16 %z
+ }
+ 
++define i32 @ld_i32(ptr addrspace(2) %p) {
++  %v = load i32, ptr addrspace(2) %p
++  ret i32 %v
++}
++
+ define void @set_far(ptr addrspace(2) %p, i16 %n) {
+   call void @llvm.memset.p2.i16(ptr addrspace(2) %p, i8 0, i16 %n, i1 false)
+   ret void
+@@ -40,12 +47,19 @@ define void @set_far(ptr addrspace(2) %p, i16 %n) {
+ 
+ declare void @llvm.memset.p2.i16(ptr addrspace(2), i8, i16, i1 immarg)
+ 
+-;--- value.ll
+-declare void @use(ptr addrspace(2))
++;--- access-w65816.ll
++define i8 @ld_rt(ptr addrspace(2) %p) {
++  %v = load i8, ptr addrspace(2) %p
++  ret i8 %v
++}
+ 
+-; VALUE-LABEL: pass:
+-; VALUE: {{jsr|jmp}} use
+-define void @pass(ptr addrspace(2) %p) {
+-  call void @use(ptr addrspace(2) %p)
++define void @st_rt(ptr addrspace(2) %p, i8 %v) {
++  store i8 %v, ptr addrspace(2) %p
+   ret void
+ }
++
++define i16 @ld_zext(ptr addrspace(2) %p) {
++  %v = load i8, ptr addrspace(2) %p
++  %z = zext i8 %v to i16
++  ret i16 %z
++}
+diff --git a/llvm/test/CodeGen/MOS/far-addressing.ll b/llvm/test/CodeGen/MOS/far-addressing.ll
+index ae7aa512e195..9322a1c56e95 100644
+--- a/llvm/test/CodeGen/MOS/far-addressing.ll
++++ b/llvm/test/CodeGen/MOS/far-addressing.ll
+@@ -2,7 +2,7 @@
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -verify-machineinstrs -filetype=obj -o %t.o < %s
+ ; RUN: llvm-objdump -d --print-imm-hex %t.o | FileCheck %s --check-prefix=OBJ
+ 
+-; #320 far addressing — the four data opcodes of the AS_Far (addrspace 2) model.
++; Far addressing: the four data opcodes of the AS_Far (addrspace 2) model.
+ ; The emulator ROM gates (dev/run.sh far_indir / far_store / far-bank1 ...) cover
+ ; the runtime behaviour; this test pins the SELECTED OPCODE, which they cannot.
+ ; These are the shapes MOSInstructionSelector::selectAddr / selectGeneric produce:
+diff --git a/llvm/test/CodeGen/MOS/far-fold-debug.ll b/llvm/test/CodeGen/MOS/far-fold-debug.ll
+new file mode 100644
+index 000000000000..fe730fd2b5eb
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-fold-debug.ll
+@@ -0,0 +1,142 @@
++; RUN: split-file %s %t
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/global-field.ll -o - | FileCheck %s --check-prefix=DROP
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %t/global-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/field.ll -o - | FileCheck %s --check-prefix=DROP
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %t/field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/store-field.ll -o - | FileCheck %s --check-prefix=DROP
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O0 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %t/store-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs -stop-after=legalizer %t/offset-field.ll -o - | FileCheck %s --check-prefix=DROP
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs %t/offset-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs %t/offset-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs %t/offset-field.ll -o /dev/null
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs %t/offset-field.ll -o /dev/null
++
++; A far addressing-mode fold replaces an access's pointer with a base and an
++; offset the new instruction encodes, so the G_PTR_ADDs that computed the
++; pointer die. salvageDebugInfo cannot express a G_PTR_ADD, so the fold drops
++; the location of each remaining DBG_VALUE of those adds ($noreg) instead of
++; leaving it on an erased register, which the verifier rejects under -g.
++; Sections:
++;   global-field: a far global plus a constant, folded into absolute-long addressing.
++;   field: a runtime far pointer plus 1, folded into the [dp],Y displacement window.
++;   store-field: a store through a runtime far pointer plus 3 (displacement window).
++;   offset-field: a runtime offset plus 1 from a runtime far pointer (runtime fold or window).
++
++; DROP-LABEL: name: walk
++; DROP: DBG_VALUE $noreg, $noreg, !{{[0-9]+}}, !DIExpression()
++; DROP-NOT: G_PTR_ADD
++
++;--- global-field.ll
++@g = external addrspace(2) global [16 x i8]
++
++define i8 @walk() !dbg !10 {
++  %q = getelementptr i8, ptr addrspace(2) @g, i32 1
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %q, metadata !17, metadata !DIExpression()), !dbg !20
++  %b = load i8, ptr addrspace(2) %q, !dbg !20
++  ret i8 %b, !dbg !20
++}
++
++declare void @llvm.dbg.value(metadata, metadata, metadata)
++
++!llvm.dbg.cu = !{!0}
++!llvm.module.flags = !{!2, !3}
++!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: "test", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)
++!1 = !DIFile(filename: "far.c", directory: "/tmp")
++!2 = !{i32 2, !"Dwarf Version", i32 4}
++!3 = !{i32 2, !"Debug Info Version", i32 3}
++!10 = distinct !DISubprogram(name: "walk", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)
++!11 = !DISubroutineType(types: !12)
++!12 = !{null}
++!13 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_unsigned_char)
++!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)
++!17 = !DILocalVariable(name: "q", scope: !10, file: !1, line: 3, type: !14)
++!20 = !DILocation(line: 2, scope: !10)
++
++;--- field.ll
++define i8 @walk(ptr addrspace(2) %base) !dbg !10 {
++  %q = getelementptr i8, ptr addrspace(2) %base, i32 1
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %q, metadata !17, metadata !DIExpression()), !dbg !20
++  %b = load i8, ptr addrspace(2) %q, !dbg !20
++  ret i8 %b, !dbg !20
++}
++
++declare void @llvm.dbg.value(metadata, metadata, metadata)
++
++!llvm.dbg.cu = !{!0}
++!llvm.module.flags = !{!2, !3}
++!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: "test", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)
++!1 = !DIFile(filename: "far.c", directory: "/tmp")
++!2 = !{i32 2, !"Dwarf Version", i32 4}
++!3 = !{i32 2, !"Debug Info Version", i32 3}
++!10 = distinct !DISubprogram(name: "walk", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)
++!11 = !DISubroutineType(types: !12)
++!12 = !{null}
++!13 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_unsigned_char)
++!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)
++!17 = !DILocalVariable(name: "q", scope: !10, file: !1, line: 3, type: !14)
++!20 = !DILocation(line: 2, scope: !10)
++
++;--- store-field.ll
++define void @walk(ptr addrspace(2) %base, i8 %v) !dbg !10 {
++  %q = getelementptr i8, ptr addrspace(2) %base, i32 3
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %q, metadata !17, metadata !DIExpression()), !dbg !20
++  store i8 %v, ptr addrspace(2) %q, !dbg !20
++  ret void, !dbg !20
++}
++
++declare void @llvm.dbg.value(metadata, metadata, metadata)
++
++!llvm.dbg.cu = !{!0}
++!llvm.module.flags = !{!2, !3}
++!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: "test", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)
++!1 = !DIFile(filename: "far.c", directory: "/tmp")
++!2 = !{i32 2, !"Dwarf Version", i32 4}
++!3 = !{i32 2, !"Debug Info Version", i32 3}
++!10 = distinct !DISubprogram(name: "walk", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)
++!11 = !DISubroutineType(types: !12)
++!12 = !{null}
++!13 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_unsigned_char)
++!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)
++!17 = !DILocalVariable(name: "q", scope: !10, file: !1, line: 3, type: !14)
++!20 = !DILocation(line: 2, scope: !10)
++
++;--- offset-field.ll
++define i8 @walk(ptr addrspace(2) %base, i8 %n) !dbg !10 {
++  %off = zext i8 %n to i32
++  %p = getelementptr i8, ptr addrspace(2) %base, i32 %off
++  %q = getelementptr i8, ptr addrspace(2) %p, i32 1
++  call void @llvm.dbg.value(metadata ptr addrspace(2) %q, metadata !17, metadata !DIExpression()), !dbg !20
++  %b = load i8, ptr addrspace(2) %q, !dbg !20
++  ret i8 %b, !dbg !20
++}
++
++declare void @llvm.dbg.value(metadata, metadata, metadata)
++
++!llvm.dbg.cu = !{!0}
++!llvm.module.flags = !{!2, !3}
++!0 = distinct !DICompileUnit(language: DW_LANG_C99, file: !1, producer: "test", isOptimized: true, runtimeVersion: 0, emissionKind: FullDebug)
++!1 = !DIFile(filename: "far.c", directory: "/tmp")
++!2 = !{i32 2, !"Dwarf Version", i32 4}
++!3 = !{i32 2, !"Debug Info Version", i32 3}
++!10 = distinct !DISubprogram(name: "walk", scope: !1, file: !1, line: 1, type: !11, spFlags: DISPFlagDefinition | DISPFlagOptimized, unit: !0)
++!11 = !DISubroutineType(types: !12)
++!12 = !{null}
++!13 = !DIBasicType(name: "char", size: 8, encoding: DW_ATE_unsigned_char)
++!14 = !DIDerivedType(tag: DW_TAG_pointer_type, baseType: !13, size: 32)
++!17 = !DILocalVariable(name: "q", scope: !10, file: !1, line: 3, type: !14)
++!20 = !DILocation(line: 2, scope: !10)
+diff --git a/llvm/test/CodeGen/MOS/far-indir-indexed.ll b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
+index ee3265db19ad..dc034ece36a0 100644
+--- a/llvm/test/CodeGen/MOS/far-indir-indexed.ll
++++ b/llvm/test/CodeGen/MOS/far-indir-indexed.ll
+@@ -121,8 +121,8 @@ define i8 @far_load_indir_idx4(i32 %a) {
+   ret i8 %v
+ }
+ 
+-; A full-width 32-bit RUNTIME index has no known-bits bound, so increment 2's
+-; range proof rejects it in every mode and the pointer add stays.
++; A full-width 32-bit RUNTIME index has no known-bits bound, so the runtime
++; fold's range proof rejects it in every mode and the pointer add stays.
+ define i8 @far_load_indir_var(i32 %a, i32 %i) {
+ ; CHECK-LABEL: far_load_indir_var:
+ ; CHECK-NOT: lda [__rc{{[0-9]+}}],y
+@@ -317,7 +317,8 @@ define void @far_rt_store_idx16(i32 %a, i16 %i, i8 %v) {
+ 
+ ; A u16 element at an UNMASKED u8 index: the scaled offsets reach 511, past an
+ ; 8-bit Y. +mos-a16: no runtime fold — byte 0 is plain `lda [dp]` off the
+-; materialised pointer and byte 1 is increment 1's `ldy #1`. +mos-xy16: both
++; materialised pointer and byte 1 is the displacement window's `ldy #1`.
++; +mos-xy16: both
+ ; bytes fold with a 16-bit Y off the ORIGINAL pointer.
+ define i16 @far_rt_load_u16_idx8(i32 %a, i8 %i) {
+ ; CHECK-LABEL: far_rt_load_u16_idx8:
+diff --git a/llvm/test/CodeGen/MOS/far-memop-length.ll b/llvm/test/CodeGen/MOS/far-memop-length.ll
+index ba03702a149b..ad9e77157a2d 100644
+--- a/llvm/test/CodeGen/MOS/far-memop-length.ll
++++ b/llvm/test/CodeGen/MOS/far-memop-length.ll
+@@ -1,13 +1,23 @@
+-; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs < %s | FileCheck %s
+-; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs < %s | FileCheck %s
+-; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: split-file %s %t
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs < %t/far.ll | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs < %t/far.ll | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %t/far.ll | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs < %t/mixed.ll | FileCheck %s --check-prefix=MIXED
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs < %t/mixed.ll | FileCheck %s --check-prefix=MIXED
+ 
+-; A far memset/memcpy/memmove length is passed to the 16-bit __mem*_far
+-; entries only when it provably fits 16 bits (a constant <= 0xFFFF, or known
++; When every pointer operand is far, a memset/memcpy/memmove length is passed
++; to the 16-bit __mem*_far entries only when it provably fits 16 bits (a constant <= 0xFFFF, or known
+ ; bits). Any other length goes to the uint32_t __mem*_far32 entries and is never
+ ; truncated to 16 bits (which would turn 70000 into 4464, 65536 into 0 and 65537
+ ; into 1).
+ 
++; Mixed address spaces: the IRTranslator narrows a memcpy/memmove length to the
++; smaller pointer's index width before legalization. For a near (addrspace 0)
++; operand that is 16 bits. This is sound because LangRef ("Allocated objects")
++; bounds a near object by 32767 bytes, so a longer length is undefined
++; behaviour. 40000 fits 16 bits and is kept; 70000 is narrowed to 4464.
++
++;--- far.ll
+ define void @set_65535(ptr addrspace(2) %d) {
+ ; CHECK-LABEL: set_65535:
+ ; CHECK: {{jsr|jmp}} __memset_far{{$}}
+@@ -103,3 +113,24 @@ declare void @llvm.memset.p2.i32(ptr addrspace(2), i8, i32, i1 immarg)
+ declare void @llvm.memset.p2.i16(ptr addrspace(2), i8, i16, i1 immarg)
+ declare void @llvm.memcpy.p2.p2.i32(ptr addrspace(2), ptr addrspace(2), i32, i1 immarg)
+ declare void @llvm.memmove.p2.p2.i32(ptr addrspace(2), ptr addrspace(2), i32, i1 immarg)
++
++;--- mixed.ll
++define void @cpy_near_40000(ptr addrspace(2) %d, ptr %s) {
++; MIXED-LABEL: cpy_near_40000:
++; MIXED: lda #64
++; MIXED-NEXT: ldx #156
++; MIXED-NEXT: {{jsr|jmp}} __memcpy_far{{$}}
++  call void @llvm.memcpy.p2.p0.i32(ptr addrspace(2) %d, ptr %s, i32 40000, i1 false)
++  ret void
++}
++
++define void @cpy_near_70000(ptr addrspace(2) %d, ptr %s) {
++; MIXED-LABEL: cpy_near_70000:
++; MIXED: lda #112
++; MIXED-NEXT: ldx #17
++; MIXED-NEXT: {{jsr|jmp}} __memcpy_far{{$}}
++  call void @llvm.memcpy.p2.p0.i32(ptr addrspace(2) %d, ptr %s, i32 70000, i1 false)
++  ret void
++}
++
++declare void @llvm.memcpy.p2.p0.i32(ptr addrspace(2), ptr, i32, i1 immarg)
+diff --git a/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll b/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll
+index ee881cbae379..76c4e2c91dd5 100644
+--- a/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll
++++ b/llvm/test/CodeGen/MOS/far-ptr-arg-exhaustion.ll
+@@ -3,13 +3,17 @@
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -stop-after=irtranslator < %s | FileCheck %s
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs -o /dev/null < %s
+ ; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs -o /dev/null < %s
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs -stop-after=irtranslator < %s | FileCheck %s --check-prefix=STACK
+ 
+ ; A far (addrspace 2) pointer argument that finds no free quad goes to a
+ ; 4-byte stack slot. It must never reach the generic 16-bit CCIfPtr rule, whose
+ ; RS pair cannot hold the 32-bit value (a "COPY $rs1" into a p2 is a
+-; size-mismatched copy). Plain mosw65816 is checked through call lowering only:
+-; without +mos-a16 a far pointer value in memory (here the stacked argument) is
+-; not legalizable, the same limitation as loading a far pointer from any other
++; size-mismatched copy). Quads are allocated only on the 65816
++; (MOSSubtarget::hasAllocatableImag32), so on other CPUs every far pointer
++; argument takes a stack slot.
++; Plain mosw65816 and mos6502 are checked through call lowering only: without
++; +mos-a16 a far pointer value in memory (here the stacked argument) is not
++; legalizable, the same limitation as loading a far pointer from any other
+ ; memory.
+ 
+ ; Four far pointers: the fourth exceeds RL1..RL3 while RS1 is still free.
+@@ -22,6 +26,11 @@ define i8 @callee4(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c
+ ; CHECK-NEXT: [[D:%[0-9]+]]:_(p2) = G_LOAD [[FI]](p0) :: (invariant load (p2) from %fixed-stack.0, align 1)
+ ; CHECK-NOT: COPY $rs
+ ; CHECK: G_LOAD [[D]](p2) :: (volatile load (s8) from %ir.d, addrspace 2)
++; STACK-LABEL: name: callee4
++; STACK: - { id: 3, type: default, offset: 0, size: 4,
++; STACK-NOT: liveins: $rl
++; STACK: [[A:%[0-9]+]]:_(p2) = G_LOAD {{%[0-9]+}}(p0) :: (invariant load (p2) from %fixed-stack.3, align 1)
++; STACK: G_LOAD [[A]](p2) :: (volatile load (s8) from %ir.a, addrspace 2)
+   %va = load volatile i8, ptr addrspace(2) %a
+   %vd = load volatile i8, ptr addrspace(2) %d
+   %s = add i8 %va, %vd
+@@ -34,6 +43,11 @@ define i8 @caller4(ptr addrspace(2) %a, ptr addrspace(2) %b, ptr addrspace(2) %c
+ ; CHECK: G_STORE %0(p2), {{%[0-9]+}}(p0) :: (store (p2) into stack, align 1)
+ ; CHECK: JSR @callee4, mos_csr, implicit $rl1, implicit $rl2, implicit $rl3, implicit-def $a
+ ; CHECK: ADJCALLSTACKUP 4, 0
++; STACK-LABEL: name: caller4
++; STACK: ADJCALLSTACKDOWN 16, 0
++; STACK: G_STORE {{%[0-9]+}}(p2), {{%[0-9]+}}(p0) :: (store (p2) into stack, align 1)
++; STACK: G_STORE {{%[0-9]+}}(p2), {{%[0-9]+}}(p0) :: (store (p2) into stack + 12, align 1)
++; STACK-NEXT: JSR @callee4, mos_csr, implicit-def $a
+   %r = call i8 @callee4(ptr addrspace(2) %d, ptr addrspace(2) %c, ptr addrspace(2) %b, ptr addrspace(2) %a)
+   ret i8 %r
+ }
+@@ -75,4 +89,3 @@ define i8 @callee_nnnfff(ptr %n1, ptr %n2, ptr %n3, ptr addrspace(2) %a, ptr add
+   %s = add i8 %vc, %vn
+   ret i8 %s
+ }
+-
+diff --git a/llvm/test/CodeGen/MOS/far-quad-spill-call.ll b/llvm/test/CodeGen/MOS/far-quad-spill-call.ll
+new file mode 100644
+index 000000000000..4e66d53cc0ed
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/far-quad-spill-call.ll
+@@ -0,0 +1,22 @@
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O0 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O0 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -mattr=+mos-a16,+mos-xy16 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; Four far pointers live across a call: only three callee-saved quads exist
++; (__rc20-__rc31), so at least one quad is spilled and reloaded as four bytes.
++
++declare void @ext()
++
++; CHECK-LABEL: f:
++; CHECK: jsr ext
++; CHECK-COUNT-4: lda [__rc{{[0-9]+}}]
++; CHECK: rts
++define i8 @f(ptr addrspace(2) %p0, ptr addrspace(2) %p1, ptr addrspace(2) %p2, ptr addrspace(2) %p3) {
++  call void @ext()
++  %v0 = load volatile i8, ptr addrspace(2) %p0
++  %v1 = load volatile i8, ptr addrspace(2) %p1
++  %v2 = load volatile i8, ptr addrspace(2) %p2
++  %v3 = load volatile i8, ptr addrspace(2) %p3
++  ret i8 %v0
++}
+diff --git a/llvm/test/CodeGen/MOS/imag32-allocation-gate.mir b/llvm/test/CodeGen/MOS/imag32-allocation-gate.mir
+new file mode 100644
+index 000000000000..ff5bfae19533
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-allocation-gate.mir
+@@ -0,0 +1,20 @@
++# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-before=greedy -stop-after=virtregrewriter -verify-machineinstrs %s -o - | FileCheck %s --check-prefix=ALLOC
++# RUN: not llc -mtriple=mos -mcpu=mos6502 -start-before=greedy -stop-after=virtregrewriter -verify-machineinstrs %s -o /dev/null 2>&1 | FileCheck %s --check-prefix=RESERVED
++
++# Imag32 quads are allocated only where MOSSubtarget::hasAllocatableImag32()
++# holds, which is the 65816; every other CPU has an empty Imag32 allocation
++# order, because linker scripts may place adjacent RS registers apart. A copy
++# from a quad outside the order is not used as an allocation hint.
++
++# ALLOC: renamable $rl1 = IMPLICIT_DEF
++# ALLOC-NEXT: RTS implicit $rl1
++# RESERVED: error: {{.*}}no registers from class available to allocate in function 'imag32_vreg'
++---
++name: imag32_vreg
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    %0:imag32 = IMPLICIT_DEF
++    $rl1 = COPY %0
++    RTS implicit $rl1
++...
+diff --git a/llvm/test/CodeGen/MOS/imag32-copy.mir b/llvm/test/CodeGen/MOS/imag32-copy.mir
+index 19511de6a189..38243d70dd6c 100644
+--- a/llvm/test/CodeGen/MOS/imag32-copy.mir
++++ b/llvm/test/CodeGen/MOS/imag32-copy.mir
+@@ -1,25 +1,14 @@
+-# RUN: llc -mtriple=mos -mcpu=mosw65816 -start-before=postrapseudos -verify-machineinstrs %s -o - | FileCheck %s
++# RUN: llc -mtriple=mos -O2 -start-before=mos-copy-opt -verify-machineinstrs \
++# RUN:   -o - %s | FileCheck %s
+ 
+-# RLk is the quad of Imag16 pairs RS(2k) and RS(2k+1): four consecutive
+-# zero-page bytes. A quad copy is four byte copies in address order, and each
+-# byte is named by its own __rc symbol.
+-
+-# CHECK-LABEL: copy_quad:
+-# CHECK:      ldx __rc8
+-# CHECK-NEXT: stx __rc4
+-# CHECK-NEXT: ldx __rc9
+-# CHECK-NEXT: stx __rc5
+-# CHECK-NEXT: ldx __rc10
+-# CHECK-NEXT: stx __rc6
+-# CHECK-NEXT: ldx __rc11
+-# CHECK-NEXT: stx __rc7
+-# CHECK-NEXT: rts
+ ---
+-name: copy_quad
++name: imag32_copy
+ tracksRegLiveness: true
+ body: |
+-  bb.0:
+-    liveins: $rl2
+-    $rl1 = COPY killed $rl2
+-    RTS implicit $rl1
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: imag32_copy:
++    ; CHECK: rts
++    $rl2 = COPY $rl1
++    RTS
+ ...
+diff --git a/llvm/test/CodeGen/MOS/imag32-registers.mir b/llvm/test/CodeGen/MOS/imag32-registers.mir
+new file mode 100644
+index 000000000000..7aa34d48ca59
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-registers.mir
+@@ -0,0 +1,27 @@
++# RUN: llc -mtriple=mos -run-pass=none -verify-machineinstrs -o - %s | FileCheck %s
++
++---
++name: imag32_register
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_register
++    ; CHECK: liveins: $rl1
++    ; CHECK: $rl1 = IMPLICIT_DEF
++    $rl1 = IMPLICIT_DEF
++    RTS
++...
++---
++name: imag32_word_subregisters
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    liveins: $rl1
++    ; CHECK-LABEL: name: imag32_word_subregisters
++    ; CHECK: $rs4 = EXTRACT_SUBREG $rl1, %subreg.sublo16
++    ; CHECK: $rs5 = EXTRACT_SUBREG $rl1, %subreg.subhi16
++    $rs4 = EXTRACT_SUBREG $rl1, %subreg.sublo16
++    $rs5 = EXTRACT_SUBREG $rl1, %subreg.subhi16
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll b/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll
+new file mode 100644
+index 000000000000..fc8f243cc2d0
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-reserved-pairs.ll
+@@ -0,0 +1,16 @@
++; RUN: llc -mtriple=mos -mcpu=mos6502 -O2 -verify-machineinstrs < %s | FileCheck %s
++; RUN: llc -mtriple=mos -mcpu=mosw65816 -O2 -verify-machineinstrs < %s | FileCheck %s
++
++; An Imag32 quad that overlaps a reserved pair is reserved too. Otherwise the
++; stack pointer's register units are no longer reserved (RL0 covers RS0), and a
++; call with stack arguments aborts live-range computation in the register
++; coalescer with "Invalid global physical register".
++
++; CHECK-LABEL: main:
++; CHECK: jsr mini_sprintf
++define i16 @main() {
++  call void (ptr, ptr, ...) @mini_sprintf(ptr null, ptr null, i16 0, i16 0)
++  ret i16 0
++}
++
++declare void @mini_sprintf(ptr, ptr, ...)
+diff --git a/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir b/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir
+new file mode 100644
+index 000000000000..141fb1add8c1
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/imag32-zp-alloc.mir
+@@ -0,0 +1,26 @@
++# RUN: llc -mtriple=mos -mcpu=mos45gs02 -O2 -zp-avail=224 \
++# RUN:   -start-before=mos-zero-page-alloc -verify-machineinstrs -o - %s \
++# RUN:   | FileCheck %s
++
++--- |
++  target triple = "mos"
++
++  define void @imag32_zp() #0 {
++  entry:
++    ret void
++  }
++
++  attributes #0 = { "nonreentrant" }
++...
++---
++name: imag32_zp
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    $rl5 = IMPLICIT_DEF
++    INLINEASM &"lda [$0],z", 9 /* sideeffect mayload attdialect */, 196622 /* mem:m */, $rl5
++    ; CHECK-LABEL: imag32_zp:
++    ; CHECK: lda [mos8(.Limag32_zp_zp_stk)],z
++    ; CHECK: .size .Limag32_zp_zp_stk, 4
++    RTS
++...
+diff --git a/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll b/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
+index 3a4374841844..27460500165d 100644
+--- a/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
++++ b/llvm/test/CodeGen/MOS/inline-asm-zp-csr.ll
+@@ -16,9 +16,7 @@ define void @inline_asm_zp_csr(i8 %c) "nonreentrant" {
+ ; CHECK-NEXT:    sta mos8(.Linline_asm_zp_csr_zp_stk+1)
+ ; CHECK-NEXT:    ;APP
+ ; CHECK-NEXT:    lda mos8(.Linline_asm_zp_csr_zp_stk)
+-; CHECK-EMPTY:
+ ; CHECK-NEXT:    lda mos8(.Linline_asm_zp_csr_zp_stk+1)
+-; CHECK-EMPTY:
+ ; CHECK-NEXT:    ;NO_APP
+ ; CHECK-NEXT:    rts
+ entry:
+diff --git a/llvm/test/CodeGen/MOS/prologepilog.mir b/llvm/test/CodeGen/MOS/prologepilog.mir
+index 4fa2e3acd73f..f8dad8ad3d86 100644
+--- a/llvm/test/CodeGen/MOS/prologepilog.mir
++++ b/llvm/test/CodeGen/MOS/prologepilog.mir
+@@ -253,6 +253,32 @@ body: |
+ 
+ ...
+ ---
++name: ld_far_ptr
++stack:
++  - { id: 0, size: 4 }
++body: |
++  bb.0.entry:
++    ; CHECK-LABEL: name: ld_far_ptr
++    ; CHECK: $rc4 = COPY killed $a
++    ; CHECK: $rc5 = COPY killed $a
++    ; CHECK: $rc6 = COPY killed $a
++    ; CHECK: $rc7 = COPY killed $a
++    $rl1, early-clobber $rs1 = LDStk %stack.0, 0 :: (load 4 from %stack.0)
++...
++---
++name: st_far_ptr
++stack:
++  - { id: 0, size: 4 }
++body: |
++  bb.0.entry:
++    ; CHECK-LABEL: name: st_far_ptr
++    ; CHECK: $a = COPY $rc4
++    ; CHECK: $a = COPY $rc5
++    ; CHECK: $a = COPY $rc6
++    ; CHECK: $a = COPY $rc7
++    early-clobber $rs1 = STStk $rl1, %stack.0, 0 :: (store 4 into %stack.0)
++...
++---
+ name: st_byte
+ stack:
+   - { id: 0, size: 1 }
+diff --git a/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir b/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir
+new file mode 100644
+index 000000000000..ba492ff86e7e
+--- /dev/null
++++ b/llvm/test/CodeGen/MOS/zp-alloc-composite-benefit.mir
+@@ -0,0 +1,26 @@
++# REQUIRES: asserts
++# RUN: llc -mtriple=mos -O2 -zp-avail=224 \
++# RUN:   -start-before=mos-zero-page-alloc \
++# RUN:   -debug-only=mos-zero-page-alloc -o /dev/null %s 2>&1 \
++# RUN:   | FileCheck %s
++
++# CHECK: CSR $rs10, Size 2, Benefit 1.900000e+01
++
++--- |
++  target triple = "mos"
++
++  define void @imag16_zp_benefit() #0 {
++  entry:
++    ret void
++  }
++
++  attributes #0 = { "nonreentrant" }
++...
++---
++name: imag16_zp_benefit
++tracksRegLiveness: true
++body: |
++  bb.0.entry:
++    $rs10 = IMPLICIT_DEF
++    RTS
++...

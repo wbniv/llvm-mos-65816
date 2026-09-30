@@ -86,12 +86,15 @@
           "docs/defects/mos-coalescing-rc-undef.json": "74187474fc32b497514fffc573c372dce806f9f138404a4ff9b54a119cef0f7a",
           "docs/defects/mos-far-access-non-65816.json": "552b6483adfedf17890efc86ef069432227360cc96ee1188e8abda15206d0b3f",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "07f335500f42673c0eca96ed83e4fd40db8e5cd500971efcb72fbf6bc74a2087",
-          "docs/defects/mos-far-index-fold-dangling-dbg.json": "58d2bf2bb3a3a00746dc74c2d4d9a11741bb390278dcc0b7eeec837b76ffe6eb",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "c7d293e267c5b9ebb52c89da9ed0f19fae05d6bde6c731221f886f0ccfd0ee09",
+          "docs/defects/mos-far-index-fold-dangling-dbg.json": "2723962e3606e07e617c4ebcfde823d3505d9168d4d87cf397d1b9e2a9439cd8",
           "docs/defects/mos-far-memop-length-truncation.json": "91f4fe1cc38b07aae2f03652fd45de84fd39bd23a2a90a80fd902c2949ade72d",
           "docs/defects/mos-far-memset-wrong-bank.json": "d3a6f214666fb72e285819affdfc3f822a8f0ae006ad000f4a08bd474036bc07",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "bc62029675d6c745522a7f2dd823787379dd57877591b659d93f2dfb83695669",
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
+          "docs/defects/mos-imag32-reserved-pair-units.json": "77c4e9eae0f1b77813cc9be6ac34a5e9a8ea290f0a7c4b3e9c1495f25c178ab4",
+          "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "80663f5d8e17cf3203aba58c8dfa8e86a98cc3f45c4f1e6caee514ed44b8853a",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
           "docs/defects/mos-native-width-pressure-sets.json": "9cbeec7386091f060937d224db03df1170c793618f754a033e6578b1017a20f1",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
@@ -114,7 +117,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "7066a90efd5cce9c824779e93df0b223e4865e0aff7900a13ae4dafcf31dbae8"
+          "docs/upstream-dashboard.json": "c123978d756e1d8e5ad5dc7fea31f6c8adba728978ee2efbb2ee63af9e325a42"
         }
       }
     },
@@ -135,13 +138,13 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
+          "docs/upstream-pending-work.md": "88010a7fca6babe47b84767690e8f9efba1d045d1d725d2809eae9a59b406bde",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "7066a90efd5cce9c824779e93df0b223e4865e0aff7900a13ae4dafcf31dbae8",
+          "docs/upstream-dashboard.json": "c123978d756e1d8e5ad5dc7fea31f6c8adba728978ee2efbb2ee63af9e325a42",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "fe545f440511c75d099f7836f35ca0adb2f8591d08ee6fbc0aa20f609627aaf4"
+          "docs/upstream-dashboard-graph.json": "a85df862493bbdcc639d236be361e0ce37e26a7d9e2615c60bb0f26754e72c58"
         }
       }
     },
@@ -309,12 +312,15 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
@@ -359,9 +365,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T20:57:36.739247+00:00",
-        "note": "The carry-scheduling pressure-contract item gained its 2026-10-01 finding and candidate summary (nothing landed); the carry plan's dated pointer and the canonical record's new run say the same. Other items unchanged by this change.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-09-30T21:42:15.993199+00:00",
+        "note": "NOT reviewed by this agent: TODO.md belongs to the orchestrator. Receipt refreshed only so the second-round #320 records (mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream) can be committed; the 0069/0070 items still describe the second review's open blockers and need the orchestrator's update.",
+        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
       }
     },
     {
@@ -404,12 +410,15 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
@@ -446,9 +455,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T20:55:57.185065+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-09-30T21:35:49.436818+00:00",
+        "note": "Far-word status updated for the second round of the #320 carry (#594 carried, new records mos-imag32-reserved-pair-units, mos-far-fold-dangling-dbg-sites, mos-legalizer-fold-dangling-dbg-upstream).",
+        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
       }
     },
     {
@@ -491,12 +500,15 @@
           "docs/defects/mos-coalescing-rc-undef.json": "825cb224c95b008b4baebaba827e7d1947182fea1dd466522499b84b73ca8323",
           "docs/defects/mos-far-access-non-65816.json": "eb14fdbe114385fff4078dddf9871e36ce20eb73ee919d617c7a2a34c0751b69",
           "docs/defects/mos-far-cc-split-axy-custom-args.json": "de4cbde6f1c87112e11489f1ddc048b280950a105f31b8a0796a09fcde2f1925",
+          "docs/defects/mos-far-fold-dangling-dbg-sites.json": "3d0b1991a4250a4eeb873eda2fa7e6cc0290d098a6ed5082ce1586e57aed7aee",
           "docs/defects/mos-far-index-fold-dangling-dbg.json": "d9e919a9bd78027c40067afd46e59b5664f5367571cb11f2dd537d81fdd857ad",
           "docs/defects/mos-far-memop-length-truncation.json": "f7c4648be1d3608bcbbdb4be8bcccabdad10141b827eb0ab10eee1d9c7cca278",
           "docs/defects/mos-far-memset-wrong-bank.json": "2fb6554a1ed1b50896648b2ed672476800a6950ef498205b21fcafb3cbcb796d",
           "docs/defects/mos-far-pointer-arg-exhaustion.json": "5ea1d379851cc981ab64071c4d9039357212f3efec6c34580f6d7e97998974ba",
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
+          "docs/defects/mos-imag32-reserved-pair-units.json": "03dfdb8bd05f24163f2e1f3a1b7a1aae1fb81ab191e6302274fc88edde853f8d",
+          "docs/defects/mos-legalizer-fold-dangling-dbg-upstream.json": "a812db7206a4aec6fd5a3358ad167b7ec3d88b89c78c3834a9053cceaa895fed",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
           "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
@@ -533,9 +545,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T20:55:57.196850+00:00",
-        "note": "Checked the 0064/0067 status, publication and measurement statements against the 2026-10-01 pressure-contract follow-up (a dated pointer in docs/plans/2026-09-26-mos-carry-scheduling.md, the TODO item text and an additional run on the canonical carry record). No status, number or publication claim changes: the follow-up adds a root cause and an unlanded candidate (docs/plans/2026-10-01-carry-pressure-contract.md). The dated aggregate-savings and timing figures remain correct as measurements with the old generated pressure sets.",
-        "attribution": "Claude Code 2.1.285, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort; session 310aee67-a99e-4b78-ba48-c560322fe80d, agent a0bbc91b2d36f234d"
+        "reviewed_at": "2026-09-30T21:33:09.645285+00:00",
+        "note": "Second round of the #320 carry adds mos-imag32-reserved-pair-units (fixed in the series), mos-far-fold-dangling-dbg-sites and mos-legalizer-fold-dangling-dbg-upstream (confirmed); the tracker's far-word status and the new llvm-mos-sdk far-runtime companion entry describe them. Nothing is posted.",
+        "attribution": "Claude Code 2.1.285 t4-opus-high agent a7633adfeee82a4f5, model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort"
       }
     },
     {

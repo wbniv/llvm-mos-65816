@@ -1,7 +1,7 @@
 From ef1fdd877206a81fa961da92b8cad45877a93be4 Mon Sep 17 00:00:00 2001
 From: Will Norris <will@biohack.net>
 Date: Wed, 30 Sep 2026 00:00:00 +0000
-Subject: [PATCH 13/32] [MOS] Require a no-wrap proof before folding near
+Subject: [PATCH 13/36] [MOS] Require a no-wrap proof before folding near
  indexes on the 65816
 
 On the 65816, indexed addressing adds the index to the 16-bit base with carry into the bank (DBR), while a near G_PTR_ADD wraps at 16 bits. Folding the add into abs,X, abs,Y or (zp),Y is correct only if the unsigned sum cannot wrap. canFoldNearIndex allows the fold when the add is nuw, when it is nusw with a known non-negative offset, or when known bits bound base + offset below 0x10000. Other CPUs are unaffected. The check applies to the native word forms and to the existing byte abs-indexed (except zero page) and indirect-indexed folds.

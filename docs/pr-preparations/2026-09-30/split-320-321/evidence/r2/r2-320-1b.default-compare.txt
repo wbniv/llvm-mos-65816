@@ -1,0 +1,12 @@
+mos6502: 90 inputs (53 compile before), 85 identical, 5 asm differ, 0 object-only differ
+mosw65816: 90 inputs (75 compile before), 85 identical, 5 asm differ, 0 object-only differ
+  asm mos6502 corpus/examples_snes_corpus_cgrade_sim.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['1', 'err:52216c99e8dd', '1', '-']
+  asm mos6502 corpus/examples_snes_corpus_sodo_sim.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['1', 'err:52216c99e8dd', '1', '-']
+  asm mos6502 corpus/examples_snes_sodo.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['134', 'err:ceadc743c1c3', '134', '-']
+  asm mos6502 corpus/examples_snes_trapguard.c.default.ll: ['134', 'err:c0ba8593f174', '134', '-'] -> ['134', 'err:01d718529e03', '134', '-']
+  asm mos6502 corpus/examples_snes_vaprintf.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['0', 'f298ab26f43206b5', '0', '7c29ea9650eb2887']
+  asm mosw65816 corpus/examples_snes_corpus_cgrade_sim.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['0', '106a65fe1b88a4ce', '0', '34a7050d253795b0']
+  asm mosw65816 corpus/examples_snes_corpus_sodo_sim.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['0', '5e907724eff058d7', '0', '065dcbdd7bde97f7']
+  asm mosw65816 corpus/examples_snes_sodo.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['0', 'bdeb76a85478c812', '0', '9d165a12971bfd2b']
+  asm mosw65816 corpus/examples_snes_trapguard.c.default.ll: ['134', 'err:c0ba8593f174', '134', '-'] -> ['134', 'err:01d718529e03', '134', '-']
+  asm mosw65816 corpus/examples_snes_vaprintf.c.default.ll: ['134', 'err:b20887473a71', '134', '-'] -> ['0', '3290134fe648e89c', '0', '4a148896322cf455']

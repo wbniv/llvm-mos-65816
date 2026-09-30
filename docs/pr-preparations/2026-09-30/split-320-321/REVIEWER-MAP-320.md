@@ -1,10 +1,21 @@
-# Reviewer map: #320 far data as a 4‑commit series
+# Reviewer map: #320 far data as a 9‑commit series on #594
 
-This series replaces the monolithic patch `11044c53d5fc` ("Extract far data addressing and bounded runtime indexing", 23 files, +1,660). It applies after the #321 series ([map](REVIEWER-MAP-321.md)) and the two unchanged MC address-width commits ([`patches-mc/`](patches-mc/)), and ends at the tree of `11044c53d5fc` plus the [native-width pressure-set change](../../../plans/2026-09-30-native-register-pressure-sets.md#application) (reference commit `fa1928c8b9ca`, tree `deb630c2d43f`), plus the test files the split adds under `llvm/test/` (twelve in #321, six here). On 2026‑10‑01 the far-prerequisite repairs B1–B4, the missing B6 trunc pattern and the review's N3/N4 cleanups were carried into the commits whose code they correct ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md)). The end tree is now that reference plus [`spec/carry-320.diff`](spec/carry-320.diff) (11 library files and 5 added tests); no other file differs ([name-status](evidence/carry/320.invariant.txt)). The #320 commits do not touch the pressure-set change. Patches: [`patches-320/`](patches-320/). Series branch: `split-320-321-carry` in `build/split-320-321/source` (commits `abfb29168fca`..`59d98c37ab77`); the pre-carry commits `42785c3bef21`..`1a616f08ea67` remain on branch `split-320-321`.
+This series replaces the monolithic patch `11044c53d5fc` ("Extract far data addressing and bounded runtime indexing", 23 files, +1,660). It applies after the #321 series ([map](REVIEWER-MAP-321.md)) and the two unchanged MC address-width commits ([`patches-mc/`](patches-mc/)). Patches: [`patches-320/`](patches-320/). Series branch: `split-320-321-r2` in `build/split-320-321/source` (`ad7b2f4239a2`..`d19b7155d3c6`).
 
-Attribution: split by Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort. The rebase-preparation credit of the monolithic patch (OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort, session `01a0e67f-298f-7a21-80af-06f867085f84`) and its provenance pointer are kept in every commit message.
+Two earlier states are kept for reference. The reviewed carry is branch `split-320-321-carry` (`abfb29168fca`..`59d98c37ab77`), which the [second independent review](../far-word-rebase/independent-review-2.md) examined. The pre-carry split is branch `split-320-321` (`42785c3bef21`..`1a616f08ea67`).
 
-Validation and default-mode evidence follow the method in the [#321 map](REVIEWER-MAP-321.md#how-to-read-and-validate). Per-commit logs: `build/split-320-321/evidence/c-320-NN/` for the carried commits (build, suites and default-mode hashes; summary in [`evidence/carry/stages.tsv`](evidence/carry/stages.tsv)), `p-320-NN/` for the pre-carry commits, and `t-320-NN/`, `320-NN/` for the first split; the parent of commit 1 (`25c40909b44a`, the second MC commit) is `p-320-00`.
+On 2026‑10‑01 the series was rebuilt ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#second-round-594-option-1-b8-b9-n10n16)). It carries the user's #594 decision (option 1), fixes the second review's B8 and B9, and applies N10 and N12–N16.
+
+The end tree is the pressure-set reference `fa1928c8b9ca` plus the changes in [name-status](evidence/r2/320.invariant.txt): #594, the carried repairs and the second-round fixes in 16 library files, and 26 added test files, 18 of them from the split and carry. [`spec/r2-320.diff`](spec/r2-320.diff) is the delta from the reviewed carry.
+
+Attribution:
+
+- #594 commits: mlund (authorship and messages kept; the rebase note is below).
+- Split: Claude Code 2.1.283 (t4-opus-high agent), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort.
+- Carry and second round: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort.
+- The rebase-preparation credit of the monolithic patch (OpenAI Codex CLI 0.157.1, model gpt-6-astra, xhigh reasoning effort, session `01a0e67f-298f-7a21-80af-06f867085f84`) is kept in every commit message it applies to.
+
+Per-commit logs are in `build/split-320-321/evidence/r2-320-*/` (build, suites, default-mode hashes); the summary is [`evidence/r2/stages.tsv`](evidence/r2/stages.tsv). The gates ran on run commits whose trees equal the final commits ([mapping](evidence/r2/message-update.tsv)).
 
 ## Dependency diagram
 
@@ -12,72 +23,152 @@ Validation and default-mode evidence follow the method in the [#321 map](REVIEWE
 flowchart TD
   N["#321 series (16 commits)"] --> M1["MC: explicit address widths for constants"]
   M1 --> M2["MC: long address widths in printed assembly"]
-  M2 --> F1["1 far address space + Imag32 quads"]
-  F1 --> F2["2 far pointer values + long/[dp] accesses"]
+  M2 --> A1["1a-i #594: no newlines in inline-asm operands"]
+  A1 --> A2["1a-ii #594: composite zero-page CSR benefit"]
+  A2 --> A3["1a-iii #594: 32-bit imaginary registers (RL)"]
+  A3 --> B["1b reserve quads over reserved pairs"]
+  B --> C["1c far address space, RL allocation gate, RL calling convention"]
+  C --> D["1d quad spills"]
+  D --> F2["2 far pointer values + long/[dp] accesses"]
   N -.->|s32 as 2 x s16 lanes, commit 9| F2
   F2 --> F3["3 far memory intrinsics"]
   F2 --> F4["4 bounded [dp],Y indexing"]
   N -.->|X16/Y16, selectXY16, fused Y pattern, commit 14| F4
 ```
 
-All four far tests run with `+mos-a16`: far pointers are s32 values, and s32 merges and unmerges are legal only with the #321 lane rules. Without `+mos-a16` far code fails to legalize (see commit 2's default-mode note and the independent review's N7).
+Far code needs `+mos-a16`: far pointers are s32 values, and s32 merges and unmerges are legal only with the #321 lane rules. Without `+mos-a16` far code fails to legalize, loudly (see [Loud unsupported far shapes](#loud-unsupported-far-shapes-n7-n16)).
 
 ## Summary
 
 | # | Commit | Subject | Code | Tests | Focused tests | Default-mode effect |
 |---|---|---|---|---|---|---|
-| 1 | `abfb29168fca` | Add the far address space and 32-bit imaginary pointer quads | +141/‑6 | +25 | imag32-copy.mir (added) | data layout string only |
-| 2 | `3576ad627b5b` | Legalize and select far pointer values and memory accesses | +417/‑27 | +299 | far-addressing.ll, far-phi.ll, far-ptr-arg-exhaustion.ll, far-access-non-65816.ll, far-ptr-trunc.ll (last three added) | none for compiling inputs; non-65816 far accesses diagnosed |
-| 3 | `eab4edb9dc32` | Route far memory intrinsics to the far runtime | +125 | +149/‑4 | far-memset.ll, far-memop-length.ll (added), far-access-non-65816.ll (extended) | none |
-| 4 | `59d98c37ab77` | Select bounded runtime [dp],Y indexing for far byte accesses | +402/‑1 | +569 | far-indir-indexed.ll, far-index-fold-debug.ll (added) | none |
+| 1a‑i | `ad7b2f4239a2` | [MOS] Avoid newlines in inline asm operands (mlund, #594) | +1/‑1 | ‑2 | inline-asm-zp-csr.ll | identical |
+| 1a‑ii | `f8a569b204c1` | [MOS] Accumulate composite zero-page CSR benefit (mlund, #594) | +2/‑2 | +26 | zp-alloc-composite-benefit.mir | identical |
+| 1a‑iii | `fcb88211d861` | [MOS] Add nonallocatable 32-bit imaginary registers (mlund, #594) | +93/‑14 | +119 | #594's imag32 and copy tests | **4 inputs of the fixed set abort**; fixed by 1b |
+| 1b | `733b59e025ee` | [MOS] Reserve Imag32 quads that overlap reserved pairs | +10 | +16 | imag32-reserved-pairs.ll | same as before 1a‑iii |
+| 1c | `dcb9d3227be9` | [MOS] Add the far address space and allocate Imag32 quads on the 65816 | +58/‑10 | +105/‑17 | imag32-allocation-gate.mir, far-ptr-arg-exhaustion.ll | data layout string only |
+| 1d | `cbbe9c70f520` | [MOS] Spill and reload Imag32 quads as four bytes | +88/‑4 | +26 | prologepilog.mir (quad cases) | identical |
+| 2 | `3046c5754503` | [MOS] Legalize and select far pointer values and memory accesses | +484/‑26 | +317 | far-addressing.ll, far-phi.ll, far-quad-spill-call.ll, far-access-non-65816.ll, far-ptr-trunc.ll, far-fold-debug.ll | none for compiling inputs; non-65816 far accesses diagnosed |
+| 3 | `8d9c0382db7c` | [MOS] Route far memory intrinsics to the far runtime | +99/‑3 | +168 | far-memset.ll, far-memop-length.ll | identical |
+| 4 | `d19b7155d3c6` | [MOS] Select bounded runtime [dp],Y indexing for far byte accesses | +389/‑1 | +666 | far-indir-indexed.ll, far-index-fold-debug.ll, far-fold-debug.ll | identical |
 
-Default-mode evidence (fixed input set, commit vs parent): commits 1, 3 and 4 give identical assembly and objects in mos6502 and mosw65816. Commit 2 gives identical output for every input that compiles; the five corpus inputs that use address space 2 fail in both default modes before and after it, with a different message (a p2 G_LOAD before; an s32 G_MERGE_VALUES or G_UNMERGE_VALUES after, and on mos6502 for three of them the far-access diagnostic). Commit 1's comparison with `p-320-00` lists one "asm differ" per mode: `trapguard` aborts with the same LoopStrengthReduce assertion on both, and its hashed first stderr line begins with the `llc` file name (`p-320-00:` against `c-320-01:`); the output does not differ.
+**Default-mode evidence** (fixed input set, each commit against its parent, at O2).
+
+- **Identical:** 1a‑i, 1a‑ii, 1c, 1d, 3 and 4.
+- **1a‑iii:** #594 as posted aborts on four inputs (see 1b), and 1b returns the set to 1a‑ii's results exactly.
+- **2:** identical for every input that compiles. The five corpus inputs that use address space 2 fail before and after it, with a different message. On mos6502, three of them stop at the far-access diagnostic.
+- **The `trapguard` row:** each comparison lists one "asm differ" per mode for `trapguard`. It aborts with the same LoopStrengthReduce assertion everywhere, and its hashed first stderr line starts with the `llc` file name, so this is a harness artifact.
+
+**By optimization level:** the whole #320 group against the MC top at O0, O1, O2, O3, Os and Oz is in [`evidence/r2/levels.txt`](evidence/r2/levels.txt).
 
 ## Commits
 
-### 1. Add the far address space and 32-bit imaginary pointer quads (`abfb29168fca`)
+### 1a. llvm-mos#594, carried unchanged (`ad7b2f4239a2`, `f8a569b204c1`, `fcb88211d861`)
 
-- **Purpose.** `p2:32:8` data layout and `AS_Far`; RLk quads over RS(2k):RS(2k+1) with `sublo16`/`subhi16`; Imag32 class and bank membership; quad naming, reservation, copies, copy cost, MC operand lowering and zero-page CSR placement.
-- **Key hunks.** `TargetDataLayout.cpp`, `MOSTargetMachine.cpp` (data layout); `MOSInstrInfo.h` (`AS_Far`); `MOSRegisterInfo.td` (`sublo16`, `subhi16`, `MOSImagReg32`, `RL#K`, `MOSReg32Class`, `Imag32`); `MOSRegisterBanks.td`; `MOSRegisterInfo.cpp` (constructor naming, `getReservedRegs`, `copyCost`); `MOSInstrInfo.cpp` (`copyPhysRegImpl`); `MOSMCInstLower.cpp` (`lowerOperand`); `MOSZeroPageAlloc.cpp` (`runOnModule`, `collectCandidates`).
-- **Tests.** imag32-copy.mir (added): a quad copy lowers to four byte copies in address order, with RL1 and RL2 naming `__rc4`–`__rc7` and `__rc8`–`__rc11`. Red on the parent: unknown register `rl2`. Nothing produces address-space-2 values until commit 2.
-- **#594 reconciliation (blocking before submission).** Open upstream PR #594 (mlund, draft, head `7b80f7e1`) defines the same `sublo16`/`subhi16`, `MOSImagReg32`, `MaxImag32Regs`, `RL#K`, `MOSReg32Class` and `Imag32` family, with matching `copyPhysRegImpl`, `copyCost`, `MOSMCInstLower` and zero-page CSR changes. It differs in the register-number offset (this commit uses `Imag32RegsOffset = 0x600`; #594 derives numbers from `Imag16RegsOffset + MaxImag16Regs`) and in allocation policy (#594 keeps RL non-allocatable pending a linker contiguity contract). **This commit is the one a #594-based rebase replaces**: carry #594 unchanged in its place and move only this commit's remaining differences (data layout, `AS_Far`, bank membership, reservation, allocatability) into a follow-up. Its register definitions are unchanged here: aligning with #594 is escalated for a decision (see the [carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#594-reconciliation-b7)). The carry applied only N3 formatting and restored #321‑1's "Native widths:" comment, which the pre-carry commit rewrote to a history tag.
+- **Purpose.** The shared RL foundation: RLk quads over RS(2k):RS(2k+1) with `sublo16`/`subhi16`, the Imag32 class (non-allocatable, as posted), quad copies, copy cost, MC operand lowering, and zero-page CSR grouping of quads. Also #594's two unrelated fixes: inline-asm operand printing, and composite zero-page CSR costing.
+- **Rebase.** Carried from #594 head `7b80f7e18768` with mlund's authorship, dates and messages. The two unrelated commits apply with identical changed lines. The register commit needs one token: `MOSImagReg32<bits<16> num>` becomes `bits<32>`, because upstream #571 widened `MOSReg` numbers to 32 bits after #594 was written, and `0x30080` does not fit in 16. A bracketed note after mlund's message records this.
+- **Numbering (B5, escalated).** The user chose #594's numbering, `Imag16RegsOffset + MaxImag16Regs`. On the current base it gives `0x30080 + K`, inside the RS "type 0x03" range of the MOS DWARF specification as #571 encodes it. The lldb MOS plugin knows only the RC and RS banks. The location is a well-formed single `DW_OP_regx`, so B5's malformed composite is gone, but no current consumer resolves the number. See the [carry plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#594-carry-one-mechanical-adaptation-one-escalation).
+- **Defect in #594 as posted.** 1a‑iii makes every function with a call that passes stack arguments abort in the register coalescer, in every MOS mode ([record](../../../defects/mos-imag32-reserved-pair-units.json)). 1b fixes it. It reproduces on upstream `06bc967d2668` with only #594 applied.
 
-### 2. Legalize and select far pointer values and memory accesses (`3576ad627b5b`)
+### 1b. Reserve Imag32 quads that overlap reserved pairs (`733b59e025ee`)
 
-- **Purpose.** Far pointer arguments in RL1‑RL3 (i32 calling-convention type); p2 legality for globals, casts, pointer adds with bank carry, PHIs (via s32) and near→far casts; byte loads and stores through absolute-long (`lda $xxxxxx`) and `[dp]`; far symbol addresses from ADDR24 relocation modifiers; Imag32 REG_SEQUENCE merges and word unmerges.
-- **Key hunks.** `MOSCallingConv.td` (`CCIfPtrAddrSpace<2, …RL1..RL3>`); `MOSISelLowering.cpp`; `MOSCallLowering.cpp`; `MOSInstrGISel.td` (G_LOAD/STORE_FAR_ABS, G_LOAD/STORE_FAR_INDIR); `MOSInstrLogical.td` (LDAbsLong, STAbsLong, LDIndirLong, STIndirLong); `MOSInstrInfo.h` (MO_ADDR24_*); `MOSLegalizerInfo.cpp` (PF rules, `legalizePhi`, `legalizePtrAdd`, `legalizeAddrSpaceCast`, `selectAddressingMode` case 32, `tryFarAbsoluteAddressing`, `tryFarIndirectAddressing`); `MOSInstructionSelector.cpp` (`getRegClassForType`, `isFarSymbol`, `buildFarAddrWords`, `selectAddr`, `selectAddrLoHi`, `selectMergeValues`, `selectUnMergeValues`, `selectGeneric` Imag32 pin); `MOSMCInstLower.cpp` (LDCImm, ADDR24 symbol flags); `MOSRegisterInfo.cpp` (`getRegAllocationHints` width filter); `MOSLateOptimization.cpp` (`combineLdImm` GPR guard).
-- **Carried repairs.** B1: `CCIfPtrAddrSpace<2, CCAssignToStack<4, 1>>` directly after the RL rule, so a fourth far pointer takes a 4-byte stack slot instead of a 16-bit RS pair. B3: `rejectFarAccessWithoutLong` diagnoses far loads, extending loads and stores on CPUs without 65816 long addressing. B6: `Pat<(i16 (trunc Imag32:$s)), (EXTRACT_SUBREG Imag32:$s, sublo16)>` under `HasAccum16`.
+- **Purpose.** Reserve an RL quad whenever either RS pair is reserved: the stack pointer, the scavenger slot, the frame pointer, or pairs outside the imaginary window. LLVM treats a register unit as reserved only when its root and all its super-registers are reserved. Without this rule, the stack pointer's byte units were not reserved, and live-range computation found uses of `$rs0` without a def ("Invalid global physical register").
+- **Key hunks.** `MOSRegisterInfo.cpp` (`getReservedRegs`).
+- **Tests.** imag32-reserved-pairs.ll, reduced with llvm-reduce from a SNES demo: a variadic call in mos6502 and mosw65816. It is red on 1a‑iii.
+- **Why a separate commit.** #594 is carried unchanged, as the user asked. The fix is offered to mlund through the coordination draft.
+
+### 1c. Add the far address space and allocate Imag32 quads on the 65816 (`dcb9d3227be9`)
+
+- **Purpose.**
+  - `p2:32:8` data layout and `AS_Far`.
+  - Imag32 bank membership.
+  - RL allocation behind one predicate, `MOSSubtarget::hasAllocatableImag32()`, which is the 65816 until an SDK contiguity contract exists. Elsewhere Imag32 has an empty alternative allocation order.
+  - The RL calling convention (RL1‑RL3 where allocatable), with B1's 4-byte stack fallback, the i32 calling-convention type of far pointers, and incoming 32-bit values.
+  - Strong copy hints outside the allocation order are no longer offered.
+- **Why not reservation for the gate.** `MOSValueAssigner` marks every reserved register and all its aliases as used for arguments. Reserving every quad on mos6502 therefore moved byte and pointer arguments out of RS2–RS3 and RC4–RC7. Twelve MOS tests caught this during the rebuild; the empty order leaves the calling convention untouched.
+- **Key hunks.** `MOSSubtarget.h` (`hasAllocatableImag32`); `MOSRegisterInfo.td` (`Imag32` `AltOrders`/`AltOrderSelect`); `MOSRegisterInfo.cpp` (`getRegAllocationHints`); `MOSCallingConv.td`/`.cpp`; `MOSISelLowering.cpp`; `MOSCallLowering.cpp`; `MOSRegisterBanks.td`; `MOSInstrInfo.h`; data layout in `TargetDataLayout.cpp` and `MOSTargetMachine.cpp`.
+- **Tests.**
+  - imag32-allocation-gate.mir: the 65816 allocates a quad; mos6502 reports that no register is available. It replaces #594's imag32-nonalloc.mir, whose contract this commit changes.
+  - far-ptr-arg-exhaustion.ll: call lowering for a fourth far pointer and for near/far interleavings in plain mosw65816, +mos-a16 and +mos-a16,+mos-xy16, and every far pointer on the stack on mos6502.
+
+### 1d. Spill and reload Imag32 quads as four bytes (`cbbe9c70f520`)
+
+- **Purpose (B9).** An allocatable quad must be spillable. A static stack slot takes four byte accesses; LDStk/STStk expand into two Imag16 operations. This was far-word patch 10 (`0018`); it is moved here because every far commit after it can spill a quad.
+- **Key hunks.** `MOSInstrInfo.cpp` (`loadStoreRegStackSlot`); `MOSRegisterInfo.cpp` (`expandLDSTStkImpl`).
+- **Tests.** prologepilog.mir (quad load and store); #320‑2 adds the end-to-end case.
+
+### 2. Legalize and select far pointer values and memory accesses (`3046c5754503`)
+
+- **Purpose.**
+  - p2 legality for globals, casts, pointer adds with bank carry, PHIs (via s32) and near→far casts.
+  - Byte loads and stores through absolute-long (`lda $xxxxxx`) and `[dp]`, and far symbol addresses from ADDR24 relocation modifiers.
+  - Imag32 REG_SEQUENCE merges and word unmerges.
+  - B3's diagnostic for far loads, stores and memory intrinsics on CPUs without long addressing (once per access, N13).
+  - B6's trunc pattern.
+  - N12: a far memory intrinsic that is not inlined fails to legalize until #320‑3, instead of calling the near runtime.
+  - B8's shared helper `dropDeadFarAddressDebugUses`, called by the absolute-long fold.
+- **Key hunks.** `MOSInstrGISel.td`; `MOSInstrLogical.td` (long and `[dp]` forms, B6); `MOSInstrInfo.h` (MO_ADDR24_*); `MOSLegalizerInfo.cpp` (PF rules and the non-65816 custom rule, `rejectFarAccessWithoutLong`, `anyFarPointerOperand`, `legalizeMemOp`, `legalizePhi`, `legalizePtrAdd`, `legalizeAddrSpaceCast`, `selectAddressingMode` case 32, `isDeadFarAddressTree`, `dropDeadFarAddressDebugUses`, `tryFarAbsoluteAddressing`, `tryFarIndirectAddressing`); `MOSInstructionSelector.cpp`; `MOSMCInstLower.cpp`; `MOSRegisterInfo.cpp` (hint width filter); `MOSLateOptimization.cpp`.
 - **Interim text.** The `selectGeneric` pin condition lists only the two non-indexed far opcodes until commit 4 adds the indexed ones.
-- **Tests.** far-addressing.ll, far-phi.ll; added far-ptr-arg-exhaustion.ll (B1), far-access-non-65816.ll (B3) and far-ptr-trunc.ll (B6).
-- **Plan deviation.** The plan's commits 2 (legalize) and 3 (select) are one commit here: far-phi.ll's legalizer checks name the selected-form opcode G_LOAD_FAR_INDIR, and far-addressing.ll checks assembly and object bytes, so legalization alone has no observable test.
+- **Tests.**
+  - far-addressing.ll and far-phi.ll.
+  - far-ptr-arg-exhaustion.ll: adds full compilation.
+  - far-quad-spill-call.ll (B9): four far pointers live across a call, at O0 and O2 in A16 and XY16.
+  - far-access-non-65816.ll: one diagnostic per access, including i32 and memset.
+  - far-ptr-trunc.ll (B6).
+  - far-fold-debug.ll (B8): a `-g` far global plus a constant.
 
-### 3. Route far memory intrinsics to the far runtime (`eab4edb9dc32`)
+### 3. Route far memory intrinsics to the far runtime (`8d9c0382db7c`)
 
-- **Purpose.** Non-inlined G_MEMSET/G_MEMCPY/G_MEMMOVE with any far pointer call the far runtime, widening near pointers to far. A provably 16-bit length calls `__memset_far`/`__memcpy_far`/`__memmove_far` with a size_t; any other length calls the `…_far32` entries with a uint32_t (B2), so no length is truncated. Far memory intrinsics on non-65816 CPUs are diagnosed (B3).
-- **Key hunks.** `MOSLegalizerInfo.cpp` (`anyFarPointerOperand`, `createFarMemLibcall` with the length domain, `legalizeMemOp` hook and diagnostic; `llvm/IR/CallingConv.h` include).
-- **Tests.** far-memset.ll; added far-memop-length.ll (B2); far-access-non-65816.ll extended with a far memset (B3).
+- **Purpose.** A non-inlined G_MEMSET, G_MEMCPY or G_MEMMOVE with any far pointer calls the far runtime, widening near pointers to far.
+  - A provably 16-bit length calls `__memset_far`, `__memcpy_far` or `__memmove_far` with a size_t; any other length calls the `…_far32` entries with a uint32_t (B2).
+  - With a near or direct-page operand, the IRTranslator has already narrowed the length. That is sound by LangRef's allocated-object bound, and the message now says so (N10).
+  - The runtime entries are not in upstream llvm-mos-sdk (N11; [tracker](../../../upstream-contribution-status.md)).
+- **Key hunks.** `MOSLegalizerInfo.cpp` (`createFarMemLibcall`, the `legalizeMemOp` route; `llvm/IR/CallingConv.h`).
+- **Tests.** far-memset.ll; far-memop-length.ll (B2), with mixed-space cases that pin 40000 kept and 70000 narrowed to 4464 (N10).
 
-### 4. Select bounded runtime [dp],Y indexing for far byte accesses (`59d98c37ab77`)
+### 4. Select bounded runtime [dp],Y indexing for far byte accesses (`d19b7155d3c6`)
 
-- **Purpose.** Fold constant displacements 1‑3 and range-proven runtime offsets from a runtime far pointer into `lda/sta [dp],y`; 16-bit Y under `+mos-xy16` with a fused `ldy zp` + access pseudo.
-- **Key hunks.** `MOSInstrGISel.td` (G_*_FAR_INDIR_IDX, G_*_FAR_INDIR_IDX16); `MOSInstrLogical.td` (LDIndirLongIdx, STIndirLongIdx, LDIndirLongYIdx, STIndirLongYIdx); `MOSAsmPrinter.cpp`; `MOSLegalizerInfo.cpp` (`kMaxFarIndirIdxDisp`, `mayBecomeCall`, `noCallBetween`, `allUsesAreFoldableFarAccesses`, `tryFarRuntimeIndexFold`, `tryFarIndirectIndexedAddressing`); `MOSLegalizerInfo.h`; `MOSInstructionSelector.cpp` (dispatch, `selectXY16` far case, `selectGeneric` cases and pin).
-- **Carried repair.** B4: once the last access folds, `tryFarRuntimeIndexFold` sets the remaining DBG_VALUEs of the dead pointer adds to `$noreg`. The far-word 0070 word fold uses the same function, so far-word patch 12 needs no code change; it extends the test with the word fold.
-- **Tests.** far-indir-indexed.ll (26 functions, assembly, object bytes and post-selection MIR in two modes); added far-index-fold-debug.ll (B4, byte fold).
+- **Purpose.** Fold constant displacements 1‑3 and range-proven runtime offsets from a runtime far pointer into `lda/sta [dp],y`, with a 16-bit Y under `+mos-xy16` (fused `ldy zp` + access pseudo). Both fold paths call `dropDeadFarAddressDebugUses`, which replaces B4's dedicated walk and covers the displacement window (B8).
+- **Key hunks.** `MOSInstrGISel.td`; `MOSInstrLogical.td`; `MOSAsmPrinter.cpp`; `MOSLegalizerInfo.cpp` (`kMaxFarIndirIdxDisp`, `mayBecomeCall`, `noCallBetween`, `allUsesAreFoldableFarAccesses`, `tryFarRuntimeIndexFold`, `tryFarIndirectIndexedAddressing`); `MOSLegalizerInfo.h`; `MOSInstructionSelector.cpp`.
+- **Tests.** far-indir-indexed.ll; far-index-fold-debug.ll (B4); far-fold-debug.ll gains the displacement-window cases (load at +1, store at +3, runtime offset plus 1).
 
-## Where the independent review's findings land
+## Where the reviews' findings land
 
-From [the far-word independent review](../far-word-rebase/independent-review.md). On 2026‑10‑01 each #320 fix was folded into the commit that introduces the code it changes ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md)); red/green evidence: [`evidence/carry/red-green.tsv`](evidence/carry/red-green.tsv).
+Red/green for every added or extended test: [`evidence/r2/red-green.tsv`](evidence/r2/red-green.tsv) (27 red runs fail, 143 green runs pass). The first-round table is [`evidence/carry/red-green.tsv`](evidence/carry/red-green.tsv).
 
 | Finding | Summary | Status |
 |---|---|---|
-| B1 | Far-pointer argument exhaustion falls through to a 16-bit RS pair | Fixed in #320‑2 `3576ad627b5b`, test far-ptr-arg-exhaustion.ll |
-| B2 | Far memory intrinsic lengths above 65535 truncated or deleted | Fixed in #320‑3 `eab4edb9dc32`, test far-memop-length.ll |
-| B3 | Far accesses on non-65816 CPUs emit `[dp]` opcodes | Fixed in #320‑2 (loads and stores) and #320‑3 (memory intrinsics), test far-access-non-65816.ll |
-| B4 | Undef DBG_VALUE after the far runtime-index fold | Fixed in #320‑4 `59d98c37ab77`, test far-index-fold-debug.ll; far-word patch 12 adds the word-fold case |
-| B5 | Far quad DWARF is a malformed composite | Open: tied to the #594 numbering decision (escalated) |
-| B6 | Missing `Pat<(i16 (trunc Imag32:$s)), (EXTRACT_SUBREG Imag32:$s, sublo16)>`; s32→s16 G_TRUNC asserts in `selectTrunc` | Fixed in #320‑2, test far-ptr-trunc.ll |
-| B7 | Imag32 collides with open #594 | Open: escalated for a decision; #320‑1 is the commit a #594 alignment replaces |
-| N3 | clang-format lines (per commit, C++ hunks) | #320: 0 in each of commits 1–4 after the carry (was 19, 16, 11, 60; [counts](evidence/carry/format-320.txt)). #321 is not changed: 1: 4, 4: 11, 5: 3, 6: 48, 7: 26, 8: 110, 9: 76, 10: 188, 11: 125, 12: 4, 14: 134, 15: 22, 16: 2 (others 0). The review's `MOSTargetMachine.cpp` include order and long comment are in #321‑4 `c5dfebbfbf55`. |
-| N4 | History-tag comment lines (`#321`, "Increment", "Phase", `B1:`) | #320: none after the carry (was #320‑1: 1, #320‑4: 7). #321 is not changed: ‑2: 4, ‑4: 4, ‑6: 1, ‑8: 13, ‑10: 8, ‑11: 14, ‑14: 7, ‑15: 1; the broken "(Native widths: )" comment is in #321‑8 `c6337b5af878` (`legalizeLoadStore16`). Line list: `build/split-320-321/evidence/history-tag-lines.txt`. |
+| B1 | Far-pointer argument exhaustion falls through to a 16-bit RS pair | Fixed in 1c (calling convention) with its call-lowering test; full compilation in #320‑2 |
+| B2 | Far memory intrinsic lengths above 65535 truncated or deleted | Fixed in #320‑3 |
+| B3 | Far accesses on non-65816 CPUs emit `[dp]` opcodes | Fixed in #320‑2 (loads, stores and memory intrinsics) |
+| B4 | Undef DBG_VALUE after the far runtime-index fold | Fixed in #320‑4 (now through the shared helper); far-word patch 12 adds the word case |
+| B5 | Far quad DWARF is a malformed composite | The composite is gone (RL has a number); the number's place in the specification is escalated |
+| B6 | s32→s16 G_TRUNC asserts in `selectTrunc` | Fixed in #320‑2 |
+| B7 | Imag32 collides with open #594 | Resolved by the user's option 1: #594 carried unchanged as 1a; allocation in 1c behind `hasAllocatableImag32()` |
+| B8 | Dangling DBG_VALUE at the other far fold sites | Fixed: #320‑2 (absolute long), #320‑4 (window and runtime fold), far-word patch 5 (absolute indexed); [record](../../../defects/mos-far-fold-dangling-dbg-sites.json). The near shapes on upstream are a separate, unfixed [record](../../../defects/mos-legalizer-fold-dangling-dbg-upstream.json) |
+| B9 | Quad spills arrive only in far-word patch 10 | Fixed: patch 10 is 1d; far-quad-spill-call.ll in #320‑2 |
+| N3 | clang-format | 0 lines in each commit of ours; #594's register commit (mlund's code, unchanged) has 5 ([counts](evidence/r2/format-320.txt)). #321 unchanged (see the first-round table below) |
+| N4 | History tags | None in #320 library code or tests |
+| N10 | Mixed-space memop narrowing | #320‑3 message and mixed-space test |
+| N11 | No SDK far runtime | Companion entry queued as future/blocked in the [tracker](../../../upstream-contribution-status.md) |
+| N12 | #320‑2 far memop called the near runtime | Fails to legalize at #320‑2 instead |
+| N13 | Diagnostic repeated per piece | One per access (custom rule for every far type without long addressing) |
+| N14 | "Storing a far pointer stays legal on every CPU" | Message and comment corrected: far pointer values need quads, which only the 65816 allocates |
+| N15 | Tags in tests, trailing blank line | Removed |
+| N16 | Far atomicrmw/cmpxchg | Listed below |
 
-N3 counts come from `clang-format-diff.py` with the container's `/opt/llvm-mos/bin/clang-format` on each commit's C++ hunks (`build/split-320-321/spec/format-count.sh`); they count reformatted output lines, so they are comparable across commits but not identical to the review's per-patch blame totals.
+First-round N3/N4 counts for #321 (unchanged): N3 1: 4, 4: 11, 5: 3, 6: 48, 7: 26, 8: 110, 9: 76, 10: 188, 11: 125, 12: 4, 14: 134, 15: 22, 16: 2; N4 ‑2: 4, ‑4: 4, ‑6: 1, ‑8: 13, ‑10: 8, ‑11: 14, ‑14: 7, ‑15: 1, including the broken "(Native widths: )" comment in #321‑8.
+
+## Loud unsupported far shapes (N7, N16)
+
+Measured on the far-word candidate `c275e191de52` (llc `c90f9648…`); each fails with an LLVM error rather than silently.
+
+| Shape | Plain mosw65816 | +mos-a16 |
+|---|---|---|
+| Any far pointer value in memory or in s32 arithmetic (stacked argument, zero-extended runtime offset) | "unable to legalize … G_MERGE_VALUES s32" | compiles |
+| `icmp eq ptr addrspace(2) %p, null` | "unable to legalize … G_CONSTANT p2 0" | same |
+| far `select` | fails at O0 and O2 | fails at O0; compiles at O2 |
+| far `atomicrmw`, `cmpxchg` | "unable to legalize … G_ATOMICRMW_ADD / G_ATOMIC_CMPXCHG" | same |
+| atomic far `load` | compiles (`lda [dp]`) | compiles |
+| Far pointer values on CPUs other than the 65816 | quads are not allocatable there; far accesses are diagnosed | — |
+| A16 vector insert (`vector-scalarize.ll`) | — | "G_IMPLICIT_DEF s16 not legal" at O2/O3 (#321 foundation gap) |

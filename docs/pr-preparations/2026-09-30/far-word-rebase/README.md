@@ -4,7 +4,33 @@ Prepared September 30, 2026. This packet rebases the [September 28 extracted ser
 
 ## Split series (current)
 
-Status (2026‑10‑01): **ready for a second independent review, not for filing.** The far-prerequisite repairs B1–B4, the missing B6 trunc pattern and the #320 parts of N3/N4 are now in the #320 commits of the [split series](../split-320-321/README.md#far-prerequisite-carry-2026-10-01), each in the commit whose code it corrects ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md)). Two blockers remain open and are escalated: the #594 alignment of #320‑1 (B7) and the far-quad DWARF numbering (B5).
+Status (2026‑10‑01): **ready for a focused third independent review, not for filing.** The [second independent review](independent-review-2.md) upheld the first carry (B1–B3, B6, N3/N4, patch 12) and found two blockers, B8 and B9, and nonblocking N10–N16. All are addressed. The user's #594 decision (option 1) is implemented. Two items stay open:
+
+- the RL DWARF numbering (B5), escalated because the chosen formula lands inside the RS range of the MOS DWARF specification;
+- the llvm-mos-sdk companion for the six far runtime entries (N11), queued as future/blocked.
+
+[Plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md#second-round-594-option-1-b8-b9-n10n16); [#320 map](../split-320-321/REVIEWER-MAP-320.md).
+
+The series is #321 in 16 commits, the two MC commits, #320 in nine commits (#594 ×3, the quad reservation fix, the far address space with the RL allocation gate, quad spills, #320‑2..4), then this packet's patches 9, 5–8 and 11–14. [`patches-split/`](patches-split/) holds all 36 patches in that order.
+
+- **Patch 10** (quad spills) is now #320‑1d, the B9 fix.
+- **Patch 9** (native index copy costs) now precedes patch 5. Patch 5's own XY16 test (`far-global-long-x.ll`) asserts in `copyCost` ("Unexpected physical register copy") without it. That was never visible, because patch 5 had not been built on its own before.
+- **Patch 5** calls the shared B8 helper at the absolute-indexed fold and extends `far-fold-debug.ll`.
+- **Patch 12** keeps the word-fold debug test.
+
+| Check | Result |
+| --- | --- |
+| Round trip | Each of the 36 patches applied in order to `06bc967d2668` reproduces its commit's tree; final tree `3ca03f1da90c` ([record](evidence/split-series.json)) |
+| Per commit | Patches 9, 5, 6, 7, 8, 11 and 14 built with assertions and passed MOS CodeGen+MC: 179, 180, 181, 182, 183, 183, 187 pass, 1 unsupported each, no MOS warnings ([stages](../split-320-321/evidence/r2/stages.tsv)). Patches 12 and 13 change only tests over patch 11's and 14's code |
+| Red/green | Patch 9's, patch 5's and patch 12's tests are red on their parents and green after ([table](../split-320-321/evidence/r2/red-green.tsv)) |
+| Replay objects | The 58 frozen configurations give objects byte-identical to the reviewed packet's, which passed MAME and bsnes ([comparison](evidence/split-r2-replay.json)); the emulators were not rerun |
+| `llc` | candidate `c90f96487d2f…` (`build/split-320-321/llc/r2-fw-14`, run commit `6306e48b493b`, same tree as `c275e191de52`), pre-0070 `e34098a6f568…` (`r2-fw-11`) |
+
+The 0070 size and speed table below is unchanged, because every executed object is identical.
+
+## Split series, first carry (reviewed by the second independent review)
+
+Status at the time (2026‑10‑01): **ready for a second independent review, not for filing.** The far-prerequisite repairs B1–B4, the missing B6 trunc pattern and the #320 parts of N3/N4 are now in the #320 commits of the [split series](../split-320-321/README.md#far-prerequisite-carry-2026-10-01), each in the commit whose code it corrects ([plan](../../../plans/2026-10-01-far-prerequisite-split-carry.md)). Two blockers remain open and are escalated: the #594 alignment of #320‑1 (B7) and the far-quad DWARF numbering (B5).
 
 The series is #321 in 16 commits, the two unchanged MC commits, #320 in 4 commits, then this packet's patches 5–14. [`patches-split/`](patches-split/) holds all 32 patches in that order. Patches 5–14 were cherry-picked onto the carried #320‑4. Patches 5 and 12 met context changed by the carried #320 comments and formatting and were resolved by hand. Patch 12 no longer reformats #320‑4 lines (the review's N3 request), so it now carries only its semantic change. Patch 12 also extends `far-index-fold-debug.ll` with the word fold, because the 0070 word fold reuses #320‑4's repaired fold path.
 
@@ -117,4 +143,4 @@ All but N6 apply to the patch text itself, so they belong to the split series be
 
 ## Attribution
 
-Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Carry of the far-prerequisite repairs into the split, the packet rebuild and the 2026‑10‑01 replay: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
+Rebase, validation, reconciliation and packet preparation: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`. The September 28 extraction, copy-cost repair and measurements: OpenAI Codex CLI 0.157.1 (session source `vscode`), model `gpt-6-astra`, `xhigh` reasoning effort; verified session `01a0e67f-298f-7a21-80af-06f867085f84`. The independent review names its own attribution. Second round (after the second independent review): Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Carry of the far-prerequisite repairs into the split, the packet rebuild and the 2026‑10‑01 replay: Claude Code 2.1.285 (t4-opus-high agent `a7633adfeee82a4f5`), model Claude Opus 5.5 (`claude-opus-5-5`), high reasoning effort; session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Downstream replay of the review findings and the four defect records: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
