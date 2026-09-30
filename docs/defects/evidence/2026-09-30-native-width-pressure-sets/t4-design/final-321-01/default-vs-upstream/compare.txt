@@ -1,0 +1,3 @@
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL

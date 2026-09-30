@@ -7,7 +7,8 @@
   "report": "docs/plans/2026-09-30-native-register-pressure-sets.md",
   "reproducer_origin": "original",
   "attribution": [
-    "Record, baseline, candidate experiment and evidence: Claude Code 2.1.285 (claude --version at run time; t3-opus-med subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk. Original observation (split 321-01 pressure-set diff and default-mode size growth) and plan: the #320/#321 split work and the planning session (Claude Code 2.1.283, model claude-opus-5-5, xhigh reasoning effort, session f79adc39-72b4-4dc5-abc1-849c14c5ce96, as recorded in the plan)."
+    "Record, baseline, candidate experiment and evidence: Claude Code 2.1.285 (claude --version at run time; t3-opus-med subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk. Original observation (split 321-01 pressure-set diff and default-mode size growth) and plan: the #320/#321 split work and the planning session (Claude Code 2.1.283, model claude-opus-5-5, xhigh reasoning effort, session f79adc39-72b4-4dc5-abc1-849c14c5ce96, as recorded in the plan).",
+    "T4 design, experiments and evidence (t4-design/): Claude Code 2.1.285 (claude --version at run time; t4-opus-high subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (agent definition); session https://claude.ai/code/session_01HAKZG571yi9zqmAeWQZVtk."
   ],
   "prior_work": {
     "disposition": "distinct_from_related",
@@ -111,6 +112,39 @@
       },
       "exit_code": 0,
       "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
+    },
+    {
+      "label": "T4 design at #321-1 (not a closure run: application to the series and downstream is dispatched separately)",
+      "command": "bash docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/default-identity.sh /home/will/llvm-mos-65816/build/pressure-sets/llc/321-00 /home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 /home/will/llvm-mos-65816/build/pressure-sets/t4/runs/default-321-01",
+      "working_directory": "/home/will/llvm-mos-65816-pressure",
+      "configuration": {
+        "tool": "llc",
+        "triple": "mos",
+        "cpus": [
+          "mos6502",
+          "mosw65816"
+        ],
+        "features": [],
+        "optimization": "O2",
+        "lto": false,
+        "outputs": [
+          "asm",
+          "obj"
+        ],
+        "reference": "upstream llvm-mos 06bc967d2668 llc (build/pressure-sets/llc/321-00, sha256 2f5c17683f93825767f9d4888ab6a15c929e9508ef2817c3267f9199e14d39a7)"
+      },
+      "toolchain_location": "/home/will/llvm-mos-65816/build/pressure-sets/t4/llc/321-01-t4 (a359c6b1d73c + t4-design/change/change-321-01.diff)",
+      "toolchain_sha256": "ab1c56fd19e197869ef1cddbaedb7189c2720f014fc1298b1de063f8668fedfb",
+      "input": {
+        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/inputs.sha256",
+        "sha256": "f22ca398b8349f3d82d0c5f519bd8f431da55c93ec58f09ac9ba7a8999603d1b"
+      },
+      "log": {
+        "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/default-vs-upstream/default-identity.log",
+        "sha256": "34304c26bd32e6b2a0506b87df167afdbfbf899e8797601f907abdcbbefbf4e9"
+      },
+      "exit_code": 0,
+      "observed": "mos6502 and mosw65816: 90 of 90 identical; RESULT: IDENTICAL"
     }
   ],
   "candidate_change": {
@@ -121,7 +155,7 @@
     },
     "pressure_tables": "tables/candidate-321-01.txt and tables/candidate-321-16.txt equal tables/upstream-06bc967d2668.txt"
   },
-  "unknowns": "The native-mode growth at series head (+539 B for +mos-a16 and +217 B for +mos-a16,+mos-xy16 on the fixed set) has no established cause. The downstream default-mode effect is not measured. Runtime (MAME/bsnes) differential for the candidate has not run; this is Phase B.",
+  "unknowns": "Native-mode growth cause established by the T4 design (t4-design/README.md). Open: placement of the pressure hooks in the split series (commit 1 moves 8-bit +mos-a16 code by +1491 B vs upstream mosw65816 before native codegen exists); 16/15 inputs still grow individually at head (largest packrec +86 B) under shrinking totals; the downstream default-mode effect is not measured; MAME runtime legs not run (SPC700 IPL secret).",
   "observations": [
     {
       "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/README.md",
@@ -314,6 +348,99 @@
     {
       "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/tools/pressure-tables.sh",
       "sha256": "21337f3909858eccd980b23360bace75cf3707f1e0d54f91dbbcd6c967e29539"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/README.md",
+      "sha256": "829701515e3b39ad4155e19f48f9c70b8518cecd2ea5fd4835bdeda8d37cd4c1"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
+      "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
+      "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/frozen-llc.sha256",
+      "sha256": "8d89ebe9300ac716ebf053a50c6b7a05387dfcf3c583ccaf1363fd9f9f2153e5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/consumers/summary.txt",
+      "sha256": "f72eb9afc85483b4db7e06afb717941ca97048db0498dfa545a8dad7e07cb58b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/summary.txt",
+      "sha256": "ea026eacaa14adea8855d3eb47c5ade23505f6a327f358939ceeaaa071f0a1fc"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/variants/probe.diff",
+      "sha256": "df516f9d49073c02afdf951fa8d484cea8a80a83d8ae4cf3ed48741baca725ba"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/size.txt",
+      "sha256": "32521f47a638a431b23c8c5889e32eeba88b0939d527b759915b14cb4a9b9d0a"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/native/compare.txt",
+      "sha256": "feea80536bd1d8353efb93f7dc75e6910c6236c456d3edc26fecbac0b4208e88"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/default-vs-cand1/compare.txt",
+      "sha256": "8727396bd1d52ac103d14567edd18809625bd04733992a08cb34b6cb7bea929b"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/native-summary.txt",
+      "sha256": "9f99bd4f46b2efc238ceef3f788ef0a0ba57355539eb81cb6ccd49112599f31d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-01/lit-summary.txt",
+      "sha256": "115588ce8b1e53cd8df681976fc047ffdfaa07ce280764f013516013c911bb31"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/final-321-16/lit-summary.txt",
+      "sha256": "d666a9fb870a8999a400547381cbaeea61f401328ab9d1e0b9e796313af64b88"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16-t4.tsv",
+      "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/runtime/results-321-16.tsv",
+      "sha256": "3ed44463d8004792aae274ffbd44d34164b2b86922db52ddb44a5ee54fe64a6d"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-01-t4.txt",
+      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/321-16-t4.txt",
+      "sha256": "382480165b93e41876b2d94740e246ed1517f5d40cb45d9dde4d738f93b27485"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-321-16-unchanged.txt",
+      "sha256": "29802f8eea6fade6bc4fdefd5365bcbb7cd2c43731e5ae25b8202b3af5c1a1ce"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/tables/decoded-candidate.txt",
+      "sha256": "94516e488fa8cf2baa273525d66d68648b7b00cef57a53f1bbd6c0a3419ffba5"
+    },
+    {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/mir/mv_step.p0.after.mir",
+      "sha256": "0e696c0a143c40fccea5c8543d48c72642a4fec87b4d9959df090c2c4e721e7b"
     }
-  ]
+  ],
+  "t4_design": {
+    "description": "Keep GeneratePressureSet = 0 on Ac16/Xc16/Yc16 (generated tables = upstream) and, under +mos-a16 only, append pressure sets A16/X16/Y16 (limit 2) through MOSRegisterInfo overrides of the six pressure-set hooks; the sets are charged by each wide register's byte units and by Ac/Ac16, Xc/Xc16, Yc/Yc16; the native class also charges its low byte's generated sets.",
+    "diff": {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-01.diff",
+      "sha256": "7b07b4c231dba7a8ff17dcee3f07a148114b1c5cad230031cf2bcb9af2880734"
+    },
+    "diff_at_head": {
+      "path": "docs/defects/evidence/2026-09-30-native-width-pressure-sets/t4-design/change/change-321-16.diff",
+      "sha256": "61e7e0444dfab32c2fcf585bdf633b1176e8cf2a3092ac16aceb4935744f8e61"
+    },
+    "native_at_head_vs_321_16": "+mos-a16 321489 -> 321411 B (-78; 16 larger, 4 smaller); +mos-a16,+mos-xy16 300012 -> 299850 B (-162; 15 larger, 5 smaller)",
+    "cause": "With the flag alone the native classes have no pressure sets, so 16-bit vregs cost nothing to MachineLICM, MachineSink and the machine scheduler (all three contribute; all three disabled gives identical output). Restoring native-class pressure removes the native growth."
+  }
 }

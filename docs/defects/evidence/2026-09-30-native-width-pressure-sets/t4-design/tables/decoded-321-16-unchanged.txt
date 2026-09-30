@@ -1,0 +1,43 @@
+sets: Ac16=2, Pc=4, Xc16=4, Yc16=4, GPR_LSB=6, GPR_LSB_with_Ac16=6, GPR_LSB_with_Xc16=6, GPR_LSB_with_Yc16=6, GPR_LSB_with_Pc=7, Anyi1=262, Anyi1_with_Ac16=262, Anyi1_with_Xc16=262, Anyi1_with_Yc16=262, Anyi1_with_Pc=263
+class Anyi1                w=1 lim=261  -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class CV_GPR_LSB           w=1 lim=5    -> GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Flag                 w=1 lim=4    -> (none)
+class GPR_LSB              w=1 lim=3    -> GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class AllocatableFlags     w=1 lim=2    -> Pc GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Cc                   w=1 lim=1    -> Pc GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Vc                   w=1 lim=1    -> Pc GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Anyi8                w=1 lim=259  -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class AImag8               w=1 lim=257  -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Imag8                w=1 lim=256  -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class AXYP                 w=1 lim=7    -> (none)
+class GPR                  w=1 lim=3    -> GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class MOSAsmParamRegClass  w=1 lim=3    -> Xc16 Yc16 GPR_LSB Anyi1
+class AP                   w=1 lim=5    -> (none)
+class AY                   w=1 lim=2    -> GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class XY                   w=1 lim=2    -> Xc16 Yc16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Ac                   w=1 lim=1    -> Ac16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Pc                   w=4 lim=4    -> Pc GPR_LSB_with_Pc Anyi1_with_Pc
+class Xc                   w=1 lim=1    -> Xc16 Yc16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Yc                   w=1 lim=1    -> Xc16 Yc16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Imag16               w=2 lim=256  -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+class Ac16                 w=2 lim=2    -> Ac16 GPR_LSB_with_Ac16 Anyi1_with_Ac16
+class PCc                  w=0 lim=0    -> (none)
+class Xc16                 w=2 lim=2    -> Xc16 GPR_LSB_with_Xc16 Anyi1_with_Xc16
+class Yc16                 w=2 lim=2    -> Yc16 GPR_LSB_with_Yc16 Anyi1_with_Yc16
+class Fakei32              w=0 lim=0    -> (none)
+class Fakei64              w=0 lim=0    -> (none)
+unit 0   ALSB     -> Ac16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 1   B        -> Ac16 GPR_LSB_with_Ac16 Anyi1_with_Ac16
+unit 2   C        -> Pc GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 3   Fake     -> (none)
+unit 4   N        -> Pc GPR_LSB_with_Pc Anyi1_with_Pc
+unit 5   Z        -> Pc GPR_LSB_with_Pc Anyi1_with_Pc
+unit 6   V        -> Pc GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 7   PC       -> (none)
+unit 8   S        -> Xc16 Yc16 GPR_LSB Anyi1
+unit 9   XLSB     -> Xc16 Yc16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 10  XH       -> Xc16 GPR_LSB_with_Xc16 Anyi1_with_Xc16
+unit 11  YLSB     -> Xc16 Yc16 GPR_LSB GPR_LSB_with_Ac16 GPR_LSB_with_Xc16 GPR_LSB_with_Yc16 GPR_LSB_with_Pc Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 12  YH       -> Yc16 GPR_LSB_with_Yc16 Anyi1_with_Yc16
+unit 13  RC0LSB   -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc
+unit 13.. RC0LSB.. -> Anyi1 Anyi1_with_Ac16 Anyi1_with_Xc16 Anyi1_with_Yc16 Anyi1_with_Pc

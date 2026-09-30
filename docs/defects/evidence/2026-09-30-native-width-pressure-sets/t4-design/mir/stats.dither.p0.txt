@@ -1,0 +1,113 @@
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+ 128 aa                     - Number of MayAlias results
+ 378 aa                     - Number of NoAlias results
+  51 abstract-call-sites    - Number of direct abstract call sites created
+  18 abstract-call-sites    - Number of invalid abstract call sites created (unknown use)
+5552 asm-printer            - Number of machine instrs printed
+ 174 assume-queries         - Number of Queries into an assume assume bundles
+ 750 basicaa                - Number of times a GEP is decomposed
+ 119 branch-folder          - Number of branches optimized
+   9 branch-folder          - Number of dead blocks removed
+   2 branch-folder          - Number of block tails merged
+  71 branch-relaxation      - Number of conditional branches relaxed
+  79 branch-relaxation      - Number of unconditional branches relaxed
+   2 capture-tracking       - Number of pointers not captured
+  16 codegenprepare         - Number of blocks eliminated
+   7 codegenprepare         - Number of uses of Cast expressions replaced with uses of sunken Casts
+   3 codegenprepare         - Number of uses of Cmp expressions replaced with uses of sunken Cmps
+  16 codegenprepare         - Number of uses of [s|z]ext instructions optimized
+  12 codegenprepare         - Number of [s|z]ext instructions combined with loads
+  49 codegenprepare         - Number of memory instructions whose address computations were sunk
+   5 codegenprepare         - Number of selects turned into branches
+  12 dead-mi-elimination    - Number of dead instructions deleted
+   3 gi-combiner            - Number of functions with one iteration
+   1 gi-combiner            - Number of functions with three or more iterations
+  24 gi-combiner            - Number of functions with two iterations
+   2 instcombine            - Negator: Maximal traversal depth ever reached while attempting to sink negation
+   3 instcombine            - Negator: Maximal number of values ever visited while attempting to sink negation
+  29 instcombine            - Negator: Total number of values visited during attempts to sink negation
+  27 instcombine            - Negator: Number of negations attempted to be sinked
+  38 instcombine            - Number of insts combined
+  10 instcombine            - Number of dead inst eliminated
+  14 instcombine            - Number of functions with one iteration
+  14 instcombine            - Number of instruction combining iterations performed
+ 115 ir                     - Number of renumberings across all blocks
+   5 lcssa                  - Number of live out of a loop variables
+  51 machine-cp             - Number of copy uses forwarded
+  44 machine-cp             - Number of dead copies deleted
+ 124 machine-cse            - Number of common subexpression eliminated
+  19 machine-latecleanup    - Number of redundant instructions removed.
+2856 machine-scheduler      - Number of scheduling units chosen from bottom queue pre-RA
+2625 machine-scheduler      - Number of instructions in source order after pre-RA scheduling
+2953 machine-scheduler      - Number of instructions scheduled by pre-RA scheduler
+1293 machine-scheduler      - Number of scheduling units chosen for NodeOrder heuristic pre-RA
+1386 machine-scheduler      - Number of scheduling units chosen for Only1 heuristic pre-RA
+ 155 machine-scheduler      - Number of scheduling units chosen for PhysReg heuristic pre-RA
+  20 machine-scheduler      - Number of scheduling units chosen for RegCritical heuristic pre-RA
+  53 machine-scheduler      - Number of scheduling units chosen for RegExcess heuristic pre-RA
+  46 machine-scheduler      - Number of scheduling units chosen for RegMax heuristic pre-RA
+  97 machine-scheduler      - Number of scheduling units chosen from top queue pre-RA
+  14 machine-sink           - Number of copies sunk after RA
+  11 machine-sink           - Number of critical edges split
+ 110 machine-sink           - Number of machine instructions sunk
+ 132 machinelicm            - Number of hoisted machine instructions CSEed
+ 213 machinelicm            - Number of machine instructions hoisted out of loops
+   1 machinelicm            - Number of instructions hoisted in low reg pressure situation
+   1 machinelicm            - Number of machine instructions hoisted out of loops post regalloc
+   6 peephole-opt           - Number of copies rewritten
+  14 phi-node-elimination   - Number of critical edges split
+ 219 phi-node-elimination   - Number of phis lowered
+   6 prolog-epilog          - Number of bytes used for stack in all functions
+  14 prolog-epilog          - Number of functions seen in PEI
+   2 prolog-epilog          - Number of leaf functions with CSRs
+ 382 reg-scavenging         - Number of frame index regs scavenged
+3176 regalloc               - Number of registers assigned
+ 576 regalloc               - Number of copies inserted for splitting
+ 308 regalloc               - Number of instructions deleted by DCE
+ 123 regalloc               - Number of interferences evicted
+ 458 regalloc               - Number of splits finished
+  97 regalloc               - Number of split global live ranges
+ 329 regalloc               - Number of identity moves eliminated after rewriting
+   3 regalloc               - Number of register classes inflated
+  79 regalloc               - Number of split local live ranges
+2019 regalloc               - Number of new live ranges queued
+ 636 regalloc               - Number of instructions rematerialized
+  39 regalloc               - Number of instructions re-materialized
+  66 regalloc               - Number of reloads inserted
+  48 regalloc               - Number of rematerialized defs for spilling
+ 549 regalloc               - Number of rematerialized defs for splitting
+ 145 regalloc               - Number of shrinkToUses called
+ 166 regalloc               - Number of splits that were simple
+  30 regalloc               - Number of spilled snippets
+  56 regalloc               - Number of spill slots allocated
+  87 regalloc               - Number of spilled live ranges
+  73 regalloc               - Number of spills inserted
+ 140 regalloc               - Number of registers unassigned
+ 527 regalloc               - Number of cross class joins performed
+1290 regalloc               - Number of interval joins performed
+6169 registerbankinfo       - Number of instruction mappings dynamically accessed
+  22 registerbankinfo       - Number of instruction mappings dynamically created
+3455 registerbankinfo       - Number of operands mappings dynamically accessed
+  20 registerbankinfo       - Number of operands mappings dynamically created
+6678 registerbankinfo       - Number of partial mappings dynamically accessed
+   3 registerbankinfo       - Number of partial mappings dynamically created
+6678 registerbankinfo       - Number of value mappings dynamically accessed
+   3 registerbankinfo       - Number of value mappings dynamically created
+  14 reset-machine-function - Number of functions visited
+   1 scalar-evolution       - Number of loops with trip counts computed by force
+  27 scalar-evolution       - Number of loop exits with predictable exit counts
+   2 scalar-evolution       - Number of loop exits without predictable exit counts
+   1 shrink-wrap            - Number of shrink-wrapping candidates
+  14 shrink-wrap            - Number of functions
+ 272 slotindexes            - Number of local renumberings
+  10 stack-coloring         - Number of lifetime markers found.
+  12 stack-slot-coloring    - Number of stack slots eliminated due to coloring
+  14 stackmaps              - Number of functions skipped
+  14 stackmaps              - Number of functions visited
+   2 twoaddressinstruction  - Number of instructions aggressively commuted
+   2 twoaddressinstruction  - Number of instructions commuted to coalesce
+ 490 twoaddressinstruction  - Number of two-address instructions
+

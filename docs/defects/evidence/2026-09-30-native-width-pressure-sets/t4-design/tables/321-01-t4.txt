@@ -1,0 +1,16 @@
+  static const char *PressureNameTable[] = {
+    "MOSAsmParamRegClass",
+    "Pc",
+    "GPR_LSB",
+    "GPR_LSB_with_Pc",
+    "Anyi1",
+    "Anyi1_with_Pc",
+  };
+  static const uint16_t PressureLimitTable[] = {
+    3,  	// 0: MOSAsmParamRegClass
+    4,  	// 1: Pc
+    6,  	// 2: GPR_LSB
+    7,  	// 3: GPR_LSB_with_Pc
+    262,  	// 4: Anyi1
+    263,  	// 5: Anyi1_with_Pc
+  };

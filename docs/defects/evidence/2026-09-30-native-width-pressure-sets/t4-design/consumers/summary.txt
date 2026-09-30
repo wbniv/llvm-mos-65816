@@ -1,0 +1,18 @@
+## none
+a16: 80 inputs, bytes 321489 -> 322028 (delta 539), larger 21, smaller 13, asm-identical 46, excluded 10
+a16xy16: 79 inputs, bytes 300012 -> 300229 (delta 217), larger 21, smaller 10, asm-identical 47, excluded 11
+## licm
+a16: 78 inputs, bytes 293410 -> 293876 (delta 466), larger 21, smaller 11, asm-identical 43, excluded 12
+a16xy16: 77 inputs, bytes 272804 -> 272876 (delta 72), larger 21, smaller 9, asm-identical 43, excluded 13
+## sink
+a16: 79 inputs, bytes 320557 -> 320913 (delta 356), larger 20, smaller 13, asm-identical 46, excluded 11
+a16xy16: 78 inputs, bytes 299706 -> 299725 (delta 19), larger 19, smaller 12, asm-identical 46, excluded 12
+## misched
+a16: 80 inputs, bytes 321048 -> 321226 (delta 178), larger 9, smaller 3, asm-identical 60, excluded 10
+a16xy16: 79 inputs, bytes 299545 -> 299760 (delta 215), larger 9, smaller 0, asm-identical 60, excluded 11
+## all
+a16: 79 inputs, bytes 307779 -> 307779 (delta 0), larger 0, smaller 0, asm-identical 79, excluded 11
+a16xy16: 78 inputs, bytes 287736 -> 287736 (delta 0), larger 0, smaller 0, asm-identical 78, excluded 12
+## unchanged head: none -> licm disabled
+a16: 78 inputs, bytes 303074 -> 293410 (delta -9664), larger 1, smaller 31, asm-identical 43, excluded 12
+a16xy16: 77 inputs, bytes 281613 -> 272804 (delta -8809), larger 1, smaller 31, asm-identical 43, excluded 13

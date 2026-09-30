@@ -1,0 +1,115 @@
+===-------------------------------------------------------------------------===
+                          ... Statistics Collected ...
+===-------------------------------------------------------------------------===
+
+ 128 aa                     - Number of MayAlias results
+ 400 aa                     - Number of NoAlias results
+  54 abstract-call-sites    - Number of direct abstract call sites created
+  12 abstract-call-sites    - Number of invalid abstract call sites created (unknown use)
+4740 asm-printer            - Number of machine instrs printed
+ 160 assume-queries         - Number of Queries into an assume assume bundles
+ 700 basicaa                - Number of times a GEP is decomposed
+  93 branch-folder          - Number of branches optimized
+  10 branch-folder          - Number of dead blocks removed
+   5 branch-folder          - Number of block tails merged
+  70 branch-relaxation      - Number of conditional branches relaxed
+  79 branch-relaxation      - Number of unconditional branches relaxed
+   2 capture-tracking       - Number of pointers not captured
+  19 codegenprepare         - Number of blocks eliminated
+   7 codegenprepare         - Number of uses of Cast expressions replaced with uses of sunken Casts
+   5 codegenprepare         - Number of uses of Cmp expressions replaced with uses of sunken Cmps
+  11 codegenprepare         - Number of uses of [s|z]ext instructions optimized
+  10 codegenprepare         - Number of [s|z]ext instructions combined with loads
+  45 codegenprepare         - Number of memory instructions whose address computations were sunk
+   6 codegenprepare         - Number of selects turned into branches
+  11 dead-mi-elimination    - Number of dead instructions deleted
+   3 gi-combiner            - Number of functions with one iteration
+  19 gi-combiner            - Number of functions with two iterations
+   0 instcombine            - Negator: Maximal traversal depth ever reached while attempting to sink negation
+   1 instcombine            - Negator: Maximal number of values ever visited while attempting to sink negation
+  26 instcombine            - Negator: Total number of values visited during attempts to sink negation
+  26 instcombine            - Negator: Number of negations attempted to be sinked
+  21 instcombine            - Number of insts combined
+   3 instcombine            - Number of dead inst eliminated
+  11 instcombine            - Number of functions with one iteration
+  11 instcombine            - Number of instruction combining iterations performed
+ 102 ir                     - Number of renumberings across all blocks
+   6 lcssa                  - Number of live out of a loop variables
+   1 machine-cp             - Number of copy defs backward propagated
+  38 machine-cp             - Number of copy uses forwarded
+  36 machine-cp             - Number of dead copies deleted
+ 118 machine-cse            - Number of common subexpression eliminated
+  14 machine-latecleanup    - Number of redundant instructions removed.
+2499 machine-scheduler      - Number of scheduling units chosen from bottom queue pre-RA
+2119 machine-scheduler      - Number of instructions in source order after pre-RA scheduling
+2611 machine-scheduler      - Number of instructions scheduled by pre-RA scheduler
+ 789 machine-scheduler      - Number of scheduling units chosen for NodeOrder heuristic pre-RA
+1155 machine-scheduler      - Number of scheduling units chosen for Only1 heuristic pre-RA
+ 221 machine-scheduler      - Number of scheduling units chosen for PhysReg heuristic pre-RA
+  26 machine-scheduler      - Number of scheduling units chosen for RegCritical heuristic pre-RA
+ 358 machine-scheduler      - Number of scheduling units chosen for RegExcess heuristic pre-RA
+  62 machine-scheduler      - Number of scheduling units chosen for RegMax heuristic pre-RA
+ 112 machine-scheduler      - Number of scheduling units chosen from top queue pre-RA
+  12 machine-sink           - Number of copies sunk after RA
+  11 machine-sink           - Number of critical edges split
+  76 machine-sink           - Number of machine instructions sunk
+ 101 machinelicm            - Number of hoisted machine instructions CSEed
+ 182 machinelicm            - Number of machine instructions hoisted out of loops
+   6 peephole-opt           - Number of copies rewritten
+  15 phi-node-elimination   - Number of critical edges split
+ 185 phi-node-elimination   - Number of phis lowered
+  66 prolog-epilog          - Number of bytes used for stack in all functions
+  11 prolog-epilog          - Number of functions seen in PEI
+   2 prolog-epilog          - Number of leaf functions with CSRs
+ 294 reg-scavenging         - Number of frame index regs scavenged
+2778 regalloc               - Number of registers assigned
+ 564 regalloc               - Number of copies inserted for splitting
+ 300 regalloc               - Number of instructions deleted by DCE
+ 174 regalloc               - Number of interferences evicted
+ 478 regalloc               - Number of splits finished
+   1 regalloc               - Number of live ranges fractured by DCE
+  92 regalloc               - Number of split global live ranges
+ 282 regalloc               - Number of identity moves eliminated after rewriting
+   2 regalloc               - Number of register classes inflated
+  85 regalloc               - Number of split local live ranges
+1894 regalloc               - Number of new live ranges queued
+ 598 regalloc               - Number of instructions rematerialized
+  37 regalloc               - Number of instructions re-materialized
+  31 regalloc               - Number of reloads inserted
+  49 regalloc               - Number of rematerialized defs for spilling
+ 512 regalloc               - Number of rematerialized defs for splitting
+ 123 regalloc               - Number of shrinkToUses called
+ 204 regalloc               - Number of splits that were simple
+  26 regalloc               - Number of spilled snippets
+  23 regalloc               - Number of spill slots allocated
+  55 regalloc               - Number of spilled live ranges
+  25 regalloc               - Number of spills inserted
+ 201 regalloc               - Number of registers unassigned
+ 487 regalloc               - Number of cross class joins performed
+   1 regalloc               - Number of copies extended
+1153 regalloc               - Number of interval joins performed
+5677 registerbankinfo       - Number of instruction mappings dynamically accessed
+  24 registerbankinfo       - Number of instruction mappings dynamically created
+3214 registerbankinfo       - Number of operands mappings dynamically accessed
+  22 registerbankinfo       - Number of operands mappings dynamically created
+6199 registerbankinfo       - Number of partial mappings dynamically accessed
+   3 registerbankinfo       - Number of partial mappings dynamically created
+6199 registerbankinfo       - Number of value mappings dynamically accessed
+   3 registerbankinfo       - Number of value mappings dynamically created
+  11 reset-machine-function - Number of functions visited
+  27 scalar-evolution       - Number of loop exits with predictable exit counts
+   4 scalar-evolution       - Number of loop exits without predictable exit counts
+   1 shrink-wrap            - Number of shrink-wrapping candidates
+  11 shrink-wrap            - Number of functions
+ 176 slotindexes            - Number of local renumberings
+  12 stack-coloring         - Number of lifetime markers found.
+   1 stack-coloring         - Number of stack slot merged.
+  18 stack-coloring         - Number of bytes saved due to merging slots.
+   4 stack-slot-coloring    - Number of stack slots eliminated due to coloring
+  11 stackmaps              - Number of functions skipped
+  11 stackmaps              - Number of functions visited
+   2 twoaddressinstruction  - Number of instructions aggressively commuted
+   2 twoaddressinstruction  - Number of instructions commuted to coalesce
+   1 twoaddressinstruction  - Number of instructions re-scheduled down
+ 400 twoaddressinstruction  - Number of two-address instructions
+

@@ -1,0 +1,6 @@
+## t4 vs unchanged 321-01
+a16: 78 inputs, bytes 293975 -> 292264 (delta -1711), larger 9, smaller 17, asm-identical 51, excluded 12
+a16xy16: 78 inputs, bytes 293975 -> 292264 (delta -1711), larger 9, smaller 17, asm-identical 51, excluded 12
+## t4 vs Phase A candidate (== upstream mosw65816)
+a16: 78 inputs, bytes 290773 -> 292264 (delta 1491), larger 23, smaller 9, asm-identical 45, excluded 12
+a16xy16: 78 inputs, bytes 290773 -> 292264 (delta 1491), larger 23, smaller 9, asm-identical 45, excluded 12

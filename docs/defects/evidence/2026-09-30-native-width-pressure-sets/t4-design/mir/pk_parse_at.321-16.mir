@@ -1,0 +1,339 @@
+# *** IR Dump After Machine Instruction Scheduler (machine-scheduler) ***:
+# Machine code for function pk_parse_at: NoPHIs, TracksLiveness, Legalized, RegBankSelected, Selected, TiedOpsRewritten
+
+0B	bb.0 (%ir-block.1):
+	  successors: %bb.4(0x40000000), %bb.1(0x40000000); %bb.4(50.00%), %bb.1(50.00%)
+	  liveins: $a, $x
+16B	  %531:ac = COPY $a
+32B	  undef %0.subhi:imag16 = COPY $x
+48B	  %0.sublo:imag16 = COPY %531:ac
+96B	  %3:imag16, dead early-clobber %674:gpr = LDImm16 @pk_blob
+128B	  %670:cc = LDImm1 0
+136B	  %671:ac16 = LDAImag16 %3:imag16
+160B	  %671:ac16, dead %672:cc, dead %673:vc = ADCImag16 %671:ac16(tied-def 0), %0:imag16, %670:cc
+176B	  %476:imag16 = STAImag16 %671:ac16
+184B	  %7:ac = LDImm 1
+208B	  %7:ac = ANDIndir %7:ac(tied-def 0), %476:imag16 :: (load (s8) from %ir.2, !tbaa !6)
+224B	  CmpBrZero %bb.4, undef $z, 1, %7:ac, implicit-def dead $c
+240B	  BRA %bb.1
+
+256B	bb.1 (%ir-block.6):
+	; predecessors: %bb.0
+	  successors: %bb.2(0x40000000), %bb.9(0x40000000); %bb.2(50.00%), %bb.9(50.00%)
+
+272B	  %11:imag16 = COPY %476:imag16
+288B	  %11:imag16 = IncPtr %11:imag16(tied-def 0), implicit-def dead $c, implicit-def dead $v
+304B	  %668:ac16 = LDAIndir16 %11:imag16 :: (load (s16) from %ir.sunkaddr, align 1, !tbaa !126)
+320B	  %468:imag16 = STAImag16 %668:ac16
+384B	  %691:yc = LDImm 3
+400B	  %665:ac16 = LDAImag16 %476:imag16
+432B	  %665:ac16, dead %666:cc, dead %667:vc = ADCImm16 %665:ac16(tied-def 0), 3, %670:cc
+448B	  %467:imag16 = STAImag16 %665:ac16
+464B	  %317:ac = LDIndirIdx %476:imag16, %691:yc :: (load (s8) from %ir.8, !tbaa !128)
+480B	  %465:yc = LDImm 1
+496B	  %319:ac = LDIndirIdx %467:imag16, %465:yc :: (load (s8) from %ir.8 + 1, !tbaa !128)
+512B	  %464:yc = LDImm 2
+528B	  %321:ac = LDIndirIdx %467:imag16, %464:yc :: (load (s8) from %ir.8 + 2, !tbaa !128)
+544B	  %323:ac = LDIndirIdx %467:imag16, %691:yc :: (load (s8) from %ir.8 + 3, !tbaa !128)
+560B	  %660:ac16 = LDAImag16 %476:imag16
+592B	  %660:ac16, dead %661:cc, dead %662:vc = ADCImm16 %660:ac16(tied-def 0), 7, %670:cc
+608B	  %452:imag16 = STAImag16 %660:ac16
+624B	  %657:ac16 = LDAIndir16 %452:imag16 :: (load (s16) from %ir.10, align 1, !tbaa !129)
+640B	  %450:imag16 = STAImag16 %657:ac16
+720B	  %656:ac16 = LDAbs16 @pk_n :: (dereferenceable load (s16) from @pk_n, align 1, !tbaa !2)
+736B	  %22:imag16 = STAImag16 %656:ac16
+740B	  %449:yc = LDImm 9
+744B	  %448:ac = LDIndirIdx %476:imag16, %449:yc :: (load (s8) from %ir.12, !tbaa !130)
+752B	  %655:ac16 = LDAImag16 %22:imag16
+768B	  %444:cc = CMPImm16 %655:ac16, 96
+776B	  %500:ac = COPY %468.sublo:imag16
+784B	  %501:ac = COPY %468.subhi:imag16
+792B	  %498:ac = COPY %450.sublo:imag16
+800B	  %499:ac = COPY %450.subhi:imag16
+808B	  %692:ac = LDZ
+816B	  GBR %bb.2, %444:cc, 0, implicit-def $c
+
+824B	bb.9:
+	; predecessors: %bb.1
+	  successors: %bb.3(0x80000000); %bb.3(100.00%)
+
+832B	  %675:imag8 = COPY %448:ac
+836B	  %679:imag8 = COPY %498:ac
+844B	  %680:imag8 = COPY %499:ac
+852B	  %676:imag8 = COPY %692:ac
+860B	  %677:imag8 = COPY %692:ac
+864B	  %678:imag8 = COPY %692:ac
+912B	  %681:imag8 = COPY %692:ac
+928B	  %682:imag8 = COPY %692:ac
+944B	  %683:imag8 = COPY %500:ac
+960B	  %684:imag8 = COPY %501:ac
+976B	  %685:imag8 = COPY %692:ac
+992B	  %686:imag8 = COPY %692:ac
+1008B	  BRA %bb.3
+
+1024B	bb.2 (%ir-block.20):
+	; predecessors: %bb.1
+	  successors: %bb.3(0x80000000); %bb.3(100.00%)
+
+1040B	  %654:ac16 = LDAImag16 %22:imag16
+1072B	  %654:ac16 = ASLAcc16 %654:ac16(tied-def 0), implicit-def dead $c
+1088B	  %31:imag16 = STAImag16 %654:ac16
+1104B	  %515:imag16, dead early-clobber %652:gpr = LDImm16 @pk_off
+1136B	  %648:cc = LDImm1 0
+1144B	  %649:ac16 = LDAImag16 %515:imag16
+1168B	  %649:ac16, dead %650:cc, dead %651:vc = ADCImag16 %649:ac16(tied-def 0), %31:imag16, %648:cc
+1184B	  %438:imag16 = STAImag16 %649:ac16
+1200B	  %646:ac16 = LDAImag16 %0:imag16
+1216B	  STAIndir16 %646:ac16, %438:imag16 :: (store (s16) into %ir.21, align 1, !tbaa !2)
+1232B	  %513:imag16, dead early-clobber %645:gpr = LDImm16 @pk_shape
+1248B	  %642:ac16 = LDAImag16 %513:imag16
+1280B	  %642:ac16, dead %643:cc, dead %644:vc = ADCImag16 %642:ac16(tied-def 0), %22:imag16, %648:cc
+1296B	  %436:imag16 = STAImag16 %642:ac16
+1312B	  STIndir %692:ac, %436:imag16 :: (store (s8) into %ir.22, !tbaa !6)
+1360B	  %637:ac16 = LDAImag16 %22:imag16
+1392B	  %637:ac16 = ASLAcc16 %637:ac16(tied-def 0), implicit-def dead $c
+1424B	  %637:ac16 = ASLAcc16 %637:ac16(tied-def 0), implicit-def dead $c
+1456B	  %637:ac16 = ASLAcc16 %637:ac16(tied-def 0), implicit-def dead $c
+1488B	  %637:ac16 = ASLAcc16 %637:ac16(tied-def 0), implicit-def dead $c
+1504B	  %38:imag16 = STAImag16 %637:ac16
+1520B	  %511:imag16, dead early-clobber %634:gpr = LDImm16 @pk_field
+1536B	  %631:ac16 = LDAImag16 %511:imag16
+1568B	  %631:ac16, dead %632:cc, dead %633:vc = ADCImag16 %631:ac16(tied-def 0), %38:imag16, %648:cc
+1584B	  %433:imag16 = STAImag16 %631:ac16
+1600B	  STIndir %500:ac, %433:imag16 :: (store (s8) into %ir.24, !tbaa !86)
+1616B	  STIndirIdx %501:ac, %433:imag16, %465:yc :: (store (s8) into %ir.24 + 1, !tbaa !86)
+1632B	  STIndirIdx %692:ac, %433:imag16, %464:yc :: (store (s8) into %ir.24 + 2, !tbaa !86)
+1640B	  %395:yc = LDImm 3
+1648B	  STIndirIdx %692:ac, %433:imag16, %395:yc :: (store (s8) into %ir.24 + 3, !tbaa !86)
+1664B	  %626:ac16 = LDAImag16 %433:imag16
+1696B	  %626:ac16, dead %627:cc, dead %628:vc = ADCImm16 %626:ac16(tied-def 0), 4, %648:cc
+1712B	  %423:imag16 = STAImag16 %626:ac16
+1720B	  %421:yc = LDImm 4
+1728B	  STIndirIdx %317:ac, %433:imag16, %421:yc :: (store (s8) into %ir.25, !tbaa !86)
+1744B	  STIndirIdx %319:ac, %423:imag16, %465:yc :: (store (s8) into %ir.25 + 1, !tbaa !86)
+1760B	  STIndirIdx %321:ac, %423:imag16, %464:yc :: (store (s8) into %ir.25 + 2, !tbaa !86)
+1776B	  STIndirIdx %323:ac, %423:imag16, %395:yc :: (store (s8) into %ir.25 + 3, !tbaa !86)
+1808B	  %621:ac16 = LDAImag16 %433:imag16
+1840B	  %621:ac16, dead %622:cc, dead %623:vc = ADCImm16 %621:ac16(tied-def 0), 8, %648:cc
+1856B	  %412:imag16 = STAImag16 %621:ac16
+1864B	  %410:yc = LDImm 8
+1872B	  STIndirIdx %498:ac, %433:imag16, %410:yc :: (store (s8) into %ir.27, !tbaa !86)
+1888B	  STIndirIdx %499:ac, %412:imag16, %465:yc :: (store (s8) into %ir.27 + 1, !tbaa !86)
+1904B	  STIndirIdx %692:ac, %412:imag16, %464:yc :: (store (s8) into %ir.27 + 2, !tbaa !86)
+1920B	  STIndirIdx %692:ac, %412:imag16, %395:yc :: (store (s8) into %ir.27 + 3, !tbaa !86)
+1952B	  %616:ac16 = LDAImag16 %433:imag16
+1984B	  %616:ac16, dead %617:cc, dead %618:vc = ADCImm16 %616:ac16(tied-def 0), 12, %648:cc
+2000B	  %400:imag16 = STAImag16 %616:ac16
+2008B	  %398:yc = LDImm 12
+2016B	  STIndirIdx %448:ac, %433:imag16, %398:yc :: (store (s8) into %ir.29, !tbaa !86)
+2032B	  STIndirIdx %692:ac, %400:imag16, %465:yc :: (store (s8) into %ir.29 + 1, !tbaa !86)
+2048B	  STIndirIdx %692:ac, %400:imag16, %464:yc :: (store (s8) into %ir.29 + 2, !tbaa !86)
+2064B	  STIndirIdx %692:ac, %400:imag16, %395:yc :: (store (s8) into %ir.29 + 3, !tbaa !86)
+2080B	  %613:ac16 = LDAImag16 %22:imag16
+2112B	  %613:ac16 = INCAcc16 %613:ac16(tied-def 0)
+2128B	  %49:imag16 = STAImag16 %613:ac16
+2144B	  %611:ac16 = LDAImag16 %49:imag16
+2160B	  STAbs16 %611:ac16, @pk_n :: (store (s16) into @pk_n, align 1, !tbaa !2)
+2176B	  %675:imag8 = COPY %448:ac
+2240B	  %679:imag8 = COPY %498:ac
+2256B	  %680:imag8 = COPY %499:ac
+2304B	  %683:imag8 = COPY %500:ac
+2320B	  %684:imag8 = COPY %501:ac
+2328B	  %676:imag8 = COPY %692:ac
+2336B	  %677:imag8 = COPY %692:ac
+2344B	  %678:imag8 = COPY %692:ac
+2352B	  %681:imag8 = COPY %692:ac
+2360B	  %682:imag8 = COPY %692:ac
+2368B	  %685:imag8 = COPY %692:ac
+2376B	  %686:imag8 = COPY %692:ac
+
+2384B	bb.3 (%ir-block.31):
+	; predecessors: %bb.2, %bb.9
+	  successors: %bb.7(0x40000000), %bb.8(0x40000000); %bb.7(50.00%), %bb.8(50.00%)
+
+2576B	  %287:cc = LDImm1 0
+2608B	  %317:ac, %334:cc, dead %610:vc = ADCImag8 %317:ac(tied-def 0), %683:imag8, %287:cc
+2640B	  %319:ac, %336:cc, dead %609:vc = ADCImag8 %319:ac(tied-def 0), %684:imag8, %334:cc
+2672B	  %321:ac, %338:cc, dead %608:vc = ADCImag8 %321:ac(tied-def 0), %685:imag8, %336:cc
+2704B	  %323:ac, dead %340:cc, dead %607:vc = ADCImag8 %323:ac(tied-def 0), %686:imag8, %338:cc
+2736B	  %317:ac, %318:cc, dead %606:vc = ADCImag8 %317:ac(tied-def 0), %679:imag8, %287:cc
+2768B	  %319:ac, %320:cc, dead %605:vc = ADCImag8 %319:ac(tied-def 0), %680:imag8, %318:cc
+2800B	  %321:ac, %322:cc, dead %604:vc = ADCImag8 %321:ac(tied-def 0), %681:imag8, %320:cc
+2832B	  %323:ac, dead %324:cc, dead %603:vc = ADCImag8 %323:ac(tied-def 0), %682:imag8, %322:cc
+2864B	  %317:ac, %302:cc, dead %602:vc = ADCImag8 %317:ac(tied-def 0), %675:imag8, %287:cc
+2896B	  %319:ac, %304:cc, dead %601:vc = ADCImag8 %319:ac(tied-def 0), %676:imag8, %302:cc
+2928B	  %321:ac, %306:cc, dead %600:vc = ADCImag8 %321:ac(tied-def 0), %677:imag8, %304:cc
+2960B	  %323:ac, dead %308:cc, dead %599:vc = ADCImag8 %323:ac(tied-def 0), %678:imag8, %306:cc
+3008B	  %317:ac, %287:cc, dead %598:vc = ADCAbs %317:ac(tied-def 0), @pk_check, %287:cc(tied-def 1)
+3056B	  %319:ac, %287:cc, dead %597:vc = ADCAbs %319:ac(tied-def 0), @pk_check + 1, %287:cc(tied-def 1)
+3104B	  %321:ac, %287:cc, dead %596:vc = ADCAbs %321:ac(tied-def 0), @pk_check + 2, %287:cc(tied-def 1)
+3152B	  %323:ac, dead %287:cc, dead %595:vc = ADCAbs %323:ac(tied-def 0), @pk_check + 3, %287:cc(tied-def 1)
+3168B	  STAbs %317:ac, @pk_check :: (store (s8) into @pk_check, !tbaa !86)
+3184B	  STAbs %319:ac, @pk_check + 1 :: (store (s8) into @pk_check + 1, !tbaa !86)
+3200B	  STAbs %321:ac, @pk_check + 2 :: (store (s8) into @pk_check + 2, !tbaa !86)
+3216B	  STAbs %323:ac, @pk_check + 3 :: (store (s8) into @pk_check + 3, !tbaa !86)
+3232B	  %594:ac16 = LDAImag16 %0:imag16
+3264B	  %594:ac16 = ANDImm16 %594:ac16(tied-def 0), 1
+3280B	  %59:imag16 = STAImag16 %594:ac16
+3328B	  %696:gpr = LDImm 10
+3344B	  %695:imag16, dead early-clobber %592:gpr = LDImm16 @pk_na
+3456B	  CmpBrZeroMultiByte %bb.7, 1, %59.sublo:imag16, %59.subhi:imag16, implicit-def dead $c
+3472B	  BRA %bb.8
+
+3488B	bb.4 (%ir-block.42):
+	; predecessors: %bb.0
+	  successors: %bb.5(0x40000000), %bb.10(0x40000000); %bb.5(50.00%), %bb.10(50.00%)
+
+3504B	  %63:imag16 = COPY %476:imag16
+3520B	  %63:imag16 = IncPtr %63:imag16(tied-def 0), implicit-def dead $c, implicit-def dead $v
+3536B	  %263:yc = LDImm 1
+3552B	  %142:ac = LDIndirIdx %476:imag16, %263:yc :: (load (s8) from %ir.sunkaddr1, !tbaa !131)
+3568B	  %144:ac = LDIndirIdx %63:imag16, %263:yc :: (load (s8) from %ir.sunkaddr1 + 1, !tbaa !131)
+3584B	  %691:yc = LDImm 2
+3616B	  %261:yc = LDImm 3
+3624B	  %146:ac = LDIndirIdx %63:imag16, %691:yc :: (load (s8) from %ir.sunkaddr1 + 2, !tbaa !131)
+3632B	  %148:ac = LDIndirIdx %63:imag16, %261:yc :: (load (s8) from %ir.sunkaddr1 + 3, !tbaa !131)
+3664B	  %589:ac16 = LDAImag16 %476:imag16
+3696B	  %589:ac16, dead %590:cc, dead %591:vc = ADCImm16 %589:ac16(tied-def 0), 5, %670:cc
+3712B	  %249:imag16 = STAImag16 %589:ac16
+3728B	  %586:ac16 = LDAIndir16 %249:imag16 :: (load (s16) from %ir.44, align 1, !tbaa !133)
+3744B	  %247:imag16 = STAImag16 %586:ac16
+3792B	  %585:ac16 = LDAbs16 @pk_n :: (dereferenceable load (s16) from @pk_n, align 1, !tbaa !2)
+3808B	  %68:imag16 = STAImag16 %585:ac16
+3824B	  %584:ac16 = LDAImag16 %68:imag16
+3840B	  %243:cc = CMPImm16 %584:ac16, 96
+3848B	  %484:ac = COPY %247.sublo:imag16
+3856B	  %485:ac = COPY %247.subhi:imag16
+3864B	  %692:ac = LDZ
+3872B	  GBR %bb.5, %243:cc, 0, implicit-def $c
+
+3880B	bb.10:
+	; predecessors: %bb.4
+	  successors: %bb.6(0x80000000); %bb.6(100.00%)
+
+3888B	  %687:imag8 = COPY %484:ac
+3904B	  %688:imag8 = COPY %485:ac
+3920B	  %689:imag8 = COPY %692:ac
+3936B	  %690:imag8 = COPY %692:ac
+3952B	  BRA %bb.6
+
+3968B	bb.5 (%ir-block.50):
+	; predecessors: %bb.4
+	  successors: %bb.6(0x80000000); %bb.6(100.00%)
+
+3984B	  %583:ac16 = LDAImag16 %68:imag16
+4016B	  %583:ac16 = ASLAcc16 %583:ac16(tied-def 0), implicit-def dead $c
+4032B	  %72:imag16 = STAImag16 %583:ac16
+4048B	  %514:imag16, dead early-clobber %581:gpr = LDImm16 @pk_off
+4080B	  %577:cc = LDImm1 0
+4088B	  %578:ac16 = LDAImag16 %514:imag16
+4112B	  %578:ac16, dead %579:cc, dead %580:vc = ADCImag16 %578:ac16(tied-def 0), %72:imag16, %577:cc
+4128B	  %237:imag16 = STAImag16 %578:ac16
+4144B	  %575:ac16 = LDAImag16 %0:imag16
+4160B	  STAIndir16 %575:ac16, %237:imag16 :: (store (s16) into %ir.51, align 1, !tbaa !2)
+4176B	  %512:imag16, dead early-clobber %574:gpr = LDImm16 @pk_shape
+4192B	  %571:ac16 = LDAImag16 %512:imag16
+4224B	  %571:ac16, dead %572:cc, dead %573:vc = ADCImag16 %571:ac16(tied-def 0), %68:imag16, %577:cc
+4240B	  %235:imag16 = STAImag16 %571:ac16
+4256B	  %519:ac = LDImm 1
+4272B	  STIndir %519:ac, %235:imag16 :: (store (s8) into %ir.52, !tbaa !6)
+4304B	  %566:ac16 = LDAImag16 %68:imag16
+4336B	  %566:ac16 = ASLAcc16 %566:ac16(tied-def 0), implicit-def dead $c
+4368B	  %566:ac16 = ASLAcc16 %566:ac16(tied-def 0), implicit-def dead $c
+4400B	  %566:ac16 = ASLAcc16 %566:ac16(tied-def 0), implicit-def dead $c
+4432B	  %566:ac16 = ASLAcc16 %566:ac16(tied-def 0), implicit-def dead $c
+4448B	  %76:imag16 = STAImag16 %566:ac16
+4464B	  %510:imag16, dead early-clobber %563:gpr = LDImm16 @pk_field
+4480B	  %560:ac16 = LDAImag16 %510:imag16
+4512B	  %560:ac16, dead %561:cc, dead %562:vc = ADCImag16 %560:ac16(tied-def 0), %76:imag16, %577:cc
+4528B	  %232:imag16 = STAImag16 %560:ac16
+4544B	  STIndir %142:ac, %232:imag16 :: (store (s8) into %ir.53, !tbaa !86)
+4560B	  STIndirIdx %144:ac, %232:imag16, %263:yc :: (store (s8) into %ir.53 + 1, !tbaa !86)
+4576B	  %197:yc = LDImm 2
+4592B	  STIndirIdx %146:ac, %232:imag16, %197:yc :: (store (s8) into %ir.53 + 2, !tbaa !86)
+4608B	  STIndirIdx %148:ac, %232:imag16, %261:yc :: (store (s8) into %ir.53 + 3, !tbaa !86)
+4624B	  %555:ac16 = LDAImag16 %232:imag16
+4656B	  %555:ac16, dead %556:cc, dead %557:vc = ADCImm16 %555:ac16(tied-def 0), 4, %577:cc
+4672B	  %222:imag16 = STAImag16 %555:ac16
+4680B	  %220:yc = LDImm 4
+4688B	  STIndirIdx %484:ac, %232:imag16, %220:yc :: (store (s8) into %ir.55, !tbaa !86)
+4704B	  STIndirIdx %485:ac, %222:imag16, %263:yc :: (store (s8) into %ir.55 + 1, !tbaa !86)
+4720B	  STIndirIdx %692:ac, %222:imag16, %197:yc :: (store (s8) into %ir.55 + 2, !tbaa !86)
+4736B	  STIndirIdx %692:ac, %222:imag16, %261:yc :: (store (s8) into %ir.55 + 3, !tbaa !86)
+4768B	  %550:ac16 = LDAImag16 %232:imag16
+4800B	  %550:ac16, dead %551:cc, dead %552:vc = ADCImm16 %550:ac16(tied-def 0), 8, %577:cc
+4816B	  %211:imag16 = STAImag16 %550:ac16
+4824B	  %209:yc = LDImm 8
+4832B	  STIndirIdx %692:ac, %232:imag16, %209:yc :: (store (s8) into %ir.56, !tbaa !86)
+4848B	  STIndirIdx %692:ac, %211:imag16, %263:yc :: (store (s8) into %ir.56 + 1, !tbaa !86)
+4864B	  STIndirIdx %692:ac, %211:imag16, %197:yc :: (store (s8) into %ir.56 + 2, !tbaa !86)
+4880B	  STIndirIdx %692:ac, %211:imag16, %261:yc :: (store (s8) into %ir.56 + 3, !tbaa !86)
+4912B	  %545:ac16 = LDAImag16 %232:imag16
+4944B	  %545:ac16, dead %546:cc, dead %547:vc = ADCImm16 %545:ac16(tied-def 0), 12, %577:cc
+4960B	  %201:imag16 = STAImag16 %545:ac16
+4968B	  %199:yc = LDImm 12
+4976B	  STIndirIdx %692:ac, %232:imag16, %199:yc :: (store (s8) into %ir.57, !tbaa !86)
+4992B	  STIndirIdx %692:ac, %201:imag16, %263:yc :: (store (s8) into %ir.57 + 1, !tbaa !86)
+5008B	  STIndirIdx %692:ac, %201:imag16, %197:yc :: (store (s8) into %ir.57 + 2, !tbaa !86)
+5024B	  STIndirIdx %692:ac, %201:imag16, %261:yc :: (store (s8) into %ir.57 + 3, !tbaa !86)
+5040B	  %542:ac16 = LDAImag16 %68:imag16
+5072B	  %542:ac16 = INCAcc16 %542:ac16(tied-def 0)
+5088B	  %86:imag16 = STAImag16 %542:ac16
+5104B	  %540:ac16 = LDAImag16 %86:imag16
+5120B	  STAbs16 %540:ac16, @pk_n :: (store (s16) into @pk_n, align 1, !tbaa !2)
+5136B	  %687:imag8 = COPY %484:ac
+5152B	  %688:imag8 = COPY %485:ac
+5168B	  %689:imag8 = COPY %692:ac
+5184B	  %690:imag8 = COPY %692:ac
+
+5200B	bb.6 (%ir-block.59):
+	; predecessors: %bb.5, %bb.10
+	  successors: %bb.7(0x40000000), %bb.8(0x40000000); %bb.7(50.00%), %bb.8(50.00%)
+
+5208B	  %531:ac = ANDImm %531:ac(tied-def 0), 1
+5280B	  %145:cc = LDImm1 0
+5312B	  %142:ac, %160:cc, dead %539:vc = ADCImag8 %142:ac(tied-def 0), %687:imag8, %145:cc
+5344B	  %144:ac, %162:cc, dead %538:vc = ADCImag8 %144:ac(tied-def 0), %688:imag8, %160:cc
+5376B	  %146:ac, %164:cc, dead %537:vc = ADCImag8 %146:ac(tied-def 0), %689:imag8, %162:cc
+5408B	  %148:ac, dead %166:cc, dead %536:vc = ADCImag8 %148:ac(tied-def 0), %690:imag8, %164:cc
+5456B	  %142:ac, %145:cc, dead %535:vc = ADCAbs %142:ac(tied-def 0), @pk_check, %145:cc(tied-def 1)
+5504B	  %144:ac, %145:cc, dead %534:vc = ADCAbs %144:ac(tied-def 0), @pk_check + 1, %145:cc(tied-def 1)
+5552B	  %146:ac, %145:cc, dead %533:vc = ADCAbs %146:ac(tied-def 0), @pk_check + 2, %145:cc(tied-def 1)
+5600B	  %148:ac, dead %145:cc, dead %532:vc = ADCAbs %148:ac(tied-def 0), @pk_check + 3, %145:cc(tied-def 1)
+5616B	  STAbs %142:ac, @pk_check :: (store (s8) into @pk_check, !tbaa !86)
+5632B	  STAbs %144:ac, @pk_check + 1 :: (store (s8) into @pk_check + 1, !tbaa !86)
+5648B	  STAbs %146:ac, @pk_check + 2 :: (store (s8) into @pk_check + 2, !tbaa !86)
+5664B	  STAbs %148:ac, @pk_check + 3 :: (store (s8) into @pk_check + 3, !tbaa !86)
+5728B	  %696:gpr = LDImm 7
+5744B	  %695:imag16, dead early-clobber %530:gpr = LDImm16 @pk_nb
+5856B	  GBR %bb.8, %531.sublsb:ac, 1, implicit-def dead $c
+5872B	  BRA %bb.7
+
+5888B	bb.7 (%ir-block.66):
+	; predecessors: %bb.3, %bb.6
+	  successors: %bb.8(0x80000000); %bb.8(100.00%)
+
+5968B	  undef %93.sublo:imag16 = COPY %691:yc
+5984B	  %93.subhi:imag16 = COPY %692:ac
+6000B	  %527:ac16 = LDAbs16 @pk_odd_wide :: (dereferenceable load (s16) from @pk_odd_wide, align 1, !tbaa !2)
+6016B	  %526:cc = LDImm1 0
+6048B	  %527:ac16, dead %528:cc, dead %529:vc = ADCImag16 %527:ac16(tied-def 0), %93:imag16, %526:cc
+6064B	  %98:imag16 = STAImag16 %527:ac16
+6080B	  %524:ac16 = LDAImag16 %98:imag16
+6096B	  STAbs16 %524:ac16, @pk_odd_wide :: (store (s16) into @pk_odd_wide, align 1, !tbaa !2)
+
+6144B	bb.8 (%ir-block.72):
+	; predecessors: %bb.3, %bb.6, %bb.7
+
+6192B	  %523:ac16 = LDAIndir16 %695:imag16 :: (load (s16) from %ir.73, align 1, !tbaa !2)
+6208B	  %101:imag16 = STAImag16 %523:ac16
+6224B	  %522:ac16 = LDAImag16 %101:imag16
+6256B	  %522:ac16 = INCAcc16 %522:ac16(tied-def 0)
+6272B	  %102:imag16 = STAImag16 %522:ac16
+6288B	  %520:ac16 = LDAImag16 %102:imag16
+6304B	  STAIndir16 %520:ac16, %695:imag16 :: (store (s16) into %ir.73, align 1, !tbaa !2)
+6320B	  $a = COPY %696:gpr
+6336B	  RTS implicit $a
+
+# End machine code for function pk_parse_at.
+

@@ -1,0 +1,203 @@
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+index bd90e7c881a7..f53434e03e87 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.cpp
+@@ -37,6 +37,9 @@
+ #include "llvm/CodeGen/VirtRegMap.h"
+ #include "llvm/IR/CallingConv.h"
+ #include "llvm/MC/MCRegisterInfo.h"
++#include "llvm/Support/CommandLine.h"
++#include <map>
++#include <vector>
+ #include "llvm/Support/ErrorHandling.h"
+ 
+ #define DEBUG_TYPE "mos-reginfo"
+@@ -46,6 +49,143 @@
+ 
+ using namespace llvm;
+ 
++// T4 PROBE ONLY (not for commit): selects the native-class pressure modelling.
++//  0 none: native classes have no pressure sets (Phase A candidate)
++//  1 low: Ac16/Xc16/Yc16 charge their low byte class's sets (Ac/Xc/Yc)
++//  2 lowunits: 1 plus the high-byte units B/XH/YH charge their low byte unit's sets
++//  3 low1: 1 with class weight 1 instead of 2
++//  4 extra-a: 1 plus three appended sets A16/X16/Y16 (limit 2) charged only by
++//    the native classes and the high-byte units
++//  5 extra-b: 4, and the 8-bit Ac/Xc/Yc classes and A/X/Y low units also
++//    charge their register's appended set
++static cl::opt<unsigned> MOSNativePressureProbe("mos-native-pressure-probe",
++                                                cl::init(0), cl::Hidden);
++
++static bool probeExtra() { return MOSNativePressureProbe >= 4; }
++
++unsigned MOSRegisterInfo::getNumRegPressureSets() const {
++  return MOSGenRegisterInfo::getNumRegPressureSets() + (probeExtra() ? 3 : 0);
++}
++
++const char *MOSRegisterInfo::getRegPressureSetName(unsigned Idx) const {
++  unsigned Base = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < Base)
++    return MOSGenRegisterInfo::getRegPressureSetName(Idx);
++  static const char *Names[] = {"A16", "X16", "Y16"};
++  return Names[Idx - Base];
++}
++
++unsigned MOSRegisterInfo::getRegPressureSetLimit(const MachineFunction &MF,
++                                                 unsigned Idx) const {
++  unsigned Base = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < Base)
++    return MOSGenRegisterInfo::getRegPressureSetLimit(MF, Idx);
++  return 2;
++}
++
++const TargetRegisterClass *
++MOSRegisterInfo::getLargestRegClassForRegPressureSet(unsigned Idx) const {
++  unsigned Base = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (Idx < Base)
++    return MOSGenRegisterInfo::getLargestRegClassForRegPressureSet(Idx);
++  static const TargetRegisterClass *RCs[] = {&MOS::Ac16RegClass,
++                                             &MOS::Xc16RegClass,
++                                             &MOS::Yc16RegClass};
++  return RCs[Idx - Base];
++}
++
++static const int *appendSet(const int *BaseList, int Extra) {
++  static std::map<std::pair<const int *, int>, std::vector<int>> Cache;
++  auto &V = Cache[{BaseList, Extra}];
++  if (V.empty()) {
++    for (const int *P = BaseList; *P != -1; ++P)
++      V.push_back(*P);
++    V.push_back(Extra);
++    V.push_back(-1);
++  }
++  return V.data();
++}
++
++const int *
++MOSRegisterInfo::getRegClassPressureSets(const TargetRegisterClass *RC) const {
++  int Extra = -1;
++  int Base = MOSGenRegisterInfo::getNumRegPressureSets();
++  if (MOSNativePressureProbe != 0) {
++    if (RC == &MOS::Ac16RegClass)
++      RC = &MOS::AcRegClass, Extra = Base;
++    else if (RC == &MOS::Xc16RegClass)
++      RC = &MOS::XcRegClass, Extra = Base + 1;
++    else if (RC == &MOS::Yc16RegClass)
++      RC = &MOS::YcRegClass, Extra = Base + 2;
++    else if (MOSNativePressureProbe == 5) {
++      if (RC == &MOS::AcRegClass)
++        Extra = Base;
++      else if (RC == &MOS::XcRegClass)
++        Extra = Base + 1;
++      else if (RC == &MOS::YcRegClass)
++        Extra = Base + 2;
++    }
++  }
++  const int *L = MOSGenRegisterInfo::getRegClassPressureSets(RC);
++  if (probeExtra() && Extra != -1)
++    return appendSet(L, Extra);
++  return L;
++}
++
++const int *MOSRegisterInfo::getRegUnitPressureSets(MCRegUnit RegUnit) const {
++  if (MOSNativePressureProbe == 2 || probeExtra()) {
++    int Base = MOSGenRegisterInfo::getNumRegPressureSets();
++    MCRegUnitRootIterator Roots(RegUnit, this);
++    MCRegister Root = *Roots;
++    MCRegUnit Lo = RegUnit;
++    int Extra = -1;
++    if (Root == MOS::B)
++      Lo = *regunits(MOS::A).begin(), Extra = Base;
++    else if (Root == MOS::XH)
++      Lo = *regunits(MOS::X).begin(), Extra = Base + 1;
++    else if (Root == MOS::YH)
++      Lo = *regunits(MOS::Y).begin(), Extra = Base + 2;
++    else if (MOSNativePressureProbe == 5) {
++      if (Root == MOS::ALSB)
++        Extra = Base;
++      else if (Root == MOS::XLSB)
++        Extra = Base + 1;
++      else if (Root == MOS::YLSB)
++        Extra = Base + 2;
++    }
++    if (probeExtra()) {
++      if (Extra == -1)
++        return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
++      if (Lo != RegUnit) // high byte: only its own extra set
++        return appendSet(MOSGenRegisterInfo::getRegUnitPressureSets(
++                             *regunits(MOS::Fake).begin()),
++                         Extra);
++      return appendSet(MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit),
++                       Extra);
++    }
++    RegUnit = Lo;
++  }
++  return MOSGenRegisterInfo::getRegUnitPressureSets(RegUnit);
++}
++
++static cl::opt<unsigned> MOSNativePressureWeight("mos-native-pressure-weight",
++                                                 cl::init(0), cl::Hidden);
++
++const RegClassWeight &
++MOSRegisterInfo::getRegClassWeight(const TargetRegisterClass *RC) const {
++  bool Native = RC == &MOS::Ac16RegClass || RC == &MOS::Xc16RegClass ||
++                RC == &MOS::Yc16RegClass;
++  if (MOSNativePressureProbe == 3 && Native)
++    return MOSGenRegisterInfo::getRegClassWeight(&MOS::AcRegClass);
++  if (MOSNativePressureWeight != 0 && Native) {
++    static RegClassWeight W[16];
++    unsigned N = std::min(15u, (unsigned)MOSNativePressureWeight);
++    W[N] = {N, N};
++    return W[N];
++  }
++  return MOSGenRegisterInfo::getRegClassWeight(RC);
++}
++
+ MOSRegisterInfo::MOSRegisterInfo()
+     : MOSGenRegisterInfo(/*RA=*/0, /*DwarfFlavor=*/0, /*EHFlavor=*/0,
+                          /*PC=*/0, /*HwMode=*/0),
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.h b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+index 4374d26d8f55..2131914fdfd8 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.h
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.h
+@@ -49,6 +49,16 @@ public:
+ 
+   unsigned getCSRCost(const MachineFunction &MF) const override;
+ 
++  const int *getRegClassPressureSets(const TargetRegisterClass *RC) const override;
++  unsigned getNumRegPressureSets() const override;
++  const char *getRegPressureSetName(unsigned Idx) const override;
++  unsigned getRegPressureSetLimit(const MachineFunction &MF,
++                                  unsigned Idx) const override;
++  const TargetRegisterClass *
++  getLargestRegClassForRegPressureSet(unsigned Idx) const override;
++  const int *getRegUnitPressureSets(MCRegUnit RegUnit) const override;
++  const RegClassWeight &getRegClassWeight(const TargetRegisterClass *RC) const override;
++
+   bool requiresRegisterScavenging(const MachineFunction &MF) const override {
+     // Saving/restoring to stack may require temporary registers.
+     return true;
+diff --git a/llvm/lib/Target/MOS/MOSRegisterInfo.td b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+index e64c0860e596..52d4cbc453be 100644
+--- a/llvm/lib/Target/MOS/MOSRegisterInfo.td
++++ b/llvm/lib/Target/MOS/MOSRegisterInfo.td
+@@ -234,6 +234,11 @@ let isPressureFineGrained = true in {
+ def Imag8 : MOSReg8Class<(sequence "RC%u", 0, !add(MaxImag8Regs, -1))>;
+ def Imag16 : MOSReg16Class<(sequence "RS%u", 0, !add(MaxImag16Regs, -1))>;
+ 
++// The native-width classes below are opt-in and must not create register
++// pressure sets: MachineLICM, MachineSink and the scheduler read the pressure
++// tables in every mode, so new sets would change code for programs that never
++// enable +mos-a16 or +mos-xy16.
++let GeneratePressureSet = 0 in {
+ // Native widths: the 16-bit accumulator as a register class (single member,
+ // A16 = B:A — NOT the carry flag C). Target of 16-bit-accumulator load/add/store
+ // under +mos-a16. Named Ac16 to parallel the 8-bit accumulator class `Ac`.
+@@ -243,6 +248,7 @@ def Ac16 : MOSReg16Class<(add A16)>;
+ // +mos-xy16; inert otherwise. Mirror Ac16.
+ def Xc16 : MOSReg16Class<(add X16)>;
+ def Yc16 : MOSReg16Class<(add Y16)>;
++}
+ 
+ // Instruction-specific register classes.
+ def AImag8 : MOSReg8Class<(add Imag8, A)>;
