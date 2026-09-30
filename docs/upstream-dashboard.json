@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "8eecd5aeffc448d3782ad0cf92eaad0c7ed5aafb622d65533e91c85ea88575f1",
+  "sourceHash": "75d5f25047fef4e8d02318df5165e05694f934c0fa6e0154772e739dce501c4f",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -277,7 +277,7 @@
       "kind": "defect",
       "title": "Opt-in native-width register classes change default-mode register pressure sets and code",
       "summary": "Split #321-1 (a359c6b1d73c) adds the single-member classes Ac16, Xc16 and Yc16 for the opt-in 65816 native widths. TableGen derives pressure sets from them: the MOS pressure tables grow from 6 sets to 14 and lose MOSAsmParamRegClass. MachineLICM, MachineSink and the scheduler read those tables in every mode, so default-mode code changes. Against upstream 06bc967d2668 on the split's fixed 90-input set, 18 of 90 mos6502 and 33 of 90 plain mosw65816 results differ, adding +3,478 bytes on mos6502 and +3,202 bytes on mosw65816. Candidate (Phase A, not yet applied to the series or downstream): let GeneratePressureSet = 0 on Ac16/Xc16/Yc16 restores upstream's PressureNameTable/PressureLimitTable exactly and makes default output byte-identical to upstream on all 90 inputs in both modes, in asm and object. At #321-1, +mos-a16 and +mos-a16,+mos-xy16 output also becomes identical to upstream plain mosw65816 (-3,202 bytes). At series head c33eb63d65a3 the change removes 3,515 bytes (mos6502) and 3,379 bytes (mosw65816) of default-mode code, but native output grows by 539 bytes (+mos-a16: 21 inputs larger, 13 smaller) and by 217 bytes (+mos-a16,+mos-xy16: 21 larger, 10 smaller). That growth is unexplained and escalated. Status 2026-09-30: fixed in the #320/#321 split series; downstream 0002 held (escalated), so the record stays confirmed. Ac16, Xc16 and Yc16 set GeneratePressureSet = 0 (split #321-1), so the generated pressure tables equal upstream's; MOSRegisterInfo overrides the pressure-set hooks under +mos-a16 (split #321-8): native classes charge their low byte's sets and, below -O3 (CodeGenOptLevel::Aggressive, read once per subtarget), A16/X16/Y16 sets are appended. Default output at #321-1 is byte-identical to upstream again (90 of 90 inputs, both modes, every level); native bytes at head vs unchanged 321-16: -78/-162 B at -Os, -84/-166 B at -O2, -429/-552 B at -O3; clocks -0.15% at -O2 and -0.18%/-0.17% at -O3. Downstream, the same change grows default-mode code by 13,427 B (+0.58%) over 262 SNES sources at -Os because the downstream computed-carry scheduling (0064/0067) relies on the Ac16/Xc16/Yc16-derived sets; with -mos-carry-sched=off it shrinks default code by 25,290 B. 0002 is unchanged pending the user decision.",
-      "localStatus": "qualified",
+      "localStatus": "fixed",
       "publicationStatus": "unknown",
       "evidenceUrls": [
         "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/mos-native-width-pressure-sets.json"

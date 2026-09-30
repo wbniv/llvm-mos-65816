@@ -93,7 +93,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "e7563418b65c76f7587da94903f696aad6462bd1d1d359b9b53221d3c276d13c",
           "docs/defects/mos-float-vector-legalization.json": "3129e92be0ee2c2d32d4b9bc413bf5a49cddf606da1d1fefd1a9f511202226b6",
           "docs/defects/mos-native-index-copy-cost.json": "6b6e2b6f48f37cb1778e0dc72dd9d22ff2a7a9896dd4c4a413e1ae8343e09ce5",
-          "docs/defects/mos-native-width-pressure-sets.json": "af493f59488159ee5e8251ff8b31fc99393c48abb23e27e74ac271951ad92521",
+          "docs/defects/mos-native-width-pressure-sets.json": "f573563ba3e96fc8fe939408493eaa7099cc61c58384816de0c7825766dfabcc",
           "docs/defects/mos-near-index-bank-wrap.json": "20579d324cb05675db41e0ec8c703eacc51c265447903ba5b6fdef25a6f374d0",
           "docs/defects/mos-near-index-overflow-proofs.json": "db0da058a8821c4ef2603f07f7f66d994bd516dc29fa2e433119b6d7c0356485",
           "docs/defects/mos-near-nowrap-option-clash.json": "f02673b6a5a6895a2ec4edd8d312ad02cb8813c4e42a411719b353c858ce33b1",
@@ -113,7 +113,7 @@
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "e14fa4fca503d2e1e19f865185b2f60d1dc75283be451f3b8a85ad2cc073315c"
+          "docs/upstream-dashboard.json": "eae747197bde58413c18e0b196f7d8b00e9630d56e86611322a6a225cd90b4be"
         }
       }
     },
@@ -136,11 +136,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "e14fa4fca503d2e1e19f865185b2f60d1dc75283be451f3b8a85ad2cc073315c",
+          "docs/upstream-dashboard.json": "eae747197bde58413c18e0b196f7d8b00e9630d56e86611322a6a225cd90b4be",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "a7ad6507dec85a2a81a99ea59638287133f22ab5e5213f3d305c1b38b5282363"
+          "docs/upstream-dashboard-graph.json": "858cb32cab08d23833dd362c2149783c404f5cd8683c45e11b8462edfc5df08a"
         }
       }
     },
@@ -315,7 +315,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
+          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -357,9 +357,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T15:13:00.076435+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-09-30T17:13:12.916686+00:00",
+        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -409,7 +409,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
+          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -443,9 +443,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T15:13:00.183527+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-09-30T17:13:13.071535+00:00",
+        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -495,7 +495,7 @@
           "docs/defects/mos-farblit-byte-load-legalization.json": "8e373df0c6c63ab1584411bef79be008099a2edba8d4fb64b04f749bf7c3bbb0",
           "docs/defects/mos-float-vector-legalization.json": "9fa08a7f2c3e52a6fff00d868dab69421476af9ff27d75e741605efad7d3ba89",
           "docs/defects/mos-native-index-copy-cost.json": "70b373fbea39b6322f318e2b28adde62b2d901425bb1c2cb997b18b5b891a7be",
-          "docs/defects/mos-native-width-pressure-sets.json": "616f7c81baf5370a9da004620a3db4647dc080fc42d808c4fec6dfeaa3a62938",
+          "docs/defects/mos-native-width-pressure-sets.json": "e0c7ca862bbfff9d2f02336b4ab9cf49ae5a7cd0156b7168f906430c56234a21",
           "docs/defects/mos-near-index-bank-wrap.json": "54e66093df7564d6615cbe63ddaca47fbb7c0dbd3ebebdb1eca120f1abbac33c",
           "docs/defects/mos-near-index-overflow-proofs.json": "cb409e4488b91b66b9bc1b853da12c6fa4e13a659fb12a7c3b4f35d85a7a7b3b",
           "docs/defects/mos-near-nowrap-option-clash.json": "b03c5c59b718e255056f0517938f8bef606cdaa5ea833f48d616f64eb7c0e802",
@@ -529,9 +529,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T15:13:00.188315+00:00",
-        "note": "Reviewed after mos-native-width-pressure-sets changed its summary (split-series fix applied, downstream 0002 held and escalated, status still confirmed) and the split packet regenerated its commits. None of these documents summarizes that record's status or the split commits' default-mode effect beyond what stays true (16 #321 commits; packets applying on the split). The TODO item is left to the orchestrator by instruction; 0065 README's split-series section is updated in the same commit.",
-        "attribution": "Claude Code 2.1.285 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition)"
+        "reviewed_at": "2026-09-30T17:13:13.079221+00:00",
+        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
+        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     },
     {
@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "3ae83a0e9d82f3ccf61e7dbe1ca682e1aff24fc6c02dc1b144715d2d7ca98f52"
+          "TODO.md": "f39b6fe9cf1c3708294442259d0910441f5459b1de53204e3f331a651818a799"
         },
-        "reviewed_at": "2026-09-30T13:03:45.078544+00:00",
-        "note": "The deferred -O2 speed-gate measurement was triaged from the Inbox into M2 as a T3 item; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T17:13:13.293043+00:00",
+        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
