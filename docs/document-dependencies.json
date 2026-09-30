@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "37c1ac743021fd0b02ec16fd020006371096fcc3f0a1406dcca7d440b51909c2"
+          "TODO.md": "94954e7c2a4962b01d06c9df90fd6b06cb508c3128eb6defbed13b4733413424"
         },
-        "reviewed_at": "2026-09-30T19:17:33.795262+00:00",
-        "note": "The 0069/0070 items record the user's #594 choice (build on #594) and the drafted coordination comment; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T19:48:44.706589+00:00",
+        "note": "The 0069/0070 items record the second review's B8/B9 blockers and the dispatched #594/B8/B9 fixes; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
