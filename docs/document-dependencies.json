@@ -2607,10 +2607,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "5f17af2a1aee82fe9324e1f18d4205a2674859dce2637b7bd349bdcee432e457"
+          "TODO.md": "974b302b2fa73247d5c928355bb735dd8b9276225027268d0812c2c5f8904325"
         },
-        "reviewed_at": "2026-09-30T01:12:16.176061+00:00",
-        "note": "Reviewed, no change: TODO Inbox triage and new ranked repair items do not affect the publication runbook.",
+        "reviewed_at": "2026-09-30T01:19:59.321705+00:00",
+        "note": "Reviewed, no change: work-in-progress stamps on the B1-B4 TODO items do not affect the publication runbook.",
         "attribution": "Claude Code 2.1.283, model Claude Opus 5.5 (claude-opus-5-5), xhigh reasoning effort; session f79adc39-72b4-4dc5-abc1-849c14c5ce96"
       }
     }
