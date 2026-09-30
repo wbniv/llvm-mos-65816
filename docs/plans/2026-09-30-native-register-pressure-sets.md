@@ -1,6 +1,6 @@
 # Keep the native-width registers out of default-mode register pressure
 
-Status: Phase A done. The [T4 design](#t4-design) is done and measured, and its bar and placement are [decided](#decision-after-the-t4-design). Optimization-level gating is being measured before application; nothing is applied to the split series or `0002` yet. The T4 design followed the [decision](#decision-after-phase-a), after one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
+Status: Phase A done. The [T4 design](#t4-design) is done and measured, and its bar and placement are [decided](#decision-after-the-t4-design). [Optimization-level gating](#optimization-level-gating) is measured: ungated wins at `-Os`/`-Oz`, and a sound `-O2`/`-O3` gate needs a per-level subtarget, which is escalated for a decision. Nothing is applied to the split series or `0002` yet. The T4 design followed the [decision](#decision-after-phase-a), after one escalation (see [Phase A results](#phase-a-results)). Canonical record: [`mos-native-width-pressure-sets`](../defects/mos-native-width-pressure-sets.json). The user approved this on 2026‑09‑30 ("Go ahead with it at T3?" — "yes"). The #320/#321 split found it: the first #321 commit only adds opt-in registers, but it changes default-mode code. On the split's fixed input set (38 MOS `.ll` tests plus 52 corpus IRs), mos6502 output grows 278,940 → 282,418 bytes (+3,478; 17 inputs larger, 1 smaller) and plain mosw65816 grows 290,773 → 293,975 bytes (+3,202; 24 larger, 8 smaller). Evidence: `build/split-320-321/evidence/321-01/{size-vs-base.txt,pressure-sets.txt,default-compare.txt}`, copied into the [split packet](../pr-preparations/2026-09-30/split-320-321/README.md).
 
 Attribution: Claude Code 2.1.283, model Claude Opus 5.5 (`claude-opus-5-5`), `xhigh` reasoning effort; session `f79adc39-72b4-4dc5-abc1-849c14c5ce96`.
 
@@ -79,6 +79,38 @@ The user chose **"Hold both, T4 first"**. Apply nothing to the split series or `
 1. **Bar: totals.** The native result of −78 B (`+mos-a16`) and −162 B (`+mos-a16,+mos-xy16`) meets the bar. Per-input growth, up to +86 B for packrec, is recorded but does not block.
 2. **Placement.** The TableGen `GeneratePressureSet = 0` flag goes in #321 commit 1, which keeps default output identical to upstream there. The `MOSRegisterInfo` hook overrides and the subtarget-taking constructor go in the first #321 commit that selects `Ac16`, so each commit's size change sits beside the code that causes it.
 3. **Gate by optimization level first.** The user asked whether the change can be enabled or disabled per optimization setting, and made that question standing (project [CLAUDE.md](../../CLAUDE.md), lesson 4). Every measurement above is `-O2` bytes. A T4 dispatch now measures `-Os`/`-Oz` size and `-O2` cycles, including a per-function gate through `getRegPressureSetLimit(MF, …)`. That is the only overridden hook that receives the function; the membership lists are fixed per subtarget. Its result goes in an "Optimization-level gating" section below. Application follows, with the placement in item 2.
+
+## Optimization-level gating
+
+**2026‑09‑30.** Claude Code 2.1.285, model Claude Opus 5.5 (`claude-opus-5-5`), `high` reasoning effort (t4-opus-high agent definition); session [session_01Skyq488smgqkyyzHrcCX7F](https://claude.ai/code/session_01Skyq488smgqkyyzHrcCX7F). Evidence: [`opt-levels/`](../defects/evidence/2026-09-30-native-width-pressure-sets/opt-levels/README.md). Nothing is applied to the split series or `0002`.
+
+- **Method.** `clang -O2`, `-Os` and `-Oz` all codegen at `llc -O2`; `-Os` adds `optsize` and `-Oz` adds `minsize optsize`. The frozen fixed set was already mixed: all 52 corpus IRs carry `optsize`, so the earlier "`-O2`" bytes were mostly `-Os` bytes. Sizes use the frozen set with only those attributes changed (opt's `forceattrs`; 584 of 585 definitions, the `optnone` one left alone), which keeps the exact inputs and isolates the codegen effect. Clocks use the fixed set's 17 corpus sims rebuilt from source at each level, measured as bsnes master clocks from `main` to the `corpus_result` write (Policy 0070's region). Each ROM runs twice, and every pair is identical. The ROM default is `-Os`: `dev/corpus.sh` and the demos pass `-Os`, and the SDK builds `MinSizeRel`.
+- **Bytes, fixed set, against unchanged `321-16`.** A size gate turns the appended sets off at `-Os`/`-Oz`; a speed gate turns them off at `-O2`/`-O3`.
+
+    | Level | `+mos-a16`: ungated / sets off | `+mos-a16,+mos-xy16`: ungated / sets off |
+    |---|---|---|
+    | `-Os` | **−78** / −10 B | **−162** / −147 B |
+    | `-Oz` | **−78** / −13 B | **−162** / −150 B |
+    | `-O2` | −84 / −29 B | −166 / −175 B |
+    | `-O3` | −214 / −429 B | −296 / −552 B |
+
+- **Master clocks, 15 sims (14 at `-O3`), against unchanged `321-16`.**
+
+    | Level | Mode | Ungated | Sets off | Sets off vs ungated (sims faster / slower) |
+    |---|---|---|---|---|
+    | `-O2` | `+mos-a16` | −0.15% | −0.36% | −0.21% (8 / 3) |
+    | `-O2` | `+mos-a16,+mos-xy16` | −0.15% | −0.34% | −0.19% (7 / 2) |
+    | `-O3` | `+mos-a16` | +0.01% | −0.18% | −0.20% (6 / 2) |
+    | `-O3` | `+mos-a16,+mos-xy16` | +0.02% | −0.17% | −0.18% (5 / 1) |
+
+- **Default identity holds at every level.** At `Os`, `Oz`, `O2` and `O3`, upstream `06bc967d2668` and the design at #321‑1 give 90 of 90 identical inputs in both mos6502 and mosw65816. At head, the design equals the Phase A candidate, and the gate probe equals the design.
+- **Gate mechanics.** Only `getRegPressureSetLimit(MF, …)` and `getRegPressureSetScore(MF, …)` see the function; set membership is fixed per subtarget, and subtargets are keyed on CPU and features only. The limit is also not per function in practice. `RegisterClassInfo` caches it, and clears the cache only when the register info, callee-saved list, allocation-order mask or reserved registers change. A trace shows that in a module with an `-O2` function and then an `optsize` function, only the first reaches the hook, and reversing the order reverses the decision. An unbounded limit also leaves the set visible to the scheduler's `CurrentMax` check. It still gave the same totals as removing the sets.
+- **Decision by the project rule.**
+    - **Size levels:** keep the design ungated. It wins at `-Os`, the ROM default, and at `-Oz`.
+    - **Speed levels:** switching the appended sets off wins about 0.2% of clocks at `-O2` and `-O3`. But a limit gate is decided by the first function the cache sees. In a mixed module, such as the SDK's default `-flto` link of user code with `MinSizeRel` libraries, it can switch the sets off for `-Os` functions, which then grow. That breaks the conservative-gate rule.
+    - A sound speed gate needs a per-level subtarget (`optsize` in the `getSubtargetImpl` key, as X86 keys on `prefer-vector-width`) or an equivalent. That is a design change, **escalated for a decision**.
+    - Without it, the recommendation is the ungated design, unchanged. It is still faster than unchanged head at `-O2` (−0.15%) and flat at `-O3`.
+- **Seen, not acted on.** Pre-existing `Remaining virtual register` aborts (perlin, satcast, domcol at `-Oz`, grid3d at `-O3`) appear in unchanged `321-16` and in every variant. They are the spill-hoist defect that patch `0033` fixes and `mos-clang` masks with `-disable-spill-hoist`. The split series does not carry that patch.
 
 ## Verification
 

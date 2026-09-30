@@ -1,0 +1,5 @@
+level O2: 90 files, 0 failures
+FAIL rc=0 corpus/examples_snes_lzss-gallery.c.default.ll: Cannot add optsize as an attribute name.
+level Os: 90 files, 1 failures
+FAIL rc=0 corpus/examples_snes_lzss-gallery.c.default.ll: Cannot add optsize as an attribute name.
+level Oz: 90 files, 1 failures

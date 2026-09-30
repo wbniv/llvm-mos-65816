@@ -1,0 +1,121 @@
+== O2 a16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   gate1  clocks 310,744,756  bytes 24,612 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   gate2  clocks 310,078,774  bytes 24,402 | vs head: -1,120,650 clk (-0.36%), -503 B, faster 8 slower 3 | vs t4: -665,982 clk (-0.21%), -210 B, faster 8 slower 3
+   head   clocks 311,199,424  bytes 24,905 | vs t4: +454,668 clk (+0.15%), +293 B, faster 1 slower 2
+   memb1  clocks 310,078,774  bytes 24,402 | vs head: -1,120,650 clk (-0.36%), -503 B, faster 8 slower 3 | vs t4: -665,982 clk (-0.21%), -210 B, faster 8 slower 3
+   t4     clocks 310,744,756  bytes 24,612 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1
+     gate1 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+     gate2 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; critters_sim -129,368; boids_sim -120,936; montorbit_sim -15,544; rangecode_sim -14,744; lzdec_sim -1,972; cgrade_sim -1,004; jt256_sim +14,800; avalanche_sim +15,280; grid3d_sim +34,018
+     memb1 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; critters_sim -129,368; boids_sim -120,936; montorbit_sim -15,544; rangecode_sim -14,744; lzdec_sim -1,972; cgrade_sim -1,004; jt256_sim +14,800; avalanche_sim +15,280; grid3d_sim +34,018
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+== O2 a16xy16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   gate1  clocks 307,616,408  bytes 24,408 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   gate2  clocks 307,020,134  bytes 24,216 | vs head: -1,050,942 clk (-0.34%), -485 B, faster 7 slower 2 | vs t4: -596,274 clk (-0.19%), -192 B, faster 7 slower 2
+   head   clocks 308,071,076  bytes 24,701 | vs t4: +454,668 clk (+0.15%), +293 B, faster 1 slower 2
+   memb1  clocks 307,020,134  bytes 24,216 | vs head: -1,050,942 clk (-0.34%), -485 B, faster 7 slower 2 | vs t4: -596,274 clk (-0.19%), -192 B, faster 7 slower 2
+   t4     clocks 307,616,408  bytes 24,408 | vs head: -454,668 clk (-0.15%), -293 B, faster 2 slower 1
+     gate1 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+     gate2 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; boids_sim -120,936; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -14,744; cgrade_sim -1,004; avalanche_sim +15,280; grid3d_sim +51,274
+     memb1 vs head per sim: tea_sim -537,170; nmitally_sim -364,010; boids_sim -120,936; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -14,744; cgrade_sim -1,004; avalanche_sim +15,280; grid3d_sim +51,274
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -16,880; nmitally_sim +52,126
+== O3 a16: 14 sims pass under every variant; excluded grid3d_sim, perlin_sim, satcast_sim
+   gate1  clocks 279,373,464  bytes 31,869 | vs head: +41,656 clk (+0.01%), +11 B, faster 1 slower 2 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   gate2  clocks 278,819,638  bytes 31,605 | vs head: -512,170 clk (-0.18%), -253 B, faster 6 slower 3 | vs t4: -553,826 clk (-0.20%), -264 B, faster 6 slower 2
+   head   clocks 279,331,808  bytes 31,858 | vs t4: -41,656 clk (-0.01%), -11 B, faster 2 slower 1
+   memb1  clocks 278,819,638  bytes 31,605 | vs head: -512,170 clk (-0.18%), -253 B, faster 6 slower 3 | vs t4: -553,826 clk (-0.20%), -264 B, faster 6 slower 2
+   t4     clocks 279,373,464  bytes 31,869 | vs head: +41,656 clk (+0.01%), +11 B, faster 1 slower 2
+     gate1 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+     gate2 vs head per sim: nmitally_sim -373,452; critters_sim -129,368; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; lzdec_sim -1,972; boids_sim +24; jt256_sim +14,800; avalanche_sim +15,280
+     memb1 vs head per sim: nmitally_sim -373,452; critters_sim -129,368; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; lzdec_sim -1,972; boids_sim +24; jt256_sim +14,800; avalanche_sim +15,280
+     t4 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+== O3 a16xy16: 14 sims pass under every variant; excluded grid3d_sim, perlin_sim, satcast_sim
+   gate1  clocks 277,335,400  bytes 31,633 | vs head: +41,656 clk (+0.02%), +11 B, faster 1 slower 2 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   gate2  clocks 276,834,026  bytes 31,377 | vs head: -459,718 clk (-0.17%), -245 B, faster 5 slower 2 | vs t4: -501,374 clk (-0.18%), -256 B, faster 5 slower 1
+   head   clocks 277,293,744  bytes 31,622 | vs t4: -41,656 clk (-0.02%), -11 B, faster 2 slower 1
+   memb1  clocks 276,834,026  bytes 31,377 | vs head: -459,718 clk (-0.17%), -245 B, faster 5 slower 2 | vs t4: -501,374 clk (-0.18%), -256 B, faster 5 slower 1
+   t4     clocks 277,335,400  bytes 31,633 | vs head: +41,656 clk (+0.02%), +11 B, faster 1 slower 2
+     gate1 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+     gate2 vs head per sim: nmitally_sim -373,452; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; boids_sim +24; avalanche_sim +15,280
+     memb1 vs head per sim: nmitally_sim -373,452; critters_sim -64,088; montorbit_sim -15,544; rangecode_sim -15,428; cgrade_sim -6,510; boids_sim +24; avalanche_sim +15,280
+     t4 vs head per sim: avalanche_sim -16,880; boids_sim +24; nmitally_sim +58,512
+== Os a16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   gate1  clocks 331,137,566  bytes 21,581 | vs head: -994,568 clk (-0.30%), -463 B, faster 7 slower 4 | vs t4: -452,926 clk (-0.14%), -144 B, faster 7 slower 4
+   gate2  clocks 331,590,492  bytes 21,725 | vs head: -541,642 clk (-0.16%), -319 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 332,132,134  bytes 22,044 | vs t4: +541,642 clk (+0.16%), +319 B, faster 1 slower 2
+   memb1  clocks 331,137,566  bytes 21,581 | vs head: -994,568 clk (-0.30%), -463 B, faster 7 slower 4 | vs t4: -452,926 clk (-0.14%), -144 B, faster 7 slower 4
+   t4     clocks 331,590,492  bytes 21,725 | vs head: -541,642 clk (-0.16%), -319 B, faster 2 slower 1
+     gate1 vs head per sim: tea_sim -536,482; nmitally_sim -360,990; critters_sim -129,368; boids_sim -120,936; montorbit_sim -15,544; lzdec_sim -1,972; cgrade_sim -1,004; jt256_sim +14,800; rangecode_sim +19,190; avalanche_sim +32,706; grid3d_sim +105,032
+     gate2 vs head per sim: tea_sim -489,914; avalanche_sim -103,854; nmitally_sim +52,126
+     memb1 vs head per sim: tea_sim -536,482; nmitally_sim -360,990; critters_sim -129,368; boids_sim -120,936; montorbit_sim -15,544; lzdec_sim -1,972; cgrade_sim -1,004; jt256_sim +14,800; rangecode_sim +19,190; avalanche_sim +32,706; grid3d_sim +105,032
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -103,854; nmitally_sim +52,126
+== Os a16xy16: 15 sims pass under every variant; excluded perlin_sim, satcast_sim
+   gate1  clocks 328,925,494  bytes 21,385 | vs head: -942,076 clk (-0.29%), -455 B, faster 6 slower 3 | vs t4: -400,434 clk (-0.12%), -136 B, faster 6 slower 3
+   gate2  clocks 329,325,928  bytes 21,521 | vs head: -541,642 clk (-0.16%), -319 B, faster 2 slower 1 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 329,867,570  bytes 21,840 | vs t4: +541,642 clk (+0.16%), +319 B, faster 1 slower 2
+   memb1  clocks 328,925,494  bytes 21,385 | vs head: -942,076 clk (-0.29%), -455 B, faster 6 slower 3 | vs t4: -400,434 clk (-0.12%), -136 B, faster 6 slower 3
+   t4     clocks 329,325,928  bytes 21,521 | vs head: -541,642 clk (-0.16%), -319 B, faster 2 slower 1
+     gate1 vs head per sim: tea_sim -536,482; nmitally_sim -360,990; boids_sim -120,896; critters_sim -64,088; montorbit_sim -15,544; cgrade_sim -1,004; rangecode_sim +19,190; avalanche_sim +32,706; grid3d_sim +105,032
+     gate2 vs head per sim: tea_sim -489,914; avalanche_sim -103,854; nmitally_sim +52,126
+     memb1 vs head per sim: tea_sim -536,482; nmitally_sim -360,990; boids_sim -120,896; critters_sim -64,088; montorbit_sim -15,544; cgrade_sim -1,004; rangecode_sim +19,190; avalanche_sim +32,706; grid3d_sim +105,032
+     t4 vs head per sim: tea_sim -489,914; avalanche_sim -103,854; nmitally_sim +52,126
+== Oz a16: 15 sims pass under every variant; excluded domcol_sim, satcast_sim
+   gate1  clocks 322,557,296  bytes 21,195 | vs head: -860,962 clk (-0.27%), -452 B, faster 6 slower 5 | vs t4: -220,536 clk (-0.07%), -90 B, faster 5 slower 6
+   gate2  clocks 322,777,832  bytes 21,285 | vs head: -640,426 clk (-0.20%), -362 B, faster 2 slower 0 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 323,418,258  bytes 21,647 | vs t4: +640,426 clk (+0.20%), +362 B, faster 0 slower 2
+   memb1  clocks 322,557,296  bytes 21,195 | vs head: -860,962 clk (-0.27%), -452 B, faster 6 slower 5 | vs t4: -220,536 clk (-0.07%), -90 B, faster 5 slower 6
+   t4     clocks 322,777,832  bytes 21,285 | vs head: -640,426 clk (-0.20%), -362 B, faster 2 slower 0
+     gate1 vs head per sim: tea_sim -574,108; nmitally_sim -138,704; critters_sim -129,944; avalanche_sim -36,436; cgrade_sim -25,924; perlin_sim -15,020; lzdec_sim +660; boids_sim +1,448; rangecode_sim +3,882; grid3d_sim +19,320; jt256_sim +33,864
+     gate2 vs head per sim: tea_sim -379,036; nmitally_sim -261,390
+     memb1 vs head per sim: tea_sim -574,108; nmitally_sim -138,704; critters_sim -129,944; avalanche_sim -36,436; cgrade_sim -25,924; perlin_sim -15,020; lzdec_sim +660; boids_sim +1,448; rangecode_sim +3,882; grid3d_sim +19,320; jt256_sim +33,864
+     t4 vs head per sim: tea_sim -379,036; nmitally_sim -261,390
+== Oz a16xy16: 15 sims pass under every variant; excluded domcol_sim, satcast_sim
+   gate1  clocks 321,238,672  bytes 20,978 | vs head: -799,530 clk (-0.25%), -450 B, faster 6 slower 5 | vs t4: -159,104 clk (-0.05%), -88 B, faster 5 slower 6
+   gate2  clocks 321,397,776  bytes 21,066 | vs head: -640,426 clk (-0.20%), -362 B, faster 2 slower 0 | vs t4: +0 clk (+0.00%), +0 B, faster 0 slower 0
+   head   clocks 322,038,202  bytes 21,428 | vs t4: +640,426 clk (+0.20%), +362 B, faster 0 slower 2
+   memb1  clocks 321,238,672  bytes 20,978 | vs head: -799,530 clk (-0.25%), -450 B, faster 6 slower 5 | vs t4: -159,104 clk (-0.05%), -88 B, faster 5 slower 6
+   t4     clocks 321,397,776  bytes 21,066 | vs head: -640,426 clk (-0.20%), -362 B, faster 2 slower 0
+     gate1 vs head per sim: tea_sim -574,108; nmitally_sim -138,704; critters_sim -64,664; avalanche_sim -36,436; cgrade_sim -25,924; perlin_sim -3,440; lzdec_sim +32; boids_sim +1,448; rangecode_sim +3,882; jt256_sim +19,064; grid3d_sim +19,320
+     gate2 vs head per sim: tea_sim -379,036; nmitally_sim -261,390
+     memb1 vs head per sim: tea_sim -574,108; nmitally_sim -138,704; critters_sim -64,664; avalanche_sim -36,436; cgrade_sim -25,924; perlin_sim -3,440; lzdec_sim +32; boids_sim +1,448; rangecode_sim +3,882; jt256_sim +19,064; grid3d_sim +19,320
+     t4 vs head per sim: tea_sim -379,036; nmitally_sim -261,390
+== status counts (level mode variant status: n)
+   O2 a16 gate1 llc-fail rc=-6 2
+   O2 a16 gate2 llc-fail rc=-6 2
+   O2 a16 head llc-fail rc=-6 2
+   O2 a16 memb1 llc-fail rc=-6 2
+   O2 a16 t4 llc-fail rc=-6 2
+   O2 a16xy16 gate1 llc-fail rc=-6 2
+   O2 a16xy16 gate2 llc-fail rc=-6 2
+   O2 a16xy16 head llc-fail rc=-6 2
+   O2 a16xy16 memb1 llc-fail rc=-6 2
+   O2 a16xy16 t4 llc-fail rc=-6 2
+   O3 a16 gate1 llc-fail rc=-6 3
+   O3 a16 gate2 llc-fail rc=-6 2
+   O3 a16 head llc-fail rc=-6 3
+   O3 a16 memb1 llc-fail rc=-6 2
+   O3 a16 t4 llc-fail rc=-6 3
+   O3 a16xy16 gate1 llc-fail rc=-6 3
+   O3 a16xy16 gate2 llc-fail rc=-6 2
+   O3 a16xy16 head llc-fail rc=-6 3
+   O3 a16xy16 memb1 llc-fail rc=-6 2
+   O3 a16xy16 t4 llc-fail rc=-6 3
+   Os a16 gate1 llc-fail rc=-6 2
+   Os a16 gate2 llc-fail rc=-6 2
+   Os a16 head llc-fail rc=-6 2
+   Os a16 memb1 llc-fail rc=-6 2
+   Os a16 t4 llc-fail rc=-6 2
+   Os a16xy16 gate1 llc-fail rc=-6 2
+   Os a16xy16 gate2 llc-fail rc=-6 2
+   Os a16xy16 head llc-fail rc=-6 2
+   Os a16xy16 memb1 llc-fail rc=-6 2
+   Os a16xy16 t4 llc-fail rc=-6 2
+   Oz a16 gate1 llc-fail rc=-6 2
+   Oz a16 gate2 llc-fail rc=-6 2
+   Oz a16 head llc-fail rc=-6 2
+   Oz a16 memb1 llc-fail rc=-6 2
+   Oz a16 t4 llc-fail rc=-6 2
+   Oz a16xy16 gate1 llc-fail rc=-6 2
+   Oz a16xy16 gate2 llc-fail rc=-6 2
+   Oz a16xy16 head llc-fail rc=-6 2
+   Oz a16xy16 memb1 llc-fail rc=-6 2
+   Oz a16xy16 t4 llc-fail rc=-6 2

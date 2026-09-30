@@ -1,0 +1,20 @@
+== mixed.ll gate-probe=1 (+mos-a16, -O2)
+      2 native-pset-limit speed_first A16 on
+      2 native-pset-limit speed_first X16 on
+      2 native-pset-limit speed_first Y16 on
+llc rc=0
+== mixed.ll gate-probe=2 (+mos-a16, -O2)
+      2 native-pset-limit speed_first A16 off
+      2 native-pset-limit speed_first X16 off
+      2 native-pset-limit speed_first Y16 off
+llc rc=0
+== mixed-rev.ll gate-probe=1 (+mos-a16, -O2)
+      2 native-pset-limit size_second A16 off
+      2 native-pset-limit size_second X16 off
+      2 native-pset-limit size_second Y16 off
+llc rc=0
+== mixed-rev.ll gate-probe=2 (+mos-a16, -O2)
+      2 native-pset-limit size_second A16 on
+      2 native-pset-limit size_second X16 on
+      2 native-pset-limit size_second Y16 on
+llc rc=0

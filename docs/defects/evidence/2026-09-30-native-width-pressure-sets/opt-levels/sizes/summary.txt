@@ -1,0 +1,304 @@
+################ level Os
+=== native bytes, 321-16 -> t4
+a16: 80 inputs, bytes 321430 -> 321352 (delta -78), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17797 (+86)
+  a16 corpus/examples_snes_epicycles.c.default.ll: 20445 -> 20462 (+17)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14008 -> 14025 (+17)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18286 -> 18282 (-4)
+a16xy16: 79 inputs, bytes 299953 -> 299791 (delta -162), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16766 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 13998 -> 14013 (+15)
+  a16xy16 corpus/examples_snes_funnelkal.c.default.ll: 16591 -> 16605 (+14)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native bytes, 321-16 -> gate1
+a16: 80 inputs, bytes 321430 -> 321420 (delta -10), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16592 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17812 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16892 (+80)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18286 -> 18213 (-73)
+a16xy16: 79 inputs, bytes 299953 -> 299806 (delta -147), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16832 (+82)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19289 (+62)
+  a16xy16 corpus/examples_snes_huffman.c.default.ll: 15476 -> 15526 (+50)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18239 -> 18168 (-71)
+=== native bytes, 321-16 -> memb1
+a16: 80 inputs, bytes 321430 -> 321420 (delta -10), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16592 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17812 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16892 (+80)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18286 -> 18213 (-73)
+a16xy16: 79 inputs, bytes 299953 -> 299806 (delta -147), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16832 (+82)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19289 (+62)
+  a16xy16 corpus/examples_snes_huffman.c.default.ll: 15476 -> 15526 (+50)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18239 -> 18168 (-71)
+=== native bytes, 321-16 -> cand1
+a16: 80 inputs, bytes 321430 -> 321969 (delta 539), larger 21, smaller 13, asm-identical 46, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16649 (+162)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16968 (+156)
+  a16 corpus/examples_snes_boids.c.default.ll: 19246 -> 19402 (+156)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 786 (-291)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18286 -> 18203 (-83)
+a16xy16: 79 inputs, bytes 299953 -> 300170 (delta 217), larger 21, smaller 10, asm-identical 47, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16908 (+158)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19334 (+107)
+  a16xy16 corpus/examples_snes_crctex.c.default.ll: 15934 -> 16012 (+78)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 786 (-291)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18239 -> 18172 (-67)
+=== default identity, upstream -> t4-01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> t4
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> gate1
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level Oz
+=== native bytes, 321-16 -> t4
+a16: 80 inputs, bytes 321320 -> 321242 (delta -78), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17797 (+86)
+  a16 corpus/examples_snes_epicycles.c.default.ll: 20445 -> 20462 (+17)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14008 -> 14025 (+17)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18267 -> 18263 (-4)
+a16xy16: 79 inputs, bytes 299842 -> 299680 (delta -162), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16766 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 13998 -> 14013 (+15)
+  a16xy16 corpus/examples_snes_funnelkal.c.default.ll: 16591 -> 16605 (+14)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 788 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native bytes, 321-16 -> gate1
+a16: 80 inputs, bytes 321320 -> 321307 (delta -13), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16592 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17812 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16892 (+80)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18267 -> 18192 (-75)
+a16xy16: 79 inputs, bytes 299842 -> 299692 (delta -150), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16832 (+82)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19289 (+62)
+  a16xy16 corpus/examples_snes_huffman.c.default.ll: 15476 -> 15526 (+50)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18220 -> 18147 (-73)
+=== native bytes, 321-16 -> memb1
+a16: 80 inputs, bytes 321320 -> 321307 (delta -13), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16592 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17711 -> 17812 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16892 (+80)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18267 -> 18192 (-75)
+a16xy16: 79 inputs, bytes 299842 -> 299692 (delta -150), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16832 (+82)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19289 (+62)
+  a16xy16 corpus/examples_snes_huffman.c.default.ll: 15476 -> 15526 (+50)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 787 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18220 -> 18147 (-73)
+=== native bytes, 321-16 -> cand1
+a16: 80 inputs, bytes 321320 -> 321849 (delta 529), larger 21, smaller 13, asm-identical 46, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16487 -> 16649 (+162)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16812 -> 16968 (+156)
+  a16 corpus/examples_snes_boids.c.default.ll: 19246 -> 19402 (+156)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 786 (-291)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18267 -> 18182 (-85)
+a16xy16: 79 inputs, bytes 299842 -> 300049 (delta 207), larger 21, smaller 10, asm-identical 47, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16750 -> 16908 (+158)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19227 -> 19334 (+107)
+  a16xy16 corpus/examples_snes_crctex.c.default.ll: 15934 -> 16012 (+78)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1077 -> 786 (-291)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 818 -> 650 (-168)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18220 -> 18151 (-69)
+=== default identity, upstream -> t4-01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> t4
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> gate1
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level O2
+=== native bytes, 321-16 -> t4
+a16: 80 inputs, bytes 324317 -> 324233 (delta -84), larger 16, smaller 4, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17848 -> 17934 (+86)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14132 -> 14149 (+17)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16912 -> 16927 (+15)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 800 (-289)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18401 -> 18397 (-4)
+a16xy16: 79 inputs, bytes 302699 -> 302533 (delta -166), larger 15, smaller 5, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16850 -> 16866 (+16)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 14122 -> 14137 (+15)
+  a16xy16 corpus/examples_snes_sodo.c.default.ll: 15010 -> 15023 (+13)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 800 (-289)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_65816_a16scavnz.c.default.ll: 527 -> 519 (-8)
+=== native bytes, 321-16 -> gate2
+a16: 80 inputs, bytes 324317 -> 324288 (delta -29), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16642 -> 16747 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17848 -> 17949 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16912 -> 16988 (+76)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 799 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18401 -> 18328 (-73)
+a16xy16: 79 inputs, bytes 302699 -> 302524 (delta -175), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16850 -> 16928 (+78)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19401 -> 19461 (+60)
+  a16xy16 corpus/examples_snes_bf-vm.c.default.ll: 18067 -> 18118 (+51)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 799 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18363 -> 18292 (-71)
+=== native bytes, 321-16 -> memb1
+a16: 80 inputs, bytes 324317 -> 324288 (delta -29), larger 21, smaller 11, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16642 -> 16747 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17848 -> 17949 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16912 -> 16988 (+76)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 799 (-290)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18401 -> 18328 (-73)
+a16xy16: 79 inputs, bytes 302699 -> 302524 (delta -175), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16850 -> 16928 (+78)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19401 -> 19461 (+60)
+  a16xy16 corpus/examples_snes_bf-vm.c.default.ll: 18067 -> 18118 (+51)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 799 (-290)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18363 -> 18292 (-71)
+=== native bytes, 321-16 -> cand1
+a16: 80 inputs, bytes 324317 -> 324873 (delta 556), larger 22, smaller 12, asm-identical 46, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16642 -> 16804 (+162)
+  a16 corpus/examples_snes_boids.c.default.ll: 19420 -> 19574 (+154)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16912 -> 17064 (+152)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 798 (-291)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18401 -> 18339 (-62)
+a16xy16: 79 inputs, bytes 302699 -> 302908 (delta 209), larger 21, smaller 10, asm-identical 47, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16850 -> 17004 (+154)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19401 -> 19506 (+105)
+  a16xy16 corpus/examples_snes_crctex.c.default.ll: 16054 -> 16132 (+78)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1089 -> 798 (-291)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 827 -> 650 (-177)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18363 -> 18303 (-60)
+=== default identity, upstream -> t4-01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> t4
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> gate2
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+################ level O3
+=== native bytes, 321-16 -> t4
+a16: 80 inputs, bytes 326054 -> 325840 (delta -214), larger 17, smaller 3, asm-identical 60, excluded 10
+  a16 corpus/examples_snes_packrec.c.default.ll: 17874 -> 17960 (+86)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16934 -> 16952 (+18)
+  a16 corpus/examples_snes_1d-ca.c.default.ll: 14132 -> 14149 (+17)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 800 (-423)
+  a16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18490 -> 18474 (-16)
+a16xy16: 79 inputs, bytes 304371 -> 304075 (delta -296), larger 16, smaller 4, asm-identical 59, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16877 -> 16896 (+19)
+  a16xy16 corpus/examples_snes_1d-ca.c.default.ll: 14122 -> 14137 (+15)
+  a16xy16 corpus/examples_snes_sodo.c.default.ll: 15034 -> 15047 (+13)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 800 (-423)
+  a16xy16 corpus/examples_snes_corpus_avalanche_sim.c.default.ll: 1058 -> 1031 (-27)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18452 -> 18438 (-14)
+=== native bytes, 321-16 -> gate2
+a16: 80 inputs, bytes 326054 -> 325625 (delta -429), larger 20, smaller 12, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16706 -> 16811 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17874 -> 17975 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16934 -> 17013 (+79)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18490 -> 18335 (-155)
+a16xy16: 79 inputs, bytes 304371 -> 303819 (delta -552), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16877 -> 16958 (+81)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19416 -> 19468 (+52)
+  a16xy16 corpus/examples_snes_bf-vm.c.default.ll: 18174 -> 18225 (+51)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18452 -> 18299 (-153)
+=== native bytes, 321-16 -> memb1
+a16: 80 inputs, bytes 326054 -> 325625 (delta -429), larger 20, smaller 12, asm-identical 48, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16706 -> 16811 (+105)
+  a16 corpus/examples_snes_packrec.c.default.ll: 17874 -> 17975 (+101)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16934 -> 17013 (+79)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18490 -> 18335 (-155)
+a16xy16: 79 inputs, bytes 304371 -> 303819 (delta -552), larger 19, smaller 9, asm-identical 50, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16877 -> 16958 (+81)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19416 -> 19468 (+52)
+  a16xy16 corpus/examples_snes_bf-vm.c.default.ll: 18174 -> 18225 (+51)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 799 (-424)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18452 -> 18299 (-153)
+=== native bytes, 321-16 -> cand1
+a16: 80 inputs, bytes 326054 -> 326229 (delta 175), larger 21, smaller 13, asm-identical 46, excluded 10
+  a16 corpus/examples_snes_dither.c.default.ll: 16706 -> 16868 (+162)
+  a16 corpus/examples_snes_boids.c.default.ll: 19435 -> 19595 (+160)
+  a16 corpus/examples_snes_mvscrl.c.default.ll: 16934 -> 17089 (+155)
+  a16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 798 (-425)
+  a16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16 corpus/examples_snes_vaprintf.c.default.ll: 18490 -> 18346 (-144)
+a16xy16: 79 inputs, bytes 304371 -> 304222 (delta -149), larger 21, smaller 10, asm-identical 47, excluded 11
+  a16xy16 corpus/examples_snes_mvscrl.c.default.ll: 16877 -> 17034 (+157)
+  a16xy16 corpus/examples_snes_boids.c.default.ll: 19416 -> 19527 (+111)
+  a16xy16 corpus/examples_snes_crctex.c.default.ll: 16054 -> 16132 (+78)
+  a16xy16 corpus/examples_snes_corpus_tea_sim.c.default.ll: 1223 -> 798 (-425)
+  a16xy16 corpus/examples_snes_corpus_nmitally_sim.c.default.ll: 856 -> 650 (-206)
+  a16xy16 corpus/examples_snes_vaprintf.c.default.ll: 18452 -> 18310 (-142)
+=== default identity, upstream -> t4-01
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (78 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, cand1 -> t4
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0
+=== default identity, t4 -> gate2
+mos6502: 90 inputs (54 compile before), 90 identical, 0 asm differ, 0 object-only differ
+mosw65816: 90 inputs (79 compile before), 90 identical, 0 asm differ, 0 object-only differ
+RESULT: IDENTICAL
+exit 0

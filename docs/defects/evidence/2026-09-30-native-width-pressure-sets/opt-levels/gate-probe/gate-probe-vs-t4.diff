@@ -1,0 +1,48 @@
+2c2
+< index bd90e7c881a7..e1f63bd01238 100644
+---
+> index bd90e7c881a7..c8483ade7358 100644
+13,23c13
+< @@ -37,7 +38,9 @@
+<  #include "llvm/CodeGen/VirtRegMap.h"
+<  #include "llvm/IR/CallingConv.h"
+<  #include "llvm/MC/MCRegisterInfo.h"
+< +#include "llvm/Support/CommandLine.h"
+<  #include "llvm/Support/ErrorHandling.h"
+< +#include "llvm/Support/raw_ostream.h"
+<  
+<  #define DEBUG_TYPE "mos-reginfo"
+<  
+< @@ -46,10 +49,23 @@
+---
+> @@ -46,10 +47,15 @@
+28,35d17
+< +// MEASUREMENT PROBE ONLY: see getRegPressureSetLimit.
+< +static cl::opt<unsigned> NativePSetGateProbe(
+< +    "mos-native-pset-gate-probe", cl::Hidden, cl::init(0),
+< +    cl::desc("Probe: unbounded native set limits when 0 never, 1 optsize, "
+< +             "2 not optsize, 3 minsize, 4 always"));
+< +static cl::opt<bool> NativePSetGateTrace("mos-native-pset-gate-trace",
+< +                                         cl::Hidden, cl::init(false));
+< +
+49c31
+< @@ -73,6 +89,130 @@ MOSRegisterInfo::MOSRegisterInfo()
+---
+> @@ -73,6 +79,114 @@ MOSRegisterInfo::MOSRegisterInfo()
+132,147d113
+< +  // MEASUREMENT PROBE ONLY (opt-level gating study, 2026-09-30): switch the
+< +  // appended native sets off per function by making their limit unbounded.
+< +  const Function &F = MF.getFunction();
+< +  bool Off = false;
+< +  switch (NativePSetGateProbe) {
+< +  case 1: Off = F.hasOptSize(); break;
+< +  case 2: Off = !F.hasOptSize(); break;
+< +  case 3: Off = F.hasMinSize(); break;
+< +  case 4: Off = true; break;
+< +  default: break;
+< +  }
+< +  if (NativePSetGateTrace)
+< +    errs() << "native-pset-limit " << F.getName() << ' '
+< +           << getRegPressureSetName(Idx) << (Off ? " off\n" : " on\n");
+< +  if (Off)
+< +    return 1u << 16;
