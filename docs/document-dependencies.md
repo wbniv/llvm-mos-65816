@@ -147,7 +147,7 @@ Raw defect evidence, transcripts, vendored trees, and editor history are exclude
 | [docs/investigations/2026-09-28-farblit-payoff.md](<investigations/2026-09-28-farblit-payoff.md>) | maintained | 28 | 5 |
 | [docs/investigations/2026-09-28-farblit-range-integration.md](<investigations/2026-09-28-farblit-range-integration.md>) | maintained | 26 | 17 |
 | [docs/investigations/2026-09-28-vlastack-xy16-stale-reload.md](<investigations/2026-09-28-vlastack-xy16-stale-reload.md>) | maintained | 24 | 6 |
-| [docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md](<investigations/2026-10-01-dither-o3-soft-stack-collision.md>) | dated record | 3 | 2 |
+| [docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md](<investigations/2026-10-01-dither-o3-soft-stack-collision.md>) | dated record | 3 | 3 |
 | [docs/investigations/65816-a16-regalloc-pressure-failure.md](<investigations/65816-a16-regalloc-pressure-failure.md>) | reference | 5 | 12 |
 | [docs/investigations/65816-a16-scavenger-nz-liveness.md](<investigations/65816-a16-scavenger-nz-liveness.md>) | reference | 6 | 7 |
 | [docs/investigations/65816-calling-convention-decision.md](<investigations/65816-calling-convention-decision.md>) | reference | 5 | 7 |

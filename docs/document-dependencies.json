@@ -2620,10 +2620,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "94954e7c2a4962b01d06c9df90fd6b06cb508c3128eb6defbed13b4733413424"
+          "TODO.md": "55000749d7779d8706d73bff660e256932dcbd05d54a76bc082072658deab591"
         },
-        "reviewed_at": "2026-09-30T19:48:44.706589+00:00",
-        "note": "The 0069/0070 items record the second review's B8/B9 blockers and the dispatched #594/B8/B9 fixes; the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T20:40:00.504224+00:00",
+        "note": "The dither -O3 item now records the root cause (SNES soft stack overlapping static data, not a miscompile) and the guard decision awaiting the user; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
