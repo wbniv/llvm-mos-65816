@@ -17,6 +17,16 @@ This file tracks actions that remain. The [September 28 history snapshot](TODO-h
 
 - [T4] **Prepare the bounded Farblit range proof for upstream review.** Patch 0069 is integrated and installed locally: A16 `cp8` uses Y8, full LTO saves 101 bytes at `-Os`, and all 36 LTO ROM configurations pass MAME and bsnes. The 26-case MIR regression, original gate and 16 sensitivity tests pass. Broader `-Os` results have no growing object in the 16-fixture sample; retain the `-O2` XY16 tradeoff of +24 bytes and 2.72% fewer Farblit master clocks. [Independent AI source review](docs/pr-preparations/2026-09-28/far-word-index/independent-review.md) found no valid-input compiler correctness defect. The P2 opcode-boundary finding is resolved: all 78 assertions use explicit delimiters, all 156 deliberately wrong opcode substitutions are rejected, all three correct outputs pass, and four focused regression files pass. The [exact-base extraction](docs/pr-preparations/2026-09-28/far-word-index/upstream-series.md) supplies the patches, executed checks and frozen-IR backend replay. The full-LTO figures above remain downstream measurements and are separate from that backend replay. The [September 30 rebase](docs/pr-preparations/2026-09-30/far-word-rebase/README.md) onto `06bc967d2668` keeps every patch body and reproduces the suites, sensitivity checks and all 58 emulator configurations byte for byte. Its [independent review](docs/pr-preparations/2026-09-30/far-word-rebase/independent-review.md) upholds 0069 and 0070 but blocks filing on the far prerequisite: four downstream defects ([ABI exhaustion](docs/defects/mos-far-pointer-arg-exhaustion.json), [lengths above 65535](docs/defects/mos-far-memop-length-truncation.json), [non-65816 CPUs](docs/defects/mos-far-access-non-65816.json), [undef debug values](docs/defects/mos-far-index-fold-dangling-dbg.json)), two extraction gaps and a register collision with open #594. Repair them in the [#320/#321 split series](docs/plans/2026-09-30-split-320-321-series.md), then re-review. [Integrated proof, size/runtime evidence and suite qualifications](docs/investigations/2026-09-28-farblit-range-integration.md).
 
+- [T2] **Fix far-pointer argument exhaustion (B1).** A fourth far-pointer argument takes a 16-bit RS pair and crashes the compiler; add the soft-stack fallback after the far-pointer CC rules. Ranked T2: the reviewer gave the rule and the tests. [Record](docs/defects/mos-far-pointer-arg-exhaustion.json) · [plan](docs/plans/2026-09-30-far-prerequisite-defects.md).
+
+- [T3] **Fix far memory lengths above 65535 (B2).** Far memset/memcpy/memmove silently truncate longer lengths; keep the 16-bit runtime entry for provable lengths and route the rest to new 32-bit-length entries, with a >64 KiB emulator check. Ranked T3: runtime and compiler change with a settled design. [Record](docs/defects/mos-far-memop-length-truncation.json) · [plan](docs/plans/2026-09-30-far-prerequisite-defects.md).
+
+- [T2] **Reject far memory accesses on non-65816 CPUs (B3).** Runtime far loads and stores on 6502-family CPUs silently emit `$A7`; report a clear diagnostic instead. Ranked T2: one guard plus negative tests. [Record](docs/defects/mos-far-access-non-65816.json) · [plan](docs/plans/2026-09-30-far-prerequisite-defects.md).
+
+- [T2] **Drop undef debug values after the far index fold (B4).** `-g` builds fail `-verify-machineinstrs` after the byte or word far index fold; set the orphaned `DBG_VALUE` to `$noreg`. Ranked T2: bounded, known repair. [Record](docs/defects/mos-far-index-fold-dangling-dbg.json) · [plan](docs/plans/2026-09-30-far-prerequisite-defects.md).
+
+- [T4] **Repair XY16 preserveX status-register saves.** `preserveX` saves `$p` as defined after a call clobbered its flags, which fails the machine verifier on the recovered-IR boids.c XY16 input; repair it in `0002` and the #321 prerequisite with a red/green on the retained IR. Ranked T4: liveness root cause spans preserveX and the scavenger P save. [Record](docs/defects/mos-xy16-preserve-x-p-save.json).
+
 ### Test Bench / CI
 
 
@@ -111,4 +121,8 @@ _Auto-added from plan "Out of scope"/"Deferred" sections at commit time. Triage 
 
 <!-- BEGIN auto-captured-deferrals (managed by audit-plan-deferrals.sh — triage these into the curated sections above; the fingerprint ledger means a deleted item is NOT re-added) -->
 <!-- triaged 2026-09-30: split-series verification is the in-progress split work (live agent); covered by the 0069/0070 items, which route their repairs through that series. -->
+<!-- triaged 2026-09-30: carrying the repairs into the extracted #320 series is covered by the 0069/0070 items, which route them through the split series. -->
+<!-- triaged 2026-09-30: B5 and B7 are covered by the 0069/0070 items (extraction gaps and the #594 collision). -->
+<!-- triaged 2026-09-30: dropped; no measured need to tune the 32-bit far runtime entries. Revisit only if one appears in a hot path. -->
+<!-- triaged 2026-09-30: plan verification is covered by the B1-B4 items now in progress. -->
 <!-- END auto-captured-deferrals -->
