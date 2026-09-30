@@ -1,0 +1,427 @@
+{
+ "schema": 1,
+ "id": "snes-soft-stack-static-data-collision",
+ "title": "SNES soft stack silently overlaps static data (dither -O3 never writes its gate CRC)",
+ "status": "confirmed",
+ "reproducer_origin": "original",
+ "report": "docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md",
+ "attribution": [
+  "Claude Code 2.1.286 (claude --version), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (T4 design-and-build agent definition; effort not readable from session metadata); session session_01Skyq488smgqkyyzHrcCX7F. Capture, prior-work reconciliation, root cause and proposal, 2026-10-01.",
+  "Original sighting (not diagnosed): Claude Code 2.1.285 (T3 plan-execution subagent), model Claude Opus 5.5 (claude-opus-5-5), medium reasoning effort, commit 18e7f8a0, o2-large/o3-dither/report.txt."
+ ],
+ "summary": "examples/snes/dither.c built with the SDK driver at -O3 (LTO) never writes corpus_result (0x0000 against 0x80C4) in default mosw65816 and +mos-a16, on bsnes-jg and MAME; -O2 passes. There is no miscompile: the same -O3 instruction stream passes when only the data layout changes. Cause: the SNES platform (platforms/snes/link.ld) puts the soft stack at $2000, growing down into the same low-WRAM region as .bss/.noinit, with no reservation or check. The demo's static data ends at $1FAD (82 B free). At -O3 the pre-link inliner (threshold 250; opt-bisect pass 4016, inline on main) inlines dither_gate_crc and its three unrolled ds_dither calls into main, adding six [66 x i16] locals. main makes 7 indirect calls, so MOSNonReentrant never marks it nonreentrant and its 313 B frame (353 B with +mos-a16) goes on the soft stack at [$1EC7,$2000). The frame overlaps dither_gate_crc.out[478..575] and the whole .noinit static stack. The gate's out[] stores in row 21 overwrite main's spilled row counter and row pointer, and the loop livelocks. Reproduces with upstream llc 06bc967d2668 on the same IR and with an unpatched upstream clang 742d554bf080 full build using this repo's SNES SDK. Placing main's frame on the static stack turns it into a link error (.noinit overflowed by 181 bytes). An earlier instance (rdiff, e3bb5a62, 2026-09-25) was fixed in the demo without a record or guard. Fix location: our SNES platform (a link-time soft-stack reservation and assertion) and/or the differential gate (a soft-SP low-water check); an optional upstream MOSNonReentrant enhancement; not 0002, the #320/#321 patches or generic LLVM. Not fixed; the guard policy is a user decision.",
+ "prior_work": {
+  "disposition": "distinct_from_related",
+  "search_terms": [
+   "dither",
+   "O3 never writes gate CRC",
+   "soft stack",
+   "static stack",
+   "nonreentrant",
+   "MOSNonReentrant",
+   "stack overflow",
+   "stack collision",
+   "headroom",
+   "__heap_start",
+   "overflowed by",
+   "__stack",
+   "noinit"
+  ],
+  "related_records": [
+   "docs/defects/mos-native-width-pressure-sets.json",
+   "docs/defects/reentrant-attribute-contract.json"
+  ],
+  "related_reports": [
+   "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/o3-dither/report.txt",
+   "docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/README.md",
+   "docs/plans/2026-06-18-321-xy16-hang-fix-xhigh.md"
+  ],
+  "related_changes": [
+   "18e7f8a0 (sighting recorded, not diagnosed)",
+   "e3bb5a62 (rdiff soft-stack overrun fixed by shrinking the demo; no record, no guard)",
+   "c9cfa6a0 (SNES near-code budget link-time contract; ROM only)",
+   "platforms/snes/link.ld"
+  ],
+  "source_assessment": "No patch or live-source change covers this. MOSNonReentrant.cpp (upstream code, untouched by 0002 and 0038 in the relevant analysis) adds a calls-external to external-calling edge, so main, which has external linkage and makes indirect calls, is never norecurse and MOSFrameLowering::usesStaticStack keeps its frame on the soft stack. platforms/snes*/link.ld and the installed link.ld (sha256 9eb48681...) set __stack = 0x2000 in the ram region shared with .bss/.noinit and reserve or assert nothing. No upstream llvm-mos-sdk platform script reserves or asserts a soft-stack size.",
+  "binary_assessment": "The installed clang-23 254624ba..., lld c89b04cb..., llc cf5355d3... and mos-snes.cfg f12c5b6a... are the report's identities and reproduce its four ROM hashes byte for byte. Upstream llc 321-00 (2f5c1768..., equals frozen-llc.sha256, upstream 06bc967d2668) and unpatched upstream clang 742d554b (b48000f5..., manifest unpatched, empty tracked diff) fail the same way, so no downstream patch is involved.",
+  "decision": "New canonical record for the SNES soft-stack/static-data collision. mos-native-width-pressure-sets only recorded the sighting; its pressure-set change is not involved, since every llc variant and plain mosw65816 fail. reentrant-attribute-contract concerns the frontend reentrant attribute contract, not a resource overlap. The rdiff fix e3bb5a62 is an earlier, unrecorded instance of the same platform mechanism, now covered here.",
+  "evidence": {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/prior-work-audit.md",
+   "sha256": "bc20c87e317594de9a6c653fd210d541153361b16ee52705463def91ce54e2b9"
+  }
+ },
+ "baseline": {
+  "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O3 default stock",
+  "working_directory": "/home/will/llvm-mos-65816-o3dither",
+  "configuration": {
+   "cpu": "mosw65816",
+   "features": [],
+   "optimization": "O3",
+   "lto": true,
+   "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+   "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+   "emulator": "bsnes-jg (build/jgxcheck)",
+   "frames": 600,
+   "expected": "0x80C4",
+   "result_symbol": "corpus_result"
+  },
+  "toolchain_location": "build/llvm-mos-install/bin (hardlinks of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-snes-soft-stack-collision/README.md",
+  "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+  "input": {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+   "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+  },
+  "log": {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-default-stock.log",
+   "sha256": "2aeabbcc7a71c25c57cb9b603c93312409ad0919ec597dbf1fb88676dc400060"
+  },
+  "exit_code": 1,
+  "observed": "0x0000",
+  "failure_signature": "SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4"
+ },
+ "additional_runs": [
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O3 a16 stock",
+   "working_directory": "/home/will/llvm-mos-65816-o3dither",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O3",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (hardlinks of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-snes-soft-stack-collision/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+    "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-a16-stock.log",
+    "sha256": "a35855ce4bd58f0d8a571f8d05721ac8597e240114ba60fdfc091070c0a02d87"
+   },
+   "exit_code": 1,
+   "observed": "0x0000",
+   "failure_signature": "SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O2 default stock",
+   "working_directory": "/home/will/llvm-mos-65816-o3dither",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [],
+    "optimization": "O2",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (hardlinks of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-snes-soft-stack-collision/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+    "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O2-default-stock.log",
+    "sha256": "4a5629c770273f017a8b4fa10f8359938b4df07389546986ed3acc904c6bec52"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4"
+  },
+  {
+   "command": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh gate OUT O2 a16 stock",
+   "working_directory": "/home/will/llvm-mos-65816-o3dither",
+   "configuration": {
+    "cpu": "mosw65816",
+    "features": [
+     "+mos-a16"
+    ],
+    "optimization": "O2",
+    "lto": true,
+    "sdk": "build/install/bin/mos-snes.cfg (sha256 f12c5b6a...)",
+    "layout": "stock build/install/mos-platform/snes/lib/link.ld",
+    "emulator": "bsnes-jg (build/jgxcheck)",
+    "frames": 600,
+    "expected": "0x80C4",
+    "result_symbol": "corpus_result"
+   },
+   "toolchain_location": "build/llvm-mos-install/bin (hardlinks of /home/will/llvm-mos-65816/build/llvm-mos-install/bin); identities in docs/defects/evidence/2026-10-01-snes-soft-stack-collision/README.md",
+   "toolchain_sha256": "254624ba26462f49b4c875b16eda3a1d10d7b766dd80175ec69b64bc96485b0c",
+   "input": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+    "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+   },
+   "log": {
+    "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O2-a16-stock.log",
+    "sha256": "76ea5cba745a7f43cf89a0975c52ed89385c88e849638f5c4ad38b6c84280f8d"
+   },
+   "exit_code": 0,
+   "observed": "0x80C4"
+  }
+ ],
+ "root_cause": {
+  "defect_class": "platform resource contract (silent soft-stack overflow into static data); not a code-generation error",
+  "function": "main (with dither_gate_crc and three unrolled ds_dither copies inlined)",
+  "pass": "pre-link CGSCC inliner, -O3 threshold 250 (opt-bisect 4016: inline on (main)); frame placement by MOSNonReentrant / MOSFrameLowering::usesStaticStack",
+  "construct": "two [66 x i16] locals per inlined ds_dither, colored to 2 x 132 B, plus 49 B of spills: a 313 B soft-stack frame against 82 B of headroom",
+  "causal_checks": [
+   "Reordered data layout (tools/reorder-ld.py), identical instruction stream (0 of 9573 / 8839 instructions differ after masking $ operands): PASS in both modes on bsnes-jg and MAME",
+   "main marked norecurse in the -O3 IR: frame moves to the static stack and the link fails (.noinit overflowed by 181 bytes)",
+   "Latch trace (tools/jgxlatch.cpp): row 21 out[] stores reset the spilled row counter to 2/3 and the row pointer to $1E03; livelock",
+   "Host oracle and whole demo at gcc -O3 with ASan+UBSan: clean, results equal the -O2 oracle",
+   "__attribute__((nonreentrant)) main in a copy of dither.c: -O2 builds and passes, -O3 fails to link (.noinit overflowed by 181 bytes)"
+  ],
+  "proposed_fix": [
+   "Differential gate (ours): record the soft stack pointer low-water mark on bsnes-jg and fail below __heap_start",
+   "SNES platform (ours, platforms/snes*/link.ld): reserve soft-stack space and ASSERT __heap_start + reserve <= __stack; the reserve size is a policy decision (any value of 83 B or more also rejects the passing -O2 dither build)",
+   "Optional upstream llvm-mos enhancement (MOSNonReentrant.cpp): exclude a non-address-taken main from the indirect-call recursion edge, making this overflow a loud link error",
+   "Per-program source guard available now: __attribute__((nonreentrant)) on main puts its frame on the static stack; dither then passes at -O2 and fails to link at -O3 (.noinit overflowed by 181 bytes)",
+   "Demo: dither -O3 needs 231 B (soft stack) or 181 B (static stack) more low WRAM; fits only by shrinking static data or keeping ds_dither out of line"
+  ],
+  "user_decision_needed": "Which guard (gate check, link-time reserve, per-program nonreentrant main, or a combination), the reserve size, and whether dither -O3 must fit or is declared unsupported."
+ },
+ "upstream": {
+  "llc_06bc967d2668_on_O3_ir": "FAIL 0x0000 (logs/llc-upstream-O3-on-O3ir.log); O2 IR PASS",
+  "clang_742d554bf080_full_build": "FAIL 0x0000 on bsnes-jg and MAME, PASS with the reordered layout (logs/upstream-clang-*.log, logs/mame.log)",
+  "not_covered": "The SDK (libc, crt0, link.ld) is this repo's build; upstream llvm-mos-sdk has no merged SNES platform.",
+  "sdk_pr_415": "The open upstream SNES target llvm-mos-sdk#415 (head e6a5c17cab52026cb66924a8e2bf5fab870536f2, read via the public API 2026-10-01) sets __stack = 0x0200, so its soft stack grows down into page 1 with the hardware stack; it has no soft-stack reservation or assertion either."
+ },
+ "unknowns": "The upstream clang run links this repo's SDK libc bitcode (with a data-layout warning for the p2/p3 address spaces); an entirely upstream toolchain+SDK run is impossible because upstream has no SNES platform. The harness -O3 builds in the o2-large run reported a wrong fold (0xA7D4) where this replay sees 0x0000 after 3000 frames; both fail and pass with the reordered layout here, and the exact corrupted value depends on the llc variant's layout.",
+ "observations": [
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/README.md",
+   "sha256": "424b62b815f24fc9decdb673d186551541545aee2b59bb29f4d9b14685d8d743"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/frontend.bc",
+   "sha256": "c19a4d3249280e26c35f75b21cd9a4048f8357d8e3b589e7256d8f9729dedb94"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/main.precodegen.ll",
+   "sha256": "8fefad3f6c6629d6340b9c54db15f7a44d4e320b3c3a59cb8be10035a977f7e4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/main.prelink.ll",
+   "sha256": "f95c13615365d18423d9e6507e332fcd2fb59381c644f6b3a8e88f4661764b7e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/prelink-lto-input.bc",
+   "sha256": "b0684cfbcc2c8ff3c52e6c449a3415a630f15cb9b894034ef1023589f9972379"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/rom.map",
+   "sha256": "aac9617b087b989cc614a0b052c275a27027d279a92d89b7842ae7184639e711"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/rom.sfc",
+   "sha256": "f467cfd88052d34bed3559ca0ac7cf23ded3d0c11126b359056bbec684365ff5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-a16/rom.sfc.0.5.precodegen.bc",
+   "sha256": "96888081597c88da536b63fe007618a0c406bcd2ba59467698fba6eacecf533e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/frontend.bc",
+   "sha256": "0ae0a671943f3df52497b8d96863bf653b79374592283dd9447c31643c892b0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/main.frame-objects.txt",
+   "sha256": "fbe8728057c75a5894d9f11c745a84260cfd501e63cff39a474a40a3c5b2a6eb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/main.post-pei.mir.xz",
+   "sha256": "850f5f2defab8517ce87071dbd25e616bd423c39f8c1a795db5539b14630d5a7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/main.precodegen.ll",
+   "sha256": "8fefad3f6c6629d6340b9c54db15f7a44d4e320b3c3a59cb8be10035a977f7e4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/main.prelink.ll",
+   "sha256": "f95c13615365d18423d9e6507e332fcd2fb59381c644f6b3a8e88f4661764b7e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/prelink-lto-input.bc",
+   "sha256": "8275d7245734d5aa5e7c8fc6c3a4cf38b4c713f71cc8eaf80501b40c0ea36d92"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/rom.map",
+   "sha256": "86f5c3d67500fe07033659724c7d7c457edd067bd79d253b8153eab4117f2c52"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/rom.sfc",
+   "sha256": "ffdc0ff1e6a44bcb84f1f92c714f823e2b7ae37ff825d040a50510eb4f85309b"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/rom.sfc.0.5.precodegen.bc",
+   "sha256": "781e6bda6af422cfe1058ae2ff6917979f66b05f912b039322f1b9dfcf3247a4"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/frontend.bc",
+   "sha256": "0ae0a671943f3df52497b8d96863bf653b79374592283dd9447c31643c892b0c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/main.precodegen.ll",
+   "sha256": "06dd350d987ad38829c19f51477b3c7948835df45238c4c48abc007d342c3c5e"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/main.prelink.ll",
+   "sha256": "952a99138cde71362b968d7e2124d5b2476acdb7df20a423a3a83169a341a487"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/prelink-lto-input.bc",
+   "sha256": "980ba3be16711de94185bcea09168dcfa57c43d8c38dee527103a1c855dfbba2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/rom.map",
+   "sha256": "fab3488d9aed9e8793deb5cdc8eef0716a2ca932c66604c9a23b32e5ffb0a80d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/rom.sfc",
+   "sha256": "fc1de17a378006ee5298d0da780f294e889bb1db6fa89a2cea534839d096e47d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/rom.sfc.0.5.precodegen.bc",
+   "sha256": "56c64c9673671845f5ba37869b2652a04678fe715764dd2236b973cf23f4987c"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.O3.i",
+   "sha256": "9a0966bcf227adbb5779493c8de4531d7219856a7854c70bc4f79a8a0ca07d75"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.c",
+   "sha256": "3d63d18f4b791a452550b247fe55bc8542cfb796e426a560d4bcbf788577d9b7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/input/dither.h",
+   "sha256": "ae7e7c9a775f688c79125821130bec112c86b40201f118fe86f5e85878016139"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/code-identity-O3-a16.log",
+   "sha256": "a543075a92c16cc348d81103916a3c6498d11f15f7f017541c291a26af6118d5"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/code-identity-O3-default.log",
+   "sha256": "1c744815c1e435a0a34159d48ce4c9aab04bfcedd5eb13870340dac3666178f9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O2-a16-stock.log",
+   "sha256": "76ea5cba745a7f43cf89a0975c52ed89385c88e849638f5c4ad38b6c84280f8d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O2-default-stock.log",
+   "sha256": "4a5629c770273f017a8b4fa10f8359938b4df07389546986ed3acc904c6bec52"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-a16-reorder.log",
+   "sha256": "d85a126d0a255967ca4b87974345defb405272694b46ba667dda18c67f40b3f7"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-a16-stock.log",
+   "sha256": "a35855ce4bd58f0d8a571f8d05721ac8597e240114ba60fdfc091070c0a02d87"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-default-reorder.log",
+   "sha256": "efa96043e55b5159a979b4481e94bccbe2703014315dee4634a34c6ed5d5d228"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/gate-O3-default-stock.log",
+   "sha256": "2aeabbcc7a71c25c57cb9b603c93312409ad0919ec597dbf1fb88676dc400060"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/harness-O3.log",
+   "sha256": "29d6240cdcc2afcdd05402ad791edd4d1c809f85da696744410cb15f735f6c64"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/host.log",
+   "sha256": "c47fae6f9aa5e516427e35537b79052d590b3065db9da3379bc04b55119be932"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/latch.log",
+   "sha256": "b6eab0728cc8178cda270c0435a9b8be90cb47919811e0b78dfd5c19dd4290a9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/llc-installed-O0.log",
+   "sha256": "46924352d0263ba254686aca1d626c3a87ec251283147992310a4814371144bd"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/llc-installed-O2.log",
+   "sha256": "e076ed489964e5028211c7a577007ad9bf6773594ef09556d8085f5efa26c282"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/llc-installed-O3.log",
+   "sha256": "05dc53fdb0fd02c4947fba8f3c70580e09542d9c8d80d3ef3cae5ab98cd0590a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/llc-upstream-O2-on-O2ir.log",
+   "sha256": "f195fea98b94f334661d2445ad9ad29354a549940163f4c33d641952e78b5962"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/llc-upstream-O3-on-O3ir.log",
+   "sha256": "4fb0131e41da28b39b071d176e3a647b76a3fb21c310f47a820d4c44b5e719cf"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/mame.log",
+   "sha256": "1627a25681b8b5f3fb093fabfbf6ef4733a0ef2e1b142988857668e8c9843631"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/nonreentrant-main.log",
+   "sha256": "0e78a6af2fd932d2a4d10f8654646149bc7477013963036c262241a6e8102316"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/nonreentrant.txt",
+   "sha256": "750ee09d6eba704e6cafcf5676a45fe674b1e9321d809dc7ed10e2ec4b601036"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/norecurse.log",
+   "sha256": "c804d3322ac9e88c2e93c0fbe66d92430233171aa5bcaf11ff652f54147aa61d"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/pass-bisect.txt",
+   "sha256": "a326fb21156ff99f041797cc6d9b8746901ab7182433ab245f91dc459d8db00f"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/upstream-clang-reorder.log",
+   "sha256": "45c53b09352c02696b2624b2ac22f48de41dee2fb9a9b79fabe8aa748d7562aa"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/upstream-clang-stock.log",
+   "sha256": "fcf020ee8147e31bd1a60ce4ded5ee05bc38eac8634843cfcc93a41e1a3dd2d2"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/verify-O3-a16.log",
+   "sha256": "637d5ee567f5a2b74fab28c5457260d13cc55375bc89dc0bedfc651c8e96e129"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/logs/verify-O3-default.log",
+   "sha256": "95e85f1cc77b3059cd9eac1c6db9b0485ad1854187ec5ad282f4ea2dbd3499fb"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/prior-work-audit.md",
+   "sha256": "bc20c87e317594de9a6c653fd210d541153361b16ee52705463def91ce54e2b9"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/jgxlatch.cpp",
+   "sha256": "d0572a83e1e749f8cdac130d4af9c5a2e50887c0e85fc23977953c06ebda365a"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reorder-ld.py",
+   "sha256": "85a07bbc7afab82a347413dd27eba386ebca14d5213ed57e2aaff90f7d18de81"
+  },
+  {
+   "path": "docs/defects/evidence/2026-10-01-snes-soft-stack-collision/tools/reproduce.sh",
+   "sha256": "568e4d529fa0610ed81e4f6e0cc9e76fd8b8b85abd90f09772f2bc5a46d6cfbb"
+  }
+ ]
+}

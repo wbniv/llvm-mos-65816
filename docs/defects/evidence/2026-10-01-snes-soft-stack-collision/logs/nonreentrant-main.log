@@ -1,0 +1,12 @@
+2026-09-30T20:03:16Z edit: 1 line(s) changed (main declared nonreentrant)
+2026-09-30T20:03:17Z -O2 build rc=0
+main soft-stack frame: 0 B -> [0x2000, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  no overlap with named .bss objects or .noinit
+2026-09-30T20:03:17Z bsnes-jg: jgxcheck /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/ev2/nonreentrant-main/O2.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f)
+SMOKE: PASS off=0x1CE7 len=2 got=0x80C4 (ran 600 frames, bsnes-jg)
+2026-09-30T20:03:28Z gate rc=0
+ld.lld: error: section '.noinit' will not fit in region 'ram': overflowed by 181 bytes
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+2026-09-30T20:03:29Z -O3 build rc=1
+nonreentrant-main exit=1

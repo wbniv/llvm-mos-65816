@@ -1,0 +1,7 @@
+2026-09-30T19:59:02Z dither-sim -O2: bands: 45 247 243 41 dither gate_crc = 0x80C4 
+2026-09-30T19:59:04Z dither-sim -O3 ASan+UBSan (rc=0): bands: 45 247 243 41 dither gate_crc = 0x80C4
+2026-09-30T19:59:04Z whole demo (o2-large host-oracle.sh; cc = gcc 15.2.0 -O3 ASan+UBSan, alignment off for the harness MMIO shim):
+dither 0x21FF
+dither:DITHER_RUN_FRAMES=6 0x15CC
+2026-09-30T19:59:21Z sanitized: libasan.so.8 libasan.so.8 libubsan.so.1 libubsan.so.1 
+host exit=0

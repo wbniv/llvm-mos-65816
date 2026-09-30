@@ -1,0 +1,9 @@
+2026-09-30T19:47:48Z MAME O2-a16-stock corpus_result@0x7E1CE7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-09-30T19:48:05Z MAME O2-default-stock corpus_result@0x7E1CE7: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-09-30T19:48:21Z MAME O3-a16-reorder corpus_result@0x7E04C4: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-09-30T19:48:38Z MAME O3-a16-stock corpus_result@0x7E1CE7: SHOT: FAIL corpus=0x0000 want=0x80C4
+2026-09-30T19:48:54Z MAME O3-default-reorder corpus_result@0x7E04C4: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-09-30T19:49:09Z MAME O3-default-stock corpus_result@0x7E1CE7: SHOT: FAIL corpus=0x0000 want=0x80C4
+2026-09-30T19:49:24Z MAME upstream-clang-O3-default-reorder corpus_result@0x7E04C4: SHOT: PASS corpus=0x80C4 (snapshot at frame 900)
+2026-09-30T19:49:40Z MAME upstream-clang-O3-default-stock corpus_result@0x7E1CE7: SHOT: FAIL corpus=0x0000 want=0x80C4
+mame rc=0

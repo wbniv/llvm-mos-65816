@@ -281,6 +281,17 @@
       "evidencePaths": [
         "docs/defects/mos-far-cc-split-axy-custom-args.json"
       ]
+    },
+    "snes-soft-stack-static-data-collision": {
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:snes415"
+      ],
+      "nextStep": "Choose the guard for SNES soft-stack overflow into static data (a soft-stack low-water check in the differential gate, a link-time soft-stack reservation in the SNES linker scripts, or nonreentrant main per program), then fit or retire dither at -O3. The -O3 code is correct; no compiler change is needed.",
+      "evidencePaths": [
+        "docs/defects/snes-soft-stack-static-data-collision.json",
+        "docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md"
+      ]
     }
   },
   "items": [

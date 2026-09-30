@@ -1,0 +1,12 @@
+command: build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -O3 -flto -I/home/will/llvm-mos-65816-o3dither -Idocs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness -DDITHER_RUN_FRAMES=6 -Iexamples/65816 -Iexamples/snes -Ibuild docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/dither_run.c -o /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/harn2/h.stock.sfc -Wl,-Map=/tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/harn2/h.stock.map
+build rc=0 rom sha256 538871bb2efbc0be02a40616b209c04281ce94caf406d09319a9c04ee53c920a
+corpus_result 0x002a; main prologue: adc	#$c7 adc	#$fe 
+     200      200     1a5b     1                 main.a
+    1ce7     1ce7      240     1                 dither_gate_crc.out
+SMOKE: FAIL off=0x2A len=2 got=0x0000 want=0x15CC
+command: build/llvm-mos-install/bin/mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -O3 -flto -I/home/will/llvm-mos-65816-o3dither -Idocs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness -DDITHER_RUN_FRAMES=6 -Iexamples/65816 -Iexamples/snes -Ibuild docs/defects/evidence/2026-09-30-native-width-pressure-sets/o2-large/harness/dither_run.c -o /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/harn2/h.reorder.sfc -Wl,-Map=/tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/harn2/h.reorder.map -Wl,-L,/tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/harn2/ld
+build rc=0 rom sha256 2d6c468ba3a19f07a3924605f8799833b1d1398503978dcd7a1fa1524bead4e6
+corpus_result 0x002a; main prologue: adc	#$c7 adc	#$fe 
+     284      284      240     1                 dither_gate_crc.out
+     550      550     1a5b     1                 main.a
+SMOKE: PASS off=0x2A len=2 got=0x15CC (ran 3000 frames, bsnes-jg)

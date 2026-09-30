@@ -1,0 +1,16 @@
+# opt-bisect of the -O3 pre-link (compile) pipeline: the first limit at which main holds the [66 x i16] arrays
+# command: mos-clang --config build/install/bin/mos-snes.cfg -mcpu=mosw65816 -O3 -flto -c -I examples/65816 -I examples/snes -I build examples/snes/dither.c -mllvm -opt-bisect-limit=N; count 'alloca [66' in main of the output bitcode
+passes run at no limit: 5057
+limit 0: main allocas 0; limit 4015: main allocas 0, calls dither_gate_crc; limit 4016: main allocas 6, no call to dither_gate_crc or ds_dither
+BISECT: running pass (4015) coro-annotation-elide on (dither_frame)
+BISECT: running pass (4016) inline on (main)
+
+# inliner remarks (-Rpass-missed=inline) for ds_dither
+## -O2
+      1 remark: 'ds_dither' not inlined into 'dither_frame' because too costly to inline (cost=255, threshold=225) 
+      1 remark: 'ds_dither' not inlined into 'dither_gate_crc' because too costly to inline (cost=255, threshold=225) 
+      1 remark: 'ds_dither' not inlined into 'main' because too costly to inline (cost=235, threshold=225) 
+      2 remark: 'ds_dither' not inlined into 'main' because too costly to inline (cost=245, threshold=225) 
+## -O3
+      1 remark: 'ds_dither' not inlined into 'dither_frame' because too costly to inline (cost=255, threshold=250) 
+      1 remark: 'ds_dither' not inlined into 'dither_gate_crc' because too costly to inline (cost=255, threshold=250) 

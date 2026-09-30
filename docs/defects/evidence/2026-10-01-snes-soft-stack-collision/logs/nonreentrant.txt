@@ -1,0 +1,16 @@
+## O2 default: build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 docs/defects/evidence/2026-10-01-snes-soft-stack-collision/contrast/O2-default/rom.sfc.0.5.precodegen.bc -filetype=null -o /dev/null -print-after=mos-nonreentrant
+llc rc=0
+main: 
+ds_dither: norecurse "nonreentrant" 
+dither_frame: norecurse "nonreentrant" 
+upq_flush: norecurse "nonreentrant" 
+_title_reserve: norecurse "nonreentrant" 
+main indirect calls: 7
+## O3 default: build/llvm-mos-install/bin/llc -mtriple=mos -mcpu=mosw65816 -O3 docs/defects/evidence/2026-10-01-snes-soft-stack-collision/baseline/O3-default/rom.sfc.0.5.precodegen.bc -filetype=null -o /dev/null -print-after=mos-nonreentrant
+llc rc=0
+main: 
+ds_dither: (not present; inlined)
+dither_frame: norecurse "nonreentrant" 
+upq_flush: norecurse "nonreentrant" 
+_title_reserve: norecurse "nonreentrant" 
+main indirect calls: 7

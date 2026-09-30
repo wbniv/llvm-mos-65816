@@ -1,0 +1,43 @@
+2026-09-30T19:59:43Z probe core 4c6ccf724b8c65f9248795d73d525e6bfa01c4a89958f6a64b09e6b325436b3c; ROM ffdc0ff1e6a44bcb84f1f92c714f823e2b7ae37ff825d040a50510eb4f85309b; watch 0x907a
+hit 0 pc=00907a softSP=1ec7 y@SP+46=00 rowptr@SP+47=1ce9 h@SP+44=00
+hit 1 pc=00907a softSP=1ec7 y@SP+46=01 rowptr@SP+47=1d01 h@SP+44=0b
+hit 2 pc=00907a softSP=1ec7 y@SP+46=02 rowptr@SP+47=1d19 h@SP+44=16
+hit 3 pc=00907a softSP=1ec7 y@SP+46=03 rowptr@SP+47=1d31 h@SP+44=21
+hit 4 pc=00907a softSP=1ec7 y@SP+46=04 rowptr@SP+47=1d49 h@SP+44=2c
+hit 5 pc=00907a softSP=1ec7 y@SP+46=05 rowptr@SP+47=1d61 h@SP+44=37
+hit 6 pc=00907a softSP=1ec7 y@SP+46=06 rowptr@SP+47=1d79 h@SP+44=42
+hit 7 pc=00907a softSP=1ec7 y@SP+46=07 rowptr@SP+47=1d91 h@SP+44=4d
+hit 8 pc=00907a softSP=1ec7 y@SP+46=08 rowptr@SP+47=1da9 h@SP+44=58
+hit 9 pc=00907a softSP=1ec7 y@SP+46=09 rowptr@SP+47=1dc1 h@SP+44=63
+hit 10 pc=00907a softSP=1ec7 y@SP+46=0a rowptr@SP+47=1dd9 h@SP+44=6e
+hit 11 pc=00907a softSP=1ec7 y@SP+46=0b rowptr@SP+47=1df1 h@SP+44=79
+hit 12 pc=00907a softSP=1ec7 y@SP+46=0c rowptr@SP+47=1e09 h@SP+44=84
+hit 13 pc=00907a softSP=1ec7 y@SP+46=0d rowptr@SP+47=1e21 h@SP+44=8f
+hit 14 pc=00907a softSP=1ec7 y@SP+46=0e rowptr@SP+47=1e39 h@SP+44=9a
+hit 15 pc=00907a softSP=1ec7 y@SP+46=0f rowptr@SP+47=1e51 h@SP+44=a5
+hit 16 pc=00907a softSP=1ec7 y@SP+46=10 rowptr@SP+47=1e69 h@SP+44=b0
+hit 17 pc=00907a softSP=1ec7 y@SP+46=11 rowptr@SP+47=1e81 h@SP+44=bb
+hit 18 pc=00907a softSP=1ec7 y@SP+46=12 rowptr@SP+47=1e99 h@SP+44=c6
+hit 19 pc=00907a softSP=1ec7 y@SP+46=13 rowptr@SP+47=1eb1 h@SP+44=d1
+hit 20 pc=00907a softSP=1ec7 y@SP+46=14 rowptr@SP+47=1ec9 h@SP+44=dc
+hit 21 pc=00907a softSP=1ec7 y@SP+46=02 rowptr@SP+47=1e03 h@SP+44=02
+hit 22 pc=00907a softSP=1ec7 y@SP+46=03 rowptr@SP+47=1e1b h@SP+44=0d
+hit 23 pc=00907a softSP=1ec7 y@SP+46=04 rowptr@SP+47=1e33 h@SP+44=18
+hit 24 pc=00907a softSP=1ec7 y@SP+46=05 rowptr@SP+47=1e4b h@SP+44=23
+hit 25 pc=00907a softSP=1ec7 y@SP+46=06 rowptr@SP+47=1e63 h@SP+44=2e
+hit 26 pc=00907a softSP=1ec7 y@SP+46=07 rowptr@SP+47=1e7b h@SP+44=39
+hit 27 pc=00907a softSP=1ec7 y@SP+46=08 rowptr@SP+47=1e93 h@SP+44=44
+hit 28 pc=00907a softSP=1ec7 y@SP+46=09 rowptr@SP+47=1eab h@SP+44=4f
+hit 29 pc=00907a softSP=1ec7 y@SP+46=0a rowptr@SP+47=1ec3 h@SP+44=5a
+hit 30 pc=00907a softSP=1ec7 y@SP+46=0b rowptr@SP+47=1edb h@SP+44=65
+hit 31 pc=00907a softSP=1ec7 y@SP+46=03 rowptr@SP+47=1e03 h@SP+44=03
+hit 32 pc=00907a softSP=1ec7 y@SP+46=04 rowptr@SP+47=1e1b h@SP+44=0e
+hit 33 pc=00907a softSP=1ec7 y@SP+46=05 rowptr@SP+47=1e33 h@SP+44=19
+hit 34 pc=00907a softSP=1ec7 y@SP+46=06 rowptr@SP+47=1e4b h@SP+44=24
+hit 35 pc=00907a softSP=1ec7 y@SP+46=07 rowptr@SP+47=1e63 h@SP+44=2f
+hit 36 pc=00907a softSP=1ec7 y@SP+46=08 rowptr@SP+47=1e7b h@SP+44=3a
+hit 37 pc=00907a softSP=1ec7 y@SP+46=09 rowptr@SP+47=1e93 h@SP+44=45
+hit 38 pc=00907a softSP=1ec7 y@SP+46=0a rowptr@SP+47=1eab h@SP+44=50
+hit 39 pc=00907a softSP=1ec7 y@SP+46=0b rowptr@SP+47=1ec3 h@SP+44=5b
+hits=40
+latch exit=0

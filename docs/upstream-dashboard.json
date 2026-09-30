@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "reviewedAt": "2026-09-30",
-  "sourceHash": "7f09f62552c653eb3507efe23c04436ea6f4d329138074c460bde3486db38e1a",
+  "sourceHash": "58f8ff66537e690c1226b1eea97d6bedad33ba4ad83172ebff21755f1a4a6926",
   "sourceRepository": "wbniv/llvm-mos-65816",
   "items": [
     {
@@ -594,6 +594,25 @@
       ],
       "evidenceNote": "",
       "upstreamUrl": null
+    },
+    {
+      "id": "defect:snes-soft-stack-static-data-collision",
+      "kind": "defect",
+      "title": "SNES soft stack silently overlaps static data (dither -O3 never writes its gate CRC)",
+      "summary": "examples/snes/dither.c built with the SDK driver at -O3 (LTO) never writes corpus_result (0x0000 against 0x80C4) in default mosw65816 and +mos-a16, on bsnes-jg and MAME; -O2 passes. There is no miscompile: the same -O3 instruction stream passes when only the data layout changes. Cause: the SNES platform (platforms/snes/link.ld) puts the soft stack at $2000, growing down into the same low-WRAM region as .bss/.noinit, with no reservation or check. The demo's static data ends at $1FAD (82 B free). At -O3 the pre-link inliner (threshold 250; opt-bisect pass 4016, inline on main) inlines dither_gate_crc and its three unrolled ds_dither calls into main, adding six [66 x i16] locals. main makes 7 indirect calls, so MOSNonReentrant never marks it nonreentrant and its 313 B frame (353 B with +mos-a16) goes on the soft stack at [$1EC7,$2000). The frame overlaps dither_gate_crc.out[478..575] and the whole .noinit static stack. The gate's out[] stores in row 21 overwrite main's spilled row counter and row pointer, and the loop livelocks. Reproduces with upstream llc 06bc967d2668 on the same IR and with an unpatched upstream clang 742d554bf080 full build using this repo's SNES SDK. Placing main's frame on the static stack turns it into a link error (.noinit overflowed by 181 bytes). An earlier instance (rdiff, e3bb5a62, 2026-09-25) was fixed in the demo without a record or guard. Fix location: our SNES platform (a link-time soft-stack reservation and assertion) and/or the differential gate (a soft-SP low-water check); an optional upstream MOSNonReentrant enhancement; not 0002, the #320/#321 patches or generic LLVM. Not fixed; the guard policy is a user decision.",
+      "localStatus": "qualified",
+      "publicationStatus": "unposted",
+      "dependsOn": [
+        "platform:snes415"
+      ],
+      "nextStep": "Choose the guard for SNES soft-stack overflow into static data (a soft-stack low-water check in the differential gate, a link-time soft-stack reservation in the SNES linker scripts, or nonreentrant main per program), then fit or retire dither at -O3. The -O3 code is correct; no compiler change is needed.",
+      "evidenceUrls": [
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/defects/snes-soft-stack-static-data-collision.json",
+        "https://github.com/wbniv/llvm-mos-65816/blob/main/docs/investigations/2026-10-01-dither-o3-soft-stack-collision.md"
+      ],
+      "evidenceNote": "",
+      "upstreamUrl": null,
+      "demoUrls": []
     },
     {
       "id": "platform:320",

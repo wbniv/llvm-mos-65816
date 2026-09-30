@@ -1,0 +1,11 @@
+2026-09-30T19:59:01Z upstream clang-23 b48000f510c8769ea48709c09d985c32d3933e64856ace67fc8fe861b30497aa (manifest: unpatched 742d554bf08042b8df93d791c335260fadd16643) lld 8f79d9ae68ec36263c15282dd8a23fc9b3700b5339407b8523770a1a90680a75
+2026-09-30T19:59:13Z build rc=0 (the SDK libc data-layout warning is filtered: it lists address spaces p2/p3)
+2026-09-30T19:59:13Z rom.sfc sha256 df9ccc3b40fb14dfaf0aeb1a89a4c24c9689ac1d52118e7863441f721a19ed73
+main soft-stack frame: 314 B -> [0x1ec6, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  overlaps dither_gate_crc.out [0x1ce9, 0x1f29) by 99 B
+  overlaps .noinit (static stack) [0x1f29, 0x1fad) by 132 B
+2026-09-30T19:59:14Z bsnes-jg: jgxcheck rom.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f)
+SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4
+2026-09-30T19:59:40Z gate rc=1
+upstream-clang-stock exit=1

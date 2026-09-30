@@ -1,0 +1,13 @@
+2026-09-30T19:58:04Z llc /home/will/llvm-mos-65816-o3dither/build/llvm-mos-install/bin/llc sha256 cf5355d392bd37cdce2606c6bb19465db68a63e8ffa911613fabc474ffa2d5f7 -O0 on /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/ev2/O3-default-stock/rom.sfc.0.5.precodegen.bc 781e6bda6af422cfe1058ae2ff6917979f66b05f912b039322f1b9dfcf3247a4
+2026-09-30T19:58:05Z llc rc=0
+2026-09-30T19:58:05Z link rc=0
+2026-09-30T19:58:05Z rom.sfc sha256 c185a9ce6a8fa0d67615aac893b5d9138e676e27af379fe0765e3d1d17123f3c
+main soft-stack frame: 865 B -> [0x1c9f, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1f2a soft-stack headroom above __heap_start: 214 B
+  overlaps main.title [0x1c5b, 0x1ce7) by 72 B
+  overlaps corpus_result [0x1ce7, 0x1ce9) by 2 B
+  overlaps dither_gate_crc.out [0x1ce9, 0x1f29) by 576 B
+2026-09-30T19:58:05Z bsnes-jg: jgxcheck /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/ev2/llc-O3-default-bin-llc-O0/rom.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f)
+SMOKE: FAIL off=0x1CE7 len=2 got=0x0302 want=0x80C4
+2026-09-30T19:58:19Z gate rc=1
+llc-installed-O0 exit=1

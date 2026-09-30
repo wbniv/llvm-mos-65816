@@ -1,0 +1,16 @@
+2026-09-30T19:58:21Z llvm-dis /home/will/llvm-mos-65816/build/llvm-mos/bin/llvm-dis sha256 461791d2dce7308dc937d2355956cbbbe368178d7706e069d738b6b1d7d9a9dd
+2026-09-30T19:58:21Z edit: 1 line(s) changed (main gains norecurse)
+2026-09-30T19:58:23Z llc precodegen rc=0
+2026-09-30T19:58:23Z link precodegen rc=0
+main soft-stack frame: 313 B -> [0x1ec7, 0x2000)
+__bss_end=0x1f29 __heap_start=0x1fae soft-stack headroom above __heap_start: 82 B
+  overlaps dither_gate_crc.out [0x1ce9, 0x1f29) by 98 B
+  overlaps .noinit (static stack) [0x1f29, 0x1fad) by 132 B
+2026-09-30T19:58:24Z bsnes-jg: jgxcheck /tmp/claude-1000/-home-will-llvm-mos-65816/310aee67-a99e-4b78-ba48-c560322fe80d/scratchpad/ev2/norecurse/precodegen.sfc 0x1ce7 2 0x80C4 600 (jgxcheck 4c9a88d21a6098b4f0a4443aebf03a75c7f6fd5f8b7dee18a4ac5f4d76e7006f)
+SMOKE: FAIL off=0x1CE7 len=2 got=0x0000 want=0x80C4
+2026-09-30T19:58:58Z gate rc=1
+2026-09-30T19:59:00Z llc norecurse rc=0
+ld.lld: error: section '.noinit' will not fit in region 'ram': overflowed by 181 bytes
+mos-clang: error: ld.lld command failed with exit code 1 (use -v to see invocation)
+2026-09-30T19:59:00Z link norecurse rc=1
+norecurse exit=1

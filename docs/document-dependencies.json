@@ -77,7 +77,7 @@
       ],
       "receipt": {
         "sources": {
-          "docs/upstream-dashboard-curation.json": "4fb23717bb72840cbe6e3260653947d14a0de74cc333794c1db7f19655f23e32",
+          "docs/upstream-dashboard-curation.json": "efa9f2f53e85dcfc2bf28f86590eb8d1c95686b1160634057980bf61398e4701",
           "docs/defects/bitboard-inline-register-pressure.json": "eae95a06607b9d8921e1ffd6134645c5e1d3f25e22d5f5c3e601d39e13d252be",
           "docs/defects/gisel-inline-asm-register-bounds.json": "4c72539be530466c277a0374cec3a5591eba421a7f72c4b53bf9724e00895af4",
           "docs/defects/llvm-reduce-parallel-mir-crash.json": "61fd8f97f9fd1c2ed7daffede2a0d5d9f13a595244bd628659453d3998205487",
@@ -110,10 +110,11 @@
           "docs/defects/selectiondag-inline-asm-register-bounds.json": "fde070950bc0fe9e941061619ad5aca6cd31adc7c65bb28a3748f8fa46c943b0",
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "0fe97bab63ba3f6aab5ae5e59072bb32e7100439478bd1f249eef5441c813497",
           "docs/defects/shift64-narrow-count.json": "f838d2f297cd5723db603e66c195b8cf870af624c52b74203b2f0510afd834c6",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "ae4921fcbd64aa20099ab6edb891768b63359b2b67c5a4e3023f576270bf54fd",
           "dev/export-upstream-dashboard.py": "29ca79484b6c39dd4064650eb2ebde094c34e33bb80d75bae223b5e9ccc113d0"
         },
         "outputs": {
-          "docs/upstream-dashboard.json": "5fff19f9ddc54235d77d15576d9ef006884206691fb7e4849c4c80fdebdbfb42"
+          "docs/upstream-dashboard.json": "8ab971033c98bc2a228d658cb0879c90b70bb92be2a04fbd23412b107bf48c1b"
         }
       }
     },
@@ -136,11 +137,11 @@
         "sources": {
           "docs/upstream-pending-work.md": "fe7c1942314a963973fa3576ce4695d1e71292836a01de04d9ac234efb82a5f9",
           "docs/upstream-dashboard-graph-map.json": "e020b9fa85d6a0d293a15cd161deb51775de34233ad289750209136b8b94f48a",
-          "docs/upstream-dashboard.json": "5fff19f9ddc54235d77d15576d9ef006884206691fb7e4849c4c80fdebdbfb42",
+          "docs/upstream-dashboard.json": "8ab971033c98bc2a228d658cb0879c90b70bb92be2a04fbd23412b107bf48c1b",
           "dev/export-upstream-dashboard-graph.py": "1482a7972ec2fbbb596c4cafbead9075cc08d5fe569a5e2c8ebd13d2af10f70d"
         },
         "outputs": {
-          "docs/upstream-dashboard-graph.json": "c7467a6cab60512068ef0148759a2a33b255c2fb135b9ec939dd933a78c7ae0e"
+          "docs/upstream-dashboard-graph.json": "b7c95a0ec53f93dcb838cdedcaa4fc73dd4d206378d6faf8ded7f8a65c6e43f6"
         }
       }
     },
@@ -332,6 +333,7 @@
           "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/howto-defect-evidence.md": "605b61df0b221ea7ff66817b7f2278b928436891f94fbcda7cc6a2ba89d9d0f1",
@@ -357,9 +359,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T17:13:12.916686+00:00",
-        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T20:22:27.851772+00:00",
+        "note": "New confirmed record snes-soft-stack-static-data-collision (dither -O3 soft stack overlapping static data on the SNES platform; no miscompile, no compiler change). The existing [wip T4] dither -O3 TODO item is left to the orchestrator to update. The upstream trackers describe compiler patches and the #415 SNES target reconciliation; this record adds no drafted upstream artifact, and its platform guard belongs to that reconciliation, so they need no change.",
+        "attribution": "Claude Code 2.1.286 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata)"
       }
     },
     {
@@ -426,6 +428,7 @@
           "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
@@ -443,9 +446,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T17:13:13.071535+00:00",
-        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T20:30:50.171720+00:00",
+        "note": "New confirmed record snes-soft-stack-static-data-collision (dither -O3 soft stack overlapping static data on the SNES platform; no miscompile, no compiler change). The existing [wip T4] dither -O3 TODO item is left to the orchestrator to update. The upstream trackers describe compiler patches and the #415 SNES target reconciliation; this record adds no drafted upstream artifact, and its platform guard belongs to that reconciliation, so they need no change.",
+        "attribution": "Claude Code 2.1.286 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata)"
       }
     },
     {
@@ -512,6 +515,7 @@
           "docs/defects/selectiondag-inline-asm-register-bounds.json": "8f390c813bfca8baba20ef6a304283797cc4e8a4766f5fe9a4b52b643fadb1e2",
           "docs/defects/selectiondag-inline-asm-vector-parts.json": "e6ad3ef6fa68ea796f8063f6730005f0848e0e87f72562e36aa877f8ac14abce",
           "docs/defects/shift64-narrow-count.json": "4cbc1904bc838d280b255522c6538d504161cb1f86f68dbd36f685267f307928",
+          "docs/defects/snes-soft-stack-static-data-collision.json": "675a45b8fc43e4b13400e543d8a2c70f8cc9d2c3e7eece96bd1f28f51aae49fa",
           "docs/plans/2026-09-25-65816-all-opcode-roundtrip.md": "c80ba9fc00cf0e9feb27ef0cb985d0efe9dca5f70bc9b463adc1cc6bce31a88a",
           "docs/investigations/2026-09-26-trunc-imag8-i1-contract.md": "6002fc2c408fba9e7af7001528e52262a74bcf50227c8a07b39980b04301916f",
           "docs/pr-preparations/2026-09-26/README.md": "8ab7177fd0801ebbb8c676b3dd3dc8349581ff4a4e85706f39f11be73f83dd5b",
@@ -529,9 +533,9 @@
           "docs/pr-preparations/2026-09-28/far-word-index/independent-review.md": "fa2d10a18f67dbad4e5b29fe3523adc85657f672afd8b48552764df14c755189",
           "docs/pr-preparations/2026-09-28/0065/README.md": "a1800076926a18defa9b1d339513b903a8162cd998fc572e075355f3a2011cbb"
         },
-        "reviewed_at": "2026-09-30T17:13:13.079221+00:00",
-        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
-        "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
+        "reviewed_at": "2026-09-30T20:32:21.954441+00:00",
+        "note": "New confirmed record snes-soft-stack-static-data-collision (dither -O3 soft stack overlapping static data on the SNES platform; no miscompile, no compiler change). The existing [wip T4] dither -O3 TODO item is left to the orchestrator to update. The upstream trackers describe compiler patches and the #415 SNES target reconciliation; this record adds no drafted upstream artifact, and its platform guard belongs to that reconciliation, so they need no change.",
+        "attribution": "Claude Code 2.1.286 (T4 design-and-build subagent), model Claude Opus 5.5 (claude-opus-5-5), high reasoning effort (t4-opus-high agent definition; not readable from session metadata)"
       }
     },
     {
