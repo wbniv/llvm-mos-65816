@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "eaaaffbcecb244e9c1f9e5c1b773bd365bac07f29f369a1b93f48c1300f07a5d"
+          "TODO.md": "c2e41d28d33495f10b867713569c9e22be55baa12caf13440bdf637ef807a65d"
         },
-        "reviewed_at": "2026-09-30T18:26:54.549174+00:00",
-        "note": "The finished -O2 speed-gate measurement item left TODO (verdict: no per-level subtarget); the publication procedure is unchanged, and the site is republished after the push.",
+        "reviewed_at": "2026-09-30T18:51:48.882702+00:00",
+        "note": "The 0069/0070 items now record the #320 split carry (6105daaf), the running second review, the escalated #594 alignment and current 0070 numbers; the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
