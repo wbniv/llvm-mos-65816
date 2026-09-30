@@ -2616,10 +2616,10 @@
       ],
       "receipt": {
         "sources": {
-          "TODO.md": "f39b6fe9cf1c3708294442259d0910441f5459b1de53204e3f331a651818a799"
+          "TODO.md": "eaaaffbcecb244e9c1f9e5c1b773bd365bac07f29f369a1b93f48c1300f07a5d"
         },
-        "reviewed_at": "2026-09-30T17:13:13.293043+00:00",
-        "note": "mos-native-width-pressure-sets closed as fixed in the split series (downstream held per the user's option c); TODO drops the finished item and routes downstream convergence through the carry-scheduling item; the two trackers do not describe this defect, and the publication procedure is unchanged.",
+        "reviewed_at": "2026-09-30T18:26:54.549174+00:00",
+        "note": "The finished -O2 speed-gate measurement item left TODO (verdict: no per-level subtarget); the publication procedure is unchanged, and the site is republished after the push.",
         "attribution": "Claude Code 2.1.285 orchestrator, model Claude Opus 5.5 (claude-opus-5-5), reasoning effort not recorded in session metadata"
       }
     }
